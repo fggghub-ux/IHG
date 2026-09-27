@@ -21,5 +21,3 @@
 | 数据备份 / 数据管理 | `js/settings.js`、`js/export_file.js`、`js/storage/`、`storage.js` |
 | 消息通知 / 输入兼容 | `js/system_notifications.js`、`notification-sw.js`、`js/mobile_input_compat.js` |
 | 原生与 Web 兼容桥 | `js/vendor/native_bridge.js`，保留入口加载关系 |
-
-新增 App 继续使用与旧仓库一致的 `js/<app>.js`、`css/<app>.css` 风格。没有为了制造新目录而把最新版模块强行拆散或合回旧版 Loves。
