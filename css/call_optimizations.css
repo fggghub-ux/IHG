@@ -1,0 +1,115 @@
+/* History button positioning */
+.call-thread-history {
+    position: absolute;
+    top: calc(var(--safe-top) + 13px);
+    right: 18px;
+    pointer-events: auto;
+}
+
+/* Plus menu styles */
+.call-plus-menu {
+    position: absolute;
+    bottom: calc(var(--safe-bottom) + 80px);
+    left: 18px;
+    z-index: 20;
+    min-width: 180px;
+    padding: 8px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 12px 38px rgba(20, 20, 22, 0.18);
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+    transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.22, 0.78, 0.28, 1);
+    pointer-events: none;
+}
+
+.call-plus-menu:not([hidden]) {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.call-menu-item {
+    width: 100%;
+    padding: 12px 14px;
+    border: 0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+    color: #111;
+    text-align: left;
+    font-size: 15px;
+    font-weight: 580;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.call-menu-item:hover {
+    background: #f5f5f7;
+}
+
+.call-menu-item:active {
+    background: #ebebed;
+    transform: scale(0.98);
+}
+
+.call-menu-item i {
+    font-size: 18px;
+    color: #666;
+    width: 20px;
+    text-align: center;
+}
+
+.call-menu-item span {
+    flex: 1;
+    white-space: nowrap;
+}
+
+/* iOS-style message bubbles - 完全圆角，只有最后一条有小尾巴 */
+.call-message-bubble {
+    border-radius: 20px !important;
+}
+
+/* 移除中间消息的小圆角样式 */
+.call-message-row.has-prev .call-message-bubble,
+.call-message-row.has-next .call-message-bubble {
+    border-radius: 20px !important;
+}
+
+/* 只有最后一条消息（没有 has-next）才有小尾巴 */
+.call-message-row.anonymous:not(.has-next) .call-message-bubble {
+    border-bottom-right-radius: 4px !important;
+}
+
+.call-message-row.char:not(.has-next) .call-message-bubble {
+    border-bottom-left-radius: 4px !important;
+}
+
+/* 确保第一条消息（没有 has-prev）是完全圆角 */
+.call-message-row:not(.has-prev) .call-message-bubble {
+    border-radius: 20px !important;
+}
+
+/* 历史会话显示模式 */
+.call-thread-page.show-history .call-thread-messages {
+    opacity: 0.6;
+}
+
+.call-thread-page.show-history .call-thread-composer {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* 历史消息分隔线 */
+.call-history-divider {
+    margin: 22px 0;
+    padding: 10px 0;
+    border-top: 1px solid #e5e5ea;
+    border-bottom: 1px solid #e5e5ea;
+    text-align: center;
+    color: #8e8e93;
+    font-size: 13px;
+    font-weight: 650;
+}

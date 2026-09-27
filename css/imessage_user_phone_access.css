@@ -1,0 +1,94 @@
+#lovers-user-phone-access-sheet {
+    --loves-bg: #fbfbfc;
+    --loves-surface: #fff;
+    --loves-ink: #101012;
+    --loves-muted: #85858b;
+    --loves-line: rgba(24, 24, 27, .09);
+    --loves-accent: #111113;
+    --loves-accent-soft: #f8edf0;
+    --loves-pink-ink: #8f5f67;
+}
+
+#chat-reverse-phone-btn[hidden] { display: none !important; }
+#lovers-user-phone-access-sheet button { border: 0; color: inherit; font: inherit; }
+#lovers-user-phone-access-sheet button:focus-visible,
+#lovers-user-phone-access-sheet input:focus-visible,
+#lovers-user-phone-access-sheet select:focus-visible { outline: 2px solid #111113; outline-offset: 3px; }
+
+/* User phone access */
+#lovers-user-phone-access-sheet {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1060;
+    justify-content: stretch;
+    background: var(--loves-bg, #f2f2f7);
+}
+.lovers-user-phone-access-panel {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0;
+    color: var(--loves-ink);
+    background: var(--loves-bg, #f2f2f7);
+}
+.lovers-user-phone-header {
+    min-height: calc(58px + env(safe-area-inset-top));
+    padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) 64px;
+    gap: 8px;
+    align-items: center;
+    border-bottom: 1px solid var(--loves-line);
+}
+.lovers-user-phone-header > div { min-width: 0; text-align: center; }
+.lovers-user-phone-header strong { display: block; font-size: 16px; font-weight: 800; }
+.lovers-user-phone-header small { display: block; margin-top: 2px; color: var(--loves-muted); font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lovers-user-phone-cancel,
+.lovers-user-phone-save { min-height: 40px; padding: 0 10px; border-radius: 12px; font-size: 13px; font-weight: 750; cursor: pointer; }
+#lovers-user-phone-access-sheet .lovers-user-phone-cancel { background: transparent; color: var(--loves-muted); }
+#lovers-user-phone-access-sheet .lovers-user-phone-save { background: var(--loves-accent); color: #fff; }
+.lovers-user-phone-scroll { min-height: 0; flex: 1; padding: 14px 14px calc(20px + env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain; }
+.lovers-user-phone-card { margin-bottom: 12px; padding: 14px; border-radius: 20px; background: var(--loves-surface); box-shadow: inset 0 0 0 1px var(--loves-line); transition: opacity .2s ease; }
+.lovers-user-phone-card.is-disabled > :not(.lovers-user-phone-section-title) { opacity: .55; }
+.lovers-user-phone-switch-row { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.lovers-user-phone-switch-row > span:first-child { min-width: 0; flex: 1; }
+.lovers-user-phone-switch-row strong,
+.lovers-user-phone-section-title strong { display: block; font-size: 14px; font-weight: 800; }
+.lovers-user-phone-switch-row small,
+.lovers-user-phone-section-title small { display: block; margin-top: 4px; color: var(--loves-muted); font-size: 11px; line-height: 1.45; }
+.lovers-user-phone-switch-row > input { position: absolute; opacity: 0; pointer-events: none; }
+.lovers-user-phone-switch { width: 46px; height: 28px; padding: 3px; border-radius: 999px; flex: 0 0 auto; background: #c8c8cd; transition: background .2s ease; }
+.lovers-user-phone-switch::after { content: ''; display: block; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.2); transition: transform .2s ease; }
+.lovers-user-phone-switch-row > input:checked + .lovers-user-phone-switch { background: var(--loves-accent); }
+.lovers-user-phone-switch-row > input:checked + .lovers-user-phone-switch::after { transform: translateX(18px); }
+.lovers-user-phone-quota { margin: 12px 0 0; padding: 10px 11px; border-radius: 13px; color: #8a5a00; background: #fff5d8; font-size: 11px; line-height: 1.5; }
+.lovers-user-phone-quota i { margin-right: 5px; }
+.lovers-user-phone-auto-fields { margin-top: 14px; display: grid; gap: 12px; transition: opacity .2s ease; }
+.lovers-user-phone-auto-fields.is-disabled { opacity: .55; }
+.lovers-user-phone-field > span { display: block; margin-bottom: 8px; color: var(--loves-muted); font-size: 11px; font-weight: 750; }
+.lovers-user-phone-field select { width: 100%; height: 43px; padding: 0 36px 0 12px; border: 1px solid var(--loves-line); border-radius: 13px; outline: none; color: var(--loves-ink); background: var(--loves-bg); font: inherit; }
+.lovers-user-phone-invalid { margin: 9px 0 0; color: #d63d31; font-size: 11px; line-height: 1.45; }
+.lovers-user-phone-section-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.lovers-user-phone-section-title > span { flex: 0 0 auto; padding: 4px 8px; border-radius: 99px; color: var(--loves-pink-ink); background: var(--loves-accent-soft); font-size: 10px; font-weight: 800; }
+.lovers-user-phone-toolbar { margin-top: 12px; display: flex; gap: 7px; }
+.lovers-user-phone-toolbar label { min-width: 0; flex: 1; height: 38px; padding: 0 10px; display: flex; align-items: center; gap: 7px; border-radius: 12px; background: var(--loves-bg); color: var(--loves-muted); }
+.lovers-user-phone-toolbar input { min-width: 0; width: 100%; border: 0; outline: 0; color: var(--loves-ink); background: transparent; font: inherit; }
+#lovers-user-phone-access-sheet .lovers-user-phone-toolbar button { flex: 0 0 auto; min-width: 46px; padding: 0 9px; border-radius: 11px; color: var(--loves-pink-ink); background: var(--loves-accent-soft); font-size: 11px; font-weight: 750; cursor: pointer; }
+.lovers-user-phone-char-list { margin-top: 10px; display: grid; gap: 7px; }
+.lovers-user-phone-char-row { min-width: 0; min-height: 58px; padding: 8px 10px; display: flex; align-items: center; gap: 10px; border-radius: 15px; background: var(--loves-bg); cursor: pointer; }
+.lovers-user-phone-char-row > input { position: absolute; opacity: 0; pointer-events: none; }
+.lovers-user-phone-avatar { width: 40px; height: 40px; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 13px; color: var(--loves-pink-ink); background: var(--loves-accent-soft); }
+.lovers-user-phone-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.lovers-user-phone-char-copy { min-width: 0; flex: 1; }
+.lovers-user-phone-char-copy strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.lovers-user-phone-char-copy small { display: block; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--loves-muted); font-size: 10px; }
+.lovers-user-phone-check { width: 24px; height: 24px; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; border: 1.5px solid #c8c8cd; border-radius: 8px; color: transparent; font-size: 11px; }
+.lovers-user-phone-char-row > input:checked ~ .lovers-user-phone-check { border-color: var(--loves-accent); color: #fff; background: var(--loves-accent); }
+.lovers-user-phone-empty { padding: 16px 4px; color: var(--loves-muted); text-align: center; font-size: 11px; }
