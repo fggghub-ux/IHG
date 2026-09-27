@@ -1,7 +1,5 @@
 # 新版功能定位
 
-依据 APK 实际文件和入口引用整理；用户提供的更新日志只作辅助，不代表完整功能清单。表格说明代码位置，不宣称每项功能均已进行真实账号的端到端测试。
-
 | 模块 / 更新方向 | 最新代码位置 |
 | --- | --- |
 | App Store / 自定义 App | `js/appstore.js`、`js/custom_app_runtime.js`、`js/custom_app_template_source.js`、`css/appstore.css`、`templates/u2-custom-app-template.html` |
