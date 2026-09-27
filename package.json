@@ -1,0 +1,11 @@
+{
+  "name": "phone-recovered-frontend",
+  "version": "0.0.0-recovered",
+  "private": true,
+  "description": "Readable frontend reconstructed from the supplied u2phone 1.0.5 APK; original paths retained.",
+  "scripts": {
+    "start": "node tools/dev-server.mjs",
+    "check": "node tools/check-source.mjs"
+  },
+  "engines": {"node": ">=18"}
+}
