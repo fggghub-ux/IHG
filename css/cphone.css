@@ -1,0 +1,428 @@
+.app-view.cphone-view {
+    position: absolute;
+    inset: 0;
+    z-index: 120;
+    display: none;
+    flex-direction: column;
+    background: #fbfbfc;
+    color: #101012;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
+}
+.app-view.cphone-view.active { display: flex; }
+.cphone-view[hidden], .cphone-switcher[hidden], .cphone-sms-page[hidden], .cphone-contact-sheet[hidden], .cphone-create-group-sheet[hidden], .cphone-thread-action[hidden], .cphone-create-group-error[hidden] { display: none !important; }
+.cphone-home-icon { background: #fff; color: #1c1c1e; border: 1px solid #e5e5ea; display: flex; align-items: center; justify-content: center; font-size: 27px; }
+.cphone-circle-button, .cphone-home-back {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(25,25,28,.1);
+    border-radius: 50%;
+    background: #fff;
+    color: #101012;
+    box-shadow: 0 8px 24px rgba(15,15,18,.07);
+    cursor: pointer;
+}
+.cphone-circle-button:focus-visible, .cphone-home-back:focus-visible, .cphone-owner-widget:focus-visible, .cphone-switch-row:focus-visible, .cphone-sms-row:focus-visible, .cphone-sms-wordmark:focus-visible, .cphone-create-group-card button:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
+#cphone-back-btn { position: absolute; top: calc(var(--safe-top) + 12px); left: 18px; z-index: 2; }
+.cphone-empty-home { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px; text-align: center; }
+.cphone-empty-home > i { font-size: 40px; color: #b6b6bd; }
+.cphone-empty-home h1 { margin: 20px 0 8px; font-size: 28px; letter-spacing: -.04em; }
+.cphone-empty-home p { margin: 0; color: #85858b; font-size: 14px; line-height: 1.5; }
+
+#lovers-friend-phone-view.lovers-friend-phone-view { overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif; }
+#lovers-friend-phone-view.lovers-friend-phone-view.has-custom-wallpaper {
+    background-image: var(--cphone-wallpaper-image) !important;
+    background-position: center !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+}
+#lovers-friend-phone-view.lovers-friend-phone-view.has-custom-wallpaper .cphone-home-grid > div > div:last-child {
+    color: #fff !important;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, .75) !important;
+}
+#lovers-friend-phone-view .cphone-home-back { position: absolute; z-index: 10; top: calc(var(--safe-top) + 12px); left: 18px; }
+.cphone-owner-widget {
+    position: absolute;
+    z-index: 5;
+    top: calc(var(--safe-top) + 65px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 174px;
+    max-width: calc(100% - 90px);
+    min-height: 72px;
+    padding: 10px 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #ececf0;
+    border-radius: 23px;
+    background: #fff;
+    color: #101012;
+    box-shadow: 0 8px 24px rgba(15,15,18,.07);
+    cursor: pointer;
+}
+.cphone-owner-widget .cphone-avatar { width: 48px; height: 48px; }
+.cphone-owner-copy { min-width: 0; display: flex; flex-direction: column; text-align: left; }
+.cphone-owner-copy small { color: #8b8b91; font-size: 9px; font-weight: 750; letter-spacing: .12em; white-space: nowrap; }
+.cphone-owner-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; }
+.cphone-owner-widget > i { color: #919198; font-size: 11px; }
+.cphone-avatar { width: 48px; height: 48px; flex: none; display: grid; place-items: center; overflow: hidden; border-radius: 50%; background: #e9e9ed; color: #6f6f78; font-size: 19px; font-weight: 700; }
+.cphone-avatar.is-group { border-radius: 17px; background: #e9e6ef; }
+.cphone-avatar img { width: 100%; height: 100%; object-fit: cover; }
+#lovers-friend-phone-view .cphone-home-grid {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 0;
+    flex: 1;
+    margin-top: calc(var(--safe-top) + 168px);
+    padding: 0 22px 22px !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-auto-rows: max-content;
+    align-content: start;
+    justify-items: center;
+    gap: 24px 10px !important;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+#lovers-friend-phone-view .cphone-home-grid > div { width: 100%; min-width: 0; }
+#lovers-friend-phone-view .cphone-home-grid > div > div:first-child,
+#lovers-friend-phone-view .cphone-home-dock > div {
+    width: min(60px, 100%) !important;
+    aspect-ratio: 1;
+    height: auto !important;
+    border-radius: 17px !important;
+    box-shadow: 0 8px 20px rgba(15,15,18,.07) !important;
+}
+#lovers-friend-phone-view.lovers-friend-phone-view .cphone-home-grid > div > div:last-child {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #171719 !important;
+    text-shadow: none !important;
+    font-size: 11px !important;
+    font-weight: 650 !important;
+}
+#lovers-friend-phone-view .cphone-home-dock {
+    box-sizing: border-box;
+    width: min(300px, calc(100% - 36px));
+    justify-content: space-around;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+    margin-bottom: calc(var(--safe-bottom) + 15px) !important;
+    border: 1px solid #e7e7eb;
+    border-radius: 28px !important;
+    background: rgba(255,255,255,.96) !important;
+    box-shadow: 0 10px 28px rgba(17,17,20,.12);
+}
+.cphone-switcher { position: absolute; inset: 0; z-index: 300; display: flex; align-items: flex-end; justify-content: center; background: rgba(0,0,0,.32); }
+.cphone-switch-card { box-sizing: border-box; width: 100%; max-width: 540px; max-height: min(70%, 560px); overflow: auto; padding: 18px 18px calc(var(--safe-bottom) + 22px); border-radius: 28px 28px 0 0; background: #fbfbfc; box-shadow: 0 -12px 35px rgba(0,0,0,.12); }
+.cphone-switch-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 19px; }
+.cphone-switch-heading button, .cphone-contact-close { width: 34px; height: 34px; border: 0; border-radius: 50%; background: #ececf0; color: #555; cursor: pointer; }
+.cphone-switch-list { display: flex; flex-direction: column; gap: 8px; }
+.cphone-switch-row { width: 100%; min-height: 68px; display: flex; align-items: center; gap: 12px; padding: 9px 12px; border: 1px solid #e9e9ee; border-radius: 18px; background: #fff; color: #111; text-align: left; cursor: pointer; }
+.cphone-switch-row strong { flex: 1; font-size: 15px; }
+.cphone-switch-row > i { color: #92929a; font-size: 13px; }
+
+#friend-imessage-view.cphone-sms-view { position: absolute; inset: 0; z-index: 200; display: none; flex-direction: column; overflow: hidden; padding: 0; background: #fbfbfc; color: #101012; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif; }
+#friend-imessage-view.cphone-sms-view.active { display: flex; }
+.cphone-sms-page { position: absolute; inset: 0; display: flex; flex-direction: column; min-height: 0; }
+.cphone-sms-topbar { position: absolute; z-index: 2; top: 0; left: 0; right: 0; box-sizing: border-box; height: calc(var(--safe-top) + 54px); padding: var(--safe-top) 18px 0; display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
+.cphone-sms-topbar > * { pointer-events: auto; }
+.cphone-sms-wordmark { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid rgba(25,25,28,.1); border-radius: 50%; background: #fff; color: #171719; box-shadow: 0 8px 24px rgba(15,15,18,.07); cursor: pointer; }
+.cphone-sms-scroll { min-height: 0; flex: 1; box-sizing: border-box; overflow-y: auto; padding: calc(var(--safe-top) + 74px) 18px calc(var(--safe-bottom) + 110px); -webkit-overflow-scrolling: touch; }
+.cphone-sms-heading { position: relative; margin-bottom: 20px; }
+.cphone-eyebrow { display: block; color: #98989e; font-size: 10px; font-weight: 750; letter-spacing: .12em; }
+.cphone-sms-heading h1 { margin: 5px 0 0; font-size: clamp(35px, 10vw, 43px); line-height: 1.02; letter-spacing: -.045em; }
+.cphone-sms-count { position: absolute; right: 0; bottom: 3px; color: #85858b; font-size: 12px; }
+.cphone-sms-search { height: 45px; display: flex; align-items: center; gap: 10px; padding: 0 15px; border: 1px solid #e6e6ea; border-radius: 15px; background: #f0f0f3; color: #93939a; }
+.cphone-sms-search input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: #111; font: inherit; font-size: 16px; }
+.cphone-sms-list { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+.cphone-sms-row { width: 100%; min-height: 76px; display: flex; align-items: center; gap: 13px; padding: 11px 12px; border: 1px solid #ececf0; border-radius: 19px; background: #fff; color: #111; text-align: left; cursor: pointer; }
+.cphone-sms-row:active { transform: scale(.985); }
+.cphone-sms-row-body { display: flex; flex: 1; flex-direction: column; gap: 5px; min-width: 0; }
+.cphone-sms-row-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.cphone-sms-row-top strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; }
+.cphone-sms-row-top small { flex: none; color: #92929a; font-size: 11px; }
+.cphone-sms-preview { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #85858b; font-size: 13px; }
+.cphone-sms-empty { min-height: 180px; display: grid; place-items: center; padding: 24px; border: 1px solid #ececf0; border-radius: 22px; background: #fff; color: #92929a; text-align: center; font-size: 14px; }
+.cphone-sms-tabs { position: absolute; z-index: 2; left: 50%; bottom: calc(var(--safe-bottom) + 16px); transform: translateX(-50%); display: flex; gap: 4px; padding: 5px; border: 1px solid #e7e7eb; border-radius: 999px; background: rgba(255,255,255,.96); box-shadow: 0 10px 28px rgba(17,17,20,.12); }
+.cphone-sms-tabs button { min-width: 100px; height: 45px; display: flex; align-items: center; justify-content: center; gap: 7px; border: 0; border-radius: 999px; background: transparent; color: #85858b; font-size: 13px; font-weight: 650; cursor: pointer; }
+.cphone-sms-tabs button.active { background: #171719; color: #fff; }
+.cphone-thread-page { background: #fff; }
+.cphone-thread-header { height: calc(var(--safe-top) + 70px); box-sizing: border-box; padding: var(--safe-top) 16px 0; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #e9e9ed; background: #fff; }
+.cphone-thread-header .cphone-avatar { width: 40px; height: 40px; }
+.cphone-thread-heading { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cphone-thread-actions { flex: none; display: flex; align-items: center; gap: 8px; }
+.cphone-thread-action { flex: none; width: 38px; height: 38px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; cursor: pointer; }
+.cphone-progress-open { background: #171719; color: #fff; font-size: 15px; }
+.cphone-clear-chat { background: #f1f1f3; color: #b42332; font-size: 15px; }
+.cphone-thread-action:disabled { opacity: .4; cursor: default; }
+.cphone-thread-action:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
+.cphone-thread-heading strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; }
+.cphone-thread-heading small { color: #909099; font-size: 11px; }
+.cphone-sms-messages { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 0; overflow-y: auto; padding: 14px 18px calc(var(--safe-bottom) + 18px); background: #fff; -webkit-overflow-scrolling: touch; }
+#cphone-sms-messages .group-private-chat-detail-bubble.has-translation:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+.cphone-contact-sheet { position: absolute; inset: 0; z-index: 8; display: flex; align-items: flex-end; background: rgba(0,0,0,.28); }
+.cphone-contact-card { position: relative; box-sizing: border-box; width: 100%; max-height: calc(100% - var(--safe-top) - 20px); overflow-y: auto; padding: 30px 24px calc(var(--safe-bottom) + 22px); display: flex; flex-direction: column; align-items: center; border-radius: 28px 28px 0 0; background: #fff; text-align: center; }
+.cphone-contact-card > .cphone-avatar { width: 74px; height: 74px; font-size: 28px; }
+.cphone-contact-card h2 { margin: 14px 0 4px; font-size: 23px; }
+.cphone-contact-card p { margin: 4px 0; color: #85858b; font-size: 13px; line-height: 1.45; }
+.cphone-contact-close { position: absolute; top: 16px; right: 16px; }
+.cphone-contact-send { width: 100%; min-height: 45px; margin-top: 22px; border: 0; border-radius: 15px; background: #171719; color: #fff; font-size: 14px; font-weight: 650; cursor: pointer; }
+.cphone-create-group-sheet { position: absolute; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: calc(var(--safe-top) + 20px) 18px calc(var(--safe-bottom) + 20px); background: rgba(0,0,0,.35); }
+.cphone-create-group-card { position: relative; box-sizing: border-box; width: min(100%, 430px); max-height: 100%; overflow-y: auto; padding: 27px 22px 22px; border-radius: 28px; background: #fff; box-shadow: 0 20px 65px rgba(0,0,0,.2); }
+.cphone-create-group-card h2 { margin: 7px 0 23px; font-size: 28px; letter-spacing: -.04em; }
+.cphone-create-group-card label { display: block; margin-top: 15px; color: #45454b; font-size: 13px; font-weight: 650; }
+.cphone-create-group-card label small { color: #92929a; font-weight: 500; }
+.cphone-create-group-card input, .cphone-create-group-card textarea { display: block; box-sizing: border-box; width: 100%; margin-top: 7px; padding: 11px 13px; border: 1px solid #e5e5e9; border-radius: 14px; outline: 0; background: #f7f7f9; color: #171719; font: inherit; font-size: 16px; }
+.cphone-create-group-card textarea { resize: vertical; min-height: 96px; line-height: 1.5; }
+.cphone-create-group-card input:focus, .cphone-create-group-card textarea:focus { border-color: #8e8e96; }
+.cphone-create-group-card > button[type="submit"] { width: 100%; min-height: 48px; margin-top: 20px; border: 0; border-radius: 999px; background: #171719; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; }
+.cphone-create-group-card > button[type="submit"]:disabled { opacity: .55; cursor: wait; }
+.cphone-create-group-error { margin: 12px 0 0; color: #b42332; font-size: 12px; line-height: 1.5; }
+#friend-imessage-view.cphone-sms-view.u2-android-keyboard-open .cphone-sms-tabs { display: none; }
+#friend-imessage-view.cphone-sms-view.u2-android-keyboard-open .cphone-create-group-sheet { padding-bottom: 20px; }
+
+/* Other Char phone apps share the Messages surface, controls, and list rhythm. */
+#lovers-friend-phone-view.lovers-friend-phone-view,
+:is(#friend-files-view, #friend-health-view, #friend-pay-view, #friend-game-view, #friend-weibo-view, #friend-safari-view, #friend-music-view, #friend-phonecall-view, #friend-phone-settings-sheet) {
+    background: #fbfbfc !important;
+    color: #101012;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
+}
+:is(#friend-files-view, #friend-health-view, #friend-pay-view, #friend-game-view, #friend-weibo-view, #friend-safari-view, #friend-music-view, #friend-phonecall-view) > div:first-child {
+    background: #fbfbfc !important;
+    border-bottom: 0 !important;
+}
+:is(#friend-health-view, #friend-pay-view, #friend-game-view, #friend-music-view, #friend-phonecall-view) > div:first-child {
+    height: calc(var(--safe-top) + 118px) !important;
+}
+:is(#friend-health-view, #friend-pay-view, #friend-game-view, #friend-music-view, #friend-phonecall-view) > div:first-child > div {
+    height: 118px !important;
+    align-items: flex-end !important;
+    padding: 0 18px 14px !important;
+}
+:is(#friend-health-view, #friend-pay-view, #friend-game-view, #friend-music-view, #friend-phonecall-view) > div:first-child > div > div:last-child {
+    color: #101012 !important;
+    font-size: clamp(35px, 10vw, 43px) !important;
+    line-height: 1.02;
+    font-weight: 750 !important;
+    letter-spacing: -.045em;
+}
+:is(#friend-files-back-btn, #friend-health-back-btn, #friend-pay-back-btn, #friend-game-back-btn, #friend-weibo-back-btn, #friend-safari-back-btn, #friend-music-back-btn, #friend-phonecall-back-btn) {
+    position: absolute !important;
+    top: 8px;
+    left: 18px !important;
+    width: 38px !important;
+    height: 38px !important;
+    display: grid !important;
+    place-items: center !important;
+    padding: 0 !important;
+    border: 1px solid rgba(25,25,28,.1);
+    border-radius: 50%;
+    background: #fff !important;
+    color: #101012 !important;
+    box-shadow: 0 8px 24px rgba(15,15,18,.07);
+    font-size: 15px !important;
+    cursor: pointer;
+    flex: none;
+    z-index: 2;
+}
+:is(#friend-files-back-btn, #friend-health-back-btn, #friend-pay-back-btn, #friend-game-back-btn, #friend-weibo-back-btn, #friend-safari-back-btn, #friend-music-back-btn, #friend-phonecall-back-btn, #friend-settings-back-btn):focus-visible {
+    outline: 2px solid #171719;
+    outline-offset: 3px;
+}
+#friend-weibo-back-btn { position: relative !important; top: auto; left: auto !important; }
+:is(#friend-files-content, #friend-health-content, #friend-pay-content, #friend-game-content, #friend-music-content, #friend-phonecall-view > div:last-child) {
+    min-height: 0;
+    background: #fbfbfc !important;
+    -webkit-overflow-scrolling: touch;
+}
+#friend-files-content { padding: 18px !important; }
+#friend-files-content > div:first-child { font-size: clamp(35px, 10vw, 43px) !important; letter-spacing: -.045em; }
+#friend-files-content > div[style*="background: #fff"] {
+    border: 1px solid #ececf0;
+    border-radius: 19px !important;
+    overflow: hidden;
+}
+#friend-files-content > div[style*="background: #e5e5ea"] {
+    box-sizing: border-box;
+    height: 45px !important;
+    border: 1px solid #e6e6ea;
+    border-radius: 15px !important;
+    background: #f0f0f3 !important;
+}
+#friend-files-tags-list > div,
+#friend-files-tags-list .file-item-clickable {
+    border-color: #ececf0 !important;
+    border-radius: 19px !important;
+}
+#friend-health-content > div[style*="background: #fff"] {
+    border: 1px solid #ececf0 !important;
+    border-radius: 19px !important;
+}
+#friend-health-content > div[style*="background: #fff"] i { color: #171719 !important; }
+#friend-pay-content > div:last-child > div:last-child,
+#pay-tx-container > div:last-child {
+    border: 1px solid #ececf0;
+    border-radius: 19px !important;
+    background: #fff;
+}
+#friend-game-content { padding: 18px !important; }
+#friend-game-content > div:first-child > div:first-child,
+.game-history-item-new > div:first-child {
+    border: 0 !important;
+    background: #f0f0f3 !important;
+    color: #171719 !important;
+}
+#friend-game-content > div:first-child [style*="color: #fff"],
+#friend-game-content > div:nth-child(2),
+.game-history-item-new [style*="color: #fff"] {
+    color: #171719 !important;
+}
+.game-history-item-new {
+    border: 1px solid #ececf0 !important;
+    border-radius: 19px !important;
+    background: #fff !important;
+    color: #171719 !important;
+}
+.game-history-item-new [style*="background: #3a3a3c"] { background: #f0f0f3 !important; }
+#friend-game-content > div:nth-child(3) > div {
+    border: 1px solid #ececf0;
+    border-radius: 19px !important;
+    background: #fff !important;
+}
+#friend-game-content > div:nth-child(3) > div [style*="color: #fff"] { color: #171719 !important; }
+#friend-game-view .friend-phone-generated-time.is-dark,
+#friend-game-view .friend-phone-translate-toggle { color: #85858b; }
+#friend-game-view .friend-phone-translation { background: #f0f0f3; color: #4b4b50; }
+#friend-music-content > div {
+    box-sizing: border-box;
+    margin: 0 18px 12px;
+    padding: 18px !important;
+    border: 1px solid #ececf0;
+    border-radius: 19px;
+    background: #fff !important;
+}
+.music-history-item { min-height: 70px; border-color: #ececf0 !important; }
+.music-history-item > div:nth-child(2) { border-radius: 15px !important; }
+#friend-phonecall-view > div:last-child { padding: 0 18px 24px; }
+#friend-phonecall-view > div:last-child > div:first-child { justify-content: flex-start !important; margin: 0 0 16px !important; }
+#friend-phonecall-view > div:last-child > div:first-child > div {
+    width: 100%;
+    max-width: 320px;
+    padding: 5px !important;
+    border: 1px solid #e7e7eb;
+    border-radius: 999px !important;
+    background: #fff !important;
+}
+#friend-call-tab-recent, #friend-call-tab-contacts {
+    flex: 1;
+    padding: 12px 10px !important;
+    border-radius: 999px !important;
+    text-align: center;
+    color: #85858b !important;
+    box-shadow: none !important;
+}
+#friend-call-tab-recent.active, #friend-call-tab-contacts.active { background: #171719 !important; color: #fff !important; }
+#friend-call-list, #friend-contact-list { padding: 0 !important; }
+.call-history-item-new, .contact-item-new,
+#friend-call-list > div:not(.call-history-item-new) {
+    min-height: 72px;
+    margin-bottom: 8px;
+    padding: 11px 13px !important;
+    border: 1px solid #ececf0 !important;
+    border-radius: 19px;
+    background: #fff;
+}
+:is(#friend-call-list, #friend-contact-list) .fa-info-circle { color: #85858b !important; }
+#friend-weibo-view > div:nth-child(2), #friend-weibo-pages, .friend-weibo-page {
+    background: #fbfbfc !important;
+}
+#friend-weibo-view > div:first-child > div > div:nth-child(2),
+#friend-safari-search-bar {
+    border: 1px solid #e6e6ea;
+    border-radius: 15px !important;
+    background: #f0f0f3 !important;
+}
+#friend-weibo-view > div:first-child > div > div:last-child,
+#friend-weibo-switch-account-btn { color: #171719 !important; border-color: #e7e7eb !important; }
+#friend-weibo-tabs { background: #fbfbfc !important; border-color: #e7e7eb !important; }
+.friend-weibo-tab-line { background: #171719 !important; }
+.friend-weibo-post-card {
+    margin: 0 12px;
+    border: 1px solid #ececf0;
+    border-radius: 19px;
+    background: #fff !important;
+}
+#friend-weibo-view .friend-weibo-page > div { gap: 8px; }
+#friend-safari-normal-mode { background: #fbfbfc !important; border-radius: 0 !important; }
+#friend-safari-view.is-private,
+#friend-safari-view.is-private #friend-safari-topbar { background: #171719 !important; }
+#friend-safari-view.is-private #friend-safari-back-btn { border-color: #3a3a3f; background: #2c2c30 !important; color: #fff !important; }
+#friend-safari-view.is-private #friend-safari-search-bar { border-color: #3a3a3f; background: #2c2c30 !important; }
+#friend-safari-history-list .safari-history-item-new {
+    padding: 15px !important;
+    border: 1px solid #ececf0 !important;
+    border-radius: 19px;
+    background: #fff;
+}
+#friend-safari-dock { border-color: #e7e7eb !important; box-shadow: 0 -4px 20px rgba(17,17,20,.04); }
+#friend-phone-settings-sheet {
+    --friend-settings-bg: #fbfbfc;
+    --friend-settings-surface: #fff;
+    --friend-settings-ink: #101012;
+    --friend-settings-muted: #85858b;
+    --friend-settings-line: #ececf0;
+}
+#friend-phone-settings-sheet .friend-settings-nav { background: #fbfbfc; border: 0; }
+#friend-phone-settings-sheet .friend-settings-back {
+    left: 18px;
+    width: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    padding: 0;
+    justify-content: center;
+    gap: 0;
+    border: 1px solid rgba(25,25,28,.1);
+    border-radius: 50%;
+    background: #fff;
+    color: #101012;
+    box-shadow: 0 8px 24px rgba(15,15,18,.07);
+}
+#friend-phone-settings-sheet .friend-settings-back span { display: none; }
+#friend-phone-settings-sheet .friend-settings-title h2 { font-size: clamp(35px, 10vw, 43px); letter-spacing: -.045em; }
+#friend-phone-settings-sheet .friend-gen-section { margin-top: 4px; }
+#friend-phone-settings-sheet :is(.friend-real-time-option, .friend-gen-limits) { border-color: #ececf0; border-radius: 19px; background: #fff; }
+#friend-phone-settings-sheet .friend-gen-limit-row { border-color: #ececf0; }
+#friend-phone-settings-sheet .friend-gen-heading h3,
+#friend-phone-settings-sheet .friend-gen-limit-name,
+#friend-phone-settings-sheet .friend-real-time-option strong { color: #171719; }
+#friend-phone-settings-sheet .friend-real-time-option > span > i { color: #85858b; }
+#friend-phone-settings-sheet .friend-real-time-option > input { accent-color: #171719; }
+#friend-phone-settings-sheet .friend-gen-check input:checked + span { border-color: #171719; background: #171719; }
+#friend-phone-settings-sheet .friend-gen-limit-name .settings-icon,
+#friend-phone-settings-sheet .friend-gen-limit-name .settings-icon.is-light {
+    border: 1px solid #e6e6ea;
+    background: #f0f0f3 !important;
+    color: #171719 !important;
+}
+#friend-phone-settings-sheet .friend-gen-limit-inputs label { border-color: #e6e6ea; background: #f0f0f3; }
+#friend-phone-settings-sheet .friend-gen-submit { border-radius: 999px; background: #171719; }
+.cphone-wallpaper-settings { margin: 0 20px 18px; padding: 18px; border: 1px solid #ececf0; border-radius: 19px; background: #fff; }
+.cphone-wallpaper-settings .friend-gen-heading { margin-bottom: 12px; }
+.cphone-wallpaper-url-row { display: flex; gap: 8px; }
+.cphone-wallpaper-url-row input { flex: 1; min-width: 0; min-height: 42px; padding: 0 12px; border: 1px solid #e6e6ea; border-radius: 12px; background: #f7f7f9; color: #171719; font-size: 14px; }
+.cphone-wallpaper-url-row button { min-width: 58px; border: 0; border-radius: 12px; background: #171719; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; }
+.cphone-wallpaper-actions { display: flex; gap: 9px; margin-top: 10px; }
+.cphone-wallpaper-actions button { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 0 12px; border: 1px solid #e6e6ea; border-radius: 12px; background: #f7f7f9; color: #171719; font-size: 12px; font-weight: 650; cursor: pointer; }
+.cphone-wallpaper-status { margin: 11px 0 0; color: #85858b; font-size: 12px; }
+.cphone-wallpaper-url-row :focus-visible, .cphone-wallpaper-actions :focus-visible { outline: 2px solid #171719; outline-offset: 2px; }
+@media (max-width: 360px) {
+    #lovers-friend-phone-view .cphone-home-grid > div > div:first-child { width: min(53px, 100%) !important; }
+    #lovers-friend-phone-view .cphone-home-grid { gap: 20px 6px !important; padding-inline: 16px !important; }
+    .cphone-sms-tabs button { min-width: 90px; }
+}
