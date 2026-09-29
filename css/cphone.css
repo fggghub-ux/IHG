@@ -87,17 +87,20 @@
     -webkit-overflow-scrolling: touch;
 }
 #lovers-friend-phone-view .cphone-home-grid > div {
-    width: 100%;
-    min-width: 0;
+    width: 60px !important;
+    min-width: 60px;
     gap: 6px !important;
 }
 #lovers-friend-phone-view .cphone-home-grid > div > div:first-child,
 #lovers-friend-phone-view .cphone-home-dock > div {
+    box-sizing: border-box;
     width: 60px !important;
     height: 60px !important;
+    min-width: 60px;
+    min-height: 60px;
     flex: 0 0 60px;
-    border-radius: 17px !important;
-    box-shadow: 0 8px 20px rgba(15,15,18,.07) !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
 }
 #lovers-friend-phone-view.lovers-friend-phone-view .cphone-home-grid > div > div:last-child {
     max-width: 100%;
@@ -206,7 +209,7 @@
 #friend-phone-app-safari {
     overflow: hidden;
     padding: 0;
-    border: 1px solid rgba(0, 0, 0, .08) !important;
+    border: 1px solid #e5e5ea !important;
     background: #fff !important;
     color: #111 !important;
     box-shadow: none !important;
@@ -218,20 +221,6 @@
     border-radius: inherit;
     object-fit: cover;
 }
-#friend-phone-app-music > div:first-child,
-#friend-phone-app-pay > div:first-child,
-#friend-phone-app-game > div:first-child,
-#friend-phone-app-call > div:first-child {
-    border: 0 !important;
-}
-#friend-phone-app-music .friend-phone-app-icon,
-#friend-phone-app-pay .friend-phone-app-icon,
-#friend-phone-app-game .friend-phone-app-icon,
-#friend-phone-app-call .friend-phone-app-icon {
-    border-radius: 0;
-    transform: scale(1.08);
-}
-
 /* Other Char phone apps share the Messages surface, controls, and list rhythm. */
 #lovers-friend-phone-view.lovers-friend-phone-view,
 :is(#friend-health-view, #friend-pay-view, #friend-music-view, #friend-phonecall-view, #friend-phone-settings-sheet) {
@@ -399,7 +388,6 @@
 .cphone-wallpaper-status { margin: 11px 0 0; color: #85858b; font-size: 12px; }
 .cphone-wallpaper-url-row :focus-visible, .cphone-wallpaper-actions :focus-visible { outline: 2px solid #171719; outline-offset: 2px; }
 @media (max-width: 360px) {
-    #lovers-friend-phone-view .cphone-home-grid > div > div:first-child { width: min(53px, 100%) !important; }
     #lovers-friend-phone-view .cphone-home-grid { gap: 20px 6px !important; padding-inline: 16px !important; }
     .cphone-sms-tabs button { min-width: 90px; }
 }
