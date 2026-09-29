@@ -21,7 +21,7 @@
     CHANGELOG_ENTRIES = [{
       id: "2026-09-4",
       year: "2026",
-      shortDate: "September 4",
+      shortDate: "9.4",
       fullDate: "2026年9月4日",
       sections: [{
         label: "",
@@ -31,7 +31,7 @@
     }, {
       id: "2026-09-29",
       year: "2026",
-      shortDate: "September 29",
+      shortDate: "9.29",
       fullDate: "2026年9月29日",
       sections: [{
         label: "",
@@ -41,7 +41,7 @@
     }, {
       id: "2026-09-14",
       year: "2026",
-      shortDate: "September 14",
+      shortDate: "9.14",
       fullDate: "2026年9月14日",
       sections: [{
         label: "",
