@@ -19,84 +19,34 @@
     closeButton = document.getElementById("about-info-modal-close"),
     confirmButton = document.getElementById("about-info-modal-confirm"),
     CHANGELOG_ENTRIES = [{
-      id: "2026-09-28",
+      id: "2026-09-4",
       year: "2026",
-      shortDate: "9.28",
-      fullDate: "2026年9月28日",
+      shortDate: "September 4",
+      fullDate: "2026年9月4日",
       sections: [{
-        label: "ONLINE",
-        title: "线上",
-        items: ["新增 Char 给 User 修改备注，备注可在 CPhone 查看。", "优化点击反馈，修复一些界面问题。", "修复有兔助手生成无效美化的问题。"]
-      }, {
-        label: "EXPERIENCE",
-        title: "整体体验",
-        items: ["优化整体点击反馈与性能。"]
-      }, {
-        label: "ANDROID",
-        title: "Android APK",
-        status: "BETA",
-        items: ["针对部分 OPPO 机型优化顶部全屏兼容。"]
-      }, {
-        label: "NETFLIX",
-        title: "Netflix",
-        items: ["完善 Netflix。"]
-      }, {
-        label: "LOVES",
-        title: "Loves",
-        items: ["修复存钱按钮丢失的问题。"]
+        label: "",
+        title: "",
+        items: ["LHV"]
       }]
     }, {
-      id: "2026-09-24",
+      id: "2026-09-29",
       year: "2026",
-      shortDate: "9.24",
-      fullDate: "2026年9月24日",
+      shortDate: "September 29",
+      fullDate: "2026年9月29日",
       sections: [{
-        label: "ONLINE",
-        title: "线上",
-        items: ["优化点击反馈与性能，修复一些问题；朋友圈入口移到主页。", "单独换美化与主题美化合并；反查手机移进 Char 设置。", "新增 Char 邀请 U 一起听、给 Char 赠送亲属卡。", "群聊新增搜索聊天记录；Bstage 与单聊互通。"]
-      }, {
-        label: "OFFLINE",
-        title: "线下",
-        items: ["优化滑动流畅度。", "新增番外模式，开启后不注入线上记忆。"]
-      }, {
-        label: "CHAR PHONE",
-        title: "查手机",
-        items: ["查手机从 Loves 独立出来。", "重构 Char 短信玩法；Char 与联系人的聊天和单聊互通记忆，可给 Char 建群。"]
-      }, {
-        label: "BACKUP / NOTIFICATION",
-        title: "数据备份与消息通知",
-        items: ["数据备份新增轻量级备份。", "消息通知兼容 iOS 16.5 以下系统版本。"]
-      }, {
-        label: "UI",
-        title: "操作与界面",
-        items: ["优化了一些手感操作，更新了一些 UI。"]
+        label: "",
+        title: "",
+        items: ["Koala"]
       }]
     }, {
-      id: "2026-09-20",
+      id: "2026-09-14",
       year: "2026",
-      shortDate: "9.20",
-      fullDate: "2026年9月20日",
+      shortDate: "September 14",
+      fullDate: "2026年9月14日",
       sections: [{
-        label: "ONLINE",
-        title: "线上",
-        items: ["优化线上聊天点击反馈。", "修复非中文环境下无法修改翻译的问题。"]
-      }, {
-        label: "API / NOTIFICATION",
-        title: "API 与消息通知",
-        items: ["优化 API 配置预设。", "开启消息通知后默认关闭内置消息弹窗。", "优化内置消息弹窗，支持上滑取消。", "修复消息提示音不生效的问题。"]
-      }, {
-        label: "ANDROID",
-        title: "Android APK",
-        status: "BETA",
-        items: ["修复 APK 初始化失败的问题。", "增加原生兼容。"]
-      }, {
-        label: "LOVES",
-        title: "Loves",
-        items: ["反查手机新增提示。", "新增查手机记录。"]
-      }, {
-        label: "AO3",
-        title: "AO3",
-        items: ["新增快捷填入 Char 人设。"]
+        label: "",
+        title: "",
+        items: ["Leo"]
       }]
     }],
     LATEST_CHANGELOG_ENTRY_ID = CHANGELOG_ENTRIES[0]?.id || "",
@@ -154,7 +104,7 @@
     dismissalLocked = false;
     text_9 = "";
     if (closeButton) closeButton.disabled = false;
-    confirmButton && (confirmButton.disabled = false, confirmButton.textContent = "知道了");
+    confirmButton && (confirmButton.disabled = false, confirmButton.textContent = "u");
   }
   function handleAction_13(value_32) {
     handleAction_12();
@@ -166,7 +116,7 @@
     const deadline = Date.now() + ACKNOWLEDGEMENT_DELAY_MS,
       updateCountdown = () => {
         const secondsRemaining = Math.ceil(Math.max(0, deadline - Date.now()) / 1000);
-        if (confirmButton) confirmButton.textContent = secondsRemaining > 0 ? "知道了（" + secondsRemaining + "秒）" : "知道了";
+        if (confirmButton) confirmButton.textContent = secondsRemaining > 0 ? "u（" + secondsRemaining + "秒）" : "u";
       };
     updateCountdown();
     acknowledgementInterval = window.setInterval(updateCountdown, 250);
@@ -176,7 +126,7 @@
       acknowledgementTimer = null;
       dismissalLocked = false;
       if (closeButton) closeButton.disabled = false;
-      confirmButton && (confirmButton.disabled = false, confirmButton.textContent = "知道了");
+      confirmButton && (confirmButton.disabled = false, confirmButton.textContent = "u");
     }, ACKNOWLEDGEMENT_DELAY_MS);
   }
   function handleAction_14(value_36) {
