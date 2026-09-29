@@ -110,9 +110,9 @@
       }
     }
     ["clearGeneratedProducts"]() {
-      const confirm_17 = window.confirm("确定要清空所有 AI 生成的外卖和商城商品吗？购物车和订单不会受到影响。");
+      const confirm_17 = window.confirm("Clear all AI-generated food and mall items? Your cart and orders will not be affected.");
       if (!confirm_17) return false;
-      return durableStorage.removeItem("shopping_generated_food"), durableStorage.removeItem("shopping_generated_mall"), this.foodListContainer?.querySelectorAll("[data-shopping-generated=\"true\"]").forEach(value_18 => value_18.remove()), this.productListContainer?.querySelectorAll("[data-shopping-generated=\"true\"]").forEach(value_19 => value_19.remove()), window.showToast ? window.showToast("已清空生成的商品") : alert("已清空生成的商品"), true;
+      return durableStorage.removeItem("shopping_generated_food"), durableStorage.removeItem("shopping_generated_mall"), this.foodListContainer?.querySelectorAll("[data-shopping-generated=\"true\"]").forEach(value_18 => value_18.remove()), this.productListContainer?.querySelectorAll("[data-shopping-generated=\"true\"]").forEach(value_19 => value_19.remove()), window.showToast ? window.showToast("Generated items cleared") : alert("Generated items cleared"), true;
     }
     ["getAvailableWorldBooks"]() {
       if (typeof window.getWorldBooks === "function") return window.getWorldBooks() || [];
@@ -141,12 +141,12 @@
       if (!this.boundWbName) return;
       const boundIds = this.getBoundWorldBookIds();
       if (boundIds.length === 0) {
-        this.boundWbName.textContent = "未绑定";
+        this.boundWbName.textContent = "Not mounted";
         return;
       }
       const books_2 = this.getAvailableWorldBooks(),
         boundBooks = boundIds.map(id_6 => books_2.find(book => String(book.id) === String(id_6))).filter(Boolean);
-      if (boundBooks.length === 1) this.boundWbName.textContent = boundBooks[0].name || "未命名世界书";else boundBooks.length > 1 ? this.boundWbName.textContent = "已挂载 " + boundBooks.length + " 本" : this.boundWbName.textContent = "未绑定";
+      if (boundBooks.length === 1) this.boundWbName.textContent = boundBooks[0].name || "Untitled World Book";else boundBooks.length > 1 ? this.boundWbName.textContent = "Mounted " + boundBooks.length + " books" : this.boundWbName.textContent = "Not mounted";
     }
     ["syncProfile"]() {
       const contact = window.getUserState ? window.getUserState() : window.userState || {},
@@ -240,7 +240,7 @@
           this.addToCart(this.currentProduct);
           this.closeDetail();
           const originalText = this.addToCartBtn.textContent;
-          this.addToCartBtn.textContent = "已添加!";
+          this.addToCartBtn.textContent = "Added!";
           setTimeout(() => {
             if (this.addToCartBtn) this.addToCartBtn.textContent = originalText;
           }, 1000);
@@ -251,7 +251,7 @@
           this.addToCart(this.currentProduct);
           this.closeDetail();
           const originalText_2 = this.addFoodToCartBtn.textContent;
-          this.addFoodToCartBtn.textContent = "已添加!";
+          this.addFoodToCartBtn.textContent = "Added!";
           setTimeout(() => {
             if (this.addFoodToCartBtn) this.addFoodToCartBtn.textContent = originalText_2;
           }, 1000);
@@ -314,7 +314,7 @@
     ["updateOrderProgress"](order, element_61, value_62 = Math.max(0, Date.now() - Number(order.timestamp || 0))) {
       if (!element_61) return;
       const isFood_2 = order.items.some(i => i.isFood),
-        cColor = isFood_2 ? "var(--shop-accent, #a97642)" : "#111111",
+        cColor = isFood_2 ? "var(--shop-accent, #111113)" : "#111111",
         fColor = "var(--shop-green, #476c5a)",
         value_66 = value_62 >= count_3 ? 3 : value_62 >= count ? 2 : 1,
         from_67 = Array.from(element_61.querySelectorAll(".shopping-order-icon-wrap")),
@@ -345,9 +345,9 @@
     async ["handleGenerateProducts"]() {
       let value_75 = this.searchInput ? this.searchInput.value.trim() : "";
       const targetTab = this.currentTab === "food" ? "food" : "mall";
-      !value_75 && (value_75 = targetTab === "food" ? "随机生成一些高质量的外卖美食和饮品" : "随机生成一些高品质的商城百货和数码日常用品");
-      this.searchConfirmBtn && (this.searchConfirmBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> 生成中...", this.searchConfirmBtn.disabled = true);
-      let content_2 = "你现在是一个商品、评价及问答生成器。根据用户的输入，生成不少于10个商品。每个商品生成5-10条用户评价，以及5-10条问答(Q&A)。\n当前分类是 " + (targetTab === "food" ? "外卖美食" : "商城百货") + "。\n\n**关键要求**：\n1. **评价**：必须非常真实、接地气，包含好评、中评甚至差评。语气要幽默、调侃或者夸张（比如：”好吃是好吃，就是吃完对象跑了”、”衣服很仙，但穿上像个成了精的拖把”）。\n2. **问答(Q&A)**：这是买家向已经买过的买家提问的板块（类似淘宝的”问大家”）。回答者**绝对不要**像官方客服，而是真实的、充满个性的普通买家。回答可以很搞笑、无厘头、甚至带点互坑的成分（比如 Q：”吃完能变帅吗？” A：”别做梦了，看脸” 或 Q：”好用吗？” A：”买回来积灰挺好的，建议入手”）。\n\n\n\n";
+      !value_75 && (value_75 = targetTab === "food" ? "Generate premium food and drink recommendations" : "Generate premium mall and luxury products");
+      this.searchConfirmBtn && (this.searchConfirmBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Generating...", this.searchConfirmBtn.disabled = true);
+      let content_2 = "You are a product, review, and Q&A generator. Based on the user's request, generate at least 10 products. Create 5-10 realistic customer reviews and 5-10 buyer Q&A pairs for each product. The current category is " + (targetTab === "food" ? "Food" : "Mall") + ". Every user-visible field must be written in natural English. Reviews should include positive, mixed, and negative opinions with varied, believable voices. Q&A answers should sound like real buyers, not official customer service.\n\n";
       const boundWorldBookIds_78 = this.getBoundWorldBookIds();
       if (boundWorldBookIds_78.length > 0 && window.wbManager) {
         const bookContexts = [];
@@ -355,12 +355,12 @@
           const bookCtx = await window.wbManager.getBookContextString(boundId);
           if (bookCtx) bookContexts.push(bookCtx);
         }
-        bookContexts.length > 0 && (content_2 += "[当前挂载的世界书上下文]\n" + bookContexts.join("\n\n") + "\n\n参考以上世界书设定生成契合世界观的商品，评价和问答也可以带入世界观中的梗。\n\n");
+        bookContexts.length > 0 && (content_2 += "[Mounted World Book Context]\n" + bookContexts.join("\n\n") + "\n\nUse the context above to create fitting products, reviews, and Q&A while keeping every user-visible field in English.\n\n");
       }
-      content_2 += "输出必须为纯 JSON 数组格式，不要任何多余文本或 markdown 标签。格式要求：\n\n[\n  {\n    \"name\": \"商品名称\",\n    \"price\": \"商品价格(包含¥符号，如¥45)\",\n    \"desc\": \"商品简短描述\",\n    \"iconClass\": \"fontawesome图标类名(例如 fa-burger)\",\n    \"bgGrad\": \"CSS渐变背景(例如 linear-gradient(135deg, #f093fb 0%, #f5576c 100%))\",\n    \"tags\": [\"标签1\", \"标签2\"],\n    \"reviews\": [\n      { \"user\": \"用户A\", \"text\": \"评价内容\", \"rating\": 5 },\n      { \"user\": \"用户B\", \"text\": \"评价内容\", \"rating\": 4 }\n    ],\n    \"qa\": [\n      { \"q\": \"问题内容1\", \"a\": \"回答内容1\" },\n      { \"q\": \"问题内容2\", \"a\": \"回答内容2\" }\n    ]\n  }\n]";
+      content_2 += "Return only a valid JSON array with no extra text or Markdown. Required schema:\n\n[\n  {\n    \"name\": \"Product name\",\n    \"price\": \"Price including the $ symbol, for example $45\",\n    \"desc\": \"Short product description\",\n    \"iconClass\": \"Font Awesome icon class, for example fa-burger\",\n    \"bgGrad\": \"CSS gradient background, for example linear-gradient(135deg, #f093fb 0%, #f5576c 100%)\",\n    \"tags\": [\"Tag 1\", \"Tag 2\"],\n    \"reviews\": [\n      { \"user\": \"User A\", \"text\": \"Review text\", \"rating\": 5 },\n      { \"user\": \"User B\", \"text\": \"Review text\", \"rating\": 4 }\n    ],\n    \"qa\": [\n      { \"q\": \"Question 1\", \"a\": \"Answer 1\" },\n      { \"q\": \"Question 2\", \"a\": \"Answer 2\" }\n    ]\n  }\n]";
       try {
         const apiConfig_2 = typeof window.getApiConfig === "function" ? window.getApiConfig() : window.apiConfig || {};
-        if (!apiConfig_2 || !apiConfig_2.endpoint || !apiConfig_2.apiKey) throw new Error("请先在系统设置中配置 API");
+        if (!apiConfig_2 || !apiConfig_2.endpoint || !apiConfig_2.apiKey) throw new Error("Configure the API in System Settings first");
         const endpoint_2 = window.u2Api.resolveChatCompletionsEndpoint(apiConfig_2.endpoint),
           value_83 = await fetch(endpoint_2, {
             method: "POST",
@@ -382,7 +382,7 @@
           });
         if (!value_83.ok) {
           const value_89 = await window.u2Api?.readApiError?.(value_83);
-          throw window.u2Api?.createHttpError?.(value_83, value_89) || Object.assign(new Error("API 请求失败: HTTP " + value_83.status), {
+          throw window.u2Api?.createHttpError?.(value_83, value_89) || Object.assign(new Error("API request failed: HTTP " + value_83.status), {
             status: value_83.status
           });
         }
@@ -397,19 +397,19 @@
         } catch (value_90) {
           const startIdx = jsonText.indexOf("["),
             endIdx = jsonText.lastIndexOf("]");
-          if (startIdx !== -1 && endIdx !== -1) productsData = JSON.parse(jsonText.substring(startIdx, endIdx + 1));else throw new Error("JSON 解析失败");
+          if (startIdx !== -1 && endIdx !== -1) productsData = JSON.parse(jsonText.substring(startIdx, endIdx + 1));else throw new Error("Could not parse the generated JSON");
         }
-        if (!Array.isArray(productsData) || productsData.length === 0) throw new Error("生成数据为空");
+        if (!Array.isArray(productsData) || productsData.length === 0) throw new Error("No products were generated");
         this.injectGeneratedProducts(productsData, targetTab);
         if (this.searchSheet) this.searchSheet.classList.remove("active");
         if (this.searchInput) this.searchInput.value = "";
       } catch (e_4) {
         console.error("Generate error:", e_4);
         (!window.u2Api?.isRequestError?.(e_4) || !window.u2Api.reportError(e_4, {
-          operation: "商品生成"
-        })) && (window.showToast ? window.showToast("生成失败: " + e_4.message) : alert("生成失败: " + e_4.message));
+          operation: "Product generation"
+        })) && (window.showToast ? window.showToast("Generation failed: " + e_4.message) : alert("Generation failed: " + e_4.message));
       } finally {
-        this.searchConfirmBtn && (this.searchConfirmBtn.innerHTML = "<i class=\"fas fa-magic\"></i> 确认生成", this.searchConfirmBtn.disabled = false);
+        this.searchConfirmBtn && (this.searchConfirmBtn.innerHTML = "<i class=\"fas fa-magic\"></i> Generate", this.searchConfirmBtn.disabled = false);
       }
     }
     ["renderProductCards"](items_94, targetTab_2) {
@@ -482,13 +482,13 @@
           if (product_2.classList.contains("shopping-food-card")) {
             isFood_3 = true;
             name_2 = product_2.querySelector("strong")?.textContent || "Food Item";
-            price_2 = product_2.querySelector(".shopping-card-topline span")?.textContent || "¥0";
+            price_2 = product_2.querySelector(".shopping-card-topline span")?.textContent || "$0";
             desc_2 = product_2.querySelector("p")?.textContent || "";
             iconHtml_2 = product_2.querySelector(".shopping-food-media")?.innerHTML || "";
             mediaBg_2 = product_2.querySelector(".shopping-food-media").style.background || window.getComputedStyle(product_2.querySelector(".shopping-food-media")).background;
           } else {
             name_2 = product_2.querySelector("strong")?.textContent || "Product";
-            price_2 = product_2.querySelector("span")?.textContent.split("·")[0].trim() || "¥0";
+            price_2 = product_2.querySelector("span")?.textContent.split("·")[0].trim() || "$0";
             const spans = product_2.querySelectorAll("span");
             desc_2 = spans.length > 1 ? spans[1].textContent : "";
             iconHtml_2 = product_2.querySelector(".shopping-product-media")?.innerHTML || "";
@@ -507,21 +507,21 @@
     async ["openGiftCharSelection"](order_2, id_7) {
       if (!this.charSelectionModal || !this.charList) return;
       const textContent_2 = this.charSelectionModal.querySelector(".wb-centered-modal-title").textContent;
-      this.charSelectionModal.querySelector(".wb-centered-modal-title").textContent = "选择赠送的好友";
+      this.charSelectionModal.querySelector(".wb-centered-modal-title").textContent = "Choose a friend";
       this.charList.innerHTML = "";
       let items_123 = [];
       if (window.imStorage && window.imStorage.loadFriends) try {
         const allFriends = await window.imStorage.loadFriends();
         items_123 = allFriends;
       } catch (value_126) {}
-      items_123.length === 0 ? this.charList.innerHTML = "<div style=\"text-align: center; padding: 20px; color: #73706a;\">暂无好友</div>" : items_123.forEach(friend => {
+      items_123.length === 0 ? this.charList.innerHTML = "<div style=\"text-align: center; padding: 20px; color: #85858b;\">No friends found</div>" : items_123.forEach(friend => {
         const element_128 = document.createElement("div");
         element_128.style.cssText = "background: rgba(255, 255, 255, 0.82); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 1px solid rgba(17,17,17,0.09); ";
         const value_129 = friend.name || friend.nickname || "Unknown Char";
-        let text_130 = "<div style=\"width: 40px; height: 40px; border-radius: 50%; background: rgba(17,17,17,0.06); display: flex; justify-content: center; align-items: center; color: #73706a;\"><i class=\"fas fa-user\"></i></div>";
+        let text_130 = "<div style=\"width: 40px; height: 40px; border-radius: 50%; background: rgba(17,17,17,0.06); display: flex; justify-content: center; align-items: center; color: #85858b;\"><i class=\"fas fa-user\"></i></div>";
         const value_131 = friend.avatarUrl || friend.avatar;
         value_131 && (text_130 = "<img src=\"" + value_131 + "\" style=\"width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(17,17,17,0.09);\">");
-        element_128.innerHTML = "\n                        <div style=\"display: flex; align-items: center; gap: 12px;\">\n                            " + text_130 + "\n                            <div style=\"display: flex; flex-direction: column;\">\n                                <div style=\"font-size: 15px; font-weight: 700; color: #111;\">" + value_129 + "</div>\n                                <div style=\"font-size: 13px; color: #73706a; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;\">" + (friend.signature || "") + "</div>\n                            </div>\n                        </div>\n                        <div style=\"background: #111; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 13px; font-weight: 600;\">赠送</div>\n                    ";
+        element_128.innerHTML = "\n                        <div style=\"display: flex; align-items: center; gap: 12px;\">\n                            " + text_130 + "\n                            <div style=\"display: flex; flex-direction: column;\">\n                                <div style=\"font-size: 15px; font-weight: 700; color: #111;\">" + value_129 + "</div>\n                                <div style=\"font-size: 13px; color: #85858b; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;\">" + (friend.signature || "") + "</div>\n                            </div>\n                        </div>\n                        <div style=\"background: #111; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 13px; font-weight: 600;\">Gift</div>\n                    ";
         element_128.addEventListener("click", async () => {
           if (this.giftOrdersInFlight.has(String(order_2.id))) return;
           const success = await this.sendGiftMessage(friend, order_2);
@@ -553,12 +553,12 @@
       if (!orderId_2 || this.giftOrdersInFlight.has(orderId_2)) return false;
       this.giftOrdersInFlight.add(orderId_2);
       const value_137 = value_136.items?.[0] || {},
-        itemName_2 = String(value_137.name || "商品"),
+        itemName_2 = String(value_137.name || "Item"),
         price_3 = Number(value_136.itemTotal ?? value_137.priceVal ?? value_136.total) || 0,
-        text_3 = "[赠送礼物]\n商品: " + itemName_2 + "\n价值: ¥" + price_3.toFixed(2) + "\n付款方式: " + value_136.method,
+        text_3 = "[Gift]\nItem: " + itemName_2 + "\nValue: $" + price_3.toFixed(2) + "\nPayment method: " + value_136.method,
         handleAction_6_141 = handleAction_6(itemName_2),
         handleAction_6_142 = handleAction_6(value_136.method || "Pay"),
-        content_3 = "\n                <div style=\"background: #fff0f3; border-radius: 16px; padding: 16px; min-width: 220px; max-width: 280px; color: #111111; border: 1px solid rgba(255,155,179,0.3); display: inline-block;\">\n                    <div style=\"font-size: 12px; color: #ff9bb3; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-weight: 700;\">\n                        <i class=\"fas fa-gift\"></i> 收到礼物\n                    </div>\n                    <div style=\"font-size: 15px; font-weight: 700; margin-bottom: 6px; white-space: normal; word-break: break-word; line-height: 1.4;\">" + handleAction_6_141 + "</div>\n                    <div style=\"font-size: 13px; color: #73706a; margin-top: 8px;\">价值 ¥" + price_3.toFixed(2) + "</div>\n                    <div style=\"font-size: 12px; color: #8e8e93; margin-top: 4px;\">由 " + handleAction_6_142 + " 支付</div>\n                </div>\n            ";
+        content_3 = "\n                <div style=\"background: #fff0f3; border-radius: 16px; padding: 16px; min-width: 220px; max-width: 280px; color: #111111; border: 1px solid rgba(255,155,179,0.3); display: inline-block;\">\n                    <div style=\"font-size: 12px; color: #ff9bb3; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-weight: 700;\">\n                        <i class=\"fas fa-gift\"></i> Gift received\n                    </div>\n                    <div style=\"font-size: 15px; font-weight: 700; margin-bottom: 6px; white-space: normal; word-break: break-word; line-height: 1.4;\">" + handleAction_6_141 + "</div>\n                    <div style=\"font-size: 13px; color: #85858b; margin-top: 8px;\">Value $" + price_3.toFixed(2) + "</div>\n                    <div style=\"font-size: 12px; color: #8e8e93; margin-top: 4px;\">Paid via " + handleAction_6_142 + "</div>\n                </div>\n            ";
       let enabled_144 = false;
       try {
         if (window.imApp && window.imApp.appendFriendMessage) {
@@ -587,7 +587,7 @@
             void window.imChat.handleAiReply(value_147, value_146, null, {
               source: "shop_gift",
               silent: true,
-              extraSystemPrompt: "User 刚刚赠送了礼物“" + itemName_2 + "”（价值 ¥" + price_3.toFixed(2) + "）。请以 Char 身份结合人设和关系自然回应这份礼物。"
+              extraSystemPrompt: "User just sent a gift: \"" + itemName_2 + "\" (value $" + price_3.toFixed(2) + "). Respond naturally in character, based on the established personality and relationship."
             });
           }
         }
@@ -596,7 +596,7 @@
       } finally {
         this.giftOrdersInFlight["delete"](orderId_2);
       }
-      if (window.showToast) window.showToast(enabled_144 ? "赠送成功" : "赠送失败");else alert(enabled_144 ? "赠送成功" : "赠送失败");
+      if (window.showToast) window.showToast(enabled_144 ? "Gift sent" : "Gift failed");else alert(enabled_144 ? "Gift sent" : "Gift failed");
       return enabled_144;
     }
     ["loadOrders"]() {
@@ -639,7 +639,7 @@
         });
       }), items_155;
     }
-    ["createOrdersFromCart"](method_3, status_2 = "已付款") {
+    ["createOrdersFromCart"](method_3, status_2 = "Paid") {
       const batchId_3 = handleAction_5("checkout"),
         timestamp_3 = Date.now();
       return this.cart.map((value_169, value_170) => {
@@ -668,12 +668,12 @@
       typeof window.getPayCards === "function" && (items_172 = window.getPayCards());
       (!items_172 || items_172.length === 0) && (items_172 = [{
         id: "card1",
-        name: "招商银行储蓄卡",
+        name: "Bank debit card",
         number: "**** **** **** 8888",
         icon: "fa-university"
       }, {
         id: "card2",
-        name: "工商银行信用卡",
+        name: "Bank credit card",
         number: "**** **** **** 1234",
         icon: "fa-credit-card"
       }]);
@@ -684,7 +684,7 @@
       !this.selectedCard && items_172.length > 0 && (this.selectedCard = items_172[0]);
       friends_2.length > 0 ? (!this.selectedFriend || !friends_2.find(f => String(f.id) === String(this.selectedFriend.id))) && (this.selectedFriend = friends_2[0]) : this.selectedFriend = null;
       this.payDesc && this.selectedCard && (this.payDesc.textContent = this.selectedCard.name + " (" + this.selectedCard.number.slice(-4) + ")");
-      this.friendDesc && (this.friendDesc.textContent = this.selectedFriend ? this.selectedFriend.name || this.selectedFriend.nickname || "Unknown Char" : "选择好友");
+      this.friendDesc && (this.friendDesc.textContent = this.selectedFriend ? this.selectedFriend.name || this.selectedFriend.nickname || "Unknown Char" : "Select a friend");
     }
     async ["openCardSelection"]() {
       if (!this.cardSelectionModal || !this.cardList) return;
@@ -695,21 +695,21 @@
       typeof window.getPayBalance === "function" && (balance_2 = window.getPayBalance());
       (!items_175 || items_175.length === 0) && (items_175 = [{
         id: "card1",
-        name: "招商银行储蓄卡",
+        name: "Bank debit card",
         number: "**** **** **** 8888",
         icon: "fa-university"
       }, {
         id: "card2",
-        name: "工商银行信用卡",
+        name: "Bank credit card",
         number: "**** **** **** 1234",
         icon: "fa-credit-card"
       }]);
-      this.cardBalance && (this.cardBalance.textContent = "¥" + balance_2.toFixed(2));
+      this.cardBalance && (this.cardBalance.textContent = "$" + balance_2.toFixed(2));
       items_175.forEach(selectedCard_2 => {
         const element_178 = document.createElement("div");
         element_178.style.cssText = "background: rgba(255, 255, 255, 0.82); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 1px solid rgba(17,17,17,0.09); ";
         const isSelected = this.selectedCard && String(this.selectedCard.id) === String(selectedCard_2.id);
-        element_178.innerHTML = "\n                    <div style=\"display: flex; align-items: center; gap: 12px;\">\n                        <div style=\"width: 40px; height: 40px; border-radius: 50%; background: rgba(17,17,17,0.06); display: flex; justify-content: center; align-items: center; color: #111;\">\n                            <i class=\"fas " + (selectedCard_2.icon || "fa-credit-card") + "\"></i>\n                        </div>\n                        <div style=\"display: flex; flex-direction: column;\">\n                            <div style=\"font-size: 15px; font-weight: 700; color: #111;\">" + selectedCard_2.name + "</div>\n                            <div style=\"font-size: 13px; color: #73706a; font-family: monospace;\">" + selectedCard_2.number + "</div>\n                        </div>\n                    </div>\n                    " + (isSelected ? "<i class=\"fas fa-check-circle\" style=\"color: #111113; font-size: 20px;\"></i>" : "<div style=\"width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(17,17,17,0.15);\"></div>") + "\n                ";
+        element_178.innerHTML = "\n                    <div style=\"display: flex; align-items: center; gap: 12px;\">\n                        <div style=\"width: 40px; height: 40px; border-radius: 50%; background: rgba(17,17,17,0.06); display: flex; justify-content: center; align-items: center; color: #111;\">\n                            <i class=\"fas " + (selectedCard_2.icon || "fa-credit-card") + "\"></i>\n                        </div>\n                        <div style=\"display: flex; flex-direction: column;\">\n                            <div style=\"font-size: 15px; font-weight: 700; color: #111;\">" + selectedCard_2.name + "</div>\n                            <div style=\"font-size: 13px; color: #85858b; font-family: monospace;\">" + selectedCard_2.number + "</div>\n                        </div>\n                    </div>\n                    " + (isSelected ? "<i class=\"fas fa-check-circle\" style=\"color: #111113; font-size: 20px;\"></i>" : "<div style=\"width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(17,17,17,0.15);\"></div>") + "\n                ";
         element_178.addEventListener("click", () => {
           this.selectedCard = selectedCard_2;
           this.payDesc && (this.payDesc.textContent = this.selectedCard.name + " (" + this.selectedCard.number.slice(-4) + ")");
@@ -730,15 +730,15 @@
       if (window.imStorage && window.imStorage.loadFriends) try {
         items_180 = await window.imStorage.loadFriends();
       } catch (value_181) {}
-      items_180.length === 0 ? this.charList.innerHTML = "<div style=\"text-align: center; padding: 20px; color: #73706a;\">暂无好友</div>" : items_180.forEach(selectedFriend_2 => {
+      items_180.length === 0 ? this.charList.innerHTML = "<div style=\"text-align: center; padding: 20px; color: #85858b;\">No friends found</div>" : items_180.forEach(selectedFriend_2 => {
         const element_183 = document.createElement("div");
         element_183.style.cssText = "background: rgba(255, 255, 255, 0.82); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 1px solid rgba(17,17,17,0.09); ";
         const isSelected_2 = this.selectedFriend && String(this.selectedFriend.id) === String(selectedFriend_2.id),
           textContent_3 = selectedFriend_2.name || selectedFriend_2.nickname || "Unknown Char";
-        let text_186 = "<div style=\"width: 40px; height: 40px; border-radius: 50%; background: rgba(17,17,17,0.06); display: flex; justify-content: center; align-items: center; color: #73706a;\"><i class=\"fas fa-user\"></i></div>";
+        let text_186 = "<div style=\"width: 40px; height: 40px; border-radius: 50%; background: rgba(17,17,17,0.06); display: flex; justify-content: center; align-items: center; color: #85858b;\"><i class=\"fas fa-user\"></i></div>";
         const value_187 = selectedFriend_2.avatarUrl || selectedFriend_2.avatar;
         value_187 && (text_186 = "<img src=\"" + value_187 + "\" style=\"width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(17,17,17,0.09);\">");
-        element_183.innerHTML = "\n                        <div style=\"display: flex; align-items: center; gap: 12px;\">\n                            " + text_186 + "\n                            <div style=\"display: flex; flex-direction: column;\">\n                                <div style=\"font-size: 15px; font-weight: 700; color: #111;\">" + textContent_3 + "</div>\n                                <div style=\"font-size: 13px; color: #73706a; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;\">" + (selectedFriend_2.signature || "") + "</div>\n                            </div>\n                        </div>\n                        " + (isSelected_2 ? "<i class=\"fas fa-check-circle\" style=\"color: #111113; font-size: 20px;\"></i>" : "<div style=\"width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(17,17,17,0.15);\"></div>") + "\n                    ";
+        element_183.innerHTML = "\n                        <div style=\"display: flex; align-items: center; gap: 12px;\">\n                            " + text_186 + "\n                            <div style=\"display: flex; flex-direction: column;\">\n                                <div style=\"font-size: 15px; font-weight: 700; color: #111;\">" + textContent_3 + "</div>\n                                <div style=\"font-size: 13px; color: #85858b; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;\">" + (selectedFriend_2.signature || "") + "</div>\n                            </div>\n                        </div>\n                        " + (isSelected_2 ? "<i class=\"fas fa-check-circle\" style=\"color: #111113; font-size: 20px;\"></i>" : "<div style=\"width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(17,17,17,0.15);\"></div>") + "\n                    ";
         element_183.addEventListener("click", () => {
           this.selectedFriend = selectedFriend_2;
           this.friendDesc && (this.friendDesc.textContent = textContent_3);
@@ -756,37 +756,37 @@
       const method_2 = document.querySelector("input[name=\"shopping-payment-method\"]:checked")?.value;
       let subtotal = 0;
       this.cart.forEach(item_3 => subtotal += item_3.priceVal);
-      const total_2 = subtotal,
+      const total_2 = subtotal + 5,
         itemNames = this.cart.map(item_4 => item_4.name).join(", ");
       if (method_2 === "pay") {
         if (!this.selectedCard) {
-          window.showToast ? window.showToast("请选择支付卡片") : alert("请选择支付卡片");
+          window.showToast ? window.showToast("Select a payment card") : alert("Select a payment card");
           return;
         }
         const cardBalance_2 = this.selectedCard.balance !== undefined ? this.selectedCard.balance : typeof window.getPayBalance === "function" ? window.getPayBalance() : 0;
         if (cardBalance_2 >= total_2) {
           let paymentSuccess = true;
-          typeof window.addPayTransaction === "function" && (paymentSuccess = window.addPayTransaction(total_2, "购物消费", "expense", this.selectedCard.id));
+          typeof window.addPayTransaction === "function" && (paymentSuccess = window.addPayTransaction(total_2, "Shopping", "expense", this.selectedCard.id));
           if (paymentSuccess) {
-            const value_195 = this.selectedCard.type === "family" ? "亲属卡 (" + this.selectedCard.name + ")" : "Pay";
+            const value_195 = this.selectedCard.type === "family" ? "Family card (" + this.selectedCard.name + ")" : "Pay";
             this.orders.unshift(...this.createOrdersFromCart(value_195));
             this.saveOrders();
             this.cart = [];
             this.saveCart();
             this.renderCart();
             this.checkoutSheet?.classList.remove("active");
-            window.showToast ? window.showToast("支付成功") : alert("支付成功");
-          } else window.showToast ? window.showToast("支付失败") : alert("支付失败");
-        } else window.showToast ? window.showToast("余额不足") : alert("余额不足");
+            window.showToast ? window.showToast("Payment successful") : alert("Payment successful");
+          } else window.showToast ? window.showToast("Payment failed") : alert("Payment failed");
+        } else window.showToast ? window.showToast("Insufficient balance") : alert("Insufficient balance");
       } else {
         if (method_2 === "friend") {
           if (!this.selectedFriend) {
-            window.showToast ? window.showToast("请选择代付好友") : alert("请选择代付好友");
+            window.showToast ? window.showToast("Select a payer") : alert("Select a payer");
             return;
           }
           const friendName = this.selectedFriend.name || this.selectedFriend.nickname || "Unknown Char",
-            text_4 = "[代付请求]\n商品: " + itemNames + "\n总价: ¥" + total_2.toFixed(2),
-            content_4 = "\n                    <div style=\"background: #f7f7f5; border-radius: 16px; padding: 16px; min-width: 220px; max-width: 280px; color: #111111;  border: 1px solid rgba(17,17,17,0.09); display: inline-block;\">\n                        <div style=\"font-size: 12px; color: #73706a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-weight: 700;\">\n                            <i class=\"fas fa-bag-shopping\" style=\"color: #a97642;\"></i> Shop Request\n                        </div>\n                        <div style=\"font-size: 15px; font-weight: 700; margin-bottom: 6px; white-space: normal; word-break: break-word; line-height: 1.4;\">" + itemNames + "</div>\n                        <div style=\"font-size: 24px; font-weight: 800; color: #111111; margin-top: 14px; margin-bottom: 16px;\">¥" + total_2.toFixed(2) + "</div>\n                        <div style=\"background: #a97642; color: #ffffff; text-align: center; padding: 10px 0; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;\">Pay Now</div>\n                    </div>\n                ";
+            text_4 = "[Payment request]\nItems: " + itemNames + "\nTotal: $" + total_2.toFixed(2),
+            content_4 = "\n                    <div style=\"background: #f6f6f8; border-radius: 16px; padding: 16px; min-width: 220px; max-width: 280px; color: #111111;  border: 1px solid rgba(17,17,17,0.09); display: inline-block;\">\n                        <div style=\"font-size: 12px; color: #85858b; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-weight: 700;\">\n                            <i class=\"fas fa-bag-shopping\" style=\"color: #111113;\"></i> Shop Request\n                        </div>\n                        <div style=\"font-size: 15px; font-weight: 700; margin-bottom: 6px; white-space: normal; word-break: break-word; line-height: 1.4;\">" + itemNames + "</div>\n                        <div style=\"font-size: 24px; font-weight: 800; color: #111111; margin-top: 14px; margin-bottom: 16px;\">$" + total_2.toFixed(2) + "</div>\n                        <div style=\"background: #111113; color: #ffffff; text-align: center; padding: 10px 0; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;\">Pay Now</div>\n                    </div>\n                ";
           let success_2 = false;
           if (window.imApp && window.imApp.appendFriendMessage) try {
             window.imApp.ensureFriendMessagesLoaded && (await window.imApp.ensureFriendMessagesLoaded(this.selectedFriend.id));
@@ -807,7 +807,7 @@
           } catch (e_6) {
             console.error("Failed to append shop request message:", e_6);
           }
-          success_2 ? (this.orders.unshift(...this.createOrdersFromCart("代付 (" + friendName + ")", "代付请求已发送")), this.saveOrders(), this.cart = [], this.saveCart(), this.renderCart(), this.checkoutSheet?.classList.remove("active"), window.showToast ? window.showToast("代付请求已发送") : alert("代付请求已发送")) : window.showToast ? window.showToast("无法发送代付请求") : alert("无法发送代付请求");
+          success_2 ? (this.orders.unshift(...this.createOrdersFromCart("Pay for me (" + friendName + ")", "Payment request sent")), this.saveOrders(), this.cart = [], this.saveCart(), this.renderCart(), this.checkoutSheet?.classList.remove("active"), window.showToast ? window.showToast("Payment request sent") : alert("Payment request sent")) : window.showToast ? window.showToast("Could not send the payment request") : alert("Could not send the payment request");
         }
       }
     }
@@ -815,27 +815,27 @@
       if (!this.ordersList) return;
       this.ordersList.innerHTML = "";
       if (this.orders.length === 0) {
-        this.ordersList.innerHTML = "\n                    <div style=\"text-align: center; padding: 40px 20px; color: #8e8e93;\">\n                        <i class=\"fas fa-receipt\" style=\"font-size: 40px; margin-bottom: 15px; opacity: 0.5;\"></i>\n                        <div style=\"font-size: 15px;\">暂无订单记录</div>\n                    </div>\n                ";
+        this.ordersList.innerHTML = "\n                    <div style=\"text-align: center; padding: 40px 20px; color: #8e8e93;\">\n                        <i class=\"fas fa-receipt\" style=\"font-size: 40px; margin-bottom: 15px; opacity: 0.5;\"></i>\n                        <div style=\"font-size: 15px;\">No orders yet</div>\n                    </div>\n                ";
         return;
       }
       this.orders.forEach((order_3, value_203) => {
         const el = document.createElement("div"),
           value_205 = order_3.items[0],
-          value_206 = value_205?.name || "商品",
+          value_206 = value_205?.name || "Item",
           ts = order_3.timestamp || order_3.id,
           max_208 = Math.max(0, Date.now() - Number(ts || 0)),
           isFood_4 = Boolean(value_205?.isFood),
-          step1Text = isFood_4 ? "已取餐" : "已发货",
-          step2Text = isFood_4 ? "送餐中" : "运输中",
-          text_211 = "已送达",
+          step1Text = isFood_4 ? "Picked up" : "Shipped",
+          step2Text = isFood_4 ? "Out for delivery" : "In transit",
+          text_211 = "Delivered",
           value_212 = value_203 * 0.1;
         el.className = "shopping-order-card";
         el.style.cssText = "animation-delay: " + value_212 + "s;";
         el.dataset.orderId = String(order_3.id);
-        el.innerHTML = "\n                    <div class=\"shopping-order-header\">\n                        <div class=\"shopping-order-date\">" + order_3.date + "</div>\n                        <button class=\"shopping-order-delete-btn shopping-order-delete\" data-index=\"" + value_203 + "\">\n                            <i class=\"fas fa-times\"></i>\n                        </button>\n                    </div>\n                    \n                    <div class=\"shopping-order-progress\">\n                        <div class=\"shopping-order-track\"></div>\n                        <div class=\"shopping-order-fill\"></div>\n                        \n                        <div class=\"shopping-order-nodes\">\n                            <!-- Node 1 -->\n                            <div class=\"shopping-order-node\">\n                                <div class=\"shopping-order-icon-wrap\">\n                                    <i class=\"fas fa-check\"></i>\n                                </div>\n                                <div class=\"shopping-order-node-text\">" + step1Text + "</div>\n                            </div>\n                            <!-- Node 2 -->\n                            <div class=\"shopping-order-node\">\n                                <div class=\"shopping-order-icon-wrap\">\n                                    <i class=\"fas fa-motorcycle\"></i>\n                                </div>\n                                <div class=\"shopping-order-node-text\">" + step2Text + "</div>\n                            </div>\n                            <!-- Node 3 -->\n                            <div class=\"shopping-order-node\">\n                                <div class=\"shopping-order-icon-wrap\">\n                                    <i class=\"fas fa-home\"></i>\n                                </div>\n                                <div class=\"shopping-order-node-text\">" + text_211 + "</div>\n                            </div>\n                        </div>\n                    </div>\n\n                    <div class=\"shopping-order-item-inline-wrap\">\n                        <div class=\"shopping-order-items-scroll inline-mode\">\n                            <div class=\"shopping-order-item-media\" style=\"background: " + (value_205?.mediaBg || "#f2f2f7") + ";\">\n                                " + (value_205?.iconHtml || "<i class=\"fas fa-box\"></i>") + "\n                            </div>\n                        </div>\n                        <div class=\"shopping-order-title inline-mode\">" + value_206 + "</div>\n                    </div>\n                    \n                    <div class=\"shopping-order-footer\">\n                        <div class=\"shopping-order-method\">" + order_3.method + "</div>\n                        <div class=\"shopping-order-price-wrap\">\n                            <button class=\"shopping-order-gift-btn\" data-order-id=\"" + order_3.id + "\" style=\"margin-right: 8px; background: #ff9bb3; color: #fff; border: none; border-radius: 12px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer;\">赠送</button>\n                            <button class=\"shopping-order-comment-btn\" data-product=\"" + (order_3.items.length > 0 ? order_3.items[0].name : "") + "\">评价商品</button>\n                            <div class=\"shopping-order-price\">¥" + Number(order_3.itemTotal ?? order_3.total ?? 0).toFixed(2) + "</div>\n                        </div>\n                    </div>\n                ";
+        el.innerHTML = "\n                    <div class=\"shopping-order-header\">\n                        <div class=\"shopping-order-date\">" + order_3.date + "</div>\n                        <button class=\"shopping-order-delete-btn shopping-order-delete\" data-index=\"" + value_203 + "\">\n                            <i class=\"fas fa-times\"></i>\n                        </button>\n                    </div>\n                    \n                    <div class=\"shopping-order-progress\">\n                        <div class=\"shopping-order-track\"></div>\n                        <div class=\"shopping-order-fill\"></div>\n                        \n                        <div class=\"shopping-order-nodes\">\n                            <!-- Node 1 -->\n                            <div class=\"shopping-order-node\">\n                                <div class=\"shopping-order-icon-wrap\">\n                                    <i class=\"fas fa-check\"></i>\n                                </div>\n                                <div class=\"shopping-order-node-text\">" + step1Text + "</div>\n                            </div>\n                            <!-- Node 2 -->\n                            <div class=\"shopping-order-node\">\n                                <div class=\"shopping-order-icon-wrap\">\n                                    <i class=\"fas fa-motorcycle\"></i>\n                                </div>\n                                <div class=\"shopping-order-node-text\">" + step2Text + "</div>\n                            </div>\n                            <!-- Node 3 -->\n                            <div class=\"shopping-order-node\">\n                                <div class=\"shopping-order-icon-wrap\">\n                                    <i class=\"fas fa-home\"></i>\n                                </div>\n                                <div class=\"shopping-order-node-text\">" + text_211 + "</div>\n                            </div>\n                        </div>\n                    </div>\n\n                    <div class=\"shopping-order-item-inline-wrap\">\n                        <div class=\"shopping-order-items-scroll inline-mode\">\n                            <div class=\"shopping-order-item-media\" style=\"background: " + (value_205?.mediaBg || "#f2f2f7") + ";\">\n                                " + (value_205?.iconHtml || "<i class=\"fas fa-box\"></i>") + "\n                            </div>\n                        </div>\n                        <div class=\"shopping-order-title inline-mode\">" + value_206 + "</div>\n                    </div>\n                    \n                    <div class=\"shopping-order-footer\">\n                        <div class=\"shopping-order-method\">" + order_3.method + "</div>\n                        <div class=\"shopping-order-price-wrap\">\n                            <button class=\"shopping-order-gift-btn\" data-order-id=\"" + order_3.id + "\" style=\"margin-right: 8px; background: #ff9bb3; color: #fff; border: none; border-radius: 12px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer;\">Gift</button>\n                            <button class=\"shopping-order-comment-btn\" data-product=\"" + (order_3.items.length > 0 ? order_3.items[0].name : "") + "\">Review item</button>\n                            <div class=\"shopping-order-price\">$" + Number(order_3.itemTotal ?? order_3.total ?? 0).toFixed(2) + "</div>\n                        </div>\n                    </div>\n                ";
         this.updateOrderProgress(order_3, el, max_208);
         const giftBtn = el.querySelector(".shopping-order-gift-btn");
-        giftBtn && (order_3.gifted ? (giftBtn.textContent = order_3.giftedToName ? "已赠给 " + order_3.giftedToName : "已赠送", giftBtn.style.background = "#e5e5ea", giftBtn.style.color = "#8e8e93", giftBtn.style.cursor = "default") : giftBtn.addEventListener("click", event_213 => {
+        giftBtn && (order_3.gifted ? (giftBtn.textContent = order_3.giftedToName ? "Gifted to " + order_3.giftedToName : "Gifted", giftBtn.style.background = "#e5e5ea", giftBtn.style.color = "#8e8e93", giftBtn.style.cursor = "default") : giftBtn.addEventListener("click", event_213 => {
           event_213.stopPropagation();
           const id_214 = giftBtn.dataset.orderId,
             orderToGift = this.orders.find(book_3 => String(book_3.id) === String(id_214));
@@ -872,8 +872,8 @@
       if (isFood_5) {
         if (this.foodDetailName) this.foodDetailName.textContent = product_3.name;
         if (this.foodDetailPrice) {
-          const val_2 = product_3.price.replace("¥", "");
-          this.foodDetailPrice.innerHTML = "<span style=\"font-size: 16px;\">¥</span>" + val_2;
+          const val_2 = product_3.price.replace("$", "");
+          this.foodDetailPrice.innerHTML = "<span style=\"font-size: 16px;\">$</span>" + val_2;
         }
         if (this.foodBottomPrice) this.foodBottomPrice.textContent = product_3.price;
         if (this.foodDetailDesc) this.foodDetailDesc.textContent = product_3.desc;
@@ -906,10 +906,10 @@
         if (item_228) options_226 = JSON.parse(item_228);
       } catch (value_229) {}
       const items_227 = options_226[value_223] || [];
-      if (qaSheetTitle) qaSheetTitle.textContent = "问大家 (" + items_227.length + ")";
+      if (qaSheetTitle) qaSheetTitle.textContent = "Q&A (" + items_227.length + ")";
       if (qaTrigger) {
         qaTrigger.innerHTML = "\n                    <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;\">\n                        <div style=\"font-size: 16px; font-weight: 700; color: #111;\">Q&A (" + items_227.length + ")</div>\n                        <div style=\"font-size: 13px; color: #111; font-weight: 600; display: flex; align-items: center;\">See All <i class=\"fas fa-chevron-right\" style=\"font-size: 10px; margin-left: 4px;\"></i></div>\n                    </div>\n                ";
-        if (items_227.length === 0) qaTrigger.innerHTML += "<div style=\"font-size: 14px; color: #8e8e93;\">暂无问答</div>";else {
+        if (items_227.length === 0) qaTrigger.innerHTML += "<div style=\"font-size: 14px; color: #8e8e93;\">No Q&A yet</div>";else {
           const slice_230 = items_227.slice(0, 2);
           slice_230.forEach(value_231 => {
             const randomAnswersCount = Math.floor(Math.random() * 5) + 1;
@@ -918,7 +918,7 @@
         }
       }
       shoppingQaContainerElement.innerHTML = "";
-      items_227.length === 0 ? shoppingQaContainerElement.innerHTML = "<div style=\"text-align: center; color: #8e8e93; font-size: 14px; padding: 20px 0;\">暂无问答数据</div>" : items_227.forEach(value_233 => {
+      items_227.length === 0 ? shoppingQaContainerElement.innerHTML = "<div style=\"text-align: center; color: #8e8e93; font-size: 14px; padding: 20px 0;\">No Q&A yet</div>" : items_227.forEach(value_233 => {
         const element_234 = document.createElement("div");
         element_234.style.cssText = "display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid rgba(17,17,17,0.05);";
         element_234.innerHTML = "\n                        <div style=\"display: flex; align-items: flex-start; gap: 8px;\">\n                            <span style=\"background: #111; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 2px;\">Q</span>\n                            <div style=\"font-size: 15px; font-weight: 600; color: #111; line-height: 1.4;\">" + value_233.q + "</div>\n                        </div>\n                        <div style=\"display: flex; align-items: flex-start; gap: 8px; margin-top: 4px;\">\n                            <span style=\"background: #e5e5ea; color: #8e8e93; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 2px;\">A</span>\n                            <div style=\"font-size: 14px; color: #333; line-height: 1.5;\">" + value_233.a + "</div>\n                        </div>\n                    ";
@@ -934,7 +934,7 @@
       if (isFood_7) {
         const allDivs = sheet.querySelectorAll("div");
         for (let div of allDivs) {
-          if (div.textContent.includes("外卖评价") && div.style.fontSize === "15px") {
+          if (div.textContent.includes("Delivery Reviews") && div.style.fontSize === "15px") {
             titleEl = div;
             reviewsContainerList_2 = div.parentElement.lastElementChild;
             break;
@@ -957,13 +957,13 @@
         if (item_246) options_241 = JSON.parse(item_246);
       } catch (value_247) {}
       const value_242 = options_241[value_235] || [];
-      titleEl && (titleEl.textContent = isFood_7 ? "外卖评价 (" + value_242.length + ")" : "Reviews (" + value_242.length + ")");
+      titleEl && (titleEl.textContent = isFood_7 ? "Delivery Reviews (" + value_242.length + ")" : "Reviews (" + value_242.length + ")");
       reviewsContainerList_2.innerHTML = "";
-      value_242.length === 0 && (reviewsContainerList_2.innerHTML = "<div style=\"font-size: 14px; color: #8e8e93; text-align: center; padding: 10px 0;\">暂无评价</div>");
+      value_242.length === 0 && (reviewsContainerList_2.innerHTML = "<div style=\"font-size: 14px; color: #8e8e93; text-align: center; padding: 10px 0;\">No reviews yet</div>");
     }
     ["initRatingSheet"]() {
       if (document.getElementById("shopping-rating-sheet")) return;
-      const sheetHtml = "\n            <div class=\"bottom-sheet-overlay detail-sheet-overlay\" id=\"shopping-rating-sheet\" style=\"z-index: 1200;\">\n                <div class=\"bottom-sheet\" style=\"height: auto; max-height: 70%; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)); background: #ffffff;\">\n                    <div class=\"sheet-handle\"></div>\n                    <div class=\"sheet-title\" id=\"shopping-rating-title\">商品评价</div>\n                    <div class=\"detail-sheet-content\" style=\"padding: 16px;\">\n                        <div style=\"display: flex; justify-content: center; gap: 15px; margin-bottom: 24px;\" id=\"shopping-rating-stars\">\n                            <i class=\"fas fa-star\" data-val=\"1\" style=\"font-size: 32px; color: #ff9500; cursor: pointer;\"></i>\n                            <i class=\"fas fa-star\" data-val=\"2\" style=\"font-size: 32px; color: #ff9500; cursor: pointer;\"></i>\n                            <i class=\"fas fa-star\" data-val=\"3\" style=\"font-size: 32px; color: #ff9500; cursor: pointer;\"></i>\n                            <i class=\"fas fa-star\" data-val=\"4\" style=\"font-size: 32px; color: #ff9500; cursor: pointer;\"></i>\n                            <i class=\"fas fa-star\" data-val=\"5\" style=\"font-size: 32px; color: #ff9500; cursor: pointer;\"></i>\n                        </div>\n                        <textarea id=\"shopping-rating-text\" placeholder=\"写点评价吧，你的评价对其他买家有很大帮助...\" style=\"width: 100%; height: 120px; border: none; background: #f7f7f5; border-radius: 12px; padding: 16px; font-size: 15px; resize: none; outline: none; margin-bottom: 20px; box-sizing: border-box;\"></textarea>\n                        <button type=\"button\" id=\"shopping-rating-submit\" style=\"width: 100%; padding: 16px; background: #111; color: #fff; border-radius: 12px; font-size: 16px; font-weight: 700; border: none; cursor: pointer;\">提交评价</button>\n                    </div>\n                </div>\n            </div>";
+      const sheetHtml = "\n            <div class=\"bottom-sheet-overlay detail-sheet-overlay\" id=\"shopping-rating-sheet\" style=\"z-index: 1200;\">\n                <div class=\"bottom-sheet\" style=\"height: auto; max-height: 70%; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)); background: #ffffff;\">\n                    <div class=\"sheet-handle\"></div>\n                    <div class=\"sheet-title\" id=\"shopping-rating-title\">Product Review</div>\n                    <div class=\"detail-sheet-content\" style=\"padding: 16px;\">\n                        <div style=\"display: flex; justify-content: center; gap: 15px; margin-bottom: 24px;\" id=\"shopping-rating-stars\">\n                            <i class=\"fas fa-star\" data-val=\"1\" style=\"font-size: 32px; color: #ff9500; cursor: pointer;\"></i>\n                            <i class=\"fas fa-star\" data-val=\"2\" style=\"font-size: 32px; color: #ff9500; cursor: pointer;\"></i>\n                            <i class=\"fas fa-star\" data-val=\"3\" style=\"font-size: 32px; color: #ff9500; cursor: pointer;\"></i>\n                            <i class=\"fas fa-star\" data-val=\"4\" style=\"font-size: 32px; color: #ff9500; cursor: pointer;\"></i>\n                            <i class=\"fas fa-star\" data-val=\"5\" style=\"font-size: 32px; color: #ff9500; cursor: pointer;\"></i>\n                        </div>\n                        <textarea id=\"shopping-rating-text\" placeholder=\"Write a review to help other shoppers...\" style=\"width: 100%; height: 120px; border: none; background: #f6f6f8; border-radius: 12px; padding: 16px; font-size: 15px; resize: none; outline: none; margin-bottom: 20px; box-sizing: border-box;\"></textarea>\n                        <button type=\"button\" id=\"shopping-rating-submit\" style=\"width: 100%; padding: 16px; background: #111; color: #fff; border-radius: 12px; font-size: 16px; font-weight: 700; border: none; cursor: pointer;\">Submit Review</button>\n                    </div>\n                </div>\n            </div>";
       document.body.insertAdjacentHTML("beforeend", sheetHtml);
       this.ratingSheet = document.getElementById("shopping-rating-sheet");
       this.ratingStars = document.getElementById("shopping-rating-stars").children;
@@ -981,7 +981,7 @@
       this.ratingSubmit.addEventListener("click", () => {
         const text_2 = this.ratingText.value.trim();
         if (!text_2) {
-          if (window.showToast) window.showToast("请输入评价内容");else alert("请输入评价内容");
+          if (window.showToast) window.showToast("Enter your review");else alert("Enter your review");
           return;
         }
         if (!this.currentReviewProduct) return;
@@ -992,13 +992,13 @@
         } catch (value_257) {}
         !commentsObj_2[this.currentReviewProduct] && (commentsObj_2[this.currentReviewProduct] = []);
         commentsObj_2[this.currentReviewProduct].unshift({
-          user: "我",
+          user: "You",
           text: text_2,
           rating: rating_2,
           date: new Date().toLocaleDateString()
         });
         durableStorage.setItem("shopping_comments", JSON.stringify(commentsObj_2));
-        if (window.showToast) window.showToast("评价发表成功");else alert("评价发表成功");
+        if (window.showToast) window.showToast("Review published");else alert("Review published");
         this.ratingSheet.classList.remove("active");
         this.currentProduct && this.currentProduct.name === this.currentReviewProduct && this.renderComments(this.currentReviewProduct, this.currentProduct.isFood);
       });
@@ -1017,9 +1017,9 @@
         if (item_264) options_262 = JSON.parse(item_264);
       } catch (value_265) {}
       const items_263 = options_262[value_259] || [];
-      titleEl_2 && (titleEl_2.textContent = value_260 ? "外卖评价 (" + items_263.length + ")" : "Reviews (" + items_263.length + ")");
+      titleEl_2 && (titleEl_2.textContent = value_260 ? "Delivery Reviews (" + items_263.length + ")" : "Reviews (" + items_263.length + ")");
       container_2.innerHTML = "";
-      items_263.length === 0 ? container_2.innerHTML = "<div style=\"text-align: center; padding: 40px; color: #8e8e93;\">暂无评价</div>" : items_263.forEach(value_266 => {
+      items_263.length === 0 ? container_2.innerHTML = "<div style=\"text-align: center; padding: 40px; color: #8e8e93;\">No reviews yet</div>" : items_263.forEach(value_266 => {
         const element_267 = document.createElement("div");
         element_267.style.cssText = "display: flex; gap: 12px; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid rgba(17,17,17,0.05);";
         let starsHtml = "";
@@ -1097,8 +1097,8 @@
         });
         this.cartList.appendChild(itemEl);
       });
-      if (this.cartSubtotal) this.cartSubtotal.textContent = "¥" + count_280.toFixed(2);
-      if (this.cartTotal) this.cartTotal.textContent = "¥" + count_280.toFixed(2);
+      if (this.cartSubtotal) this.cartSubtotal.textContent = "$" + count_280.toFixed(2);
+      if (this.cartTotal) this.cartTotal.textContent = "$" + (count_280 + 5).toFixed(2);
     }
     ["open"]() {
       if (!this.view) return;
