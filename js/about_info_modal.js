@@ -19,30 +19,30 @@
     closeButton = document.getElementById("about-info-modal-close"),
     confirmButton = document.getElementById("about-info-modal-confirm"),
     CHANGELOG_ENTRIES = [{
-      id: "September 4, 2026",
+      id: "",
       year: "2026",
       shortDate: "September 4",
-      fullDate: "",
+      fullDate: "2026年9月4日",
       sections: [{
         label: "",
         title: "",
         items: ["LHV"]
       }]
     }, {
-      id: "September 29, 2026",
+      id: "",
       year: "2026",
       shortDate: "September 29",
-      fullDate: "",
+      fullDate: "2026年9月29日",
       sections: [{
         label: "",
         title: "",
         items: ["Koala"]
       }]
     }, {
-      id: "September 14, 2026",
+      id: "",
       year: "2026",
       shortDate: "September 14, 2026",
-      fullDate: "",
+      fullDate: "2026年9月14日",
       sections: [{
         label: "",
         title: "",
