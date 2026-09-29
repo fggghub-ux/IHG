@@ -580,6 +580,20 @@
     color: #ffffff;
 }
 
+#shopping-settings-sheet .bottom-sheet {
+    border-radius: 28px 28px 0 0 !important;
+    background: #fff;
+}
+
+#shopping-settings-sheet .sheet-handle { background: #c7c7cc; }
+
+#shopping-settings-sheet .sheet-title {
+    color: var(--shop-ink);
+    font-size: 23px;
+    font-weight: 740;
+    letter-spacing: -.035em;
+}
+
 @media (max-width: 360px) {
     .shopping-topbar {
         padding-left: 16px;
