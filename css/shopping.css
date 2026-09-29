@@ -598,7 +598,17 @@
 /* iPad-only Shopping scale: preserve phone metrics while matching the GPT tablet layout. */
 @media (min-width: 700px) and (max-width: 1366px) and (pointer: coarse) {
     .shopping-brand {
-        font-size: 30px;
+        font-size: 34px;
+    }
+
+    .shopping-top-actions {
+        gap: 10px;
+    }
+
+    .shopping-icon-btn {
+        width: 46px;
+        height: 46px;
+        font-size: 18px;
     }
 
     .shopping-hero h2 {
