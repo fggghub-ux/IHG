@@ -602,13 +602,13 @@
     }
 
     .shopping-top-actions {
-        gap: 10px;
+        gap: 8px;
     }
 
     .shopping-icon-btn {
-        width: 46px;
-        height: 46px;
-        font-size: 18px;
+        width: 38px;
+        height: 38px;
+        font-size: 15px;
     }
 
     .shopping-hero h2 {
@@ -783,6 +783,23 @@
 
 .shopping-brand {
     font-size: 24px;
+}
+
+/* iPad-only final topbar scale. Keep this after the full-frame header override. */
+@media (min-width: 700px) and (max-width: 1366px) and (pointer: coarse) {
+    .shopping-brand {
+        font-size: 34px;
+    }
+
+    .shopping-top-actions {
+        gap: 8px;
+    }
+
+    .shopping-icon-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 15px;
+    }
 }
 
 /* Premium Orders UI */
