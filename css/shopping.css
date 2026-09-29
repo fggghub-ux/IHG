@@ -356,12 +356,17 @@
 
 .shopping-cart-state {
     min-height: 100%;
+    padding: 20px 18px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     gap: 16px;
+    border: 1px solid var(--shop-line);
+    border-radius: 28px;
+    background: #fff;
 }
 
 .shopping-cart-icon {

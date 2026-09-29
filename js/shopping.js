@@ -146,7 +146,7 @@
       }
       const books_2 = this.getAvailableWorldBooks(),
         boundBooks = boundIds.map(id_6 => books_2.find(book => String(book.id) === String(id_6))).filter(Boolean);
-      if (boundBooks.length === 1) this.boundWbName.textContent = boundBooks[0].name || "Untitled World Book";else boundBooks.length > 1 ? this.boundWbName.textContent = "Mounted " + boundBooks.length + " books" : this.boundWbName.textContent = "Not mounted";
+      if (boundBooks.length === 1) this.boundWbName.textContent = boundBooks[0].name || "未命名世界书";else boundBooks.length > 1 ? this.boundWbName.textContent = "已挂载 " + boundBooks.length + " 本" : this.boundWbName.textContent = "Not mounted";
     }
     ["syncProfile"]() {
       const contact = window.getUserState ? window.getUserState() : window.userState || {},
@@ -240,7 +240,7 @@
           this.addToCart(this.currentProduct);
           this.closeDetail();
           const originalText = this.addToCartBtn.textContent;
-          this.addToCartBtn.textContent = "Added!";
+          this.addToCartBtn.textContent = "已添加!";
           setTimeout(() => {
             if (this.addToCartBtn) this.addToCartBtn.textContent = originalText;
           }, 1000);
@@ -251,7 +251,7 @@
           this.addToCart(this.currentProduct);
           this.closeDetail();
           const originalText_2 = this.addFoodToCartBtn.textContent;
-          this.addFoodToCartBtn.textContent = "Added!";
+          this.addFoodToCartBtn.textContent = "已添加!";
           setTimeout(() => {
             if (this.addFoodToCartBtn) this.addFoodToCartBtn.textContent = originalText_2;
           }, 1000);
@@ -294,124 +294,197 @@
       if (this.ordersRefreshTimer) clearTimeout(this.ordersRefreshTimer);
       this.ordersRefreshTimer = null;
     }
-    ["startOrdersRefresh"]() {
-      this.stopOrdersRefresh();
-      if (!this.ordersSheet?.classList.contains("active") || document.hidden) return;
-      const now_54 = Date.now();
-      let value_55 = Infinity;
-      this.orders.forEach(message_56 => {
-        const max_57 = Math.max(0, now_54 - Number(message_56.timestamp || 0)),
-          result_58 = Array.from(this.ordersList?.children || []).find(value_59 => value_59.dataset.orderId === String(message_56.id));
-        if (result_58) this.updateOrderProgress(message_56, result_58, max_57);
-        if (max_57 < count) value_55 = Math.min(value_55, count - max_57);else max_57 < count_3 && (value_55 = Math.min(value_55, count_3 - max_57));
-      });
-      if (!Number.isFinite(value_55)) return;
-      this.ordersRefreshTimer = window.setTimeout(() => {
-        this.ordersRefreshTimer = null;
-        this.startOrdersRefresh();
-      }, Math.max(16, Math.ceil(value_55) + 16));
+    startOrdersRefresh() {
+        this.stopOrdersRefresh();
+        if (!this.ordersSheet?.classList.contains('active') || document.hidden) return;
+        this.ordersRefreshTimer = window.setTimeout(() => {
+            this.ordersRefreshTimer = null;
+            if (!this.ordersSheet?.classList.contains('active') || document.hidden) return;
+            this.updateOrderProgress();
+            this.startOrdersRefresh();
+        }, 1000);
     }
-    ["updateOrderProgress"](order, element_61, value_62 = Math.max(0, Date.now() - Number(order.timestamp || 0))) {
-      if (!element_61) return;
-      const isFood_2 = order.items.some(i => i.isFood),
-        cColor = isFood_2 ? "var(--shop-accent, #111113)" : "#111111",
-        fColor = "var(--shop-green, #476c5a)",
-        value_66 = value_62 >= count_3 ? 3 : value_62 >= count ? 2 : 1,
-        from_67 = Array.from(element_61.querySelectorAll(".shopping-order-icon-wrap")),
-        from_68 = Array.from(element_61.querySelectorAll(".shopping-order-node-text"));
-      from_67.forEach((element_71, value_72) => {
-        const value_73 = value_72 < value_66,
-          value_74 = value_72 === 2 && value_66 === 3;
-        element_71.style.background = value_73 ? value_74 ? fColor : cColor : "#f2f2f7";
-        element_71.style.animation = "none";
-        const iElement = element_71.querySelector("i");
-        if (iElement) iElement.style.color = value_73 ? "#fff" : "#c7c7cc";
-        from_68[value_72] && (from_68[value_72].style.color = value_73 ? "#111" : "#8e8e93", from_68[value_72].style.fontWeight = value_73 ? "700" : "600");
-      });
-      const reviewsContainerList = element_61.querySelector(".shopping-order-fill");
-      if (!reviewsContainerList) return;
-      reviewsContainerList.style.background = value_66 === 3 ? fColor : cColor;
-      if (reviewsContainerList.dataset.progressStarted === "true") return;
-      const min_69 = Math.min(1, value_62 / count_3);
-      reviewsContainerList.style.transition = "none";
-      reviewsContainerList.style.transform = "scaleX(" + min_69 + ")";
-      reviewsContainerList.dataset.progressStarted = "true";
-      min_69 < 1 && window.requestAnimationFrame(() => {
-        if (!reviewsContainerList.isConnected) return;
-        reviewsContainerList.style.transition = "transform " + Math.max(0, count_3 - value_62) + "ms linear, background 0.3s ease";
-        reviewsContainerList.style.transform = "scaleX(1)";
-      });
+
+    updateOrderProgress() {
+        if (!this.ordersList) return;
+        const now = Date.now();
+
+        this.ordersList.querySelectorAll('.shopping-order-card[data-order-id]').forEach(card => {
+            const order = this.orders.find(item => String(item.id) === card.dataset.orderId);
+            if (!order) return;
+
+            const elapsed = (now - (order.timestamp || order.id)) / 1000;
+            const progress = Math.min(100, Math.max(0, (elapsed / 16) * 100));
+            const isFood = order.items.some(item => item.isFood);
+            const active = [true, elapsed >= 8, elapsed >= 16];
+            const currentColor = isFood ? 'var(--shop-accent, #a97642)' : '#111111';
+            const finalColor = 'var(--shop-green, #476c5a)';
+            const glow = isFood ? 'shopPulseGlow' : 'shopPulseGlowGreen';
+
+            const fill = card.querySelector('.shopping-order-fill');
+            if (fill) {
+                fill.style.width = `calc(68% * ${progress / 100})`;
+                fill.style.background = active[2] ? finalColor : currentColor;
+            }
+
+            card.querySelectorAll('.shopping-order-node').forEach((node, index) => {
+                const icon = node.querySelector('.shopping-order-icon-wrap');
+                const text = node.querySelector('.shopping-order-node-text');
+                const color = index === 2 ? finalColor : currentColor;
+                if (icon) {
+                    icon.style.background = active[index] ? color : '#f2f2f7';
+                    icon.style.animation = (
+                        (index === 0 && active[0] && !active[1]) ||
+                        (index === 1 && active[1] && !active[2])
+                    ) ? `${glow} 2s infinite` : 'none';
+                    const glyph = icon.querySelector('i');
+                    if (glyph) glyph.style.color = active[index] ? '#fff' : '#c7c7cc';
+                }
+                if (text) {
+                    text.style.color = active[index] ? '#111' : '#8e8e93';
+                    text.style.fontWeight = active[index] ? '700' : '600';
+                }
+            });
+        });
     }
-    async ["handleGenerateProducts"]() {
-      let value_75 = this.searchInput ? this.searchInput.value.trim() : "";
-      const targetTab = this.currentTab === "food" ? "food" : "mall";
-      !value_75 && (value_75 = targetTab === "food" ? "Generate premium food and drink recommendations" : "Generate premium mall and luxury products");
-      this.searchConfirmBtn && (this.searchConfirmBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Generating...", this.searchConfirmBtn.disabled = true);
-      let content_2 = "You are a product, review, and Q&A generator. Based on the user's request, generate at least 10 products. Create 5-10 realistic customer reviews and 5-10 buyer Q&A pairs for each product. The current category is " + (targetTab === "food" ? "Food" : "Mall") + ". Every user-visible field must be written in natural English. Reviews should include positive, mixed, and negative opinions with varied, believable voices. Q&A answers should sound like real buyers, not official customer service.\n\n";
-      const boundWorldBookIds_78 = this.getBoundWorldBookIds();
-      if (boundWorldBookIds_78.length > 0 && window.wbManager) {
-        const bookContexts = [];
-        for (const boundId of boundWorldBookIds_78) {
-          const bookCtx = await window.wbManager.getBookContextString(boundId);
-          if (bookCtx) bookContexts.push(bookCtx);
+
+    async handleGenerateProducts() {
+        let userInput = this.searchInput ? this.searchInput.value.trim() : '';
+            
+        const targetTab = this.currentTab === 'food' ? 'food' : 'mall';
+            
+        // If empty, generate random items based on the current tab
+        if (!userInput) {
+            userInput = targetTab === 'food' 
+                ? "随机生成一些高质量的米其林餐或雪茄吧饮品" 
+                : "随机生成一些高品质的奢侈品牌商品或酒";
         }
-        bookContexts.length > 0 && (content_2 += "[Mounted World Book Context]\n" + bookContexts.join("\n\n") + "\n\nUse the context above to create fitting products, reviews, and Q&A while keeping every user-visible field in English.\n\n");
-      }
-      content_2 += "Return only a valid JSON array with no extra text or Markdown. Required schema:\n\n[\n  {\n    \"name\": \"Product name\",\n    \"price\": \"Price including the $ symbol, for example $45\",\n    \"desc\": \"Short product description\",\n    \"iconClass\": \"Font Awesome icon class, for example fa-burger\",\n    \"bgGrad\": \"CSS gradient background, for example linear-gradient(135deg, #f093fb 0%, #f5576c 100%)\",\n    \"tags\": [\"Tag 1\", \"Tag 2\"],\n    \"reviews\": [\n      { \"user\": \"User A\", \"text\": \"Review text\", \"rating\": 5 },\n      { \"user\": \"User B\", \"text\": \"Review text\", \"rating\": 4 }\n    ],\n    \"qa\": [\n      { \"q\": \"Question 1\", \"a\": \"Answer 1\" },\n      { \"q\": \"Question 2\", \"a\": \"Answer 2\" }\n    ]\n  }\n]";
-      try {
-        const apiConfig_2 = typeof window.getApiConfig === "function" ? window.getApiConfig() : window.apiConfig || {};
-        if (!apiConfig_2 || !apiConfig_2.endpoint || !apiConfig_2.apiKey) throw new Error("Configure the API in System Settings first");
-        const endpoint_2 = window.u2Api.resolveChatCompletionsEndpoint(apiConfig_2.endpoint),
-          value_83 = await fetch(endpoint_2, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + apiConfig_2.apiKey
-            },
-            body: JSON.stringify({
-              model: apiConfig_2.model || "gpt-3.5-turbo",
-              messages: [{
-                role: "system",
-                content: content_2
-              }, {
-                role: "user",
-                content: value_75
-              }],
-              temperature: parseFloat(apiConfig_2.temperature) || 0.8
-            })
-          });
-        if (!value_83.ok) {
-          const value_89 = await window.u2Api?.readApiError?.(value_83);
-          throw window.u2Api?.createHttpError?.(value_83, value_89) || Object.assign(new Error("API request failed: HTTP " + value_83.status), {
-            status: value_83.status
-          });
+
+        if (this.searchConfirmBtn) {
+            this.searchConfirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            this.searchConfirmBtn.disabled = true;
         }
-        const data = await value_83.json(),
-          choice = data.choices && data.choices[0],
-          responseText = choice && choice.message ? choice.message.content : "";
-        let jsonText = responseText || "";
-        jsonText.startsWith("```") && (jsonText = jsonText.replace(/```json/g, "").replace(/```/g, "").trim());
-        let productsData = null;
+
+        let systemPrompt = `你现在是一个商品、评价及问答生成器。根据用户的输入，生成不少于10个商品。每个商品生成5-10条用户评价，以及5-10条问答(Q&A)。
+当前分类是 ${targetTab === 'food' ? 'Food(米其林餐)' : 'Mall(奢侈品牌商品)'}。
+
+**关键要求**：
+1. **评价(Reviews)**：必须非常真实、接地气，包含好评、中评甚至差评。语气要幽默、调侃或者夸张（比如：“全球住了七家安缦，纽约这家的餐厅终于没让我失望。怀石料理做得很有水准，空间设计也是一贯的安缦极简风，呼吸都变慢了。”、“作为在东京吃过银座级别omakase的人，Mase确实能打，但说实话同等价位在东京能吃两顿。纽约溢价太狠了。”）。
+2. **问答(Q&A)**：这是买家向已经买过的买家提问的板块（类似淘宝的“问大家”）。回答者**绝对不要**像官方客服，而是真实的、充满个性的普通买家。回答可以很搞笑、无厘头、甚至带点互坑的成分（比如 Q：“真的需要配货才能买到吗？配货比例大概多少？” A：“我的经验是1:1.5到1.2不等，看你和SA的关系。有人说直接走进去就买到了，我只能说投胎是门技术活。” 或 Q：“日常戴会不会太夸张了？” A：“看款式，基础款其实挺低调，密镶钻那款确实闪。但姐妹，花了十几万买的东西不就是为了让人看到吗？”）。
+
+\n\n`;
+
+        // Append World Book context if bound
+        const boundIds = this.getBoundWorldBookIds();
+        if (boundIds.length > 0 && window.wbManager) {
+            const bookContexts = [];
+            for (const boundId of boundIds) {
+                const bookCtx = await window.wbManager.getBookContextString(boundId);
+                if (bookCtx) bookContexts.push(bookCtx);
+            }
+            if (bookContexts.length > 0) {
+                systemPrompt += `[当前挂载的世界书上下文]\n${bookContexts.join('\n\n')}\n\n参考以上世界书设定生成契合世界观的商品，评价和问答也可以带入世界观中的梗。\n\n`;
+            }
+        }
+            
+        systemPrompt += `输出必须为纯 JSON 数组格式，不要任何多余文本或 markdown 标签。格式：字符串内如需强调词语、菜名、品牌名或俚语，一律使用单引号 ' 包裹（例如 the 'wagyu' course），禁止在字符串内使用双引号 " ，否则破坏 JSON 结构导致解析失败。tags 数组长度严格为2。格式要求：\n
+
+[
+  {
+    "name": "Product name",
+    "price": "Product price(including $ symbol，e.g. $2200)",
+    "desc": "Short product description",
+    "iconClass": "fontawesome icon class name(e.g. fa-utensils)",
+    "bgGrad": "CSS渐变背景(例如 linear-gradient(135deg, #0A1128 0%, #C41E5C 100%) 色调需偏向高端品牌)",
+    "tags": ["Tag 1", "Tag 2"],
+    "reviews": [
+      { "user": "User A", "text": "Review content", "rating": 5 },
+      { "user": "User B", "text": "Review content", "rating": 4 }
+    ],
+    "qa": [
+      { "q": "Question 1", "a": "Answer 1" },
+      { "q": "Question 2", "a": "Answer 2" }
+    ]
+  }
+]`;
+            
         try {
-          productsData = JSON.parse(jsonText);
-        } catch (value_90) {
-          const startIdx = jsonText.indexOf("["),
-            endIdx = jsonText.lastIndexOf("]");
-          if (startIdx !== -1 && endIdx !== -1) productsData = JSON.parse(jsonText.substring(startIdx, endIdx + 1));else throw new Error("Could not parse the generated JSON");
+            const apiConfig = typeof window.getApiConfig === 'function' ? window.getApiConfig() : (window.apiConfig || {});
+            if (!apiConfig || !apiConfig.endpoint || !apiConfig.apiKey) {
+                throw new Error('请先在系统设置中配置 API');
+            }
+
+            const endpoint = window.u2Api.resolveChatCompletionsEndpoint(apiConfig.endpoint);
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiConfig.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: apiConfig.model || 'gpt-3.5-turbo',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: userInput }
+                    ],
+                    temperature: parseFloat(apiConfig.temperature) || 0.8
+                })
+            });
+
+            if (!response.ok) {
+                const errorBody = await window.u2Api?.readApiError?.(response);
+                throw window.u2Api?.createHttpError?.(response, errorBody)
+                    || Object.assign(new Error(`API 请求失败: HTTP ${response.status}`), { status: response.status });
+            }
+
+            const data = await response.json();
+            const choice = data.choices && data.choices[0];
+            const responseText = choice && choice.message ? choice.message.content : '';
+                
+            let jsonText = responseText || '';
+                
+            // Clean up possible markdown wrappers
+            if (jsonText.startsWith('```')) {
+                jsonText = jsonText.replace(/```json/g, '').replace(/```/g, '').trim();
+            }
+
+            let productsData = null;
+            try {
+                productsData = JSON.parse(jsonText);
+            } catch(e) {
+                // Try to extract array if parsing fails
+                const startIdx = jsonText.indexOf('[');
+                const endIdx = jsonText.lastIndexOf(']');
+                if(startIdx !== -1 && endIdx !== -1) {
+                    productsData = JSON.parse(jsonText.substring(startIdx, endIdx + 1));
+                } else {
+                    throw new Error("JSON 解析失败");
+                }
+            }
+
+            if (!Array.isArray(productsData) || productsData.length === 0) {
+                 throw new Error("生成数据为空");
+            }
+
+            // Append generated products to UI
+            this.injectGeneratedProducts(productsData, targetTab);
+                
+            if (this.searchSheet) this.searchSheet.classList.remove('active');
+            if (this.searchInput) this.searchInput.value = '';
+                
+        } catch(e) {
+            console.error("Generate error:", e);
+            (!window.u2Api?.isRequestError?.(e) || !window.u2Api.reportError(e, { operation: 'Product generation' }))
+                && (window.showToast ? window.showToast('生成失败: ' + e.message) : alert('生成失败: ' + e.message));
+        } finally {
+            if (this.searchConfirmBtn) {
+                this.searchConfirmBtn.innerHTML = '<i class="fas fa-magic"></i> Generate';
+                this.searchConfirmBtn.disabled = false;
+            }
         }
-        if (!Array.isArray(productsData) || productsData.length === 0) throw new Error("No products were generated");
-        this.injectGeneratedProducts(productsData, targetTab);
-        if (this.searchSheet) this.searchSheet.classList.remove("active");
-        if (this.searchInput) this.searchInput.value = "";
-      } catch (e_4) {
-        console.error("Generate error:", e_4);
-        (!window.u2Api?.isRequestError?.(e_4) || !window.u2Api.reportError(e_4, {
-          operation: "Product generation"
-        })) && (window.showToast ? window.showToast("Generation failed: " + e_4.message) : alert("Generation failed: " + e_4.message));
-      } finally {
-        this.searchConfirmBtn && (this.searchConfirmBtn.innerHTML = "<i class=\"fas fa-magic\"></i> Generate", this.searchConfirmBtn.disabled = false);
-      }
     }
+
     ["renderProductCards"](items_94, targetTab_2) {
       let container = null;
       if (targetTab_2 === "food") container = this.foodListContainer;
@@ -466,139 +539,205 @@
       durableStorage.setItem("shopping_comments", JSON.stringify(commentsObj));
       durableStorage.setItem("shopping_qa", JSON.stringify(qaObj));
     }
-    ["bindProductClicks"]() {
-      const products = this.view.querySelectorAll(".shopping-food-card, .shopping-product-card");
-      products.forEach(product_2 => {
-        if (product_2.hasAttribute("data-bound")) return;
-        product_2.setAttribute("data-bound", "true");
-        product_2.style.cursor = "pointer";
-        product_2.addEventListener("click", () => {
-          let name_2,
-            price_2,
-            desc_2,
-            iconHtml_2,
-            mediaBg_2,
-            isFood_3 = false;
-          if (product_2.classList.contains("shopping-food-card")) {
-            isFood_3 = true;
-            name_2 = product_2.querySelector("strong")?.textContent || "Food Item";
-            price_2 = product_2.querySelector(".shopping-card-topline span")?.textContent || "$0";
-            desc_2 = product_2.querySelector("p")?.textContent || "";
-            iconHtml_2 = product_2.querySelector(".shopping-food-media")?.innerHTML || "";
-            mediaBg_2 = product_2.querySelector(".shopping-food-media").style.background || window.getComputedStyle(product_2.querySelector(".shopping-food-media")).background;
-          } else {
-            name_2 = product_2.querySelector("strong")?.textContent || "Product";
-            price_2 = product_2.querySelector("span")?.textContent.split("·")[0].trim() || "$0";
-            const spans = product_2.querySelectorAll("span");
-            desc_2 = spans.length > 1 ? spans[1].textContent : "";
-            iconHtml_2 = product_2.querySelector(".shopping-product-media")?.innerHTML || "";
-            mediaBg_2 = product_2.querySelector(".shopping-product-media").style.background || window.getComputedStyle(product_2.querySelector(".shopping-product-media")).background;
-          }
-          this.openDetail({
-            name: name_2,
-            price: price_2,
-            desc: desc_2,
-            iconHtml: iconHtml_2,
-            mediaBg: mediaBg_2
-          }, isFood_3);
-        });
-      });
-    }
-    async ["openGiftCharSelection"](order_2, id_7) {
-      if (!this.charSelectionModal || !this.charList) return;
-      const textContent_2 = this.charSelectionModal.querySelector(".wb-centered-modal-title").textContent;
-      this.charSelectionModal.querySelector(".wb-centered-modal-title").textContent = "Choose a friend";
-      this.charList.innerHTML = "";
-      let items_123 = [];
-      if (window.imStorage && window.imStorage.loadFriends) try {
-        const allFriends = await window.imStorage.loadFriends();
-        items_123 = allFriends;
-      } catch (value_126) {}
-      items_123.length === 0 ? this.charList.innerHTML = "<div style=\"text-align: center; padding: 20px; color: #85858b;\">No friends found</div>" : items_123.forEach(friend => {
-        const element_128 = document.createElement("div");
-        element_128.style.cssText = "background: rgba(255, 255, 255, 0.82); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 1px solid rgba(17,17,17,0.09); ";
-        const value_129 = friend.name || friend.nickname || "Unknown Char";
-        let text_130 = "<div style=\"width: 40px; height: 40px; border-radius: 50%; background: rgba(17,17,17,0.06); display: flex; justify-content: center; align-items: center; color: #85858b;\"><i class=\"fas fa-user\"></i></div>";
-        const value_131 = friend.avatarUrl || friend.avatar;
-        value_131 && (text_130 = "<img src=\"" + value_131 + "\" style=\"width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(17,17,17,0.09);\">");
-        element_128.innerHTML = "\n                        <div style=\"display: flex; align-items: center; gap: 12px;\">\n                            " + text_130 + "\n                            <div style=\"display: flex; flex-direction: column;\">\n                                <div style=\"font-size: 15px; font-weight: 700; color: #111;\">" + value_129 + "</div>\n                                <div style=\"font-size: 13px; color: #85858b; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;\">" + (friend.signature || "") + "</div>\n                            </div>\n                        </div>\n                        <div style=\"background: #111; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 13px; font-weight: 600;\">Gift</div>\n                    ";
-        element_128.addEventListener("click", async () => {
-          if (this.giftOrdersInFlight.has(String(order_2.id))) return;
-          const success = await this.sendGiftMessage(friend, order_2);
-          if (success) {
-            const result_133 = this.orders.find(book_2 => String(book_2.id) === String(id_7));
-            result_133 && (result_133.gifted = true, result_133.giftedAt = Date.now(), result_133.giftedToFriendId = String(friend.id), result_133.giftedToName = friend.name || friend.nickname || "Unknown Char", this.saveOrders(), this.renderOrders());
-          }
-          this.charSelectionModal.style.display = "none";
-          this.charSelectionModal.classList.remove("active");
-          this.charSelectionModal.querySelector(".wb-centered-modal-title").textContent = textContent_2;
-        });
-        this.charList.appendChild(element_128);
-      });
-      const closeBtn_2 = this.charSelectionModal.querySelector(".wb-centered-modal-close"),
-        newCloseBtn = closeBtn_2.cloneNode(true);
-      closeBtn_2.parentNode.replaceChild(newCloseBtn, closeBtn_2);
-      newCloseBtn.addEventListener("click", () => {
-        this.charSelectionModal.style.display = "none";
-        this.charSelectionModal.classList.remove("active");
-        this.charSelectionModal.querySelector(".wb-centered-modal-title").textContent = textContent_2;
-      });
-      this.charSelectionModal.style.display = "flex";
-      requestAnimationFrame(() => {
-        this.charSelectionModal.classList.add("active");
-      });
-    }
-    async ["sendGiftMessage"](friend_2, value_136) {
-      const orderId_2 = String(value_136?.id || "");
-      if (!orderId_2 || this.giftOrdersInFlight.has(orderId_2)) return false;
-      this.giftOrdersInFlight.add(orderId_2);
-      const value_137 = value_136.items?.[0] || {},
-        itemName_2 = String(value_137.name || "Item"),
-        price_3 = Number(value_136.itemTotal ?? value_137.priceVal ?? value_136.total) || 0,
-        text_3 = "[Gift]\nItem: " + itemName_2 + "\nValue: $" + price_3.toFixed(2) + "\nPayment method: " + value_136.method,
-        handleAction_6_141 = handleAction_6(itemName_2),
-        handleAction_6_142 = handleAction_6(value_136.method || "Pay"),
-        content_3 = "\n                <div style=\"background: #fff0f3; border-radius: 16px; padding: 16px; min-width: 220px; max-width: 280px; color: #111111; border: 1px solid rgba(255,155,179,0.3); display: inline-block;\">\n                    <div style=\"font-size: 12px; color: #ff9bb3; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-weight: 700;\">\n                        <i class=\"fas fa-gift\"></i> Gift received\n                    </div>\n                    <div style=\"font-size: 15px; font-weight: 700; margin-bottom: 6px; white-space: normal; word-break: break-word; line-height: 1.4;\">" + handleAction_6_141 + "</div>\n                    <div style=\"font-size: 13px; color: #85858b; margin-top: 8px;\">Value $" + price_3.toFixed(2) + "</div>\n                    <div style=\"font-size: 12px; color: #8e8e93; margin-top: 4px;\">Paid via " + handleAction_6_142 + "</div>\n                </div>\n            ";
-      let enabled_144 = false;
-      try {
-        if (window.imApp && window.imApp.appendFriendMessage) {
-          window.imApp.ensureFriendMessagesLoaded && (await window.imApp.ensureFriendMessagesLoaded(friend_2.id));
-          const aiMsg = {
-            role: "user",
-            type: "html",
-            text: text_3,
-            content: content_3,
-            shopGift: {
-              orderId: orderId_2,
-              itemName: itemName_2,
-              price: price_3,
-              paymentMethod: String(value_136.method || "Pay")
-            },
-            timestamp: Date.now()
-          };
-          enabled_144 = await window.imApp.appendFriendMessage(friend_2.id, aiMsg, {
-            silent: true
-          });
-          let value_146 = null;
-          enabled_144 && window.imData && window.imData.currentActiveFriend && String(window.imData.currentActiveFriend.id) === String(friend_2.id) && (value_146 = document.querySelector(".active-chat-interface .ins-chat-messages"), value_146 && window.imChat && window.imChat.appendMessageToContainer && window.imChat.appendMessageToContainer(window.imData.currentActiveFriend, value_146, aiMsg));
-          if (enabled_144 && window.imChat?.handleAiReply) {
-            const value_147 = (window.imData?.friends || []).find(value_148 => String(value_148.id) === String(friend_2.id)) || friend_2;
-            value_146 = document.getElementById("chat-interface-" + friend_2.id)?.querySelector(".ins-chat-messages") || value_146;
-            void window.imChat.handleAiReply(value_147, value_146, null, {
-              source: "shop_gift",
-              silent: true,
-              extraSystemPrompt: "User just sent a gift: \"" + itemName_2 + "\" (value $" + price_3.toFixed(2) + "). Respond naturally in character, based on the established personality and relationship."
-            });
-          }
+    bindProductClicks() {
+        const products = this.view.querySelectorAll('.shopping-food-card, .shopping-product-card');
+        products.forEach(product => {
+            // Prevent multiple bindings
+            if (product.hasAttribute('data-bound')) return;
+            product.setAttribute('data-bound', 'true');
+
+            product.style.cursor = 'pointer';
+            product.addEventListener('click', () => {
+                let name, price, desc;
+                    
+        const isFood = product.classList.contains('shopping-food-card');
+        const media = product.querySelector(isFood ? '.shopping-food-media' : '.shopping-product-media');
+        if (isFood) {
+            name = product.querySelector('strong')?.textContent || 'Food Item';
+            price = product.querySelector('.shopping-card-topline span')?.textContent || '$0';
+            desc = product.querySelector('p')?.textContent || '';
+        } else {
+            name = product.querySelector('strong')?.textContent || 'Product';
+            price = product.querySelector('span')?.textContent.split('·')[0].trim() || '$0';
+            // For generated mall items, desc is in the hidden span
+            const spans = product.querySelectorAll('span');
+            desc = (spans.length > 1) ? spans[1].textContent : '';
         }
-      } catch (e_5) {
-        console.error("Failed to append gift message:", e_5);
-      } finally {
-        this.giftOrdersInFlight["delete"](orderId_2);
-      }
-      if (window.showToast) window.showToast(enabled_144 ? "Gift sent" : "Gift failed");else alert(enabled_144 ? "Gift sent" : "Gift failed");
-      return enabled_144;
+
+                const iconHtml = media?.innerHTML || '';
+                const mediaBg = media ? (media.style.background || window.getComputedStyle(media).background) : '';
+                const mediaImage = media ? window.getComputedStyle(media, '::after').backgroundImage : 'none';
+                this.openDetail({ name, price, desc, iconHtml, mediaBg, mediaImage }, isFood);
+            });
+        });
     }
+
+    async openGiftCharSelection(order, orderIndex) {
+        if (!this.charSelectionModal || !this.charList) return;
+            
+        const originalTitle = this.charSelectionModal.querySelector('.wb-centered-modal-title').textContent;
+        this.charSelectionModal.querySelector('.wb-centered-modal-title').textContent = 'Select a friend to gift';
+            
+        this.charList.innerHTML = '';
+            
+        let friends = [];
+        if (window.imStorage && window.imStorage.loadFriends) {
+            try {
+                const allFriends = await window.imStorage.loadFriends();
+                friends = allFriends;
+            } catch(e) {}
+        }
+            
+        if (friends.length === 0) {
+            this.charList.innerHTML = '<div style="text-align: center; padding: 20px; color: #73706a;">no friends yet</div>';
+        } else {
+            friends.forEach(friend => {
+                const el = document.createElement('div');
+                el.style.cssText = 'background: rgba(255, 255, 255, 0.82); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 1px solid rgba(17,17,17,0.09); ';
+                    
+                const name = friend.name || friend.nickname || 'Unknown Char';
+                let avatarHtml = `<div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(17,17,17,0.06); display: flex; justify-content: center; align-items: center; color: #73706a;"><i class="fas fa-user"></i></div>`;
+                const friendAvatar = friend.avatarUrl || friend.avatar;
+                if (friendAvatar) {
+                    avatarHtml = `<img src="${friendAvatar}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(17,17,17,0.09);">`;
+                }
+                    
+                el.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        ${avatarHtml}
+                        <div style="display: flex; flex-direction: column;">
+                            <div style="font-size: 15px; font-weight: 700; color: #111;">${name}</div>
+                            <div style="font-size: 13px; color: #73706a; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${friend.signature || ''}</div>
+                        </div>
+                    </div>
+                    <div style="background: #111; color: #fff; padding: 6px 12px; border-radius: 16px; font-size: 13px; font-weight: 600;">Gift</div>
+                `;
+                    
+                el.addEventListener('click', () => {
+                    this.charSelectionModal.style.display = 'none';
+                    this.charSelectionModal.classList.remove('active');
+                    this.charSelectionModal.querySelector('.wb-centered-modal-title').textContent = originalTitle;
+                    this.openGiftComposer(friend, order, orderIndex);
+                });
+                    
+                this.charList.appendChild(el);
+            });
+        }
+            
+        const closeBtn = this.charSelectionModal.querySelector('.wb-centered-modal-close');
+        const newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        newCloseBtn.addEventListener('click', () => {
+            this.charSelectionModal.style.display = 'none';
+            this.charSelectionModal.classList.remove('active');
+            this.charSelectionModal.querySelector('.wb-centered-modal-title').textContent = originalTitle;
+        });
+
+        this.charSelectionModal.style.display = 'flex';
+        requestAnimationFrame(() => {
+            this.charSelectionModal.classList.add('active');
+        });
+    }
+
+    openGiftComposer(friend, order, orderIndex) {
+        document.querySelector('.shopping-gift-compose-overlay')?.remove();
+        const overlay = document.createElement('div');
+        overlay.className = 'shopping-gift-compose-overlay';
+        overlay.innerHTML = `
+            <div class="shopping-gift-compose-card" role="dialog" aria-modal="true" aria-label="Gift">
+                <div class="shopping-gift-compose-title">Gift</div>
+                <div class="shopping-gift-compose-label">Description</div>
+                <input class="shopping-gift-compose-input" type="text" maxlength="180" placeholder="e.g. : miss" autocomplete="off">
+                <div class="shopping-gift-compose-actions">
+                    <button type="button" class="shopping-gift-compose-cancel">取消</button>
+                    <button type="button" class="shopping-gift-compose-submit">发送</button>
+                </div>
+            </div>`;
+        document.body.appendChild(overlay);
+        overlay.style.display = 'flex';
+        const input = overlay.querySelector('.shopping-gift-compose-input');
+        const close = () => overlay.remove();
+        overlay.querySelector('.shopping-gift-compose-cancel')?.addEventListener('click', close);
+        overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+        overlay.querySelector('.shopping-gift-compose-submit')?.addEventListener('click', async () => {
+            const submit = overlay.querySelector('.shopping-gift-compose-submit');
+            if (submit.disabled) return;
+            submit.disabled = true;
+            const success = await this.sendGiftMessage(friend, order, input?.value || '');
+            submit.disabled = false;
+            if (!success) return;
+            if (orderIndex !== undefined && this.orders[orderIndex]) {
+                this.orders[orderIndex].gifted = true;
+                this.saveOrders();
+                this.renderOrders();
+            }
+            close();
+        });
+        requestAnimationFrame(() => input?.focus());
+    }
+        
+    async sendGiftMessage(friend, order, description = '') {
+        const orderId = String(order?.id || '');
+        if (!orderId || this.giftOrdersInFlight.has(orderId)) return false;
+        this.giftOrdersInFlight.add(orderId);
+        const itemNames = order.items.map(i => i.name).join(', ');
+        const cleanDescription = String(description || '').trim();
+        const msgText = `Gift: ${itemNames}\nValue $${order.total.toFixed(2)}${cleanDescription ? `\nDescription: ${cleanDescription}` : ''}`;
+
+        let success = false;
+        if (window.imApp && window.imApp.appendFriendMessage) {
+            try {
+                if (window.imApp.ensureFriendMessagesLoaded) {
+                    await window.imApp.ensureFriendMessagesLoaded(friend.id);
+                }
+
+                const newMsg = {
+                    role: 'user',
+                    type: 'gift',
+                    text: msgText,
+                    content: msgText,
+                    giftName: itemNames,
+                    giftValue: Number(order.total) || 0,
+                    giftDescription: cleanDescription,
+                    giftStatus: 'pending',
+                    giftPaymentMethod: order.method || '',
+                    timestamp: Date.now()
+                };
+                    
+                success = await window.imApp.appendFriendMessage(friend.id, newMsg, { silent: false });
+                const giftContextText = `[Gift event] User sent ${itemNames}. Value $${order.total.toFixed(2)}.${cleanDescription ? ` Description: ${cleanDescription}.` : ''} Paid via ${order.method}. 理解礼物描述含义，并根据你的角色人设对她送你的这份礼物做出你真实的反应。。`;
+                const aiMsg = {
+                    role: 'system',
+                    type: 'text',
+                    text: giftContextText,
+                    content: giftContextText,
+                    timestamp: Date.now() + 1
+                };
+                await window.imApp.appendFriendMessage(friend.id, aiMsg, { silent: true });
+                    
+                if (window.imData && window.imData.currentActiveFriend && String(window.imData.currentActiveFriend.id) === String(friend.id)) {
+                    const activeContainer = document.querySelector('.active-chat-interface .ins-chat-messages');
+                    if (activeContainer && window.imChat && window.imChat.appendMessageToContainer) {
+                        window.imChat.appendMessageToContainer(window.imData.currentActiveFriend, activeContainer, newMsg);
+                    }
+                }
+            } catch(e) {
+                console.error('Failed to append gift message:', e);
+            }
+        }
+            
+        if (success) {
+            if (window.showToast) window.showToast('Gift sent successfully.');
+            else alert('Gift sent successfully.');
+        } else {
+            if (window.showToast) window.showToast('赠送失败');
+            else alert('赠送失败');
+        }
+            
+        this.giftOrdersInFlight.delete(orderId);
+        return success;
+    }
+
     ["loadOrders"]() {
       try {
         const saved_2 = durableStorage.getItem("shopping_orders");
@@ -760,7 +899,7 @@
         itemNames = this.cart.map(item_4 => item_4.name).join(", ");
       if (method_2 === "pay") {
         if (!this.selectedCard) {
-          window.showToast ? window.showToast("Select a payment card") : alert("Select a payment card");
+          window.showToast ? window.showToast("请选择支付卡片") : alert("请选择支付卡片");
           return;
         }
         const cardBalance_2 = this.selectedCard.balance !== undefined ? this.selectedCard.balance : typeof window.getPayBalance === "function" ? window.getPayBalance() : 0;
@@ -776,12 +915,12 @@
             this.renderCart();
             this.checkoutSheet?.classList.remove("active");
             window.showToast ? window.showToast("Payment successful") : alert("Payment successful");
-          } else window.showToast ? window.showToast("Payment failed") : alert("Payment failed");
-        } else window.showToast ? window.showToast("Insufficient balance") : alert("Insufficient balance");
+          } else window.showToast ? window.showToast("支付失败") : alert("支付失败");
+        } else window.showToast ? window.showToast("余额不足") : alert("余额不足");
       } else {
         if (method_2 === "friend") {
           if (!this.selectedFriend) {
-            window.showToast ? window.showToast("Select a payer") : alert("Select a payer");
+            window.showToast ? window.showToast("请选择代付好友") : alert("请选择代付好友");
             return;
           }
           const friendName = this.selectedFriend.name || this.selectedFriend.nickname || "Unknown Char",
@@ -807,88 +946,247 @@
           } catch (e_6) {
             console.error("Failed to append shop request message:", e_6);
           }
-          success_2 ? (this.orders.unshift(...this.createOrdersFromCart("Pay for me (" + friendName + ")", "Payment request sent")), this.saveOrders(), this.cart = [], this.saveCart(), this.renderCart(), this.checkoutSheet?.classList.remove("active"), window.showToast ? window.showToast("Payment request sent") : alert("Payment request sent")) : window.showToast ? window.showToast("Could not send the payment request") : alert("Could not send the payment request");
+          success_2 ? (this.orders.unshift(...this.createOrdersFromCart("Pay for me (" + friendName + ")", "Payment request sent")), this.saveOrders(), this.cart = [], this.saveCart(), this.renderCart(), this.checkoutSheet?.classList.remove("active"), window.showToast ? window.showToast("Payment request sent") : alert("Payment request sent")) : window.showToast ? window.showToast("无法发送代付请求") : alert("无法发送代付请求");
         }
       }
     }
-    ["renderOrders"]() {
-      if (!this.ordersList) return;
-      this.ordersList.innerHTML = "";
-      if (this.orders.length === 0) {
-        this.ordersList.innerHTML = "\n                    <div style=\"text-align: center; padding: 40px 20px; color: #8e8e93;\">\n                        <i class=\"fas fa-receipt\" style=\"font-size: 40px; margin-bottom: 15px; opacity: 0.5;\"></i>\n                        <div style=\"font-size: 15px;\">No orders yet</div>\n                    </div>\n                ";
-        return;
-      }
-      this.orders.forEach((order_3, value_203) => {
-        const el = document.createElement("div"),
-          value_205 = order_3.items[0],
-          value_206 = value_205?.name || "Item",
-          ts = order_3.timestamp || order_3.id,
-          max_208 = Math.max(0, Date.now() - Number(ts || 0)),
-          isFood_4 = Boolean(value_205?.isFood),
-          step1Text = isFood_4 ? "picked" : "shipped",
-          step2Text = isFood_4 ? "delivery" : "in transit",
-          text_211 = "delivered",
-          value_212 = value_203 * 0.1;
-        el.className = "shopping-order-card";
-        el.style.cssText = "animation-delay: " + value_212 + "s;";
-        el.dataset.orderId = String(order_3.id);
-        el.innerHTML = "\n                    <div class=\"shopping-order-header\">\n                        <div class=\"shopping-order-date\">" + order_3.date + "</div>\n                        <button class=\"shopping-order-delete-btn shopping-order-delete\" data-index=\"" + value_203 + "\">\n                            <i class=\"fas fa-times\"></i>\n                        </button>\n                    </div>\n                    \n                    <div class=\"shopping-order-progress\">\n                        <div class=\"shopping-order-track\"></div>\n                        <div class=\"shopping-order-fill\"></div>\n                        \n                        <div class=\"shopping-order-nodes\">\n                            <!-- Node 1 -->\n                            <div class=\"shopping-order-node\">\n                                <div class=\"shopping-order-icon-wrap\">\n                                    <i class=\"fas fa-check\"></i>\n                                </div>\n                                <div class=\"shopping-order-node-text\">" + step1Text + "</div>\n                            </div>\n                            <!-- Node 2 -->\n                            <div class=\"shopping-order-node\">\n                                <div class=\"shopping-order-icon-wrap\">\n                                    <i class=\"fas fa-motorcycle\"></i>\n                                </div>\n                                <div class=\"shopping-order-node-text\">" + step2Text + "</div>\n                            </div>\n                            <!-- Node 3 -->\n                            <div class=\"shopping-order-node\">\n                                <div class=\"shopping-order-icon-wrap\">\n                                    <i class=\"fas fa-home\"></i>\n                                </div>\n                                <div class=\"shopping-order-node-text\">" + text_211 + "</div>\n                            </div>\n                        </div>\n                    </div>\n\n                    <div class=\"shopping-order-item-inline-wrap\">\n                        <div class=\"shopping-order-items-scroll inline-mode\">\n                            <div class=\"shopping-order-item-media\" style=\"background: " + (value_205?.mediaBg || "#f2f2f7") + ";\">\n                                " + (value_205?.iconHtml || "<i class=\"fas fa-box\"></i>") + "\n                            </div>\n                        </div>\n                        <div class=\"shopping-order-title inline-mode\">" + value_206 + "</div>\n                    </div>\n                    \n                    <div class=\"shopping-order-footer\">\n                        <div class=\"shopping-order-method\">" + order_3.method + "</div>\n                        <div class=\"shopping-order-price-wrap\">\n                            <button class=\"shopping-order-gift-btn\" data-order-id=\"" + order_3.id + "\" style=\"margin-right: 8px; background: #ff9bb3; color: #fff; border: none; border-radius: 12px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer;\">Gift</button>\n                            <button class=\"shopping-order-comment-btn\" data-product=\"" + (order_3.items.length > 0 ? order_3.items[0].name : "") + "\">Review</button>\n                            <div class=\"shopping-order-price\">$" + Number(order_3.itemTotal ?? order_3.total ?? 0).toFixed(2) + "</div>\n                        </div>\n                    </div>\n                ";
-        this.updateOrderProgress(order_3, el, max_208);
-        const giftBtn = el.querySelector(".shopping-order-gift-btn");
-        giftBtn && (order_3.gifted ? (giftBtn.textContent = order_3.giftedToName ? "Gifted to " + order_3.giftedToName : "Gifted", giftBtn.style.background = "#e5e5ea", giftBtn.style.color = "#8e8e93", giftBtn.style.cursor = "default") : giftBtn.addEventListener("click", event_213 => {
-          event_213.stopPropagation();
-          const id_214 = giftBtn.dataset.orderId,
-            orderToGift = this.orders.find(book_3 => String(book_3.id) === String(id_214));
-          if (orderToGift) this.openGiftCharSelection(orderToGift, id_214);
-        }));
-        const deleteBtn = el.querySelector(".shopping-order-delete-btn");
-        deleteBtn && deleteBtn.addEventListener("click", e_7 => {
-          e_7.stopPropagation();
-          const idx = parseInt(deleteBtn.dataset.index, 10);
-          this.orders.splice(idx, 1);
-          this.saveOrders();
-          this.renderOrders();
-        });
-        const commentBtn = el.querySelector(".shopping-order-comment-btn");
-        commentBtn && commentBtn.addEventListener("click", event_218 => {
-          event_218.stopPropagation();
-          const currentReviewProduct_2 = commentBtn.dataset.product;
-          if (!currentReviewProduct_2) return;
-          this.currentReviewProduct = currentReviewProduct_2;
-          if (!this.ratingSheet) this.initRatingSheet();
-          this.ratingText.value = "";
-          this.ratingStars && Array.from(this.ratingStars).forEach(s => {
-            s.className = "fas fa-star";
-            s.style.color = "#ff9500";
-          });
-          this.ratingSheet.classList.add("active");
-        });
-        this.ordersList.appendChild(el);
-      });
-    }
-    ["openDetail"](product_3, isFood_5 = false) {
-      product_3.isFood = isFood_5;
-      this.currentProduct = product_3;
-      if (isFood_5) {
-        if (this.foodDetailName) this.foodDetailName.textContent = product_3.name;
-        if (this.foodDetailPrice) {
-          const val_2 = product_3.price.replace("$", "");
-          this.foodDetailPrice.innerHTML = "<span style=\"font-size: 16px;\">$</span>" + val_2;
+    renderOrders() {
+        if (!this.ordersList) return;
+        this.ordersList.innerHTML = '';
+            
+        if (this.orders.length === 0) {
+            this.ordersList.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; color: #8e8e93;">
+                    <i class="fas fa-receipt" style="font-size: 40px; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <div style="font-size: 15px;">No Order History Yet</div>
+                </div>
+            `;
+            return;
         }
-        if (this.foodBottomPrice) this.foodBottomPrice.textContent = product_3.price;
-        if (this.foodDetailDesc) this.foodDetailDesc.textContent = product_3.desc;
-        this.foodDetailMedia && (this.foodDetailMedia.innerHTML = product_3.iconHtml, this.foodDetailMedia.style.background = product_3.mediaBg);
-        this.foodDetailSheet && this.foodDetailSheet.classList.add("active");
-      } else {
-        if (this.detailName) this.detailName.textContent = product_3.name;
-        if (this.detailPrice) this.detailPrice.textContent = product_3.price;
-        if (this.detailDesc) this.detailDesc.textContent = product_3.desc;
-        this.detailMedia && (this.detailMedia.innerHTML = product_3.iconHtml, this.detailMedia.style.background = product_3.mediaBg);
-        this.renderQA(product_3.name, false);
-        this.detailSheet && this.detailSheet.classList.add("active");
-      }
-      this.renderComments(product_3.name, isFood_5);
+
+        this.orders.forEach((order, index) => {
+            const el = document.createElement('div');
+            el.style.cssText = 'background: #fff; border-radius: 16px; padding: 16px;  position: relative;';
+                
+            const itemNames = order.items.map(i => i.name).join(', ');
+            let mediaHtml = '';
+            order.items.slice(0, 3).forEach(item => {
+                mediaHtml += `<div style="width: 40px; height: 40px; border-radius: 8px; background: ${item.mediaBg}; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 16px; flex-shrink: 0;">${item.iconHtml}</div>`;
+            });
+            if (order.items.length > 3) {
+                mediaHtml += `<div style="width: 40px; height: 40px; border-radius: 8px; background: #f2f2f7; display: flex; justify-content: center; align-items: center; color: #8e8e93; font-size: 12px; font-weight: 600; flex-shrink: 0;">+${order.items.length - 3}</div>`;
+            }
+
+            let displayStatus = order.status;
+
+            const ts = order.timestamp || order.id; // fallback to id which is Date.now()
+            const elapsed = (Date.now() - ts) / 1000;
+            const isFood = order.items.some(i => i.isFood);
+                
+            const step1Text = isFood ? 'picked' : 'shipped';
+            const step2Text = isFood ? 'delivery' : 'in transit';
+            const step3Text = 'delivered';
+
+            const progress = Math.min(100, Math.max(0, (elapsed / 16) * 100));
+            // Premium colors
+            const cColor = isFood ? 'var(--shop-accent, #a97642)' : '#111111';
+            const fColor = 'var(--shop-green, #476c5a)';
+            const fGlow = isFood ? 'shopPulseGlow' : 'shopPulseGlowGreen';
+                
+            const s1Active = elapsed >= 0;
+            const s2Active = elapsed >= 8;
+            const s3Active = elapsed >= 16;
+
+            const lineBg = s3Active ? fColor : cColor;
+                
+            // Add staggered animation delay
+            const delay = index * 0.1;
+            el.className = 'shopping-order-card';
+            el.dataset.orderId = String(order.id);
+            el.style.animationDelay = `${delay}s`;
+            // Remove inline styles that clash with css classes
+            el.style.cssText = `animation-delay: ${delay}s;`;
+                
+            el.innerHTML = `
+                <div class="shopping-order-header">
+                    <div class="shopping-order-date">${order.date}</div>
+                    <button class="shopping-order-delete-btn shopping-order-delete" data-index="${index}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                    
+                <div class="shopping-order-progress">
+                    <div class="shopping-order-track"></div>
+                    <div class="shopping-order-fill" style="width: calc(68% * ${progress / 100}); background: ${lineBg};"></div>
+                        
+                    <div class="shopping-order-nodes">
+                        <!-- Node 1 -->
+                        <div class="shopping-order-node">
+                            <div class="shopping-order-icon-wrap" style="background: ${s1Active ? cColor : '#f2f2f7'}; ${s1Active && !s2Active ? `animation: ${fGlow} 2s infinite;` : ''}">
+                                <i class="fas fa-check" style="color: ${s1Active ? '#fff' : '#c7c7cc'};"></i>
+                            </div>
+                            <div class="shopping-order-node-text" style="color: ${s1Active ? '#111' : '#8e8e93'}; font-weight: ${s1Active ? '700' : '600'};">${step1Text}</div>
+                        </div>
+                        <!-- Node 2 -->
+                        <div class="shopping-order-node">
+                            <div class="shopping-order-icon-wrap" style="background: ${s2Active ? cColor : '#f2f2f7'}; ${s2Active && !s3Active ? `animation: ${fGlow} 2s infinite;` : ''}">
+                                <i class="fas fa-motorcycle" style="color: ${s2Active ? '#fff' : '#c7c7cc'};"></i>
+                            </div>
+                            <div class="shopping-order-node-text" style="color: ${s2Active ? '#111' : '#8e8e93'}; font-weight: ${s2Active ? '700' : '600'};">${step2Text}</div>
+                        </div>
+                        <!-- Node 3 -->
+                        <div class="shopping-order-node">
+                            <div class="shopping-order-icon-wrap" style="background: ${s3Active ? fColor : '#f2f2f7'};">
+                                <i class="fas fa-home" style="color: ${s3Active ? '#fff' : '#c7c7cc'};"></i>
+                            </div>
+                            <div class="shopping-order-node-text" style="color: ${s3Active ? '#111' : '#8e8e93'}; font-weight: ${s3Active ? '700' : '600'};">${step3Text}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shopping-order-item-inline-wrap">
+                    <div class="shopping-order-items-scroll inline-mode">
+                        ${order.items.map(item => {
+                            const mediaImage = this.getProductImage(item);
+                            return `
+                                <div class="shopping-order-item-media" style="background: ${item.mediaBg}; ${mediaImage ? `background-image: ${mediaImage}; background-position: center; background-size: cover; background-repeat: no-repeat;` : ''}">
+                                    ${mediaImage ? '' : item.iconHtml}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div class="shopping-order-title inline-mode">${itemNames}</div>
+                </div>
+                    
+                <div class="shopping-order-footer">
+                    <div class="shopping-order-method">${order.method}</div>
+                    <div class="shopping-order-price-wrap">
+                        <button class="shopping-order-gift-btn" data-index="${index}" style="margin-right: 8px; background: #000; color: #fff; border: none; border-radius: 12px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer;">Gift</button>
+                        <button class="shopping-order-comment-btn" data-product="${order.items.length > 0 ? order.items[0].name : ''}">Review</button>
+                        <div class="shopping-order-price">$${order.total.toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+
+            const giftBtn = el.querySelector('.shopping-order-gift-btn');
+            if (giftBtn) {
+                if (order.gifted) {
+                    giftBtn.textContent = 'Gifted';
+                    giftBtn.style.background = '#e5e5ea';
+                    giftBtn.style.color = '#8e8e93';
+                    giftBtn.style.cursor = 'default';
+                } else {
+                    giftBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = parseInt(giftBtn.dataset.index, 10);
+                        const orderToGift = this.orders[idx];
+                        this.openGiftCharSelection(orderToGift, idx);
+                    });
+                }
+            }
+
+            const deleteBtn = el.querySelector('.shopping-order-delete-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(deleteBtn.dataset.index, 10);
+                    this.orders.splice(idx, 1);
+                    this.saveOrders();
+                    this.renderOrders();
+                });
+            }
+
+            const commentBtn = el.querySelector('.shopping-order-comment-btn');
+            if (commentBtn) {
+                commentBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const productName = commentBtn.dataset.product;
+                    if (!productName) return;
+                        
+                    this.currentReviewProduct = productName;
+                    if (!this.ratingSheet) this.initRatingSheet();
+                        
+                    // Reset form
+                    this.ratingText.value = '';
+                    if (this.ratingStars) {
+                        Array.from(this.ratingStars).forEach(s => {
+                            s.className = 'fas fa-star';
+                            s.style.color = '#ff9500';
+                        });
+                    }
+                        
+                    this.ratingSheet.classList.add('active');
+                });
+            }
+
+            this.ordersList.appendChild(el);
+        });
     }
+
+    getProductImage(product) {
+        const defaults = {
+            'Espresson': 'assets/shopping/food-coffee.jpg',
+            'Per Se Menu': 'assets/shopping/food-per-se.jpg',
+            'Mase Omakase': 'assets/shopping/food-mase.jpg',
+            'Romanée-Conti': 'assets/shopping/mall-drc.jpg',
+            'Serpenti Viper Bracelet': 'assets/shopping/mall-bylgarl.jpg',
+            'Hermes Birkin': 'assets/shopping/mall-hermes.jpg',
+            'Vintage Alhambra': 'assets/shopping/mall-vca.jpg'
+        };
+        if (product.mediaImage && product.mediaImage !== 'none') {
+            return product.mediaImage.replace(/"/g, "'");
+        }
+        return defaults[product.name] ? `url('${defaults[product.name]}')` : '';
+    }
+
+    setDetailMedia(element, product) {
+        const hasImage = product.mediaImage && product.mediaImage !== 'none';
+        element.innerHTML = hasImage ? '' : product.iconHtml;
+        element.style.background = product.mediaBg;
+        element.style.backgroundImage = hasImage ? product.mediaImage : '';
+        element.style.backgroundPosition = 'center';
+        element.style.backgroundSize = 'cover';
+        element.style.backgroundRepeat = 'no-repeat';
+    }
+
+    openDetail(product, isFood = false) {
+        product.isFood = isFood;
+        this.currentProduct = product;
+            
+        if (isFood) {
+            if (this.foodDetailName) this.foodDetailName.textContent = product.name;
+            if (this.foodDetailPrice) {
+                const val = product.price.replace('$', '');
+                this.foodDetailPrice.innerHTML = `<span style="font-size: 16px;">$</span>${val}`;
+            }
+            if (this.foodBottomPrice) this.foodBottomPrice.textContent = product.price;
+            if (this.foodDetailDesc) this.foodDetailDesc.textContent = product.desc;
+            if (this.foodDetailMedia) {
+                this.setDetailMedia(this.foodDetailMedia, product);
+            }
+            if (this.foodDetailSheet) {
+                this.foodDetailSheet.classList.add('active');
+            }
+        } else {
+            if (this.detailName) this.detailName.textContent = product.name;
+            if (this.detailPrice) this.detailPrice.textContent = product.price;
+            if (this.detailDesc) this.detailDesc.textContent = product.desc;
+            if (this.detailMedia) {
+                this.setDetailMedia(this.detailMedia, product);
+            }
+                
+            // Update QA Trigger Preview
+            this.renderQA(product.name, false);
+
+            if (this.detailSheet) {
+                this.detailSheet.classList.add('active');
+            }
+        }
+            
+        // Render comments for this product
+        this.renderComments(product.name, isFood);
+    }
+
     ["renderQA"](value_223, isFood_6) {
       const qaTrigger = document.getElementById("shopping-mall-qa-trigger"),
         shoppingQaContainerElement = document.getElementById("shopping-qa-container"),
@@ -981,7 +1279,7 @@
       this.ratingSubmit.addEventListener("click", () => {
         const text_2 = this.ratingText.value.trim();
         if (!text_2) {
-          if (window.showToast) window.showToast("Enter your review");else alert("Enter your review");
+          if (window.showToast) window.showToast("请输入评价内容");else alert("请输入评价内容");
           return;
         }
         if (!this.currentReviewProduct) return;
@@ -992,7 +1290,7 @@
         } catch (value_257) {}
         !commentsObj_2[this.currentReviewProduct] && (commentsObj_2[this.currentReviewProduct] = []);
         commentsObj_2[this.currentReviewProduct].unshift({
-          user: "You",
+          user: "我",
           text: text_2,
           rating: rating_2,
           date: new Date().toLocaleDateString()
@@ -1075,31 +1373,60 @@
       this.saveCart();
       this.renderCart();
     }
-    ["renderCart"]() {
-      if (!this.cartEmptyState || !this.cartContent || !this.cartList) return;
-      if (this.cart.length === 0) {
-        this.cartEmptyState.style.display = "flex";
-        this.cartContent.style.display = "none";
-        return;
-      }
-      this.cartEmptyState.style.display = "none";
-      this.cartContent.style.display = "flex";
-      this.cartList.innerHTML = "";
-      let count_280 = 0;
-      this.cart.forEach((value_281, index_5) => {
-        count_280 += value_281.priceVal;
-        const itemEl = document.createElement("div");
-        itemEl.className = "shopping-cart-item";
-        itemEl.innerHTML = "\n                    <div class=\"shopping-cart-item-media\" style=\"background: " + value_281.mediaBg + ";\">\n                        " + value_281.iconHtml + "\n                    </div>\n                    <div style=\"flex: 1;\">\n                        <div style=\"font-weight: 700; font-size: 15px;\">" + value_281.name + "</div>\n                        <div class=\"shopping-cart-item-price\">" + value_281.price + "</div>\n                    </div>\n                    <div class=\"shopping-cart-remove\" style=\"width: 30px; height: 30px; border-radius: 50%; background: #ffebee; color: #ff3b30; display: flex; justify-content: center; align-items: center; cursor: pointer;\">\n                        <i class=\"fas fa-trash-alt\" style=\"font-size: 12px;\"></i>\n                    </div>\n                ";
-        const removeBtn = itemEl.querySelector(".shopping-cart-remove");
-        removeBtn.addEventListener("click", () => {
-          this.removeFromCart(index_5);
+    renderCart() {
+        if (!this.cartEmptyState || !this.cartContent || !this.cartList) return;
+
+        if (this.cart.length === 0) {
+            this.cartEmptyState.style.display = 'flex';
+            this.cartContent.style.display = 'none';
+            return;
+        }
+
+        this.cartEmptyState.style.display = 'none';
+        this.cartContent.style.display = 'flex';
+            
+        this.cartList.innerHTML = '';
+        let subtotal = 0;
+
+        this.cart.forEach((item, index) => {
+            subtotal += item.priceVal;
+            const mediaImage = this.getProductImage(item);
+                
+            const itemEl = document.createElement('div');
+            itemEl.style.display = 'flex';
+            itemEl.style.alignItems = 'center';
+            itemEl.style.gap = '15px';
+            itemEl.style.padding = '10px';
+            itemEl.style.background = '#fff';
+            itemEl.style.borderRadius = '12px';
+            itemEl.style.boxShadow = '0 2px 10px rgba(0,0,0,0.03)';
+                
+            itemEl.innerHTML = `
+                <div style="width: 50px; height: 50px; border-radius: 10px; background: ${item.mediaBg}; ${mediaImage ? `background-image: ${mediaImage}; background-position: center; background-size: cover; background-repeat: no-repeat;` : ''} display: flex; justify-content: center; align-items: center; color: #fff; font-size: 20px;">
+                    ${mediaImage ? '' : item.iconHtml}
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 700; font-size: 15px;">${item.name}</div>
+                    <div style="color: #a97642; font-weight: 700; margin-top: 4px;">${item.price}</div>
+                </div>
+                <div class="shopping-cart-remove" style="width: 30px; height: 30px; border-radius: 50%; background: #ffebee; color: #ff3b30; display: flex; justify-content: center; align-items: center; cursor: pointer;">
+                    <i class="fas fa-trash-alt" style="font-size: 12px;"></i>
+                </div>
+            `;
+                
+            const removeBtn = itemEl.querySelector('.shopping-cart-remove');
+            removeBtn.addEventListener('click', () => {
+                this.removeFromCart(index);
+            });
+                
+            this.cartList.appendChild(itemEl);
         });
-        this.cartList.appendChild(itemEl);
-      });
-      if (this.cartSubtotal) this.cartSubtotal.textContent = "$" + count_280.toFixed(2);
-      if (this.cartTotal) this.cartTotal.textContent = "$" + (count_280 + 5).toFixed(2);
+
+        if (this.cartSubtotal) this.cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+        const deliveryFee = 5;
+        if (this.cartTotal) this.cartTotal.textContent = `$${(subtotal + deliveryFee).toFixed(2)}`;
     }
+
     ["open"]() {
       if (!this.view) return;
       this.syncProfile();

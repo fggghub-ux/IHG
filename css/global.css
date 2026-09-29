@@ -155,7 +155,7 @@ input, textarea, [contenteditable] {
 
 /* Toast Bubble Notification */
 .toast-bubble {
-    position: fixed;
+    position: absolute;
     bottom: 120px;
     left: 50%;
     transform: translateX(-50%) translateY(20px);
@@ -170,19 +170,13 @@ input, textarea, [contenteditable] {
     
     z-index: 1000;
     opacity: 0;
-    pointer-events: auto;
+    pointer-events: none;
     transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.17, 0.84, 0.44, 1);
-    white-space: normal;
+    white-space: nowrap;
     text-align: center;
-    box-sizing: border-box;
-    max-width: calc(100vw - 32px);
-    max-height: min(40vh, 260px);
-    overflow-x: hidden;
-    overflow-y: auto;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .toast-bubble.show {
