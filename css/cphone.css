@@ -86,12 +86,16 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
-#lovers-friend-phone-view .cphone-home-grid > div { width: 100%; min-width: 0; }
+#lovers-friend-phone-view .cphone-home-grid > div {
+    width: 100%;
+    min-width: 0;
+    gap: 6px !important;
+}
 #lovers-friend-phone-view .cphone-home-grid > div > div:first-child,
 #lovers-friend-phone-view .cphone-home-dock > div {
-    width: min(60px, 100%) !important;
-    aspect-ratio: 1;
-    height: auto !important;
+    width: 60px !important;
+    height: 60px !important;
+    flex: 0 0 60px;
     border-radius: 17px !important;
     box-shadow: 0 8px 20px rgba(15,15,18,.07) !important;
 }
@@ -103,7 +107,9 @@
     color: #171719 !important;
     text-shadow: none !important;
     font-size: 11px !important;
-    font-weight: 650 !important;
+    font-weight: 500 !important;
+    letter-spacing: normal !important;
+    line-height: normal !important;
 }
 #lovers-friend-phone-view .cphone-home-dock {
     box-sizing: border-box;
@@ -342,28 +348,6 @@
     background: #171719 !important;
 }
 
-/* Safari customization: Favorites stays on the page background; Recent Searches shares one card. */
-#friend-safari-normal-mode {
-    background: #f4f4f5 !important;
-    border-radius: 0 !important;
-}
-#friend-safari-history-list {
-    gap: 0 !important;
-    overflow: hidden;
-    border-radius: 18px;
-    background: #fff;
-}
-#friend-safari-history-list .safari-history-item-new {
-    margin: 0;
-    padding: 16px !important;
-    border: 0 !important;
-    border-bottom: 1px solid rgba(0, 0, 0, .06) !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-}
-#friend-safari-history-list .safari-history-item-new:last-child {
-    border-bottom: 0 !important;
-}
 #friend-phone-settings-sheet {
     --friend-settings-bg: #fbfbfc;
     --friend-settings-surface: #fff;
