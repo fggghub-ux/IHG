@@ -1900,6 +1900,15 @@ button.group-private-chat-detail-bubble {
     color: #111111;
 }
 
+/* Keep the relocated Moments tab above Work's full-screen Moments surface. */
+#imessage-view[data-im-active-surface="moments"] .line-bottom-nav-container {
+    z-index: 140;
+}
+
+#imessage-view[data-im-active-surface="moments"] .moments-scroll-container {
+    padding-bottom: calc(var(--im-bottom-nav-space) + 24px);
+}
+
 /* Animations */
 @keyframes imFadeIn {
     from { opacity: 0; }

@@ -313,7 +313,7 @@
     momentsBackBtnElement?.focus({
       preventScroll: true
     });
-    if (imHeaderRight) imHeaderRight.style.display = "none";
+    if (imHeaderRight) imHeaderRight.style.display = "flex";
     const imHeaderRight_2 = document.querySelector(".line-header-right");
     if (imHeaderRight_2) imHeaderRight_2.style.display = "none";
     try {

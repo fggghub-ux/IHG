@@ -5322,6 +5322,7 @@ window.addEventListener("pagehide", () => {
   });
   const navHomeBtn = document.getElementById("nav-home-btn"),
     navChatsBtn = document.getElementById("nav-chats-btn"),
+    navMomentsBtn = document.getElementById("nav-moments-btn"),
     lineNavIndicator = document.getElementById("line-nav-indicator"),
     imBottomNavContainer = document.querySelector(".line-bottom-nav-container"),
     imContent = document.querySelector(".line-content"),
@@ -6280,6 +6281,7 @@ window.addEventListener("pagehide", () => {
     if (chatsContent) chatsContent.setAttribute("aria-hidden", "true");
     if (navHomeBtn) navHomeBtn.classList.remove("active");
     if (navChatsBtn) navChatsBtn.classList.remove("active");
+    if (navMomentsBtn) navMomentsBtn.classList.remove("active");
     const lineHeaderRightElement_1890 = document.querySelector(".line-header-right");
     if (lineHeaderRightElement_1890) lineHeaderRightElement_1890.style.display = "flex";
   }
@@ -6307,8 +6309,14 @@ window.addEventListener("pagehide", () => {
     updateLineNavIndicator(navChatsBtn);
     if (window.imApp.updateChatsUnreadBadges) window.imApp.updateChatsUnreadBadges();
   });
+  navMomentsBtn && navMomentsBtn.addEventListener("click", () => {
+    if (window.imApp.openMoments) window.imApp.openMoments();
+    navMomentsBtn.classList.add("active");
+    updateLineNavIndicator(navMomentsBtn);
+    if (window.imApp.updateChatsUnreadBadges) window.imApp.updateChatsUnreadBadges();
+  });
   window.imApp.hideAllTabs = hideAllTabs_2;
-  window.imApp.setActiveThemeSurface(navChatsBtn?.classList.contains("active") ? "chats" : "home");
+  window.imApp.setActiveThemeSurface(navChatsBtn?.classList.contains("active") ? "chats" : navMomentsBtn?.classList.contains("active") ? "moments" : "home");
   setTimeout(() => {
     if (window.imApp.applyAllSavedCss) window.imApp.applyAllSavedCss();
   }, 100);
