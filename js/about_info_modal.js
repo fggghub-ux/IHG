@@ -19,30 +19,30 @@
     closeButton = document.getElementById("about-info-modal-close"),
     confirmButton = document.getElementById("about-info-modal-confirm"),
     CHANGELOG_ENTRIES = [{
-      id: "2026-09-4",
+      id: "2026-09-28",
       year: "2026",
-      shortDate: "9.4",
-      fullDate: "2026年9月4日",
+      shortDate: "9.28",
+      fullDate: "2026年9月28日",
       sections: [{
         label: "",
         title: "",
         items: ["LHV"]
       }]
     }, {
-      id: "2026-09-29",
+      id: "2026-09-24",
       year: "2026",
-      shortDate: "9.29",
-      fullDate: "2026年9月29日",
+      shortDate: "9.24",
+      fullDate: "2026年9月24日",
       sections: [{
         label: "",
         title: "",
         items: ["Koala"]
       }]
     }, {
-      id: "2026-09-14",
+      id: "2026-09-20",
       year: "2026",
-      shortDate: "9.14",
-      fullDate: "2026年9月14日",
+      shortDate: "9.20",
+      fullDate: "2026年9月20日",
       sections: [{
         label: "",
         title: "",
@@ -104,7 +104,7 @@
     dismissalLocked = false;
     text_9 = "";
     if (closeButton) closeButton.disabled = false;
-    confirmButton && (confirmButton.disabled = false, confirmButton.textContent = "u");
+    confirmButton && (confirmButton.disabled = false, confirmButton.textContent = "知道了");
   }
   function handleAction_13(value_32) {
     handleAction_12();
@@ -116,7 +116,7 @@
     const deadline = Date.now() + ACKNOWLEDGEMENT_DELAY_MS,
       updateCountdown = () => {
         const secondsRemaining = Math.ceil(Math.max(0, deadline - Date.now()) / 1000);
-        if (confirmButton) confirmButton.textContent = secondsRemaining > 0 ? "u（" + secondsRemaining + "秒）" : "u";
+        if (confirmButton) confirmButton.textContent = secondsRemaining > 0 ? "知道了（" + secondsRemaining + "秒）" : "知道了";
       };
     updateCountdown();
     acknowledgementInterval = window.setInterval(updateCountdown, 250);
@@ -126,7 +126,7 @@
       acknowledgementTimer = null;
       dismissalLocked = false;
       if (closeButton) closeButton.disabled = false;
-      confirmButton && (confirmButton.disabled = false, confirmButton.textContent = "u");
+      confirmButton && (confirmButton.disabled = false, confirmButton.textContent = "知道了");
     }, ACKNOWLEDGEMENT_DELAY_MS);
   }
   function handleAction_14(value_36) {
