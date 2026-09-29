@@ -727,8 +727,8 @@
         }
             
         if (success) {
-            if (window.showToast) window.showToast('Gift sent successfully.');
-            else alert('Gift sent successfully.');
+            if (window.showToast) window.showToast('Gift sent');
+            else alert('Gift sent');
         } else {
             if (window.showToast) window.showToast('赠送失败');
             else alert('赠送失败');
