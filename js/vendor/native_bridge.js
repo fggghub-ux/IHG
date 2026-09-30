@@ -763,7 +763,7 @@
       return;
     }
     $ = i;
-    typeof window.showToast == "function" && window.showToast("\u518D\u6309\u4E00\u6B21\u9000\u51FA u2phone");
+    typeof window.showToast == "function" && window.showToast("\u518D\u6309\u4E00\u6B21\u9000\u51FA LHV");
   }
   function $e(t) {
     return String(t || "u2phone-export").replace(/[\\/:*?"<>|\u0000-\u001f]/g, "_").replace(/\s+/g, " ").trim().slice(0, 180) || `u2phone-export-${Date.now()}`;
@@ -956,8 +956,8 @@
   async function Ke() {
     !f || fe || (await B.createChannel({
       id: we,
-      name: "u2phone \u81EA\u5B9A\u4E49\u63D0\u793A\u97F3\u6D88\u606F",
-      description: "\u901A\u77E5\u7531\u7CFB\u7EDF\u663E\u793A\uFF0C\u63D0\u793A\u97F3\u7531 u2phone \u64AD\u653E",
+      name: "LHV \u81EA\u5B9A\u4E49\u63D0\u793A\u97F3\u6D88\u606F",
+      description: "\u901A\u77E5\u7531\u7CFB\u7EDF\u663E\u793A\uFF0C\u63D0\u793A\u97F3\u7531 LHV \u64AD\u653E",
       importance: 4
     }), fe = !0);
   }
@@ -981,7 +981,7 @@
     return !f || O !== "granted" ? !1 : (r && (await Ke()), await B.schedule({
       notifications: [{
         id: Ge(i),
-        title: String(t || "u2phone"),
+        title: String(t || "LHV"),
         body: String(e || "\u65B0\u6D88\u606F"),
         ...(r ? {
           channelId: we
