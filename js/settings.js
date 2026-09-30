@@ -1,4 +1,6 @@
 (function () {
+  const DEFAULT_USER_AVATAR_URL = "assets/default-user-avatar.jpg";
+  window.U2_DEFAULT_USER_AVATAR_URL = DEFAULT_USER_AVATAR_URL;
   let accounts_2 = [],
     currentAccountId_3 = null,
     userState_2 = {
@@ -736,13 +738,11 @@
         settingsAvatarImg = document.getElementById("settings-avatar-img"),
         settingsAvatarIcon = document.querySelector(".apple-id-avatar-small .fa-user");
       settingsName && (settingsName.textContent = userState_2.name || "未登录 Apple ID");
-      if (userState_2.avatarUrl) {
-        settingsAvatarImg && (settingsAvatarImg.src = userState_2.avatarUrl, settingsAvatarImg.style.display = "block");
-        if (settingsAvatarIcon) settingsAvatarIcon.style.display = "none";
-      } else {
-        if (settingsAvatarImg) settingsAvatarImg.style.display = "none";
-        if (settingsAvatarIcon) settingsAvatarIcon.style.display = "block";
+      if (settingsAvatarImg) {
+        settingsAvatarImg.src = userState_2.avatarUrl || DEFAULT_USER_AVATAR_URL;
+        settingsAvatarImg.style.display = "block";
       }
+      if (settingsAvatarIcon) settingsAvatarIcon.style.display = "none";
       const displayName = document.getElementById("display-name"),
         displayPhone = document.getElementById("display-phone"),
         displaySignature = document.getElementById("display-signature"),
@@ -751,26 +751,22 @@
       if (displayName) displayName.textContent = userState_2.name || "未登录 Apple ID";
       if (displayPhone) displayPhone.textContent = userState_2.phone || "暂无手机号";
       if (displaySignature) displaySignature.textContent = userState_2.signature || "添加账号后可同步头像、名称与签名";
-      if (userState_2.avatarUrl) {
-        editAvatarImg && (editAvatarImg.src = userState_2.avatarUrl, editAvatarImg.style.display = "block");
-        if (editAvatarIcon) editAvatarIcon.style.display = "none";
-      } else {
-        if (editAvatarImg) editAvatarImg.style.display = "none";
-        if (editAvatarIcon) editAvatarIcon.style.display = "block";
+      if (editAvatarImg) {
+        editAvatarImg.src = userState_2.avatarUrl || DEFAULT_USER_AVATAR_URL;
+        editAvatarImg.style.display = "block";
       }
+      if (editAvatarIcon) editAvatarIcon.style.display = "none";
       const imProfileName = document.getElementById("imessage-profile-name"),
         imProfileSign = document.getElementById("imessage-profile-sign"),
         imAvatarImg = document.getElementById("imessage-avatar-img"),
         imAvatarIcon = document.getElementById("imessage-avatar-icon");
       if (imProfileName) imProfileName.textContent = userState_2.name || "Default User";
       if (imProfileSign) imProfileSign.textContent = userState_2.signature || "No Signature";
-      if (userState_2.avatarUrl) {
-        imAvatarImg && (imAvatarImg.src = userState_2.avatarUrl, imAvatarImg.style.display = "block");
-        if (imAvatarIcon) imAvatarIcon.style.display = "none";
-      } else {
-        if (imAvatarImg) imAvatarImg.style.display = "none";
-        if (imAvatarIcon) imAvatarIcon.style.display = "block";
+      if (imAvatarImg) {
+        imAvatarImg.src = userState_2.avatarUrl || DEFAULT_USER_AVATAR_URL;
+        imAvatarImg.style.display = "block";
       }
+      if (imAvatarIcon) imAvatarIcon.style.display = "none";
     };
     window.syncUIs && window.syncUIs();
     document.getElementById("close-account-sheet-btn")?.addEventListener("click", () => {
@@ -3472,7 +3468,7 @@
     function handleU2VectorMemoryStatus() {
       const status_2 = document.getElementById("vector-memory-config-status"),
         config_3 = normalizeVectorMemoryConfig_2(vectorMemoryConfig_2);
-      status_2 && (status_2.textContent = config_3.enabled ? config_3.apiKey && config_3.model && (config_3.provider !== "openai-compatible" || config_3.endpoint) ? "已启用" : "待配置" : "关闭");
+      status_2 && (status_2.textContent = config_3.enabled ? config_3.apiKey && config_3.model && (config_3.provider !== "openai-compatible" || config_3.endpoint) ? "已启用" : "待配置" : "Close");
       const runtimeStatus = window.imVectorMemory?.getStatus?.();
       UI.inputs.vectorMemoryIndexStatus && (UI.inputs.vectorMemoryIndexStatus.textContent = runtimeStatus?.message || (config_3.enabled ? "保存后将自动同步全部记忆" : "未启用"));
     }
