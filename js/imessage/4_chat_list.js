@@ -78,7 +78,9 @@
   }
   function handleAction_6(friend_3) {
     if (friend_3.type === "group") return friend_3.avatarUrl ? "<img src=\"" + friend_3.avatarUrl + "\">" : "<div style=\"width: 100%; height: 100%; background: linear-gradient(135deg, #ff9a9e, #fecfef); color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 20px;\">" + friend_3.nickname.charAt(0).toUpperCase() + "</div>";
-    return friend_3.avatarUrl ? "<img src=\"" + friend_3.avatarUrl + "\">" : "<i class=\"fas fa-user\"></i>";
+    if (friend_3.avatarUrl) return "<img src=\"" + friend_3.avatarUrl + "\">";
+    if (!friend_3.type || friend_3.type === "char") return "<img src=\"assets/imessage/default-char-avatar.jpg\">";
+    return "<i class=\"fas fa-user\"></i>";
   }
   function handleAction_7(value_30) {
     let nickname_31 = value_30.nickname;
