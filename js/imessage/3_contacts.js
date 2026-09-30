@@ -17,6 +17,7 @@
     contactCardActionStatusElement = document.getElementById("contact-card-action-status"),
     contactCardAddFriendElement = document.getElementById("contact-card-add-friend"),
     contactCardRequestFriendElement = document.getElementById("contact-card-request-friend");
+  const DEFAULT_CHAR_AVATAR_URL = "assets/imessage/default-char-avatar.jpg";
   let value_5 = null;
   function updateFriendRequestIndicators_2() {
     const some_34 = (window.imData.friendRequests || []).some(value_35 => !Number(value_35?.seenAt));
@@ -45,7 +46,7 @@
     if (friendSignatureInputElement) friendSignatureInputElement.value = "";
     if (friendRelationshipInputElement) friendRelationshipInputElement.value = "";
     if (friendProfileImportInput_3) friendProfileImportInput_3.value = "";
-    setFriendAvatar(null);
+    setFriendAvatar(DEFAULT_CHAR_AVATAR_URL, { isDefault: true });
   }
   async function handleAction_9(friendOrId, mutator, value_41 = {}) {
     if (!window.imApp.commitFriendsChange) return false;
@@ -494,7 +495,7 @@
         mimeType: "image/jpeg",
         quality: 0.8
       }) : await window.imApp.readFileAsDataUrl(file);
-      setFriendAvatar(nextAvatar);
+      setFriendAvatar(nextAvatar, { isDefault: false });
     } catch (error_2) {
       console.error("Failed to process friend avatar", error_2);
       if (showToast_2) showToast_2("头像处理失败");
@@ -534,12 +535,28 @@
       if (showToast_2) showToast_2(error_3?.message || "角色设定导入失败");
     }
   }));
-  function setFriendAvatar(src_2) {
+  function setFriendAvatar(src_2, options_3 = {}) {
     const friendAvatarImg_2 = document.getElementById("friend-avatar-img"),
       friendAvatarPreview = document.getElementById("friend-avatar-preview"),
       friendAvatarIcon_2 = friendAvatarPreview ? friendAvatarPreview.querySelector("i") : null;
     if (!friendAvatarImg_2 || !friendAvatarIcon_2) return;
-    src_2 ? (friendAvatarImg_2.src = src_2, friendAvatarImg_2.style.display = "block", friendAvatarIcon_2.style.display = "none") : (friendAvatarImg_2.style.display = "none", friendAvatarIcon_2.style.display = "block", friendAvatarImg_2.src = "");
+    if (src_2) {
+      friendAvatarImg_2.src = src_2;
+      friendAvatarImg_2.dataset.defaultAvatar = options_3.isDefault ? "true" : "false";
+      friendAvatarImg_2.style.display = "block";
+      friendAvatarIcon_2.style.display = "none";
+    } else {
+      friendAvatarImg_2.style.display = "none";
+      friendAvatarIcon_2.style.display = "block";
+      friendAvatarImg_2.src = "";
+      delete friendAvatarImg_2.dataset.defaultAvatar;
+    }
+  }
+  function getPendingFriendAvatar(includeDefault_2) {
+    const image_3 = document.getElementById("friend-avatar-img");
+    if (!image_3 || image_3.style.display !== "block") return includeDefault_2 ? DEFAULT_CHAR_AVATAR_URL : null;
+    if (image_3.dataset.defaultAvatar === "true") return includeDefault_2 ? DEFAULT_CHAR_AVATAR_URL : null;
+    return image_3.src || (includeDefault_2 ? DEFAULT_CHAR_AVATAR_URL : null);
   }
   const confirmAddFriendBtn = document.getElementById("confirm-add-friend-btn"),
     confirmAddNpcBtn = document.getElementById("confirm-add-npc-btn");
@@ -562,7 +579,7 @@
         signature: document.getElementById("friend-signature-input") ? document.getElementById("friend-signature-input").value || "No Signature" : "No Signature",
         persona: document.getElementById("friend-persona-input") ? document.getElementById("friend-persona-input").value : "",
         relationship: document.getElementById("friend-relationship-input") ? document.getElementById("friend-relationship-input").value : "",
-        avatarUrl: document.getElementById("friend-avatar-img") && document.getElementById("friend-avatar-img").style.display === "block" ? document.getElementById("friend-avatar-img").src : null,
+        avatarUrl: getPendingFriendAvatar(true),
         messages: [],
         chatBg: null,
         customCssEnabled: false,
@@ -600,7 +617,7 @@
         signature: document.getElementById("friend-signature-input") ? document.getElementById("friend-signature-input").value || "No Signature" : "No Signature",
         persona: document.getElementById("friend-persona-input") ? document.getElementById("friend-persona-input").value : "",
         relationship: document.getElementById("friend-relationship-input") ? document.getElementById("friend-relationship-input").value : "",
-        avatarUrl: document.getElementById("friend-avatar-img") && document.getElementById("friend-avatar-img").style.display === "block" ? document.getElementById("friend-avatar-img").src : null,
+        avatarUrl: getPendingFriendAvatar(false),
         messages: [],
         chatBg: null,
         customCssEnabled: false,
