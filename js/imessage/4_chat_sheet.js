@@ -200,7 +200,7 @@
       source_2 = boundAccount || fallback || {};
     return {
       name: String(source_2.name || source_2.realName || source_2.nickname || "User").trim() || "User",
-      avatarUrl: source_2.avatarUrl || source_2.avatar || "",
+      avatarUrl: source_2.avatarUrl || source_2.avatar || window.U2_DEFAULT_USER_AVATAR_URL || "assets/default-user-avatar.jpg",
       signature: String(source_2.signature || "").trim(),
       persona: String(source_2.persona || "").trim(),
       boundAccountId: boundAccount?.id ?? null
