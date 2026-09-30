@@ -1,6 +1,8 @@
 (function () {
   'use strict';
 
+  const DIARY_DEFAULT_USER_AVATAR_URL = window.U2_DEFAULT_USER_AVATAR_URL || "assets/default-user-avatar.jpg";
+
   const schemaVersion_2 = 2,
     name_2 = "Diary User",
     freeze_3 = Object.freeze({
@@ -28,7 +30,7 @@
       schemaVersion: schemaVersion_2,
       profile: {
         name: name_2,
-        avatarUrl: "",
+        avatarUrl: DIARY_DEFAULT_USER_AVATAR_URL,
         initialized: false,
         sourceAccountId: null
       },
@@ -153,7 +155,7 @@
       schemaVersion: schemaVersion_2,
       profile: {
         name: handleAction_17(value_146.name, name_2) || name_2,
-        avatarUrl: handleAction_17(value_146.avatarUrl),
+        avatarUrl: handleAction_17(value_146.avatarUrl, DIARY_DEFAULT_USER_AVATAR_URL) || DIARY_DEFAULT_USER_AVATAR_URL,
         initialized: value_146.initialized === true,
         sourceAccountId: value_146.sourceAccountId == null ? null : String(value_146.sourceAccountId)
       },
@@ -219,7 +221,7 @@
       value_158 = window.userState && typeof window.userState === "object" ? window.userState : {};
     return {
       name: handleAction_17(value_157?.name || value_158.name, name_2) || name_2,
-      avatarUrl: handleAction_17(value_157?.avatarUrl || value_158.avatarUrl),
+      avatarUrl: handleAction_17(value_157?.avatarUrl || value_158.avatarUrl, DIARY_DEFAULT_USER_AVATAR_URL) || DIARY_DEFAULT_USER_AVATAR_URL,
       sourceAccountId: value_155 == null ? null : String(value_155)
     };
   }
@@ -256,7 +258,7 @@
     }
     return {
       name: value_4.profile.name || name_2,
-      avatarUrl: value_4.profile.avatarUrl || ""
+      avatarUrl: value_4.profile.avatarUrl || DIARY_DEFAULT_USER_AVATAR_URL
     };
   }
   function handleAction_44(value_169, value_170 = "") {
