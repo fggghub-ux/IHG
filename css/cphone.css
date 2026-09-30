@@ -391,3 +391,12 @@
     #lovers-friend-phone-view .cphone-home-grid { gap: 20px 6px !important; padding-inline: 16px !important; }
     .cphone-sms-tabs button { min-width: 90px; }
 }
+
+
+/* GPT Lover wallpaper, applied to the Work Cphone shell by default. */
+#lovers-friend-phone-view.lovers-friend-phone-view {
+    background-image: url("../assets/home/bizhi.jpg");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
