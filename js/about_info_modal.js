@@ -104,7 +104,7 @@
     dismissalLocked = false;
     text_9 = "";
     if (closeButton) closeButton.disabled = false;
-    confirmButton && (confirmButton.disabled = false, confirmButton.textContent = "知道了");
+    confirmButton && (confirmButton.disabled = false, confirmButton.textContent = "u");
   }
   function handleAction_13(value_32) {
     handleAction_12();
@@ -116,7 +116,7 @@
     const deadline = Date.now() + ACKNOWLEDGEMENT_DELAY_MS,
       updateCountdown = () => {
         const secondsRemaining = Math.ceil(Math.max(0, deadline - Date.now()) / 1000);
-        if (confirmButton) confirmButton.textContent = secondsRemaining > 0 ? "知道了（" + secondsRemaining + "秒）" : "知道了";
+        if (confirmButton) confirmButton.textContent = secondsRemaining > 0 ? "u（" + secondsRemaining + "秒）" : "u";
       };
     updateCountdown();
     acknowledgementInterval = window.setInterval(updateCountdown, 250);
@@ -126,7 +126,7 @@
       acknowledgementTimer = null;
       dismissalLocked = false;
       if (closeButton) closeButton.disabled = false;
-      confirmButton && (confirmButton.disabled = false, confirmButton.textContent = "知道了");
+      confirmButton && (confirmButton.disabled = false, confirmButton.textContent = "u");
     }, ACKNOWLEDGEMENT_DELAY_MS);
   }
   function handleAction_14(value_36) {
