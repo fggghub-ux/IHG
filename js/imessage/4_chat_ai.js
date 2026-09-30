@@ -739,7 +739,7 @@
     if (!content_3) return false;
     const liveFriend_3 = getLiveFriendById(friend_13.id) || friend_13;
     if (liveFriend_3.type === "official" && window.u2OfficialAccounts?.isGenerating?.(liveFriend_3.id)) {
-      if (window.showToast) window.showToast("有兔正在生成中，可点击暂停按钮停止");
+      if (window.showToast) window.showToast("LHV正在生成中，可点击暂停按钮停止");
       return false;
     }
     if (liveFriend_3.type === "group" && Number(liveFriend_3.leftGroupAt) > 0) {
