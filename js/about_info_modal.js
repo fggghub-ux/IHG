@@ -331,7 +331,7 @@
       if (changelogEntryId_2) showChangelogDetail(changelogEntryId_2);
     } else {
       if (backButton) backButton.hidden = true;
-      setModalTitle("免责声明");
+      setModalTitle("Gravity");
     }
     return overflow_2 = document.body.style.overflow, modal.hidden = false, modal.setAttribute("aria-hidden", "false"), document.body.style.overflow = "hidden", noticeStorageKey_2 ? (handleAction_13(noticeStorageKey_2), changelogDetailView?.focus()) : closeButton?.focus(), true;
   }
