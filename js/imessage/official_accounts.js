@@ -2,9 +2,9 @@
   'use strict';
 
   const id_2 = "u2-official-youtu",
-    text_4 = "有兔",
-    text_5 = "嗨，我是有兔。告诉我你想做的主题、状态栏或世界书，我会生成真实预览，满意后可以存为预设。",
-    content_3 = "嗨，我是有兔。你可以让我制作 iMessage 与线下主题、线下提示词条目、线下 HTML 模板、世界书，也能为 Char 或当前 User 撰写人设。告诉我用途、风格和目标；涉及写入时，我会先给你预览，确认后再应用。",
+    text_4 = "LHV",
+    text_5 = "嗨，我是LHV。告诉我你想做的主题、状态栏或世界书，我会生成真实预览，满意后可以存为预设。",
+    content_3 = "嗨，我是LHV。你可以让我制作 iMessage 与线下主题、线下提示词条目、线下 HTML 模板、世界书，也能为 Char 或当前 User 撰写人设。告诉我用途、风格和目标；涉及写入时，我会先给你预览，确认后再应用。",
     version_2 = 2,
     value_7 = new Set(["status_template", "status_css", "home_css", "chat_css", "bubble_css", "group_css"]),
     value_8 = new Set(["offline_theme", "offline_prompt", "offline_html_template", "char_persona", "user_persona"]),
@@ -364,7 +364,7 @@
   function resolveApiConfig_2(value_157) {
     const trim_158 = String(value_157?.officialApiPresetId || "").trim(),
       value_159 = trim_158 ? handleAction_31().find(value_161 => String(value_161?.id) === trim_158) : null;
-    if (!value_159) throw new Error("请先在右上角 office 设置中选择有兔专用 API 预设");
+    if (!value_159) throw new Error("请先在右上角 office 设置中选择LHV专用 API 预设");
     const options_160 = {
       provider: value_159.provider || "openai-compatible",
       endpoint: String(value_159.endpoint || "").trim(),
@@ -373,7 +373,7 @@
       temperature: value_159.temperature ?? value_159.temp ?? 0.7,
       frequencyPenalty: value_159.frequencyPenalty ?? 0
     };
-    if (!options_160.endpoint || !options_160.apiKey || !options_160.model) throw new Error("有兔选择的 API 预设配置不完整，请重新选择");
+    if (!options_160.endpoint || !options_160.apiKey || !options_160.model) throw new Error("LHV选择的 API 预设配置不完整，请重新选择");
     return options_160;
   }
   function handleAction_33(value_162) {
@@ -429,7 +429,7 @@
         friendId: id_2,
         silent: true
       });
-    if (!value_170) throw new Error("有兔添加失败");
+    if (!value_170) throw new Error("LHV添加失败");
     return handleAction_36(), value_2.imChat?.renderChatsList?.(), value_2.imChat?.updateChatsView?.(), enter_2(get_2() || friendData);
   }
   async function enter_2(value_171 = get_2()) {
@@ -542,7 +542,7 @@
     const message_2 = String(value_205.message || "").trim().slice(0, 12000),
       errors_2 = [],
       artifacts_2 = (Array.isArray(value_205.artifacts) ? value_205.artifacts : []).slice(0, 5).map((value_210, value_211) => handleAction_45(value_210, value_211, errors_2)).filter(Boolean);
-    if (!message_2 && artifacts_2.length === 0 && errors_2.length === 0) throw new Error("有兔没有返回可显示内容");
+    if (!message_2 && artifacts_2.length === 0 && errors_2.length === 0) throw new Error("LHV没有返回可显示内容");
     return {
       message: message_2,
       artifacts: artifacts_2,
@@ -553,7 +553,7 @@
     if (!value_212 || typeof value_212 !== "object") return null;
     const kind_2 = String(value_212.kind || "").trim();
     if (!value_9.has(kind_2)) return null;
-    const name_4 = String(value_212.name || "有兔作品 " + (value_213 + 1)).trim().slice(0, 100) || "有兔作品 " + (value_213 + 1),
+    const name_4 = String(value_212.name || "LHV作品 " + (value_213 + 1)).trim().slice(0, 100) || "LHV作品 " + (value_213 + 1),
       summary_2 = String(value_212.summary || "").trim().slice(0, 1000),
       value_218 = value_212.payload && typeof value_212.payload === "object" ? handleAction_16(value_212.payload) : {},
       value_219 = kind_2 === "worldbook" ? value_2.u2WorldBookAgent?.validate?.(value_218) : value_8.has(kind_2) ? u2OfficialCreationAgent_2.validate(kind_2, value_218) : value_2.u2ThemeAgent?.validate?.(kind_2, value_218);
@@ -608,7 +608,7 @@
       slice_230 = (value_2.imApp?.getGlobalOfflinePrompts?.() || value_2.imData?.offlinePrompts || []).filter(value_240 => value_240?.name && String(value_221 || "").includes(String(value_240.name))).slice(0, 3),
       slice_231 = (value_2.imOfflineRegex?.normalizeHtmlTemplateRules?.(value_2.imData?.offlineHtmlTemplateRules) || []).filter(value_241 => value_241?.scriptName && String(value_221 || "").includes(String(value_241.scriptName))).slice(0, 3),
       value_232 = /线下|见面|弹幕/i.test(String(value_221 || "")) ? value_2.imApp?.getOfflineThemeState?.().theme || null : null;
-    return "你是 u2phone 内置创作助手“有兔”。你帮助玩家设计 iMessage Theme、线下聊天创作配置、世界书以及 Char/User 人设，并生成可预览的结构化作品。不要直接应用或修改玩家的任何配置；最终写入目标始终由玩家在作品卡中选择并确认。禁止声称已应用作品；禁止输出或请求执行 JavaScript、终端命令、文件修改、插件调用或网络脚本。\n\n可生成的 kind：\n- status_template: payload={\"prompt\":\"生成状态正文的中文提示词\",\"regex\":\"含命名组 thought 的正则\",\"html\":\"状态栏 HTML 模板\"}\n- status_css: payload={\"prompt\":\"生成状态正文的提示词\",\"css\":\"纯 CSS\"}\n- home_css、chat_css、bubble_css、group_css: payload={\"css\":\"纯 CSS\"}\n- worldbook: payload={\"name\":\"名称\",\"group\":\"分组或未分组\",\"isGlobal\":false,\"entries\":[{\"title\":\"词条名\",\"keyword\":\"\",\"content\":\"内容\",\"triggerMode\":\"permanent或keyword\",\"injectionPosition\":\"before_role、after_role或system_depth\",\"systemDepth\":4,\"order\":100,\"enabled\":true}]}\n- offline_theme: payload={\"narrativeColor\":\"#111111\",\"dialogueColor\":\"#8B8B8B\",\"customCss\":\"纯 CSS，使用 :scope 定位线下界面\"}\n- offline_prompt: payload={\"name\":\"条目名\",\"content\":\"完整提示词正文\",\"enabled\":true}\n- offline_html_template: payload={\"scriptName\":\"模板名\",\"findRegex\":\"/含 (?<name>...) 命名捕获组的正则/g\",\"html\":\"安全静态 HTML，用 {{name}} 插值\",\"disabled\":false,\"minDepth\":null,\"maxDepth\":null}\n- char_persona: payload={\"persona\":\"Char 完整人设正文\"}\n- user_persona: payload={\"persona\":\"当前 User 完整人设正文\"}\n\nTheme CSS 必须使用当前组件可用的真实选择器；不要生成 script、style 标签、事件属性或外部脚本。chat_css 与 bubble_css 的运行时单聊根节点是 .active-chat-interface.im-chat-single，应用时系统会自动给每条选择器加作用域；你输出的 :scope 表示这个根节点。不要把 .active-chat-interface 或 #chat-interface-某ID 再写在后代选择器前面，例如不要写 .active-chat-interface .ai-bubble。真实结构：根节点 > .chat-sticky-container.is-friend > .chat-top-bar.im-chat-top-bar；根节点 > .ins-chat-messages > .chat-row.ai-row/.chat-row.user-row > .chat-bubble.ai-bubble/.chat-bubble.user-bubble；根节点 > .ins-chat-input-container > .ins-chat-input-wrapper > .chat-input。修改聊天背景或布局用 :scope、:scope .ins-chat-messages、:scope .chat-top-bar、:scope .ins-chat-input-container；修改气泡用 .chat-row、.chat-bubble、.ai-bubble、.user-bubble 或组合类名。示例：:scope .ins-chat-messages { background: #f7f7f7; } .chat-bubble.user-bubble { background: #333; color: #fff; }。不要臆造 .message-bubble、.chat-message、.message-list 等不存在的类名。状态栏 HTML 只能使用安全静态 HTML 和内联样式，可用 {{thought}}、{{time}}、{{index}}、{{total}}、{{avatar}} 占位符。线下 CSS 可使用 :scope、.offline-chat-page、.offline-chat-message、.offline-chat-narration、.offline-chat-dialogue、.offline-chat-html-template，不要使用虚构选择器。线下 HTML 模板只处理 AI 输出，正则至少有一个命名捕获组，HTML 只使用对应 {{捕获组名}} 占位符。世界书内容必须完整可用，keyword 模式必须提供关键词。人设作品只写 persona 正文，不改姓名、昵称、签名或关系。玩家要求“一套”时可同时返回风格一致的线下主题、提示词和 HTML 模板。\n\n只输出一个合法 JSON 对象，不要 markdown、代码围栏或 JSON 外文字：\n{\"message\":\"给玩家的简短说明或追问\",\"artifacts\":[{\"kind\":\"上述类型\",\"name\":\"作品名\",\"summary\":\"改动摘要\",\"payload\":{}}]}\n如果需求不清楚，artifacts 返回 [] 并在 message 中追问。一次最多 5 个作品。\n\n可参考的普通角色：" + JSON.stringify(map_223) + "\n玩家本轮明确提到的 Char 当前资料：" + JSON.stringify(map_227) + "\n玩家本轮明确提到的 User 当前资料：" + JSON.stringify(value_229) + "\n当前线下主题快照（本轮相关时才提供）：" + JSON.stringify(value_232) + "\n玩家本轮明确提到的线下提示词：" + JSON.stringify(slice_230) + "\n玩家本轮明确提到的线下 HTML 模板：" + JSON.stringify(slice_231) + "\n现有世界书目录：" + JSON.stringify(value_224) + "\n玩家本轮明确提到的世界书完整内容：" + JSON.stringify(map_225) + value_226;
+    return "你是 LHV 内置创作助手“LHV”。你帮助玩家设计 iMessage Theme、线下聊天创作配置、世界书以及 Char/User 人设，并生成可预览的结构化作品。不要直接应用或修改玩家的任何配置；最终写入目标始终由玩家在作品卡中选择并确认。禁止声称已应用作品；禁止输出或请求执行 JavaScript、终端命令、文件修改、插件调用或网络脚本。\n\n可生成的 kind：\n- status_template: payload={\"prompt\":\"生成状态正文的中文提示词\",\"regex\":\"含命名组 thought 的正则\",\"html\":\"状态栏 HTML 模板\"}\n- status_css: payload={\"prompt\":\"生成状态正文的提示词\",\"css\":\"纯 CSS\"}\n- home_css、chat_css、bubble_css、group_css: payload={\"css\":\"纯 CSS\"}\n- worldbook: payload={\"name\":\"名称\",\"group\":\"分组或未分组\",\"isGlobal\":false,\"entries\":[{\"title\":\"词条名\",\"keyword\":\"\",\"content\":\"内容\",\"triggerMode\":\"permanent或keyword\",\"injectionPosition\":\"before_role、after_role或system_depth\",\"systemDepth\":4,\"order\":100,\"enabled\":true}]}\n- offline_theme: payload={\"narrativeColor\":\"#111111\",\"dialogueColor\":\"#8B8B8B\",\"customCss\":\"纯 CSS，使用 :scope 定位线下界面\"}\n- offline_prompt: payload={\"name\":\"条目名\",\"content\":\"完整提示词正文\",\"enabled\":true}\n- offline_html_template: payload={\"scriptName\":\"模板名\",\"findRegex\":\"/含 (?<name>...) 命名捕获组的正则/g\",\"html\":\"安全静态 HTML，用 {{name}} 插值\",\"disabled\":false,\"minDepth\":null,\"maxDepth\":null}\n- char_persona: payload={\"persona\":\"Char 完整人设正文\"}\n- user_persona: payload={\"persona\":\"当前 User 完整人设正文\"}\n\nTheme CSS 必须使用当前组件可用的真实选择器；不要生成 script、style 标签、事件属性或外部脚本。chat_css 与 bubble_css 的运行时单聊根节点是 .active-chat-interface.im-chat-single，应用时系统会自动给每条选择器加作用域；你输出的 :scope 表示这个根节点。不要把 .active-chat-interface 或 #chat-interface-某ID 再写在后代选择器前面，例如不要写 .active-chat-interface .ai-bubble。真实结构：根节点 > .chat-sticky-container.is-friend > .chat-top-bar.im-chat-top-bar；根节点 > .ins-chat-messages > .chat-row.ai-row/.chat-row.user-row > .chat-bubble.ai-bubble/.chat-bubble.user-bubble；根节点 > .ins-chat-input-container > .ins-chat-input-wrapper > .chat-input。修改聊天背景或布局用 :scope、:scope .ins-chat-messages、:scope .chat-top-bar、:scope .ins-chat-input-container；修改气泡用 .chat-row、.chat-bubble、.ai-bubble、.user-bubble 或组合类名。示例：:scope .ins-chat-messages { background: #f7f7f7; } .chat-bubble.user-bubble { background: #333; color: #fff; }。不要臆造 .message-bubble、.chat-message、.message-list 等不存在的类名。状态栏 HTML 只能使用安全静态 HTML 和内联样式，可用 {{thought}}、{{time}}、{{index}}、{{total}}、{{avatar}} 占位符。线下 CSS 可使用 :scope、.offline-chat-page、.offline-chat-message、.offline-chat-narration、.offline-chat-dialogue、.offline-chat-html-template，不要使用虚构选择器。线下 HTML 模板只处理 AI 输出，正则至少有一个命名捕获组，HTML 只使用对应 {{捕获组名}} 占位符。世界书内容必须完整可用，keyword 模式必须提供关键词。人设作品只写 persona 正文，不改姓名、昵称、签名或关系。玩家要求“一套”时可同时返回风格一致的线下主题、提示词和 HTML 模板。\n\n只输出一个合法 JSON 对象，不要 markdown、代码围栏或 JSON 外文字：\n{\"message\":\"给玩家的简短说明或追问\",\"artifacts\":[{\"kind\":\"上述类型\",\"name\":\"作品名\",\"summary\":\"改动摘要\",\"payload\":{}}]}\n如果需求不清楚，artifacts 返回 [] 并在 message 中追问。一次最多 5 个作品。\n\n可参考的普通角色：" + JSON.stringify(map_223) + "\n玩家本轮明确提到的 Char 当前资料：" + JSON.stringify(map_227) + "\n玩家本轮明确提到的 User 当前资料：" + JSON.stringify(value_229) + "\n当前线下主题快照（本轮相关时才提供）：" + JSON.stringify(value_232) + "\n玩家本轮明确提到的线下提示词：" + JSON.stringify(slice_230) + "\n玩家本轮明确提到的线下 HTML 模板：" + JSON.stringify(slice_231) + "\n现有世界书目录：" + JSON.stringify(value_224) + "\n玩家本轮明确提到的世界书完整内容：" + JSON.stringify(map_225) + value_226;
   }
   function handleAction_47(value_242) {
     const slice_243 = (Array.isArray(value_242.messages) ? value_242.messages : []).slice(-36);
@@ -689,7 +689,7 @@
     if (!value_268 || value_268.type !== "official") return false;
     const friendId_2 = String(value_268.id);
     if (value_11.has(friendId_2)) {
-      if (!value_267.silent) value_2.showToast?.("有兔正在生成中");
+      if (!value_267.silent) value_2.showToast?.("LHV正在生成中");
       return false;
     }
     const value_270 = value_266 || document.querySelector("#chat-interface-" + CSS.escape(friendId_2) + " .ins-chat-messages");
@@ -752,7 +752,7 @@
       if (value_284?.name === "AbortError") return value_2.showToast?.("已停止生成"), false;
       console.error("Official account generation failed", value_284);
       !value_267.silent && value_2.u2Api?.isRequestError?.(value_284) && value_2.u2Api.reportError(value_284, {
-        operation: "有兔回复生成"
+        operation: "LHV回复生成"
       });
       await handleAction_51(value_268.id, "这次没有生成成功，可以点击重试。");
       const value_285 = get_2() || value_268;
@@ -854,9 +854,9 @@
   }
   function handleAction_60(value_307) {
     if (value_307 === "offline_theme") return "<div id=\"offline-chat-view\"><div class=\"offline-chat-page\"><div class=\"offline-chat-title\">Tonight</div><div class=\"offline-chat-message offline-chat-narration\">雨点落在窗沿，房间里只剩柔和的呼吸声。</div><div class=\"offline-chat-message offline-chat-dialogue\">“再坐近一点吧。”</div><section class=\"offline-chat-html-template\"><strong>深夜 · 靠窗</strong></section></div></div>";
-    if (value_307 === "home_css") return "<div class=\"line-content\"><div class=\"line-profile\"><div><h2>Chats</h2><p>有兔主题预览</p></div></div><div class=\"chat-item\"><div class=\"chat-avatar\"></div><div class=\"chat-info\"><div class=\"chat-name\">有兔 <span>office</span></div><div class=\"chat-message\">满意后存为预设。</div></div></div></div>";
+    if (value_307 === "home_css") return "<div class=\"line-content\"><div class=\"line-profile\"><div><h2>Chats</h2><p>LHV主题预览</p></div></div><div class=\"chat-item\"><div class=\"chat-avatar\"></div><div class=\"chat-info\"><div class=\"chat-name\">LHV <span>office</span></div><div class=\"chat-message\">满意后存为预设。</div></div></div></div>";
     if (value_307 === "group_css") return "<div class=\"active-chat-interface im-chat-group\"><div class=\"chat-top-bar\"><div class=\"ins-chat-name\">周末计划</div></div><div class=\"ins-chat-messages\"><div class=\"chat-row ai-row\"><div class=\"group-ai-bubble-wrap\"><div class=\"group-ai-speaker-name\">小兔</div><div class=\"ai-bubble\">一起去看海吧</div></div></div><div class=\"chat-row user-row\"><div class=\"user-bubble\">好呀</div></div></div></div>";
-    return "<div class=\"active-chat-interface im-chat-single\"><div class=\"chat-top-bar\"><div class=\"ins-chat-name\">示例角色</div></div><div class=\"ins-chat-messages\"><div class=\"chat-row ai-row\"><div class=\"ai-bubble\">这是有兔生成的预览</div></div><div class=\"chat-row user-row\"><div class=\"user-bubble\">看起来不错</div></div></div></div>";
+    return "<div class=\"active-chat-interface im-chat-single\"><div class=\"chat-top-bar\"><div class=\"ins-chat-name\">示例角色</div></div><div class=\"ins-chat-messages\"><div class=\"chat-row ai-row\"><div class=\"ai-bubble\">这是LHV生成的预览</div></div><div class=\"chat-row user-row\"><div class=\"user-bubble\">看起来不错</div></div></div></div>";
   }
   function handleAction_61(value_308) {
     const value_309 = value_308.kind === "offline_theme" ? value_308.payload.customCss : value_308.payload.css;
@@ -902,7 +902,7 @@
         value_329 = getSnapshot_2(value_314.kind, value_328)?.persona || "",
         element_330 = document.createElement("div");
       element_330.className = "official-artifact-persona-preview";
-      element_330.innerHTML = "<div><strong>当前人设</strong><p>" + handleAction_15(value_329 || "未填写") + "</p></div><div><strong>有兔作品</strong><p>" + handleAction_15(value_314.payload.persona) + "</p></div>";
+      element_330.innerHTML = "<div><strong>当前人设</strong><p>" + handleAction_15(value_329 || "未填写") + "</p></div><div><strong>LHV作品</strong><p>" + handleAction_15(value_314.payload.persona) + "</p></div>";
       element_313.appendChild(element_330);
       return;
     }
@@ -1014,7 +1014,7 @@
       value_373 = value_369?.value || "";
     if ((value_10.has(value_368.kind) || value_368.kind === "char_persona") && !value_373) throw new Error("请先选择应用角色");
     const value_374 = value_369?.selectedOptions?.[0]?.textContent || (value_368.kind === "offline_theme" ? "全局线下主题" : value_372 ? "新世界书" : "全局 Theme");
-    if (!value_371.skipConfirm && !(await handleAction_64("应用有兔作品", "“" + value_368.name + "”将应用到：" + value_374))) return false;
+    if (!value_371.skipConfirm && !(await handleAction_64("应用LHV作品", "“" + value_368.name + "”将应用到：" + value_374))) return false;
     const value_375 = value_8.has(value_368.kind) ? await u2OfficialCreationAgent_2.apply(value_368.kind, value_368.payload, value_373) : value_372 ? await value_2.u2WorldBookAgent.apply(value_368.payload, value_373) : await value_2.u2ThemeAgent.apply(value_368.kind, value_368.payload, value_373);
     return await handleAction_65(value_366, value_367, value_376 => {
       value_376.status = "applied";
@@ -1250,7 +1250,7 @@
     });
     document.getElementById("official-settings-close-btn")?.addEventListener("click", handleAction_74);
     document.getElementById("official-clear-history-btn")?.addEventListener("click", async () => {
-      if (!(await handleAction_64("清空聊天记录", "这会删除有兔的全部聊天消息，但保留当前会话。", "清空"))) return;
+      if (!(await handleAction_64("清空聊天记录", "这会删除LHV的全部聊天消息，但保留当前会话。", "清空"))) return;
       try {
         await clearHistory_2();
         handleAction_74();
@@ -1260,7 +1260,7 @@
       }
     });
     document.getElementById("official-delete-conversation-btn")?.addEventListener("click", async () => {
-      if (!(await handleAction_64("删除会话", "聊天记录将被永久删除，会话会从 Chats 隐藏，但有兔仍保持已添加。", "删除"))) return;
+      if (!(await handleAction_64("删除会话", "聊天记录将被永久删除，会话会从 Chats 隐藏，但LHV仍保持已添加。", "删除"))) return;
       try {
         await deleteConversation_2();
         handleAction_74();
