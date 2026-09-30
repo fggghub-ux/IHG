@@ -15,6 +15,12 @@
     DEFAULT_PHOTO_IMAGE_SRCS = ["assets/home/photo-default-1-512.jpg", "assets/home/photo-default-2-512.jpg", "assets/home/photo-default-3-512.jpg"],
     text_10 = "assets/home/pet-default.jpg",
     DEFAULT_WIDGET_IMAGE_ASSET = "assets/home/widget-default-320.jpg",
+    DEFAULT_NOTIFICATION_AVATAR_SRC = "assets/home/notification-default.jpg",
+    DEFAULT_MUSIC_COVER_IMAGE_SRC = "assets/home/music-cover-default.jpg",
+    DEFAULT_COUPLE_LEFT_IMAGE_SRC = "assets/home/couple-default-left.jpg",
+    DEFAULT_COUPLE_RIGHT_IMAGE_SRC = "assets/home/couple-default-right.jpg",
+    DEFAULT_SOCIAL_POST_AVATAR_SRC = "assets/home/social-post-avatar.jpg",
+    DEFAULT_SOCIAL_POST_IMAGE_SRC = "assets/home/social-post-image.jpg",
     OPTIMIZED_DEFAULT_IMAGE_SOURCES = new Map([[DEFAULT_WIDGET_IMAGE_SRC, DEFAULT_WIDGET_IMAGE_ASSET], ["assets/home/photo-default-1.jpg", DEFAULT_PHOTO_IMAGE_SRCS[0]], ["assets/home/photo-default-2.jpg", DEFAULT_PHOTO_IMAGE_SRCS[1]], ["assets/home/photo-default-3.jpg", DEFAULT_PHOTO_IMAGE_SRCS[2]]]),
     WIDGET_TYPES = {
       profile: {
@@ -122,25 +128,25 @@
     OLD_PHOTO_TITLE_DEFAULTS = new Set(["", "Photos"]),
     OLD_PHOTO_BODY_DEFAULTS = new Set(["2 x 4", "Drop your favorite picture here"]),
     DEFAULT_WIDGET_TEXT = {
-      profileTitle: "name @iisonyoung",
+      profileTitle: "i 🤍uuu so..@kendall",
       profileUsername: "iisonyoung",
       profileBio: "Te amo mucho...",
-      profilePosts: "0",
-      profileFollowers: "1314",
-      profileFollowing: "520",
-      petText: "oxo",
-      musicTitle: "oode...",
-      musicArtist: "- Maximillian",
-      musicLyric1: "u2phone",
-      musicLyric2: "sonokoiomoiiyo",
-      musicLyric3: "The rain of destiny",
-      coupleLeft: "ㅠㅠ",
-      coupleRight: "ㅎㅎ",
-      photoTitle: "iisonyoung",
+      profilePosts: "19",
+      profileFollowers: "7119.1K",
+      profileFollowing: "8",
+      petText: "irrelevant",
+      musicTitle: "But...",
+      musicArtist: "- Drake",
+      musicLyric1: "Whit no makeup she a ten",
+      musicLyric2: "And she the best with that head",
+      musicLyric3: "Even better than Karrine",
+      coupleLeft: "-.-",
+      coupleRight: "TT",
+      photoTitle: "callmekim",
       photoBody: "",
-      notificationTitle: "u2phone",
-      notificationDesc: "I was with you in a happy, translucent, endless dream. In contrast to my usual dreams.",
-      postAuthor: "iisonyoung",
+      notificationTitle: "Entanglement",
+      notificationDesc: "If it’s not mine, it’s not special.",
+      postAuthor: "you",
       postBody: "If you still exist in this world, then no matter what this world is like, it is meaningful to me."
     };
   let appEl,
@@ -2421,18 +2427,18 @@
       avatar: DEFAULT_WIDGET_IMAGE_ASSET
     };
     if (type_8 === "socialPost") return {
-      avatar: DEFAULT_WIDGET_IMAGE_ASSET,
-      postImage: DEFAULT_PHOTO_IMAGE_SRCS[0]
+      avatar: DEFAULT_SOCIAL_POST_AVATAR_SRC,
+      postImage: DEFAULT_SOCIAL_POST_IMAGE_SRC
     };
     if (type_8 === "pet") return {
       pet: text_10
     };
     if (type_8 === "music") return {
-      cover: DEFAULT_WIDGET_IMAGE_ASSET
+      cover: DEFAULT_MUSIC_COVER_IMAGE_SRC
     };
     if (type_8 === "couple") return {
-      left: DEFAULT_WIDGET_IMAGE_ASSET,
-      right: DEFAULT_WIDGET_IMAGE_ASSET
+      left: DEFAULT_COUPLE_LEFT_IMAGE_SRC,
+      right: DEFAULT_COUPLE_RIGHT_IMAGE_SRC
     };
     if (type_8 === "photo") return {
       photo: DEFAULT_PHOTO_IMAGE_SRCS[0],
@@ -2756,7 +2762,7 @@
   function isAllowedWidgetImageSrc(src_4) {
     if (typeof src_4 !== "string") return false;
     const trim_912 = src_4.trim();
-    return trim_912.startsWith("data:") || trim_912.startsWith("blob:") || /^https?:\/\//i.test(trim_912) || DEFAULT_PHOTO_IMAGE_SRCS.includes(trim_912) || trim_912 === DEFAULT_WIDGET_IMAGE_ASSET || trim_912 === text_10;
+    return trim_912.startsWith("data:") || trim_912.startsWith("blob:") || /^https?:\/\//i.test(trim_912) || DEFAULT_PHOTO_IMAGE_SRCS.includes(trim_912) || [DEFAULT_WIDGET_IMAGE_ASSET, DEFAULT_NOTIFICATION_AVATAR_SRC, DEFAULT_MUSIC_COVER_IMAGE_SRC, DEFAULT_COUPLE_LEFT_IMAGE_SRC, DEFAULT_COUPLE_RIGHT_IMAGE_SRC, DEFAULT_SOCIAL_POST_AVATAR_SRC, DEFAULT_SOCIAL_POST_IMAGE_SRC, text_10].includes(trim_912);
   }
   function getPrimaryWidgetText(config_12) {
     const text_2 = config_12.text || {};
