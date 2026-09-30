@@ -1,9 +1,10 @@
+const TK_DEFAULT_USER_AVATAR_URL = window.U2_DEFAULT_USER_AVATAR_URL || "assets/default-user-avatar.jpg";
 function createDefaultTkState() {
   return {
     profile: {
       name: "User",
       handle: "user123",
-      avatar: null,
+      avatar: TK_DEFAULT_USER_AVATAR_URL,
       status: "思考中...",
       bio: "点击添加个人简介",
       persona: "",
@@ -89,7 +90,8 @@ function normalizeTkState(rawState = {}) {
     ...safeState,
     profile: {
       ...defaults.profile,
-      ...(safeState.profile && typeof safeState.profile === "object" ? safeState.profile : {})
+      ...(safeState.profile && typeof safeState.profile === "object" ? safeState.profile : {}),
+      avatar: safeState.profile?.avatar || defaults.profile.avatar
     },
     activity: {
       ...defaults.activity,
