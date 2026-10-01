@@ -2883,7 +2883,7 @@
         const button_6 = document.createElement("button");
         button_6.type = "button";
         button_6.className = "offline-chat-history-card";
-        button_6.innerHTML = "<i class=\"fas fa-history\"></i><span>查看历史见面</span>";
+        button_6.innerHTML = "<i class=\"fas fa-history\"></i><span>Forever romance</span>";
         button_6.addEventListener("click", () => handleAction_285(value_1135));
         element_1134.appendChild(button_6);
       },
@@ -3059,7 +3059,7 @@
       if (messages_9.length === 0 && normalizeOfflineMeetingSessions(value_1194).length === 0) {
         const placeholder_2 = document.createElement("div");
         placeholder_2.className = "offline-chat-placeholder";
-        placeholder_2.textContent = "开始一次线下见面";
+        placeholder_2.textContent = "Notification Center";
         documentFragment.appendChild(placeholder_2);
       }
       offlineChatContentElement_1196.appendChild(documentFragment);
@@ -3085,7 +3085,7 @@
       const backBtn = document.createElement("button");
       backBtn.type = "button";
       backBtn.className = "offline-chat-history-back";
-      backBtn.innerHTML = "<i class=\"fas fa-chevron-left\"></i> 返回当前见面";
+      backBtn.innerHTML = "<i class=\"fas fa-chevron-left\"></i> First encounter";
       backBtn.addEventListener("click", () => renderOfflineCurrentMessages(activeFriend_31));
       contentArea_6.appendChild(backBtn);
       if (sessions_3.length === 0) {
@@ -3188,7 +3188,7 @@
       const backBtn_2 = document.createElement("button");
       backBtn_2.type = "button";
       backBtn_2.className = "offline-chat-history-back";
-      backBtn_2.innerHTML = "<i class=\"fas fa-chevron-left\"></i> 返回历史见面";
+      backBtn_2.innerHTML = "<i class=\"fas fa-chevron-left\"></i> Notification Center";
       backBtn_2.addEventListener("click", () => handleAction_285(activeFriend_33));
       contentArea_7.appendChild(backBtn_2);
       const messages_10 = cloneOfflineMeetingMessages(session_9.messages || []),
