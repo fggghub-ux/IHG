@@ -452,6 +452,13 @@
     const scope_14 = bottomSheetFocusGuard,
       overlay_128 = scope_14.overlay;
     if (!isAndroid_3 || !scope_14.active || !overlay_128?.isConnected) return;
+    const isImessageSheet = overlay_128.classList.contains("imessage-scoped-modal") || overlay_128.classList.contains("im-chats-status-modal") || overlay_128.classList.contains("im-chat-back-count-modal") || !!overlay_128.closest("#imessage-view");
+    if (isImessageSheet) {
+      if (scope_14.keyboardWasOpen || overlay_128.classList.contains("u2-android-keyboard-open")) handleAction_17();
+      scheduleBottomSheetFocusRestore();
+      handleAction_19();
+      return;
+    }
     const viewportMetrics_129 = getViewportMetrics(),
       round_130 = Math.round(window.innerHeight || viewportMetrics_129.height || 0),
       layoutAlreadyResized_2 = scope_14.restingLayoutHeight - round_130 > 100,
