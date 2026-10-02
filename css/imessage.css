@@ -3687,14 +3687,18 @@ button.group-private-chat-detail-bubble {
     overflow: hidden;
 }
 
-/* Android Chromium keeps the layout viewport full-height while the software
-   keyboard shrinks only visualViewport. Anchor the outer iMessage view rather
-   than a chat nested below the transformed/contained app view; Via and similar
-   WebView shells otherwise pan that containing block and move the whole chat. */
-#imessage-view.u2-android-chat-viewport-sized {
+/* Size only the active chat page to visualViewport. Resizing #imessage-view
+   also moves the Home/Chats shell and exposes the launcher behind the app. */
+.active-chat-interface.u2-android-chat-viewport-sized {
     top: var(--u2-android-chat-viewport-top, 0px);
     bottom: auto;
     height: var(--u2-android-chat-viewport-height, 100%);
+}
+
+#custom-modal-overlay.u2-imessage-modal-viewport-sized {
+    top: var(--u2-imessage-modal-viewport-top, 0px) !important;
+    bottom: auto !important;
+    height: var(--u2-imessage-modal-viewport-height, 100%) !important;
 }
 
 .im-chat-loading-shell {
@@ -4804,7 +4808,7 @@ button.group-private-chat-detail-bubble {
 }
 
 #msg-context-bubble-clone {
-    padding: 0 10px 12px;
+    padding: 0 10px;
     box-sizing: border-box;
     overflow: visible !important;
 }
@@ -6106,7 +6110,7 @@ button.group-private-chat-detail-bubble {
 }
 
 .im-chat-char .chat-row:not(.has-next) .voice-message-bubble::after,
-#msg-context-bubble-clone .chat-row:not(.has-next) .voice-message-bubble::after {
+#msg-context-bubble-clone .user-row:not(.has-next) .voice-message-bubble::after {
     content: "";
     position: absolute;
     width: 15px;
@@ -6124,8 +6128,7 @@ button.group-private-chat-detail-bubble {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cpath d='M14.385 165.341h723.828s-102.718 111.789 136.16 498.070c199.609 111.789 29.591 144.852-58.757 137.075-97.893-15.633-301.441-20.846-861.266-208.137z' fill='%23a0a0a0'/%3E%3C/svg%3E");
 }
 
-.im-chat-char .ai-row:not(.has-next) .voice-message-bubble::after,
-#msg-context-bubble-clone .ai-row:not(.has-next) .voice-message-bubble::after {
+.im-chat-char .ai-row:not(.has-next) .voice-message-bubble::after {
     left: 7px;
     bottom: -5px;
     transform: rotate(-16deg) scaleX(-1);
@@ -9573,97 +9576,6 @@ input:checked + .slider:before {
 
 .pay-transfer-bubble .bubble-meta {
     margin-top: 4px;
-}
-
-.pay-transfer-card {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 248, 250, 0.98) 100%);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 20px;
-    padding: 11px 12px;
-    color: #111;
-}
-
-.pay-transfer-card.is-received {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 249, 246, 0.98) 100%);
-}
-
-.pay-transfer-card.is-income {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 247, 255, 0.98) 100%);
-}
-
-.pay-transfer-card.is-pending {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 249, 251, 0.98) 100%);
-    cursor: pointer;
-}
-
-.user-bubble.pay-transfer-bubble {
-    background: transparent !important;
-    color: #111 !important;
-    border-bottom-right-radius: 22px !important;
-}
-
-.ai-bubble.pay-transfer-bubble {
-    background: transparent !important;
-    color: #111 !important;
-    border-bottom-left-radius: 22px !important;
-}
-
-.pay-transfer-card-top {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
-}
-
-.pay-transfer-card-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 10px;
-    background: #111;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    flex-shrink: 0;
-}
-
-.pay-transfer-card-meta {
-    min-width: 0;
-    flex: 1;
-}
-
-.pay-transfer-card-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: #111;
-    line-height: 1.1;
-}
-
-.pay-transfer-card-subtitle {
-    font-size: 10px;
-    color: #8e8e93;
-    margin-top: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.pay-transfer-card-amount {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    color: #111;
-    margin-bottom: 4px;
-    line-height: 1.05;
-}
-
-.pay-transfer-card-desc {
-    font-size: 11px;
-    color: #636366;
-    line-height: 1.35;
-    word-break: break-word;
-    margin-bottom: 0;
 }
 
 .attachment-more-icon-grid {
@@ -18527,7 +18439,7 @@ button.moment-private-chat-bubble.has-translation {
     color: #000;
 }
 
-#msg-context-bubble-clone .msg-context-row-clone:not(.has-next) .chat-bubble:not(.im-card-bubble):not(.voice-message-bubble)::after {
+#msg-context-bubble-clone .msg-context-row-clone.user-row:not(.has-next) .chat-bubble:not(.im-card-bubble):not(.voice-message-bubble)::after {
     content: "";
     position: absolute;
     width: 15px;
@@ -18544,11 +18456,9 @@ button.moment-private-chat-bubble.has-translation {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cpath d='M14.385 165.341h723.828s-102.718 111.789 136.16 498.070c199.609 111.789 29.591 144.852-58.757 137.075-97.893-15.633-301.441-20.846-861.266-208.137z' fill='%23a0a0a0'/%3E%3C/svg%3E");
 }
 
-#msg-context-bubble-clone .msg-context-row-clone.ai-row:not(.has-next) .chat-bubble:not(.im-card-bubble):not(.voice-message-bubble)::after {
-    left: -7px;
-    bottom: -10px;
-    transform: rotate(-16deg) scaleX(-1);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cpath d='M14.385 165.341h723.828s-102.718 111.789 136.16 498.070c199.609 111.789 29.591 144.852-58.757 137.075-97.893-15.633-301.441-20.846-861.266-208.137z' fill='%23e9e9ea'/%3E%3C/svg%3E");
+#msg-context-bubble-clone .msg-context-row-clone.ai-row .chat-bubble::after {
+    content: none !important;
+    display: none !important;
 }
 
 .im-chat-char .user-bubble:not(.im-card-bubble):not(.voice-message-bubble) {
@@ -19369,4 +19279,34 @@ button.moment-private-chat-bubble.has-translation {
 }
 .line-service-item:nth-child(4)::before {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 21 12 16 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z'/%3E%3C/svg%3E");
+}
+
+/* Keep chat and context-action scrolling rigid. The GPT elastic scroll is not
+   used here because it stretches the composer and More actions in Work. */
+.im-chat-char .ins-chat-messages {
+    overscroll-behavior-y: none !important;
+    -webkit-overflow-scrolling: auto !important;
+}
+
+#chat-attachment-sheet .view-more {
+    overscroll-behavior-y: none !important;
+    -webkit-overflow-scrolling: auto !important;
+}
+
+#msg-context-menu,
+#msg-context-bubble-clone,
+#msg-context-actions,
+#msg-context-more-actions {
+    overscroll-behavior: none !important;
+    -webkit-overflow-scrolling: auto !important;
+}
+
+#msg-context-bubble-clone {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+/* Raise the composer without changing any control dimensions. */
+.im-chat-char:not(.keyboard-open) .ins-chat-input-container {
+    padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
 }
