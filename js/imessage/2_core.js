@@ -4358,6 +4358,7 @@ window.addEventListener("pagehide", () => {
   }
   function showCustomModal_2(options_35) {
     if (!customModalOverlay) return;
+    customModalOverlay.classList.toggle("imessage-scoped-modal", !!document.querySelector("#imessage-view.active"));
     modalTitle.textContent = options_35.title || "提示";
     currentModalCallback = options_35.onConfirm;
     currentModalCancelCallback = options_35.onCancel;
@@ -4478,6 +4479,7 @@ window.addEventListener("pagehide", () => {
     currentModalReferenceFace = null;
     currentModalImageComposer = null;
     currentModalGenerationPrompt = null;
+    customModalOverlay.classList.remove("imessage-scoped-modal");
   }
   window.imApp.showCustomModal = showCustomModal_2;
   window.imApp.closeCustomModal = closeCustomModal_2;

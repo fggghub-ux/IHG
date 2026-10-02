@@ -7,18 +7,137 @@
   const imChat_2 = window.imChat,
     isAndroid = /Android/i.test(navigator.userAgent || ""),
     nativeInsetsOnly_2 = isAndroid && window.u2NativeBridge?.isNativeAndroid?.() === true;
-  isAndroid && window.mobileInputCompat?.registerFocusScope && !imChat_2._androidChatFocusScopeCleanup && (imChat_2._androidChatFocusScopeCleanup = window.mobileInputCompat.registerFocusScope({
+  let keyboardRestoreTimers = [],
+    androidRestingViewportHeight = 0,
+    androidViewportWidth = 0,
+    androidKeyboardWasOpen = false,
+    androidViewportFrame = 0,
+    androidAppliedViewportHeight = 0,
+    androidAppliedViewportTop = 0;
+
+  function isChatInputFocused(page) {
+    const input = page?.querySelector(".chat-input");
+    return !!input && document.activeElement === input;
+  }
+  function getAndroidViewportMetrics() {
+    const viewport = window.visualViewport;
+    return {
+      height: Math.round(viewport?.height || window.innerHeight || 0),
+      width: Math.round(viewport?.width || window.innerWidth || 0)
+    };
+  }
+  function captureAndroidRestingViewport() {
+    if (!isAndroid) return;
+    const metrics = getAndroidViewportMetrics();
+    if (metrics.width > 0 && Math.abs(metrics.width - androidViewportWidth) > 48) {
+      androidViewportWidth = metrics.width;
+      androidRestingViewportHeight = metrics.height;
+      androidKeyboardWasOpen = false;
+      return;
+    }
+    androidViewportWidth = metrics.width || androidViewportWidth;
+    androidRestingViewportHeight = Math.max(androidRestingViewportHeight, metrics.height);
+  }
+  function clearKeyboardRestoreTimers() {
+    keyboardRestoreTimers.forEach(timer => clearTimeout(timer));
+    keyboardRestoreTimers = [];
+  }
+  function applyAndroidChatViewport(page, msgContainer, metrics = getAndroidViewportMetrics(), options = {}) {
+    if (!isAndroid || !page || !window.visualViewport || metrics.height <= 0) return;
+    const viewportTop = Math.round(window.visualViewport.offsetTop || 0),
+      metricsChanged = metrics.height !== androidAppliedViewportHeight || viewportTop !== androidAppliedViewportTop,
+      viewportClassApplied = page.classList.contains("u2-android-chat-viewport-sized");
+    if (!metricsChanged && viewportClassApplied) return;
+    if (metricsChanged) {
+      androidAppliedViewportHeight = metrics.height;
+      androidAppliedViewportTop = viewportTop;
+      page.style.setProperty("--u2-android-chat-viewport-height", metrics.height + "px");
+      page.style.setProperty("--u2-android-chat-viewport-top", viewportTop + "px");
+    }
+    if (!viewportClassApplied) page.classList.add("u2-android-chat-viewport-sized");
+    if (options.scrollToBottom) requestAnimationFrame(() => {
+      if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
+    });
+  }
+  function restoreAndroidChatViewport(page, msgContainer) {
+    if (!isAndroid || !page) return;
+    page.classList.remove("u2-android-chat-viewport-sized");
+    page.style.removeProperty("--u2-android-chat-viewport-height");
+    page.style.removeProperty("--u2-android-chat-viewport-top");
+    androidAppliedViewportHeight = 0;
+    androidAppliedViewportTop = 0;
+    page.classList.remove("keyboard-open");
+    if (page.style.display === "none") return;
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    requestAnimationFrame(() => {
+      if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
+    });
+  }
+  function scheduleAndroidChatViewportRestore(page, msgContainer) {
+    if (!isAndroid) return;
+    clearKeyboardRestoreTimers();
+    [0, 60, 180, 360].forEach(delay => {
+      keyboardRestoreTimers.push(setTimeout(() => restoreAndroidChatViewport(page, msgContainer), delay));
+    });
+  }
+  captureAndroidRestingViewport();
+  if (isAndroid && window.visualViewport && !imChat_2._androidViewportListenersBound) {
+    imChat_2._androidViewportListenersBound = true;
+    const processViewportChange = () => {
+      androidViewportFrame = 0;
+      const page = document.querySelector('.active-chat-interface[style*="display: flex"]');
+      if (!page) return;
+      const metrics = getAndroidViewportMetrics();
+      if (Math.abs(metrics.width - androidViewportWidth) > 48) {
+        androidViewportWidth = metrics.width;
+        androidRestingViewportHeight = metrics.height;
+        androidKeyboardWasOpen = false;
+        return;
+      }
+      const msgContainer = page.querySelector(".ins-chat-messages"),
+        inputFocused = isChatInputFocused(page);
+      if (!inputFocused && !androidKeyboardWasOpen) androidRestingViewportHeight = Math.max(androidRestingViewportHeight, metrics.height);
+      if (inputFocused && androidRestingViewportHeight - metrics.height > 100) {
+        const keyboardJustOpened = !androidKeyboardWasOpen;
+        androidKeyboardWasOpen = true;
+        applyAndroidChatViewport(page, msgContainer, metrics, {
+          scrollToBottom: keyboardJustOpened
+        });
+        return;
+      }
+      if (androidKeyboardWasOpen && metrics.height >= androidRestingViewportHeight - 72) {
+        androidKeyboardWasOpen = false;
+        androidRestingViewportHeight = Math.max(androidRestingViewportHeight, metrics.height);
+        scheduleAndroidChatViewportRestore(page, msgContainer);
+      }
+    };
+    const handleViewportChange = () => {
+      if (androidViewportFrame) return;
+      androidViewportFrame = requestAnimationFrame(processViewportChange);
+    };
+    window.visualViewport.addEventListener("resize", handleViewportChange, {
+      passive: true
+    });
+    window.visualViewport.addEventListener("scroll", handleViewportChange, {
+      passive: true
+    });
+  }
+  isAndroid && window.mobileInputCompat?.registerFocusScope && !imChat_2._androidOnlineChatOwnershipCleanup && (imChat_2._androidOnlineChatOwnershipCleanup = window.mobileInputCompat.registerFocusScope({
     selector: ".active-chat-interface",
-    priority: 40,
+    priority: 80,
+    nativeInsetsOnly: true
+  }));
+  isAndroid && window.mobileInputCompat?.registerFocusScope && !imChat_2._androidStatusModalFocusScopeCleanup && (imChat_2._androidStatusModalFocusScopeCleanup = window.mobileInputCompat.registerFocusScope({
+    selector: "#custom-modal-overlay.imessage-scoped-modal, #custom-modal-overlay.im-chats-status-modal, #custom-modal-overlay.im-chat-back-count-modal",
+    priority: 70,
     preferFocusScope: true,
-    nativeInsetsOnly: nativeInsetsOnly_2,
     followViewportOrigin: true,
-    resolveViewportRoot: (value_27, value_28) => value_28?.closest("#imessage-view") || value_28,
-    resolveScrollContainer: (value_29, element) => element?.querySelector(".ins-chat-messages") || null,
-    scrollBehavior: "latest",
-    viewportClassName: "u2-android-chat-viewport-sized",
-    viewportHeightCssVariable: "--u2-android-chat-viewport-height",
-    viewportTopCssVariable: "--u2-android-chat-viewport-top"
+    scrollBehavior: "focus",
+    viewportClassName: "u2-imessage-modal-viewport-sized",
+    viewportHeightCssVariable: "--u2-imessage-modal-viewport-height",
+    viewportTopCssVariable: "--u2-imessage-modal-viewport-top"
   }));
   isAndroid && window.mobileInputCompat?.registerFocusScope && !imChat_2._androidOfflineFocusScopeCleanup && (imChat_2._androidOfflineFocusScopeCleanup = window.mobileInputCompat.registerFocusScope({
     selector: "#offline-chat-view",
@@ -428,11 +547,9 @@
     });
     const chatsEmptyStateElement = document.getElementById("chats-empty-state"),
       chatsListContainerElement = document.getElementById("chats-list-container"),
-      lineHeaderElement = document.querySelector(".line-header"),
       lineBottomNavContainerElement = document.querySelector(".line-bottom-nav-container");
     if (chatsEmptyStateElement) chatsEmptyStateElement.style.display = "none";
     if (chatsListContainerElement) chatsListContainerElement.style.display = "none";
-    if (lineHeaderElement) lineHeaderElement.style.display = "none";
     if (lineBottomNavContainerElement) lineBottomNavContainerElement.style.display = "none";
     if (cachedPage_2) {
       cachedPage_2.style.display = "flex";
@@ -753,20 +870,37 @@
         window.imChat.openAttachmentSheet && window.imChat.openAttachmentSheet();
       };
       plusBtn && plusBtn.addEventListener("click", handleClick_2);
-      input_2 && (input_2.addEventListener("focus", () => {
-        page_9.classList.add("keyboard-open");
-        const attachmentSheet = document.getElementById("chat-attachment-sheet");
-        if (attachmentSheet) {
-          const overlay_2 = attachmentSheet.querySelector(".sheet-overlay"),
-            content_2 = attachmentSheet.querySelector(".sheet-content");
-          if (overlay_2) overlay_2.style.opacity = "0";
-          if (content_2) content_2.style.transform = "translateY(100%)";
-          attachmentSheet.style.display = "none";
+      if (input_2) {
+        if (isAndroid) {
+          input_2.addEventListener("pointerdown", captureAndroidRestingViewport, {
+            passive: true
+          });
+          input_2.addEventListener("touchstart", captureAndroidRestingViewport, {
+            passive: true
+          });
         }
-        setTimeout(() => window.imChat?.followOnlineChatBottom?.(msgContainer_3), 100);
-      }), input_2.addEventListener("blur", () => {
-        page_9.classList.remove("keyboard-open");
-      }));
+        input_2.addEventListener("focus", () => {
+          captureAndroidRestingViewport();
+          page_9.classList.add("keyboard-open");
+          const attachmentSheet = document.getElementById("chat-attachment-sheet");
+          if (attachmentSheet) {
+            const overlay_2 = attachmentSheet.querySelector(".sheet-overlay"),
+              content_2 = attachmentSheet.querySelector(".sheet-content");
+            if (overlay_2) overlay_2.style.opacity = "0";
+            if (content_2) content_2.style.transform = "translateY(100%)";
+            attachmentSheet.style.display = "none";
+          }
+          setTimeout(() => {
+            if (msgContainer_3) msgContainer_3.scrollTop = msgContainer_3.scrollHeight;
+          }, 100);
+        });
+        input_2.addEventListener("blur", () => {
+          page_9.classList.remove("keyboard-open");
+          if (isAndroid) {
+            if (window.visualViewport) restoreAndroidChatViewport(page_9, msgContainer_3);else scheduleAndroidChatViewportRestore(page_9, msgContainer_3);
+          }
+        });
+      }
       let value_157 = null,
         currentMentionQuery = "",
         mentionStartIndex = -1;
@@ -963,18 +1097,16 @@
       chromeHeight = reactionHeight + actionsHeight + gap_2 * 2,
       bubbleHeightLimit = Math.max(64, availableHeight - chromeHeight);
     bubbleClone.style.maxHeight = bubbleHeightLimit + "px";
-    bubbleClone.style.overflowY = "auto";
-    bubbleClone.style.overscrollBehavior = "contain";
+    bubbleClone.style.overflowY = "hidden";
+    bubbleClone.style.overscrollBehavior = "none";
     bubbleClone.style.flexShrink = "1";
     if (reactionBar) reactionBar.style.flexShrink = "0";
     if (mainActions) mainActions.style.flexShrink = "0";
     if (moreActions) moreActions.style.flexShrink = "0";
     msgContextMenu_2.style.maxHeight = availableHeight + "px";
-    msgContextMenu_2.style.overflowY = "auto";
-    msgContextMenu_2.style.overscrollBehavior = "contain";
-    const activeBubble = window.imData.currentActiveRow?.querySelector(".chat-bubble, .sticker-message-wrap"),
-      activeBubbleRect = activeBubble?.getBoundingClientRect(),
-      desiredCenter = activeBubbleRect ? activeBubbleRect.top + activeBubbleRect.height / 2 - screenRect.top : safeTop + availableHeight / 2,
+    msgContextMenu_2.style.overflowY = "hidden";
+    msgContextMenu_2.style.overscrollBehavior = "none";
+    const desiredCenter = safeTop + availableHeight / 2,
       measuredHeight = Math.min(msgContextMenu_2.scrollHeight || msgContextMenu_2.getBoundingClientRect().height, availableHeight),
       nextTop = Math.min(Math.max(desiredCenter - measuredHeight / 2, safeTop), Math.max(safeTop, safeBottom - measuredHeight));
     msgContextMenu_2.style.top = nextTop + "px";

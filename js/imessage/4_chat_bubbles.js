@@ -1488,6 +1488,18 @@
       handleAction_54(value_533, handleAction_58_535);
     });
   }
+  function pauseOnlineChatBottomFollower_2(container) {
+    if (!container) return;
+    const follower = handleAction_58(container);
+    if (!follower) return;
+    if (typeof follower.releaseFollowing === "function") follower.releaseFollowing();else {
+      follower.userReleasedFollowing = true;
+      follower.following = false;
+      if (follower.frame) cancelAnimationFrame(follower.frame);
+      follower.frame = 0;
+      follower.scheduleUiSync?.();
+    }
+  }
   function settleOnlineChatAtLatest_2(value_536) {
     if (!value_536) return;
     handleAction_55(value_536);
@@ -1818,6 +1830,7 @@ function renderPhotoBatchGroup(messages, friend, container, timestamp = Date.now
 
         const toggle = summary.querySelector('.photo-batch-toggle');
         let animationToken = 0;
+        let scrollHoldToken = 0;
         const resetStackAnimation = () => {
             stack?.getAnimations?.().forEach(animation => animation.cancel());
             if (stack) {
@@ -1829,6 +1842,22 @@ function renderPhotoBatchGroup(messages, friend, container, timestamp = Date.now
             event.preventDefault();
             event.stopPropagation();
             const token = ++animationToken;
+            const holdToken = ++scrollHoldToken;
+            const stableScrollTop = container.scrollTop;
+            const previousOverflowAnchor = container.style.overflowAnchor;
+            pauseOnlineChatBottomFollower_2(container);
+            container.style.overflowAnchor = 'none';
+            const holdViewport = () => {
+                if (holdToken !== scrollHoldToken || !container.isConnected) return;
+                container.scrollTop = stableScrollTop;
+            };
+            requestAnimationFrame(holdViewport);
+            [80, 180, 320, 520].forEach(delay => window.setTimeout(holdViewport, delay));
+            window.setTimeout(() => {
+                if (holdToken !== scrollHoldToken) return;
+                holdViewport();
+                container.style.overflowAnchor = previousOverflowAnchor;
+            }, 680);
             const expanded = !summary.classList.contains('is-expanded');
             toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
             toggle.setAttribute('aria-label', expanded ? '收起图片' : '展开图片');
@@ -2361,30 +2390,12 @@ function renderPhotoBatchGroup(messages, friend, container, timestamp = Date.now
       description_2 = msg_19.description || "转账",
       parties = handleAction_23(msg_19, friend_32),
       {
-        payKind: payKind_3,
-        status: status_4,
-        payerName: payerName_3,
-        payeeName: payeeName_3
+        status: status_4
       } = parties,
       isOfficialReceipt = msg_19.targetName === "Payment" || msg_19.cardTitle === "收款通知" || msg_19.cardTitle === "支付凭证",
       familyCardText = (msg_19.paymentAction || "") + " " + (msg_19.cardTitle || "") + " " + (msg_19.description || "") + " " + (msg_19.content || ""),
-      isFamilyCard = msg_19.paymentAction === "family_card" || msg_19.paymentAction === "family_card_increase" || familyCardText.includes("亲属卡"),
-      startsWith_768 = String(msg_19.payKind || "").startsWith("family_card_");
-    let cardTitle_2 = msg_19.cardTitle || "Payment",
-      value_770 = payerName_3 + " 向 " + payeeName_3 + " 转账",
-      extraClass = "";
-    if (status_4 === "claimed") {
-      cardTitle_2 = msg_19.cardTitle || payeeName_3 + "已收款";
-      value_770 = payeeName_3 + "已收取 " + payerName_3 + " 的转账";
-      extraClass = payKind_3 === "char_received" ? " is-received" : " is-income";
-    } else {
-      if (status_4 === "rejected") {
-        cardTitle_2 = msg_19.cardTitle || "已退还";
-        value_770 = payeeName_3 + "已退还 " + payerName_3 + " 的转账";
-        extraClass = " is-rejected";
-      } else payKind_3 === "char_to_user_pending" && (cardTitle_2 = msg_19.cardTitle || "转账", value_770 = payerName_3 + " 向 " + payeeName_3 + " 转账", extraClass = " is-pending");
-    }
-    startsWith_768 && (cardTitle_2 = msg_19.cardTitle || "亲属卡", value_770 = msg_19.familyCardStatus === "pending" ? "等待对方收下" : msg_19.familyCardStatus === "rejected" ? "已退回" : msg_19.familyCardStatus === "unbound" ? "已解绑" : "已生效", extraClass = ["rejected", "unbound"].includes(msg_19.familyCardStatus) ? " is-rejected" : msg_19.familyCardStatus === "pending" ? " is-pending" : " is-income");
+      isFamilyCard = msg_19.paymentAction === "family_card" || msg_19.paymentAction === "family_card_increase" || familyCardText.includes("亲属卡");
+    const extraClass = status_4 === "claimed" ? " is-claimed" : status_4 === "rejected" ? " is-rejected" : " is-pending";
     const handleAction_24_772 = buildMessageHeaderHtml(value_748, friend_32, value_747, speakerName_6, speakerAvatar_4, enabled_754, msg_19),
       value_773 = new Date(value_747),
       value_774 = typeof window.formatChatBubbleTime === "function" ? window.formatChatBubbleTime(value_747) : value_773.getHours() + ":" + value_773.getMinutes().toString().padStart(2, "0");
@@ -2392,7 +2403,9 @@ function renderPhotoBatchGroup(messages, friend, container, timestamp = Date.now
       const sign = msg_19.cardTitle === "收款通知" ? "+" : "-";
       row_15.innerHTML = "\n                <div class=\"chat-checkbox-wrapper\" style=\"display: " + (window.imData.batchSelectMode ? "flex" : "none") + "; width: 40px; justify-content: center; align-items: flex-end; padding-bottom: 10px; flex-shrink: 0; cursor: pointer; transition: all 0.2s;\">\n                    <i class=\"far fa-circle chat-checkbox\" data-timestamp=\"" + value_747 + "\" style=\"color: #c7c7cc; font-size: 22px;\"></i>\n                </div>\n                    <div style=\"width:100%; display:flex; justify-content:center; padding:10px 0;\">\n                    <div class=\"im-card-content pay-receipt-card\" style=\"width:280px; background:#fff; border-radius:12px; padding:16px;  display:flex; flex-direction:column; align-items:center;\">\n                        <div style=\"font-size:14px; color:#111; margin-bottom:8px;\">" + description_2 + "</div>\n                        <div style=\"font-size:28px; font-weight:bold; color:#111; margin-bottom:12px;\">" + sign + "$" + amount_2.toFixed(2) + "</div>\n                          <div style=\"background:#f2f2f7; border-radius:16px; padding:4px 12px; font-size:12px; color:#8e8e93; margin-bottom:16px;\">\n                              " + value_774 + "\n                          </div>\n                        <div style=\"width:100%; border-top:1px solid #f2f2f7; padding-top:12px; display:flex; justify-content:space-between; align-items:center;\">\n                            <span style=\"font-size:13px; color:#8e8e93;\">账单详情</span>\n                            <i class=\"fas fa-chevron-right\" style=\"font-size:12px; color:#c7c7cc;\"></i>\n                        </div>\n                    </div>\n                </div>\n            ";
     } else {
-      const value_777 = "\n                <div class=\"pay-transfer-card im-card-content" + extraClass + "\">\n                    <div class=\"pay-transfer-card-top\">\n                        <div class=\"pay-transfer-card-icon\"><i class=\"fas fa-wallet\"></i></div>\n                        <div class=\"pay-transfer-card-meta\">\n                            <div class=\"pay-transfer-card-title\">" + escapeHtml(cardTitle_2) + "</div>\n                            " + (isFamilyCard && !startsWith_768 ? "" : "<div class=\"pay-transfer-card-subtitle\">" + escapeHtml(value_770) + "</div>") + "\n                        </div>\n                    </div>\n                    <div class=\"pay-transfer-card-amount\">" + value_758 + "</div>\n                    <div class=\"pay-transfer-card-desc\">" + escapeHtml(description_2) + "</div>\n                </div>\n            ";
+      const appleLogoSvg = "<svg class=\"pay-transfer-apple-mark\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M17.05 12.54c-.03-3.04 2.48-4.5 2.59-4.57-1.42-2.08-3.63-2.36-4.42-2.39-1.86-.2-3.67 1.11-4.62 1.11-.97 0-2.43-1.09-4.01-1.06-2.03.03-3.93 1.21-4.97 3.05-2.14 3.7-.54 9.14 1.5 12.13 1.02 1.46 2.2 3.09 3.78 3.03 1.54-.06 2.12-.97 3.98-.97 1.84 0 2.39.97 4 .93 1.66-.03 2.71-1.47 3.69-2.95 1.18-1.67 1.65-3.32 1.67-3.4-.04-.01-3.16-1.2-3.19-4.81ZM14 3.61A5.37 5.37 0 0 0 15.23 0a5.46 5.46 0 0 0-3.53 1.72 5.09 5.09 0 0 0-1.26 3.47A4.52 4.52 0 0 0 14 3.61Z\"></path></svg>",
+        statusIconSvg = status_4 === "claimed" ? "<svg class=\"pay-transfer-status-icon\" viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><path d=\"M5 12.5l4.2 4.2L19 6.8\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg>" : "<svg class=\"pay-transfer-status-icon\" viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><path d=\"M7 17L17 7M9 7h8v8\" stroke=\"currentColor\" stroke-width=\"2.3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg>",
+        value_777 = "\n                <div class=\"pay-transfer-card im-card-content" + extraClass + "\">\n                    <div class=\"pay-transfer-card-top\">\n                        <div class=\"pay-transfer-card-brand\">" + appleLogoSvg + "<span>Apple Cash</span></div>\n                    </div>\n                    <div class=\"pay-transfer-card-bottom\">\n                        <div class=\"pay-transfer-card-amount\">" + value_758 + "</div>\n                        <div class=\"pay-transfer-card-status\" aria-label=\"" + escapeHtml(status_4) + "\">" + statusIconSvg + "</div>\n                    </div>\n                </div>\n            ";
       if (value_748) {
         const text_778 = "";
         row_15.innerHTML = "\n                    <div class=\"chat-checkbox-wrapper\" style=\"display: " + (window.imData.batchSelectMode ? "flex" : "none") + "; width: 40px; justify-content: center; align-items: flex-end; padding-bottom: 10px; flex-shrink: 0; cursor: pointer; transition: all 0.2s;\">\n                        <i class=\"far fa-circle chat-checkbox\" data-timestamp=\"" + value_747 + "\" style=\"color: #c7c7cc; font-size: 22px;\"></i>\n                    </div>\n                    <div style=\"flex: 1; display: flex; flex-direction: column; min-width: 0;\">\n                        " + handleAction_24_772 + "\n                        <div style=\"display: flex; justify-content: flex-end; align-items: flex-end; width: 100%;\">\n                            <div class=\"chat-bubble user-bubble im-card-bubble pay-transfer-bubble\">" + value_777 + text_778 + "</div>\n                        </div>\n                    </div>\n                ";
@@ -2403,7 +2416,7 @@ function renderPhotoBatchGroup(messages, friend, container, timestamp = Date.now
       }
     }
     element_746.appendChild(row_15);
-    if (payKind_3 === "char_to_user_pending" || payKind_3 === "user_to_char") {
+    if (!isOfficialReceipt && !isFamilyCard) {
       const clickableBubble_2 = row_15.querySelector(".chat-bubble.pay-transfer-bubble") || row_15.querySelector(".pay-transfer-card");
       clickableBubble_2 && (clickableBubble_2.style.cursor = "pointer", clickableBubble_2.addEventListener("click", event_782 => {
         event_782.preventDefault();
@@ -3120,6 +3133,7 @@ function renderPhotoBatchGroup(messages, friend, container, timestamp = Date.now
   window.imChat.renderChatHistory = renderChatHistory_2;
   window.imChat.isChatHistoryRenderCurrent = isChatHistoryRenderCurrent_2;
   window.imChat.followOnlineChatBottom = followOnlineChatBottom_2;
+  window.imChat.pauseOnlineChatBottomFollower = pauseOnlineChatBottomFollower_2;
   window.imChat.settleOnlineChatAtLatest = settleOnlineChatAtLatest_2;
   window.imChat.scrollOnlineChatToBottomOnce = scrollOnlineChatToBottomOnce_2;
   window.imChat.disposeOnlineChatBottomFollower = disposeOnlineChatBottomFollower_2;

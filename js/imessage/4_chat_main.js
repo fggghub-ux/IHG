@@ -18,6 +18,26 @@
     msgContextOverlay = document.getElementById("msg-context-overlay"),
     msgContextMenu = document.getElementById("msg-context-menu"),
     value_7 = new Map();
+  function preserveMessageViewport(row, mutate) {
+    const container = row?.closest(".ins-chat-messages"),
+      stableScrollTop = container?.scrollTop || 0,
+      previousOverflowAnchor = container?.style.overflowAnchor || "";
+    if (container) {
+      window.imChat?.pauseOnlineChatBottomFollower?.(container);
+      container.style.overflowAnchor = "none";
+    }
+    mutate();
+    if (!container) return;
+    const restore = () => {
+      if (container.isConnected) container.scrollTop = stableScrollTop;
+    };
+    requestAnimationFrame(restore);
+    window.setTimeout(restore, 80);
+    window.setTimeout(() => {
+      restore();
+      container.style.overflowAnchor = previousOverflowAnchor;
+    }, 180);
+  }
   function handleAction_8(element, element_15, value_16, innerHTML_3) {
     if (!element) return;
     const msgTranslationElement = element.querySelector(".msg-translation");
@@ -97,7 +117,7 @@
               showTranslation_3 = !!msg.showTranslation;
             value_7.set(value_38, value_39);
             msg.showTranslation = showTranslation_2;
-            handleAction_8(bubble, row_2, showTranslation_2, translation_37);
+            preserveMessageViewport(row_2, () => handleAction_8(bubble, row_2, showTranslation_2, translation_37));
             const value_41 = window.imApp.updateFriendMessage ? await window.imApp.updateFriendMessage(id_33, {
               id: msg.id || null,
               timestamp: ts_2 || null
@@ -115,7 +135,7 @@
               silent: true
             });
             if (value_7.get(value_38) !== value_39) return;
-            !value_41 ? (msg.showTranslation = showTranslation_3, handleAction_8(bubble, row_2, showTranslation_3, translation_37), window.showToast?.("翻译状态保存失败")) : value_7["delete"](value_38);
+            !value_41 ? (msg.showTranslation = showTranslation_3, preserveMessageViewport(row_2, () => handleAction_8(bubble, row_2, showTranslation_3, translation_37)), window.showToast?.("翻译状态保存失败")) : value_7["delete"](value_38);
           }
         }
       }
@@ -416,17 +436,19 @@
                         }
                         const chatBubbleElement_123 = currentActiveRow_111.querySelector(".chat-bubble");
                         if (chatBubbleElement_123) {
-                          const msgTranslationElement_128 = chatBubbleElement_123.querySelector(".msg-translation");
-                          if (showTranslation_4) {
-                            if (!msgTranslationElement_128) {
-                              const bubbleMetaElement_129 = chatBubbleElement_123.querySelector(".bubble-meta"),
-                                element_130 = document.createElement("div");
-                              element_130.className = "msg-translation";
-                              currentActiveRow_111.classList.contains("user-row") ? element_130.style.cssText = "margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.4; word-wrap: break-word; white-space: normal;" : element_130.style.cssText = "margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px; color: #8e8e93; line-height: 1.4; word-wrap: break-word; white-space: normal;";
-                              element_130.innerHTML = innerHTML_4;
-                              bubbleMetaElement_129 ? chatBubbleElement_123.insertBefore(element_130, bubbleMetaElement_129) : chatBubbleElement_123.appendChild(element_130);
-                            }
-                          } else msgTranslationElement_128 && msgTranslationElement_128.remove();
+                          preserveMessageViewport(currentActiveRow_111, () => {
+                            const msgTranslationElement_128 = chatBubbleElement_123.querySelector(".msg-translation");
+                            if (showTranslation_4) {
+                              if (!msgTranslationElement_128) {
+                                const bubbleMetaElement_129 = chatBubbleElement_123.querySelector(".bubble-meta"),
+                                  element_130 = document.createElement("div");
+                                element_130.className = "msg-translation";
+                                currentActiveRow_111.classList.contains("user-row") ? element_130.style.cssText = "margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.4; word-wrap: break-word; white-space: normal;" : element_130.style.cssText = "margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px; color: #8e8e93; line-height: 1.4; word-wrap: break-word; white-space: normal;";
+                                element_130.innerHTML = innerHTML_4;
+                                bubbleMetaElement_129 ? chatBubbleElement_123.insertBefore(element_130, bubbleMetaElement_129) : chatBubbleElement_123.appendChild(element_130);
+                              }
+                            } else msgTranslationElement_128 && msgTranslationElement_128.remove();
+                          });
                         }
                       } else {
                         if (window.showToast) window.showToast("该消息无需翻译或暂无翻译");

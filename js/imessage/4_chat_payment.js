@@ -511,7 +511,7 @@
       hasManagedOverlay = existingOverlay && page_3._transferDetailOverlayManaged === true && typeof page_3._openTransferDetailOverlay === "function";
     if (hasManagedOverlay) return;
     existingOverlay && (existingOverlay.remove(), page_3._openTransferDetailOverlay = null, page_3._closeTransferDetailOverlay = null, page_3._transferDetailOverlayManaged = false);
-    page_3.insertAdjacentHTML("beforeend", "\n                <div class=\"pay-transfer-detail-overlay\" style=\"display:none; position:absolute; inset:0; z-index:1200; background:rgba(0,0,0,0.28); align-items:center; justify-content:center; padding:20px; box-sizing:border-box;\">\n                    <div class=\"pay-transfer-detail-card\" style=\"width:100%; max-width:320px; border-radius:28px; background:rgba(255,255,255,0.96);    padding:20px 18px 16px; box-sizing:border-box;\">\n                        <div style=\"display:flex; align-items:center; gap:12px; margin-bottom:16px;\">\n                            <div class=\"pay-transfer-detail-avatar\" style=\"width:52px; height:52px; border-radius:50%; overflow:hidden; background:#e5e5ea; display:flex; align-items:center; justify-content:center; flex-shrink:0;\">\n                                <i class=\"fas fa-user\" style=\"color:#8e8e93; font-size:20px;\"></i>\n                            </div>\n                            <div style=\"min-width:0;\">\n                                <div class=\"pay-transfer-detail-name\" style=\"font-size:17px; font-weight:700; color:#111; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\">付款人</div>\n                                <div class=\"pay-transfer-detail-action-text\" style=\"font-size:12px; color:#8e8e93; margin-top:3px;\">向你转账</div>\n                            </div>\n                        </div>\n                        <div class=\"pay-transfer-detail-amount\" style=\"font-size:34px; line-height:1.1; font-weight:800; color:#111; text-align:center; margin:8px 0 10px;\">$0.00</div>\n                        <div class=\"pay-transfer-detail-desc\" style=\"font-size:14px; color:#666; text-align:center; line-height:1.5; min-height:21px; margin-bottom:18px;\">转账说明</div>\n                        <div style=\"border-radius:18px; background:#f7f7fa; padding:12px 14px; margin-bottom:16px;\">\n                            <div style=\"font-size:12px; color:#8e8e93; margin-bottom:6px;\">转账详情</div>\n                            <div class=\"pay-transfer-detail-summary\" style=\"font-size:14px; color:#222; line-height:1.5;\">付款人向你转账</div>\n                        </div>\n                        <div style=\"display:flex; gap:10px;\">\n                            <button type=\"button\" class=\"pay-transfer-detail-reject-btn\" style=\"flex:1; height:46px; border:none; border-radius:16px; background:#f2f2f7; color:#666; font-size:16px; font-weight:600; cursor:pointer;\">退回</button>\n                            <button type=\"button\" class=\"pay-transfer-detail-claim-btn\" style=\"flex:1; height:46px; border:none; border-radius:16px; background:#111; color:#fff; font-size:16px; font-weight:700; cursor:pointer;\">收下</button>\n                        </div>\n                    </div>\n                </div>\n        ");
+    page_3.insertAdjacentHTML("beforeend", "\n                <div class=\"pay-transfer-detail-overlay\" style=\"display:none; position:absolute; inset:0; z-index:1200; background:rgba(0,0,0,0.28); align-items:center; justify-content:center; padding:20px; box-sizing:border-box;\">\n                    <div class=\"pay-transfer-detail-card\" style=\"width:100%; max-width:320px; border-radius:28px; background:rgba(255,255,255,0.96); padding:20px 18px 16px; box-sizing:border-box;\">\n                        <div style=\"display:flex; align-items:center; gap:12px; margin-bottom:16px;\">\n                            <div class=\"pay-transfer-detail-avatar\" style=\"width:52px; height:52px; border-radius:50%; overflow:hidden; background:#e5e5ea; display:flex; align-items:center; justify-content:center; flex-shrink:0;\">\n                                <i class=\"fas fa-user\" style=\"color:#8e8e93; font-size:20px;\"></i>\n                            </div>\n                            <div style=\"min-width:0;\">\n                                <div class=\"pay-transfer-detail-name\" style=\"font-size:17px; font-weight:700; color:#111; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\">User</div>\n                            </div>\n                        </div>\n                        <div class=\"pay-transfer-detail-amount\" style=\"font-size:34px; line-height:1.1; font-weight:800; color:#111; text-align:center; margin:8px 0 10px;\">$0.00</div>\n                        <div class=\"pay-transfer-detail-desc\" style=\"display:none; font-size:14px; color:#666; text-align:center; line-height:1.5; min-height:21px; margin-bottom:18px;\"></div>\n                        <div style=\"border-radius:18px; background:#f7f7fa; padding:12px 14px; margin-bottom:16px;\">\n                            <div style=\"font-size:12px; color:#8e8e93; margin-bottom:6px;\">Details</div>\n                            <div class=\"pay-transfer-detail-summary\" style=\"display:none; font-size:14px; color:#222; line-height:1.5;\"></div>\n                        </div>\n                        <div style=\"display:flex; gap:10px;\">\n                            <button type=\"button\" class=\"pay-transfer-detail-reject-btn\" style=\"flex:1; height:46px; border:none; border-radius:16px; background:#f2f2f7; color:#666; font-size:16px; font-weight:600; cursor:pointer;\">退回</button>\n                            <button type=\"button\" class=\"pay-transfer-detail-claim-btn\" style=\"flex:1; height:46px; border:none; border-radius:16px; background:#111; color:#fff; font-size:16px; font-weight:700; cursor:pointer;\">收下</button>\n                        </div>\n                    </div>\n                </div>\n        ");
     const transferDetailOverlay = page_3.querySelector(".pay-transfer-detail-overlay"),
       transferDetailAvatar = page_3.querySelector(".pay-transfer-detail-avatar"),
       transferDetailName = page_3.querySelector(".pay-transfer-detail-name"),
@@ -531,27 +531,23 @@
       pendingTransferMsg = targetMsg_5;
       const model = normalizePayTransferMessage_2(targetMsg_5, friend_7),
         {
-          status: status_3,
           payerName: value_183,
-          payeeName: payeeName_3,
           payerAvatar: payerAvatar_2,
           canCurrentUserClaim: canCurrentUserClaim_2
         } = model,
         value_187 = Number(targetMsg_5.amount) || 0,
-        textContent_2 = targetMsg_5.description || "转账",
-        familyCardText = (targetMsg_5.paymentAction || "") + " " + (targetMsg_5.cardTitle || "") + " " + (targetMsg_5.description || "") + " " + (targetMsg_5.content || ""),
-        isFamilyCard = targetMsg_5.paymentAction === "family_card" || targetMsg_5.paymentAction === "family_card_increase" || familyCardText.includes("亲属卡");
+        textContent_2 = targetMsg_5.description || "转账";
       if (transferDetailName) transferDetailName.textContent = value_183;
       if (transferDetailAmount) transferDetailAmount.textContent = "$" + value_187.toFixed(2);
-      if (transferDetailDesc) transferDetailDesc.textContent = textContent_2;
-      if (transferDetailSummary) transferDetailSummary.textContent = isFamilyCard ? "备注：" + textContent_2 : value_183 + " 向 " + payeeName_3 + " 转账，备注：" + textContent_2;
-      const transferDetailActionText = page_3.querySelector(".pay-transfer-detail-action-text");
-      if (transferDetailActionText) {
-        if (isFamilyCard) transferDetailActionText.textContent = "";else {
-          if (status_3 === "claimed") transferDetailActionText.textContent = payeeName_3 + "已收款";else {
-            if (status_3 === "rejected") transferDetailActionText.textContent = "已退还";else canCurrentUserClaim_2 ? transferDetailActionText.textContent = "向你转账" : transferDetailActionText.textContent = "转账给 " + payeeName_3;
-          }
-        }
+      const visibleDescription = String(textContent_2 || "").trim(),
+        hasCustomDescription = !!visibleDescription && visibleDescription !== "转账" && visibleDescription !== "转账说明";
+      if (transferDetailDesc) {
+        transferDetailDesc.textContent = hasCustomDescription ? visibleDescription : "";
+        transferDetailDesc.style.display = hasCustomDescription ? "block" : "none";
+      }
+      if (transferDetailSummary) {
+        transferDetailSummary.textContent = hasCustomDescription ? "Note：" + visibleDescription : "";
+        transferDetailSummary.style.display = hasCustomDescription ? "block" : "none";
       }
       transferDetailAvatar && (payerAvatar_2 ? transferDetailAvatar.innerHTML = "<img src=\"" + payerAvatar_2 + "\" style=\"width:100%; height:100%; object-fit:cover; display:block;\">" : transferDetailAvatar.innerHTML = "<i class=\"fas fa-user\" style=\"color:#8e8e93; font-size:20px;\"></i>");
       const actionsContainer = transferDetailRejectBtn ? transferDetailRejectBtn.parentElement : null;

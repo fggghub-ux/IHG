@@ -7498,51 +7498,69 @@
     }
     return true;
   }
+  let imageBatchSendPending = false;
   async function sendImageMessagesBatch(items, description, options = {}) {
-    const safeItems = (Array.isArray(items) ? items : []).map(item => typeof item === "string" ? { imageUrl: item, fileName: "" } : item).filter(item => String(item?.imageUrl || "").trim());
-    if (safeItems.length <= 1) {
-      const first = safeItems[0];
-      return first ? sendImageMessage_2(first.imageUrl, description, { ...options, fileName: first.fileName || "" }) : false;
+    if (imageBatchSendPending) return false;
+    imageBatchSendPending = true;
+    try {
+      const safeItems = (Array.isArray(items) ? items : []).map(item => typeof item === "string" ? {
+        imageUrl: item,
+        fileName: ""
+      } : item).filter(item => String(item?.imageUrl || "").trim());
+      if (safeItems.length <= 1) {
+        const first = safeItems[0];
+        return first ? sendImageMessage_2(first.imageUrl, description, {
+          ...options,
+          fileName: first.fileName || ""
+        }) : false;
+      }
+      const friendId = options.friendId ?? window.imData.currentActiveFriend?.id,
+        friend = friendId != null ? window.imApp?.getFriendById?.(friendId) || (window.imData.friends || []).find(item => String(item.id) === String(friendId)) : null;
+      if (!friend) {
+        window.showToast?.("未找到当前聊天对象，图片发送失败");
+        return false;
+      }
+      const now = Date.now(),
+        groupId = `photo-group-${now}-${Math.random().toString(36).slice(2, 8)}`,
+        messages = safeItems.map((item, index) => ({
+          id: window.imChat.createMessageId("img"),
+          role: options.role === "assistant" ? "assistant" : "user",
+          type: "image",
+          content: item.imageUrl,
+          text: description,
+          description,
+          imageSource: options.imageSource || "real",
+          fileName: item.fileName || "",
+          senderName: options.senderName || "",
+          senderAvatarUrl: options.senderAvatarUrl || "",
+          senderAvatarAssetId: options.senderAvatarAssetId || "",
+          imageGroupId: groupId,
+          imageGroupIndex: index,
+          imageGroupCount: safeItems.length,
+          timestamp: now
+        }));
+      messages.forEach(message => window.imApp.captureGroupUserIdentity?.(friend, message));
+      const saved = await commitSheetFriendChange(friend, targetFriend => {
+        if (!Array.isArray(targetFriend.messages)) targetFriend.messages = [];
+        targetFriend.messages.push(...messages);
+      }, {
+        silent: true
+      });
+      if (!saved) {
+        window.showToast?.("图片消息保存失败");
+        return false;
+      }
+      const page = document.getElementById(`chat-interface-${friend.id}`),
+        container = page?.querySelector(".ins-chat-messages"),
+        latestFriend = window.imApp?.getFriendById?.(friend.id) || friend;
+      if (container) window.imChat.rerenderChatContainer?.(latestFriend, container, {
+        scroll: true,
+        resetWindow: true
+      });
+      return true;
+    } finally {
+      imageBatchSendPending = false;
     }
-    const friendId = options.friendId ?? window.imData.currentActiveFriend?.id,
-      friend = friendId != null ? window.imApp?.getFriendById?.(friendId) || (window.imData.friends || []).find(item => String(item.id) === String(friendId)) : null;
-    if (!friend) {
-      window.showToast?.("未找到当前聊天对象，图片发送失败");
-      return false;
-    }
-    const now = Date.now(),
-      groupId = `photo-group-${now}-${Math.random().toString(36).slice(2, 8)}`,
-      messages = safeItems.map((item, index) => ({
-        id: window.imChat.createMessageId("img"),
-        role: options.role === "assistant" ? "assistant" : "user",
-        type: "image",
-        content: item.imageUrl,
-        text: description,
-        description,
-        imageSource: options.imageSource || "real",
-        fileName: item.fileName || "",
-        senderName: options.senderName || "",
-        senderAvatarUrl: options.senderAvatarUrl || "",
-        senderAvatarAssetId: options.senderAvatarAssetId || "",
-        imageGroupId: groupId,
-        imageGroupIndex: index,
-        imageGroupCount: safeItems.length,
-        timestamp: now
-      }));
-    messages.forEach(message => window.imApp.captureGroupUserIdentity?.(friend, message));
-    const saved = await commitSheetFriendChange(friend, targetFriend => {
-      if (!Array.isArray(targetFriend.messages)) targetFriend.messages = [];
-      targetFriend.messages.push(...messages);
-    }, { silent: true });
-    if (!saved) {
-      window.showToast?.("图片消息保存失败");
-      return false;
-    }
-    const page = document.getElementById(`chat-interface-${friend.id}`),
-      container = page?.querySelector(".ins-chat-messages"),
-      latestFriend = window.imApp?.getFriendById?.(friend.id) || friend;
-    if (container) window.imChat.rerenderChatContainer?.(latestFriend, container, { scroll: true });
-    return true;
   }
   async function sendLocationMessage_2(value_2423, value_2424 = "", options_14 = {}) {
     const friendId_8 = options_14.friendId ?? window.imData.currentActiveFriend?.id,
