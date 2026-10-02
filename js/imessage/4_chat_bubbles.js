@@ -2749,10 +2749,10 @@
       m_2 = Math.floor(duration_3 / 60).toString().padStart(2, "0"),
       s = (duration_3 % 60).toString().padStart(2, "0"),
       value_1074 = m_2 + ":" + s,
-      title_5 = msg_30.isVideo ? "视频通话" : "语音通话",
+      title_5 = msg_30.isVideo ? "Video Call" : "Voice Call",
       statusText_2 = msg_30.statusText || "通话记录";
     let text_1077 = "";
-    statusText_2 === "已拒绝" || statusText_2 === "已取消" ? text_1077 = "<div style=\"font-size: 13px; color: #ff3b30; margin-top: 2px; font-weight: 500;\">" + statusText_2 + "</div>" : text_1077 = "<div style=\"font-size: 13px; color: #8e8e93; margin-top: 2px;\">通话时长 " + value_1074 + "</div>";
+    statusText_2 === "已拒绝" || statusText_2 === "已取消" ? text_1077 = "<div style=\"font-size: 13px; color: #ff3b30; margin-top: 2px; font-weight: 500;\">" + statusText_2 + "</div>" : text_1077 = "<div style=\"font-size: 13px; color: #8e8e93; margin-top: 2px;\">Duration " + value_1074 + "</div>";
     const value_1078 = "\n            <div class=\"voice-call-record-card im-card-content\" style=\"display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: " + (isUser_5 ? "#e5e5ea" : "#f2f2f7") + "; border-radius: 18px; cursor: pointer; color: #111;\">\n                <div style=\"width: 32px; height: 32px; border-radius: 16px; background: " + (statusText_2 === "已拒绝" || statusText_2 === "已取消" ? "#ff3b30" : "#34c759") + "; color: #fff; display: flex; justify-content: center; align-items: center; flex-shrink: 0;\">\n                    <i class=\"fas fa-phone-alt\"></i>\n                </div>\n                <div>\n                    <div style=\"font-size: 15px; font-weight: 600;\">" + title_5 + "</div>\n                    " + text_1077 + "\n                </div>\n            </div>\n        ",
       value_1079 = typeof window.formatChatBubbleTime === "function" ? window.formatChatBubbleTime(timestamp_14) : (() => {
         const value_1084 = new Date(timestamp_14);
