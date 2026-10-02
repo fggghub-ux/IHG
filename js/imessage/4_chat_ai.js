@@ -2591,7 +2591,7 @@
           } else {
             if (type_3 === "pay_transfer" || type_3 === "payment") {
               const number_2235 = Number(message_2221.amount),
-                value_2236 = Number.isFinite(number_2235) ? " ¥" + number_2235.toFixed(2) : "";
+                value_2236 = Number.isFinite(number_2235) ? " $" + number_2235.toFixed(2) : "";
               text_18 = "[支付/转账" + value_2236 + (message_2221.description ? "：" + value_2228(message_2221.description) : "") + "]";
             } else {
               if (type_3 === "fake_link") {
@@ -2621,7 +2621,7 @@
                           const value_2247 = message_2221.shopGift && typeof message_2221.shopGift === "object" ? message_2221.shopGift : null;
                           if (!value_2247) return null;
                           const rogGh_2248 = Number(value_2247.price);
-                          text_18 = "[礼物：" + (value_2228(value_2247.itemName) || "未命名") + (Number.isFinite(rogGh_2248) ? "，¥" + rogGh_2248.toFixed(2) : "") + "]";
+                          text_18 = "[礼物：" + (value_2228(value_2247.itemName) || "未命名") + (Number.isFinite(rogGh_2248) ? "，$" + rogGh_2248.toFixed(2) : "") + "]";
                         } else type_3 === "action_narration" ? text_18 = "[可见动作描写：" + value_2228(message_2221.text || message_2221.content) + "]" : text_18 = value_2228(message_2221.text || message_2221.content);
                       }
                     }
@@ -2961,8 +2961,8 @@
           familyCardStatus: familyCardStatus_2,
           amount: amount_5,
           cardTitle: value_2386 ? "已收下亲属卡" : "已退回亲属卡",
-          description: "亲属卡额度 ¥" + amount_5.toFixed(2),
-          content: "[亲属卡] " + (value_2386 ? "已收下" : "已退回") + " ¥" + amount_5.toFixed(2),
+          description: "亲属卡额度 $" + amount_5.toFixed(2),
+          content: "[亲属卡] " + (value_2386 ? "已收下" : "已退回") + " $" + amount_5.toFixed(2),
           timestamp: lastMessageTimestamp_2,
           apiRunId: apiRunId_6
         },
@@ -3828,7 +3828,7 @@
       let hasFamilyCardStr = "未知";
       typeof window.hasFamilyCard === "function" && (hasFamilyCardStr = window.hasFamilyCard(friend_31.id) ? "是" : "否");
       const value_2729 = friend_31.type === "char" && Array.isArray(friend_31.messages) ? friend_31.messages.slice().reverse().find(value_3007 => value_3007?.payKind === "family_card_pending" && value_3007.familyCardStatus === "pending") : null,
-        value_2730 = "\n\n【亲属卡互动】：当前你是否已经给过User亲属卡：" + hasFamilyCardStr + "。\n- 如果User在聊天中暗示或明示想要“亲属卡”，且你当前【未给过】亲属卡，你可以输出一个特定的支付对象：{\"type\":\"payment\",\"paymentAction\":\"family_card\",\"amount\":1000,\"description\":\"亲属卡\"}，这会给User发一张1000额度的亲属卡。\n- 如果你当前【已经给过】亲属卡，且User再次暗示或明示想要“亲属卡”，系统限制一人只能给一张，你不能再给一张，但你可以输出 {\"type\":\"payment\",\"paymentAction\":\"family_card_increase\",\"amount\":500,\"description\":\"亲属卡提额\"} 来给现有的亲属卡提升500额度，并在对话中提醒TA已经给过一张了只能提额。" + (value_2729 ? "\n- 【优先处理：User 赠送给你的待领取亲属卡】：额度 ¥" + Number(value_2729.amount).toFixed(2) + "。你必须根据人设决定收下或退回，本轮在 chat_json 中输出且只输出一个支付对象：收下时为 {\"type\":\"payment\",\"paymentAction\":\"family_card_accept\",\"amount\":" + Number(value_2729.amount) + ",\"description\":\"亲属卡\"}；退回时为 {\"type\":\"payment\",\"paymentAction\":\"family_card_reject\",\"amount\":" + Number(value_2729.amount) + ",\"description\":\"亲属卡\"}。不要用 family_card 或 family_card_increase 回应这张卡；文字回应必须与决定一致。" : ""),
+        value_2730 = "\n\n【亲属卡互动】：当前你是否已经给过User亲属卡：" + hasFamilyCardStr + "。\n- 如果User在聊天中暗示或明示想要“亲属卡”，且你当前【未给过】亲属卡，你可以输出一个特定的支付对象：{\"type\":\"payment\",\"paymentAction\":\"family_card\",\"amount\":1000,\"description\":\"亲属卡\"}，这会给User发一张1000额度的亲属卡。\n- 如果你当前【已经给过】亲属卡，且User再次暗示或明示想要“亲属卡”，系统限制一人只能给一张，你不能再给一张，但你可以输出 {\"type\":\"payment\",\"paymentAction\":\"family_card_increase\",\"amount\":500,\"description\":\"亲属卡提额\"} 来给现有的亲属卡提升500额度，并在对话中提醒TA已经给过一张了只能提额。" + (value_2729 ? "\n- 【优先处理：User 赠送给你的待领取亲属卡】：额度 $" + Number(value_2729.amount).toFixed(2) + "。你必须根据人设决定收下或退回，本轮在 chat_json 中输出且只输出一个支付对象：收下时为 {\"type\":\"payment\",\"paymentAction\":\"family_card_accept\",\"amount\":" + Number(value_2729.amount) + ",\"description\":\"亲属卡\"}；退回时为 {\"type\":\"payment\",\"paymentAction\":\"family_card_reject\",\"amount\":" + Number(value_2729.amount) + ",\"description\":\"亲属卡\"}。不要用 family_card 或 family_card_increase 回应这张卡；文字回应必须与决定一致。" : ""),
         value_2731 = favoriteMessageCandidate ? "\n\n【角色收藏 User 消息｜极低频私人行为】：\n- 本轮唯一允许收藏的候选消息是：" + JSON.stringify(favoriteMessageCandidate) + "。\n- 默认决定必须是“不收藏”。收藏不是每轮响应步骤、不是对 User 的奖励，也不是用来证明角色在乎 User 的功能；不要因为系统给出了候选消息就提高收藏意愿。\n- 日常问候、普通关心、常见情话、顺着气氛说的话、重复表达过的承诺，以及仅仅让你觉得开心、可爱或感动，都不足以收藏。\n- 只有当这句原话对当前角色具有少见且不可替代的私人意义，聊天结束后仍会自发想保留并反复重看，而且若以后找不到这句原话会真实遗憾时，才允许收藏。任一条件不确定，就不要收藏。\n- 想收藏时，在 </chat_json> 之后额外输出且只输出一个 <message_favorite>{\"messageId\":\"" + favoriteMessageCandidate.messageId + "\",\"reason\":\"完整自然的一句收藏原因\"}</message_favorite>；messageId 必须原样填写。\n- reason 必须使用符合角色口吻的第一人称简体中文，具体说明这句原话为何对自己具有不可替代的意义；必须写成语义完整的自然句子，不得为了控制字数截断句子，禁止泛泛写“很有意义”“值得收藏”。\n- 不想收藏时完全不要输出 <message_favorite>，也不要在聊天正文中解释是否收藏。" : "",
         pendingRegenerateContext_2 = friend_31.pendingRegenerateContext || null,
         userInputModalityRule = "\nUser 发送的内容/消息为线上打字发送的文字消息，除非上下文明确标注为“语音消息”的才为user发的语音",
@@ -5254,7 +5254,7 @@
                 allocations: allocations_2,
                 claimRecords: [],
                 claimedMemberIds: [],
-                content: "[群红包] " + description_2 + " ¥" + Number(totalAmount_2).toFixed(2),
+                content: "[群红包] " + description_2 + " $" + Number(totalAmount_2).toFixed(2),
                 timestamp: timestamp_12,
                 speakerMemberId: detectedSpeaker ? detectedSpeaker.id : "",
                 senderName: senderName_2,
@@ -5285,7 +5285,7 @@
           if (amount_2 > 0) {
             if (paymentAction_2 === "pay_for_friend") {
               const timestamp_6 = Date.now(),
-                content_6 = "\n                                <div style=\"background: #f7f7f5; border-radius: 16px; padding: 16px; min-width: 220px; max-width: 280px; color: #111111;  border: 1px solid rgba(17,17,17,0.09); display: inline-block;\">\n                                    <div style=\"font-size: 12px; color: #73706a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-weight: 700;\">\n                                        <i class=\"fas fa-bag-shopping\" style=\"color: #a97642;\"></i> Shop Request\n                                    </div>\n                                    <div style=\"font-size: 15px; font-weight: 700; margin-bottom: 6px; white-space: normal; word-break: break-word; line-height: 1.4;\">" + description_3 + "</div>\n                                    <div style=\"font-size: 24px; font-weight: 800; color: #111111; margin-top: 14px; margin-bottom: 16px;\">¥" + amount_2.toFixed(2) + "</div>\n                                    <div style=\"background: #e5e5ea; color: #8e8e93; text-align: center; padding: 10px 0; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: default;\">已付款</div>\n                                </div>\n                            ";
+                content_6 = "\n                                <div style=\"background: #f7f7f5; border-radius: 16px; padding: 16px; min-width: 220px; max-width: 280px; color: #111111;  border: 1px solid rgba(17,17,17,0.09); display: inline-block;\">\n                                    <div style=\"font-size: 12px; color: #73706a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-weight: 700;\">\n                                        <i class=\"fas fa-bag-shopping\" style=\"color: #a97642;\"></i> Shop Request\n                                    </div>\n                                    <div style=\"font-size: 15px; font-weight: 700; margin-bottom: 6px; white-space: normal; word-break: break-word; line-height: 1.4;\">" + description_3 + "</div>\n                                    <div style=\"font-size: 24px; font-weight: 800; color: #111111; margin-top: 14px; margin-bottom: 16px;\">$" + amount_2.toFixed(2) + "</div>\n                                    <div style=\"background: #e5e5ea; color: #8e8e93; text-align: center; padding: 10px 0; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: default;\">已付款</div>\n                                </div>\n                            ";
               try {
                 const savedOrdersStr = durableLocalStorage.getItem("shopping_orders");
                 if (savedOrdersStr) {
@@ -5368,10 +5368,10 @@
                         payKind: "system_notification",
                         paymentAction: paymentAction_2,
                         amount: amount_2,
-                        description: cardTitle_2 + " ¥" + amount_2.toFixed(2),
+                        description: cardTitle_2 + " $" + amount_2.toFixed(2),
                         cardTitle: cardTitle_2,
                         payStatus: "completed",
-                        content: "[亲属卡] " + cardTitle_2 + " ¥" + amount_2.toFixed(2),
+                        content: "[亲属卡] " + cardTitle_2 + " $" + amount_2.toFixed(2),
                         speaker: activeFriend_7.type === "group" ? paymentSpeakerName_2 : "",
                         speakerMemberId: activeFriend_7.type === "group" ? paymentSpeaker?.id || "" : "",
                         senderAvatarUrl: activeFriend_7.type === "group" ? paymentSpeaker?.avatarUrl || "" : "",
@@ -5410,7 +5410,7 @@
                           senderAvatarUrl: activeFriend_7.type === "group" ? paymentSpeaker?.avatarUrl || "" : "",
                           cardTitle: "转账",
                           payStatus: "completed",
-                          content: "[角色转账] " + description_3 + " ¥" + amount_2.toFixed(2),
+                          content: "[角色转账] " + description_3 + " $" + amount_2.toFixed(2),
                           timestamp: timestamp_14,
                           apiRunId: apiRunId_4
                         };

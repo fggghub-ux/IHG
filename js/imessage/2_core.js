@@ -2067,7 +2067,7 @@ window.imApp.formatMessageForApiContext = function (value_595, value_596, option
                     value_635 = String(value_634.itemName || "商品").trim() || "商品",
                     value_636 = Number(value_634.price) || 0,
                     trim_637 = String(value_634.paymentMethod || "").trim();
-                  value_601 = "[User 赠送给你一份礼物]\n商品：" + value_635 + "\n价值：¥" + value_636.toFixed(2) + (trim_637 ? "\n付款方式：" + trim_637 : "");
+                  value_601 = "[User 赠送给你一份礼物]\n商品：" + value_635 + "\n价值：$" + value_636.toFixed(2) + (trim_637 ? "\n付款方式：" + trim_637 : "");
                 } else {
                   if (normalizedMessage_3.type === "moment_forward") try {
                     const momentData = JSON.parse(normalizedMessage_3.content),
@@ -2092,17 +2092,17 @@ window.imApp.formatMessageForApiContext = function (value_595, value_596, option
                           const payAmount = Number(normalizedMessage_3.amount) || 0,
                             payDesc = normalizedMessage_3.description || "转账",
                             payTarget = normalizedMessage_3.targetName || normalizedFriend_4.nickname || "对方";
-                          if (normalizedMessage_3.payKind === "family_card_pending") value_601 = "[用户赠送给你一张额度 ¥" + payAmount.toFixed(2) + " 的亲属卡，等待你决定收下或退回。]";else {
-                            if (normalizedMessage_3.payKind === "family_card_accepted") value_601 = "[用户赠送给你的额度 ¥" + payAmount.toFixed(2) + " 的亲属卡已被你收下。]";else {
-                              if (normalizedMessage_3.payKind === "family_card_rejected") value_601 = "[用户赠送给你的额度 ¥" + payAmount.toFixed(2) + " 的亲属卡已被你退回。]";else {
-                                if (normalizedMessage_3.payKind === "family_card_unbound") value_601 = "[用户赠送给你的亲属卡已解绑，原额度为 ¥" + payAmount.toFixed(2) + "。]";else {
-                                  if (normalizedMessage_3.payKind === "family_card_adjust") value_601 = "[用户将赠送给你的亲属卡额度从 ¥" + Number(normalizedMessage_3.previousLimit || 0).toFixed(2) + " 调整到 ¥" + payAmount.toFixed(2) + "。]";else {
+                          if (normalizedMessage_3.payKind === "family_card_pending") value_601 = "[用户赠送给你一张额度 $" + payAmount.toFixed(2) + " 的亲属卡，等待你决定收下或退回。]";else {
+                            if (normalizedMessage_3.payKind === "family_card_accepted") value_601 = "[用户赠送给你的额度 $" + payAmount.toFixed(2) + " 的亲属卡已被你收下。]";else {
+                              if (normalizedMessage_3.payKind === "family_card_rejected") value_601 = "[用户赠送给你的额度 $" + payAmount.toFixed(2) + " 的亲属卡已被你退回。]";else {
+                                if (normalizedMessage_3.payKind === "family_card_unbound") value_601 = "[用户赠送给你的亲属卡已解绑，原额度为 $" + payAmount.toFixed(2) + "。]";else {
+                                  if (normalizedMessage_3.payKind === "family_card_adjust") value_601 = "[用户将赠送给你的亲属卡额度从 $" + Number(normalizedMessage_3.previousLimit || 0).toFixed(2) + " 调整到 $" + payAmount.toFixed(2) + "。]";else {
                                     if (normalizedMessage_3.payKind === "family_card_accept_notice" || normalizedMessage_3.payKind === "family_card_reject_notice") value_601 = "[你" + (normalizedMessage_3.payKind === "family_card_accept_notice" ? "收下" : "退回") + "了用户赠送的亲属卡。]";else {
-                                      if (normalizedMessage_3.payKind === "user_to_char") value_601 = "[用户刚刚向你转账 ¥" + payAmount.toFixed(2) + "，备注：" + payDesc + "，对象：" + payTarget + "。你可以收下这笔钱，也可以退回，或者正常回复。]";else {
-                                        if (normalizedMessage_3.payKind === "char_received") value_601 = "[你刚刚收下了用户的一笔转账 ¥" + payAmount.toFixed(2) + "，备注：" + payDesc + "。]";else {
-                                          if (normalizedMessage_3.payKind === "char_to_user_pending") value_601 = "[你刚刚向用户发起了一笔转账 ¥" + payAmount.toFixed(2) + "，备注：" + payDesc + "，等待用户领取。]";else {
-                                            if (normalizedMessage_3.payKind === "char_to_user_claimed" || normalizedMessage_3.payKind === "user_received_from_char") value_601 = "[用户已领取你的转账 ¥" + payAmount.toFixed(2) + "，备注：" + payDesc + "。]";else {
-                                              if (normalizedMessage_3.payKind === "user_rejected_from_char") value_601 = "[用户退回了你的转账 ¥" + payAmount.toFixed(2) + "，备注：" + payDesc + "。]";else (normalizedMessage_3.payKind === "char_to_user_rejected" || normalizedMessage_3.payKind === "user_to_char_rejected") && (value_601 = "[你刚刚退回了用户的转账 ¥" + payAmount.toFixed(2) + "，备注：" + payDesc + "。]");
+                                      if (normalizedMessage_3.payKind === "user_to_char") value_601 = "[用户刚刚向你转账 $" + payAmount.toFixed(2) + "，备注：" + payDesc + "，对象：" + payTarget + "。你可以收下这笔钱，也可以退回，或者正常回复。]";else {
+                                        if (normalizedMessage_3.payKind === "char_received") value_601 = "[你刚刚收下了用户的一笔转账 $" + payAmount.toFixed(2) + "，备注：" + payDesc + "。]";else {
+                                          if (normalizedMessage_3.payKind === "char_to_user_pending") value_601 = "[你刚刚向用户发起了一笔转账 $" + payAmount.toFixed(2) + "，备注：" + payDesc + "，等待用户领取。]";else {
+                                            if (normalizedMessage_3.payKind === "char_to_user_claimed" || normalizedMessage_3.payKind === "user_received_from_char") value_601 = "[用户已领取你的转账 $" + payAmount.toFixed(2) + "，备注：" + payDesc + "。]";else {
+                                              if (normalizedMessage_3.payKind === "user_rejected_from_char") value_601 = "[用户退回了你的转账 $" + payAmount.toFixed(2) + "，备注：" + payDesc + "。]";else (normalizedMessage_3.payKind === "char_to_user_rejected" || normalizedMessage_3.payKind === "user_to_char_rejected") && (value_601 = "[你刚刚退回了用户的转账 $" + payAmount.toFixed(2) + "，备注：" + payDesc + "。]");
                                             }
                                           }
                                         }
@@ -3943,19 +3943,22 @@ window.addImFriend = async function (friendData_2) {
   if (window.showToast) window.showToast("已添加好友: " + friend_25.nickname);
   return true;
 };
-window.imApp.formatTime = function (value_1347) {
-  if (!value_1347) return "";
-  const date_3 = new Date(value_1347),
-    now_4 = new Date(),
-    value_1350 = date_3.toDateString() === now_4.toDateString(),
-    yesterday = new Date(now_4);
-  yesterday.setDate(now_4.getDate() - 1);
-  const value_1352 = date_3.toDateString() === yesterday.toDateString(),
-    hours_2 = date_3.getHours().toString().padStart(2, "0"),
-    minutes_2 = date_3.getMinutes().toString().padStart(2, "0");
-  if (value_1350) return hours_2 + ":" + minutes_2;
-  if (value_1352) return "Yesterday";
-  return date_3.getMonth() + 1 + "/" + date_3.getDate() + " " + hours_2 + ":" + minutes_2;
+window.imApp.formatTime = function (timestamp) {
+  if (!timestamp) return "";
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) return "";
+  const now = new Date();
+  const dayNumber = value => Date.UTC(value.getFullYear(), value.getMonth(), value.getDate());
+  const dayDifference = Math.round((dayNumber(now) - dayNumber(date)) / 86400000);
+  const timeText = window.imDataUtils?.formatUsTime
+    ? window.imDataUtils.formatUsTime(date)
+    : date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+  if (dayDifference === 0) return timeText;
+  if (dayDifference === 1) return "Yesterday";
+  if (dayDifference >= 2 && dayDifference <= 6) {
+    return date.toLocaleDateString("en-US", { weekday: "long" });
+  }
+  return date.toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "2-digit" });
 };
 window.imApp.addMomentNotification = async function (type_2, user_6, momentId_6, contentOrPayload = "", thought_4 = "") {
   const payload_3 = contentOrPayload && typeof contentOrPayload === "object" ? contentOrPayload : {
@@ -4317,11 +4320,14 @@ window.addEventListener("pagehide", () => {
     currentModalGenerationPrompt = null;
   function renderModalImageComposer(composer) {
     currentModalImageComposer = composer || null;
-    const src_2 = String(composer?.imageUrl || ""),
+    const imageUrls = Array.isArray(composer?.images) ? composer.images.map(item => String(item || "")).filter(Boolean) : [],
+      src_2 = imageUrls[0] || String(composer?.imageUrl || ""),
+      imageCount = imageUrls.length || (src_2 ? 1 : 0),
       imgElement = modalImageComposerPreview?.querySelector("img"),
       iElement = modalImageComposerPreview?.querySelector("i");
+    if (modalImageComposerInput) modalImageComposerInput.multiple = composer?.multiple === true;
     if (modalImageComposerGroup) modalImageComposerGroup.style.display = composer ? "block" : "none";
-    if (modalImageComposerStatus) modalImageComposerStatus.textContent = src_2 ? composer?.fileName || "已选择图片" : "未选择图片时发送虚拟图片";
+    if (modalImageComposerStatus) modalImageComposerStatus.textContent = src_2 ? imageCount > 1 ? `已选择 ${imageCount} 张图片` : composer?.fileName || "已选择图片" : "未选择图片时发送虚拟图片";
     if (modalImageComposerUploadBtn) modalImageComposerUploadBtn.textContent = src_2 ? "更换" : "上传";
     if (modalImageComposerRemoveBtn) modalImageComposerRemoveBtn.style.display = src_2 ? "" : "none";
     if (modalImageComposerRecognizeBtn) modalImageComposerRecognizeBtn.style.display = src_2 ? "block" : "none";
@@ -4448,6 +4454,8 @@ window.addEventListener("pagehide", () => {
       referenceImage: currentModalReferenceFace?.imageUrl || "",
       uploadedImage: currentModalImageComposer?.imageUrl || "",
       uploadedFileName: currentModalImageComposer?.fileName || "",
+      uploadedImages: Array.isArray(currentModalImageComposer?.images) ? currentModalImageComposer.images.slice() : currentModalImageComposer?.imageUrl ? [currentModalImageComposer.imageUrl] : [],
+      uploadedFileNames: Array.isArray(currentModalImageComposer?.fileNames) ? currentModalImageComposer.fileNames.slice() : currentModalImageComposer?.fileName ? [currentModalImageComposer.fileName] : [],
       charAppearance: modalGenerationCharAppearance?.value || "",
       userAppearance: modalGenerationUserAppearance?.value || "",
       artistPrompt: modalGenerationArtistPrompt?.value || "",
@@ -4522,16 +4530,19 @@ window.addEventListener("pagehide", () => {
   });
   modalImageComposerUploadBtn?.addEventListener("click", () => modalImageComposerInput?.click());
   modalImageComposerInput?.addEventListener("change", async event_3 => {
-    const file_2 = event_3.target.files?.[0];
+    const files = Array.from(event_3.target.files || []);
     event_3.target.value = "";
-    if (!file_2 || typeof currentModalImageComposer?.onUpload !== "function") return;
+    if (!files.length || typeof currentModalImageComposer?.onUpload !== "function") return;
     try {
       modalImageComposerUploadBtn.disabled = true;
-      const result_3 = await currentModalImageComposer.onUpload(file_2);
-      if (result_3?.imageUrl) renderModalImageComposer({
-        ...currentModalImageComposer,
-        ...result_3
-      });
+      if (currentModalImageComposer?.multiple === true) {
+        const results = await Promise.all(files.map(file => currentModalImageComposer.onUpload(file)));
+        const validResults = results.filter(result => result?.imageUrl);
+        if (validResults.length) renderModalImageComposer({ ...currentModalImageComposer, imageUrl: validResults[0].imageUrl, fileName: validResults[0].fileName || files[0]?.name || "", images: validResults.map(result => result.imageUrl), fileNames: validResults.map((result, index) => result.fileName || files[index]?.name || "") });
+      } else {
+        const result_3 = await currentModalImageComposer.onUpload(files[0]);
+        if (result_3?.imageUrl) renderModalImageComposer({ ...currentModalImageComposer, ...result_3 });
+      }
     } catch (error_6) {
       window.showToast?.(error_6?.message || "图片处理失败");
     } finally {
@@ -4542,7 +4553,9 @@ window.addEventListener("pagehide", () => {
     renderModalImageComposer({
       ...currentModalImageComposer,
       imageUrl: "",
-      fileName: ""
+      fileName: "",
+      images: [],
+      fileNames: []
     });
   });
   modalImageComposerRecognizeBtn?.addEventListener("click", async () => {
@@ -4653,6 +4666,11 @@ window.addEventListener("pagehide", () => {
   const imHeaderLeft = document.querySelector(".line-header-left");
   imHeaderLeft && imHeaderLeft.addEventListener("click", () => {
     closeView_2(imessageView_3);
+  });
+  const chatsEditBtn = document.getElementById("chats-edit-btn");
+  chatsEditBtn?.addEventListener("click", () => {
+    if (imHeaderLeft) imHeaderLeft.click();
+    else closeView_2(imessageView_3);
   });
   const imHeaderRight = document.querySelector(".line-header-right");
   if (imHeaderRight) {

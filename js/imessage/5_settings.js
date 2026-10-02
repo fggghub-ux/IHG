@@ -3177,6 +3177,8 @@
       timestampPositionBodyElement_912 = document.getElementById("timestamp-position-body"),
       timestampPositionSelectElement_913 = document.getElementById("timestamp-position-select"),
       chatAvatarToggleElement_914 = document.getElementById("chat-avatar-toggle"),
+      avatarPositionBodyElement = document.getElementById("avatar-position-body"),
+      avatarPositionSelectElement = document.getElementById("avatar-position-select"),
       chatLanguageSelect = document.getElementById("chat-language-select"),
       chatCustomLanguageRow_2 = document.getElementById("chat-custom-language-row"),
       chatCustomLanguageInput_2 = document.getElementById("chat-custom-language-input"),
@@ -3192,9 +3194,11 @@
       chatTtsVoiceInput = document.getElementById("chat-tts-voice-id-input"),
       chatTtsSpeedInput = document.getElementById("chat-tts-speed-input");
     chatAvatarToggleElement_914 && (chatAvatarToggleElement_914.checked = !!friend_57.showAvatar);
+    if (avatarPositionBodyElement) avatarPositionBodyElement.style.display = friend_57.showAvatar ? "flex" : "none";
+    if (avatarPositionSelectElement) avatarPositionSelectElement.value = friend_57.avatarDisplayMode === "two" ? "two" : "one";
     if (chatLanguageSelect) {
       const language_2 = String(friend_57.language || "zh").trim() || "zh",
-        standardLanguages = new Set(["zh", "ko", "ja", "en", "fr", "yue", "ru"]),
+        standardLanguages = new Set(["zh", "en", "ru", "yue", "it", "es", "ar"]),
         isCustomLanguage_2 = !standardLanguages.has(language_2);
       chatLanguageSelect.value = isCustomLanguage_2 ? "__custom__" : language_2;
       if (chatCustomLanguageRow_2) chatCustomLanguageRow_2.style.display = isCustomLanguage_2 ? "flex" : "none";
@@ -3353,7 +3357,7 @@
   const chatLanguageSelect_2 = document.getElementById("chat-language-select"),
     chatCustomLanguageRowElement = document.getElementById("chat-custom-language-row"),
     chatCustomLanguageInput = document.getElementById("chat-custom-language-input"),
-    value_92 = new Set(["zh", "ko", "ja", "en", "fr", "yue", "ru"]);
+    value_92 = new Set(["zh", "en", "ru", "yue", "it", "es", "ar"]);
   chatLanguageSelect_2 && chatLanguageSelect_2.addEventListener("change", async event_966 => {
     if (window.imData.currentSettingsFriend) {
       const value_8 = window.imData.currentSettingsFriend.language || "zh",
@@ -3626,8 +3630,17 @@
     e_7.target.value = value_12;
     await saveChatTtsField("speed", value_12, e_7.target, previousValue_5);
   }));
-  const chatAvatarToggleElement = document.getElementById("chat-avatar-toggle");
-  chatAvatarToggleElement && chatAvatarToggleElement.addEventListener("change", async event_1042 => {
+  const chatAvatarToggleElement = document.getElementById("chat-avatar-toggle"),
+    avatarPositionBodyElement = document.getElementById("avatar-position-body"),
+    avatarPositionSelectElement = document.getElementById("avatar-position-select"),
+    rerenderAvatarSettingPreview = () => {
+      if (!window.imChat?.rerenderChatContainer) return;
+      const friend = window.imData.currentSettingsFriend,
+        page = friend ? document.getElementById("chat-interface-" + friend.id) : null,
+        msgContainer = page?.querySelector(".ins-chat-messages");
+      if (friend && msgContainer) window.imChat.rerenderChatContainer(friend, msgContainer, { scroll: false });
+    };
+  chatAvatarToggleElement && chatAvatarToggleElement.dataset.bound !== "true" && (chatAvatarToggleElement.dataset.bound = "true", chatAvatarToggleElement.addEventListener("change", async event_1042 => {
     if (window.imData.currentSettingsFriend) {
       const checked_10 = !!window.imData.currentSettingsFriend.showAvatar,
         showAvatar_3 = event_1042.target.checked,
@@ -3641,18 +3654,24 @@
         showToast_2("头像设置保存失败");
         return;
       }
-      if (window.imChat && window.imChat.rerenderChatContainer) {
-        const currentSettingsFriend_1047 = window.imData.currentSettingsFriend,
-          elementById_1048 = document.getElementById("chat-interface-" + currentSettingsFriend_1047.id);
-        if (elementById_1048) {
-          const insChatMessagesElement_1049 = elementById_1048.querySelector(".ins-chat-messages");
-          if (insChatMessagesElement_1049) window.imChat.rerenderChatContainer(currentSettingsFriend_1047, insChatMessagesElement_1049, {
-            scroll: false
-          });
-        }
-      }
+      if (avatarPositionBodyElement) avatarPositionBodyElement.style.display = showAvatar_3 ? "flex" : "none";
+      rerenderAvatarSettingPreview();
     }
-  });
+  }));
+  avatarPositionSelectElement && avatarPositionSelectElement.dataset.bound !== "true" && (avatarPositionSelectElement.dataset.bound = "true", avatarPositionSelectElement.addEventListener("change", async event => {
+    if (!window.imData.currentSettingsFriend) return;
+    const previousValue = window.imData.currentSettingsFriend.avatarDisplayMode === "two" ? "two" : "one",
+      nextValue = event.target.value === "two" ? "two" : "one",
+      saved = await commitSettingsFriendChange(targetFriend => {
+        targetFriend.avatarDisplayMode = nextValue;
+      }, { silent: true });
+    if (!saved) {
+      event.target.value = previousValue;
+      showToast_2("头像样式保存失败");
+      return;
+    }
+    rerenderAvatarSettingPreview();
+  }));
   const pinToggle_2 = document.getElementById("chat-pinned-toggle");
   pinToggle_2 && pinToggle_2.addEventListener("change", async event_1050 => {
     if (window.imData.currentSettingsFriend) {

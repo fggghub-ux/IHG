@@ -2445,6 +2445,9 @@
       photo2: DEFAULT_PHOTO_IMAGE_SRCS[1],
       photo3: DEFAULT_PHOTO_IMAGE_SRCS[2]
     };
+    if (type_8 === "notification") return {
+      avatar: DEFAULT_NOTIFICATION_AVATAR_SRC
+    };
     return {};
   }
   function mergeWidgetImagesWithDefaults(type_9, images_3 = {}) {

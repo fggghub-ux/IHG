@@ -49,8 +49,15 @@
     const avatarUrl_2 = getEffectiveUserProfile(friend_3).avatarUrl || "assets/moren-thumb.jpg";
     container_2.style.setProperty("--group-user-avatar-image", "url(" + JSON.stringify(String(avatarUrl_2)) + ")");
   }
+  function syncSingleChatAvatarState(friend, container) {
+    if (!container) return;
+    const isTwo = (!friend?.type || friend.type === "char") && friend?.showAvatar === true && friend?.avatarDisplayMode === "two";
+    container.classList.toggle("avatar-mode-two", isTwo);
+  }
   function decorateMessageRowAvatar(row_2, friend_4, message_3 = {}) {
-    if (!row_2 || friend_4?.type === "group" || row_2.querySelector(":scope > .im-message-avatar")) return row_2;
+    const isCharFriend = !friend_4?.type || friend_4.type === "char",
+      isEveryMessageMode = friend_4?.avatarDisplayMode === "two";
+    if (!row_2 || !friend_4?.showAvatar || !isCharFriend || !isEveryMessageMode || row_2.querySelector(":scope > .im-message-avatar")) return row_2;
     if (message_3.type === "system_notice" || message_3.type === "memory_request" || row_2.classList.contains("chat-system-row") || row_2.classList.contains("typing-row")) return row_2;
     const isUser_2 = message_3.role === "user" || row_2.classList.contains("user-row");
     let profile;
@@ -71,6 +78,15 @@
     const messageId_2 = String(message_4?.id || ""),
       row_3 = handleAction_18(value_127, candidate => candidate.classList?.contains("chat-row") && (!messageId_2 || String(candidate.getAttribute("data-message-id") || "") === messageId_2));
     if (row_3) decorateMessageRowAvatar(row_3, friend_5, message_4);
+    if (message_4?.role === "assistant") {
+      value_127?.querySelectorAll?.(".gift-message-card[data-gift-timestamp]").forEach(card => {
+        const giftTime = Number(card.dataset.giftTimestamp) || 0;
+        if ((Number(message_4.timestamp) || 0) <= giftTime) return;
+        card.classList.add("is-received");
+        const copy = card.querySelector(".gift-message-copy");
+        if (copy && !copy.querySelector(".gift-message-status")) copy.insertAdjacentHTML("beforeend", '<div class="gift-message-status">Received</div>');
+      });
+    }
     return true;
   }
   function handleAction_20(row_4, friend_6, message_5 = renderMessageContextByFriend.get(friend_6)) {
@@ -129,6 +145,7 @@
   }
   function buildMessageHeaderHtml(value_154, friend_10, value_156, speakerName_3, speakerAvatar, hasPrev, message_6 = null) {
     if (!friend_10 || !friend_10.showAvatar || hasPrev) return "";
+    if ((!friend_10.type || friend_10.type === "char") && friend_10.avatarDisplayMode === "two") return "";
     const date = new Date(value_156),
       dateStr = date.toLocaleString("en-US", {
         month: "long",
@@ -791,7 +808,7 @@
       packetCount_2 = parseInt(msg_7.packetCount, 10) || 0,
       claimedCount = Array.isArray(msg_7.claimRecords) ? msg_7.claimRecords.length : 0,
       value_365 = msg_7.currentUserClaimed ? "已领取 · " + claimedCount + "/" + packetCount_2 : msg_7.isFinished ? claimedCount + "/" + packetCount_2 + " 已领取" : "点击领取红包",
-      value_366 = "\n            <div class=\"group-red-packet-card im-card-content\" style=\"width:100%; min-width:0; max-width:268px; border-radius:18px; padding:12px 14px; background:#fff; color:#111;  border:1px solid rgba(0,0,0,0.08); cursor:pointer;\">\n                <div style=\"display:flex; align-items:center; gap:12px;\">\n                    <div style=\"width:40px; height:40px; border-radius:14px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;\">\n                        <i class=\"fas fa-gift\"></i>\n                    </div>\n                    <div style=\"min-width:0; flex:1;\">\n                        <div style=\"font-size:15px; font-weight:800; color:#111; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\">" + (msg_7.description || "恭喜发财") + "</div>\n                        <div style=\"font-size:12px; color:#8e8e93; margin-top:4px;\">" + value_365 + "</div>\n                    </div>\n                </div>\n                <div style=\"margin-top:10px; font-size:26px; font-weight:800; color:#111; letter-spacing:0.2px;\">¥" + totalAmount_2.toFixed(2) + "</div>\n            </div>\n        ",
+      value_366 = "\n            <div class=\"group-red-packet-card im-card-content\" style=\"width:100%; min-width:0; max-width:268px; border-radius:18px; padding:12px 14px; background:#fff; color:#111;  border:1px solid rgba(0,0,0,0.08); cursor:pointer;\">\n                <div style=\"display:flex; align-items:center; gap:12px;\">\n                    <div style=\"width:40px; height:40px; border-radius:14px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;\">\n                        <i class=\"fas fa-gift\"></i>\n                    </div>\n                    <div style=\"min-width:0; flex:1;\">\n                        <div style=\"font-size:15px; font-weight:800; color:#111; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;\">" + (msg_7.description || "恭喜发财") + "</div>\n                        <div style=\"font-size:12px; color:#8e8e93; margin-top:4px;\">" + value_365 + "</div>\n                    </div>\n                </div>\n                <div style=\"margin-top:10px; font-size:26px; font-weight:800; color:#111; letter-spacing:0.2px;\">$" + totalAmount_2.toFixed(2) + "</div>\n            </div>\n        ",
       value_367 = typeof window.formatChatBubbleTime === "function" ? window.formatChatBubbleTime(value_352) : (() => {
         const value_370 = new Date(value_352);
         return value_370.getHours() + ":" + value_370.getMinutes().toString().padStart(2, "0");
@@ -1616,6 +1633,309 @@
       nextElement = targetRow.nextElementSibling;
     return targetRow.remove(), previousElement && previousElement.classList && previousElement.classList.contains("chat-timestamp") && (!nextElement || !nextElement.classList || !nextElement.classList.contains("chat-row")) && previousElement.remove(), value_580.scroll && window.imChat.scrollToBottom(value_578), true;
   }
+function renderPhotoBatchGroup(messages, friend, container, timestamp = Date.now()) {
+        const safeMessages = Array.isArray(messages) ? messages.filter(Boolean) : [];
+        if (safeMessages.length < 2) {
+            if (safeMessages[0]) renderMessageBubble_2(safeMessages[0], friend, container, timestamp);
+            return;
+        }
+
+        const first = safeMessages[0];
+        const groupId = String(first.imageGroupId || first.id || timestamp);
+        const isUser = first.role === 'user';
+        const expandedGroups = container._imExpandedPhotoGroups || new Set();
+        container._imExpandedPhotoGroups = expandedGroups;
+        const isExpanded = expandedGroups.has(groupId);
+
+        const summary = document.createElement('div');
+        summary.className = `photo-batch-summary ${isUser ? 'is-user' : 'is-char'}${isExpanded ? ' is-expanded' : ''}`;
+        summary.dataset.photoGroupId = groupId;
+        const gridIconSvg = `<svg class="photo-batch-grid-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor"></rect><rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor"></rect><rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor"></rect><rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor"></rect></svg>`;
+        const downloadIconSvg = `<svg class="photo-batch-download-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line></svg>`;
+        summary.innerHTML = `
+            <div class="photo-batch-content">
+                <div class="photo-batch-label">${gridIconSvg}<span>${safeMessages.length} photos</span></div>
+                <div class="photo-batch-stack" aria-label="${safeMessages.length} photos"${isExpanded ? ' hidden' : ''}></div>
+                <div class="photo-batch-expanded-list"${isExpanded ? '' : ' hidden'}></div>
+            </div>
+            <button type="button" class="photo-batch-toggle" aria-label="${isExpanded ? '收起图片' : '展开图片'}" aria-expanded="${isExpanded ? 'true' : 'false'}">
+                ${downloadIconSvg}
+            </button>
+        `;
+        container.appendChild(summary);
+
+        const stack = summary.querySelector('.photo-batch-stack');
+        const cards = safeMessages.map((message, index) => {
+            const card = document.createElement('div');
+            card.className = 'photo-batch-card';
+            card.dataset.photoIndex = String(index);
+            card.innerHTML = `<img src="${escapeHtml(message.content || window.imChat.CHAT_IMAGE_PLACEHOLDER_URL || '')}" alt="">`;
+            stack?.appendChild(card);
+            return card;
+        });
+        const cardOrder = cards.slice();
+
+        // Gesture timing and scrub behavior adapted from fggghub-ux/PhotoStack
+        // (PolyForm Noncommercial 1.0.0). The order wraps so either direction
+        // moves the visible card to the back, as required by this chat UI.
+        const stackMotion = {
+            frame: 0,
+            apply() {
+                cardOrder.forEach((card, depth) => {
+                    card.style.transition = '';
+                    card.classList.toggle('is-top', depth === 0);
+                    card.style.zIndex = String(100 - depth);
+                    card.style.opacity = depth < 3 ? '1' : '0';
+                    if (depth === 0) card.style.transform = 'translateX(0) rotate(0deg) scale(1)';
+                    else {
+                        const offset = 8 + (depth - 1) * 7;
+                        const rotation = 2.2 * Math.min(depth, 3);
+                        const scale = Math.max(.82, 1 - .055 * depth);
+                        card.style.transform = `translateX(${offset}px) rotate(${rotation}deg) scale(${scale})`;
+                    }
+                });
+            },
+            scrub(direction, progress) {
+                const width = stack?.offsetWidth || 140;
+                const peak = width * .52;
+                cardOrder.forEach(card => { card.style.transition = 'none'; });
+                this.apply();
+                cardOrder.forEach(card => { card.style.transition = 'none'; });
+                const current = cardOrder[0];
+                const next = cardOrder[1];
+                const third = cardOrder[2];
+                let x;
+                let rotation;
+                let scale = 1;
+                if (progress <= .5) {
+                    const phase = progress / .5;
+                    x = direction * peak * phase;
+                    rotation = direction * 8 * phase;
+                } else {
+                    const phase = (progress - .5) / .5;
+                    x = direction * (peak - (peak - 8) * phase);
+                    rotation = direction * (8 - 5.8 * phase);
+                    scale = 1 - .055 * phase;
+                }
+                current.style.transform = `translateX(${x}px) rotate(${rotation}deg) scale(${scale})`;
+                current.style.zIndex = progress < .5 ? '110' : '98';
+                if (next) {
+                    next.style.transform = `translateX(${8 * (1 - progress)}px) rotate(${2.2 * (1 - progress)}deg) scale(${.945 + .055 * progress})`;
+                    next.style.opacity = '1';
+                    next.style.zIndex = '105';
+                }
+                if (third) {
+                    third.style.transform = `translateX(${15 - 7 * progress}px) rotate(${4.4 - 2.2 * progress}deg) scale(${.89 + .055 * progress})`;
+                    third.style.opacity = '1';
+                }
+            },
+            finish(direction, fromProgress) {
+                if (this.frame) cancelAnimationFrame(this.frame);
+                const duration = Math.max(140, (1 - fromProgress) * 340);
+                const startedAt = performance.now();
+                const step = (now) => {
+                    const elapsed = Math.min(1, (now - startedAt) / duration);
+                    const eased = 1 - Math.pow(1 - elapsed, 2);
+                    this.scrub(direction, fromProgress + (1 - fromProgress) * eased);
+                    if (elapsed < 1) {
+                        this.frame = requestAnimationFrame(step);
+                        return;
+                    }
+                    this.frame = 0;
+                    cardOrder.push(cardOrder.shift());
+                    this.apply();
+                };
+                this.frame = requestAnimationFrame(step);
+            }
+        };
+        stackMotion.apply();
+
+        if (stack) {
+            let pointerId = null;
+            let startX = 0;
+            let startY = 0;
+            let lastX = 0;
+            let lastTime = 0;
+            let velocity = 0;
+            let dragging = false;
+            let deltaX = 0;
+            stack.style.touchAction = 'pan-y';
+            stack.addEventListener('pointerdown', (event) => {
+                if (summary.classList.contains('is-expanded')) return;
+                pointerId = event.pointerId;
+                startX = lastX = event.clientX;
+                startY = event.clientY;
+                lastTime = event.timeStamp;
+                velocity = 0;
+                deltaX = 0;
+                dragging = false;
+                stack.setPointerCapture?.(pointerId);
+            });
+            stack.addEventListener('pointermove', (event) => {
+                if (pointerId !== event.pointerId) return;
+                const dx = event.clientX - startX;
+                const dy = event.clientY - startY;
+                if (!dragging && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) dragging = true;
+                if (!dragging) return;
+                event.preventDefault();
+                if (event.timeStamp > lastTime) {
+                    velocity = .7 * ((event.clientX - lastX) / (event.timeStamp - lastTime)) + .3 * velocity;
+                }
+                lastX = event.clientX;
+                lastTime = event.timeStamp;
+                deltaX = dx;
+                stackMotion.scrub(dx < 0 ? -1 : 1, Math.min(1, Math.abs(dx) / Math.max(120, stack.offsetWidth * 1.45)));
+            });
+            const release = (event, cancelled = false) => {
+                if (pointerId !== event.pointerId) return;
+                stack.releasePointerCapture?.(pointerId);
+                pointerId = null;
+                const progress = Math.min(1, Math.abs(deltaX) / Math.max(120, stack.offsetWidth * 1.45));
+                const fling = Math.abs(velocity) > .4 && progress > .04;
+                if (!cancelled && dragging && (progress > .32 || fling)) {
+                    stackMotion.finish(deltaX < 0 ? -1 : 1, progress);
+                } else {
+                    stackMotion.apply();
+                }
+                dragging = false;
+            };
+            stack.addEventListener('pointerup', event => release(event));
+            stack.addEventListener('pointercancel', event => release(event, true));
+        }
+
+        const memberRows = [];
+        const expandedList = summary.querySelector('.photo-batch-expanded-list');
+        safeMessages.forEach((message) => {
+            window.imChat.ensureMessageId(message, 'img');
+            renderImageBubble_2(message, friend, expandedList, message.timestamp || timestamp);
+            const row = expandedList?.lastElementChild;
+            if (row?.classList?.contains('chat-row')) {
+                row.classList.add('photo-batch-member');
+                row.dataset.photoGroupId = groupId;
+                memberRows.push(row);
+            }
+        });
+
+        const toggle = summary.querySelector('.photo-batch-toggle');
+        let animationToken = 0;
+        const resetStackAnimation = () => {
+            stack?.getAnimations?.().forEach(animation => animation.cancel());
+            if (stack) {
+                stack.style.opacity = '';
+                stack.style.transform = '';
+            }
+        };
+        toggle?.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const token = ++animationToken;
+            const expanded = !summary.classList.contains('is-expanded');
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            toggle.setAttribute('aria-label', expanded ? '收起图片' : '展开图片');
+            if (expanded) {
+                resetStackAnimation();
+                summary.classList.add('is-expanded');
+                if (expandedList) expandedList.hidden = false;
+                memberRows.forEach((row, index) => {
+                    row.getAnimations?.().forEach(animation => animation.cancel());
+                    row.animate?.([
+                        { opacity: 0, transform: 'translateY(-16px) scale(.98)' },
+                        { opacity: 1, transform: 'translateY(0) scale(1)' }
+                    ], { duration: 300, delay: index * 65, easing: 'cubic-bezier(.22,.8,.25,1)', fill: 'both' });
+                });
+                const collapse = stack?.animate?.([
+                    { opacity: 1, transform: 'scale(1)' },
+                    { opacity: 0, transform: 'scale(.96)' }
+                ], { duration: 170, easing: 'ease-out', fill: 'both' });
+                if (collapse && stack) collapse.finished.catch(() => {}).then(() => {
+                    if (token === animationToken) {
+                        collapse.cancel();
+                        stack.hidden = true;
+                    }
+                });
+                else if (stack) stack.hidden = true;
+                expandedGroups.add(groupId);
+            } else {
+                const reversed = memberRows.slice().reverse();
+                const total = 240 + Math.max(0, reversed.length - 1) * 55;
+                reversed.forEach((row, index) => {
+                    row.getAnimations?.().forEach(animation => animation.cancel());
+                    row.animate?.([
+                        { opacity: 1, transform: 'translateY(0) scale(1)' },
+                        { opacity: 0, transform: 'translateY(-14px) scale(.98)' }
+                    ], { duration: 240, delay: index * 55, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'both' });
+                });
+                window.setTimeout(() => {
+                    if (token !== animationToken) return;
+                    if (expandedList) expandedList.hidden = true;
+                    memberRows.forEach(row => row.getAnimations?.().forEach(animation => animation.cancel()));
+                    summary.classList.remove('is-expanded');
+                    if (stack) {
+                        resetStackAnimation();
+                        stack.hidden = false;
+                        const reveal = stack.animate?.([
+                            { opacity: 0, transform: 'scale(.96)' },
+                            { opacity: 1, transform: 'scale(1)' }
+                        ], { duration: 220, easing: 'cubic-bezier(.22,.8,.25,1)' });
+                        reveal?.finished.catch(() => {}).then(() => {
+                            if (token === animationToken) resetStackAnimation();
+                        });
+                    }
+                }, total);
+                expandedGroups.delete(groupId);
+            }
+        });
+    }
+
+
+    function buildPhotoBatchLookup(messages) {
+        const list = Array.isArray(messages) ? messages : [];
+        const lookup = new Map();
+        const explicitGroups = new Map();
+
+        list.forEach((message) => {
+            if (message?.type !== 'image' || Number(message.imageGroupCount) < 2 || !message.imageGroupId) return;
+            const key = `saved:${String(message.imageGroupId)}`;
+            if (!explicitGroups.has(key)) explicitGroups.set(key, []);
+            explicitGroups.get(key).push(message);
+        });
+
+        explicitGroups.forEach((groupMessages, key) => {
+            groupMessages
+                .sort((left, right) => Number(left.imageGroupIndex || 0) - Number(right.imageGroupIndex || 0))
+                .forEach(message => lookup.set(message, { key, messages: groupMessages }));
+        });
+
+        // Older saves discarded imageGroup* fields. A single picker send gives every
+        // member the exact same timestamp and adjacent order, so only recover that
+        // narrow shape; separately sent images are intentionally left independent.
+        for (let index = 0; index < list.length;) {
+            const first = list[index];
+            if (first?.type !== 'image' || lookup.has(first)) {
+                index += 1;
+                continue;
+            }
+            const timestamp = Number(first.timestamp) || 0;
+            const role = String(first.role || 'assistant');
+            const run = [first];
+            let cursor = index + 1;
+            while (cursor < list.length) {
+                const candidate = list[cursor];
+                if (candidate?.type !== 'image'
+                    || lookup.has(candidate)
+                    || (Number(candidate.timestamp) || 0) !== timestamp
+                    || String(candidate.role || 'assistant') !== role) break;
+                run.push(candidate);
+                cursor += 1;
+            }
+            if (run.length > 1) {
+                const key = `legacy:${role}:${timestamp}:${String(first.id || index)}`;
+                run.forEach(message => lookup.set(message, { key, messages: run }));
+            }
+            index = cursor;
+        }
+        return lookup;
+    }
   function renderChatHistory_2(friend_25, container_15, value_586 = {}) {
     if (!friend_25 || !container_15) return;
     const handleAction_58_587 = handleAction_58(container_15);
@@ -1630,6 +1950,7 @@
       handleAction_58_587.scheduleUiSync?.();
     }
     syncGroupUserAvatarState_2(friend_25, container_15);
+    syncSingleChatAvatarState(friend_25, container_15);
     const messages_5 = Array.isArray(friend_25.messages) ? friend_25.messages : [],
       handleAction_48_589 = handleAction_48(friend_25, container_15, messages_5, value_586);
     let count_590 = 0;
@@ -1641,12 +1962,21 @@
     try {
       container_15._imIsRenderingHistory = true;
       handleAction_49(friend_25, container_15, messages_5, handleAction_48_589);
-      messages_5.length > 0 && messages_5.slice(handleAction_48_589.visibleStartIndex, handleAction_48_589.visibleEndIndex).forEach(message_597 => {
+      const visibleMessages = messages_5.slice(handleAction_48_589.visibleStartIndex, handleAction_48_589.visibleEndIndex).filter(message => message?.role !== "system" && message?.type !== "hidden_context"),
+        renderedPhotoGroups = new Set(),
+        photoBatchLookup = buildPhotoBatchLookup(messages_5);
+      messages_5.length > 0 && visibleMessages.forEach(message_597 => {
         window.imChat.ensureMessageId(message_597, message_597.type === "pay_transfer" ? "pay" : "msg");
+        const photoBatch = photoBatchLookup.get(message_597) || null,
+          photoGroupId = photoBatch?.key || "";
+        if (photoGroupId && renderedPhotoGroups.has(photoGroupId)) return;
         const value_598 = message_597.timestamp || 0;
-        value_598 - count_590 > 300000 && (window.imChat.renderTimestamp(value_598, container_15), count_590 = value_598);
+        (!count_590 || value_598 - count_590 >= 3600000) && (window.imChat.renderTimestamp(value_598, container_15), count_590 = value_598);
         message_597 === recallAnchorMessage && window.imChat.renderMemoryRecallPresentation && window.imChat.renderMemoryRecallPresentation(friend_25, container_15, recallPresentation_3);
-        renderMessageBubble_2(message_597, friend_25, container_15, value_598);
+        if (photoGroupId) {
+          renderedPhotoGroups.add(photoGroupId);
+          renderPhotoBatchGroup(photoBatch.messages, friend_25, container_15, value_598);
+        } else renderMessageBubble_2(message_597, friend_25, container_15, value_598);
       });
       handleAction_50(friend_25, container_15, messages_5, handleAction_48_589);
     } finally {
@@ -2027,7 +2357,7 @@
     handleAction_22(row_15, friend_32, msg_19);
     handleAction_20(row_15, friend_32, msg_19);
     const amount_2 = Number(msg_19.amount) || 0,
-      value_758 = "¥" + amount_2.toFixed(2),
+      value_758 = "$" + amount_2.toFixed(2),
       description_2 = msg_19.description || "转账",
       parties = handleAction_23(msg_19, friend_32),
       {
@@ -2060,7 +2390,7 @@
       value_774 = typeof window.formatChatBubbleTime === "function" ? window.formatChatBubbleTime(value_747) : value_773.getHours() + ":" + value_773.getMinutes().toString().padStart(2, "0");
     if (isOfficialReceipt) {
       const sign = msg_19.cardTitle === "收款通知" ? "+" : "-";
-      row_15.innerHTML = "\n                <div class=\"chat-checkbox-wrapper\" style=\"display: " + (window.imData.batchSelectMode ? "flex" : "none") + "; width: 40px; justify-content: center; align-items: flex-end; padding-bottom: 10px; flex-shrink: 0; cursor: pointer; transition: all 0.2s;\">\n                    <i class=\"far fa-circle chat-checkbox\" data-timestamp=\"" + value_747 + "\" style=\"color: #c7c7cc; font-size: 22px;\"></i>\n                </div>\n                    <div style=\"width:100%; display:flex; justify-content:center; padding:10px 0;\">\n                    <div class=\"im-card-content pay-receipt-card\" style=\"width:280px; background:#fff; border-radius:12px; padding:16px;  display:flex; flex-direction:column; align-items:center;\">\n                        <div style=\"font-size:14px; color:#111; margin-bottom:8px;\">" + description_2 + "</div>\n                        <div style=\"font-size:28px; font-weight:bold; color:#111; margin-bottom:12px;\">" + sign + "¥" + amount_2.toFixed(2) + "</div>\n                          <div style=\"background:#f2f2f7; border-radius:16px; padding:4px 12px; font-size:12px; color:#8e8e93; margin-bottom:16px;\">\n                              " + value_774 + "\n                          </div>\n                        <div style=\"width:100%; border-top:1px solid #f2f2f7; padding-top:12px; display:flex; justify-content:space-between; align-items:center;\">\n                            <span style=\"font-size:13px; color:#8e8e93;\">账单详情</span>\n                            <i class=\"fas fa-chevron-right\" style=\"font-size:12px; color:#c7c7cc;\"></i>\n                        </div>\n                    </div>\n                </div>\n            ";
+      row_15.innerHTML = "\n                <div class=\"chat-checkbox-wrapper\" style=\"display: " + (window.imData.batchSelectMode ? "flex" : "none") + "; width: 40px; justify-content: center; align-items: flex-end; padding-bottom: 10px; flex-shrink: 0; cursor: pointer; transition: all 0.2s;\">\n                    <i class=\"far fa-circle chat-checkbox\" data-timestamp=\"" + value_747 + "\" style=\"color: #c7c7cc; font-size: 22px;\"></i>\n                </div>\n                    <div style=\"width:100%; display:flex; justify-content:center; padding:10px 0;\">\n                    <div class=\"im-card-content pay-receipt-card\" style=\"width:280px; background:#fff; border-radius:12px; padding:16px;  display:flex; flex-direction:column; align-items:center;\">\n                        <div style=\"font-size:14px; color:#111; margin-bottom:8px;\">" + description_2 + "</div>\n                        <div style=\"font-size:28px; font-weight:bold; color:#111; margin-bottom:12px;\">" + sign + "$" + amount_2.toFixed(2) + "</div>\n                          <div style=\"background:#f2f2f7; border-radius:16px; padding:4px 12px; font-size:12px; color:#8e8e93; margin-bottom:16px;\">\n                              " + value_774 + "\n                          </div>\n                        <div style=\"width:100%; border-top:1px solid #f2f2f7; padding-top:12px; display:flex; justify-content:space-between; align-items:center;\">\n                            <span style=\"font-size:13px; color:#8e8e93;\">账单详情</span>\n                            <i class=\"fas fa-chevron-right\" style=\"font-size:12px; color:#c7c7cc;\"></i>\n                        </div>\n                    </div>\n                </div>\n            ";
     } else {
       const value_777 = "\n                <div class=\"pay-transfer-card im-card-content" + extraClass + "\">\n                    <div class=\"pay-transfer-card-top\">\n                        <div class=\"pay-transfer-card-icon\"><i class=\"fas fa-wallet\"></i></div>\n                        <div class=\"pay-transfer-card-meta\">\n                            <div class=\"pay-transfer-card-title\">" + escapeHtml(cardTitle_2) + "</div>\n                            " + (isFamilyCard && !startsWith_768 ? "" : "<div class=\"pay-transfer-card-subtitle\">" + escapeHtml(value_770) + "</div>") + "\n                        </div>\n                    </div>\n                    <div class=\"pay-transfer-card-amount\">" + value_758 + "</div>\n                    <div class=\"pay-transfer-card-desc\">" + escapeHtml(description_2) + "</div>\n                </div>\n            ";
       if (value_748) {

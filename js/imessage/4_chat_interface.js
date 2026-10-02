@@ -306,7 +306,92 @@
       });
     }), true;
   };
-  const IM_CHAT_PAGE_CACHE_LIMIT = 10;
+  const IM_CHAT_PAGE_CACHE_LIMIT = 10,
+    IM_CHAT_BACK_BADGE_STORAGE_KEY = "imessage_chat_back_badge",
+    IM_CHAT_BACK_BADGE_DEFAULT = "2991";
+  function getChatBackBadgeValue() {
+    const stored = window.appStorage?.loadLegacyKey?.(IM_CHAT_BACK_BADGE_STORAGE_KEY, null);
+    return stored == null ? IM_CHAT_BACK_BADGE_DEFAULT : String(stored);
+  }
+  function renderChatBackBadge(page, value = getChatBackBadgeValue()) {
+    const normalized = String(value == null ? "" : value).trim(),
+      badge = page?.querySelector?.(".im-chat-back-count"),
+      backButton = page?.querySelector?.(".im-chat-back-btn"),
+      restoreHotspot = page?.querySelector?.(".im-chat-back-restore-hotspot");
+    if (badge) {
+      badge.textContent = normalized;
+      badge.hidden = !normalized;
+    }
+    if (backButton) {
+      backButton.setAttribute("aria-label", "返回");
+      backButton.classList.toggle("has-count", !!normalized);
+    }
+    if (restoreHotspot) {
+      restoreHotspot.hidden = !!normalized;
+      restoreHotspot.setAttribute("aria-label", "编辑数字");
+    }
+  }
+  function openChatBackBadgeEditor(page) {
+    if (!window.showCustomModal) return;
+    const overlay = document.getElementById("custom-modal-overlay"),
+      modalInput = document.getElementById("modal-input"),
+      clearModalClass = () => {
+        overlay?.classList.remove("im-chat-back-count-modal");
+        if (modalInput) modalInput.inputMode = "text";
+      };
+    overlay?.classList.add("im-chat-back-count-modal");
+    window.showCustomModal({
+      type: "prompt",
+      title: "STATUS",
+      defaultValue: getChatBackBadgeValue(),
+      placeholder: "2991",
+      confirmText: "确认",
+      onCancel: clearModalClass,
+      onConfirm: value => {
+        const normalized = String(value == null ? "" : value).trim();
+        window.appStorage?.saveLegacyKey?.(IM_CHAT_BACK_BADGE_STORAGE_KEY, normalized);
+        document.querySelectorAll(".active-chat-interface.im-chat-char").forEach(chatPage => renderChatBackBadge(chatPage, normalized));
+        clearModalClass();
+      }
+    });
+    if (modalInput) modalInput.inputMode = "numeric";
+  }
+  function openChatCallChooser(friend) {
+    let callOverlay = document.getElementById("custom-call-overlay");
+    if (!callOverlay) {
+      callOverlay = document.createElement("div");
+      callOverlay.id = "custom-call-overlay";
+      Object.assign(callOverlay.style, { position: "fixed", inset: "0", backgroundColor: "rgba(0,0,0,0.4)", zIndex: "10000", display: "flex", alignItems: "flex-end", justifyContent: "center" });
+      const sheet = document.createElement("div"),
+        menuGroup = document.createElement("div");
+      Object.assign(sheet.style, { width: "100%", backgroundColor: "transparent", padding: "10px", boxSizing: "border-box", paddingBottom: "max(10px, env(safe-area-inset-bottom))" });
+      Object.assign(menuGroup.style, { backgroundColor: "#fff", borderRadius: "14px", overflow: "hidden" });
+      const makeCallButton = (label, withDivider, action) => {
+        const button = document.createElement("div");
+        button.innerText = label;
+        Object.assign(button.style, { padding: "18px 0", textAlign: "center", fontSize: "20px", color: "#007aff", cursor: "pointer", borderBottom: withDivider ? "1px solid #e5e5ea" : "" });
+        button.addEventListener("click", event => {
+          event.stopPropagation();
+          callOverlay.style.display = "none";
+          action();
+        });
+        return button;
+      };
+      menuGroup.appendChild(makeCallButton("视频通话", true, () => window.showToast?.("视频通话功能开发中...")));
+      menuGroup.appendChild(makeCallButton("语音通话", false, () => {
+        const activeFriend = window.imData?.currentActiveFriend || friend;
+        if (window.imChat?.openVoiceCall) window.imChat.openVoiceCall(activeFriend);else window.showToast?.("语音通话准备中...");
+      }));
+      sheet.appendChild(menuGroup);
+      callOverlay.appendChild(sheet);
+      document.body.appendChild(callOverlay);
+      callOverlay.addEventListener("click", event => {
+        if (event.target === callOverlay) callOverlay.style.display = "none";
+      });
+    }
+    callOverlay.style.display = "flex";
+  }
+  window.imChat.openChatCallChooser = openChatCallChooser;
   function touchChatPageCache(page_7) {
     if (page_7) page_7.dataset.imChatCacheUsedAt = String(Date.now());
   }
@@ -400,11 +485,13 @@
     const isGroupChat = friend_6.type === "group",
       isNpcChat = friend_6.type === "npc",
       value_134 = friend_6.type === "official",
-      className_2 = "active-chat-interface im-chat-interface " + (isGroupChat ? "im-chat-group" : isNpcChat ? "im-chat-npc" : value_134 ? "im-chat-official" : "im-chat-single"),
+      isCharChat = !isGroupChat && !isNpcChat && !value_134,
+      className_2 = "active-chat-interface im-chat-interface " + (isGroupChat ? "im-chat-group" : isNpcChat ? "im-chat-npc" : value_134 ? "im-chat-official" : "im-chat-single im-chat-char"),
       isSleeping_2 = window.imApp.isCharacterSleeping(friend_6),
       statusLabel = formatStatusLabel(isSleeping_2 ? "offline" : "online", isSleeping_2),
       value_138 = isSleeping_2 ? "#8e8e93" : "#34c759";
     page_9 && (page_9.className = className_2, page_9.style.setProperty("--im-chat-status-color", value_138), touchChatPageCache(page_9), window.imApp.applyFriendCss && window.imApp.applyFriendCss(friend_6));
+    if (page_9 && isCharChat) renderChatBackBadge(page_9);
     if (!page_9) {
       page_9 = document.createElement("div");
       page_9.id = id_4;
@@ -417,21 +504,36 @@
       const value_144 = isGroupChat ? "position: relative; top: 0; padding: 0 16px; align-items: center; justify-content: space-between; display: flex; pointer-events: none; width: 100%;" : "position: relative; top: 0; padding: 0 16px; align-items: center;";
       let text_145 = "";
       if (isGroupChat) text_145 = "<div class=\"im-chat-group-title-wrap\" style=\"display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; padding: 4px 16px; background: rgba(242, 242, 247, 0.85);   border-radius: 40px;  pointer-events: auto;\">\n                        <div class=\"ins-chat-name\" style=\"font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;\">" + friend_6.nickname + "</div>\n                        <div class=\"ins-chat-sign\" style=\"font-size: 11px; font-weight: 500; color: #8e8e93; margin-top: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px;\">" + formatGroupMemberCount(getGroupMemberCount(friend_6)) + "</div>\n                   </div>";else {
-        if (friend_6.type === "official") text_145 = "<div class=\"im-chat-avatar-wrap\">\n                        <div class=\"ins-chat-avatar\" style=\"pointer-events: none;\">\n                            " + value_143 + "\n                        </div>\n                   </div>\n                   <div class=\"im-chat-title-wrap\">\n                        <div class=\"ins-chat-name\">" + friend_6.nickname + "</div>\n                        <div class=\"ins-chat-sign\"><div class=\"im-chat-status-dot\"></div><span>" + statusLabel + "</span></div>\n                   </div>";else isNpcChat ? text_145 = "<div class=\"im-chat-avatar-wrap\">\n                        <div class=\"ins-chat-avatar\">\n                            " + value_143 + "\n                        </div>\n                   </div>\n                   <div class=\"im-chat-title-wrap\">\n                        <div class=\"ins-chat-name\">" + friend_6.nickname + "</div>\n                   </div>" : text_145 = "<div class=\"im-chat-avatar-wrap\">\n                        <div class=\"ins-chat-avatar\">\n                            " + value_143 + "\n                        </div>\n                   </div>\n                   <div class=\"im-chat-title-wrap\">\n                        <div class=\"ins-chat-name\">" + friend_6.nickname + "</div>\n                        <div class=\"ins-chat-sign\"><div class=\"im-chat-status-dot\"></div><span>" + statusLabel + "</span></div>\n                   </div>";
+        if (friend_6.type === "official") text_145 = "<div class=\"im-chat-avatar-wrap\">\n                        <div class=\"ins-chat-avatar\" style=\"pointer-events: none;\">\n                            " + value_143 + "\n                        </div>\n                   </div>\n                   <div class=\"im-chat-title-wrap\">\n                        <div class=\"ins-chat-name\">" + friend_6.nickname + "</div>\n                        <div class=\"ins-chat-sign\"><div class=\"im-chat-status-dot\"></div><span>" + statusLabel + "</span></div>\n                   </div>";else isNpcChat ? text_145 = "<div class=\"im-chat-avatar-wrap\">\n                        <div class=\"ins-chat-avatar\">\n                            " + value_143 + "\n                        </div>\n                   </div>\n                   <div class=\"im-chat-title-wrap\">\n                        <div class=\"ins-chat-name\">" + friend_6.nickname + "</div>\n                   </div>" : text_145 = "<div class=\"im-chat-avatar-wrap\">\n                        <div class=\"ins-chat-avatar\">\n                            " + value_143 + "\n                        </div>\n                   </div>\n                   <div class=\"im-chat-title-wrap\">\n                        <div class=\"ins-chat-name\">" + friend_6.nickname + "</div>\n                   </div>";
       }
       let text_146 = "";
       if (isGroupChat) text_146 = "<button type=\"button\" class=\"group-header-right-avatar\" aria-label=\"打开群聊详情\" title=\"群聊详情\">\n                        <div class=\"group-header-right-avatar-inner\">" + value_143 + "</div>\n                   </button>";else {
-        if (friend_6.type === "official") text_146 = "<button type=\"button\" class=\"chat-menu-btn im-chat-icon-btn official-settings-btn\" aria-label=\"office 设置\" title=\"office 设置\"><i class=\"fas fa-bars\"></i></button>";else isNpcChat ? text_146 = "<button type=\"button\" class=\"chat-menu-btn im-chat-icon-btn\" aria-label=\"聊天设置\" title=\"聊天设置\"><i class=\"fas fa-bars\" aria-hidden=\"true\"></i></button>" : text_146 = "<button type=\"button\" class=\"chat-call-btn im-chat-icon-btn\" aria-label=\"视频通话\" title=\"视频通话\"><i class=\"fas fa-phone-alt\" aria-hidden=\"true\"></i></button>\n                   <button type=\"button\" class=\"chat-menu-btn im-chat-icon-btn\" aria-label=\"聊天设置\" title=\"聊天设置\"><i class=\"fas fa-bars\" aria-hidden=\"true\"></i></button>";
+        if (friend_6.type === "official") text_146 = "<button type=\"button\" class=\"chat-menu-btn im-chat-icon-btn official-settings-btn\" aria-label=\"office 设置\" title=\"office 设置\"><i class=\"fas fa-bars\"></i></button>";else isNpcChat ? text_146 = "<button type=\"button\" class=\"chat-menu-btn im-chat-icon-btn\" aria-label=\"聊天设置\" title=\"聊天设置\"><i class=\"fas fa-bars\" aria-hidden=\"true\"></i></button>" : text_146 = "<button type=\"button\" class=\"chat-menu-btn im-chat-icon-btn\" aria-label=\"Chat Settings\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><polygon points=\"23 7 16 12 23 17 23 7\"></polygon><rect x=\"1\" y=\"5\" width=\"15\" height=\"14\" rx=\"2\" ry=\"2\"></rect></svg></button>";
       }
-      const value_147 = isGroupChat ? "<button type=\"button\" class=\"chat-back-btn im-chat-back-btn im-chat-group-back-btn\" aria-label=\"返回聊天列表\" title=\"返回聊天列表\"><i class=\"fas fa-chevron-left\" aria-hidden=\"true\"></i></button>" : "<button type=\"button\" class=\"chat-back-btn im-chat-back-btn\" aria-label=\"返回聊天列表\" title=\"返回聊天列表\"><i class=\"fas fa-chevron-left\" aria-hidden=\"true\"></i></button>";
+      const value_147 = isGroupChat ? "<button type=\"button\" class=\"chat-back-btn im-chat-back-btn im-chat-group-back-btn\" aria-label=\"返回聊天列表\" title=\"返回聊天列表\"><i class=\"fas fa-chevron-left\" aria-hidden=\"true\"></i></button>" : isCharChat ? "<div class=\"chat-back-btn im-chat-back-btn\" role=\"button\"><svg class=\"im-chat-back-chevron\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M15 6 L8.5 12 L15 18\"></path></svg><span class=\"im-chat-back-count\"></span></div><button type=\"button\" class=\"im-chat-back-restore-hotspot\" aria-label=\"编辑数字\" hidden></button>" : "<button type=\"button\" class=\"chat-back-btn im-chat-back-btn\" aria-label=\"返回聊天列表\" title=\"返回聊天列表\"><i class=\"fas fa-chevron-left\" aria-hidden=\"true\"></i></button>";
       let text_148 = "";
       isGroupChat ? text_148 = "\n                    <div class=\"chat-top-bar\" style=\"" + value_144 + "\">\n                        " + value_147 + "\n                        <div style=\"display: flex; align-items: center; justify-content: center; flex: 1; pointer-events: none;\" class=\"ins-chat-header\" id=\"active-chat-header\">\n                            " + text_145 + "\n                        </div>\n                        <div id=\"active-chat-right-avatar-container\">\n                            " + text_146 + "\n                        </div>\n                    </div>\n                " : text_148 = "\n                    <div class=\"chat-top-bar im-chat-top-bar\">\n                        <div class=\"im-chat-header-left\">\n                            " + value_147 + "\n                            <div class=\"ins-chat-header im-chat-header-main\">\n                                " + text_145 + "\n                            </div>\n                        </div>\n                        <div class=\"im-chat-actions\">\n                            " + text_146 + "\n                        </div>\n                    </div>\n                ";
-      page_9.innerHTML = "\n                <div class=\"chat-sticky-container " + (isGroupChat ? "is-group" : "is-friend") + "\">\n                    " + text_148 + "\n                    <div class=\"chat-batch-header\" style=\"display:none; align-items:center; justify-content:space-between; min-height:46px; padding:0 14px; color:#111; pointer-events:auto;\">\n                        <button type=\"button\" class=\"chat-cancel-batch-btn im-chat-cancel-batch-btn\">取消</button>\n                        <div class=\"chat-batch-selection-count\" style=\"font-size:16px; font-weight:600;\">已选择 0 条</div>\n                        <div class=\"chat-batch-actions\">\n                            <button type=\"button\" class=\"batch-forward-btn\">转发</button>\n                            <button type=\"button\" class=\"batch-delete-btn\">删除</button>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"ins-chat-messages\"></div>\n                <button type=\"button\" class=\"im-chat-scroll-latest\" aria-label=\"回到最新消息\" aria-hidden=\"true\" tabindex=\"-1\">\n                    <i class=\"fas fa-chevron-down\" aria-hidden=\"true\"></i>\n                </button>\n                <div class=\"ins-chat-input-container\">\n                    <div class=\"im-together-listening-player\" hidden>\n                        <button class=\"im-together-listening-main\" type=\"button\" aria-label=\"打开正在播放\">\n                            <span class=\"im-together-listening-art\"><i class=\"fas fa-music\"></i></span>\n                            <span class=\"im-together-listening-copy\"><strong class=\"im-together-listening-title\">未知歌曲</strong><small class=\"im-together-listening-artist\">未知歌手</small></span>\n                        </button>\n                        <button class=\"im-together-listening-control\" type=\"button\" data-together-listening-control=\"toggle\" aria-label=\"播放\"><i class=\"fas fa-play\"></i></button>\n                        <button class=\"im-together-listening-control\" type=\"button\" data-together-listening-control=\"next\" aria-label=\"下一首\"><i class=\"fas fa-forward-step\"></i></button>\n                        <span class=\"im-together-listening-progress\"></span>\n                    </div>\n                    <div class=\"reply-preview-container\" style=\"display:none; padding: 10px 14px; background: #f2f2f7; border-radius: 18px; margin-bottom: 10px; font-size: 13px; color: #8e8e93; position: relative; margin-left: 10px; margin-right: 10px; max-width: fit-content; border: 1px solid #e5e5ea; \">\n                        <div class=\"reply-preview-text\" style=\"white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 24px; color: #333; max-width: 250px;\"></div>\n                        <button type=\"button\" class=\"reply-cancel-btn\" aria-label=\"取消回复\" title=\"取消回复\" style=\"position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; border-radius: 50%; background: #ccc; color: #fff; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 10px;\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n                    </div>\n                    <div class=\"ins-chat-input-wrapper\">\n                        " + (isNpcChat ? "" : "<button type=\"button\" class=\"ins-input-icon plus-btn\" aria-label=\"添加附件\" title=\"添加附件\"><i class=\"fas fa-plus\" aria-hidden=\"true\"></i></button>") + "\n                        <input type=\"text\" placeholder=\"imessage...\" class=\"ins-message-input chat-input\" inputmode=\"text\" enterkeyhint=\"send\" autocomplete=\"off\">\n                        <div class=\"im-chat-input-actions\">\n                            " + (value_134 ? "<button type=\"button\" class=\"send-btn-icon mic-btn official-send-control\" aria-label=\"发送给LHV\" title=\"发送给LHV\"><i class=\"fas fa-arrow-up\"></i></button>" : "<button type=\"button\" class=\"send-btn-icon send-btn\" aria-label=\"发送消息\" title=\"发送消息\"><i class=\"fas fa-paper-plane\" aria-hidden=\"true\"></i></button><button type=\"button\" class=\"send-btn-icon mic-btn\" aria-label=\"生成回复\" title=\"生成回复\"><i class=\"fas fa-arrow-down\" aria-hidden=\"true\"></i></button>") + "\n                        </div>\n                    </div>\n                    " + (isGroupChat ? "\n                    <div class=\"im-left-group-bar\" style=\"display:none; align-items:center; justify-content:space-between; gap:10px; margin:0 10px; padding:8px 10px; border-radius:22px; background:#f2f2f7; border:1px solid #e5e5ea;\">\n                        <div class=\"im-left-group-label\" style=\"font-size:14px; color:#8e8e93; font-weight:600; white-space:nowrap;\">" + (friend_6.groupObserverMode ? "旁观群聊" : "已退出该群") + "</div>\n                        <div style=\"display:flex; align-items:center; gap:8px; min-width:0;\">\n                            <button type=\"button\" class=\"im-left-group-rejoin-btn\" style=\"display:" + (friend_6.groupObserverMode ? "none" : "") + "; border:0; border-radius:18px; background:#007aff; color:#fff; height:34px; padding:0 12px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap;\">重新进入</button>\n                            <button type=\"button\" class=\"im-left-group-ai-btn\" aria-label=\"推进剧情\" title=\"推进剧情\" style=\"border:0; border-radius:50%; background:#1c1c1e; color:#fff; width:34px; height:34px; padding:0; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer; flex-shrink:0;\"><i class=\"fas fa-arrow-down\"></i></button>\n                        </div>\n                    </div>\n                    " : "") + "\n                </div>\n            ";
+      page_9.innerHTML = "\n                <div class=\"chat-sticky-container " + (isGroupChat ? "is-group" : "is-friend") + "\">\n                    " + text_148 + "\n                    <div class=\"chat-batch-header\" style=\"display:none; align-items:center; justify-content:space-between; min-height:46px; padding:0 14px; color:#111; pointer-events:auto;\">\n                        <button type=\"button\" class=\"chat-cancel-batch-btn im-chat-cancel-batch-btn\">取消</button>\n                        <div class=\"chat-batch-selection-count\" style=\"font-size:16px; font-weight:600;\">已选择 0 条</div>\n                        <div class=\"chat-batch-actions\">\n                            <button type=\"button\" class=\"batch-forward-btn\">转发</button>\n                            <button type=\"button\" class=\"batch-delete-btn\">删除</button>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"ins-chat-messages\"></div>\n                <button type=\"button\" class=\"im-chat-scroll-latest\" aria-label=\"回到最新消息\" aria-hidden=\"true\" tabindex=\"-1\">\n                    <i class=\"fas fa-chevron-down\" aria-hidden=\"true\"></i>\n                </button>\n                <div class=\"ins-chat-input-container\">\n                    <div class=\"im-together-listening-player\" hidden>\n                        <button class=\"im-together-listening-main\" type=\"button\" aria-label=\"打开正在播放\">\n                            <span class=\"im-together-listening-art\"><i class=\"fas fa-music\"></i></span>\n                            <span class=\"im-together-listening-copy\"><strong class=\"im-together-listening-title\">未知歌曲</strong><small class=\"im-together-listening-artist\">未知歌手</small></span>\n                        </button>\n                        <button class=\"im-together-listening-control\" type=\"button\" data-together-listening-control=\"toggle\" aria-label=\"播放\"><i class=\"fas fa-play\"></i></button>\n                        <button class=\"im-together-listening-control\" type=\"button\" data-together-listening-control=\"next\" aria-label=\"下一首\"><i class=\"fas fa-forward-step\"></i></button>\n                        <span class=\"im-together-listening-progress\"></span>\n                    </div>\n                    <div class=\"reply-preview-container\" style=\"display:none; padding: 10px 14px; background: #f2f2f7; border-radius: 18px; margin-bottom: 10px; font-size: 13px; color: #8e8e93; position: relative; margin-left: 10px; margin-right: 10px; max-width: fit-content; border: 1px solid #e5e5ea; \">\n                        <div class=\"reply-preview-text\" style=\"white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 24px; color: #333; max-width: 250px;\"></div>\n                        <button type=\"button\" class=\"reply-cancel-btn\" aria-label=\"取消回复\" title=\"取消回复\" style=\"position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; border-radius: 50%; background: #ccc; color: #fff; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 10px;\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n                    </div>\n                    <div class=\"ins-chat-input-wrapper\">\n                        " + (isNpcChat ? "" : "<button type=\"button\" class=\"ins-input-icon plus-btn\" aria-label=\"添加附件\" title=\"添加附件\"><i class=\"fas fa-plus\" aria-hidden=\"true\"></i></button>") + "\n                        <input type=\"text\" placeholder=\"iMessage\" class=\"ins-message-input chat-input\" inputmode=\"text\" enterkeyhint=\"send\" autocomplete=\"off\">\n                        <div class=\"im-chat-input-actions\">\n                            " + (value_134 ? "<button type=\"button\" class=\"send-btn-icon mic-btn official-send-control\" aria-label=\"发送给LHV\" title=\"发送给LHV\"><i class=\"fas fa-arrow-up\"></i></button>" : "<button type=\"button\" class=\"send-btn-icon send-btn\" aria-label=\"发送消息\" title=\"发送消息\"><i class=\"fas fa-paper-plane\" aria-hidden=\"true\"></i></button><button type=\"button\" class=\"send-btn-icon mic-btn\" aria-label=\"生成回复\" title=\"生成回复\"><i class=\"fas fa-microphone\" aria-hidden=\"true\"></i></button>") + "\n                        </div>\n                    </div>\n                    " + (isGroupChat ? "\n                    <div class=\"im-left-group-bar\" style=\"display:none; align-items:center; justify-content:space-between; gap:10px; margin:0 10px; padding:8px 10px; border-radius:22px; background:#f2f2f7; border:1px solid #e5e5ea;\">\n                        <div class=\"im-left-group-label\" style=\"font-size:14px; color:#8e8e93; font-weight:600; white-space:nowrap;\">" + (friend_6.groupObserverMode ? "旁观群聊" : "已退出该群") + "</div>\n                        <div style=\"display:flex; align-items:center; gap:8px; min-width:0;\">\n                            <button type=\"button\" class=\"im-left-group-rejoin-btn\" style=\"display:" + (friend_6.groupObserverMode ? "none" : "") + "; border:0; border-radius:18px; background:#007aff; color:#fff; height:34px; padding:0 12px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap;\">重新进入</button>\n                            <button type=\"button\" class=\"im-left-group-ai-btn\" aria-label=\"推进剧情\" title=\"推进剧情\" style=\"border:0; border-radius:50%; background:#1c1c1e; color:#fff; width:34px; height:34px; padding:0; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer; flex-shrink:0;\"><i class=\"fas fa-arrow-down\"></i></button>\n                        </div>\n                    </div>\n                    " : "") + "\n                </div>\n            ";
       if (chatsContent_2) chatsContent_2.appendChild(page_9);
       handleAction_20_128.shell?.remove();
       window.imApp.applyFriendCss && window.imApp.applyFriendCss(friend_6);
       window.imApp.applyGlobalChatCss && window.imApp.applyGlobalChatCss(window.u2ThemeState || {});
       const backBtn = page_9.querySelector(".chat-back-btn");
+      if (backBtn && isCharChat) {
+        renderChatBackBadge(page_9);
+        const badge = page_9.querySelector(".im-chat-back-count"),
+          restoreHotspot = page_9.querySelector(".im-chat-back-restore-hotspot");
+        badge?.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          openChatBackBadgeEditor(page_9);
+        });
+        restoreHotspot?.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          openChatBackBadgeEditor(page_9);
+        });
+      }
       backBtn && backBtn.addEventListener("click", () => {
         if (profilePanelOverlay) {
           const latestFriend = window.imApp.getFriendById(friend_6) || friend_6;
@@ -444,7 +546,6 @@
       });
       const cancelBatchBtn = page_9.querySelector(".chat-cancel-batch-btn"),
         menuBtn = page_9.querySelector(".chat-menu-btn"),
-        callBtn = page_9.querySelector(".chat-call-btn"),
         batchForwardBtnElement_149 = page_9.querySelector(".batch-forward-btn"),
         batchDeleteBtnElement_150 = page_9.querySelector(".batch-delete-btn");
       function exitBatchSelectMode_3() {
@@ -452,75 +553,6 @@
       }
       window.imChat.ensureTransferDetailOverlayForExistingPage(page_9, friend_6);
       window.imChat.ensureRedPacketDetailOverlayForExistingPage(page_9, friend_6);
-      callBtn && callBtn.addEventListener("click", () => {
-        const friendId_9 = String(friend_6?.id ?? "").trim();
-        if (!friendId_9) return;
-        let callOverlay = document.getElementById("custom-call-overlay");
-        if (!callOverlay) {
-          callOverlay = document.createElement("div");
-          callOverlay.id = "custom-call-overlay";
-          callOverlay.style.position = "fixed";
-          callOverlay.style.inset = "0";
-          callOverlay.style.backgroundColor = "rgba(0,0,0,0.4)";
-          callOverlay.style.zIndex = "10000";
-          callOverlay.style.display = "flex";
-          callOverlay.style.alignItems = "flex-end";
-          callOverlay.style.justifyContent = "center";
-          const sheet_2 = document.createElement("div");
-          sheet_2.style.width = "100%";
-          sheet_2.style.backgroundColor = "transparent";
-          sheet_2.style.padding = "10px";
-          sheet_2.style.boxSizing = "border-box";
-          sheet_2.style.paddingBottom = "max(10px, env(safe-area-inset-bottom))";
-          const menuGroup = document.createElement("div");
-          menuGroup.style.backgroundColor = "#fff";
-          menuGroup.style.borderRadius = "14px";
-          menuGroup.style.overflow = "hidden";
-          const videoBtn = document.createElement("div");
-          videoBtn.innerText = "视频通话";
-          videoBtn.style.padding = "18px 0";
-          videoBtn.style.textAlign = "center";
-          videoBtn.style.fontSize = "20px";
-          videoBtn.style.color = "#007aff";
-          videoBtn.style.borderBottom = "1px solid #e5e5ea";
-          videoBtn.style.cursor = "pointer";
-          videoBtn.addEventListener("click", e_2 => {
-            e_2.stopPropagation();
-            callOverlay.style.display = "none";
-            if (window.showToast) window.showToast("视频通话功能开发中...");
-          });
-          const element_169 = document.createElement("div");
-          element_169.innerText = "语音通话";
-          element_169.style.padding = "18px 0";
-          element_169.style.textAlign = "center";
-          element_169.style.fontSize = "20px";
-          element_169.style.color = "#007aff";
-          element_169.style.cursor = "pointer";
-          element_169.addEventListener("click", event_171 => {
-            event_171.stopPropagation();
-            callOverlay.style.display = "none";
-            const friendId_8 = String(callOverlay.dataset.friendId || "").trim(),
-              friend_7 = window.imApp?.getFriendById?.(friendId_8) || (window.imData?.friends || []).find(item_6 => String(item_6.id) === friendId_8);
-            if (!friend_7) {
-              if (window.showToast) window.showToast("联系人不存在或已被删除");
-              return;
-            }
-            if (window.imChat && window.imChat.openVoiceCall) window.imChat.openVoiceCall(friend_7);else {
-              if (window.showToast) window.showToast("语音通话准备中...");
-            }
-          });
-          menuGroup.appendChild(videoBtn);
-          menuGroup.appendChild(element_169);
-          sheet_2.appendChild(menuGroup);
-          callOverlay.appendChild(sheet_2);
-          document.body.appendChild(callOverlay);
-          callOverlay.addEventListener("click", event_175 => {
-            event_175.target === callOverlay && (callOverlay.style.display = "none");
-          });
-        }
-        callOverlay.dataset.friendId = friendId_9;
-        callOverlay.style.display = "flex";
-      });
       cancelBatchBtn && cancelBatchBtn.addEventListener("click", () => {
         exitBatchSelectMode_3();
       });

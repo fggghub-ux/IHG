@@ -672,7 +672,7 @@
       UI.inputs.detailPhone.value = "";
       if (UI.inputs.detailSignature) UI.inputs.detailSignature.value = "";
       UI.inputs.detailPersona.value = "";
-      setDetailAvatar(null);
+      setDetailAvatar(DEFAULT_USER_AVATAR_URL);
       openView(UI.overlays.personaDetail);
     });
     document.getElementById("save-id-btn")?.addEventListener("click", () => {

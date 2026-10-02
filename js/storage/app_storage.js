@@ -2483,6 +2483,9 @@
       payStatus: safe.payStatus,
       claimed: !!safe.claimed,
       imageSource: safe.imageSource,
+      imageGroupId: typeof safe.imageGroupId === 'string' ? safe.imageGroupId : '',
+      imageGroupIndex: Math.max(0, Number(safe.imageGroupIndex) || 0),
+      imageGroupCount: Math.max(0, Number(safe.imageGroupCount) || 0),
       imageProvider: typeof safe.imageProvider === 'string' ? safe.imageProvider : '',
       imageModel: typeof safe.imageModel === 'string' ? safe.imageModel : '',
       imageSize: typeof safe.imageSize === 'string' ? safe.imageSize : '',
@@ -2667,6 +2670,9 @@
       payStatus: row.payStatus,
       claimed: !!row.claimed,
       imageSource: row.imageSource,
+      imageGroupId: row.imageGroupId || '',
+      imageGroupIndex: Math.max(0, Number(row.imageGroupIndex) || 0),
+      imageGroupCount: Math.max(0, Number(row.imageGroupCount) || 0),
       imageProvider: row.imageProvider || '',
       imageModel: row.imageModel || '',
       imageSize: row.imageSize || '',
@@ -2848,7 +2854,8 @@
   }
   async function buildFriendMessageSummary(messages) {
     const list = Array.isArray(messages) ? messages : [];
-    const lastMessage = list.length > 0 ? list[list.length - 1] : null;
+    const visibleList = list.filter(message => message?.role !== "system" && message?.type !== "hidden_context");
+    const lastMessage = visibleList.length > 0 ? visibleList[visibleList.length - 1] : null;
     let previewText = '';
     if (lastMessage) {
       if (lastMessage.type === 'image') {

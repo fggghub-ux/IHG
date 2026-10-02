@@ -5,6 +5,7 @@
       showToast: showToast_2
     } = window,
     addCharBtn = document.getElementById("add-char-btn"),
+    chatsAddFriendBtn = document.getElementById("chats-add-friend-btn"),
     friendActionsSheet = document.getElementById("friend-actions-sheet"),
     openAddFriendSheetBtn = document.getElementById("open-add-friend-sheet-btn"),
     newFriendsBtn = document.getElementById("new-friends-btn"),
@@ -86,6 +87,9 @@
   }
   addCharBtn && addCharBtn.addEventListener("click", () => {
     friendActionsSheet ? typeof window.openView === "function" ? window.openView(friendActionsSheet) : friendActionsSheet.style.display = "flex" : handleAction_11();
+  });
+  chatsAddFriendBtn && chatsAddFriendBtn.addEventListener("click", () => {
+    handleAction_11();
   });
   openAddFriendSheetBtn && openAddFriendSheetBtn.addEventListener("click", () => {
     if (friendActionsSheet && typeof window.closeView === "function") window.closeView(friendActionsSheet);else friendActionsSheet && (friendActionsSheet.style.display = "none");
