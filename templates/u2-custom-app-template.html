@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+        <!-- 修改元数据；更新 App 时请保持 u2-app-id 不变。 -->
+        <meta name="u2-app-id" content="my.first.game" />
+        <meta name="u2-app-name" content="心动小游戏" />
+        <meta name="u2-app-version" content="1.1.0" />
+        <meta
+            name="u2-app-description"
+            content="展示角色与 User 人设注入、调用 AI 并保存进度的聊天式示例。"
+        />
+        <meta name="u2-app-icon" content="💗" />
+        <meta name="u2-app-permissions" content="characters profile ai" />
+        <title>心动小游戏</title>
+        <style>
+            :root { color-scheme: light; --ink: #201c22; --muted: #7c747e; --line: rgba(67, 48, 62, 0.09); --accent: #ee6f91; --accent-deep: #d95077; --surface: rgba(255, 255, 255, 0.92); }
+            * { box-sizing: border-box; }
+            [hidden] { display: none !important; }
+            html, body { min-height: 100%; }
+            body { margin: 0; min-height: 100vh; padding: calc(28px + env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); background: radial-gradient(circle at 15% 2%, rgba(255, 205, 218, 0.76), transparent 36%), linear-gradient(180deg, #fff9fb 0%, #f8f4f7 55%, #f3f1f5 100%); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+            button, select { font: inherit; }
+            button { -webkit-tap-highlight-color: transparent; }
+            main { width: min(440px, 100%); margin: 0 auto; }
+            .eyebrow { margin: 0 0 8px; color: var(--accent-deep); font-size: 11px; font-weight: 800; letter-spacing: 0.16em; }
+            h1 { margin: 0; font-size: clamp(30px, 9vw, 40px); line-height: 1.08; letter-spacing: -0.04em; }
+            .intro { margin: 10px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+            .panel { margin-top: 24px; padding: 16px; border: 1px solid rgba(255, 255, 255, 0.78); border-radius: 26px; background: var(--surface); box-shadow: 0 18px 55px rgba(81, 48, 65, 0.11); }
+            .section-label { display: block; margin: 0 0 10px 2px; color: #9a8791; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+            .character-picker { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) 30px; gap: 12px; align-items: center; min-height: 84px; padding: 13px; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: #fff; }
+            .character-picker select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+            .avatar { position: relative; width: 56px; height: 56px; overflow: hidden; border-radius: 50%; background: linear-gradient(145deg, #f9bfd0, #e9799a); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7); }
+            .avatar.small { width: 34px; height: 34px; flex: 0 0 34px; }
+            .avatar img { width: 100%; height: 100%; display: block; object-fit: cover; }
+            .avatar-fallback { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 22px; font-weight: 800; }
+            .avatar.small .avatar-fallback { font-size: 14px; }
+            .character-copy { min-width: 0; }
+            .character-copy small { display: block; margin-bottom: 4px; color: var(--muted); font-size: 11px; }
+            .character-copy strong { display: block; overflow: hidden; font-size: 17px; text-overflow: ellipsis; white-space: nowrap; }
+            .character-copy p { margin: 5px 0 0; overflow: hidden; color: #918991; font-size: 12px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+            .picker-arrow { color: #aa9da5; font-size: 26px; line-height: 1; text-align: center; }
+            .score-card { display: flex; align-items: center; justify-content: space-between; margin-top: 13px; padding: 16px 18px; border-radius: 20px; background: #2c262c; color: #fff; }
+            .score-copy span { display: block; color: rgba(255, 255, 255, 0.58); font-size: 11px; font-weight: 700; letter-spacing: 0.09em; }
+            .score-copy strong { display: block; margin-top: 3px; font-size: 23px; }
+            .score-value { display: flex; align-items: baseline; gap: 6px; }
+            .score-value strong { font-size: 42px; line-height: 1; letter-spacing: -0.05em; }
+            .score-value span { color: #f9a4bc; font-size: 18px; }
+            .actions { display: grid; grid-template-columns: 0.86fr 1.14fr; gap: 10px; margin-top: 13px; }
+            .actions button { min-height: 48px; padding: 0 14px; border: 0; border-radius: 16px; cursor: pointer; font-weight: 800; }
+            #add { background: #f4edf1; color: #352d32; }
+            #ask { background: linear-gradient(135deg, var(--accent), var(--accent-deep)); color: #fff; box-shadow: 0 9px 20px rgba(217, 80, 119, 0.23); }
+            .actions button:disabled { cursor: default; opacity: 0.48; box-shadow: none; }
+            .conversation { margin-top: 22px; }
+            .bubble-row { display: flex; align-items: flex-end; gap: 9px; }
+            .bubble-stack { min-width: 0; max-width: calc(100% - 43px); }
+            .bubble-name { display: block; margin: 0 0 5px 4px; color: var(--muted); font-size: 11px; font-weight: 700; }
+            .bubble { min-height: 44px; padding: 12px 15px; border: 1px solid var(--line); border-radius: 18px 18px 18px 5px; background: #fff; color: #342d32; font-size: 14px; line-height: 1.6; white-space: pre-wrap; box-shadow: 0 8px 22px rgba(72, 48, 61, 0.07); }
+            .typing { display: inline-flex; gap: 4px; align-items: center; min-width: 42px; min-height: 22px; }
+            .typing i { width: 6px; height: 6px; border-radius: 50%; background: #b9aeb5; animation: pulse 1s infinite ease-in-out; }
+            .typing i:nth-child(2) { animation-delay: 0.14s; }
+            .typing i:nth-child(3) { animation-delay: 0.28s; }
+            .status { min-height: 18px; margin: 12px 3px 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+            .status.error { color: #c83d54; font-weight: 700; }
+            @keyframes pulse { 0%, 60%, 100% { transform: translateY(0); opacity: 0.45; } 30% { transform: translateY(-4px); opacity: 1; } }
+            @media (max-width: 360px) { .actions { grid-template-columns: 1fr; } .character-picker { grid-template-columns: 50px minmax(0, 1fr) 24px; } .avatar { width: 50px; height: 50px; } }
+            @media (prefers-reduced-motion: reduce) { .typing i { animation: none; } }
+        </style>
+    </head>
+    <body>
+        <main>
+            <p class="eyebrow">U2PHONE MINI APP</p>
+            <h1>心动小游戏</h1>
+            <p class="intro">选择一位 Char，积累属于你们的心动值，然后听听 TA 此刻想说的话。</p>
+            <section class="panel">
+                <span class="section-label">Your character</span>
+                <label class="character-picker" for="character">
+                    <span class="avatar" aria-hidden="true"
+                        ><img id="character-avatar" alt="" hidden /><span
+                            class="avatar-fallback"
+                            id="character-avatar-fallback"
+                            >?</span
+                        ></span
+                    >
+                    <span class="character-copy"
+                        ><small>当前角色</small><strong id="character-name">正在读取角色…</strong
+                        ><p id="character-description">角色资料将显示在这里</p></span
+                    >
+                    <span class="picker-arrow" aria-hidden="true">›</span>
+                    <select id="character" aria-label="选择角色" disabled
+                        ><option>正在读取角色…</option></select
+                    >
+                </label>
+                <div class="score-card">
+                    <div class="score-copy"><span>HEARTBEAT</span><strong>心动值</strong></div>
+                    <div class="score-value"><strong id="score">0</strong><span>♥</span></div>
+                </div>
+                <div class="actions">
+                    <button id="add" type="button" disabled>心动 +1</button>
+                    <button id="ask" type="button" disabled>听听 TA 怎么说</button>
+                </div>
+                <section class="conversation" id="conversation" aria-live="polite" hidden>
+                    <span class="section-label">Message</span>
+                    <div class="bubble-row">
+                        <span class="avatar small" aria-hidden="true"
+                            ><img id="bubble-avatar" alt="" hidden /><span
+                                class="avatar-fallback"
+                                id="bubble-avatar-fallback"
+                                >?</span
+                            ></span
+                        >
+                        <div class="bubble-stack"
+                            ><span class="bubble-name" id="bubble-name">Char</span
+                            ><div class="bubble" id="bubble"></div
+                        ></div>
+                    </div>
+                </section>
+                <p class="status" id="status" role="status"></p>
+            </section>
+        </main>
+        <script>
+            (async function () {
+                'use strict';
+
+                const api = window.U2App;
+                const elements = {
+                    select: document.getElementById('character'),
+                    avatar: document.getElementById('character-avatar'),
+                    avatarFallback: document.getElementById('character-avatar-fallback'),
+                    name: document.getElementById('character-name'),
+                    description: document.getElementById('character-description'),
+                    score: document.getElementById('score'),
+                    add: document.getElementById('add'),
+                    ask: document.getElementById('ask'),
+                    conversation: document.getElementById('conversation'),
+                    bubble: document.getElementById('bubble'),
+                    bubbleName: document.getElementById('bubble-name'),
+                    bubbleAvatar: document.getElementById('bubble-avatar'),
+                    bubbleAvatarFallback: document.getElementById('bubble-avatar-fallback'),
+                    status: document.getElementById('status'),
+                };
+                let characters = [];
+                let userProfile = {
+                    name: 'User',
+                    persona: '',
+                };
+                let score = 0;
+                function selectedCharacter() {
+                    return (
+                        characters.find(function (item) {
+                            return item.id === elements.select.value;
+                        }) || null
+                    );
+                }
+                function setStatus(text, isError) {
+                    elements.status.textContent = text || '';
+                    elements.status.classList.toggle('error', Boolean(isError));
+                }
+                function showAvatar(image, fallback, character) {
+                    const name = String((character && character.name) || '?').trim();
+                    const source = String((character && character.avatarUrl) || '').trim();
+                    fallback.textContent = name.slice(0, 1).toUpperCase() || '?';
+                    fallback.hidden = false;
+                    image.hidden = true;
+                    image.removeAttribute('src');
+                    if (!/^(data:image\/|blob:)/i.test(source)) return;
+                    image.onload = function () {
+                        image.hidden = false;
+                        fallback.hidden = true;
+                    };
+                    image.onerror = function () {
+                        image.hidden = true;
+                        fallback.hidden = false;
+                    };
+                    image.src = source;
+                }
+                function renderCharacter() {
+                    const character = selectedCharacter();
+                    if (!character) return;
+                    elements.name.textContent = character.name;
+                    elements.description.textContent = character.description || '还没有角色简介';
+                    elements.bubbleName.textContent = character.name;
+                    showAvatar(elements.avatar, elements.avatarFallback, character);
+                    showAvatar(elements.bubbleAvatar, elements.bubbleAvatarFallback, character);
+                }
+                function buildCharacterPrompt(character) {
+                    return [
+                        '角色名：' + character.name,
+                        '角色简介：' + (character.description || '未设置'),
+                        '角色人设：' + (character.persona || '未设置'),
+                        '与 User 的关系：' + (character.relationship || '未设置'),
+                    ].join(`
+                                    `);
+                }
+                function buildUserPrompt(profile) {
+                    return [
+                        'User 名字：' + (profile.name || 'User'),
+                        'User 人设：' + (profile.persona || '未设置'),
+                    ].join(`
+                                    `);
+                }
+                async function loadScore() {
+                    score = Number(await api.storage.get('score:' + elements.select.value, 0)) || 0;
+                    elements.score.textContent = String(score);
+                }
+                function showTypingBubble() {
+                    elements.conversation.hidden = false;
+                    elements.bubble.innerHTML =
+                        '<span class="typing" aria-label="正在输入"><i></i><i></i><i></i></span>';
+                }
+                try {
+                    if (!api) throw new Error('U2App API 未加载，请确保在 U2phone 环境中运行');
+                    await api.ready();
+                    // 可选能力：这里读取 User 名字与人设并注入提示词。
+                    // 如果你的 App 不需要它，可以删除这一行和 buildUserPrompt()，并从 u2-app-permissions 中移除 profile。
+                    userProfile = await api.profile.get();
+                    characters = await api.characters.list();
+                    elements.select.replaceChildren();
+                    characters.forEach(function (character) {
+                        const option = document.createElement('option');
+                        option.value = character.id;
+                        option.textContent = character.name;
+                        elements.select.appendChild(option);
+                    });
+                    if (!characters.length) {
+                        const option = document.createElement('option');
+                        option.textContent = '没有可用角色';
+                        elements.select.appendChild(option);
+                        throw new Error('请先在 iMessage 添加角色');
+                    }
+                    const savedId = await api.storage.get('selectedCharacterId', characters[0].id);
+                    elements.select.value = characters.some(function (item) {
+                        return item.id === savedId;
+                    })
+                        ? savedId
+                        : characters[0].id;
+                    elements.select.disabled = false;
+                    elements.add.disabled = false;
+                    elements.ask.disabled = false;
+                    renderCharacter();
+                    await loadScore();
+                } catch (error) {
+                    elements.name.textContent = '角色读取失败';
+                    elements.description.textContent = '请检查角色数据与 App 权限';
+                    setStatus(error.message || 'App 初始化失败', true);
+                }
+                elements.select.addEventListener('change', async function () {
+                    elements.conversation.hidden = true;
+                    renderCharacter();
+                    await api.storage.set('selectedCharacterId', elements.select.value);
+                    await loadScore();
+                    setStatus('');
+                });
+                elements.add.addEventListener('click', async function () {
+                    score += 1;
+                    elements.score.textContent = String(score);
+                    try {
+                        await api.storage.set('score:' + elements.select.value, score);
+                        await api.ui.toast('心动值已保存');
+                        setStatus('');
+                    } catch (error) {
+                        setStatus(error.message || '保存失败', true);
+                    }
+                });
+                elements.ask.addEventListener('click', async function () {
+                    const character = selectedCharacter();
+                    if (!character) return;
+                    elements.ask.disabled = true;
+                    elements.add.disabled = true;
+                    showTypingBubble();
+                    setStatus('正在等待 ' + character.name + ' 回应…');
+                    try {
+                        const result = await api.ai.chat({
+                            messages: [
+                                {
+                                    role: 'system',
+                                    content:
+                                        `请严格根据以下信息扮演 Char，并保持人设和与 User 的关系阶段一致。
+
+                                    ` +
+                                        buildCharacterPrompt(character) +
+                                        `
+
+                                    ` +
+                                        buildUserPrompt(userProfile) +
+                                        `
+
+                                    请自然回应；不要解释设定，也不要提及自己是 AI。`,
+                                },
+                                {
+                                    role: 'user',
+                                    content:
+                                        '我们之间的心动值是' +
+                                        score +
+                                        '。请用角色口吻，对我说一句此刻最想说的话。',
+                                },
+                            ],
+                            temperature: 0.8,
+                        });
+                        elements.bubble.textContent = result.text || '……';
+                        setStatus('');
+                    } catch (error) {
+                        elements.conversation.hidden = true;
+                        setStatus(error.message || 'AI 调用失败，请检查 U2phone API 设置', true);
+                    } finally {
+                        elements.ask.disabled = false;
+                        elements.add.disabled = false;
+                    }
+                });
+            })();
+        </script>
+    </body>
+</html>
