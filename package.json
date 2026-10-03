@@ -1,0 +1,17 @@
+{
+    "name": "phone-recovered-frontend",
+    "version": "0.0.0-recovered",
+    "private": true,
+    "description": "Readable u2phone 1.0.6 frontend, integrated from IHG/main with web interaction repairs.",
+    "scripts": {
+        "start": "node tools/dev-server.mjs",
+        "check": "node tools/check-source.mjs",
+        "format": "prettier --write ."
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "devDependencies": {
+        "prettier": "3.6.2"
+    }
+}
