@@ -1,0 +1,418 @@
+.app-view.im-video-call {
+    position: absolute;
+    inset: 0;
+    z-index: 1002;
+    display: none;
+    overflow: hidden;
+    padding: 0;
+    color: #fff;
+    background: #111318;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.app-view.im-video-call.active {
+    display: flex;
+}
+.im-video-call-stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: linear-gradient(145deg, #313b49, #111318);
+}
+.im-video-call-avatar,
+.im-video-call-avatar-fallback {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+}
+.im-video-call-avatar {
+    display: block;
+    object-fit: cover;
+    object-position: center;
+}
+.im-video-call-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 92px;
+    color: #f2f4f9a8;
+}
+.im-video-call-avatar[hidden],
+.im-video-call-avatar-fallback[hidden],
+.im-video-call-preview video[hidden],
+.im-video-call-preview img[hidden],
+.im-video-call-input-row[hidden] {
+    display: none;
+}
+.im-video-call-stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(180deg, #07090faa 0%, #080a102c 24%, #080a1029 52%, #07090fbb 100%);
+}
+.im-video-call.speaking .im-video-call-stage::after {
+    background: linear-gradient(180deg, #07090faa 0%, #10182929 26%, #10182920 55%, #07090fbb 100%);
+}
+.im-video-call-name,
+.im-video-call-status {
+    position: absolute;
+    z-index: 2;
+    left: 20px;
+    right: min(37vw, 175px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-shadow: 0 2px 12px #000c;
+}
+.im-video-call-name {
+    top: max(76px, calc(env(safe-area-inset-top) + 70px));
+    font-size: 24px;
+    font-weight: 650;
+}
+.im-video-call-status {
+    top: max(111px, calc(env(safe-area-inset-top) + 105px));
+    font-size: 13px;
+    color: #ffffffe0;
+}
+.im-video-call-preview {
+    position: absolute;
+    z-index: 3;
+    right: 16px;
+    top: max(60px, calc(env(safe-area-inset-top) + 52px));
+    width: min(28vw, 132px);
+    aspect-ratio: 3/4;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #25272d;
+    border: 1px solid #ffffff65;
+    box-shadow: 0 12px 30px #0009;
+}
+.im-video-call-preview video,
+.im-video-call-preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: #25272d;
+}
+.im-video-call-preview video.front {
+    transform: scaleX(-1);
+}
+.im-video-call-preview-label {
+    position: absolute;
+    inset: auto 0 0;
+    padding: 17px 5px 7px;
+    background: linear-gradient(transparent, #000b);
+    font-size: 10px;
+    text-align: center;
+    text-shadow: 0 1px 3px #000;
+}
+.im-video-call-top {
+    position: absolute;
+    z-index: 5;
+    left: 14px;
+    right: 14px;
+    top: max(10px, env(safe-area-inset-top));
+    display: flex;
+    justify-content: space-between;
+}
+.im-video-call-icon {
+    appearance: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 50%;
+    color: #fff;
+    background: #151923cf;
+    font-size: 17px;
+    cursor: pointer;
+}
+.im-video-call-icon[disabled] {
+    opacity: 0.38;
+    cursor: default;
+}
+.im-video-call-captions {
+    position: absolute;
+    z-index: 4;
+    left: 20px;
+    right: 20px;
+    top: max(165px, calc(env(safe-area-inset-top) + 145px));
+    bottom: max(180px, calc(env(safe-area-inset-bottom) + 160px));
+    overflow-y: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    text-align: center;
+    pointer-events: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+.im-video-call-captions::-webkit-scrollbar {
+    display: none;
+}
+.im-video-call-line {
+    margin: auto;
+    max-width: min(100%, 560px);
+    padding-bottom: 14px;
+    color: #fff;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    text-shadow:
+        0 2px 10px #000e,
+        0 1px 3px #000;
+}
+.im-video-call-segment {
+    padding: 5px 0;
+    animation: im-video-call-segment-in 0.35s ease-out both;
+}
+.im-video-call-segment + .im-video-call-segment {
+    margin-top: 10px;
+}
+@keyframes im-video-call-segment-in {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.im-video-call-original {
+    font-size: clamp(19px, 5.4vw, 27px);
+    line-height: 1.42;
+    font-weight: 630;
+}
+.im-video-call-translation {
+    margin-top: 11px;
+    color: #e8edf4e0;
+    font-size: clamp(13px, 3.7vw, 17px);
+    line-height: 1.4;
+    font-weight: 450;
+}
+.im-video-call-translation-label {
+    display: inline-block;
+    margin-right: 7px;
+    color: #d1ddedb8;
+    font-size: 11px;
+    font-weight: 700;
+    vertical-align: 2px;
+}
+.im-video-call-bottom {
+    position: absolute;
+    z-index: 5;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 28px 10px max(22px, env(safe-area-inset-bottom));
+    background: linear-gradient(transparent, #06080db3 24%, #06080deb 100%);
+}
+.im-video-call-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 1px;
+}
+.im-video-call-control {
+    appearance: none;
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: none;
+    color: #f4f5f8;
+    font-size: 10px;
+    cursor: pointer;
+}
+.im-video-call-control .im-video-call-icon {
+    width: 47px;
+    height: 47px;
+    background: #ffffff3a;
+    font-size: 19px;
+}
+.im-video-call-control.active .im-video-call-icon {
+    background: #f3f4f7;
+    color: #232732;
+}
+.im-video-call-control.hangup .im-video-call-icon {
+    background: #ee3e48;
+}
+.im-video-call-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 17px 8px 0;
+    min-width: 0;
+}
+.im-video-call-input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 14px;
+    border: 1px solid #ffffff30;
+    border-radius: 20px;
+    outline: 0;
+    color: #fff;
+    background: #ffffff21;
+    font-size: 14px;
+}
+.im-video-call-input::placeholder {
+    color: #ffffffb7;
+}
+.im-video-call-send {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #f0f2f6;
+    color: #1b2330;
+    font-size: 17px;
+    cursor: pointer;
+}
+.im-video-call-send:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+.app-keyboard-open .im-video-call .im-video-call-controls,
+.app-keyboard-open .im-video-call .im-video-call-preview,
+.im-video-call.im-video-call-keyboard-open .im-video-call-controls,
+.im-video-call.im-video-call-keyboard-open .im-video-call-preview {
+    display: none;
+}
+.app-keyboard-open .im-video-call .im-video-call-bottom,
+.im-video-call.im-video-call-keyboard-open .im-video-call-bottom {
+    padding: 8px 10px max(8px, env(safe-area-inset-bottom));
+}
+.app-keyboard-open .im-video-call .im-video-call-input-row,
+.im-video-call.im-video-call-keyboard-open .im-video-call-input-row {
+    margin: 0 4px;
+}
+.app-keyboard-open .im-video-call .im-video-call-captions,
+.im-video-call.im-video-call-keyboard-open .im-video-call-captions {
+    top: max(120px, calc(env(safe-area-inset-top) + 100px));
+    bottom: 76px;
+}
+.im-video-call-float {
+    display: none;
+    position: absolute;
+    z-index: 4;
+    right: 16px;
+    top: max(55px, env(safe-area-inset-top));
+    min-width: 90px;
+    padding: 10px;
+    border-radius: 18px;
+    background: #242830;
+    box-shadow: 0 7px 28px #0009;
+    text-align: center;
+    pointer-events: auto;
+    cursor: pointer;
+}
+.im-video-call.minimized {
+    pointer-events: none;
+    background: transparent;
+}
+.im-video-call.minimized .im-video-call-stage,
+.im-video-call.minimized .im-video-call-captions,
+.im-video-call.minimized .im-video-call-preview,
+.im-video-call.minimized .im-video-call-top,
+.im-video-call.minimized .im-video-call-bottom {
+    display: none;
+}
+.im-video-call.minimized .im-video-call-float {
+    display: block;
+}
+.im-video-call-config {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: #000a;
+}
+.im-video-call-config.open {
+    display: flex;
+}
+.im-video-call-config-card {
+    box-sizing: border-box;
+    width: min(100%, 370px);
+    max-height: calc(100vh - 40px);
+    max-height: calc(100dvh - 40px);
+    overflow-y: auto;
+    padding: 20px;
+    border-radius: 20px;
+    color: #15181c;
+    background: #f6f7fa;
+    box-shadow: 0 12px 40px #0007;
+}
+.im-video-call-config-card h2 {
+    font-size: 18px;
+    margin: 0 0 12px;
+}
+.im-video-call-config-card h3 {
+    font-size: 15px;
+    margin: 18px 0 8px;
+}
+.im-video-call-config-hint {
+    margin: 5px 0 10px;
+    color: #6a7078;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.im-video-call-config-card label {
+    display: block;
+    margin: 10px 0;
+    font-size: 13px;
+    color: #414852;
+}
+.im-video-call-config-card input,
+.im-video-call-config-card select {
+    box-sizing: border-box;
+    width: 100%;
+    display: block;
+    margin-top: 5px;
+    padding: 10px;
+    border: 1px solid #c5cad3;
+    border-radius: 9px;
+    background: #fff;
+    color: #15181c;
+    font: inherit;
+}
+.im-video-call-config-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 15px;
+}
+.im-video-call-config-actions button {
+    border: 0;
+    border-radius: 9px;
+    padding: 9px 14px;
+    background: #dfe3ea;
+}
+.im-video-call-config-actions button.primary {
+    background: #1876e8;
+    color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+    .im-video-call-segment {
+        animation: none;
+    }
+    .im-video-call-captions {
+        scroll-behavior: auto;
+    }
+}
