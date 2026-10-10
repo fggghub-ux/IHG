@@ -201,6 +201,15 @@ textarea,
     -webkit-overflow-scrolling: touch;
 }
 
+
+.toast-bubble.shop-success-toast {
+    white-space: nowrap;
+    text-align: center;
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .toast-bubble.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);

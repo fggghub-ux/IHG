@@ -118,6 +118,18 @@
                         String(candidate.getAttribute('data-message-id') || '') === messageId_2),
             );
         if (row_3) decorateMessageRowAvatar(row_3, friend_5, message_4);
+        if (message_4?.role === 'assistant') {
+            value_127?.querySelectorAll?.('.gift-message-card[data-gift-timestamp]').forEach(card => {
+                const giftTime = Number(card.dataset.giftTimestamp) || 0;
+                if ((Number(message_4.timestamp) || 0) <= giftTime) return;
+                card.classList.add('is-received');
+                const copy = card.querySelector('.gift-message-copy');
+                if (copy && !copy.querySelector('.gift-message-status')) {
+                    copy.insertAdjacentHTML('beforeend', '<div class="gift-message-status">Received</div>');
+                }
+            });
+        }
+
         return true;
     }
     function handleAction_20(
@@ -2280,6 +2292,10 @@
                 window.imChat.renderSystemNoticeBubble(msg_10, friend_16, container_6, msgTime),
                 true
             );
+        if (msg_10.type === 'gift' || (msg_10.type === 'html' && /Gift Received/i.test(`${msg_10.text || ''} ${msg_10.content || ''}`))) {
+            window.imChat.renderGiftBubble(msg_10, friend_16, container_6, msgTime);
+            return handleAction_19(msg_10, friend_16, container_6);
+        }
         if (msg_10.type === 'html')
             return (
                 window.imChat.renderHtmlBubble(msg_10, friend_16, container_6, msgTime),
@@ -2308,8 +2324,7 @@
                 safeSpeakerName = groupIdentity_3.name;
                 speakerAvatar_2 = groupIdentity_3.avatarUrl;
             }
-            return (
-                window.imChat.renderAiBubble(
+            window.imChat.renderAiBubble(
                     msg_10.content,
                     friend_16,
                     container_6,
@@ -2325,12 +2340,126 @@
                     msg_10.offlineAction || null,
                     msg_10.speakerMemberId || msg_10.senderMemberId || null,
                     msg_10,
-                ),
-                handleAction_19(msg_10, friend_16, container_6)
-            );
+                );
+            const acceptedGift = findGiftAcceptedByAssistant(msg_10, friend_16);
+            if (acceptedGift) {
+                const acceptanceId = `gift-accepted-${acceptedGift.id || acceptedGift.timestamp}`;
+                const alreadyRendered = Array.from(container_6.querySelectorAll('.chat-row[data-message-id]'))
+                    .some(row => String(row.dataset.messageId || '') === acceptanceId);
+                if (!alreadyRendered) {
+                    window.imChat.renderGiftBubble({
+                        ...acceptedGift,
+                        id: acceptanceId,
+                        role: 'assistant',
+                        giftStatus: 'received',
+                        status: 'received',
+                        syntheticGiftAcceptance: true,
+                        timestamp: msgTime
+                    }, friend_16, container_6, msgTime);
+                }
+            }
+            return handleAction_19(msg_10, friend_16, container_6);
         }
         return false;
     }
+    function normalizeGiftMessage(msg) {
+        const raw = `${msg?.text || ''} ${msg?.content || ''}`;
+        const legacyName = raw.match(/Pay for me\s*\n?\s*:\s*([^\n<]+)/i)?.[1]
+            || raw.match(/Gift Received:\s*([^。\n<]+)/i)?.[1]
+            || 'Gift';
+        const legacyValue = raw.match(/(?:Value|Price)\s*\$\s*([\d.]+)/i)?.[1];
+        const legacyReceived = msg?.type === 'html' && /Gift Received/i.test(raw);
+        return {
+            name: String(msg?.giftName || legacyName || 'Gift').trim(),
+            value: Math.max(0, Number(msg?.giftValue ?? legacyValue) || 0),
+            description: String(msg?.giftDescription || msg?.description || '').trim(),
+            status: legacyReceived || msg?.giftStatus === 'received' || msg?.status === 'received' ? 'received' : 'pending'
+        };
+    }
+
+    function findGiftAcceptedByAssistant(assistantMessage, friend) {
+        if (!assistantMessage || assistantMessage.role !== 'assistant') return null;
+        const messages = Array.isArray(friend?.messages) ? friend.messages : [];
+        let assistantIndex = messages.findIndex(message => message === assistantMessage);
+        if (assistantIndex < 0 && assistantMessage.id != null) {
+            assistantIndex = messages.findIndex(message => String(message?.id || '') === String(assistantMessage.id));
+        }
+        if (assistantIndex < 0) {
+            assistantIndex = messages.findIndex(message => Number(message?.timestamp) === Number(assistantMessage.timestamp));
+        }
+        if (assistantIndex < 0) return null;
+
+        for (let index = assistantIndex - 1; index >= 0; index -= 1) {
+            const candidate = messages[index];
+            if (!candidate || candidate.role === 'system' || candidate.type === 'hidden_context') continue;
+            if (candidate.role === 'assistant') return null;
+            if (candidate.type === 'gift' && candidate.role === 'user') return candidate;
+        }
+        return null;
+    }
+
+    function openGiftDetailOverlay(msg, friend, anchor) {
+        const page = anchor?.closest?.('.active-chat-interface');
+        if (!page) return;
+        page.querySelector('.gift-detail-overlay')?.remove();
+        const data = normalizeGiftMessage(msg);
+        const isUser = msg?.role === 'user';
+        const profile = isUser ? getEffectiveUserProfile(friend) : {
+            name: friend?.nickname || friend?.realName || friend?.name || 'Char',
+            avatarUrl: friend?.avatarUrl || friend?.avatar || 'assets/moren-thumb.jpg'
+        };
+        const overlay = document.createElement('div');
+        overlay.className = 'gift-detail-overlay';
+        overlay.innerHTML = `
+            <div class="gift-detail-card" role="dialog" aria-modal="true" aria-label="Gift details">
+                <div class="gift-detail-sender">
+                    <img class="gift-detail-avatar" src="${escapeHtml(profile.avatarUrl || 'assets/moren-thumb.jpg')}" alt="">
+                    <div class="gift-detail-sender-name">${escapeHtml(profile.name || (isUser ? 'User' : 'Char'))}</div>
+                </div>
+                <div class="gift-detail-name">${escapeHtml(data.name)}</div>
+                <div class="gift-detail-value">Value $${data.value.toFixed(2)}</div>
+                <div class="gift-detail-info"><div class="gift-detail-info-label">Details</div>${data.description ? `<div class="gift-detail-info-text">Note：${escapeHtml(data.description)}</div>` : ''}</div>
+            </div>`;
+        page.appendChild(overlay);
+        overlay.style.display = 'flex';
+        const close = (event) => {
+            if (event && event.target !== overlay) return;
+            overlay.remove();
+        };
+        overlay.addEventListener('click', close);
+    }
+
+    function renderGiftBubble(msg, friend, container, timestamp = Date.now()) {
+        const isUser = msg.role === 'user';
+        const rows = Array.from(container.children).filter(el => el.classList?.contains('chat-row'));
+        const lastRow = rows[rows.length - 1] || null;
+        let hasPrev = false;
+        if (lastRow?.classList.contains(isUser ? 'user-row' : 'ai-row')) {
+            hasPrev = true;
+            lastRow.classList.add('has-next');
+        }
+        const row = document.createElement('div');
+        row.className = `chat-row ${isUser ? 'user-row' : 'ai-row'}${hasPrev ? ' has-prev' : ''}`;
+        row.dataset.timestamp = String(timestamp);
+        row.dataset.messageId = window.imChat.ensureMessageId(msg, 'gift');
+        handleAction_20(row, friend, msg);
+        const data = normalizeGiftMessage(msg);
+        const bowSvg = `<svg class="gift-message-bow" viewBox="0 0 52 58" fill="none" aria-hidden="true"><path d="M25.8 27.5C16 16.1 7.4 15.1 5 20.3c-2.8 6.2 7.5 11.3 20.8 7.2Zm.4 0C36 16.1 44.6 15.1 47 20.3c2.8 6.2-7.5 11.3-20.8 7.2ZM26 27.5V56M13 31l13-3.5L7.5 48M39 31l-13-3.5L44.5 48M26 27.5V3" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        const card = `
+            <div class="gift-message-card im-card-content${data.status === 'received' ? ' is-received' : ''}" data-gift-timestamp="${timestamp}" role="button" tabindex="0">
+                <div class="gift-message-main">${bowSvg}<div class="gift-message-copy"><div class="gift-message-title">A Gift For You</div>${data.status === 'received' ? '<div class="gift-message-status">Received</div>' : ''}</div></div>
+                <div class="gift-message-footer">Gift</div>
+            </div>`;
+        const headerHtml = buildMessageHeaderHtml(isUser, friend, timestamp, null, null, hasPrev, msg);
+        row.innerHTML = `<div class="chat-checkbox-wrapper" style="display:${window.imData.batchSelectMode ? 'flex' : 'none'};width:40px;justify-content:center;align-items:flex-end;padding-bottom:10px;flex-shrink:0;"><i class="far fa-circle chat-checkbox" data-timestamp="${timestamp}" style="color:#c7c7cc;font-size:22px;"></i></div><div style="flex:1;display:flex;flex-direction:column;min-width:0;">${headerHtml}<div style="display:flex;justify-content:${isUser ? 'flex-end' : 'flex-start'};align-items:flex-end;width:100%;"><div class="chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'} im-card-bubble gift-message-bubble">${card}</div></div></div>`;
+        const cardEl = row.querySelector('.gift-message-card');
+        cardEl?.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); openGiftDetailOverlay(msg, friend, cardEl); });
+        cardEl?.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openGiftDetailOverlay(msg, friend, cardEl); } });
+        container.appendChild(row);
+        decorateMessageRowAvatar(row, friend, msg);
+        window.imChat.scrollToBottom(container);
+    }
+
     function getMessageUserRoundCount(value_429, value_430 = 0, endIndex_2 = null) {
         const safeMessages_2 = Array.isArray(value_429) ? value_429 : [];
         let count_2 = 0;
@@ -6060,6 +6189,7 @@
     window.imChat.renderGroupRedPacketBubble = renderGroupRedPacketBubble_2;
     window.imChat.renderStickerMessageBubble = renderStickerMessageBubble_2;
     window.imChat.openRecalledMessageDetail = openRecalledMessageDetail_2;
+    window.imChat.renderGiftBubble = renderGiftBubble;
     window.imChat.renderMessageBubble = renderMessageBubble_3;
     window.imChat.renderGroupPollBubble = renderGroupPollBubble_2;
     window.imChat.appendMessageToContainer = appendMessageToContainer_3;

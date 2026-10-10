@@ -7425,7 +7425,7 @@ input:checked + .slider:before {
 #moments-content {
     position: absolute;
     inset: 0;
-    z-index: 130;
+    z-index: 90;
     background-color: #fff;
     display: none;
     flex-direction: column;
@@ -9040,7 +9040,7 @@ input:checked + .slider:before {
     align-items: center;
     gap: 15px;
     border-bottom: 1px solid #f2f2f2;
-    cursor: pointer; 
+    cursor: pointer;
 }
 
 .settings-avatar {
@@ -17695,3 +17695,60 @@ button.moment-private-chat-bubble.has-translation {
     font-weight: 700;
     cursor: pointer;
 }
+
+/* Blue gift cards adapted to the compact WeChat gift proportions. */
+.chat-row .chat-bubble.gift-message-bubble {
+    width: 213px !important;
+    min-width: 213px !important;
+    max-width: 213px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    overflow: visible !important;
+}
+
+.gift-message-card {
+    position: relative;
+    width: 213px;
+    height: 85px;
+    box-sizing: border-box;
+    overflow: visible;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #3159a9 0%, #23478f 100%);
+    color: rgba(255,255,255,.92);
+    box-shadow: 0 3px 9px rgba(29,65,135,.16);
+    cursor: pointer;
+}
+
+.gift-message-card.is-received { background: linear-gradient(135deg, #798db9 0%, #657ba8 100%); }
+.gift-message-card::after { content:''; position:absolute; top:19px; width:0; height:0; background:none; transform:none; z-index:0; }
+.user-row .gift-message-card::after { right:-10px; border-top:8px solid transparent; border-bottom:8px solid transparent; border-left:10px solid #23478f; }
+.ai-row .gift-message-card::after { left:-10px; border-top:8px solid transparent; border-bottom:8px solid transparent; border-right:10px solid #3159a9; }
+.user-row .gift-message-card.is-received::after { border-left-color:#657ba8; }
+.ai-row .gift-message-card.is-received::after { border-right-color:#798db9; }
+.gift-message-main { position:relative; z-index:1; height:64px; display:flex; align-items:center; gap:12px; padding:8px 13px 5px; box-sizing:border-box; }
+.gift-message-bow { width:40px; height:46px; flex:0 0 40px; color:#f7ecd0; }
+.gift-message-copy { min-width:0; flex:1; }
+.gift-message-title { font-size:14px; font-weight:650; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.gift-message-status { margin-top:4px; font-size:11px; color:rgba(255,255,255,.78); }
+.gift-message-footer { position:relative; z-index:1; height:21px; padding:3px 13px 0; box-sizing:border-box; border-top:1px solid rgba(255,255,255,.16); font-size:10px; color:rgba(255,255,255,.68); }
+
+.gift-detail-overlay { position:absolute; inset:0; z-index:260; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.28); box-sizing:border-box; }
+.gift-detail-card { width:min(88%, 348px); border-radius:30px; background:rgba(255,255,255,.98); padding:22px 18px 20px; box-sizing:border-box; box-shadow:0 16px 40px rgba(0,0,0,.12); }
+.gift-detail-sender { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+.gift-detail-avatar { width:52px; height:52px; border-radius:50%; object-fit:cover; background:#e5e5ea; }
+.gift-detail-sender-name { font-size:18px; font-weight:750; color:#111; }
+.gift-detail-name { color:#111; font-size:23px; font-weight:760; line-height:1.18; text-align:center; word-break:break-word; }
+.gift-detail-value { margin-top:8px; color:#6e6e73; font-size:14px; font-weight:650; text-align:center; }
+.gift-detail-info { margin-top:22px; padding:15px; border-radius:20px; background:#f7f7fa; }
+.gift-detail-info-label { color:#8e8e93; font-size:12px; font-weight:400; margin-bottom:6px; }
+.gift-detail-info-text { margin-top:0; color:#222; font-size:14px; font-weight:400; line-height:1.5; word-break:break-word; }
+
+.shopping-gift-compose-overlay { position:fixed; inset:0; z-index:10050; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.28); box-sizing:border-box; }
+.shopping-gift-compose-card { width:100%; max-width:348px; border-radius:30px; background:rgba(255,255,255,.98); padding:18px 16px 16px; box-sizing:border-box; }
+.shopping-gift-compose-title { color:#111; font-size:18px; font-weight:800; text-align:center; padding-bottom:16px; border-bottom:1px solid rgba(0,0,0,.08); }
+.shopping-gift-compose-label { margin:22px 0 8px; color:#8e8e93; font-size:13px; font-weight:650; }
+.shopping-gift-compose-input { width:100%; height:48px; border:0; outline:0; border-radius:18px; background:#f7f7fa; padding:0 14px; box-sizing:border-box; color:#111; font-family:inherit; font-size:15px; font-weight:600; }
+.shopping-gift-compose-actions { display:flex; gap:8px; margin-top:24px; }
+.shopping-gift-compose-actions button { flex:1; height:44px; border:0; border-radius:16px; font-size:15px; font-weight:750; cursor:pointer; }
+.shopping-gift-compose-cancel { background:#f2f2f7; color:#666; }
+.shopping-gift-compose-submit { background:#111; color:#fff; }

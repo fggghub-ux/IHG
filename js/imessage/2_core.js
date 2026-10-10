@@ -9398,6 +9398,7 @@ window.addEventListener('pagehide', () => {
         });
     const navHomeBtn = document.getElementById('nav-home-btn'),
         navChatsBtn = document.getElementById('nav-chats-btn'),
+        navMomentsBtn = document.getElementById('nav-moments-btn'),
         lineNavIndicator = document.getElementById('line-nav-indicator'),
         imBottomNavContainer = document.querySelector('.line-bottom-nav-container'),
         imContent = document.querySelector('.line-content'),
@@ -11046,6 +11047,7 @@ window.addEventListener('pagehide', () => {
         if (chatsContent) chatsContent.setAttribute('aria-hidden', 'true');
         if (navHomeBtn) navHomeBtn.classList.remove('active');
         if (navChatsBtn) navChatsBtn.classList.remove('active');
+        if (navMomentsBtn) navMomentsBtn.classList.remove('active');
         const lineHeaderRightElement_1890 = document.querySelector('.line-header-right');
         if (lineHeaderRightElement_1890) lineHeaderRightElement_1890.style.display = 'flex';
     }
@@ -11076,6 +11078,7 @@ window.addEventListener('pagehide', () => {
             if (window.imApp.updateChatsUnreadBadges) window.imApp.updateChatsUnreadBadges();
         });
     window.imApp.hideAllTabs = hideAllTabs_2;
+    window.imApp.updateLineNavIndicator = updateLineNavIndicator;
     window.imApp.setActiveThemeSurface(
         navChatsBtn?.classList.contains('active') ? 'chats' : 'home',
     );

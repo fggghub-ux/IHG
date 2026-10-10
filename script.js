@@ -98,6 +98,7 @@
             const screen = document.getElementById('app');
             screen ? screen.appendChild(toast) : document.body.appendChild(toast);
         }
+        toast.classList.toggle('shop-success-toast', textContent_2 === 'Payment successful' || textContent_2 === 'Payment request sent');
         toast.textContent = textContent_2;
         toast.classList.remove('show');
         void toast.offsetWidth;

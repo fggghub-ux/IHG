@@ -9,7 +9,7 @@
             showToast: showToast_2,
         } = window,
         momentsContent = document.getElementById('moments-content'),
-        imessageMomentsBtnElement = document.getElementById('imessage-moments-btn'),
+        imessageMomentsBtnElement = document.getElementById('nav-moments-btn'),
         momentsBackBtnElement = document.getElementById('moments-back-btn'),
         navHomeBtnElement = document.getElementById('nav-home-btn'),
         imHeaderRight = document.querySelector('.line-bottom-nav-container'),
@@ -407,7 +407,9 @@
         momentsBackBtnElement?.focus({
             preventScroll: true,
         });
-        if (imHeaderRight) imHeaderRight.style.display = 'none';
+        if (imHeaderRight) imHeaderRight.style.display = 'flex';
+        imessageMomentsBtnElement?.classList.add('active');
+        window.imApp.updateLineNavIndicator?.(imessageMomentsBtnElement);
         const imHeaderRight_2 = document.querySelector('.line-header-right');
         if (imHeaderRight_2) imHeaderRight_2.style.display = 'none';
         try {

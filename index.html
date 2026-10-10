@@ -84,7 +84,7 @@
         </script>
         <link
             rel="stylesheet"
-            href="css/global.css?v=20261009-restored-repairs"
+            href="css/global.css?v=20261009-restored-repairs&shop-moments=20261010-v1"
         />
         <link
             rel="stylesheet"
@@ -97,7 +97,7 @@
         <link rel="stylesheet" href="css/worldbook.css?v=20261007-107-r1" />
         <link rel="stylesheet" href="css/app_guide_modal.css?v=20261007-107-r1" />
         <link rel="stylesheet" href="css/online_prompts.css?v=20260905-v6&repair=20261003" />
-        <link rel="stylesheet" href="css/imessage.css?v=20261007-107-r1" />
+        <link rel="stylesheet" href="css/imessage.css?v=20261007-107-r1&shop-moments=20261010-v1" />
         <link rel="stylesheet" href="css/pay.css?v=20260923-gallery-layout-v1&repair=20261003" />
         <link
             rel="stylesheet"
@@ -109,7 +109,7 @@
         />
         <link
             rel="stylesheet"
-            href="css/shopping.css?v=20260820-orders-v1&layout=20260923-gallery-v2&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003"
+            href="css/shopping.css?v=20260820-orders-v1&layout=20260923-gallery-v2&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1"
         />
         <link rel="stylesheet" href="css/x.css?v=20261007-107-r1" />
 
@@ -7030,18 +7030,7 @@
                                 <div class="line-service-icon"><i class="fas fa-bullhorn"></i></div>
                                 <span>Official Accounts</span>
                             </div>
-                            <div
-                                class="line-service-item"
-                                id="imessage-moments-btn"
-                                role="button"
-                                tabindex="0"
-                                aria-label="打开朋友圈"
-                            >
-                                <div class="line-service-icon"
-                                    ><i class="far fa-compass" aria-hidden="true"></i
-                                ></div>
-                                <span>Moments</span>
-                            </div>
+
                         </div>
                     </div>
 
@@ -7217,7 +7206,7 @@
                     </div>
                 </div>
 
-                <!-- Moments opens from the Home service tile as a full-screen surface. -->
+                <!-- Moments opens from the bottom navigation. -->
                 <div
                     class="moments-content"
                     id="moments-content"
@@ -7954,6 +7943,10 @@
                         <div class="line-nav-item" id="nav-chats-btn">
                             <i class="fas fa-comment"></i>
                             <span data-u2-i18n="imessage.chats">Chats</span>
+                        </div>
+                        <div class="line-nav-item" id="nav-moments-btn">
+                            <i class="far fa-compass"></i>
+                            <span>Moments</span>
                         </div>
                     </div>
                 </div>
@@ -17992,173 +17985,125 @@
             <!-- ========================================== -->
             <div class="app-view shopping-view" id="shopping-view" style="display: none;">
                 <div class="shopping-topbar">
-                    <button
-                        type="button"
-                        class="shopping-brand"
-                        id="shopping-close-btn"
-                        aria-label="返回主屏幕"
-                        ><i class="fas fa-chevron-left" aria-hidden="true"></i
-                    ></button>
+                    <button type="button" class="shopping-brand" id="shopping-close-btn" data-u2-i18n="shopping.shop">Shop</button>
                     <div class="shopping-top-actions">
-                        <button
-                            type="button"
-                            class="shopping-icon-btn"
-                            id="shopping-search-btn"
-                            aria-label="Search"
-                            data-u2-i18n-aria-label="shopping.search"
-                            ><i class="fas fa-search" aria-hidden="true"></i
-                        ></button>
-                        <button
-                            type="button"
-                            class="shopping-icon-btn"
-                            id="shopping-settings-btn"
-                            aria-label="Settings"
-                            data-u2-i18n-aria-label="shopping.settings"
-                            ><i class="fas fa-cog" aria-hidden="true"></i
-                        ></button>
-                        <button
-                            type="button"
-                            class="shopping-icon-btn"
-                            aria-label="Bag"
-                            data-u2-i18n-aria-label="shopping.bag"
-                            ><i class="fas fa-bag-shopping" aria-hidden="true"></i
-                        ></button>
+                        <button type="button" class="shopping-icon-btn" id="shopping-search-btn" aria-label="Search" data-u2-i18n-aria-label="shopping.search"><i class="fas fa-search"></i></button>
+                        <button type="button" class="shopping-icon-btn" id="shopping-settings-btn" aria-label="Settings" data-u2-i18n-aria-label="shopping.settings"><i class="fas fa-cog"></i></button>
+                        <button type="button" class="shopping-icon-btn" aria-label="Bag" data-u2-i18n-aria-label="shopping.bag"><i class="fas fa-bag-shopping"></i></button>
                     </div>
                 </div>
 
                 <div class="shopping-content">
                     <div class="shopping-panels" id="shopping-panels">
                         <section class="shopping-panel active" data-tab="food">
-                            <div class="shopping-page-heading"
-                                ><span>SHOP · FOOD</span><h1>外卖</h1></div
-                            >
+                            <div class="shopping-hero shopping-hero-food">
+                                <div>
+                                    <div class="shopping-kicker">LVMHResults</div>
+                                    <h2>Timely Decision Making</h2>
+                                    <p>Opportunities are fleeting, knowing when to decide quickly is a highly important skill.</p>
+                                </div>
+                                <div class="shopping-hero-badge">
+                                    <i class="fas fa-spa"></i>
+                                    <span>Value</span>
+                                </div>
+                            </div>
+
                             <div class="shopping-section-head">
-                                <span>附近热销</span>
-                                <button type="button">全部</button>
+                                <span>Popular nearby</span>
+                                <button type="button">All</button>
                             </div>
                             <div class="shopping-food-list" id="shopping-food-list-container">
                                 <article class="shopping-food-card">
-                                    <div class="shopping-food-media food-media-rose"
-                                        ><i class="fas fa-mug-hot"></i
-                                    ></div>
+                                    <div class="shopping-food-media food-media-ash"><i class="fas fa-mug-hot"></i></div>
                                     <div class="shopping-food-copy">
-                                        <div class="shopping-card-topline"
-                                            ><strong>Berry latte set</strong><span>¥32</span></div
-                                        >
-                                        <p>Warm drink with a small pastry pairing.</p>
-                                        <div class="shopping-tags"
-                                            ><span>30 min</span><span>4.9</span></div
-                                        >
+                                        <div class="shopping-card-topline"><strong>Espresson</strong><span>$32</span></div>
+                                        <p>A rich, velvety espresso crafted for the perfect moment.</p>
+                                        <div class="shopping-tags"><span>30 min</span><span>4.9</span></div>
                                     </div>
                                 </article>
                                 <article class="shopping-food-card">
-                                    <div class="shopping-food-media food-media-gold"
-                                        ><i class="fas fa-burger"></i
-                                    ></div>
+                                    <div class="shopping-food-media food-media-rose"><i class="fas fa-wine-glass"></i></div>
                                     <div class="shopping-food-copy">
-                                        <div class="shopping-card-topline"
-                                            ><strong>Midnight burger</strong><span>¥46</span></div
-                                        >
-                                        <p>Charcoal bun, grilled beef, and crispy fries.</p>
-                                        <div class="shopping-tags"
-                                            ><span>Hot</span><span>Free delivery</span></div
-                                        >
+                                        <div class="shopping-card-topline"><strong>Per Se Menu</strong><span>$780</span></div>
+                                        <p>Led by Thomas Keller, a nine-course French tasting menu.</p>
+                                        <div class="shopping-tags"><span>Michelin</span><span>Fine Dining</span></div>
+                                    </div>
+                                </article>
+                                <article class="shopping-food-card">
+                                    <div class="shopping-food-media food-media-noir"><i class="fas fa-utensils"></i></div>
+                                    <div class="shopping-food-copy">
+                                        <div class="shopping-card-topline"><strong>Mase Omakase</strong><span>$1250</span></div>
+                                        <p>Handcrafted using the finest ingredients flown in from Tokyo’s Tsukiji Market.</p>
+                                        <div class="shopping-tags"><span>Michelin 3★</span><span>Omakase</span></div>
                                     </div>
                                 </article>
                             </div>
                         </section>
 
                         <section class="shopping-panel" data-tab="mall">
-                            <div class="shopping-page-heading"
-                                ><span>SHOP · MALL</span><h1>商城</h1></div
-                            >
+                            <div class="shopping-hero shopping-hero-mall">
+                                <div>
+                                    <div class="shopping-kicker">LVNHvKering</div>
+                                    <h2>The Best Investment</h2>
+                                    <p>In any circumstances, investing in your own mind is the wisest choice.</p>
+                                </div>
+                                <div class="shopping-hero-badge">
+                                    <i class="fas fa-bag-shopping"></i>
+                                    <span>Wealth</span>
+                                </div>
+                            </div>
+
                             <div class="shopping-section-head">
-                                <span>新品上架</span>
-                                <button type="button">筛选</button>
+                                <span>New arrivals</span>
+                                <button type="button">Filter</button>
                             </div>
                             <div class="shopping-product-grid" id="shopping-product-grid-container">
                                 <article class="shopping-product-card">
-                                    <div class="shopping-product-media product-media-ivory"
-                                        ><i class="fas fa-shirt"></i
-                                    ></div>
-                                    <strong>Soft cotton tee</strong>
-                                    <span>¥129 · Ivory</span>
+                                    <div class="shopping-product-media product-media-ivory"><i class="fas fa-wine-glass"></i></div>
+                                    <strong>Romanée-Conti</strong>
+                                    <span>$558000 · DOMAINE</span>
                                 </article>
                                 <article class="shopping-product-card">
-                                    <div class="shopping-product-media product-media-charcoal"
-                                        ><i class="fas fa-headphones"></i
-                                    ></div>
-                                    <strong>Noise buds</strong>
-                                    <span>¥299 · Charcoal</span>
+                                    <div class="shopping-product-media product-media-charcoal"><i class="fas fa-ring"></i></div>
+                                    <strong>Serpenti Viper Bracelet</strong>
+                                    <span>$57200 · BYLGARL</span>
                                 </article>
                                 <article class="shopping-product-card">
-                                    <div class="shopping-product-media product-media-stone"
-                                        ><i class="fas fa-camera-retro"></i
-                                    ></div>
-                                    <strong>Pocket camera</strong>
-                                    <span>¥699 · Stone</span>
+                                    <div class="shopping-product-media product-media-stone"><i class="fas fa-suitcase"></i></div>
+                                    <strong>Hermes Birkin</strong>
+                                    <span>$20600 · HERMÈS</span>
                                 </article>
                                 <article class="shopping-product-card">
-                                    <div class="shopping-product-media product-media-moss"
-                                        ><i class="fas fa-seedling"></i
-                                    ></div>
-                                    <strong>Desk planter</strong>
-                                    <span>¥59 · Moss</span>
+                                    <div class="shopping-product-media product-media-moss"><i class="fas fa-clover"></i></div>
+                                    <strong>Vintage Alhambra</strong>
+                                    <span>$29100 · VCA</span>
                                 </article>
                             </div>
                         </section>
 
                         <section class="shopping-panel" data-tab="cart">
-                            <div class="shopping-page-heading"
-                                ><span>SHOP · CART</span><h1>购物车</h1></div
-                            >
                             <div class="shopping-cart-state" id="shopping-cart-empty-state">
-                                <div class="shopping-cart-icon"
-                                    ><i class="fas fa-cart-shopping"></i
-                                ></div>
-                                <h2>购物车空空如也</h2>
-                                <p>添加外卖或商城商品，结算前会显示在这里</p>
+                                <div class="shopping-cart-icon"><i class="fas fa-cart-shopping"></i></div>
+                                <h2>Your cart is waiting.</h2>
+                                <p>Add food or mall items and they will appear here before checkout.</p>
                                 <div class="shopping-cart-preview">
-                                    <div><strong>优惠券</strong><span>可用</span></div>
+                                    <div><strong>Delivery</strong><span>Not selected</span></div>
+                                    <div><strong>Voucher</strong><span>Available</span></div>
                                 </div>
                             </div>
-                            <div
-                                class="shopping-cart-content"
-                                id="shopping-cart-content"
-                                style="display: none; height: 100%; flex-direction: column;"
-                            >
-                                <div class="shopping-cart-list-heading">已选商品</div>
-                                <div
-                                    id="shopping-cart-list"
-                                    style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding-bottom: 20px;"
-                                ></div>
-                                <div
-                                    style="border-top: 1px solid rgba(17,17,17,0.1); padding-top: 15px; margin-top: 10px;"
-                                >
-                                    <div
-                                        style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"
-                                        ><span>小计</span
-                                        ><strong id="shopping-cart-subtotal">¥0</strong></div
-                                    >
-                                    <div
-                                        style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 18px;"
-                                        ><strong>总计</strong
-                                        ><strong id="shopping-cart-total">¥0</strong></div
-                                    >
-                                    <button
-                                        type="button"
-                                        id="shopping-checkout-btn"
-                                        style="width: 100%; padding: 16px; background: #111; color: #fff; border-radius: 12px; font-size: 16px; font-weight: 700; border: none; cursor: pointer;"
-                                        >去结算</button
-                                    >
+                            <div class="shopping-cart-content" id="shopping-cart-content" style="display: none; height: 100%; flex-direction: column;">
+                                <div style="font-size: 24px; font-weight: 800; margin-bottom: 20px;">Shopping Cart</div>
+                                <div id="shopping-cart-list" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding-bottom: 20px;"></div>
+                                <div style="border-top: 1px solid rgba(17,17,17,0.1); padding-top: 15px; margin-top: 10px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span>Subtotal</span><strong id="shopping-cart-subtotal">$0</strong></div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px;"><span>Delivery</span><strong>$5</strong></div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 18px;"><strong>Total</strong><strong id="shopping-cart-total">$5</strong></div>
+                                    <button type="button" id="shopping-checkout-btn" style="width: 100%; padding: 16px; background: #111; color: #fff; border-radius: 12px; font-size: 16px; font-weight: 700; border: none; cursor: pointer;">Checkout</button>
                                 </div>
                             </div>
                         </section>
 
                         <section class="shopping-panel" data-tab="me">
-                            <div class="shopping-page-heading"
-                                ><span>SHOP · ACCOUNT</span><h1>我的</h1></div
-                            >
                             <div class="shopping-profile-card">
                                 <div class="shopping-avatar" id="shopping-profile-avatar">
                                     <img
@@ -18170,24 +18115,15 @@
                                     <i class="fas fa-user" id="shopping-profile-avatar-icon"></i>
                                 </div>
                                 <div>
-                                    <span>商城账号</span>
+                                    <span>Shopping account</span>
                                     <strong id="shopping-profile-name">User</strong>
                                 </div>
-                                <button type="button">编辑</button>
+                                <button type="button">Edit</button>
                             </div>
                             <div class="shopping-profile-list">
-                                <button type="button" id="shopping-orders-btn"
-                                    ><i class="fas fa-receipt"></i><span>我的订单</span
-                                    ><em>外卖与商城订单记录</em></button
-                                >
-                                <button type="button"
-                                    ><i class="fas fa-location-dot"></i><span>收货地址</span
-                                    ><em>管理配送地点</em></button
-                                >
-                                <button type="button"
-                                    ><i class="fas fa-credit-card"></i><span>支付方式</span
-                                    ><em>使用 Pay 卡片结算</em></button
-                                >
+                                <button type="button" id="shopping-orders-btn"><i class="fas fa-receipt"></i><span>Orders</span><em>Food and mall history</em></button>
+                                <button type="button"><i class="fas fa-location-dot"></i><span>Addresses</span><em>Manage delivery places</em></button>
+                                <button type="button"><i class="fas fa-credit-card"></i><span>Payment</span><em>Use Pay cards at checkout</em></button>
                             </div>
                         </section>
                     </div>
@@ -18195,38 +18131,10 @@
 
                 <nav class="shopping-bottom-nav" aria-label="Shopping tabs">
                     <div class="shopping-nav-indicator" id="shopping-nav-indicator"></div>
-                    <button
-                        type="button"
-                        class="shopping-nav-item active"
-                        data-tab="food"
-                        aria-label="外卖"
-                        aria-pressed="true"
-                        ><i class="fas fa-bowl-food" aria-hidden="true"></i
-                    ></button>
-                    <button
-                        type="button"
-                        class="shopping-nav-item"
-                        data-tab="mall"
-                        aria-label="商城"
-                        aria-pressed="false"
-                        ><i class="fas fa-bag-shopping" aria-hidden="true"></i
-                    ></button>
-                    <button
-                        type="button"
-                        class="shopping-nav-item"
-                        data-tab="cart"
-                        aria-label="购物车"
-                        aria-pressed="false"
-                        ><i class="fas fa-cart-shopping" aria-hidden="true"></i
-                    ></button>
-                    <button
-                        type="button"
-                        class="shopping-nav-item"
-                        data-tab="me"
-                        aria-label="我的"
-                        aria-pressed="false"
-                        ><i class="fas fa-user" aria-hidden="true"></i
-                    ></button>
+                    <button type="button" class="shopping-nav-item active" data-tab="food"><i class="fas fa-bowl-food"></i><span>Food</span></button>
+                    <button type="button" class="shopping-nav-item" data-tab="mall"><i class="fas fa-bag-shopping"></i><span>Mall</span></button>
+                    <button type="button" class="shopping-nav-item" data-tab="cart"><i class="fas fa-cart-shopping"></i><span>Cart</span></button>
+                    <button type="button" class="shopping-nav-item" data-tab="me"><i class="fas fa-user"></i><span>Me</span></button>
                 </nav>
 
                 <!-- Shopping Settings Sheet -->
@@ -18240,18 +18148,18 @@
                         style="max-height: 85%; height: auto; display: flex; flex-direction: column;"
                     >
                         <div class="sheet-handle"></div>
-                        <div class="sheet-title">Shop 设置</div>
+                        <div class="sheet-title">SHOP</div>
                         <div class="detail-sheet-content" style="padding: 16px;">
                             <div class="settings-group fully-rounded" style="margin: 0;">
                                 <div class="settings-item" id="shopping-bind-wb-btn">
                                     <div class="settings-icon" style="background-color: #1c1c1e;"
                                         ><i class="fas fa-book"></i
                                     ></div>
-                                    <div class="settings-text">挂载世界书</div>
+                                    <div class="settings-text">World books</div>
                                     <div
                                         id="shopping-bound-wb-name"
                                         style="font-size: 13px; color: #8e8e93; margin-right: 6px;"
-                                        >未绑定</div
+                                        >Not mounted</div
                                     >
                                     <i class="fas fa-chevron-right arrow"></i>
                                 </div>
@@ -18264,7 +18172,7 @@
                                         ><i class="fas fa-trash-alt"></i
                                     ></div>
                                     <div class="settings-text" style="color: #ff3b30;"
-                                        >清空生成的商品</div
+                                        >Clear items</div
                                     >
                                     <i class="fas fa-chevron-right arrow"></i>
                                 </div>
@@ -18274,58 +18182,28 @@
                 </div>
 
                 <!-- Shopping Search/Generate Sheet -->
-                <div
-                    class="bottom-sheet-overlay detail-sheet-overlay"
-                    id="shopping-search-sheet"
-                    style="z-index: 1250;"
-                >
-                    <div
-                        class="bottom-sheet"
-                        style="height: auto; max-height: 80%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));"
-                    >
+                <div class="bottom-sheet-overlay detail-sheet-overlay" id="shopping-search-sheet" style="z-index: 1250;">
+                    <div class="bottom-sheet" style="height: auto; max-height: 80%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));">
                         <div class="sheet-handle"></div>
-                        <div class="sheet-title">搜索商品</div>
+                        <div class="sheet-title">SEARCH PRODUCTS</div>
 
                         <div class="detail-sheet-content" style="padding: 16px; overflow-y: auto;">
-                            <textarea
-                                id="shopping-search-input"
-                                placeholder="输入你想搜索的内容，AI将生成相关商品..."
-                                style="width: 100%; height: 120px; border: none; background: #fff; border-radius: 12px; padding: 16px; font-size: 15px; resize: none; outline: none; margin-bottom: 20px; box-sizing: border-box; "
-                            ></textarea>
+                            <textarea id="shopping-search-input" placeholder="Assets bring cash inflows; liabilities cause cash outflows." style="width: 100%; height: 120px; border: none; background: #fff; border-radius: 12px; padding: 16px; font-size: 15px; resize: none; outline: none; margin-bottom: 20px; box-sizing: border-box; "></textarea>
 
-                            <button
-                                type="button"
-                                id="shopping-search-confirm-btn"
-                                style="width: 100%; padding: 16px; background: #111; color: #fff; border-radius: 12px; font-size: 16px; font-weight: 700; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;"
-                            >
-                                <i class="fas fa-magic"></i> 确认生成
+                            <button type="button" id="shopping-search-confirm-btn" style="width: 100%; padding: 16px; background: #111; color: #fff; border-radius: 12px; font-size: 16px; font-weight: 700; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                                <i class="fas fa-magic"></i> Generate
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Shopping All Reviews Sheet -->
-                <div
-                    class="bottom-sheet-overlay detail-sheet-overlay"
-                    id="shopping-all-reviews-sheet"
-                    style="z-index: 1150;"
-                >
-                    <div
-                        class="bottom-sheet"
-                        style="height: 80%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));"
-                    >
+                <div class="bottom-sheet-overlay detail-sheet-overlay" id="shopping-all-reviews-sheet" style="z-index: 1150;">
+                    <div class="bottom-sheet" style="height: 80%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));">
                         <div class="sheet-handle"></div>
-                        <div class="sheet-title" id="shopping-all-reviews-sheet-title"
-                            >商品评价</div
-                        >
-                        <div
-                            class="detail-sheet-content"
-                            style="flex: 1; padding: 16px; overflow-y: auto;"
-                        >
-                            <div
-                                id="shopping-all-reviews-container"
-                                style="background: #fff; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px;"
-                            >
+                        <div class="sheet-title" id="shopping-all-reviews-sheet-title">Reviews</div>
+                        <div class="detail-sheet-content" style="flex: 1; padding: 16px; overflow-y: auto;">
+                            <div id="shopping-all-reviews-container" style="background: #fff; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
                                 <!-- Full reviews injected here -->
                             </div>
                         </div>
@@ -18333,393 +18211,159 @@
                 </div>
 
                 <!-- Shopping Q&A Sheet -->
-                <div
-                    class="bottom-sheet-overlay detail-sheet-overlay"
-                    id="shopping-qa-sheet"
-                    style="z-index: 1150;"
-                >
-                    <div
-                        class="bottom-sheet"
-                        style="height: 80%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));"
-                    >
+                <div class="bottom-sheet-overlay detail-sheet-overlay" id="shopping-qa-sheet" style="z-index: 1150;">
+                    <div class="bottom-sheet" style="height: 80%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));">
                         <div class="sheet-handle"></div>
-                        <div class="sheet-title" id="shopping-qa-sheet-title">问大家 (Q&A)</div>
-                        <div
-                            class="detail-sheet-content"
-                            style="flex: 1; padding: 16px; overflow-y: auto;"
-                        >
-                            <div
-                                id="shopping-qa-container"
-                                style="background: #fff; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px;"
-                            >
-                                <div
-                                    style="text-align: center; color: #8e8e93; font-size: 14px; padding: 20px 0;"
-                                    >暂无问答数据</div
-                                >
+                        <div class="sheet-title" id="shopping-qa-sheet-title">Q&A</div>
+                        <div class="detail-sheet-content" style="flex: 1; padding: 16px; overflow-y: auto;">
+                            <div id="shopping-qa-container" style="background: #fff; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+                                <div style="text-align: center; color: #8e8e93; font-size: 14px; padding: 20px 0;">no answers yet</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Shopping Item Detail Sheet -->
-                <div
-                    class="bottom-sheet-overlay detail-sheet-overlay"
-                    id="shopping-detail-sheet"
-                    style="z-index: 1050;"
-                >
-                    <div
-                        class="bottom-sheet"
-                        style="height: 90%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: 0;"
-                    >
+                <div class="bottom-sheet-overlay detail-sheet-overlay" id="shopping-detail-sheet" style="z-index: 1050;">
+                    <div class="bottom-sheet" style="height: 90%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: 0;">
                         <div class="sheet-handle"></div>
-                        <div
-                            class="detail-sheet-content"
-                            style="flex: 1; overflow-y: auto; padding: 0 20px 20px;"
-                        >
-                            <div
-                                id="shopping-detail-media"
-                                style="width: 100%; aspect-ratio: 1/1; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 60px; color: #fff; margin-bottom: 20px; "
-                            >
+                        <div class="detail-sheet-content" style="flex: 1; overflow-y: auto; padding: 0 20px 20px;">
+                            <div id="shopping-detail-media" style="width: 100%; aspect-ratio: 1/1; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 60px; color: #fff; margin-bottom: 20px; ">
                                 <i class="fas fa-box"></i>
                             </div>
-                            <div
-                                style="background: #fff; border-radius: 16px; padding: 20px 16px; margin-bottom: 15px;"
-                            >
-                                <div
-                                    style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;"
-                                >
-                                    <div
-                                        id="shopping-detail-price"
-                                        style="font-size: 26px; font-weight: 800; color: #111;"
-                                        >¥0</div
-                                    >
+                            <div style="background: #fff; border-radius: 16px; padding: 20px 16px; margin-bottom: 15px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                    <div id="shopping-detail-price" style="font-size: 26px; font-weight: 800; color: #111;">$0</div>
                                 </div>
-                                <div
-                                    id="shopping-detail-name"
-                                    style="font-size: 20px; font-weight: 800; color: #111; margin-bottom: 10px;"
-                                    >Item Name</div
-                                >
-                                <p
-                                    id="shopping-detail-desc"
-                                    style="font-size: 14px; color: #73706a; line-height: 1.5; margin: 0;"
-                                    >Description</p
-                                >
+                                <div id="shopping-detail-name" style="font-size: 20px; font-weight: 800; color: #111; margin-bottom: 10px;">Item Name</div>
+                                <p id="shopping-detail-desc" style="font-size: 14px; color: #73706a; line-height: 1.5; margin: 0;">Description</p>
                             </div>
 
                             <!-- 宝贝评价 -->
-                            <div
-                                style="background: #fff; border-radius: 16px; padding: 20px 16px; margin-bottom: 15px;"
-                            >
-                                <div
-                                    id="shopping-reviews-trigger"
-                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; cursor: pointer;"
-                                >
-                                    <div
-                                        style="font-size: 16px; font-weight: 700; color: #111;"
-                                        id="shopping-reviews-title"
-                                        >商品评价 (128)</div
-                                    >
-                                    <div
-                                        style="font-size: 13px; color: #111; font-weight: 600; display: flex; align-items: center;"
-                                        >查看全部
-                                        <i
-                                            class="fas fa-chevron-right"
-                                            style="font-size: 10px; margin-left: 4px;"
-                                        ></i
-                                    ></div>
+                            <div style="background: #fff; border-radius: 16px; padding: 20px 16px; margin-bottom: 15px;">
+                                <div id="shopping-reviews-trigger" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; cursor: pointer;">
+                                    <div style="font-size: 16px; font-weight: 700; color: #111;" id="shopping-reviews-title">Reviews (128)</div>
+                                    <div style="font-size: 13px; color: #111; font-weight: 600; display: flex; align-items: center;">See All <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 4px;"></i></div>
                                 </div>
-                                <div
-                                    style="display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; scrollbar-width: none;"
-                                >
-                                    <span
-                                        style="background: #f7f7f5; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #111; white-space: nowrap;"
-                                        >质量好(45)</span
-                                    >
-                                    <span
-                                        style="background: #f7f7f5; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #111; white-space: nowrap;"
-                                        >发货快(32)</span
-                                    >
-                                    <span
-                                        style="background: #f7f7f5; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #111; white-space: nowrap;"
-                                        >包装好(18)</span
-                                    >
+                                <div style="display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; scrollbar-width: none;">
+                                    <span style="background: #f7f7f5; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #111; white-space: nowrap;">Quality(45)</span>
+                                    <span style="background: #f7f7f5; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #111; white-space: nowrap;">Fast Shipping(32)</span>
+                                    <span style="background: #f7f7f5; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #111; white-space: nowrap;">Packaging(18)</span>
                                 </div>
-                                <div
-                                    id="shopping-reviews-list"
-                                    style="display: flex; flex-direction: column; gap: 12px;"
-                                >
+                                <div id="shopping-reviews-list" style="display: flex; flex-direction: column; gap: 12px;">
                                     <!-- Reviews injected here -->
                                 </div>
                             </div>
 
                             <!-- 问大家 -->
-                            <div
-                                id="shopping-mall-qa-trigger"
-                                style="background: #fff; border-radius: 16px; padding: 20px 16px; margin-bottom: 15px; cursor: pointer;"
-                            >
-                                <div
-                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"
-                                >
-                                    <div style="font-size: 16px; font-weight: 700; color: #111;"
-                                        >问大家 (12)</div
-                                    >
-                                    <div
-                                        style="font-size: 13px; color: #111; font-weight: 600; display: flex; align-items: center;"
-                                        >查看全部
-                                        <i
-                                            class="fas fa-chevron-right"
-                                            style="font-size: 10px; margin-left: 4px;"
-                                        ></i
-                                    ></div>
+                            <div id="shopping-mall-qa-trigger" style="background: #fff; border-radius: 16px; padding: 20px 16px; margin-bottom: 15px; cursor: pointer;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                    <div style="font-size: 16px; font-weight: 700; color: #111;">Q&A (12)</div>
+                                    <div style="font-size: 13px; color: #111; font-weight: 600; display: flex; align-items: center;">See All <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 4px;"></i></div>
                                 </div>
-                                <div
-                                    style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;"
-                                >
-                                    <span
-                                        style="background: #111; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 2px;"
-                                        >Q</span
-                                    >
-                                    <div
-                                        style="flex: 1; font-size: 14px; color: #111; line-height: 1.4;"
-                                        >颜色和图片一样吗？</div
-                                    >
-                                    <div
-                                        style="font-size: 12px; color: #8e8e93; white-space: nowrap;"
-                                        >4 回答</div
-                                    >
+                                <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                                    <span style="background: #111; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 2px;">Q</span>
+                                    <div style="flex: 1; font-size: 14px; color: #111; line-height: 1.4;">Is the color true to the photos?</div>
+                                    <div style="font-size: 12px; color: #8e8e93; white-space: nowrap;">4 answers</div>
                                 </div>
                                 <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                    <span
-                                        style="background: #111; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 2px;"
-                                        >Q</span
-                                    >
-                                    <div
-                                        style="flex: 1; font-size: 14px; color: #111; line-height: 1.4;"
-                                        >有礼品包装吗？</div
-                                    >
-                                    <div
-                                        style="font-size: 12px; color: #8e8e93; white-space: nowrap;"
-                                        >2 回答</div
-                                    >
+                                    <span style="background: #111; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 2px;">Q</span>
+                                    <div style="flex: 1; font-size: 14px; color: #111; line-height: 1.4;">Does it come with gift packaging?</div>
+                                    <div style="font-size: 12px; color: #8e8e93; white-space: nowrap;">2 answers</div>
                                 </div>
                             </div>
 
                             <!-- 店铺 -->
-                            <div
-                                style="background: #fff; border-radius: 16px; padding: 20px 16px; margin-bottom: 10px;"
-                            >
-                                <div
-                                    style="display: flex; align-items: center; gap: 14px; margin-bottom: 18px;"
-                                >
-                                    <div
-                                        style="width: 52px; height: 52px; border-radius: 12px; background: #111; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 22px;"
-                                        ><i class="fas fa-store"></i
-                                    ></div>
+                            <div style="background: #fff; border-radius: 16px; padding: 20px 16px; margin-bottom: 10px;">
+                                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 18px;">
+                                    <div style="width: 52px; height: 52px; border-radius: 12px; background: #111; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 22px;"><i class="fas fa-store"></i></div>
                                     <div style="flex: 1;">
-                                        <div style="font-size: 16px; font-weight: 700; color: #111;"
-                                            >官方旗舰店</div
-                                        >
-                                        <div
-                                            style="font-size: 13px; color: #8e8e93; margin-top: 4px; display: flex; gap: 10px;"
-                                        >
-                                            <span
-                                                >评分
-                                                <strong style="color: #111;">4.9</strong></span
-                                            >
-                                            <span
-                                                >粉丝
-                                                <strong style="color: #111;">12.4万</strong></span
-                                            >
+                                        <div style="font-size: 16px; font-weight: 700; color: #111;">Official Store</div>
+                                        <div style="font-size: 13px; color: #8e8e93; margin-top: 4px; display: flex; gap: 10px;">
+                                            <span>Rating <strong style="color: #111;">4.9</strong></span>
+                                            <span>Followers <strong style="color: #111;">124K</strong></span>
                                         </div>
                                     </div>
-                                    <div
-                                        style="background: #f7f7f5; padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #111;"
-                                        >进店</div
-                                    >
+                                    <div style="background: #f7f7f5; padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #111;">Visit</div>
                                 </div>
-                                <div
-                                    style="display: flex; justify-content: space-between; font-size: 12px; color: #8e8e93; padding-top: 15px; border-top: 1px solid #f0f0f0;"
-                                >
-                                    <span>描述 4.9</span>
-                                    <span>服务 4.9</span>
-                                    <span>物流 4.9</span>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #8e8e93; padding-top: 15px; border-top: 1px solid #f0f0f0;">
+                                    <span>Description 4.9</span>
+                                    <span>Service 4.9</span>
+                                    <span>Logistics 4.9</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- 底部操作栏 -->
-                        <div
-                            style="padding: 10px 20px calc(10px + env(safe-area-inset-bottom, 0px)); background: #fff; border-top: 1px solid rgba(17,17,17,0.05); display: flex; align-items: center; gap: 15px; flex-shrink: 0;"
-                        >
-                            <div
-                                style="flex: 1; display: flex; background: #111; border-radius: 999px; overflow: hidden; gap: 1px;"
-                            >
-                                <button
-                                    type="button"
-                                    id="shopping-add-to-cart-btn"
-                                    style="flex: 1; padding: 14px 0; background: #111; color: #fff; border: none; font-size: 15px; font-weight: 700; cursor: pointer;"
-                                    >加入购物车</button
-                                >
-                                <button
-                                    type="button"
-                                    style="flex: 1; padding: 14px 0; background: #111; color: #fff; border: none; font-size: 15px; font-weight: 700; cursor: pointer; border-left: 1px solid rgba(255,255,255,0.2);"
-                                    >立即购买</button
-                                >
+                        <div style="padding: 10px 20px calc(10px + env(safe-area-inset-bottom, 0px)); background: #fff; border-top: 1px solid rgba(17,17,17,0.05); display: flex; align-items: center; gap: 15px; flex-shrink: 0;">
+                            <div style="flex: 1; display: flex; background: #111; border-radius: 999px; overflow: hidden; gap: 1px;">
+                                <button type="button" id="shopping-add-to-cart-btn" style="flex: 1; padding: 14px 0; background: #111; color: #fff; border: none; font-size: 15px; font-weight: 700; cursor: pointer;">Add to cart</button>
+                                <button type="button" style="flex: 1; padding: 14px 0; background: #111; color: #fff; border: none; font-size: 15px; font-weight: 700; cursor: pointer; border-left: 1px solid rgba(255,255,255,0.2);">Buy now</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Shopping Checkout Sheet -->
-                <div
-                    class="bottom-sheet-overlay detail-sheet-overlay"
-                    id="shopping-checkout-sheet"
-                    style="z-index: 1100;"
-                >
-                    <div
-                        class="bottom-sheet"
-                        style="height: auto; max-height: 80%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));"
-                    >
+                <div class="bottom-sheet-overlay detail-sheet-overlay" id="shopping-checkout-sheet" style="z-index: 1100;">
+                    <div class="bottom-sheet" style="height: auto; max-height: 80%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));">
                         <div class="sheet-handle"></div>
-                        <div class="sheet-title">结算</div>
+                        <div class="sheet-title">CHECKOUT</div>
 
                         <div class="detail-sheet-content" style="padding: 16px; overflow-y: auto;">
                             <!-- Payment Method Selection -->
-                            <div
-                                style="background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px;"
-                            >
-                                <div
-                                    style="font-size: 16px; font-weight: 700; color: #111; margin-bottom: 12px;"
-                                    >支付方式</div
-                                >
+                            <div style="background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px;">
+                                <div style="font-size: 16px; font-weight: 700; color: #111; margin-bottom: 12px;">PAYMENT</div>
 
                                 <div style="display: flex; flex-direction: column; gap: 10px;">
                                     <!-- Pay 支付 -->
-                                    <label
-                                        style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid #e5e5ea; border-radius: 12px; cursor: pointer;"
-                                    >
+                                    <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid #e5e5ea; border-radius: 12px; cursor: pointer;">
                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                            <input
-                                                type="radio"
-                                                name="shopping-payment-method"
-                                                value="pay"
-                                                checked
-                                                style="accent-color: #111; width: 18px; height: 18px;"
-                                            />
-                                            <div
-                                                style="width: 32px; height: 32px; border-radius: 8px; background: #007aff; display: flex; justify-content: center; align-items: center; color: #fff;"
-                                                ><i class="fas fa-wallet"></i
-                                            ></div>
+                                            <input type="radio" name="shopping-payment-method" value="pay" checked style="accent-color: #111; width: 18px; height: 18px;">
+                                            <div style="width: 32px; height: 32px; border-radius: 8px; background: #007aff; display: flex; justify-content: center; align-items: center; color: #fff;"><i class="fas fa-wallet"></i></div>
                                             <div style="display: flex; flex-direction: column;">
-                                                <span style="font-weight: 600; font-size: 15px;"
-                                                    >Pay</span
-                                                >
-                                                <span
-                                                    id="shopping-checkout-pay-desc"
-                                                    style="font-size: 12px; color: #8e8e93;"
-                                                    >钱包余额</span
-                                                >
+                                                <span style="font-weight: 600; font-size: 15px;">Pay</span>
+                                                <span id="shopping-checkout-pay-desc" style="font-size: 12px; color: #8e8e93;">TOTAL BALANCE</span>
                                             </div>
                                         </div>
-                                        <div
-                                            id="shopping-checkout-pay-select"
-                                            style="font-size: 12px; font-weight: 600; color: #007aff; padding: 4px 8px; background: #e5f1ff; border-radius: 6px;"
-                                            >更改</div
-                                        >
+                                        <div id="shopping-checkout-pay-select" style="font-size: 12px; font-weight: 600; color: #007aff; padding: 4px 8px; background: #e5f1ff; border-radius: 6px;">change</div>
                                     </label>
 
                                     <!-- 代付 -->
-                                    <label
-                                        style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid #e5e5ea; border-radius: 12px; cursor: pointer;"
-                                    >
+                                    <label style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid #e5e5ea; border-radius: 12px; cursor: pointer;">
                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                            <input
-                                                type="radio"
-                                                name="shopping-payment-method"
-                                                value="friend"
-                                                style="accent-color: #111; width: 18px; height: 18px;"
-                                            />
-                                            <div
-                                                style="width: 32px; height: 32px; border-radius: 8px; background: #34c759; display: flex; justify-content: center; align-items: center; color: #fff;"
-                                                ><i class="fas fa-user-friends"></i
-                                            ></div>
+                                            <input type="radio" name="shopping-payment-method" value="friend" style="accent-color: #111; width: 18px; height: 18px;">
+                                            <div style="width: 32px; height: 32px; border-radius: 8px; background: #34c759; display: flex; justify-content: center; align-items: center; color: #fff;"><i class="fas fa-user-friends"></i></div>
                                             <div style="display: flex; flex-direction: column;">
-                                                <span style="font-weight: 600; font-size: 15px;"
-                                                    >找人代付</span
-                                                >
-                                                <span
-                                                    id="shopping-checkout-friend-desc"
-                                                    style="font-size: 12px; color: #8e8e93;"
-                                                    >选择好友</span
-                                                >
+                                                <span style="font-weight: 600; font-size: 15px;">For me</span>
+                                                <span id="shopping-checkout-friend-desc" style="font-size: 12px; color: #8e8e93;">Select a payer</span>
                                             </div>
                                         </div>
-                                        <div
-                                            id="shopping-checkout-friend-select"
-                                            style="font-size: 12px; font-weight: 600; color: #34c759; padding: 4px 8px; background: #e8f5e9; border-radius: 6px;"
-                                            >选择</div
-                                        >
+                                        <div id="shopping-checkout-friend-select" style="font-size: 12px; font-weight: 600; color: #34c759; padding: 4px 8px; background: #e8f5e9; border-radius: 6px;">select</div>
                                     </label>
                                 </div>
                             </div>
 
-                            <button
-                                type="button"
-                                id="shopping-confirm-payment-btn"
-                                style="width: 100%; padding: 16px; background: #111; color: #fff; border-radius: 12px; font-size: 16px; font-weight: 700; border: none; cursor: pointer;"
-                                >确认支付</button
-                            >
+                            <button type="button" id="shopping-confirm-payment-btn" style="width: 100%; padding: 16px; background: #111; color: #fff; border-radius: 12px; font-size: 16px; font-weight: 700; border: none; cursor: pointer;">Payment</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Shopping Card Selection Modal -->
-                <div
-                    class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay"
-                    id="shopping-card-selection-modal"
-                    style="z-index: 1200;"
-                >
-                    <div
-                        class="wb-centered-modal-card"
-                        style=" border-radius: 16px; background: #f7f7f5; overflow: hidden; display: flex; flex-direction: column; max-height: 70%; border: 1px solid rgba(17,17,17,0.09);"
-                    >
-                        <div
-                            class="wb-centered-modal-header"
-                            style="position: relative; flex-shrink: 0; background: transparent; border-bottom: none; padding-bottom: 0;"
-                        >
-                            <div
-                                class="wb-centered-modal-title"
-                                style="font-weight: 800; color: #111;"
-                                >选择支付方式</div
-                            >
-                            <div
-                                class="wb-centered-modal-close"
-                                style="position: absolute; right: 16px; top: 16px; font-size: 18px; color: #111; cursor: pointer;"
-                                onclick="document.getElementById('shopping-card-selection-modal').style.display='none'; document.getElementById('shopping-card-selection-modal').classList.remove('active');"
-                            >
+                <div class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay" id="shopping-card-selection-modal" style="z-index: 1200;">
+                    <div class="wb-centered-modal-card" style=" border-radius: 16px; background: #f7f7f5; overflow: hidden; display: flex; flex-direction: column; max-height: 70%; border: 1px solid rgba(17,17,17,0.09);">
+                        <div class="wb-centered-modal-header" style="position: relative; flex-shrink: 0; background: transparent; border-bottom: none; padding-bottom: 0;">
+                            <div class="wb-centered-modal-title" style="font-weight: 800; color: #111;">Payment</div>
+                            <div class="wb-centered-modal-close" style="position: absolute; right: 16px; top: 16px; font-size: 18px; color: #111; cursor: pointer;" onclick="document.getElementById('shopping-card-selection-modal').style.display='none'; document.getElementById('shopping-card-selection-modal').classList.remove('active');">
                                 <i class="fas fa-times"></i>
                             </div>
                         </div>
-                        <div
-                            style="background: transparent; padding: 10px 16px; text-align: center;"
-                        >
-                            <div style="font-size: 13px; color: #73706a; font-weight: 600;"
-                                >账户总余额</div
-                            >
-                            <div
-                                id="shopping-card-selection-balance"
-                                style="font-size: 28px; font-weight: 800; color: #111113; margin-top: 4px;"
-                                >¥0.00</div
-                            >
+                        <div style="background: transparent; padding: 10px 16px; text-align: center;">
+                            <div style="font-size: 13px; color: #73706a; font-weight: 600;">BALANCE</div>
+                            <div id="shopping-card-selection-balance" style="font-size: 28px; font-weight: 800; color: #a97642; margin-top: 4px;">$0.00</div>
                         </div>
-                        <div
-                            class="wb-centered-modal-body"
-                            style="padding: 16px; background: transparent; flex: 1; overflow-y: auto;"
-                        >
-                            <div
-                                id="shopping-card-list"
-                                style="display: flex; flex-direction: column; gap: 10px;"
-                            >
+                        <div class="wb-centered-modal-body" style="padding: 16px; background: transparent; flex: 1; overflow-y: auto;">
+                            <div id="shopping-card-list" style="display: flex; flex-direction: column; gap: 10px;">
                                 <!-- Cards will be injected here -->
                             </div>
                         </div>
@@ -18727,40 +18371,16 @@
                 </div>
 
                 <!-- Shopping Char Selection Modal -->
-                <div
-                    class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay"
-                    id="shopping-char-selection-modal"
-                    style="z-index: 1200;"
-                >
-                    <div
-                        class="wb-centered-modal-card"
-                        style=" border-radius: 16px; background: #f7f7f5; overflow: hidden; display: flex; flex-direction: column; max-height: 70%; border: 1px solid rgba(17,17,17,0.09);"
-                    >
-                        <div
-                            class="wb-centered-modal-header"
-                            style="position: relative; flex-shrink: 0; background: transparent; border-bottom: none; padding-bottom: 0;"
-                        >
-                            <div
-                                class="wb-centered-modal-title"
-                                style="font-weight: 800; color: #111;"
-                                >选择代付人</div
-                            >
-                            <div
-                                class="wb-centered-modal-close"
-                                style="position: absolute; right: 16px; top: 16px; font-size: 18px; color: #111; cursor: pointer;"
-                                onclick="document.getElementById('shopping-char-selection-modal').style.display='none'; document.getElementById('shopping-char-selection-modal').classList.remove('active');"
-                            >
+                <div class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay" id="shopping-char-selection-modal" style="z-index: 1200;">
+                    <div class="wb-centered-modal-card" style=" border-radius: 16px; background: #f7f7f5; overflow: hidden; display: flex; flex-direction: column; max-height: 70%; border: 1px solid rgba(17,17,17,0.09);">
+                        <div class="wb-centered-modal-header" style="position: relative; flex-shrink: 0; background: transparent; border-bottom: none; padding-bottom: 0;">
+                            <div class="wb-centered-modal-title" style="font-weight: 800; color: #111;">Select a payer</div>
+                            <div class="wb-centered-modal-close" style="position: absolute; right: 16px; top: 16px; font-size: 18px; color: #111; cursor: pointer;" onclick="document.getElementById('shopping-char-selection-modal').style.display='none'; document.getElementById('shopping-char-selection-modal').classList.remove('active');">
                                 <i class="fas fa-times"></i>
                             </div>
                         </div>
-                        <div
-                            class="wb-centered-modal-body"
-                            style="padding: 16px; background: transparent; flex: 1; overflow-y: auto; padding-top: 10px;"
-                        >
-                            <div
-                                id="shopping-char-list"
-                                style="display: flex; flex-direction: column; gap: 10px;"
-                            >
+                        <div class="wb-centered-modal-body" style="padding: 16px; background: transparent; flex: 1; overflow-y: auto; padding-top: 10px;">
+                            <div id="shopping-char-list" style="display: flex; flex-direction: column; gap: 10px;">
                                 <!-- Chars will be injected here -->
                             </div>
                         </div>
@@ -18768,25 +18388,12 @@
                 </div>
 
                 <!-- Shopping Orders Sheet -->
-                <div
-                    class="bottom-sheet-overlay detail-sheet-overlay"
-                    id="shopping-orders-sheet"
-                    style="z-index: 1050;"
-                >
-                    <div
-                        class="bottom-sheet"
-                        style="height: 80%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));"
-                    >
+                <div class="bottom-sheet-overlay detail-sheet-overlay" id="shopping-orders-sheet" style="z-index: 1050;">
+                    <div class="bottom-sheet" style="height: 80%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));">
                         <div class="sheet-handle"></div>
                         <div class="sheet-title">My Orders</div>
-                        <div
-                            class="detail-sheet-content"
-                            style="flex: 1; padding: 16px; overflow-y: auto;"
-                        >
-                            <div
-                                id="shopping-orders-list"
-                                style="display: flex; flex-direction: column; gap: 16px;"
-                            >
+                        <div class="detail-sheet-content" style="flex: 1; padding: 16px; overflow-y: auto;">
+                            <div id="shopping-orders-list" style="display: flex; flex-direction: column; gap: 16px;">
                                 <!-- Orders will be injected here -->
                             </div>
                         </div>
@@ -18794,184 +18401,89 @@
                 </div>
 
                 <!-- Shopping Food Detail Sheet (Meituan/Eleme Style) -->
-                <div
-                    class="bottom-sheet-overlay detail-sheet-overlay"
-                    id="shopping-food-detail-sheet"
-                    style="z-index: 1050;"
-                >
-                    <div
-                        class="bottom-sheet"
-                        style="height: 90%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: 0; overflow: hidden; border-radius: 20px 20px 0 0;"
-                    >
+                <div class="bottom-sheet-overlay detail-sheet-overlay" id="shopping-food-detail-sheet" style="z-index: 1050;">
+                    <div class="bottom-sheet" style="height: 90%; display: flex; flex-direction: column; background: #ffffff; padding-bottom: 0; overflow: hidden; border-radius: 20px 20px 0 0;">
+
                         <!-- 沉浸式顶部返回与分享栏 -->
-                        <div
-                            style="position: absolute; top: 0; left: 0; width: 100%; height: 50px; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; z-index: 10;"
-                        >
-                            <div
-                                class="sheet-handle"
-                                style="position: absolute; left: 50%; transform: translateX(-50%); top: 8px; width: 36px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 3px;"
-                            ></div>
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 50px; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; z-index: 10;">
+                            <div class="sheet-handle" style="position: absolute; left: 50%; transform: translateX(-50%); top: 8px; width: 36px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 3px;"></div>
                         </div>
 
                         <!-- 可滚动内容区 -->
-                        <div
-                            class="detail-sheet-content"
-                            style="flex: 1; overflow-y: auto; padding: 0; padding-bottom: 20px;"
-                        >
+                        <div class="detail-sheet-content" style="flex: 1; overflow-y: auto; padding: 0; padding-bottom: 20px;">
+
                             <!-- 沉浸式商品大图 -->
                             <div style="padding: 16px;">
-                                <div
-                                    id="shopping-food-detail-media"
-                                    style="width: 100%; aspect-ratio: 4/3; display: flex; justify-content: center; align-items: center; font-size: 80px; color: #fff; background: linear-gradient(145deg, #c46f70, #4c3432); border-radius: 16px; overflow: hidden; "
-                                >
+                                <div id="shopping-food-detail-media" style="width: 100%; aspect-ratio: 4/3; display: flex; justify-content: center; align-items: center; font-size: 80px; color: #fff; background: linear-gradient(145deg, #c46f70, #4c3432); border-radius: 16px; overflow: hidden; ">
                                     <i class="fas fa-mug-hot"></i>
                                 </div>
                             </div>
 
                             <!-- 菜品基础信息卡片 -->
-                            <div
-                                style="background: #fff; padding: 20px 16px; border-radius: 16px; margin-bottom: 12px; margin-top: -8px;"
-                            >
-                                <div
-                                    id="shopping-food-detail-name"
-                                    style="font-size: 22px; font-weight: 800; color: #111; margin-bottom: 8px;"
-                                    >Berry latte set</div
-                                >
-                                <div
-                                    style="display: flex; gap: 10px; margin-bottom: 15px; font-size: 12px; color: #8e8e93;"
-                                >
-                                    <span>月售 800+</span>
-                                    <span>好评度 99%</span>
+                            <div style="background: #fff; padding: 20px 16px; border-radius: 16px; margin-bottom: 12px; margin-top: -8px;">
+                                <div id="shopping-food-detail-name" style="font-size: 22px; font-weight: 800; color: #111; margin-bottom: 8px;">Berry latte set</div>
+                                <div style="display: flex; gap: 10px; margin-bottom: 15px; font-size: 12px; color: #8e8e93;">
+                                    <span>800+ Sold</span>
+                                    <span>99% Positive</span>
                                 </div>
-                                <div
-                                    style="display: flex; justify-content: space-between; align-items: flex-end;"
-                                >
-                                    <div
-                                        id="shopping-food-detail-price"
-                                        style="font-size: 26px; font-weight: 800; color: #111;"
-                                    >
-                                        <span style="font-size: 16px;">¥</span>32
+                                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                                    <div id="shopping-food-detail-price" style="font-size: 26px; font-weight: 800; color: #111;">
+                                        <span style="font-size: 16px;">$</span>32
                                     </div>
-                                    <div
-                                        style="display: flex; align-items: center; gap: 8px; background: #f7f7f5; padding: 4px 10px; border-radius: 12px; color: #111; font-size: 12px; font-weight: 600;"
-                                    >
-                                        <i class="fas fa-star"></i> 店长推荐
+                                    <div style="display: flex; align-items: center; gap: 8px; background: #f7f7f5; padding: 4px 10px; border-radius: 12px; color: #111; font-size: 12px; font-weight: 600;">
+                                        <i class="fas fa-star"></i> Recommend
                                     </div>
                                 </div>
-                                <p
-                                    id="shopping-food-detail-desc"
-                                    style="font-size: 14px; color: #666; line-height: 1.5; margin: 15px 0 0; padding-top: 15px; border-top: 1px solid #f0f0f0;"
-                                    >Warm drink with a small pastry pairing.</p
-                                >
+                                <p id="shopping-food-detail-desc" style="font-size: 14px; color: #666; line-height: 1.5; margin: 15px 0 0; padding-top: 15px; border-top: 1px solid #f0f0f0;">Warm drink with a small pastry pairing.</p>
                             </div>
 
                             <!-- 外卖评价区 -->
-                            <div
-                                style="background: #fff; padding: 16px; border-radius: 16px; margin: 0 12px 12px;"
-                            >
-                                <div
-                                    id="shopping-food-reviews-trigger"
-                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer;"
-                                >
-                                    <div
-                                        style="font-size: 15px; font-weight: 700; color: #111;"
-                                        id="shopping-food-reviews-title"
-                                        >外卖评价 (458)</div
-                                    >
-                                    <div
-                                        style="font-size: 13px; color: #8e8e93; display: flex; align-items: center;"
-                                        >好评率 99%
-                                        <i
-                                            class="fas fa-chevron-right"
-                                            style="font-size: 10px; margin-left: 4px;"
-                                        ></i
-                                    ></div>
+                            <div style="background: #fff; padding: 16px; border-radius: 16px; margin: 0 12px 12px;">
+                                <div id="shopping-food-reviews-trigger" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer;">
+                                    <div style="font-size: 15px; font-weight: 700; color: #111;" id="shopping-food-reviews-title">Delivery Reviews (458)</div>
+                                    <div style="font-size: 13px; color: #8e8e93; display: flex; align-items: center;">no reviews yet<i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 4px;"></i></div>
                                 </div>
-                                <div
-                                    style="display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none;"
-                                >
-                                    <span
-                                        style="background: #f7f7f5; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #111; white-space: nowrap;"
-                                        >Taste(201)</span
-                                    >
-                                    <span
-                                        style="background: #f7f7f5; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #111; white-space: nowrap;"
-                                        >Packaging(156)</span
-                                    >
-                                    <span
-                                        style="background: #f7f7f5; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #111; white-space: nowrap;"
-                                        >Portion(89)</span
-                                    >
+                                <div style="display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none;">
+                                    <span style="background: #f7f7f5; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #111; white-space: nowrap;">Taste(201)</span>
+                                    <span style="background: #f7f7f5; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #111; white-space: nowrap;">Packaging(156)</span>
+                                    <span style="background: #f7f7f5; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #111; white-space: nowrap;">Portion(89)</span>
                                 </div>
-                                <div
-                                    id="shopping-food-reviews-list"
-                                    style="display: flex; flex-direction: column; gap: 10px;"
-                                >
+                                <div id="shopping-food-reviews-list" style="display: flex; flex-direction: column; gap: 10px;">
                                     <!-- Reviews injected here -->
                                 </div>
                             </div>
 
                             <!-- 商家配送信息 -->
-                            <div
-                                style="background: #fff; padding: 16px; border-radius: 16px; margin: 0 12px 12px;"
-                            >
-                                <div
-                                    style="font-size: 15px; font-weight: 700; color: #111; margin-bottom: 12px;"
-                                    >门店与配送</div
-                                >
-                                <div
-                                    style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;"
-                                >
-                                    <i
-                                        class="fas fa-store"
-                                        style="color: #8e8e93; font-size: 16px;"
-                                    ></i>
-                                    <div style="flex: 1; font-size: 14px; color: #333;"
-                                        >Premium Cafe Bakery</div
-                                    >
+                            <div style="background: #fff; padding: 16px; border-radius: 16px; margin: 0 12px 12px;">
+                                <div style="font-size: 15px; font-weight: 700; color: #111; margin-bottom: 12px;">Store & Delivery</div>
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                    <i class="fas fa-store" style="color: #8e8e93; font-size: 16px;"></i>
+                                    <div style="flex: 1; font-size: 14px; color: #333;">Premium Cafe Bakery</div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 12px;">
-                                    <i
-                                        class="fas fa-motorcycle"
-                                        style="color: #8e8e93; font-size: 16px;"
-                                    ></i>
-                                    <div style="flex: 1; font-size: 14px; color: #333;"
-                                        >Delivered in 30 mins</div
-                                    >
+                                    <i class="fas fa-motorcycle" style="color: #8e8e93; font-size: 16px;"></i>
+                                    <div style="flex: 1; font-size: 14px; color: #333;">Delivered in 30 mins</div>
                                 </div>
                             </div>
+
                         </div>
 
                         <!-- 底部外卖操作栏 -->
-                        <div
-                            style="padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: #fff; border-top: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; flex-shrink: 0; position: relative;"
-                        >
+                        <div style="padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: #fff; border-top: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; flex-shrink: 0; position: relative;">
+
                             <!-- 悬浮购物车图标 -->
-                            <div
-                                style="position: relative; width: 50px; height: 50px; border-radius: 50%; background: #111; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 20px;  transform: translateY(-15px); border: 4px solid #fff; cursor: pointer;"
-                            >
+                            <div style="position: relative; width: 50px; height: 50px; border-radius: 50%; background: #111; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 20px;  transform: translateY(-15px); border: 4px solid #fff; cursor: pointer;">
                                 <i class="fas fa-shopping-cart"></i>
                                 <!-- 购物车角标，假设这里已有商品才显示 -->
-                                <div
-                                    style="position: absolute; top: -5px; right: -5px; background: #111; color: #fff; font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid #fff; display: none;"
-                                    >1</div
-                                >
+                                <div style="position: absolute; top: -5px; right: -5px; background: #111; color: #fff; font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid #fff; display: none;">1</div>
                             </div>
 
                             <div style="flex: 1; display: flex; flex-direction: column;">
-                                <div
-                                    style="font-size: 18px; font-weight: 800; color: #111;"
-                                    id="shopping-food-bottom-price"
-                                    >¥0</div
-                                >
+                                <div style="font-size: 18px; font-weight: 800; color: #111;" id="shopping-food-bottom-price">$0</div>
+                                <div style="font-size: 11px; color: #8e8e93;">Delivery $5</div>
                             </div>
 
-                            <button
-                                type="button"
-                                id="shopping-food-add-to-cart-btn"
-                                style="padding: 12px 24px; background: #111; color: #fff; border: none; border-radius: 999px; font-size: 15px; font-weight: 700; cursor: pointer;"
-                                >Add to cart</button
-                            >
+                            <button type="button" id="shopping-food-add-to-cart-btn" style="padding: 12px 24px; background: #111; color: #fff; border: none; border-radius: 999px; font-size: 15px; font-weight: 700; cursor: pointer;">Add to cart</button>
                         </div>
                     </div>
                 </div>
@@ -21589,7 +21101,7 @@
         <script src="js/imessage/data_utils.js?v=20261007-107-r1"></script>
         <script src="js/imessage/weather_context.js?v=20261007-107-r1"></script>
         <script src="js/imessage/online_prompts.js?v=20260905-v2&repair=20261003"></script>
-        <script src="js/imessage/2_core.js?v=20261007-107-r1"></script>
+        <script src="js/imessage/2_core.js?v=20261007-107-r1&shop-moments=20261010-v1"></script>
         <script src="js/imessage/vector_memory.js?v=20260807-local-vector-memory-v1&memory-recall-promotion=20260813-v1&repair=20261003"></script>
         <script src="js/imessage/3_contacts.js?v=20260718-friend-profile-import-v1&render-cache=20260801-v1&vendor-lazy=20260803-v1&startup-queue=20260804-v1&official=20260827-v1&contact-card-actions=20260916-v4&repair=20261003"></script>
         <script src="js/imessage/3_groups.js?v=20260718-group-poll-v4-group-memory-editor-v1&observer=20260730-v1&render-cache=20260801-v1&user-avatar=20260802-v1&group-auto-translation=20260803-v1&startup-queue=20260804-v1&context-limit=20260804-v1&group-identity-css-v1&member-sync-private-permissions=20260812-v1&theme-avatar-hooks=20260814-v2&worldbook=20260817-v1&online-chat-optimization=20260818-v1&token-usage=20260822-v1&online-prompts=20260905-v2&history-index=20260907-v1&cross-group-memory=20260919-v1&group-chat-search=20260924-v1&tap-response=20260924-v1&repair=20261003"></script>
@@ -21597,7 +21109,7 @@
         <script src="js/imessage/4_chat_common.js?v=image-assets-20260803-v1&auto-image=20260807-v1&startup-queue=20260804-v1&auto-face-lock=20260813-v1&prompt-parts=20260819-v1&repair=20261003"></script>
         <script src="js/imessage/4_chat_status.js?v=20260821-status-memory-request-v1&template-avatar=20260821-v1&template-history-fallback=20260821-v1&paging=20260801-button-only-v1&startup-queue=20260804-v1&status-refresh=20260821-v1&offline-html-template-sanitize=20260822-v1&status-css-snapshot=20260822-v1&imessage-performance=20260825-v1&mcp-chat-settings=20260901-v2&repair=20261003"></script>
         <script src="js/imessage/4_chat_payment.js?v=20260725-single-chat-cot-v1&startup-queue=20260804-v1&group-identity-css-v1&group-member-resolution=20260812-v1&repair=20261003"></script>
-        <script src="js/imessage/4_chat_bubbles.js?v=20261007-107-r1"></script>
+        <script src="js/imessage/4_chat_bubbles.js?v=20261007-107-r1&shop-moments=20261010-v1"></script>
         <script src="js/imessage/chat_search.js?v=20260718-chat-history-search-v2&keyboard-guard=20260801-v1&startup-queue=20260804-v1&location-timezone=20260825-v1&location-translation=20260825-v1&history-index=20260907-v1&group-chat-search=20260924-v3&repair=20261003"></script>
         <script src="js/imessage/chat_favorites.js?v=20260723-chat-favorites-v3&startup-queue=20260804-v1&repair=20261003"></script>
         <script src="js/imessage/tts.js?v=20261007-107-r1"></script>
@@ -21614,7 +21126,7 @@
         <script src="js/imessage/4_chat_main.js?v=20261007-107-r1"></script>
         <script src="js/imessage/online_prompt_settings.js?v=20260905-v6&repair=20261003"></script>
         <script src="js/imessage/5_settings.js?v=20261009-original-layout-clear"></script>
-        <script src="js/imessage/6_moments.js?v=20260718-moments-target-reply-v1&auto-translation=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&current-account-avatar-v1&moment-visibility=20260811-v1&relationship-engagement=20260811-v1&char-batch=20260825-v1&comment-threads=20260825-v3&private-chat-labels=20260825-v1&moment-private-chats=20260825-v4&interaction-render=20260911-v1&api-error-dialog=20260923-v1&moments-home=20260923-v2&repair=20261003"></script>
+        <script src="js/imessage/6_moments.js?v=20260718-moments-target-reply-v1&auto-translation=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&current-account-avatar-v1&moment-visibility=20260811-v1&relationship-engagement=20260811-v1&char-batch=20260825-v1&comment-threads=20260825-v3&private-chat-labels=20260825-v1&moment-private-chats=20260825-v4&interaction-render=20260911-v1&api-error-dialog=20260923-v1&moments-home=20260923-v2&repair=20261003&shop-moments=20261010-v1"></script>
 
         <script src="js/imessage/user_phone_access_ui.js?v=20260928-auto-toggle-scroll-v1&ihg=20260929-106-r1&repair=20261003"></script>
 
@@ -21625,7 +21137,7 @@
         <script src="js/builtin_worldbook.js?v=20260713-disable-override-limit-v2&repair=20261003"></script>
         <script src="js/worldbook.js?v=20261007-107-r1"></script>
         <!-- 引入核心 UI 管理与设置模块脚本 -->
-        <script src="js/ui.js?v=20260811-no-glass-v1&toast-full-message=20260822-v1&notification-banner-v3&repair=20261003"></script>
+        <script src="js/ui.js?v=20260811-no-glass-v1&toast-full-message=20260822-v1&notification-banner-v3&repair=20261003&shop-moments=20261010-v1"></script>
         <script src="js/ui_translation.js?v=20260807-global-ui-zh-v1&repair=20261003"></script>
         <script src="js/settings.js?v=20261007-107-r1"></script>
         <script src="js/imessage/official_accounts.js?v=20260828-youtu-preview-stable-v5&api-error-dialog=20260923-v1&official-css-generation=20260928-v1&ihg=20260929-106-r1&repair=20261003"></script>
@@ -21649,7 +21161,7 @@
         <script src="js/youtube/8_user_live.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003"></script>
         <script src="js/netflix_game_core.js?v=20260811-character-relations-v3&repair=20261003"></script>
         <script src="js/netflix.js?v=20260928-story-hub-direct-v3&open-performance=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&ihg=20260929-106-r1&repair=20261003"></script>
-        <script src="js/shopping.js?v=20260710-storage-ready-v1&performance=20260801-v2&api=20260803-unified-v1&startup-queue=20260804-v1&shop-fixes=20260820-v2&api-error-dialog=20260923-v1&layout=20260923-gallery-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003"></script>
+        <script src="js/shopping.js?v=20260710-storage-ready-v1&performance=20260801-v2&api=20260803-unified-v1&startup-queue=20260804-v1&shop-fixes=20260820-v2&api-error-dialog=20260923-v1&layout=20260923-gallery-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1"></script>
         <script src="js/xapp.js?v=20261007-107-r1"></script>
         <script src="js/custom_app_template_source.js?v=20260830-custom-apps-v6-user-profile&repair=20261003"></script>
         <script src="js/custom_app_runtime.js?v=20260830-custom-apps-v13-icon-only-same-origin&repair=20261003"></script>
@@ -21663,6 +21175,6 @@
         <script src="js/home_desktop.js?v=20261007-107-r1"></script>
         <script src="js/home_widget_panel_enhance.js?v=20260830-widget-image-flush-v1&couple-text=20260911-v1&repair=20261003"></script>
         <!-- 引入主逻辑脚本 -->
-        <script src="script.js?v=20260725-modal-owner-v1&home-swipe=20260801-scrollend-v2&performance=20260801-v1&splash-notice-handshake=20260813-v1&reader-selection=20260819-v1&ihg=20260929-106-r1&repair=20261003"></script>
+        <script src="script.js?v=20260725-modal-owner-v1&home-swipe=20260801-scrollend-v2&performance=20260801-v1&splash-notice-handshake=20260813-v1&reader-selection=20260819-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1"></script>
     </body>
 </html>

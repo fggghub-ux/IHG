@@ -31,6 +31,7 @@ function showToast(value) {
         document.body.appendChild(toast));
     const textContent_2 = String(value || '');
     toastHideTimer && (clearTimeout(toastHideTimer), (toastHideTimer = null));
+    toast.classList.toggle('shop-success-toast', textContent_2 === 'Payment successful' || textContent_2 === 'Payment request sent');
     toast.textContent = textContent_2;
     toast.classList.add('show');
     const value_3 = textContent_2.length > 80 ? 8000 : 2500;
