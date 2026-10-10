@@ -532,41 +532,45 @@
     letter-spacing: 0;
 }
 /* 好友手机桌面统一使用白底黑色图标 */
-#friend-phone-app-music > div,
-#friend-phone-app-health > div,
-#friend-phone-app-pay > div,
-#friend-phone-app-game > div,
-#friend-phone-app-call > div,
-#friend-phone-app-files > div,
-#friend-phone-app-weibo > div,
+#friend-phone-app-music > div:first-child,
+#friend-phone-app-health > div:first-child,
+#friend-phone-app-pay > div:first-child,
+#friend-phone-app-game > div:first-child,
+#friend-phone-app-call > div:first-child,
+#friend-phone-app-files > div:first-child,
+#friend-phone-app-weibo > div:first-child,
 #friend-phone-app-settings,
 #friend-phone-app-imessage,
 #friend-phone-app-safari {
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid rgba(0, 0, 0, .08) !important;
     background: #fff !important;
     color: #111 !important;
     box-shadow: none !important;
+    overflow: hidden;
+    padding: 0;
 }
 
-/* The app labels are the second child; keep them as plain text rather than
-   treating them as another icon tile. */
-#friend-phone-app-music > div:last-child,
-#friend-phone-app-health > div:last-child,
-#friend-phone-app-pay > div:last-child,
-#friend-phone-app-game > div:last-child,
-#friend-phone-app-call > div:last-child,
-#friend-phone-app-files > div:last-child,
-#friend-phone-app-weibo > div:last-child {
+#lovers-friend-phone-view .friend-phone-app-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+}
+
+#friend-phone-app-music > div:first-child,
+#friend-phone-app-pay > div:first-child,
+#friend-phone-app-game > div:first-child,
+#friend-phone-app-call > div:first-child {
     border: 0 !important;
-    background: transparent !important;
-    color: #111 !important;
-    box-shadow: none !important;
 }
 
-#lovers-friend-phone-view > div[style*='grid-template-columns'] > div > div:last-child {
-    background: transparent !important;
-    color: #111 !important;
-    text-shadow: none !important;
+#friend-phone-app-music .friend-phone-app-icon,
+#friend-phone-app-pay .friend-phone-app-icon,
+#friend-phone-app-game .friend-phone-app-icon,
+#friend-phone-app-call .friend-phone-app-icon {
+    border-radius: 0;
+    transform: scale(1.08);
 }
 
 .friend-mac-dock {

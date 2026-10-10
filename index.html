@@ -19292,81 +19292,39 @@
                     style="padding: max(80px, calc(60px + var(--safe-top))) 30px 40px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px 15px;"
                 >
                     <!-- Music -->
-                    <div
-                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;"
-                        id="friend-phone-app-music"
-                    >
-                        <div
-                            style="width: 60px; height: 60px; border-radius: 14px; background: #ff2d55; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 30px; "
-                            ><i class="fas fa-music"></i
-                        ></div>
-                        <div style="font-size: 12px; color: #333; font-weight: 500;">Music</div>
+                    <div id="friend-phone-app-music" aria-label="Music" title="Music" class="app-item">
+                        <div style="background: rgb(255, 45, 85); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 30px;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/lover/char-phone-music.jpg" alt=""></div>
+                        <div class="friend-phone-app-label app-name">Music</div>
                     </div>
                     <!-- 健康 -->
-                    <div
-                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;"
-                        id="friend-phone-app-health"
-                    >
-                        <div
-                            style="width: 60px; height: 60px; border-radius: 14px; background: #fff; color: #ff2d55; display: flex; justify-content: center; align-items: center; font-size: 32px; "
-                            ><i class="fas fa-heart"></i
-                        ></div>
-                        <div style="font-size: 12px; color: #333; font-weight: 500;">健康</div>
+                    <div id="friend-phone-app-health" aria-label="Health" title="Health" class="app-item">
+                        <div style="background: rgb(255, 255, 255); color: rgb(255, 45, 85); display: flex; justify-content: center; align-items: center; font-size: 32px;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/lover/char-phone-health.jpg" alt=""></div>
+                        <div class="friend-phone-app-label app-name">Health</div>
                     </div>
                     <!-- Pay -->
-                    <div
-                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;"
-                        id="friend-phone-app-pay"
-                    >
-                        <div
-                            style="width: 60px; height: 60px; border-radius: 14px; background: #007aff; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 28px; "
-                            ><i class="fas fa-wallet"></i
-                        ></div>
-                        <div style="font-size: 12px; color: #333; font-weight: 500;">Pay</div>
+                    <div id="friend-phone-app-pay" aria-label="Wallet" title="Wallet" class="app-item">
+                        <div style="background: rgb(0, 122, 255); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 28px;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/lover/char-phone-wallet.jpg" alt=""></div>
+                        <div class="friend-phone-app-label app-name">Wallet</div>
                     </div>
                     <!-- Game -->
-                    <div
-                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;"
-                        id="friend-phone-app-game"
-                    >
-                        <div
-                            style="width: 60px; height: 60px; border-radius: 14px; background: #000; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 30px; "
-                            ><i class="fas fa-gamepad"></i
-                        ></div>
-                        <div style="font-size: 12px; color: #333; font-weight: 500;">Game</div>
+                    <div id="friend-phone-app-game" aria-label="Games" title="Games" class="app-item">
+                        <div style="background: rgb(0, 0, 0); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 30px;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/lover/char-phone-games.jpg" alt=""></div>
+                        <div class="friend-phone-app-label app-name">Games</div>
                     </div>
                     <!-- 电话 -->
-                    <div
-                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;"
-                        id="friend-phone-app-call"
-                    >
-                        <div
-                            style="width: 60px; height: 60px; border-radius: 14px; background: #34c759; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 28px;  transform: rotate(90deg);"
-                            ><i class="fas fa-phone"></i
-                        ></div>
-                        <div style="font-size: 12px; color: #333; font-weight: 500;">call</div>
+                    <div id="friend-phone-app-call" aria-label="Phone" title="Phone" class="app-item">
+                        <div style="background: rgb(52, 199, 89); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 28px;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/lover/char-phone-phone.jpg" alt=""></div>
+                        <div class="friend-phone-app-label app-name">Phone</div>
                     </div>
                     <!-- 文件 (Files) -->
-                    <div
-                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;"
-                        id="friend-phone-app-files"
-                    >
-                        <div
-                            style="width: 60px; height: 60px; border-radius: 14px; background: #fff; color: #007aff; display: flex; justify-content: center; align-items: center; font-size: 30px; "
-                            ><i class="far fa-folder-open"></i
-                        ></div>
-                        <div style="font-size: 12px; color: #333; font-weight: 500;">文件</div>
+                    <div id="friend-phone-app-files" aria-label="Files" title="Files" class="app-item">
+                        <div style="background: rgb(255, 255, 255); color: rgb(0, 122, 255); display: flex; justify-content: center; align-items: center; font-size: 30px;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/lover/char-phone-files.jpg" alt=""></div>
+                        <div class="friend-phone-app-label app-name">Files</div>
                     </div>
                     <!-- Weibo -->
-                    <div
-                        style="display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;"
-                        id="friend-phone-app-weibo"
-                    >
-                        <div
-                            style="width: 60px; height: 60px; border-radius: 14px; background: linear-gradient(135deg, #ff8a00, #ff2d55); color: #fff; display: flex; justify-content: center; align-items: center; font-size: 30px;"
-                            ><i class="fab fa-weibo"></i
-                        ></div>
-                        <div style="font-size: 12px; color: #333; font-weight: 500;">微博</div>
+                    <div id="friend-phone-app-weibo" aria-label="Weibo" title="Weibo" class="app-item">
+                        <div style="background: linear-gradient(135deg, #ff8a00, #ff2d55); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 30px;" class="app-icon icon-placeholder"><i class="fab fa-weibo"></i></div>
+                        <div class="friend-phone-app-label app-name">Weibo</div>
                     </div>
                 </div>
 
@@ -19810,7 +19768,7 @@
                                 >
                             </div>
                             <div
-                                style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: #ff8200; font-size: 19px; cursor: pointer; flex-shrink: 0;"
+                                style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: #171719; font-size: 19px; cursor: pointer; flex-shrink: 0;"
                                 ><i class="fas fa-plus-circle"></i
                             ></div>
                         </div>
@@ -19850,7 +19808,7 @@
                                     <div style="display: flex; gap: 8px; margin-bottom: 4px;">
                                         <div
                                             id="friend-weibo-switch-account-btn"
-                                            style="height: 30px; padding: 0 14px; border-radius: 15px; border: 1px solid #ff8200; color: #ff8200; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; cursor: pointer;"
+                                            style="height: 30px; padding: 0 14px; border-radius: 15px; border: 1px solid #e7e7eb; color: #171719; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; cursor: pointer;"
                                             >切换账号</div
                                         >
                                     </div>
@@ -19903,7 +19861,7 @@
                                 style="flex: 1; height: 44px; display: flex; align-items: center; justify-content: center; color: #111; font-size: 15px; font-weight: 700; position: relative; cursor: pointer;"
                                 >主页<div
                                     class="friend-weibo-tab-line"
-                                    style="position: absolute; bottom: 0; width: 24px; height: 3px; border-radius: 3px; background: #ff8200;"
+                                    style="position: absolute; bottom: 0; width: 24px; height: 3px; border-radius: 3px; background: #171719;"
                                 ></div
                             ></div>
                             <div
@@ -19912,7 +19870,7 @@
                                 style="flex: 1; height: 44px; display: flex; align-items: center; justify-content: center; color: #777; font-size: 15px; font-weight: 600; position: relative; cursor: pointer;"
                                 >相册<div
                                     class="friend-weibo-tab-line"
-                                    style="display: none; position: absolute; bottom: 0; width: 24px; height: 3px; border-radius: 3px; background: #ff8200;"
+                                    style="display: none; position: absolute; bottom: 0; width: 24px; height: 3px; border-radius: 3px; background: #171719;"
                                 ></div
                             ></div>
                             <div
@@ -19921,7 +19879,7 @@
                                 style="flex: 1; height: 44px; display: flex; align-items: center; justify-content: center; color: #777; font-size: 15px; font-weight: 600; position: relative; cursor: pointer;"
                                 >赞过<div
                                     class="friend-weibo-tab-line"
-                                    style="display: none; position: absolute; bottom: 0; width: 24px; height: 3px; border-radius: 3px; background: #ff8200;"
+                                    style="display: none; position: absolute; bottom: 0; width: 24px; height: 3px; border-radius: 3px; background: #171719;"
                                 ></div
                             ></div>
                         </div>
@@ -19972,23 +19930,11 @@
                     style="margin-top: auto; margin-bottom: max(30px, calc(10px + var(--safe-bottom))); align-self: center; background: rgba(0,0,0,0.04);   border-radius: 35px; padding: 18px 22px; display: flex; gap: 20px; "
                 >
                     <!-- 设置 -->
-                    <div
-                        id="friend-phone-app-settings"
-                        style="width: 60px; height: 60px; border-radius: 14px; background: #8e8e93; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 32px; cursor: pointer;"
-                        ><i class="fas fa-cog"></i
-                    ></div>
+                    <div id="friend-phone-app-settings" aria-label="Settings" title="Settings" style="background: rgb(142, 142, 147); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 32px; cursor: pointer;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/lover/char-phone-settings.jpg" alt=""></div>
                     <!-- iMessage -->
-                    <div
-                        id="friend-phone-app-imessage"
-                        style="width: 60px; height: 60px; border-radius: 14px; background: #34c759; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 30px; cursor: pointer;"
-                        ><i class="fas fa-comment"></i
-                    ></div>
+                    <div id="friend-phone-app-imessage" aria-label="Message" title="Message" style="background: rgb(52, 199, 89); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 30px; cursor: pointer;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/lover/char-phone-message.jpg" alt=""></div>
                     <!-- Safari -->
-                    <div
-                        id="friend-phone-app-safari"
-                        style="width: 60px; height: 60px; border-radius: 14px; background: #fff; color: #007aff; display: flex; justify-content: center; align-items: center; font-size: 34px; cursor: pointer;"
-                        ><i class="far fa-compass"></i
-                    ></div>
+                    <div id="friend-phone-app-safari" aria-label="Safari" title="Safari" style="background: rgb(255, 255, 255); color: rgb(0, 122, 255); display: flex; justify-content: center; align-items: center; font-size: 34px; cursor: pointer;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/lover/char-phone-safari.jpg" alt=""></div>
                 </div>
             </div>
 

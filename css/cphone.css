@@ -2,13 +2,39 @@
     position: absolute;
     inset: 0;
     z-index: 120;
-    display: none;
     flex-direction: column;
     background: #fbfbfc;
     color: #101012;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif;
 }
-.app-view.cphone-view.active {
+:is(#cphone-view,
+    #lovers-friend-phone-view,
+    #friend-files-view,
+    #friend-health-view,
+    #friend-pay-view,
+    #friend-game-view,
+    #friend-weibo-view,
+    #friend-safari-view,
+    #friend-music-view,
+    #friend-phonecall-view,
+    #friend-phone-settings-sheet,
+    #friend-imessage-view,
+    #friend-reverse-chat-view) {
+    display: none;
+}
+:is(#cphone-view,
+    #lovers-friend-phone-view,
+    #friend-files-view,
+    #friend-health-view,
+    #friend-pay-view,
+    #friend-game-view,
+    #friend-weibo-view,
+    #friend-safari-view,
+    #friend-music-view,
+    #friend-phonecall-view,
+    #friend-phone-settings-sheet,
+    #friend-imessage-view,
+    #friend-reverse-chat-view).active {
     display: flex;
 }
 .cphone-view[hidden],
@@ -87,7 +113,7 @@
 
 #lovers-friend-phone-view.lovers-friend-phone-view {
     overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif;
+    font-family: inherit;
 }
 #lovers-friend-phone-view.lovers-friend-phone-view:is(
         .has-custom-wallpaper,
@@ -198,24 +224,6 @@
 #lovers-friend-phone-view .cphone-home-grid > div {
     width: 100%;
     min-width: 0;
-}
-#lovers-friend-phone-view .cphone-home-grid > div > div:first-child,
-#lovers-friend-phone-view .cphone-home-dock > div {
-    width: min(60px, 100%) !important;
-    aspect-ratio: 1;
-    height: auto !important;
-    border-radius: 17px !important;
-    box-shadow: 0 8px 20px rgba(15, 15, 18, 0.07) !important;
-}
-#lovers-friend-phone-view.lovers-friend-phone-view .cphone-home-grid > div > div:last-child {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: #171719 !important;
-    text-shadow: none !important;
-    font-size: 11px !important;
-    font-weight: 650 !important;
 }
 #lovers-friend-phone-view .cphone-home-dock {
     box-sizing: border-box;
@@ -760,13 +768,9 @@
 }
 
 /* Other Char phone apps share the Messages surface, controls, and list rhythm. */
-#lovers-friend-phone-view.lovers-friend-phone-view,
 :is(
-    #friend-files-view,
     #friend-health-view,
     #friend-pay-view,
-    #friend-game-view,
-    #friend-weibo-view,
     #friend-safari-view,
     #friend-music-view,
     #friend-phonecall-view,
@@ -777,11 +781,8 @@
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif;
 }
 :is(
-        #friend-files-view,
         #friend-health-view,
         #friend-pay-view,
-        #friend-game-view,
-        #friend-weibo-view,
         #friend-safari-view,
         #friend-music-view,
         #friend-phonecall-view
@@ -816,7 +817,6 @@
 :is(
         #friend-health-view,
         #friend-pay-view,
-        #friend-game-view,
         #friend-music-view,
         #friend-phonecall-view
     )
@@ -830,11 +830,8 @@
     letter-spacing: -0.045em;
 }
 :is(
-    #friend-files-back-btn,
     #friend-health-back-btn,
     #friend-pay-back-btn,
-    #friend-game-back-btn,
-    #friend-weibo-back-btn,
     #friend-safari-back-btn,
     #friend-music-back-btn,
     #friend-phonecall-back-btn
@@ -871,16 +868,9 @@
     outline: 2px solid #171719;
     outline-offset: 3px;
 }
-#friend-weibo-back-btn {
-    position: relative !important;
-    top: auto;
-    left: auto !important;
-}
 :is(
-    #friend-files-content,
     #friend-health-content,
     #friend-pay-content,
-    #friend-game-content,
     #friend-music-content,
     #friend-phonecall-view > div:last-child
 ) {
@@ -888,36 +878,9 @@
     background: #fbfbfc !important;
     -webkit-overflow-scrolling: touch;
 }
-#friend-files-content {
-    padding: 18px !important;
-}
-#friend-files-content > div:first-child {
-    font-size: clamp(35px, 10vw, 43px) !important;
-    letter-spacing: -0.045em;
-}
-#friend-files-content > div[style*='background: #fff'] {
-    border: 1px solid #ececf0;
-    border-radius: 19px !important;
-    overflow: hidden;
-}
-#friend-files-content > div[style*='background: #e5e5ea'] {
-    box-sizing: border-box;
-    height: 45px !important;
-    border: 1px solid #e6e6ea;
-    border-radius: 15px !important;
-    background: #f0f0f3 !important;
-}
-#friend-files-tags-list > div,
-#friend-files-tags-list .file-item-clickable {
-    border-color: #ececf0 !important;
-    border-radius: 19px !important;
-}
 #friend-health-content > div[style*='background: #fff'] {
     border: 1px solid #ececf0 !important;
     border-radius: 19px !important;
-}
-#friend-health-content > div[style*='background: #fff'] i {
-    color: #171719 !important;
 }
 #friend-pay-content > div:last-child > div:last-child,
 #pay-tx-container > div:last-child {
@@ -925,44 +888,84 @@
     border-radius: 19px !important;
     background: #fff;
 }
+#friend-game-view,
+#friend-game-view > div:first-child {
+    background: #111 !important;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif;
+}
+#friend-game-view > div:first-child {
+    border-bottom: 0 !important;
+}
+#friend-game-view > div:first-child > div > div:last-child {
+    color: #fff !important;
+    font-size: clamp(35px, 10vw, 43px) !important;
+    line-height: 1.02;
+    font-weight: 750 !important;
+    letter-spacing: -0.045em;
+}
+#friend-game-back-btn {
+    position: absolute !important;
+    top: 8px;
+    left: 18px !important;
+    width: 38px !important;
+    height: 38px !important;
+    display: grid !important;
+    place-items: center !important;
+    padding: 0 !important;
+    border: 1px solid #3a3a3c;
+    border-radius: 50%;
+    background: #242424 !important;
+    color: #fff !important;
+    box-shadow: 0 8px 24px rgba(15, 15, 18, 0.07);
+    font-size: 15px !important;
+    cursor: pointer;
+    flex: none;
+    z-index: 2;
+}
 #friend-game-content {
     padding: 18px !important;
+    min-height: 0;
+    background: #111 !important;
+    -webkit-overflow-scrolling: touch;
 }
 #friend-game-content > div:first-child > div:first-child,
 .game-history-item-new > div:first-child {
     border: 0 !important;
-    background: #f0f0f3 !important;
-    color: #171719 !important;
+    background: #242424 !important;
+    color: #fff !important;
 }
 #friend-game-content > div:first-child [style*='color: #fff'],
 #friend-game-content > div:nth-child(2),
 .game-history-item-new [style*='color: #fff'] {
-    color: #171719 !important;
+    color: #fff !important;
 }
 .game-history-item-new {
-    border: 1px solid #ececf0 !important;
+    border: 1px solid #555 !important;
     border-radius: 19px !important;
-    background: #fff !important;
-    color: #171719 !important;
+    background: #111 !important;
+    color: #fff !important;
 }
 .game-history-item-new [style*='background: #3a3a3c'] {
-    background: #f0f0f3 !important;
+    background: #242424 !important;
 }
 #friend-game-content > div:nth-child(3) > div {
-    border: 1px solid #ececf0;
+    border: 1px solid #555;
     border-radius: 19px !important;
-    background: #fff !important;
+    background: #111 !important;
 }
 #friend-game-content > div:nth-child(3) > div [style*='color: #fff'] {
-    color: #171719 !important;
+    color: #fff !important;
 }
 #friend-game-view .friend-phone-generated-time.is-dark,
-#friend-game-view .friend-phone-translate-toggle {
-    color: #85858b;
+#friend-game-view .friend-phone-translate-toggle,
+.friend-game-detail .friend-phone-translate-toggle {
+    color: #aaa;
 }
-#friend-game-view .friend-phone-translation {
-    background: #f0f0f3;
-    color: #4b4b50;
+#friend-game-view .friend-phone-translation,
+.friend-game-detail .friend-phone-translation {
+    background: #242424;
+    color: #ccc;
 }
 #friend-music-content > div {
     box-sizing: border-box;
@@ -1025,38 +1028,13 @@
 :is(#friend-call-list, #friend-contact-list) .fa-info-circle {
     color: #85858b !important;
 }
-#friend-weibo-view > div:nth-child(2),
-#friend-weibo-pages,
-.friend-weibo-page {
-    background: #fbfbfc !important;
-}
-#friend-weibo-view > div:first-child > div > div:nth-child(2),
 #friend-safari-search-bar {
     border: 1px solid #e6e6ea;
     border-radius: 15px !important;
     background: #f0f0f3 !important;
 }
-#friend-weibo-view > div:first-child > div > div:last-child,
-#friend-weibo-switch-account-btn {
-    color: #171719 !important;
-    border-color: #e7e7eb !important;
-}
-#friend-weibo-tabs {
-    background: #fbfbfc !important;
-    border-color: #e7e7eb !important;
-}
-.friend-weibo-tab-line {
-    background: #171719 !important;
-}
-.friend-weibo-post-card {
-    margin: 0 12px;
-    border: 1px solid #ececf0;
-    border-radius: 19px;
-    background: #fff !important;
-}
-#friend-weibo-view .friend-weibo-page > div {
-    gap: 8px;
-}
+
+
 #friend-safari-normal-mode {
     background: #fbfbfc !important;
     border-radius: 0 !important;
@@ -1074,9 +1052,9 @@
     border-color: #3a3a3f;
     background: #2c2c30 !important;
 }
-#friend-safari-history-list .safari-history-item-new {
-    padding: 15px !important;
-    border: 1px solid #ececf0 !important;
+#friend-safari-history-list {
+    padding: 0 15px;
+    border: 1px solid #ececf0;
     border-radius: 19px;
     background: #fff;
 }
@@ -1222,9 +1200,6 @@
     outline-offset: 2px;
 }
 @media (max-width: 360px) {
-    #lovers-friend-phone-view .cphone-home-grid > div > div:first-child {
-        width: min(53px, 100%) !important;
-    }
     #lovers-friend-phone-view .cphone-home-grid {
         gap: 20px 6px !important;
         padding-inline: 16px !important;

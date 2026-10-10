@@ -1,3 +1,16 @@
+const FRIEND_PHONE_APP_META = Object.freeze({
+    music: { name: 'Music', icon: 'assets/lover/char-phone-music.jpg' },
+    health: { name: 'Health', icon: 'assets/lover/char-phone-health.jpg' },
+    pay: { name: 'Wallet', icon: 'assets/lover/char-phone-wallet.jpg' },
+    game: { name: 'Games', icon: 'assets/lover/char-phone-games.jpg' },
+    call: { name: 'Phone', icon: 'assets/lover/char-phone-phone.jpg' },
+    files: { name: 'Files', icon: 'assets/lover/char-phone-files.jpg' },
+    weibo: { name: 'Weibo', icon: null },
+    settings: { name: 'Settings', icon: 'assets/lover/char-phone-settings.jpg' },
+    imessage: { name: 'Message', icon: 'assets/lover/char-phone-message.jpg' },
+    safari: { name: 'Safari', icon: 'assets/lover/char-phone-safari.jpg' }
+});
+
 window.lovesApp = {
     view: null,
     backBtn: null,
@@ -5567,7 +5580,26 @@ Char 已存：` +
                 '<i class="fas fa-wand-magic-sparkles"></i><span>生成选中的应用数据</span>';
         }
     },
+    syncFriendPhoneAppMetadata: function() {
+        Object.entries(FRIEND_PHONE_APP_META).forEach(([key, meta]) => {
+            const app = document.getElementById(`friend-phone-app-${key}`);
+            if (!app) return;
+
+            app.setAttribute('aria-label', meta.name);
+            app.setAttribute('title', meta.name);
+
+            const label = app.querySelector('.friend-phone-app-label');
+            if (label) label.textContent = meta.name;
+
+            const image = app.querySelector('.friend-phone-app-icon');
+            if (image && meta.icon && image.getAttribute('src') !== meta.icon) {
+                image.src = meta.icon;
+            }
+        });
+    },
+
     openFriendPhone: function (friend_28) {
+        this.syncFriendPhoneAppMetadata();
         const loversFriendPhoneViewElement = document.getElementById('lovers-friend-phone-view');
         if (!loversFriendPhoneViewElement || friend_28?.type !== 'char') return;
         String(this.currentFriend?.id || '') !== String(friend_28?.id || '') &&
@@ -7666,17 +7698,17 @@ Extracted:`,
                                         g_3 = friend_28.gameData.recentGames[attribute_511];
                                     let content_9 = '';
                                     if (Array.isArray(g_3.matches)) {
-                                        content_9 += `<div style="background: #f4f4f5; border-radius: 24px; padding: 16px; margin-bottom: 16px;">
-                                            <div style="font-weight: 700; color: #111; margin-bottom: 12px; padding-left: 4px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-gamepad" style="color: #111;"></i> 近期对局 (点击查看单局详情)</div>`;
+                                        content_9 += `<div style="background: #242424; border-radius: 24px; padding: 16px; margin-bottom: 16px;">
+                                            <div style="font-weight: 700; color: #fff; margin-bottom: 12px; padding-left: 4px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-gamepad" style="color: #fff;"></i> 近期对局 (点击查看单局详情)</div>`;
                                         g_3.matches.forEach((m_9, value_515) => {
                                             const isWin =
                                                     m_9.result === '胜利' || m_9.result === 'Win',
-                                                bgColor = isWin ? '#111' : '#fff',
-                                                textColor = isWin ? '#fff' : '#8e8e93',
-                                                value_522 = isWin ? '#fff' : '#111',
-                                                kdaBgColor = isWin ? '#333' : '#f4f4f5',
-                                                value_524 = isWin ? '#fff' : '#111',
-                                                value_525 = isWin ? '#fff' : '#111',
+                                                bgColor = isWin ? '#242424' : '#111',
+                                                textColor = isWin ? '#fff' : '#aaa',
+                                                value_522 = '#fff',
+                                                kdaBgColor = isWin ? '#333' : '#242424',
+                                                value_524 = '#fff',
+                                                value_525 = '#fff',
                                                 encodeURIComponent_526 = encodeURIComponent(
                                                     JSON.stringify(m_9),
                                                 );
@@ -7686,7 +7718,7 @@ Extracted:`,
                                                 encodeURIComponent_526 +
                                                 '" style="display: flex; align-items: center; justify-content: space-between; background: ' +
                                                 bgColor +
-                                                `; border: 1px solid #e5e5ea; border-radius: 16px; padding: 16px; margin-bottom: 10px; cursor: pointer;">
+                                                `; border: 1px solid #555; border-radius: 16px; padding: 16px; margin-bottom: 10px; cursor: pointer;">
                                                 <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 50px; pointer-events: none;">
                                                     <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(142,142,147,0.1); display: flex; justify-content: center; align-items: center; color: ` +
                                                 value_525 +
@@ -7741,18 +7773,18 @@ Extracted:`,
                                         typeof g_3.matches === 'string' &&
                                             g_3.matches &&
                                             (content_9 +=
-                                                `<div style="background: #f4f4f5; border-radius: 24px; padding: 16px; margin-bottom: 16px;">
-                                            <div style="font-weight: 700; color: #111; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-history" style="color: #111;"></i> 近期对局</div>
-                                            <div style="color: #333; line-height: 1.6; font-size: 14px;">` +
+                                                `<div style="background: #242424; border-radius: 24px; padding: 16px; margin-bottom: 16px;">
+                                            <div style="font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-history" style="color: #fff;"></i> 近期对局</div>
+                                            <div style="color: #ccc; line-height: 1.6; font-size: 14px;">` +
                                                 g_3.matches.replace(/\n/g, '<br>') +
                                                 `</div>
                                         </div>`);
                                     g_3.innerThoughts &&
                                         !Array.isArray(g_3.matches) &&
                                         (content_9 +=
-                                            `<div style="background: #f4f4f5; border-radius: 24px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #111;">
-                                            <div style="font-weight: 700; color: #111; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-headset" style="color: #111;"></i> 局内心声</div>
-                                            <div style="color: #333; line-height: 1.6; font-size: 14px; font-style: italic;">“` +
+                                            `<div style="background: #242424; border-radius: 24px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #fff;">
+                                            <div style="font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-headset" style="color: #fff;"></i> 局内心声</div>
+                                            <div style="color: #ccc; line-height: 1.6; font-size: 14px; font-style: italic;">“` +
                                             window.lovesApp.renderFriendPhoneLocalized(
                                                 g_3,
                                                 'innerThoughts',
@@ -7781,6 +7813,7 @@ Extracted:`,
                                     window.lovesApp.showDetailModal(
                                         g_3.name + ' - 战绩列表',
                                         content_9,
+                                        true,
                                     );
                                     setTimeout(() => {
                                         const matchItems =
@@ -7796,17 +7829,17 @@ Extracted:`,
                                                         let matchDetailContent = '';
                                                         matchDetailContent +=
                                                             `
-                                                            <div style="background: #f4f4f5; border-radius: 20px; padding: 16px; margin-bottom: 16px;">
+                                                            <div style="background: #242424; border-radius: 20px; padding: 16px; margin-bottom: 16px;">
                                                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                                                                     <div style="font-weight: 800; font-size: 20px; color: ` +
                                                             (m_10.result === '胜利' ||
                                                             m_10.result === 'Win'
-                                                                ? '#111'
+                                                                ? '#fff'
                                                                 : '#8e8e93') +
                                                             ';">' +
                                                             m_10.result +
                                                             `</div>
-                                                                    <div style="font-weight: 700; color: #111; background: #e5e5ea; padding: 4px 10px; border-radius: 8px;">KDA: ` +
+                                                                    <div style="font-weight: 700; color: #fff; background: #333; padding: 4px 10px; border-radius: 8px;">KDA: ` +
                                                             (m_10.kda || '-/-/-') +
                                                             `</div>
                                                                 </div>
@@ -7837,14 +7870,14 @@ Extracted:`,
                                                                     (h) =>
                                                                         `
                                                                 <div style="display: flex; gap: 12px; margin-bottom: 8px; align-items: flex-start;">
-                                                                    <div style="font-weight: 700; color: #111; font-size: 13px; background: #e5e5ea; padding: 2px 6px; border-radius: 4px; flex-shrink: 0;">` +
+                                                                    <div style="font-weight: 700; color: #fff; font-size: 13px; background: #333; padding: 2px 6px; border-radius: 4px; flex-shrink: 0;">` +
                                                                         window.lovesApp.escapeHTML(
                                                                             window.lovesApp.formatFriendPhoneGeneratedAt(
                                                                                 h.generatedAt,
                                                                             ) || '',
                                                                         ) +
                                                                         `</div>
-                                                                    <div style="color: #333; font-size: 14px; line-height: 1.4;">` +
+                                                                    <div style="color: #ccc; font-size: 14px; line-height: 1.4;">` +
                                                                         window.lovesApp.renderFriendPhoneLocalized(
                                                                             h,
                                                                             'desc',
@@ -7859,8 +7892,8 @@ Extracted:`,
                                                                 .join('');
                                                             matchDetailContent +=
                                                                 `
-                                                                <div style="background: #fff; border: 1px solid #e5e5ea; border-radius: 20px; padding: 16px; margin-bottom: 16px;">
-                                                                    <div style="font-weight: 700; color: #111; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-bolt" style="color: #111;"></i> 高光时刻</div>
+                                                                <div style="background: #111; border: 1px solid #555; border-radius: 20px; padding: 16px; margin-bottom: 16px;">
+                                                                    <div style="font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-bolt" style="color: #fff;"></i> 高光时刻</div>
                                                                     ` +
                                                                 join_531 +
                                                                 `
@@ -7870,9 +7903,9 @@ Extracted:`,
                                                         m_10.innerThoughts &&
                                                             (matchDetailContent +=
                                                                 `
-                                                                <div style="background: #f4f4f5; border-radius: 20px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #111;">
-                                                                    <div style="font-weight: 700; color: #111; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-headset" style="color: #111;"></i> 局内心声</div>
-                                                                    <div style="color: #333; line-height: 1.6; font-size: 14px; font-style: italic;">“` +
+                                                                <div style="background: #242424; border-radius: 20px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #fff;">
+                                                                    <div style="font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-headset" style="color: #fff;"></i> 局内心声</div>
+                                                                    <div style="color: #ccc; line-height: 1.6; font-size: 14px; font-style: italic;">“` +
                                                                 window.lovesApp.renderFriendPhoneLocalized(
                                                                     m_10,
                                                                     'innerThoughts',
@@ -7914,6 +7947,7 @@ Extracted:`,
                                                         window.lovesApp.showDetailModal(
                                                             '单局详情',
                                                             matchDetailContent,
+                                                            true,
                                                         );
                                                     } catch (e_11) {
                                                         console.error(
@@ -8198,7 +8232,7 @@ Extracted:`,
             console.error('Error showing call detail modal:', e_13);
         }
     },
-    showDetailModal: function (innerText_3, innerHTML_2) {
+    showDetailModal: function (innerText_3, innerHTML_2, isGame = false) {
         try {
             const oldModals_3 = document.querySelectorAll('#loves-detail-modal');
             oldModals_3.forEach((value_1085) => value_1085.remove());
@@ -8214,8 +8248,9 @@ Extracted:`,
             modal.style.display = 'flex';
             modal.style.justifyContent = 'center';
             modal.style.alignItems = 'center';
+            if (isGame) modal.className = 'friend-game-detail';
             const card_3 = document.createElement('div');
-            card_3.style.backgroundColor = '#fff';
+            card_3.style.backgroundColor = isGame ? '#111' : '#fff';
             card_3.style.borderRadius = '16px';
             card_3.style.width = '80%';
             card_3.style.maxWidth = '300px';
@@ -8241,14 +8276,14 @@ Extracted:`,
             titleEl_2.id = 'loves-detail-modal-title';
             titleEl_2.style.fontSize = '20px';
             titleEl_2.style.fontWeight = '800';
-            titleEl_2.style.color = '#111';
+            titleEl_2.style.color = isGame ? '#fff' : '#111';
             titleEl_2.style.marginBottom = '18px';
             titleEl_2.style.paddingRight = '20px';
             titleEl_2.innerText = innerText_3;
             const contentEl = document.createElement('div');
             contentEl.id = 'loves-detail-modal-content';
             contentEl.style.fontSize = '15px';
-            contentEl.style.color = '#333';
+            contentEl.style.color = isGame ? '#ccc' : '#333';
             contentEl.style.lineHeight = '1.6';
             contentEl.innerHTML = innerHTML_2;
             card_3.appendChild(closeBtn_2);
