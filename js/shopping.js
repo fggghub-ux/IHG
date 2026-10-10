@@ -102,7 +102,7 @@
         }
         ['clearGeneratedProducts']() {
             const confirm_17 = window.confirm(
-                '确定要清空所有 AI 生成的外卖和商城商品吗？购物车和订单不会受到影响。',
+                'Are you sure you want to clear all items?',
             );
             if (!confirm_17) return false;
             return (
@@ -114,7 +114,7 @@
                 this.productListContainer
                     ?.querySelectorAll('[data-shopping-generated="true"]')
                     .forEach((value_19) => value_19.remove()),
-                window.showToast ? window.showToast('已清空生成的商品') : alert('已清空生成的商品'),
+                window.showToast ? window.showToast('Generated items cleared') : alert('Generated items cleared'),
                 true
             );
         }
