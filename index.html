@@ -116,7 +116,7 @@
         <!-- FontAwesome for Icons -->
         <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css" />
 
-        <link rel="stylesheet" href="css/loves.css?v=20261007-107-r1" />
+        <link rel="stylesheet" href="css/loves.css?v=20261007-107-r1&dock=20261010-r3" />
         <link
             rel="stylesheet"
             href="css/library.css?v=20260911-netease-mobile-web-v1&reader-comments=20260817-v3&reader-selection=20260819-v1&repair=20261003"
@@ -137,7 +137,7 @@
         <link rel="stylesheet" href="css/appstore.css?v=20260830-runner-back-v7&repair=20261003" />
         <link rel="stylesheet" href="css/gallery.css?v=20260829-gallery-ios26-v8&repair=20261003" />
         <link rel="stylesheet" href="css/cycle.css?v=20261009-gpt-restore1" />
-        <link rel="stylesheet" href="css/cphone.css?v=20261007-107-r1&settings=20261010-r1&cphone=20261010-r2" />
+        <link rel="stylesheet" href="css/cphone.css?v=20261007-107-r1&settings=20261010-r1&cphone=20261010-r2&dock=20261010-r3" />
         <link
             rel="stylesheet"
             href="css/imessage_user_phone_access.css?v=20260928-auto-toggle-scroll-v1&ihg=20260929-106-r1&repair=20261003"
@@ -19710,12 +19710,18 @@
                 <!-- 悬浮底栏 Dock -->
                 <div class="dock-container">
                     <div class="dock cphone-home-dock">
-                        <!-- 设置 -->
-                        <div id="friend-phone-app-settings" aria-label="Settings" title="Settings" style="background: rgb(142, 142, 147); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 32px; cursor: pointer;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-settings.jpg" alt=""></div>
-                        <!-- iMessage -->
-                        <div id="friend-phone-app-imessage" aria-label="Message" title="Message" style="background: rgb(52, 199, 89); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 30px; cursor: pointer;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-message.jpg" alt=""></div>
-                        <!-- Safari -->
-                        <div id="friend-phone-app-safari" aria-label="Safari" title="Safari" style="background: rgb(255, 255, 255); color: rgb(0, 122, 255); display: flex; justify-content: center; align-items: center; font-size: 34px; cursor: pointer;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-safari.jpg" alt=""></div>
+                        <div class="app-item" id="friend-phone-app-settings" aria-label="Settings" title="Settings">
+                            <div class="app-icon"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-settings.jpg" alt=""></div>
+                            <span class="app-name">Settings</span>
+                        </div>
+                        <div class="app-item" id="friend-phone-app-imessage" aria-label="Message" title="Message">
+                            <div class="app-icon"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-message.jpg" alt=""></div>
+                            <span class="app-name">Message</span>
+                        </div>
+                        <div class="app-item" id="friend-phone-app-safari" aria-label="Safari" title="Safari">
+                            <div class="app-icon"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-safari.jpg" alt=""></div>
+                            <span class="app-name">Safari</span>
+                        </div>
                     </div>
                 </div>
             </div>

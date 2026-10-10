@@ -538,10 +538,7 @@
 #friend-phone-app-game > div:first-child,
 #friend-phone-app-call > div:first-child,
 #friend-phone-app-files > div:first-child,
-#friend-phone-app-weibo > div:first-child,
-#friend-phone-app-settings,
-#friend-phone-app-imessage,
-#friend-phone-app-safari {
+#friend-phone-app-weibo > div:first-child {
     border: 1px solid rgba(0, 0, 0, .08) !important;
     background: #fff !important;
     color: #111 !important;
