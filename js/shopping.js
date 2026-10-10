@@ -663,7 +663,7 @@
                 window.showToast ? window.showToast('生成失败: ' + e.message) : alert('生成失败: ' + e.message);
             } finally {
                 if (this.searchConfirmBtn) {
-                    this.searchConfirmBtn.innerHTML = '<i class="fas fa-magic"></i> Confirm Genration';
+                    this.searchConfirmBtn.innerHTML = '<i class="fas fa-magic"></i> Generate';
                     this.searchConfirmBtn.disabled = false;
                 }
             }
@@ -958,7 +958,7 @@
             }
 
             if (success) {
-                if (window.showToast) window.showToast('Gift sent successfully.');
+                if (window.showToast) window.showToast('Gift sent');
                 else alert('Gift sent successfully.');
             } else {
                 if (window.showToast) window.showToast('赠送失败');
@@ -1248,7 +1248,7 @@
                 }
 
                 if (success) {
-                    this.orders.unshift(...this.createOrdersFromCart(`pay for me (${friendName})`, '代付请求已发送'));
+                    this.orders.unshift(...this.createOrdersFromCart(`pay for me (${friendName})`, 'Payment request sent'));
                     this.saveOrders();
 
                     this.cart = [];
@@ -1690,7 +1690,7 @@
                 durableStorage.setItem('shopping_comments', JSON.stringify(commentsObj));
 
                 if (window.showToast) window.showToast('Comment posted successfully.');
-                else alert('Comment posted successfully.');
+                else alert('Review published');
 
                 this.ratingSheet.classList.remove('active');
 
