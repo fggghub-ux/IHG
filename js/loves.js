@@ -1,14 +1,14 @@
 const FRIEND_PHONE_APP_META = Object.freeze({
-    music: { name: 'Music', icon: 'assets/lover/char-phone-music.jpg' },
-    health: { name: 'Health', icon: 'assets/lover/char-phone-health.jpg' },
-    pay: { name: 'Wallet', icon: 'assets/lover/char-phone-wallet.jpg' },
-    game: { name: 'Games', icon: 'assets/lover/char-phone-games.jpg' },
-    call: { name: 'Phone', icon: 'assets/lover/char-phone-phone.jpg' },
-    files: { name: 'Files', icon: 'assets/lover/char-phone-files.jpg' },
+    music: { name: 'Music', icon: 'assets/cphone/char-phone-music.jpg' },
+    health: { name: 'Health', icon: 'assets/cphone/char-phone-health.jpg' },
+    pay: { name: 'Wallet', icon: 'assets/cphone/char-phone-wallet.jpg' },
+    game: { name: 'Games', icon: 'assets/cphone/char-phone-games.jpg' },
+    call: { name: 'Phone', icon: 'assets/cphone/char-phone-phone.jpg' },
+    files: { name: 'Files', icon: 'assets/cphone/char-phone-files.jpg' },
     weibo: { name: 'Weibo', icon: null },
-    settings: { name: 'Settings', icon: 'assets/lover/char-phone-settings.jpg' },
-    imessage: { name: 'Message', icon: 'assets/lover/char-phone-message.jpg' },
-    safari: { name: 'Safari', icon: 'assets/lover/char-phone-safari.jpg' }
+    settings: { name: 'Settings', icon: 'assets/cphone/char-phone-settings.jpg' },
+    imessage: { name: 'Message', icon: 'assets/cphone/char-phone-message.jpg' },
+    safari: { name: 'Safari', icon: 'assets/cphone/char-phone-safari.jpg' }
 });
 
 window.lovesApp = {

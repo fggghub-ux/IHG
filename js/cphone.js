@@ -337,10 +337,6 @@
                     )
                         this.refreshMessages();
                 });
-                window.addEventListener('u2:home-wallpaper-changed', () => {
-                    if (this.phoneView?.classList.contains('has-desktop-wallpaper'))
-                        this.paintWallpaper('');
-                });
                 window.addEventListener('u2:friend-message-appended', (value_45) => {
                     const string = String(value_45.detail?.friendId || '');
                     if (this.activeThread) {
@@ -703,16 +699,12 @@
                 if (!this.phoneView) return;
                 const string_127 = String(value_70 || '');
                 this.phoneView.classList.toggle('has-custom-wallpaper', !!string_127);
-                this.phoneView.classList.toggle('has-desktop-wallpaper', !string_127);
-                const value_73 = !string_127 ? document.getElementById('app') : null,
-                    value_74 = value_73 ? window.getComputedStyle?.(value_73)?.backgroundImage : '',
-                    value_75 = string_127
-                        ? 'url(' + JSON.stringify(string_127) + ')'
-                        : value_74 && value_74 !== 'none'
-                          ? value_74
-                          : '';
-                if (value_75)
-                    this.phoneView.style.setProperty('--cphone-wallpaper-image', value_75);
+                this.phoneView.classList.toggle('has-default-wallpaper', !string_127);
+                if (string_127)
+                    this.phoneView.style.setProperty(
+                        '--cphone-wallpaper-image',
+                        'url(' + JSON.stringify(string_127) + ')',
+                    );
                 else this.phoneView.style.removeProperty('--cphone-wallpaper-image');
             },
             syncWallpaperSettings() {
