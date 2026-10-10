@@ -1689,7 +1689,7 @@
 
                 durableStorage.setItem('shopping_comments', JSON.stringify(commentsObj));
 
-                if (window.showToast) window.showToast('Comment posted successfully.');
+                if (window.showToast) window.showToast('Review published');
                 else alert('Review published');
 
                 this.ratingSheet.classList.remove('active');
