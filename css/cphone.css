@@ -129,7 +129,7 @@
     > div
     > div:last-child {
     color: #fff !important;
-    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.75) !important;
+    text-shadow: none !important;
 }
 #lovers-friend-phone-view .cphone-home-back {
     position: absolute;
@@ -1038,6 +1038,11 @@
 #friend-safari-normal-mode {
     background: #fbfbfc !important;
     border-radius: 0 !important;
+    display: flex;
+    flex-direction: column;
+}
+#friend-safari-normal-mode > * {
+    flex-shrink: 0;
 }
 #friend-safari-view.is-private,
 #friend-safari-view.is-private #friend-safari-topbar {
@@ -1053,9 +1058,10 @@
     background: #2c2c30 !important;
 }
 #friend-safari-history-list {
-    padding: 0 15px;
-    border: 1px solid #ececf0;
-    border-radius: 19px;
+    margin: 0 -20px -30px;
+    padding: 20px;
+    flex: 1 0 auto;
+    border-radius: 24px 24px 0 0;
     background: #fff;
 }
 #friend-safari-dock {

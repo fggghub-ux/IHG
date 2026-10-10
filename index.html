@@ -92,7 +92,7 @@
         />
         <link
             rel="stylesheet"
-            href="css/home.css?v=20260731-ios-swipe-icon-flicker-v1&layout=20260801-fixed-grid-v1&performance=20260801-v1&desktop=20260830-widget-grid-heights-v1&drag=20260920-v1&repair=20261003"
+            href="css/home.css?v=20260731-ios-swipe-icon-flicker-v1&layout=20260801-fixed-grid-v1&performance=20260801-v1&desktop=20260830-widget-grid-heights-v1&drag=20260920-v1&repair=20261003&settings=20261010-r1"
         />
         <link rel="stylesheet" href="css/worldbook.css?v=20261007-107-r1" />
         <link rel="stylesheet" href="css/app_guide_modal.css?v=20261007-107-r1" />
@@ -137,7 +137,7 @@
         <link rel="stylesheet" href="css/appstore.css?v=20260830-runner-back-v7&repair=20261003" />
         <link rel="stylesheet" href="css/gallery.css?v=20260829-gallery-ios26-v8&repair=20261003" />
         <link rel="stylesheet" href="css/cycle.css?v=20261009-gpt-restore1" />
-        <link rel="stylesheet" href="css/cphone.css?v=20261007-107-r1" />
+        <link rel="stylesheet" href="css/cphone.css?v=20261007-107-r1&settings=20261010-r1" />
         <link
             rel="stylesheet"
             href="css/imessage_user_phone_access.css?v=20260928-auto-toggle-scroll-v1&ihg=20260929-106-r1&repair=20261003"
@@ -166,7 +166,7 @@
             <!-- Logo 文字 -->
             <div
                 style="font-size: 32px; font-weight: 800; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; letter-spacing: 1px; color: #000; margin-bottom: 60px; margin-top: -40px;"
-                >u2phone</div
+                >LHV</div
             >
             <!-- iOS 风格进度条 -->
             <div
@@ -396,7 +396,7 @@
                                 aria-describedby="u2-login-error"
                             />
                             <label for="u2-login-notice-accepted">我已知晓《</label
-                            ><button type="button" id="u2-login-notice-link">u2phone食用须知</button
+                            ><button type="button" id="u2-login-notice-link">LHV Check-in Notice</button
                             ><span>》</span>
                         </div>
                         <div
@@ -499,119 +499,40 @@
                 <div class="page-wrapper">
                     <div class="main-grid" id="main-grid-1">
                         <!-- Custom Profile Widget (Top, 4x3 = 12 slots) -->
-                        <div
-                            class="ins-profile-widget"
-                            id="ins-profile-widget"
-                            style="background-color: rgba(255, 255, 255, 0.9); "
-                        >
-                            <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
-                            <div class="custom-widget-top">
-                                <div
-                                    class="custom-widget-avatar-wrapper"
-                                    id="custom-avatar-btn-desktop"
-                                >
-                                    <img
-                                        src=""
-                                        id="custom-avatar-img-desktop"
-                                        style="display: none;"
-                                    />
-                                    <i class="fas fa-user"></i>
-                                    <input
-                                        type="file"
-                                        id="custom-avatar-upload-desktop"
-                                        accept="image/*"
-                                        style="display:none;"
-                                    />
-                                </div>
-                                <div class="custom-widget-stats">
-                                    <div class="custom-widget-stat-item">
-                                        <div
-                                            class="custom-widget-stat-num"
-                                            contenteditable="true"
-                                            spellcheck="false"
-                                            >0</div
-                                        >
-                                        <div class="custom-widget-stat-label">Posts</div>
-                                    </div>
-                                    <div class="custom-widget-stat-item">
-                                        <div
-                                            class="custom-widget-stat-num"
-                                            contenteditable="true"
-                                            spellcheck="false"
-                                            >1314</div
-                                        >
-                                        <div class="custom-widget-stat-label">Followers</div>
-                                    </div>
-                                    <div class="custom-widget-stat-item">
-                                        <div
-                                            class="custom-widget-stat-num"
-                                            contenteditable="true"
-                                            spellcheck="false"
-                                            >520</div
-                                        >
-                                        <div class="custom-widget-stat-label">Following</div>
-                                    </div>
-                                </div>
-                                <!-- offline-result-preview-modal moved to #app root
-                <div class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay" id="offline-result-preview-modal" style="z-index: 1080; display: none; background: rgba(0,0,0,0.4); justify-content: center; align-items: center;">
-                   <section class="bottom-sheet wb-centered-modal-card offline-result-preview-modal" role="dialog" aria-modal="true" aria-labelledby="offline-result-preview-title">
-                       <div class="sheet-handle"></div>
-                       <div class="sheet-title" id="offline-result-preview-title">预览</div>
-                       <div class="offline-result-preview-content">
-                           <div id="offline-result-preview-subtitle" class="offline-result-preview-subtitle"></div>
-                           <label id="offline-result-preview-editor" class="offline-result-preview-editor" for="offline-result-preview-textarea">
-                               <span>生成内容</span>
-                               <textarea id="offline-result-preview-textarea" rows="10" aria-label="生成内容预览"></textarea>
-                           </label>
-                           <div id="offline-result-preview-readonly" class="offline-result-preview-readonly" hidden></div>
-                           <div class="offline-result-preview-actions">
-                               <button type="button" id="offline-result-preview-cancel" class="offline-summary-secondary">取消</button>
-                               <button type="button" id="offline-result-preview-regenerate" class="offline-summary-secondary">重新总结</button>
-                               <button type="button" id="offline-result-preview-confirm" class="offline-summary-primary">确认保存</button>
-                           </div>
-                       </div>
-                   </section>
-                </div> -->
+                        <div class="ins-profile-widget" id="ins-profile-widget" style="background-color: rgba(255, 255, 255, 0.9); ">
+                        <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                        <div class="custom-widget-top">
+                            <div class="custom-widget-avatar-wrapper" id="custom-avatar-btn-desktop">
+                                <img src="" id="custom-avatar-img-desktop" style="display: none;">
+                                <i class="fas fa-user"></i>
+                                <input type="file" id="custom-avatar-upload-desktop" accept="image/*" style="display:none;">
                             </div>
-                            <div
-                                class="custom-widget-name"
-                                id="custom-name-desktop"
-                                contenteditable="true"
-                                spellcheck="false"
-                                >name @iisonyoung</div
-                            >
-                            <div class="custom-widget-edit-btn" style="border-radius: 20px;"
-                                >Edit Profile</div
-                            >
-                            <div
-                                class="custom-widget-bottom"
-                                style="display: flex; justify-content: flex-start; gap: 15px;"
-                            >
-                                <div
-                                    class="custom-widget-add-icon"
-                                    style="width: 40px; height: 40px;"
-                                    ><i class="fas fa-plus"></i
-                                ></div>
-                                <div
-                                    class="custom-widget-small-avatar"
-                                    id="custom-small-avatar-btn-desktop"
-                                    style="width: 40px; height: 40px; border-radius: 50%;"
-                                >
-                                    <img
-                                        src=""
-                                        id="custom-small-avatar-img-desktop"
-                                        style="display: none;"
-                                    />
-                                    <i class="fas fa-image"></i>
-                                    <input
-                                        type="file"
-                                        id="custom-small-avatar-upload-desktop"
-                                        accept="image/*"
-                                        style="display:none;"
-                                    />
+                            <div class="custom-widget-stats">
+                                <div class="custom-widget-stat-item">
+                                    <div class="custom-widget-stat-num" contenteditable="true" spellcheck="false">19</div>
+                                    <div class="custom-widget-stat-label">Posts</div>
+                                </div>
+                                <div class="custom-widget-stat-item">
+                                    <div class="custom-widget-stat-num" contenteditable="true" spellcheck="false">7119.1K</div>
+                                    <div class="custom-widget-stat-label">Followers</div>
+                                </div>
+                                <div class="custom-widget-stat-item">
+                                    <div class="custom-widget-stat-num" contenteditable="true" spellcheck="false">8</div>
+                                    <div class="custom-widget-stat-label">Following</div>
                                 </div>
                             </div>
                         </div>
+                        <div class="custom-widget-name" id="custom-name-desktop" contenteditable="true" spellcheck="false">i 🤍uuu so..@kendall</div>
+                        <div class="custom-widget-edit-btn" style="border-radius: 20px;">Edit Profile</div>
+                        <div class="custom-widget-bottom" style="display: flex; justify-content: flex-start; gap: 15px;">
+                            <div class="custom-widget-add-icon" style="width: 40px; height: 40px;"><i class="fas fa-plus"></i></div>
+                            <div class="custom-widget-small-avatar" id="custom-small-avatar-btn-desktop" style="width: 40px; height: 40px; border-radius: 50%;">
+                                <img src="" id="custom-small-avatar-img-desktop" style="display: none;">
+                                <i class="fas fa-image"></i>
+                                <input type="file" id="custom-small-avatar-upload-desktop" accept="image/*" style="display:none;">
+                            </div>
+                        </div>
+                    </div>
 
                         <!-- Apps and Pet Widget (Bottom) -->
                         <div
@@ -644,31 +565,16 @@
 
                         <!-- Pet Widget (2x2 = 4 slots) -->
                         <div class="pet-widget" id="pet-widget-desktop">
-                            <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
-                            <div class="pet-widget-img-wrapper" id="pet-img-container-desktop">
-                                <img src="" id="pet-img-desktop" />
-                                <i
-                                    class="fas fa-image"
-                                    id="pet-icon-desktop"
-                                    style="font-size: 30px; color: #ccc;"
-                                ></i>
-                                <input
-                                    type="file"
-                                    id="pet-upload-desktop"
-                                    accept="image/*"
-                                    style="display:none;"
-                                />
-                            </div>
-                            <div
-                                class="pet-widget-bubble"
-                                id="pet-bubble-desktop"
-                                contenteditable="true"
-                                spellcheck="false"
-                                >oxo</div
-                            >
-                            <div class="pet-widget-music-icon"><i class="fas fa-music"></i></div>
-                            <div class="pet-widget-plus-btn"><i class="fas fa-plus"></i></div>
+                        <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                        <div class="pet-widget-img-wrapper" id="pet-img-container-desktop">
+                            <img src="" id="pet-img-desktop">
+                            <i class="fas fa-image" id="pet-icon-desktop" style="font-size: 30px; color: #ccc;"></i>
+                            <input type="file" id="pet-upload-desktop" accept="image/*" style="display:none;">
                         </div>
+                        <div class="pet-widget-bubble" id="pet-bubble-desktop" contenteditable="true" spellcheck="false">irrelevant</div>
+                        <div class="pet-widget-music-icon"><i class="fas fa-music"></i></div>
+                        <div class="pet-widget-plus-btn"><i class="fas fa-plus"></i></div>
+                    </div>
 
                         <!-- More Apps (2 slots) -->
                         <div
@@ -697,42 +603,17 @@
                         </div>
                         <!-- Notification Widget (1x4 = 4 slots) -->
                         <div class="notification-widget" id="notification-widget-desktop-1">
-                            <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
-                            <div
-                                class="notification-widget-img-wrapper"
-                                id="notification-avatar-btn-desktop-1"
-                            >
-                                <img
-                                    src=""
-                                    id="notification-avatar-img-desktop-1"
-                                    style="display: none;"
-                                />
-                                <i class="fas fa-user"></i>
-                                <input
-                                    type="file"
-                                    id="notification-avatar-upload-desktop-1"
-                                    accept="image/*"
-                                    style="display:none;"
-                                />
-                            </div>
-                            <div class="notification-widget-content">
-                                <div
-                                    class="notification-widget-title"
-                                    id="notification-title-desktop-1"
-                                    contenteditable="true"
-                                    spellcheck="false"
-                                    >u2phone</div
-                                >
-                                <div
-                                    class="notification-widget-desc"
-                                    id="notification-desc-desktop-1"
-                                    contenteditable="true"
-                                    spellcheck="false"
-                                    >I was with you in a happy, translucent, endless dream. In
-                                    contrast to my usual dreams.</div
-                                >
-                            </div>
+                        <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                        <div class="notification-widget-img-wrapper" id="notification-avatar-btn-desktop-1">
+                            <img src="" id="notification-avatar-img-desktop-1" style="display: none;">
+                            <i class="fas fa-user"></i>
+                            <input type="file" id="notification-avatar-upload-desktop-1" accept="image/*" style="display:none;">
                         </div>
+                        <div class="notification-widget-content">
+                            <div class="notification-widget-title" id="notification-title-desktop-1" contenteditable="true" spellcheck="false">Entanglement</div>
+                            <div class="notification-widget-desc" id="notification-desc-desktop-1" contenteditable="true" spellcheck="false">If it’s not mine, it’s not special.</div>
+                        </div>
+                    </div>
                     </div>
                 </div>
 
@@ -741,118 +622,50 @@
                     <div class="main-grid" id="main-grid-2">
                         <!-- Top: Custom Music Widget (4x2 = 8 slots) -->
                         <div class="custom-music-widget" id="custom-music-widget-desktop-2">
-                            <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
-                            <div
-                                style="display: flex; align-items: center; width: 100%; height: 100%;"
-                            >
-                                <div
-                                    style="position: relative; width: 140px; height: 140px; margin-left: 10px; display: flex; justify-content: center; align-items: center; flex-shrink: 0;"
-                                >
-                                    <!-- 黑胶底盘 -->
-                                    <div
-                                        style="width: 110px; height: 110px; border-radius: 50%; background: #111; position: absolute; display: flex; justify-content: center; align-items: center; animation: spin 4s linear infinite;"
-                                    >
-                                        <div
-                                            style="width: 90px; height: 90px; border-radius: 50%; border: 1px solid #222; position: absolute;"
-                                        ></div>
-                                        <div
-                                            style="width: 70px; height: 70px; border-radius: 50%; border: 1px solid #222; position: absolute;"
-                                        ></div>
-                                        <!-- 用户上传的封面 -->
-                                        <div
-                                            id="cm-cover-btn-d2"
-                                            class="home-widget-music-cover"
-                                            style="width: 44px; height: 44px; border-radius: 50%; background-color: #fff; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; z-index: 2; border: 2px solid #000; cursor: pointer;"
-                                        >
-                                            <img
-                                                src=""
-                                                id="cm-cover-img-d2"
-                                                style="width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top: 0; left: 0;"
-                                            />
-                                            <i
-                                                class="fas fa-image"
-                                                id="cm-cover-icon-d2"
-                                                style="font-size: 16px; color: #ccc;"
-                                            ></i>
-                                            <input
-                                                type="file"
-                                                id="cm-cover-upload-d2"
-                                                accept="image/*"
-                                                style="display:none;"
-                                            />
-                                        </div>
-                                    </div>
-                                    <!-- 唱针 -->
-                                    <div
-                                        style="position: absolute; top: 15px; right: 30px; width: 4px; height: 50px; background: #666; transform-origin: top center; transform: rotate(25deg); border-radius: 2px; z-index: 3;"
-                                    >
-                                        <div
-                                            style="position: absolute; top: -4px; left: -4px; width: 12px; height: 12px; border-radius: 50%; background: #444;"
-                                        ></div>
-                                        <div
-                                            style="position: absolute; bottom: 0; left: -2px; width: 8px; height: 16px; background: #333; border-radius: 2px; transform: rotate(-15deg);"
-                                        ></div>
+                        <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                        <div style="display: flex; align-items: center; width: 100%; height: 100%;">
+                            <div style="position: relative; width: 140px; height: 140px; margin-left: 10px; display: flex; justify-content: center; align-items: center; flex-shrink: 0;">
+                                <!-- 黑胶底盘 -->
+                                <div style="width: 110px; height: 110px; border-radius: 50%; background: #111; position: absolute; display: flex; justify-content: center; align-items: center; animation: spin 4s linear infinite;">
+                                    <div style="width: 90px; height: 90px; border-radius: 50%; border: 1px solid #222; position: absolute;"></div>
+                                    <div style="width: 70px; height: 70px; border-radius: 50%; border: 1px solid #222; position: absolute;"></div>
+                                    <!-- 用户上传的封面 -->
+                                    <div id="cm-cover-btn-d2" class="home-widget-music-cover" style="width: 44px; height: 44px; border-radius: 50%; background-color: #fff; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; z-index: 2; border: 2px solid #000; cursor: pointer;">
+                                        <img src="" id="cm-cover-img-d2" style="width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top: 0; left: 0;">
+                                        <i class="fas fa-image" id="cm-cover-icon-d2" style="font-size: 16px; color: #ccc;"></i>
+                                        <input type="file" id="cm-cover-upload-d2" accept="image/*" style="display:none;">
                                     </div>
                                 </div>
+                                <!-- 唱针 -->
+                                <div style="position: absolute; top: 15px; right: 30px; width: 4px; height: 50px; background: #666; transform-origin: top center; transform: rotate(25deg); border-radius: 2px; z-index: 3;">
+                                    <div style="position: absolute; top: -4px; left: -4px; width: 12px; height: 12px; border-radius: 50%; background: #444;"></div>
+                                    <div style="position: absolute; bottom: 0; left: -2px; width: 8px; height: 16px; background: #333; border-radius: 2px; transform: rotate(-15deg);"></div>
+                                </div>
+                            </div>
 
-                                <!-- 右侧文本与控制区 -->
-                                <div
-                                    style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding-left: 10px; padding-right: 15px;"
-                                >
-                                    <div
-                                        class="home-widget-music-title music-title-edit"
-                                        contenteditable="false"
-                                        spellcheck="false"
-                                        style="font-size: 18px; font-weight: 700; color: #111; text-align: center; outline: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                        >oode...</div
-                                    >
+                            <!-- 右侧文本与控制区 -->
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding-left: 10px; padding-right: 15px;">
+                                <div class="home-widget-music-title music-title-edit" contenteditable="false" spellcheck="false" style="font-size: 18px; font-weight: 700; color: #111; text-align: center; outline: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">She's A 10 But</div>
 
-                                    <div
-                                        style="margin-top: 10px; display: flex; flex-direction: column; gap: 3px; text-align: center;"
-                                    >
-                                        <div
-                                            class="music-lyric1-edit"
-                                            contenteditable="false"
-                                            spellcheck="false"
-                                            style="font-size: 9px; color: #666; outline: none;"
-                                            >u2phone</div
-                                        >
-                                        <div
-                                            class="music-lyric2-edit"
-                                            contenteditable="false"
-                                            spellcheck="false"
-                                            style="font-size: 10px; font-weight: 700; color: #111; outline: none;"
-                                            >sonokoiomoiiyo</div
-                                        >
-                                        <div
-                                            class="music-lyric3-edit"
-                                            contenteditable="false"
-                                            spellcheck="false"
-                                            style="font-size: 9px; color: #666; outline: none;"
-                                            >The rain of destiny</div
-                                        >
+                                <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 3px; text-align: center;">
+                                    <div class="music-lyric1-edit" contenteditable="false" spellcheck="false" style="font-size: 9px; color: #666; outline: none;">With no makeup she a ten</div>
+                                    <div class="music-lyric2-edit" contenteditable="false" spellcheck="false" style="font-size: 10px; font-weight: 700; color: #111; outline: none;">And she the best with that head</div>
+                                    <div class="music-lyric3-edit" contenteditable="false" spellcheck="false" style="font-size: 9px; color: #666; outline: none;">Even better than Karrine</div>
+                                </div>
+
+                                <!-- 控制按钮 -->
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 12px; color: #111; font-size: 14px;">
+                                    <i class="fas fa-random" style="font-size: 12px;"></i>
+                                    <i class="fas fa-step-backward" style="font-size: 12px;"></i>
+                                    <div style="width: 24px; height: 24px; border-radius: 50%; background: #111; color: #fff; display: flex; justify-content: center; align-items: center;">
+                                        <i class="fas fa-pause" style="font-size: 10px;"></i>
                                     </div>
-
-                                    <!-- 控制按钮 -->
-                                    <div
-                                        style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 12px; color: #111; font-size: 14px;"
-                                    >
-                                        <i class="fas fa-random" style="font-size: 12px;"></i>
-                                        <i
-                                            class="fas fa-step-backward"
-                                            style="font-size: 12px;"
-                                        ></i>
-                                        <div
-                                            style="width: 24px; height: 24px; border-radius: 50%; background: #111; color: #fff; display: flex; justify-content: center; align-items: center;"
-                                        >
-                                            <i class="fas fa-pause" style="font-size: 10px;"></i>
-                                        </div>
-                                        <i class="fas fa-step-forward" style="font-size: 12px;"></i>
-                                        <i class="fas fa-heart" style="font-size: 12px;"></i>
-                                    </div>
+                                    <i class="fas fa-step-forward" style="font-size: 12px;"></i>
+                                    <i class="fas fa-heart" style="font-size: 12px;"></i>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
                         <!-- App 1 & App 2 (Left side of Row 3) -->
                         <div
@@ -880,31 +693,23 @@
                         </div>
 
                         <!-- Couple Widget (Right side, Row 3-4, 2x2 = 4 slots) -->
-                        <div
-                            class="couple-widget"
-                            id="couple-widget-desktop-2"
-                            style="grid-row: span 2;"
-                        >
-                            <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
-                            <div class="couple-avatar-container">
-                                <div class="couple-bubble" contenteditable="true" spellcheck="false"
-                                    >ㅠㅠ</div
-                                >
-                                <div class="couple-img-wrapper">
-                                    <img src="" style="display: none;" />
-                                    <i class="fas fa-image"></i>
-                                </div>
-                            </div>
-                            <div class="couple-avatar-container">
-                                <div class="couple-bubble" contenteditable="true" spellcheck="false"
-                                    >ㅎㅎ</div
-                                >
-                                <div class="couple-img-wrapper">
-                                    <img src="" style="display: none;" />
-                                    <i class="fas fa-image"></i>
-                                </div>
+                        <div class="couple-widget" id="couple-widget-desktop-2" style="grid-row: span 2;">
+                        <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                        <div class="couple-avatar-container">
+                            <div class="couple-bubble" contenteditable="true" spellcheck="false">-.-</div>
+                            <div class="couple-img-wrapper">
+                                <img src="" style="display: none;">
+                                <i class="fas fa-image"></i>
                             </div>
                         </div>
+                        <div class="couple-avatar-container">
+                            <div class="couple-bubble" contenteditable="true" spellcheck="false">TT</div>
+                            <div class="couple-img-wrapper">
+                                <img src="" style="display: none;">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        </div>
+                    </div>
 
                         <!-- App 3 & App 4 (Left side of Row 4) -->
                         <div
@@ -941,43 +746,21 @@
                         </div>
 
                         <!-- Photo Widget (Row 5 & 6, 4x2 = 8 slots) -->
-                        <div
-                            class="photo-widget"
-                            id="photo-widget-desktop-2"
-                            style="grid-column: span 4; grid-row: span 2; display: flex; width: 100%; height: 155px; border-radius: 28px; background: rgba(255, 255, 255, 0.78); border: 1px solid rgba(255, 255, 255, 0.45); position: relative; overflow: hidden; cursor: pointer; padding: 12px; box-sizing: border-box; gap: 8px;"
-                        >
-                            <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
-                            <div
-                                class="photo-widget-image"
-                                style="position: relative; flex: 1; border-radius: 14px; overflow: hidden; background: rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer;"
-                            >
-                                <img
-                                    src=""
-                                    style="width: 100%; height: 100%; object-fit: cover; display: none;"
-                                />
-                                <i class="fas fa-image" style="color: #ccc; font-size: 24px;"></i>
-                            </div>
-                            <div
-                                class="photo-widget-image-2"
-                                style="position: relative; flex: 1; border-radius: 14px; overflow: hidden; background: rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer;"
-                            >
-                                <img
-                                    src=""
-                                    style="width: 100%; height: 100%; object-fit: cover; display: none;"
-                                />
-                                <i class="fas fa-image" style="color: #ccc; font-size: 24px;"></i>
-                            </div>
-                            <div
-                                class="photo-widget-image-3"
-                                style="position: relative; flex: 1; border-radius: 14px; overflow: hidden; background: rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer;"
-                            >
-                                <img
-                                    src=""
-                                    style="width: 100%; height: 100%; object-fit: cover; display: none;"
-                                />
-                                <i class="fas fa-image" style="color: #ccc; font-size: 24px;"></i>
-                            </div>
+                        <div class="photo-widget" id="photo-widget-desktop-2" style="grid-column: span 4; grid-row: span 2; display: flex; width: 100%; height: 155px; border-radius: 28px; background: rgba(255, 255, 255, 0.78); border: 1px solid rgba(255, 255, 255, 0.45); position: relative; overflow: hidden; cursor: pointer; padding: 12px; box-sizing: border-box; gap: 8px;">
+                        <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                        <div class="photo-widget-image" style="position: relative; flex: 1; border-radius: 14px; overflow: hidden; background: rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                            <img src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                            <i class="fas fa-image" style="color: #ccc; font-size: 24px;"></i>
                         </div>
+                        <div class="photo-widget-image-2" style="position: relative; flex: 1; border-radius: 14px; overflow: hidden; background: rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                            <img src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                            <i class="fas fa-image" style="color: #ccc; font-size: 24px;"></i>
+                        </div>
+                        <div class="photo-widget-image-3" style="position: relative; flex: 1; border-radius: 14px; overflow: hidden; background: rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                            <img src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                            <i class="fas fa-image" style="color: #ccc; font-size: 24px;"></i>
+                        </div>
+                    </div>
                     </div>
                 </div>
 
@@ -988,11 +771,11 @@
                             <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
                             <div class="social-post-header">
                                 <div class="social-post-avatar"
-                                    ><img src="assets/home/widget-default-320.jpg" alt=""
+                                    ><img src="assets/home/social-post-avatar.jpg" alt=""
                                 /></div>
                                 <div class="social-post-identity">
                                     <div class="social-post-author"
-                                        ><span>iisonyoung</span
+                                        ><span>you</span
                                         ><i class="fas fa-check social-post-verified"></i
                                     ></div>
                                     <div class="social-post-time"><b>52</b> days ago</div>
@@ -1007,7 +790,7 @@
                                 like, it is meaningful to me.</div
                             >
                             <div class="social-post-image"
-                                ><img src="assets/home/photo-default-1-512.jpg" alt=""
+                                ><img src="assets/home/social-post-image.jpg" alt=""
                             /></div>
                             <div class="social-post-translation">Translation from the internet</div>
                             <div class="social-post-actions" aria-hidden="true">
@@ -8376,18 +8159,18 @@
                             <div class="settings-icon" style="background-color: #5856d6;"
                                 ><i class="fas fa-plug"></i
                             ></div>
-                            <div class="settings-text">API 配置</div>
+                            <div class="settings-text">API Configuration</div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </div>
                         <div class="settings-item" id="vector-memory-config-btn">
                             <div class="settings-icon" style="background-color: #5856d6;"
                                 ><i class="fas fa-brain"></i
                             ></div>
-                            <div class="settings-text">向量记忆</div>
+                            <div class="settings-text">Vector Memory</div>
                             <span
                                 id="vector-memory-config-status"
                                 style="margin-left:auto; color:#8e8e93; font-size:14px;"
-                                >关闭</span
+                                >Close</span
                             >
                             <i class="fas fa-chevron-right arrow"></i>
                         </div>
@@ -8395,28 +8178,28 @@
                             <div class="settings-icon" style="background-color: #34aadc;"
                                 ><i class="fas fa-eye"></i
                             ></div>
-                            <div class="settings-text">识图配置</div>
+                            <div class="settings-text">Image Recognition</div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </div>
                         <div class="settings-item" id="image-generation-config-btn">
                             <div class="settings-icon" style="background-color: #af52de;"
                                 ><i class="fas fa-wand-magic-sparkles"></i
                             ></div>
-                            <div class="settings-text">生图配置</div>
+                            <div class="settings-text">Image Generation</div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </div>
                         <div class="settings-item" id="tts-config-btn">
                             <div class="settings-icon" style="background-color: #ff9500;"
                                 ><i class="fas fa-volume-up"></i
                             ></div>
-                            <div class="settings-text">TTS 配置</div>
+                            <div class="settings-text">TTS Configuration</div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </div>
                         <div class="settings-item" id="world-book-main-btn">
                             <div class="settings-icon" style="background-color: #1c1c1e;"
                                 ><i class="fas fa-book"></i
                             ></div>
-                            <div class="settings-text">世界书</div>
+                            <div class="settings-text">Word Book</div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </div>
                     </div>
@@ -8431,7 +8214,7 @@
                                 <div class="settings-icon" style="background-color: #34c759;"
                                     ><i class="fas fa-language"></i
                                 ></div>
-                                <div class="settings-text">全局翻译</div>
+                                <div class="settings-text">Translation</div>
                             </div>
                             <label class="toggle-switch">
                                 <input
@@ -8446,7 +8229,7 @@
                             <div class="settings-icon" style="background-color: #ff2d55;"
                                 ><i class="fas fa-paint-brush"></i
                             ></div>
-                            <div class="settings-text">主题美化</div>
+                            <div class="settings-text">App Icon</div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </div>
                         <button
@@ -8457,7 +8240,7 @@
                             <div class="settings-icon" style="background-color: #5856d6;"
                                 ><i class="fas fa-font"></i
                             ></div>
-                            <div class="settings-text">字体</div>
+                            <div class="settings-text">Fonts</div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </button>
                         <div
@@ -8468,14 +8251,14 @@
                             <div class="settings-icon" style="background-color: #5ac8fa;"
                                 ><i class="fas fa-layer-group"></i
                             ></div>
-                            <div class="settings-text">小组件</div>
+                            <div class="settings-text">Widgets</div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </div>
                         <div class="settings-item" id="assistive-ball-config-btn">
                             <div class="settings-icon" style="background-color: #111111;"
                                 ><i class="fas fa-circle-dot"></i
                             ></div>
-                            <div class="settings-text">悬浮球</div>
+                            <div class="settings-text">Floating Ball</div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </div>
                     </div>
@@ -8486,7 +8269,7 @@
                             <div class="settings-icon" style="background-color: #8e8e93;"
                                 ><i class="fas fa-mobile-screen-button"></i
                             ></div>
-                            <div class="settings-text">关于本机</div>
+                            <div class="settings-text">About This Device</div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </button>
                         <div
@@ -8497,7 +8280,7 @@
                             <div class="settings-icon" style="background-color: #34c759;"
                                 ><i class="fas fa-database"></i
                             ></div>
-                            <div class="settings-text">数据管理</div>
+                            <div class="settings-text">Data Management</div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </div>
                     </div>
@@ -8511,7 +8294,7 @@
                     style="height: auto; max-height: 70%; display: flex; flex-direction: column;"
                 >
                     <div class="sheet-handle"></div>
-                    <div class="sheet-title">关于本机</div>
+                    <div class="sheet-title">About This Device</div>
 
                     <div class="detail-sheet-content" style="padding: 24px 20px 20px;">
                         <div
@@ -8520,7 +8303,7 @@
                             <div
                                 id="about-device-app-name"
                                 style="font-size: 28px; font-weight: 700; color: #000; line-height: 1.2;"
-                                >u2phone</div
+                                >LHV</div
                             >
                             <div
                                 id="about-device-version"
@@ -8534,21 +8317,21 @@
                             class="sheet-action"
                             id="about-device-disclaimer-btn"
                             style="margin-top: 0; margin-bottom: 12px;"
-                            >免责声明</button
+                            >Gravity</button
                         >
                         <button
                             type="button"
                             class="sheet-action"
                             id="about-device-changelog-btn"
                             style="margin-top: 0; margin-bottom: 12px;"
-                            >更新日志</button
+                            >Desire</button
                         >
                         <button
                             type="button"
                             class="sheet-action"
                             id="about-device-close-btn"
                             style="margin-top: 0;"
-                            >关闭</button
+                            >Close</button
                         >
                     </div>
                 </div>
@@ -8586,7 +8369,7 @@
                         </div>
                         <div class="u2-official-account-copy">
                             <div class="u2-official-account-name-row"
-                                ><strong id="u2-official-youtu-name">有兔</strong
+                                ><strong id="u2-official-youtu-name">LHV</strong
                                 ><span>office</span></div
                             >
                             <p>制作主题、线下配置、世界书与人设</p>
@@ -8619,7 +8402,7 @@
                         ><i class="fas fa-chevron-left"></i
                     ></button>
                     <div class="u2-official-settings-nav-copy">
-                        <h1>有兔设置</h1>
+                        <h1>LHV设置</h1>
                         <span>office</span>
                     </div>
                     <span class="u2-official-nav-spacer" aria-hidden="true"></span>
@@ -8629,7 +8412,7 @@
                         <div class="u2-official-settings-rabbit" aria-hidden="true"
                             ><i class="fas fa-wand-magic-sparkles"></i
                         ></div>
-                        <div><h2>有兔 Beta 1.0</h2></div>
+                        <div><h2>LHV Beta 1.0</h2></div>
                     </section>
                     <section
                         class="u2-official-settings-section"
@@ -8641,14 +8424,14 @@
                             ></span>
                             <div
                                 ><h2 id="official-api-section-title">生成 API</h2
-                                ><p>仅供有兔使用的独立连接</p></div
+                                ><p>仅供LHV使用的独立连接</p></div
                             >
                         </div>
                         <label class="u2-official-api-field" for="official-api-preset-select">
                             <span>API 预设</span>
                             <select
                                 id="official-api-preset-select"
-                                aria-label="选择有兔 API 预设"
+                                aria-label="选择LHV API 预设"
                             ></select>
                             <small
                                 >未选择、预设被删除或配置不完整时会停止生成，不会回退到系统
@@ -8666,7 +8449,7 @@
                             ></span>
                             <div
                                 ><h2 id="official-conversation-section-title">会话管理</h2
-                                ><p>管理当前有兔会话与本地聊天记录</p></div
+                                ><p>管理当前LHV会话与本地聊天记录</p></div
                             >
                         </div>
                         <div class="u2-official-settings-actions">
@@ -8688,7 +8471,7 @@
                         </div>
                     </section>
                     <p class="u2-official-settings-footnote"
-                        >删除会话不会取消添加有兔；你仍可从 Official Accounts 再次进入。</p
+                        >删除会话不会取消添加LHV；你仍可从 Official Accounts 再次进入。</p
                     >
                 </main>
             </div>
@@ -8950,7 +8733,7 @@
                     >
                         <i class="fas fa-chevron-left" aria-hidden="true"></i>
                     </button>
-                    <h2>数据管理</h2>
+                    <h2>Data Management</h2>
                     <span class="data-management-header-spacer" aria-hidden="true"></span>
                 </header>
 
@@ -9881,7 +9664,7 @@
             >
                 <div class="bottom-sheet vector-memory-config-sheet">
                     <div class="sheet-handle"></div>
-                    <div class="sheet-title">向量记忆</div>
+                    <div class="sheet-title">Vector Memory</div>
                     <div class="detail-sheet-content vector-memory-config-content">
                         <div class="form-group fully-rounded vector-memory-api-config">
                             <div class="form-item" style="justify-content: space-between;">
@@ -9995,12 +9778,12 @@
                     <div
                         class="sheet-action confirm-action vector-memory-config-save"
                         id="confirm-vector-memory-config-btn"
-                        >保存</div
+                        >Save</div
                     >
                     <div
                         class="sheet-action vector-memory-config-close"
                         id="close-vector-memory-config-btn"
-                        >取消</div
+                        >Cancel</div
                     >
                 </div>
             </div>
@@ -10013,7 +9796,7 @@
             >
                 <div class="bottom-sheet" style="max-height: 85%;">
                     <div class="sheet-handle"></div>
-                    <div class="sheet-title">识图配置</div>
+                    <div class="sheet-title">Image Recognition</div>
                     <div class="detail-sheet-content" style="padding-bottom: 20px;">
                         <div class="form-group fully-rounded" style="margin-bottom: 20px;">
                             <div class="form-item">
@@ -10124,7 +9907,7 @@
             >
                 <div class="bottom-sheet" style="max-height: 85%;">
                     <div class="sheet-handle"></div>
-                    <div class="sheet-title">生图配置</div>
+                    <div class="sheet-title">Image Generation</div>
                     <div class="detail-sheet-content" style="padding-bottom: 20px;">
                         <div class="form-group fully-rounded" style="margin-bottom: 20px;">
                             <div class="form-item">
@@ -10247,7 +10030,7 @@
             >
                 <div class="bottom-sheet" style="max-height: 85%;">
                     <div class="sheet-handle"></div>
-                    <div class="sheet-title">TTS 配置</div>
+                    <div class="sheet-title">TTS Configuration</div>
 
                     <div class="detail-sheet-content" style="padding-bottom: 20px;">
                         <div class="form-group fully-rounded" style="margin-bottom: 20px;">
@@ -10456,7 +10239,7 @@
             >
                 <div class="bottom-sheet" style="height: auto; max-height: 78%; overflow-y: auto;">
                     <div class="sheet-handle"></div>
-                    <div class="sheet-title">悬浮球设置</div>
+                    <div class="sheet-title">Floating Ball</div>
                     <div class="settings-group fully-rounded" style="margin: 0 16px 20px;">
                         <div
                             class="form-item"
@@ -10568,7 +10351,7 @@
                     style="max-height: 85%; height: 80%; display: flex; flex-direction: column;"
                 >
                     <div class="sheet-handle"></div>
-                    <div class="sheet-title">主题美化</div>
+                    <div class="sheet-title">App Icon</div>
 
                     <div
                         class="detail-sheet-content"
@@ -10695,7 +10478,7 @@
                     </button>
                     <div class="im-theme-title">
                         <strong>主题美化</strong>
-                        <span id="theme-draft-indicator" aria-live="polite">iMessage 样式工具</span>
+                        <span id="theme-draft-indicator" aria-live="polite">iMessage CSS</span>
                     </div>
                     <div class="im-theme-header-spacer" aria-hidden="true"></div>
                 </header>
@@ -10709,7 +10492,7 @@
                         role="tab"
                         aria-selected="true"
                         aria-controls="theme-tab-home"
-                        >主页</button
+                        >Home CSS</button
                     >
                     <button
                         class="theme-tab"
@@ -10729,7 +10512,7 @@
                         role="tab"
                         aria-selected="false"
                         aria-controls="theme-tab-bubble"
-                        >气泡</button
+                        >Chat</button
                     >
                     <button
                         class="theme-tab"
@@ -10739,7 +10522,7 @@
                         role="tab"
                         aria-selected="false"
                         aria-controls="theme-tab-group"
-                        >群聊</button
+                        >Group</button
                     >
                     <button
                         class="theme-tab"
@@ -11099,7 +10882,7 @@
                         <div class="im-theme-layout"
                             ><div class="im-theme-editor-panel"
                                 ><div class="im-theme-panel-heading"
-                                    ><strong>群聊</strong><span>应用到所有群聊会话</span></div
+                                    ><strong>Group CSS</strong><span>All group chats</span></div
                                 ><textarea
                                     id="theme-group-css-input"
                                     class="global-textarea im-theme-code-input"
@@ -11615,7 +11398,7 @@
                     <header class="theme-font-modal-header">
                         <div>
                             <div class="theme-font-modal-title" id="theme-font-modal-title"
-                                >字体</div
+                                >Fonts</div
                             >
                             <div class="theme-font-modal-subtitle">统一设置界面文字与字号</div>
                         </div>
@@ -20880,7 +20663,7 @@
                         hidden
                         ><i class="fas fa-chevron-left" aria-hidden="true"></i
                     ></button>
-                    <h2 id="about-info-modal-title">免责声明</h2>
+                    <h2 id="about-info-modal-title">Gravity</h2>
                     <button
                         type="button"
                         class="about-info-modal-close"
@@ -20891,33 +20674,17 @@
                 </header>
                 <div class="about-info-modal-body">
                     <div id="about-disclaimer-content" class="about-info-panel">
-                        <section class="about-author-block">
-                            <span>作者</span>
-                            <strong>iisonyoung</strong>
-                            <p>小红书号：49713923588</p>
-                        </section>
-                        <section class="about-notice-block">
-                            <h3>使用须知</h3>
-                            <ol>
-                                <li>本作品默认用户已成年，仅面向年满 18 周岁的玩家。</li>
-                                <li
-                                    >内容仅供个人娱乐与交流，不构成现实建议；AI
-                                    生成内容可能存在虚构或错误。</li
-                                >
-                                <li
-                                    >第三方
-                                    API、网络服务及其内容由对应服务提供方负责。用户应自行保管密钥并承担使用风险。</li
-                                >
-                                <li>应用数据主要保存在本机，请自行备份重要数据。</li>
-                                <li
-                                    >禁止二次上传、二传、倒卖、分享或出售下载链接或访问链接、改包分发、镜像传播、冒充作者及其他未经许可的商业使用。</li
-                                >
-                                <li
-                                    >第三方名称、图标和素材权利归原权利人所有，如有问题可联系作者处理。</li
-                                >
-                            </ol>
-                        </section>
-                    </div>
+                <section class="about-author-block">
+                    <strong>«Свидание с тишиной»</strong>
+                </section>
+                <section class="about-notice-block">
+                    <ul>
+                        <li>— Знаешь, я никогда не думал, что приду к тебе снова спустя столько времени. Я безумно скучал по тебе, но не знаю, почему я так долго опасался тебя. Возможно просто боялся взглянуть на тебя после того, что произошло</li>
+                        <li>Сигарета в между пальцев при каждой затяжке загоралась слабым алым цветном. Вокруг было очень тихо и только голос мужчины, будто лезвие, разрезал эту тишину. Слабый прохладный ветер ласкал его лицо и волосы, словно стараясь утешить. Он шумно выдохнул, и грудь покинула полупрозрачная вуаль дыма</li>
+                        <li>Капли надвигающегося дождя начали тихонько мочить волосы и одежду. Усталые глаза взглянули на небо</li>
+                   </ul>
+                </section>
+            </div>
                     <div id="about-changelog-content" class="about-info-panel" hidden>
                         <div id="about-changelog-list-view">
                             <section class="about-changelog-calendar" aria-label="更新日历">
@@ -21034,8 +20801,8 @@
         <script src="js/image_generation.js?v=20260807-model-cache-v1&prompt-parts=20260819-v1&api-error-dialog=20260923-v1&repair=20261003"></script>
         <script src="js/image_understanding.js?v=20261007-107-r1"></script>
         <script src="js/export_file.js?v=20260907-capacitor-v1&repair=20261003"></script>
-        <script src="js/about_info_modal.js?v=20261007-107-r1"></script>
-        <script src="js/login.js?v=20260801-resume-recovery-v1&changelog-notice=20260819-v1&repair=20261003"></script>
+        <script src="js/about_info_modal.js?v=20261007-107-r1&settings=20261010-r1"></script>
+        <script src="js/login.js?v=20260801-resume-recovery-v1&changelog-notice=20260819-v1&repair=20261003&settings=20261010-r1"></script>
         <script src="js/app_guide_modal.js?v=20261007-107-r1"></script>
         <script src="js/viewport_layout.js?v=20261009-restored-repairs"></script>
         <script src="js/mobile_input_compat.js?v=20261009-restored-repairs"></script>
@@ -21059,14 +20826,14 @@
         <script src="js/imessage/chat_search.js?v=20260718-chat-history-search-v2&keyboard-guard=20260801-v1&startup-queue=20260804-v1&location-timezone=20260825-v1&location-translation=20260825-v1&history-index=20260907-v1&group-chat-search=20260924-v3&repair=20261003"></script>
         <script src="js/imessage/chat_favorites.js?v=20260723-chat-favorites-v3&startup-queue=20260804-v1&repair=20261003"></script>
         <script src="js/imessage/tts.js?v=20261007-107-r1"></script>
-        <script src="js/imessage/4_chat_ai.js?v=20261007-107-r1"></script>
+        <script src="js/imessage/4_chat_ai.js?v=20261007-107-r1&settings=20261010-r1"></script>
         <script src="js/imessage/offline_regex.js?v=20260705-offline-regex-v1&html-template=20260822-v3&offline-text-replacement=20260913-v1&repair=20261003"></script>
         <script src="js/imessage/offline_reasoning.js?v=20260718-offline-cot-v1&custom-cot=20260823-v1&repair=20261003"></script>
         <script src="js/imessage/offline_summary_errors.js?v=20260907-detailed-errors-v1&repair=20261003"></script>
         <script src="js/imessage/4_chat_sheet.js?v=20261007-107-r1"></script>
         <script src="js/imessage/4_chat_link.js?v=20260726-light-link-theatre-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&picsum-cdn=20260815-v1&api-error-dialog=20260923-v1&repair=20261003"></script>
-        <script src="js/imessage/4_chat_list.js?chat-runtime-performance=20260803-v1&startup-queue=20260804-v1&theme-surfaces=20260814-v1&imessage-performance=20260825-v2&mobile-latest=20260825-v1&mobile-performance=20260825-v1&official=20260827-v1&history-index=20260907-v1&chat-observer-lifecycle=20260920-v1&group-chat-search=20260924-v1&repair=20261003"></script>
-        <script src="js/imessage/4_chat_interface.js?v=20261007-107-r1"></script>
+        <script src="js/imessage/4_chat_list.js?chat-runtime-performance=20260803-v1&startup-queue=20260804-v1&theme-surfaces=20260814-v1&imessage-performance=20260825-v2&mobile-latest=20260825-v1&mobile-performance=20260825-v1&official=20260827-v1&history-index=20260907-v1&chat-observer-lifecycle=20260920-v1&group-chat-search=20260924-v1&repair=20261003&settings=20261010-r1"></script>
+        <script src="js/imessage/4_chat_interface.js?v=20261007-107-r1&settings=20261010-r1"></script>
         <script src="js/imessage/4_chat_voice_call.js?v=20261009-restored-repairs"></script>
         <script src="js/imessage/video_call.js?v=20261009-restored-repairs"></script>
         <script src="js/imessage/4_chat_main.js?v=20261007-107-r1"></script>
@@ -21085,8 +20852,8 @@
         <!-- 引入核心 UI 管理与设置模块脚本 -->
         <script src="js/ui.js?v=20260811-no-glass-v1&toast-full-message=20260822-v1&notification-banner-v3&repair=20261003&shop-moments=20261010-v1"></script>
         <script src="js/ui_translation.js?v=20260807-global-ui-zh-v1&repair=20261003"></script>
-        <script src="js/settings.js?v=20261007-107-r1"></script>
-        <script src="js/imessage/official_accounts.js?v=20260828-youtu-preview-stable-v5&api-error-dialog=20260923-v1&official-css-generation=20260928-v1&ihg=20260929-106-r1&repair=20261003"></script>
+        <script src="js/settings.js?v=20261007-107-r1&settings=20261010-r1"></script>
+        <script src="js/imessage/official_accounts.js?v=20260828-youtu-preview-stable-v5&api-error-dialog=20260923-v1&official-css-generation=20260928-v1&ihg=20260929-106-r1&repair=20261003&settings=20261010-r1"></script>
         <script src="js/vendor/mcp_client_sdk.js?v=20260901-mobile-mcp-v3&repair=20261003"></script>
         <script src="js/mcp_relay_config.js?v=20260906-relay-v2&repair=20261003"></script>
         <script src="js/imessage/mcp_integration.js?v=20260906-relay-v3&version-compat=20260907-v1&storage-persistence=20260907-v1&repair=20261003"></script>
@@ -21118,8 +20885,8 @@
         <script src="js/mcp.js?v=20260906-relay-ui-v1&android-input=20260906-v1&storage-persistence=20260907-v1&repair=20261003"></script>
         <script src="js/diary.js?v=20260913-diary-v6-prompt-toggle-scroll&api-error-dialog=20260923-v1&repair=20261003"></script>
         <script src="js/ao3.js?v=20260904-ao3-cp-search-v12&persona=20260920-v4&api-error-dialog=20260923-v2&repair=20261003"></script>
-        <script src="js/home_desktop.js?v=20261007-107-r1"></script>
-        <script src="js/home_widget_panel_enhance.js?v=20260830-widget-image-flush-v1&couple-text=20260911-v1&repair=20261003"></script>
+        <script src="js/home_desktop.js?v=20261007-107-r1&settings=20261010-r1"></script>
+        <script src="js/home_widget_panel_enhance.js?v=20260830-widget-image-flush-v1&couple-text=20260911-v1&repair=20261003&settings=20261010-r1"></script>
         <!-- 引入主逻辑脚本 -->
         <script src="script.js?v=20260725-modal-owner-v1&home-swipe=20260801-scrollend-v2&performance=20260801-v1&splash-notice-handshake=20260813-v1&reader-selection=20260819-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1"></script>
     </body>

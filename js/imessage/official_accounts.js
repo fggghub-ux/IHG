@@ -2,11 +2,11 @@
     'use strict';
 
     const id_2 = 'u2-official-youtu',
-        text_4 = '有兔',
+        text_4 = 'LHV',
         text_5 =
-            '嗨，我是有兔。告诉我你想做的主题、状态栏或世界书，我会生成真实预览，满意后可以存为预设。',
+            '嗨，我是LHV。告诉我你想做的主题、状态栏或世界书，我会生成真实预览，满意后可以存为预设。',
         content_3 =
-            '嗨，我是有兔。你可以让我制作 iMessage 与线下主题、线下提示词条目、线下 HTML 模板、世界书，也能为 Char 或当前 User 撰写人设。告诉我用途、风格和目标；涉及写入时，我会先给你预览，确认后再应用。',
+            '嗨，我是LHV。你可以让我制作 iMessage 与线下主题、线下提示词条目、线下 HTML 模板、世界书，也能为 Char 或当前 User 撰写人设。告诉我用途、风格和目标；涉及写入时，我会先给你预览，确认后再应用。',
         version_2 = 2,
         value_7 = new Set([
             'status_template',
@@ -545,7 +545,7 @@
             value_159 = trim_158
                 ? handleAction_31().find((value_161) => String(value_161?.id) === trim_158)
                 : null;
-        if (!value_159) throw new Error('请先在右上角 office 设置中选择有兔专用 API 预设');
+        if (!value_159) throw new Error('请先在右上角 office 设置中选择LHV专用 API 预设');
         const options_160 = {
             provider: value_159.provider || 'openai-compatible',
             endpoint: String(value_159.endpoint || '').trim(),
@@ -555,7 +555,7 @@
             frequencyPenalty: value_159.frequencyPenalty ?? 0,
         };
         if (!options_160.endpoint || !options_160.apiKey || !options_160.model)
-            throw new Error('有兔选择的 API 预设配置不完整，请重新选择');
+            throw new Error('LHV选择的 API 预设配置不完整，请重新选择');
         return options_160;
     }
     function handleAction_33(value_162) {
@@ -628,7 +628,7 @@
                     silent: true,
                 },
             );
-        if (!value_170) throw new Error('有兔添加失败');
+        if (!value_170) throw new Error('LHV添加失败');
         return (
             handleAction_36(),
             value_2.imChat?.renderChatsList?.(),
@@ -815,7 +815,7 @@
                 .map((value_210, value_211) => handleAction_45(value_210, value_211, errors_2))
                 .filter(Boolean);
         if (!message_2 && artifacts_2.length === 0 && errors_2.length === 0)
-            throw new Error('有兔没有返回可显示内容');
+            throw new Error('LHV没有返回可显示内容');
         return {
             message: message_2,
             artifacts: artifacts_2,
@@ -827,9 +827,9 @@
         const kind_2 = String(value_212.kind || '').trim();
         if (!value_9.has(kind_2)) return null;
         const name_4 =
-                String(value_212.name || '有兔作品 ' + (value_213 + 1))
+                String(value_212.name || 'LHV作品 ' + (value_213 + 1))
                     .trim()
-                    .slice(0, 100) || '有兔作品 ' + (value_213 + 1),
+                    .slice(0, 100) || 'LHV作品 ' + (value_213 + 1),
             summary_2 = String(value_212.summary || '')
                 .trim()
                 .slice(0, 1000),
@@ -1094,7 +1094,7 @@ Theme CSS 必须使用当前组件可用的真实选择器；不要生成 script
         if (!value_268 || value_268.type !== 'official') return false;
         const friendId_2 = String(value_268.id);
         if (value_11.has(friendId_2)) {
-            if (!value_267.silent) value_2.showToast?.('有兔正在生成中');
+            if (!value_267.silent) value_2.showToast?.('LHV正在生成中');
             return false;
         }
         const value_270 =
@@ -1206,7 +1206,7 @@ Theme CSS 必须使用当前组件可用的真实选择器；不要生成 script
             !value_267.silent &&
                 value_2.u2Api?.isRequestError?.(value_284) &&
                 value_2.u2Api.reportError(value_284, {
-                    operation: '有兔回复生成',
+                    operation: 'LHV回复生成',
                 });
             await handleAction_51(value_268.id, '这次没有生成成功，可以点击重试。');
             const value_285 = get_2() || value_268;
@@ -1355,10 +1355,10 @@ Theme CSS 必须使用当前组件可用的真实选择器；不要生成 script
         if (value_307 === 'offline_theme')
             return '<div id="offline-chat-view"><div class="offline-chat-page"><div class="offline-chat-title">Tonight</div><div class="offline-chat-message offline-chat-narration">雨点落在窗沿，房间里只剩柔和的呼吸声。</div><div class="offline-chat-message offline-chat-dialogue">“再坐近一点吧。”</div><section class="offline-chat-html-template"><strong>深夜 · 靠窗</strong></section></div></div>';
         if (value_307 === 'home_css')
-            return '<div class="line-content"><div class="line-profile"><div><h2>Chats</h2><p>有兔主题预览</p></div></div><div class="chat-item"><div class="chat-avatar"></div><div class="chat-info"><div class="chat-name">有兔 <span>office</span></div><div class="chat-message">满意后存为预设。</div></div></div></div>';
+            return '<div class="line-content"><div class="line-profile"><div><h2>Chats</h2><p>LHV主题预览</p></div></div><div class="chat-item"><div class="chat-avatar"></div><div class="chat-info"><div class="chat-name">LHV <span>office</span></div><div class="chat-message">满意后存为预设。</div></div></div></div>';
         if (value_307 === 'group_css')
             return '<div class="active-chat-interface im-chat-group"><div class="chat-top-bar"><div class="ins-chat-name">周末计划</div></div><div class="ins-chat-messages"><div class="chat-row ai-row"><div class="group-ai-bubble-wrap"><div class="group-ai-speaker-name">小兔</div><div class="ai-bubble">一起去看海吧</div></div></div><div class="chat-row user-row"><div class="user-bubble">好呀</div></div></div></div>';
-        return '<div class="active-chat-interface im-chat-single"><div class="chat-top-bar"><div class="ins-chat-name">示例角色</div></div><div class="ins-chat-messages"><div class="chat-row ai-row"><div class="ai-bubble">这是有兔生成的预览</div></div><div class="chat-row user-row"><div class="user-bubble">看起来不错</div></div></div></div>';
+        return '<div class="active-chat-interface im-chat-single"><div class="chat-top-bar"><div class="ins-chat-name">示例角色</div></div><div class="ins-chat-messages"><div class="chat-row ai-row"><div class="ai-bubble">这是LHV生成的预览</div></div><div class="chat-row user-row"><div class="user-bubble">看起来不错</div></div></div></div>';
     }
     function handleAction_61(value_308) {
         const value_309 =
@@ -1467,7 +1467,7 @@ Theme CSS 必须使用当前组件可用的真实选择器；不要生成 script
             element_330.innerHTML =
                 '<div><strong>当前人设</strong><p>' +
                 handleAction_15(value_329 || '未填写') +
-                '</p></div><div><strong>有兔作品</strong><p>' +
+                '</p></div><div><strong>LHV作品</strong><p>' +
                 handleAction_15(value_314.payload.persona) +
                 '</p></div>';
             element_313.appendChild(element_330);
@@ -1642,7 +1642,7 @@ Theme CSS 必须使用当前组件可用的真实选择器；不要生成 script
         if (
             !value_371.skipConfirm &&
             !(await handleAction_64(
-                '应用有兔作品',
+                '应用LHV作品',
                 '“' + value_368.name + '”将应用到：' + value_374,
             ))
         )
@@ -2067,7 +2067,7 @@ Theme CSS 必须使用当前组件可用的真实选择器；不要生成 script
                 if (
                     !(await handleAction_64(
                         '清空聊天记录',
-                        '这会删除有兔的全部聊天消息，但保留当前会话。',
+                        '这会删除LHV的全部聊天消息，但保留当前会话。',
                         '清空',
                     ))
                 )
@@ -2086,7 +2086,7 @@ Theme CSS 必须使用当前组件可用的真实选择器；不要生成 script
                 if (
                     !(await handleAction_64(
                         '删除会话',
-                        '聊天记录将被永久删除，会话会从 Chats 隐藏，但有兔仍保持已添加。',
+                        '聊天记录将被永久删除，会话会从 Chats 隐藏，但LHV仍保持已添加。',
                         '删除',
                     ))
                 )

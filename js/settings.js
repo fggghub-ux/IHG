@@ -185,6 +185,22 @@
                 },
             },
         ];
+    const APP_ICON_BASE = 'assets/app-icons/';
+    const DEFAULT_APP_ICONS = {
+        'app-icon-1': APP_ICON_BASE + 'pay.jpg',
+        'app-icon-2': APP_ICON_BASE + 'tiktok.jpg',
+        'app-icon-3': APP_ICON_BASE + 'bstage.jpg',
+        'app-icon-4': APP_ICON_BASE + 'x.jpg',
+        'app-icon-5': APP_ICON_BASE + 'shop.jpg',
+        'app-icon-6': APP_ICON_BASE + 'library.jpg',
+        'app-icon-7': APP_ICON_BASE + 'netflix.jpg',
+        'app-icon-8': APP_ICON_BASE + 'lover.jpg',
+        'dock-icon-settings': APP_ICON_BASE + 'settings.jpg',
+        'dock-icon-imessage': APP_ICON_BASE + 'imessage.jpg',
+        'dock-icon-youtube': APP_ICON_BASE + 'youtube.jpg'
+    };
+
+
     let themeState_2 = {
         bgUrl: null,
         uiChineseEnabled: false,
@@ -192,42 +208,42 @@
             {
                 id: 'app-icon-1',
                 name: 'Pay',
-                icon: null,
+                icon: DEFAULT_APP_ICONS['app-icon-1'],
             },
             {
                 id: 'app-icon-2',
                 name: 'TikTok',
-                icon: null,
+                icon: DEFAULT_APP_ICONS['app-icon-2'],
             },
             {
                 id: 'app-icon-3',
                 name: 'b.stage',
-                icon: null,
+                icon: DEFAULT_APP_ICONS['app-icon-3'],
             },
             {
                 id: 'app-icon-4',
                 name: 'X',
-                icon: null,
+                icon: DEFAULT_APP_ICONS['app-icon-4'],
             },
             {
                 id: 'app-icon-5',
                 name: 'Shop',
-                icon: null,
+                icon: DEFAULT_APP_ICONS['app-icon-5'],
             },
             {
                 id: 'app-icon-6',
                 name: 'Library',
-                icon: null,
+                icon: DEFAULT_APP_ICONS['app-icon-6'],
             },
             {
                 id: 'app-icon-7',
                 name: 'Netflix',
-                icon: null,
+                icon: DEFAULT_APP_ICONS['app-icon-7'],
             },
             {
                 id: 'app-icon-8',
                 name: 'Loves',
-                icon: null,
+                icon: DEFAULT_APP_ICONS['app-icon-8'],
             },
             {
                 id: 'app-icon-9',
@@ -272,17 +288,17 @@
             {
                 id: 'dock-icon-settings',
                 name: '设置',
-                icon: null,
+                icon: DEFAULT_APP_ICONS['dock-icon-settings'],
             },
             {
                 id: 'dock-icon-imessage',
                 name: '信息',
-                icon: null,
+                icon: DEFAULT_APP_ICONS['dock-icon-imessage'],
             },
             {
                 id: 'dock-icon-youtube',
                 name: 'YouTube',
-                icon: null,
+                icon: DEFAULT_APP_ICONS['dock-icon-youtube'],
             },
         ],
         fontMode: 'preset',
@@ -396,7 +412,7 @@
                     (savedThemeState.apps.forEach((savedApp) => {
                         const existingApp = themeState_2.apps.find((a_2) => a_2.id === savedApp.id);
                         if (existingApp) {
-                            existingApp.icon = savedApp.icon;
+                            existingApp.icon = savedApp.icon || DEFAULT_APP_ICONS[savedApp.id] || null;
                             if (savedApp.id === 'app-icon-6') existingApp.name = 'Library';
                             else {
                                 if (savedApp.id === 'app-icon-10') existingApp.name = 'Gallery';
@@ -612,7 +628,7 @@
             aboutDeviceSheet &&
             aboutDeviceBtn.addEventListener('click', () => {
                 const appNameEl = document.getElementById('about-device-app-name');
-                if (appNameEl) appNameEl.textContent = 'u2phone';
+                if (appNameEl) appNameEl.textContent = 'LHV';
                 openView(aboutDeviceSheet);
             });
         aboutDeviceCloseBtn &&
@@ -4600,7 +4616,7 @@
         resetAllIconsBtn &&
             resetAllIconsBtn.addEventListener('click', () => {
                 themeState_2.apps.forEach((app_4) => {
-                    app_4.icon = null;
+                    app_4.icon = DEFAULT_APP_ICONS[app_4.id] || null;
                 });
                 commitThemeAppIconChanges('应用图标已全部重置');
             });
@@ -4670,7 +4686,7 @@
                 const resetBtn = item_2.querySelector('.reset-single-app-btn');
                 resetBtn.addEventListener('click', (event_644) => {
                     event_644.stopPropagation();
-                    themeState_2.apps[index_2].icon = null;
+                    themeState_2.apps[index_2].icon = DEFAULT_APP_ICONS[app_5.id] || null;
                     commitThemeAppIconChanges(app_5.name + ' 图标已重置');
                 });
                 const uploadBtn = item_2.querySelector('.upload-single-app-btn');
@@ -4715,25 +4731,19 @@
                     iconDiv.querySelector('i')
                 );
             };
-            if (app_7.icon) {
+            const iconSource = app_7.icon || (app_7.id === 'app-icon-8' ? DEFAULT_APP_ICONS['app-icon-8'] : '');
+
+            if (iconSource) {
                 iconDiv.innerHTML = '';
                 iconDiv.classList.add('has-custom-app-icon');
-                iconDiv.style.setProperty(
-                    'background',
-                    'url(' + app_7.icon + ') center / cover no-repeat',
-                    'important',
-                );
-                iconDiv.style.setProperty(
-                    'background-image',
-                    'url(' + app_7.icon + ')',
-                    'important',
-                );
+                iconDiv.style.setProperty('background', `url(${iconSource}) center / cover no-repeat`, 'important');
+                iconDiv.style.setProperty('background-image', `url(${iconSource})`, 'important');
                 iconDiv.style.setProperty('background-size', 'cover', 'important');
                 iconDiv.style.setProperty('background-position', 'center', 'important');
                 iconDiv.style.setProperty('background-repeat', 'no-repeat', 'important');
                 iconDiv.style.setProperty('background-color', 'transparent', 'important');
+                // Reset possible inner borders
                 iconDiv.style.setProperty('border', 'none', 'important');
-                iconDiv.style.setProperty('box-shadow', 'none', 'important');
             } else {
                 iconDiv.classList.remove('has-custom-app-icon');
                 iconDiv.style.removeProperty('background');
@@ -6085,7 +6095,7 @@
                       (config_3.provider !== 'openai-compatible' || config_3.endpoint)
                         ? '已启用'
                         : '待配置'
-                    : '关闭');
+                    : 'Close');
             const runtimeStatus = window.imVectorMemory?.getStatus?.();
             UI.inputs.vectorMemoryIndexStatus &&
                 (UI.inputs.vectorMemoryIndexStatus.textContent =

@@ -531,7 +531,7 @@
         </div>
     `),
             (shell_2.querySelector('.im-chat-loading-header span').textContent =
-                value_116_2.nickname || value_116_2.realName || '聊天'),
+                (value_116_2.type === 'official' && value_116_2.nickname === '有兔' ? 'LHV' : value_116_2.nickname) || value_116_2.realName || '聊天'),
             element_117.appendChild(shell_2),
             {
                 shell: shell_2,
@@ -646,7 +646,7 @@
                    </div>
                    <div class="im-chat-title-wrap">
                         <div class="ins-chat-name">` +
-                        friend_6.nickname +
+                        (friend_6.nickname === '有兔' ? 'LHV' : friend_6.nickname) +
                         `</div>
                         <div class="ins-chat-sign"><div class="im-chat-status-dot"></div><span>` +
                         statusLabel +
@@ -798,7 +798,7 @@
                         <div class="im-chat-input-actions">
                             ` +
                 (value_134
-                    ? '<button type="button" class="send-btn-icon mic-btn official-send-control" aria-label="发送给有兔" title="发送给有兔"><i class="fas fa-arrow-up"></i></button>'
+                    ? '<button type="button" class="send-btn-icon mic-btn official-send-control" aria-label="发送给LHV" title="发送给LHV"><i class="fas fa-arrow-up"></i></button>'
                     : '<button type="button" class="send-btn-icon send-btn" aria-label="发送消息" title="发送消息"><i class="fas fa-paper-plane" aria-hidden="true"></i></button><button type="button" class="send-btn-icon mic-btn" aria-label="生成回复" title="生成回复"><i class="fas fa-arrow-down" aria-hidden="true"></i></button>') +
                 `
                         </div>
@@ -1809,8 +1809,8 @@
                     if (!value_134 || !micBtn) return;
                     const value_233 = value_232 === true;
                     micBtn.classList.toggle('is-generating', value_233);
-                    micBtn.setAttribute('aria-label', value_233 ? '停止有兔生成' : '发送给有兔');
-                    micBtn.setAttribute('title', value_233 ? '停止生成' : '发送给有兔');
+                    micBtn.setAttribute('aria-label', value_233 ? '停止LHV生成' : '发送给LHV');
+                    micBtn.setAttribute('title', value_233 ? '停止生成' : '发送给LHV');
                     const icon_2 = micBtn.querySelector('i');
                     if (icon_2) icon_2.className = value_233 ? 'fas fa-pause' : 'fas fa-arrow-up';
                 },

@@ -30,27 +30,26 @@
             },
         },
         WIDGET_TEXT_DEFAULTS = {
-            profileTitle: 'name @iisonyoung',
-            profileBio: 'Te amo mucho...',
-            profilePosts: '0',
-            profileFollowers: '1314',
-            profileFollowing: '520',
-            petText: 'oxo',
-            musicTitle: 'oode...',
-            musicArtist: '- Maximillian',
-            musicLyric1: 'u2phone',
-            musicLyric2: 'sonokoiomoiiyo',
-            musicLyric3: 'The rain of destiny',
-            coupleLeft: 'ㅠㅠ',
-            coupleRight: 'ㅎㅎ',
-            photoTitle: 'iisonyoung',
+            profileTitle: 'i 🤍uuu so..@kendall',
+            profilePosts: '19',
+            profileFollowers: '7119.1K',
+            profileFollowing: '8',
+            petText: 'irrelevant',
+            musicTitle: 'But...',
+            musicArtist: '- Drake',
+            musicLyric1: 'Whit no makeup she a ten',
+            musicLyric2: 'And she the best with that head',
+            musicLyric3: 'Even better than Karrine',
+            coupleLeft: '-.-',
+            coupleRight: 'TT',
+            photoTitle: 'callmekim',
             photoBody: '',
-            notificationTitle: 'u2phone',
-            notificationDesc:
-                'I was with you in a happy, translucent, endless dream. In contrast to my usual dreams.',
-            postAuthor: 'iisonyoung',
-            postBody:
-                'If you still exist in this world, then no matter what this world is like, it is meaningful to me.',
+            notificationTitle: 'Entanglement',
+            notificationDesc: 'If it’s not mine, it’s not special.',
+            profileUsername: 'kendall',
+            profileBio: '',
+            postAuthor: 'you',
+            postBody: 'If you still exist in this world, then no matter what this world is like, it is meaningful to me.'
         },
         options = {
             profile: [
@@ -193,17 +192,16 @@
                 },
             ],
         };
-    let libraryObserver = null,
-        batteryLevel = 100;
+    let libraryObserver = null;
     document.addEventListener('DOMContentLoaded', init);
     function init() {
         ensureStatusBar();
         ensurePanelSwitches();
         applyHomeChromeSettings();
+        window.u2OnStorageReady?.(applyHomeChromeSettings, { queue: false });
         enhanceLibraryWhenReady();
         updateStatusClock();
         setInterval(updateStatusClock, 30000);
-        initBattery();
     }
     function loadSettings() {
         try {
@@ -342,55 +340,24 @@
         const bar = document.createElement('div');
         bar.className = 'home-ios-status-bar';
         bar.id = 'home-ios-status-bar';
-        const left = document.createElement('div');
-        left.className = 'home-ios-status-left';
-        left.id = 'home-ios-status-time';
-        left.textContent = '9:41';
+        const time = document.createElement('div');
+        time.className = 'home-ios-status-left';
+        time.id = 'home-ios-status-time';
         const right = document.createElement('div');
         right.className = 'home-ios-status-right';
-        const signal = document.createElement('i');
-        signal.className = 'fas fa-signal';
-        const wifi = document.createElement('i');
-        wifi.className = 'fas fa-wifi';
         const battery = document.createElement('div');
         battery.className = 'home-ios-battery';
         battery.setAttribute('aria-label', 'battery');
-        const batteryLevelEl = document.createElement('div');
-        batteryLevelEl.className = 'home-ios-battery-level';
-        batteryLevelEl.id = 'home-ios-battery-level';
-        battery.appendChild(batteryLevelEl);
-        right.appendChild(signal);
-        right.appendChild(wifi);
         right.appendChild(battery);
-        bar.appendChild(left);
+        bar.appendChild(time);
         bar.appendChild(right);
         app.insertBefore(bar, app.firstChild);
     }
     function updateStatusClock() {
-        const timeEl = document.getElementById('home-ios-status-time');
-        if (!timeEl) return;
+        const time = document.getElementById('home-ios-status-time');
+        if (!time) return;
         const now = new Date();
-        timeEl.textContent = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-        const batteryEl = document.getElementById('home-ios-battery-level');
-        batteryEl &&
-            batteryEl.style.setProperty(
-                '--battery-level',
-                Math.max(8, Math.min(100, batteryLevel)) + '%',
-            );
-    }
-    function initBattery() {
-        if (!navigator.getBattery) return;
-        navigator
-            .getBattery()
-            .then(function (battery_2) {
-                const sync = function () {
-                    batteryLevel = Math.round((battery_2.level || 1) * 100);
-                    updateStatusClock();
-                };
-                sync();
-                battery_2.addEventListener('levelchange', sync);
-            })
-            ['catch'](function () {});
+        time.textContent = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
     }
     function enhanceLibraryWhenReady() {
         const library = document.getElementById('home-widget-library');

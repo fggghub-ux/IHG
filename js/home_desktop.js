@@ -451,8 +451,14 @@
             'assets/home/photo-default-2-512.jpg',
             'assets/home/photo-default-3-512.jpg',
         ],
-        text_10 = 'assets/home/pet-default.jpg',
+        DEFAULT_PET_IMAGE_SRC = 'assets/home/pet-default.jpg',
         DEFAULT_WIDGET_IMAGE_ASSET = 'assets/home/widget-default-320.jpg',
+        DEFAULT_NOTIFICATION_AVATAR_SRC = 'assets/home/notification-default.jpg',
+        DEFAULT_MUSIC_COVER_IMAGE_SRC = 'assets/home/music-cover-default.jpg',
+        DEFAULT_COUPLE_LEFT_IMAGE_SRC = 'assets/home/couple-default-left.jpg',
+        DEFAULT_COUPLE_RIGHT_IMAGE_SRC = 'assets/home/couple-default-right.jpg',
+        DEFAULT_SOCIAL_POST_AVATAR_SRC = 'assets/home/social-post-avatar.jpg',
+        DEFAULT_SOCIAL_POST_IMAGE_SRC = 'assets/home/social-post-image.jpg',
         OPTIMIZED_DEFAULT_IMAGE_SOURCES = new Map([
             [DEFAULT_WIDGET_IMAGE_SRC, DEFAULT_WIDGET_IMAGE_ASSET],
             ['assets/home/photo-default-1.jpg', DEFAULT_PHOTO_IMAGE_SRCS[0]],
@@ -579,28 +585,26 @@
         OLD_PHOTO_TITLE_DEFAULTS = new Set(['', 'Photos']),
         OLD_PHOTO_BODY_DEFAULTS = new Set(['2 x 4', 'Drop your favorite picture here']),
         DEFAULT_WIDGET_TEXT = {
-            profileTitle: 'name @iisonyoung',
-            profileUsername: 'iisonyoung',
-            profileBio: 'Te amo mucho...',
-            profilePosts: '0',
-            profileFollowers: '1314',
-            profileFollowing: '520',
-            petText: 'oxo',
-            musicTitle: 'oode...',
-            musicArtist: '- Maximillian',
-            musicLyric1: 'u2phone',
-            musicLyric2: 'sonokoiomoiiyo',
-            musicLyric3: 'The rain of destiny',
-            coupleLeft: 'ㅠㅠ',
-            coupleRight: 'ㅎㅎ',
-            photoTitle: 'iisonyoung',
+            profileTitle: 'i 🤍uuu so..@kendall',
+            profilePosts: '19',
+            profileFollowers: '7119.1K',
+            profileFollowing: '8',
+            petText: 'irrelevant',
+            musicTitle: 'But...',
+            musicArtist: '- Drake',
+            musicLyric1: 'Whit no makeup she a ten',
+            musicLyric2: 'And she the best with that head',
+            musicLyric3: 'Even better than Karrine',
+            coupleLeft: '-.-',
+            coupleRight: 'TT',
+            photoTitle: 'callmekim',
             photoBody: '',
-            notificationTitle: 'u2phone',
-            notificationDesc:
-                'I was with you in a happy, translucent, endless dream. In contrast to my usual dreams.',
-            postAuthor: 'iisonyoung',
-            postBody:
-                'If you still exist in this world, then no matter what this world is like, it is meaningful to me.',
+            notificationTitle: 'Entanglement',
+            notificationDesc: 'If it’s not mine, it’s not special.',
+            profileUsername: 'kendall',
+            profileBio: '',
+            postAuthor: 'you',
+            postBody: 'If you still exist in this world, then no matter what this world is like, it is meaningful to me.'
         };
     let appEl,
         pagesContainer,
@@ -698,7 +702,7 @@
         sheetEl.innerHTML = `
             <div class="bottom-sheet home-widget-bottom-sheet">
                 <div class="sheet-handle"></div>
-                <div class="sheet-title" id="home-widget-sheet-title">小组件</div>
+                <div class="sheet-title" id="home-widget-sheet-title">WIDGETS</div>
                 <div class="detail-sheet-content home-widget-form">
                     <div class="home-widget-library" id="home-widget-library"></div>
                 </div>
@@ -3729,7 +3733,7 @@
         lastWidgetSheetOpenedAt = Date.now();
         renderWidgetLibrary();
         const title_5 = document.getElementById('home-widget-sheet-title');
-        if (title_5) title_5.textContent = '小组件';
+        if (title_5) title_5.textContent = 'WIDGETS';
         openViewSafe(sheetEl);
     }
     function closeWidgetSheet() {
@@ -3866,37 +3870,23 @@
             html: type_6 === 'html' ? '' : undefined,
         };
     }
-    function getDefaultWidgetImages(type_8) {
-        if (type_8 === 'profile')
-            return {
-                avatar: DEFAULT_WIDGET_IMAGE_ASSET,
-            };
-        if (type_8 === 'socialPost')
-            return {
-                avatar: DEFAULT_WIDGET_IMAGE_ASSET,
-                postImage: DEFAULT_PHOTO_IMAGE_SRCS[0],
-            };
-        if (type_8 === 'pet')
-            return {
-                pet: text_10,
-            };
-        if (type_8 === 'music')
-            return {
-                cover: DEFAULT_WIDGET_IMAGE_ASSET,
-            };
-        if (type_8 === 'couple')
-            return {
-                left: DEFAULT_WIDGET_IMAGE_ASSET,
-                right: DEFAULT_WIDGET_IMAGE_ASSET,
-            };
-        if (type_8 === 'photo')
-            return {
-                photo: DEFAULT_PHOTO_IMAGE_SRCS[0],
-                photo2: DEFAULT_PHOTO_IMAGE_SRCS[1],
-                photo3: DEFAULT_PHOTO_IMAGE_SRCS[2],
-            };
-        return {};
+    function getDefaultWidgetImages(type) {
+    if (type === 'profile') return { avatar: DEFAULT_WIDGET_IMAGE_ASSET };
+    if (type === 'pet') return { pet: DEFAULT_PET_IMAGE_SRC };
+    if (type === 'music') return { cover: DEFAULT_MUSIC_COVER_IMAGE_SRC };
+    if (type === 'couple') return { left: DEFAULT_COUPLE_LEFT_IMAGE_SRC, right: DEFAULT_COUPLE_RIGHT_IMAGE_SRC };
+    if (type === 'photo') {
+        return {
+            photo: DEFAULT_PHOTO_IMAGE_SRCS[0],
+            photo2: DEFAULT_PHOTO_IMAGE_SRCS[1],
+            photo3: DEFAULT_PHOTO_IMAGE_SRCS[2]
+        };
     }
+    if (type === 'notification') return { avatar: DEFAULT_NOTIFICATION_AVATAR_SRC };
+    if (type === 'socialPost') return { avatar: DEFAULT_SOCIAL_POST_AVATAR_SRC, postImage: DEFAULT_SOCIAL_POST_IMAGE_SRC };
+    return {};
+}
+
     function mergeWidgetImagesWithDefaults(type_9, images_3 = {}) {
         const merged = {
             ...(images_3 || {}),
@@ -4129,13 +4119,12 @@
                 <div class="custom-widget-top">
                     <div class="custom-widget-avatar-wrapper"><img src="" style="display:none;"><i class="fas fa-user"></i></div>
                     <div class="custom-widget-stats">
-                        <div class="custom-widget-stat-item"><div class="custom-widget-stat-num">0</div><div class="custom-widget-stat-label">Posts</div></div>
-                        <div class="custom-widget-stat-item"><div class="custom-widget-stat-num">1314</div><div class="custom-widget-stat-label">Followers</div></div>
-                        <div class="custom-widget-stat-item"><div class="custom-widget-stat-num">520</div><div class="custom-widget-stat-label">Following</div></div>
+                        <div class="custom-widget-stat-item"><div class="custom-widget-stat-num">19</div><div class="custom-widget-stat-label">Posts</div></div>
+                        <div class="custom-widget-stat-item"><div class="custom-widget-stat-num">7119.1K</div><div class="custom-widget-stat-label">Followers</div></div>
+                        <div class="custom-widget-stat-item"><div class="custom-widget-stat-num">8</div><div class="custom-widget-stat-label">Following</div></div>
                     </div>
                 </div>
-                <div class="custom-widget-name">name @iisonyoung</div>
-                <div class="custom-widget-bio">Te amo mucho...</div>
+                <div class="custom-widget-name">i 🤍uuu so..@kendall</div>
                 <div class="custom-widget-edit-btn">Edit Profile</div>
                 <div class="custom-widget-bottom">
                     <div class="custom-widget-add-icon"><i class="fas fa-plus"></i></div>
@@ -4148,7 +4137,7 @@
                     wrapper.innerHTML = `
                 <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
                 <div class="pet-widget-img-wrapper"><img src=""><i class="fas fa-image" style="font-size:30px;color:#ccc;"></i></div>
-                <div class="pet-widget-bubble">oxo</div>
+                <div class="pet-widget-bubble">irrelevant</div>
                 <div class="pet-widget-music-icon"><i class="fas fa-music"></i></div>
                 <div class="pet-widget-plus-btn"><i class="fas fa-plus"></i></div>
             `;
@@ -4173,11 +4162,11 @@
                         </div>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding-left: 10px; padding-right: 15px;">
-                        <div class="home-widget-music-title music-title-edit" contenteditable="false" spellcheck="false" style="font-size: 18px; font-weight: 700; color: #111; text-align: center; outline: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">oode...</div>
+                        <div class="home-widget-music-title music-title-edit" contenteditable="false" spellcheck="false" style="font-size: 18px; font-weight: 700; color: #111; text-align: center; outline: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">But...</div>
                         <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 3px; text-align: center;">
-                            <div class="music-lyric1-edit" contenteditable="false" spellcheck="false" style="font-size: 9px; color: #666; outline: none;">u2phone</div>
-                            <div class="music-lyric2-edit" contenteditable="false" spellcheck="false" style="font-size: 10px; font-weight: 700; color: #111; outline: none;">sonokoiomoiiyo</div>
-                            <div class="music-lyric3-edit" contenteditable="false" spellcheck="false" style="font-size: 9px; color: #666; outline: none;">The rain of destiny</div>
+                            <div class="music-lyric1-edit" contenteditable="false" spellcheck="false" style="font-size: 9px; color: #666; outline: none;">Whit no makeup she a ten</div>
+                            <div class="music-lyric2-edit" contenteditable="false" spellcheck="false" style="font-size: 10px; font-weight: 700; color: #111; outline: none;">And she the best with that head</div>
+                            <div class="music-lyric3-edit" contenteditable="false" spellcheck="false" style="font-size: 9px; color: #666; outline: none;">Even better than Karrine</div>
                         </div>
                         <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 12px; color: #111; font-size: 14px;">
                             <i class="fas fa-random" style="font-size: 12px;"></i>
@@ -4229,8 +4218,8 @@
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="notification-widget-content">
-                    <div class="notification-widget-title" contenteditable="true" spellcheck="false">u2phone</div>
-                    <div class="notification-widget-desc" contenteditable="true" spellcheck="false">I was with you in a happy, translucent, endless dream. In contrast to my usual dreams.</div>
+                    <div class="notification-widget-title" contenteditable="true" spellcheck="false">Entanglement</div>
+                    <div class="notification-widget-desc" contenteditable="true" spellcheck="false">If it’s not mine, it’s not special.</div>
                 </div>
             `;
                                 } else
@@ -4299,7 +4288,7 @@
                 if (!node_19.querySelector('.custom-widget-bio')) {
                     const element_893 = document.createElement('div');
                     element_893.className = 'custom-widget-bio';
-                    element_893.textContent = 'Te amo mucho...';
+                    element_893.textContent = config_11.text.profileBio || '';
                     const name_3 = node_19.querySelector('.custom-widget-name');
                     name_3 &&
                         name_3.nextSibling &&
@@ -4493,27 +4482,34 @@
             count_905 = ((count_905 << 5) - count_905 + value_904.charCodeAt(count_906)) | 0;
         return count_905;
     }
-    function setImage(img_2, icon, src_3) {
-        const value_910 = isAllowedWidgetImageSrc(src_3) ? String(src_3).trim() : '';
-        img_2 &&
-            ((img_2.loading = 'eager'),
-            (img_2.src = value_910),
-            (img_2.style.display = value_910 ? 'block' : 'none'),
-            img_2.closest('.photo-widget')?.classList.toggle('has-image', !!value_910));
-        if (icon) icon.style.display = value_910 ? 'none' : 'flex';
+    function setImage(img, icon, src) {
+        const value = isAllowedWidgetImageSrc(src) ? String(src).trim() : '';
+        if (img) {
+            img.loading = 'eager';
+            img.src = value;
+            img.style.display = value ? 'block' : 'none';
+            img.closest('.photo-widget')?.classList.toggle('has-image', !!value);
+        }
+        if (icon) icon.style.display = value ? 'none' : 'flex';
     }
-    function isAllowedWidgetImageSrc(src_4) {
-        if (typeof src_4 !== 'string') return false;
-        const trim_912 = src_4.trim();
-        return (
-            trim_912.startsWith('data:') ||
-            trim_912.startsWith('blob:') ||
-            /^https?:\/\//i.test(trim_912) ||
-            DEFAULT_PHOTO_IMAGE_SRCS.includes(trim_912) ||
-            trim_912 === DEFAULT_WIDGET_IMAGE_ASSET ||
-            trim_912 === text_10
-        );
+
+    function isAllowedWidgetImageSrc(src) {
+        if (typeof src !== 'string') return false;
+        const value = src.trim();
+        return value.startsWith('data:')
+            || value.startsWith('blob:')
+            || /^https?:\/\//i.test(value)
+            || DEFAULT_PHOTO_IMAGE_SRCS.includes(value)
+            || value === DEFAULT_WIDGET_IMAGE_ASSET
+            || value === DEFAULT_PET_IMAGE_SRC
+            || value === DEFAULT_NOTIFICATION_AVATAR_SRC
+            || value === DEFAULT_MUSIC_COVER_IMAGE_SRC
+            || value === DEFAULT_COUPLE_LEFT_IMAGE_SRC
+            || value === DEFAULT_COUPLE_RIGHT_IMAGE_SRC
+            || value === DEFAULT_SOCIAL_POST_AVATAR_SRC
+            || value === DEFAULT_SOCIAL_POST_IMAGE_SRC;
     }
+
     function getPrimaryWidgetText(config_12) {
         const text_2_2 = config_12.text || {};
         if (config_12.type === 'profile')

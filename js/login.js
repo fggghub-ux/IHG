@@ -438,7 +438,7 @@
             if (error_8?.code === 'PASSWORD_MISMATCH') setMessage('两次输入的密码不一致。');
             else {
                 if (error_8?.code === 'NOTICE_REQUIRED')
-                    setMessage('请先阅读并勾选《u2phone食用须知》。');
+                    setMessage('请先阅读并勾选《LHV Check-in Notice》。');
                 else setMessage(messageForError(error_8));
             }
             return;

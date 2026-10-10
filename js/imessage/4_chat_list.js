@@ -105,7 +105,9 @@
             : '<i class="fas fa-user"></i>';
     }
     function handleAction_7(value_30) {
-        let nickname_31 = value_30.nickname;
+        let nickname_31 = value_30.type === 'official' && value_30.nickname === '有兔'
+            ? 'LHV'
+            : value_30.nickname;
         if (value_30.type === 'group')
             nickname_31 +=
                 ' <span style="background:#e5e5ea; color:#8e8e93; font-size:10px; padding:2px 6px; border-radius:10px; margin-left:6px; vertical-align: middle;">group</span>';
