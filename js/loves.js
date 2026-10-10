@@ -318,7 +318,7 @@ window.lovesApp = {
             original_3 +
             '<span class="friend-phone-translate-toggle" role="button" tabindex="0" aria-expanded="false" aria-controls="' +
             value_58 +
-            '">翻译</span><span class="friend-phone-translation" id="' +
+            '">Translate</span><span class="friend-phone-translation" id="' +
             value_58 +
             '" hidden>' +
             translation_5 +
@@ -6835,30 +6835,30 @@ Extracted:`,
                         musicContent.innerHTML =
                             `
                         <div style="padding: 20px 16px; background: #fff;">
-                            <div style="font-size: 28px; font-weight: 800; color: #111; margin-bottom: 20px; letter-spacing: -0.5px;">音乐库</div>
+                            <div style="font-size: 28px; font-weight: 800; color: #111; margin-bottom: 20px; letter-spacing: -0.5px;">APPLE</div>
                             <div style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px;">
                                 <div style="min-width: 140px; display: flex; flex-direction: column; gap: 10px;">
                                     <div style="width: 140px; height: 140px; border-radius: 12px; background: #f4f4f5; display: flex; justify-content: center; align-items: center; color: #111; font-size: 30px; ">
                                         <i class="fas fa-history"></i>
                                     </div>
-                                    <div style="font-size: 15px; font-weight: 700; color: #111;">最近播放</div>
+                                    <div style="font-size: 15px; font-weight: 700; color: #111;">Recently</div>
                                     <div style="font-size: 13px; color: #8e8e93;">` +
                             (musicData_2.recent ? musicData_2.recent.length : 0) +
-                            ` 首歌曲</div>
+                            ` Songs</div>
                                 </div>
                                 <div style="min-width: 140px; display: flex; flex-direction: column; gap: 10px;">
                                     <div style="width: 140px; height: 140px; border-radius: 12px; background: #111; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 30px; ">
                                         <i class="fas fa-heart"></i>
                                     </div>
-                                    <div style="font-size: 15px; font-weight: 700; color: #111;">最爱</div>
+                                    <div style="font-size: 15px; font-weight: 700; color: #111;">Favorites</div>
                                     <div style="font-size: 13px; color: #8e8e93;">` +
                             (musicData_2.favorites ? musicData_2.favorites.length : 0) +
-                            ` 首歌曲</div>
+                            ` Songs</div>
                                 </div>
                             </div>
                         </div>
                         <div style="padding: 10px 16px 30px; background: #fff; border-top: 1px solid #f0f0f0;">
-                            <div style="font-size: 22px; font-weight: 700; color: #111; margin-bottom: 15px; margin-top: 10px;">听歌排行</div>
+                            <div style="font-size: 22px; font-weight: 700; color: #111; margin-bottom: 15px; margin-top: 10px;">RANKINGS</div>
                             <div style="display: flex; flex-direction: column; gap: 5px;">
                                 ` +
                             join_444 +
@@ -6908,16 +6908,16 @@ Extracted:`,
                                                 <div style="width: 32px; height: 32px; border-radius: 8px; background: #fff; display: flex; justify-content: center; align-items: center; color: #111;">
                                                     <i class="fas fa-redo-alt" style="font-size: 14px;"></i>
                                                 </div>
-                                                <span style="font-size: 15px; font-weight: 600; color: #111;">循环次数</span>
+                                                <span style="font-size: 15px; font-weight: 600; color: #111;">Repeated</span>
                                             </div>
                                             <div style="font-size: 20px; font-weight: 800; color: #111;">` +
                                             loops_2 +
-                                            ` <span style="font-size: 13px; font-weight: 500; color: #8e8e93;">次</span></div>
+                                            ` <span style="font-size: 13px; font-weight: 500; color: #8e8e93;">Times</span></div>
                                         </div>
 
                                         <div style="background: #111; border-radius: 16px; padding: 20px; border-left: 4px solid #fff;">
                                             <div style="font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                                                <i class="fas fa-headphones-alt" style="color: #fff;"></i> 听歌心声
+                                                <i class="fas fa-headphones-alt" style="color: #fff;"></i> THOUGHTS
                                             </div>
                                             <div style="color: #ccc; line-height: 1.6; font-size: 14px; font-style: italic;">
                                                 “` +
@@ -6933,7 +6933,7 @@ Extracted:`,
                                             </div>
                                         </div>
                                     `;
-                                    window.lovesApp.showDetailModal('单曲详情', content_8);
+                                    window.lovesApp.showDetailModal('SINGLE', content_8);
                                 });
                                 window.lovesApp.bindLongPress(value_938, function () {
                                     const idx_11 = value_938.getAttribute('data-idx'),
