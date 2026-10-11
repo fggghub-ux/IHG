@@ -5,11 +5,6 @@
     const viewport = window.visualViewport;
     const isNative = window.u2NativeBridge?.isNativeAndroid?.() === true;
     if (isNative) return; // The Android host owns its WebView size and insets.
-    // iPadOS desktop mode identifies itself as a Mac. Keep its resting page in
-    // normal document layout, as in the original fullscreen implementation.
-    const isIPad = /iPad/.test(navigator.userAgent) ||
-        (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
-    root.classList.toggle('app-ipad-layout', isIPad);
 
     let frame = 0;
     let restingHeight = window.innerHeight;
