@@ -55,11 +55,11 @@
             profile: [
                 {
                     key: 'profileTitle',
-                    label: '名称',
+                    label: 'Name',
                 },
                 {
                     key: 'profileBio',
-                    label: '个人简介',
+                    label: 'Bio',
                     multiline: true,
                 },
                 {
@@ -78,56 +78,56 @@
             pet: [
                 {
                     key: 'petText',
-                    label: '气泡文字',
+                    label: 'Bubble',
                 },
             ],
             music: [
                 {
                     key: 'musicTitle',
-                    label: '标题',
+                    label: 'Title',
                 },
                 {
                     key: 'musicLyric1',
-                    label: '歌词 1',
+                    label: 'Lyrics 1',
                 },
                 {
                     key: 'musicLyric2',
-                    label: '歌词 2',
+                    label: 'Lyrics 2',
                 },
                 {
                     key: 'musicLyric3',
-                    label: '歌词 3',
+                    label: 'Lyrics 3',
                 },
             ],
             couple: [
                 {
                     key: 'coupleLeft',
-                    label: '左侧文字',
+                    label: 'Left',
                 },
                 {
                     key: 'coupleRight',
-                    label: '右侧文字',
+                    label: 'Right',
                 },
             ],
             notification: [
                 {
                     key: 'notificationTitle',
-                    label: '标题',
+                    label: 'Title',
                 },
                 {
                     key: 'notificationDesc',
-                    label: '内容',
+                    label: 'Content',
                     multiline: true,
                 },
             ],
             socialPost: [
                 {
                     key: 'postAuthor',
-                    label: '名字',
+                    label: 'Name',
                 },
                 {
                     key: 'postBody',
-                    label: '文案',
+                    label: 'Text',
                     multiline: true,
                 },
             ],
@@ -136,59 +136,59 @@
             profile: [
                 {
                     key: 'avatar',
-                    label: '头像',
+                    label: 'Avatar',
                 },
             ],
             pet: [
                 {
                     key: 'pet',
-                    label: '图片',
+                    label: 'Image',
                 },
             ],
             music: [
                 {
                     key: 'cover',
-                    label: '封面',
+                    label: 'Cover',
                 },
             ],
             couple: [
                 {
                     key: 'left',
-                    label: '左侧图片',
+                    label: 'Left',
                 },
                 {
                     key: 'right',
-                    label: '右侧图片',
+                    label: 'Right',
                 },
             ],
             photo: [
                 {
                     key: 'photo',
-                    label: '图片 1',
+                    label: 'Image 1',
                 },
                 {
                     key: 'photo2',
-                    label: '图片 2',
+                    label: 'Image 2',
                 },
                 {
                     key: 'photo3',
-                    label: '图片 3',
+                    label: 'Image 3',
                 },
             ],
             notification: [
                 {
                     key: 'avatar',
-                    label: '头像',
+                    label: 'Avatar',
                 },
             ],
             socialPost: [
                 {
                     key: 'avatar',
-                    label: '头像',
+                    label: 'Avatar',
                 },
                 {
                     key: 'postImage',
-                    label: '横图',
+                    label: 'Image',
                 },
             ],
         };
@@ -266,7 +266,7 @@
         group.id = 'home-panel-chrome-settings';
         group.appendChild(
             createSettingRow({
-                title: '显示状态栏',
+                title: 'Status bar',
                 desc: '顶部时间、电量等仿 iPhone 状态',
                 inputId: 'home-statusbar-toggle',
                 checked: settings.showStatusBar,
@@ -281,7 +281,7 @@
         );
         group.appendChild(
             createSettingRow({
-                title: '显示搜索',
+                title: 'Safari',
                 desc: '主界面底栏上方 Search 样式',
                 inputId: 'home-search-toggle',
                 checked: settings.showSearch,
@@ -529,7 +529,7 @@
         panel.className = 'home-widget-card-controls';
         const textSection = document.createElement('div');
         textSection.className = 'home-widget-editor-section';
-        textSection.appendChild(createSectionTitle('内容'));
+        textSection.appendChild(createSectionTitle('Content'));
         const items = options[value_71] || [];
         items.forEach(function (value_86) {
             textSection.appendChild(handleAction_7(value_86, handleAction_9_73));
@@ -544,7 +544,7 @@
         const label_3 = document.createElement('div');
         label_3.className = 'home-widget-opacity-label';
         const labelText = document.createElement('span');
-        labelText.textContent = '组件背景透明度';
+        labelText.textContent = 'Transparent';
         const value_2 = document.createElement('span');
         value_2.className = 'home-widget-opacity-value';
         value_2.textContent = Math.round(alpha_2 * 100) + '%';
@@ -559,7 +559,7 @@
         slider_2.max = '100';
         slider_2.step = '1';
         slider_2.value = String(Math.round(alpha_2 * 100));
-        slider_2.setAttribute('aria-label', '组件背景透明度');
+        slider_2.setAttribute('aria-label', 'Transparent');
         const resetBtn = document.createElement('button');
         resetBtn.className = 'home-widget-reset-btn';
         resetBtn.type = 'button';
@@ -636,7 +636,7 @@
             (urlInput.className = 'home-widget-image-url-input'),
             (urlInput.type = 'url'),
             (urlInput.inputMode = 'url'),
-            (urlInput.placeholder = '图片链接 URL'),
+            (urlInput.placeholder = 'Image link URL'),
             (urlInput.dataset.imageField = field_4.key),
             (urlInput.value = isRemoteImageUrl(widgetImageValue) ? widgetImageValue : ''),
             button.addEventListener('click', function (event_8) {

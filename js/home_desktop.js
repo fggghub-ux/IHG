@@ -1898,7 +1898,7 @@
             'beforeend',
             `
             <div class="home-widget-library-toolbar">
-                <button type="button" class="home-widget-import-btn"><i class="fas fa-file-code"></i><span>导入 HTML 小组件</span></button>
+                <button type="button" class="home-widget-import-btn"><i class="fas fa-file-code"></i><span>Import HTML</span></button>
                 <input type="file" class="home-widget-html-input" accept=".html,text/html" hidden>
             </div>
             <div class="home-widget-size-filters" role="tablist" aria-label="按组件尺寸筛选">
@@ -1913,13 +1913,13 @@
                             '" role="tab" aria-selected="' +
                             (value_416 === text_20) +
                             '">' +
-                            (value_416 === 'all' ? '全部' : value_416) +
+                            (value_416 === 'all' ? 'All' : value_416) +
                             '</button>',
                     )
                     .join('') +
                 `
             </div>
-            <div class="home-widget-section-title">组件库</div>
+            <div class="home-widget-section-title">Widgets</div>
         `,
         );
         WIDGET_CATALOG.forEach((entry_7) => {
@@ -1944,7 +1944,7 @@
                 </div>
                 <button type="button" class="home-widget-add-btn" data-template-id="` +
                 entry_7.id +
-                `"><i class="fas fa-plus"></i><span>添加</span></button>
+                `"><i class="fas fa-plus"></i><span>Add</span></button>
             `;
             card_2
                 .querySelector('.home-widget-library-preview-shell')
@@ -1961,7 +1961,7 @@
             .filter((value_421) => value_421.config);
         library.insertAdjacentHTML(
             'beforeend',
-            '<div class="home-widget-section-title">已添加组件</div>',
+            '<div class="home-widget-section-title">Added</div>',
         );
         filter_415.forEach(({ id: id_18, config: config_15 }) =>
             library.appendChild(handleAction_66(id_18, config_15)),
@@ -1969,7 +1969,7 @@
         library.insertAdjacentHTML(
             'beforeend',
             `
-            <button type="button" class="home-widget-reset-desktop-btn"><i class="fas fa-rotate-left"></i><span>重置桌面</span></button>
+            <button type="button" class="home-widget-reset-desktop-btn"><i class="fas fa-rotate-left"></i><span>Reset</span></button>
         `,
         );
         handleAction_73(text_20);
@@ -1994,12 +1994,12 @@
             handleAction_36_427.rows +
             `</span>
             </div>
-            <em>设置</em>
+            <em>settings</em>
             <div class="home-widget-instance-meta">
-                <label><span>组件名称</span><input class="home-widget-instance-name" type="text" maxlength="40" value="` +
+                <label><span>Name</span><input class="home-widget-instance-name" type="text" maxlength="40" value="` +
             handleAction_70(entry_8.name) +
             `"></label>
-                <button type="button" class="home-widget-instance-delete"><i class="fas fa-trash"></i><span>删除组件</span></button>
+                <button type="button" class="home-widget-instance-delete"><i class="fas fa-trash"></i><span>Delete</span></button>
             </div>
         `;
         const options_428 = {
@@ -2353,7 +2353,7 @@
     function resetHomeDesktop_2(value_507 = {}) {
         if (
             value_507.confirm &&
-            !window.confirm('重置桌面会删除所有自定义布局和导入组件，是否继续？')
+            !window.confirm('Resetting will clear everything. Continue?')
         )
             return false;
         return (
@@ -2364,7 +2364,7 @@
             handleAction_27({
                 silent: true,
             }),
-            window.showToast?.('桌面已恢复默认'),
+            window.showToast?.('Restored to default'),
             true
         );
     }

@@ -683,7 +683,7 @@ App 本体和它的本地存档都会删除。`,
             }),
         );
         value_2.learnMore?.addEventListener('click', () =>
-            handleAction_54('U2phone: Chat, create, and live — all in one place.'),
+            handleAction_54('LHV: Chat, create, and live — all in one place.'),
         );
         value_2.copyTemplate?.addEventListener('click', handleAction_44);
         value_2.importButton?.addEventListener('click', () => value_2.importInput?.click());

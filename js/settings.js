@@ -1075,8 +1075,8 @@
                 showToast(
                     persisted_2
                         ? enabled_2
-                            ? '全局 UI 已切换为中文'
-                            : '全局 UI 已恢复英文'
+                            ? 'Global UI: Chinese'
+                            : 'Global UI: English'
                         : '全局翻译保存失败，当前效果未持久化',
                 );
             });
