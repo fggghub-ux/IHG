@@ -5,6 +5,9 @@
     const viewport = window.visualViewport;
     const isNative = window.u2NativeBridge?.isNativeAndroid?.() === true;
     if (isNative) return; // The Android host owns its WebView size and insets.
+    const isIPad = /iPad/.test(navigator.userAgent) ||
+        (/Mac/.test(navigator.userAgent + navigator.platform) && navigator.maxTouchPoints > 1);
+    root.classList.toggle('app-ipad-layout', isIPad);
 
     let frame = 0;
     let restingHeight = window.innerHeight;
