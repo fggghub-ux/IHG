@@ -938,6 +938,16 @@ button.group-private-chat-detail-bubble {
     flex: 1;
 }
 
+/* Home is a vertical scrollport. With only overflow-y:auto, overflow-x
+   computes to auto too. Contain its iPad horizontal overflow/bounce without
+   disabling horizontal gestures inside intentional child carousels. */
+.app-ipad-layout #imessage-view > .line-content {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+}
+
 /* 2. Profile Section */
 .line-profile {
     display: flex;
