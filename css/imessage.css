@@ -1885,6 +1885,18 @@ button.group-private-chat-detail-bubble {
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
 }
 
+/* Keep the iPad bottom bar in the app's entering layer. Flex centering avoids
+   a second translated layer being attached while the whole app slides in. */
+.app-ipad-layout #imessage-view {
+    will-change: transform;
+}
+.app-ipad-layout #imessage-view > .line-bottom-nav-container {
+    left: 0;
+    right: 0;
+    width: 100%;
+    transform: none;
+}
+
 /* Animated Indicator for iMessage */
 .line-nav-indicator {
     position: absolute;

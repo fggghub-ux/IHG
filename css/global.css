@@ -970,3 +970,8 @@ html.app-viewport-managed.app-ipad-layout {
 .app-keyboard-open {
     --safe-bottom: 0px;
 }
+
+/* Added only to actual iPad scrollports, never to clipped cards or avatars. */
+.app-ipad-layout .app-ipad-scrollport {
+    overscroll-behavior-y: none;
+}
