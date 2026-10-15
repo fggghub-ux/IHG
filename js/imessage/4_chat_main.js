@@ -496,6 +496,26 @@
                                     window.imChat.closeContextMenu();
                                     return;
                                 }
+                                if (
+                                    msg_2?.type === 'voice_message' &&
+                                    window.imVoiceMessageAudio?.canManage?.(liveFriend_4, msg_2)
+                                ) {
+                                    window.imChat.closeContextMenu();
+                                    try {
+                                        await window.imVoiceMessageAudio.play(liveFriend_4, msg_2);
+                                    } catch (error) {
+                                        console.error('Voice message playback failed', error);
+                                        (!window.u2Api?.isRequestError?.(error) ||
+                                            !window.u2Api.reportError(error, {
+                                                operation: '语音生成',
+                                            })) &&
+                                            window.showToast?.(
+                                                window.u2Tts?.getUserErrorMessage?.(error) ||
+                                                    '语音播放失败',
+                                            );
+                                    }
+                                    return;
+                                }
                                 const bubble_4 = row_6.querySelector('.chat-bubble');
                                 let text_4 =
                                     msg_2?.type === 'voice_message'

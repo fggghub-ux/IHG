@@ -421,55 +421,7 @@
             clearTimeout(timeoutId);
         }
     }
-    function handleAction_31(value_124) {
-        const trim_125 = String(value_124 || '')
-            .replace(/^```(?:json|text)?\s*|\s*```$/gi, '')
-            .trim();
-        if (!trim_125)
-            return {
-                scenePrompt: '',
-                charPresent: null,
-                userPresent: null,
-            };
-        try {
-            const result = JSON.parse(trim_125),
-                scenePrompt_2 = String(result?.scenePrompt || result?.scene_prompt || '')
-                    .trim()
-                    .slice(0, 12000);
-            if (scenePrompt_2)
-                return {
-                    scenePrompt: scenePrompt_2,
-                    charPresent:
-                        result.charPresent === true || result.char_present === true
-                            ? true
-                            : result.charPresent === false || result.char_present === false
-                              ? false
-                              : null,
-                    userPresent:
-                        result.userPresent === true || result.user_present === true
-                            ? true
-                            : result.userPresent === false || result.user_present === false
-                              ? false
-                              : null,
-                };
-        } catch (value_127) {}
-        return {
-            scenePrompt: trim_125.slice(0, 12000),
-            charPresent: null,
-            userPresent: null,
-        };
-    }
     async function handleAction_32(value_42) {
-        const currentApiConfig_2 = window.getApiConfig
-                ? window.getApiConfig()
-                : window.apiConfig || value_2 || {},
-            chatCompletionsEndpoint_29_130 = resolveChatCompletionsEndpoint_2(currentApiConfig_2);
-        if (
-            !chatCompletionsEndpoint_29_130 ||
-            !currentApiConfig_2.apiKey ||
-            !currentApiConfig_2.model
-        )
-            throw new Error('请先完成 API 配置，再根据剧情生成提示词');
         if (window.imApp?.ensureFriendMessagesLoaded)
             await window.imApp.ensureFriendMessagesLoaded(value_42);
         const latestFriend_2 = window.imApp?.getFriendById?.(value_42.id) || value_42,
@@ -502,77 +454,9 @@
                 )
                 .slice(-12000);
         if (!context_2) throw new Error('当前聊天还没有可用于生成画面的剧情');
-        const controller_2 = new AbortController(),
-            timeoutId_2 = setTimeout(() => controller_2.abort(), 60000);
-        try {
-            const headers_2 = window.u2Api?.buildApiHeaders
-                    ? window.u2Api.buildApiHeaders(currentApiConfig_2, {
-                          'X-U2-Silent-Errors': '1',
-                      })
-                    : {
-                          'Content-Type': 'application/json',
-                          Authorization: 'Bearer ' + currentApiConfig_2.apiKey,
-                          'X-U2-Silent-Errors': '1',
-                      },
-                value_143_2 = await fetch(chatCompletionsEndpoint_29_130, {
-                    method: 'POST',
-                    headers: headers_2,
-                    body: JSON.stringify({
-                        model: currentApiConfig_2.model,
-                        temperature: 0.6,
-                        messages: [
-                            {
-                                role: 'system',
-                                content:
-                                    '你是剧情画面提炼助手。根据最近聊天选择最适合视觉化的当前剧情瞬间。只输出一个 JSON 对象，不要 Markdown、解释或额外字段：{"scenePrompt":"中文画面提示词","charPresent":true,"userPresent":false}。scenePrompt 只写本次画面的主体、动作、场景、构图、光线、氛围；不要写角色固定外貌、用户固定外貌、画师串、质量词或负面提示词。charPresent 和 userPresent 必须如实表示本次画面是否出现对应人物。',
-                            },
-                            {
-                                role: 'user',
-                                content:
-                                    'Char 名称：' +
-                                    charName_2 +
-                                    `
-User 名称：` +
-                                    userName_2 +
-                                    `
-最近剧情：
-` +
-                                    context_2,
-                            },
-                        ],
-                    }),
-                    signal: controller_2.signal,
-                });
-            if (!value_143_2.ok) {
-                const value_147_2 = await window.u2Api?.readApiError?.(value_143_2);
-                throw (
-                    window.u2Api?.createHttpError?.(
-                        value_143_2,
-                        value_147_2,
-                        '剧情提示词生成失败',
-                    ) ||
-                    Object.assign(
-                        new Error('剧情提示词生成失败（HTTP ' + value_143_2.status + '）'),
-                        {
-                            status: value_143_2.status,
-                        },
-                    )
-                );
-            }
-            const value_60 = await value_143_2.json(),
-                rawContent = getVisionResponseContent(value_60),
-                content_3 = Array.isArray(rawContent)
-                    ? rawContent.map((item) => item?.text || '').join('')
-                    : String(rawContent || ''),
-                handleAction_31_146 = handleAction_31(content_3);
-            if (!handleAction_31_146.scenePrompt) throw new Error('API 没有返回剧情生图提示词');
-            return handleAction_31_146;
-        } catch (error_2) {
-            if (error_2?.name === 'AbortError') throw new Error('剧情提示词生成超时，请稍后重试');
-            throw error_2;
-        } finally {
-            clearTimeout(timeoutId_2);
-        }
+        return window.imChat.prepareEnglishImageScene(latestFriend_2, context_2, {
+            fromChat: true,
+        });
     }
     const isOfflineAutoImageMessage = (value_70) => value_70?.type === type_2,
         shouldAutoGenerateOfflineImage = (friend) =>
@@ -604,15 +488,13 @@ User 名称：` +
                 scene: scene_2,
             };
         },
-        value_35 = (value_157) => {
-            return String(value_157 || '').trim();
-        },
+        value_35 = (value_157) => String(value_157 || '').trim(),
         buildOfflineAutoImageRequirement = () =>
             `<offline_auto_image_rule>
 Only when the current offline story reaches a moment that is genuinely worth visualizing, append exactly one final line in this exact format:
-` +
+  ` +
             OFFLINE_AUTO_IMAGE_MARKER +
-            ` concise Chinese image scene prompt
+            ` concise English image scene prompt
 The prompt must describe the same current moment with characters, action, setting, composition, light, and atmosphere. Do not use this marker for ordinary dialogue or routine transitions. If no visual image is needed, do not output the marker at all. The marker line is frontend-only and must be the final line after all prose, barrage, choices, and recap content.
 </offline_auto_image_rule>`;
     function createAttachmentSheet_2(page) {
@@ -2419,6 +2301,19 @@ The prompt must describe the same current moment with characters, action, settin
                                 : '',
                             imageSize: isAutoImage ? String(message_4?.imageSize || '').trim() : '',
                             faceReferenceUsed: isAutoImage && message_4?.faceReferenceUsed === true,
+                            charFaceReferenceUsed:
+                                isAutoImage && message_4?.charFaceReferenceUsed === true,
+                            userFaceReferenceUsed:
+                                isAutoImage && message_4?.userFaceReferenceUsed === true,
+                            imageGenerationPrompt: isAutoImage
+                                ? String(message_4?.imageGenerationPrompt || '')
+                                : '',
+                            imageGenerationCompiledPrompt: isAutoImage
+                                ? String(message_4?.imageGenerationCompiledPrompt || '')
+                                : '',
+                            imageGenerationConfig: isAutoImage
+                                ? message_4?.imageGenerationConfig || null
+                                : null,
                             updatedAt: message_4?.updatedAt || undefined,
                             generationState: ['failed', 'truncated'].includes(
                                 String(message_4?.generationState || ''),
@@ -2514,6 +2409,11 @@ The prompt must describe the same current moment with characters, action, settin
                 imageModel: message_667.imageModel || '',
                 imageSize: message_667.imageSize || '',
                 faceReferenceUsed: !!message_667.faceReferenceUsed,
+                charFaceReferenceUsed: !!message_667.charFaceReferenceUsed,
+                userFaceReferenceUsed: !!message_667.userFaceReferenceUsed,
+                imageGenerationPrompt: message_667.imageGenerationPrompt || '',
+                imageGenerationCompiledPrompt: message_667.imageGenerationCompiledPrompt || '',
+                imageGenerationConfig: message_667.imageGenerationConfig || null,
                 updatedAt: message_667.updatedAt || '',
                 generationState: message_667.generationState || '',
                 continuationState: message_667.continuationState || '',
@@ -4888,6 +4788,13 @@ The prompt must describe the same current moment with characters, action, settin
                         imageModel: String(rawMessage.imageModel || '').trim(),
                         imageSize: String(rawMessage.imageSize || '').trim(),
                         faceReferenceUsed: rawMessage.faceReferenceUsed === true,
+                        charFaceReferenceUsed: rawMessage.charFaceReferenceUsed === true,
+                        userFaceReferenceUsed: rawMessage.userFaceReferenceUsed === true,
+                        imageGenerationPrompt: String(rawMessage.imageGenerationPrompt || ''),
+                        imageGenerationCompiledPrompt: String(
+                            rawMessage.imageGenerationCompiledPrompt || '',
+                        ),
+                        imageGenerationConfig: rawMessage.imageGenerationConfig || null,
                         generationState: ['failed', 'truncated'].includes(
                             String(rawMessage.generationState || ''),
                         )
@@ -5290,20 +5197,25 @@ The prompt must describe the same current moment with characters, action, settin
             if (!imageGenerationPrompt_2) return null;
             try {
                 window.showToast?.('线下剧情图片开始生成…');
-                const referenceImage_2 =
-                        await window.imChat.resolveAutoImageReferenceFace(liveFriend),
-                    result_4 = await window.imChat.generateChatImage(
-                        imageGenerationPrompt_2,
+                const referenceImage_2 = await window.imChat.prepareEnglishImageScene(
                         liveFriend,
-                        {
-                            referenceImage: referenceImage_2,
-                            basePrompt: value_1114.basePrompt || value_1114.lastPrompt || '',
-                            charAppearance: value_1114.charAppearance || '',
-                            userAppearance: value_1114.userAppearance || '',
-                            artistPrompt: value_1114.artistPrompt || '',
-                            negativePrompt: value_1114.negativePrompt || '',
-                        },
-                    );
+                        imageGenerationPrompt_2,
+                    ),
+                    apk110New_1339 = referenceImage_2.scenePrompt,
+                    apk110New_1340 = await window.imChat.resolveImageReferenceFaces(
+                        liveFriend,
+                        referenceImage_2,
+                    ),
+                    result_4 = await window.imChat.generateChatImage(apk110New_1339, liveFriend, {
+                        referenceImages: apk110New_1340,
+                        basePrompt: value_1114.basePrompt || value_1114.lastPrompt || '',
+                        charAppearance: value_1114.charAppearance || '',
+                        userAppearance: value_1114.userAppearance || '',
+                        artistPrompt: value_1114.artistPrompt || '',
+                        negativePrompt: value_1114.negativePrompt || '',
+                        includeCharAppearance: referenceImage_2.charPresent,
+                        includeUserAppearance: referenceImage_2.userPresent,
+                    });
                 if (!result_4?.imageUrl) throw new Error('image_generation_empty');
                 const value_1118 = window.imApp?.getFriendById?.(liveFriend.id) || liveFriend,
                     value_221_1119 = value_221(value_1118),
@@ -5322,14 +5234,20 @@ The prompt must describe the same current moment with characters, action, settin
                         imageModel: result_4.model || '',
                         imageSize: result_4.size || '',
                         faceReferenceUsed: result_4.faceReferenceUsed === true,
-                        imageGenerationPrompt: imageGenerationPrompt_2,
+                        charFaceReferenceUsed: result_4.charFaceReferenceUsed === true,
+                        userFaceReferenceUsed: result_4.userFaceReferenceUsed === true,
+                        imageGenerationPrompt: apk110New_1339,
                         imageGenerationConfig: {
                             basePrompt: value_1114.basePrompt || value_1114.lastPrompt || '',
                             charAppearance: value_1114.charAppearance || '',
                             userAppearance: value_1114.userAppearance || '',
                             artistPrompt: value_1114.artistPrompt || '',
                             negativePrompt: value_1114.negativePrompt || '',
-                            useReferenceFace: !!referenceImage_2,
+                            includeCharAppearance: referenceImage_2.charPresent,
+                            includeUserAppearance: referenceImage_2.userPresent,
+                            useReferenceFace: result_4.charFaceReferenceUsed === true,
+                            useCharReferenceFace: result_4.charFaceReferenceUsed === true,
+                            useUserReferenceFace: result_4.userFaceReferenceUsed === true,
                         },
                         imageGenerationCompiledPrompt: result_4.compiledPrompt || '',
                         timestamp: Date.now(),
@@ -6495,20 +6413,20 @@ The prompt must describe the same current moment with characters, action, settin
                         apiMessages.push({
                             role: 'system',
                             content:
-                                '【本次线下见面的起始约定】Char 的邀请：' +
+                                '本次线下见面的初始约定：Char 发出的邀请是“' +
                                 (offlineInvitationContext_459.title || '见面') +
-                                '。邀约内容：' +
+                                '”。邀请内容：' +
                                 (offlineInvitationContext_459.invitationText || '') +
                                 (offlineInvitationContext_459.place
                                     ? '。约定地点：' + offlineInvitationContext_459.place
                                     : '') +
-                                '。User 已接受邀请；这只是本次见面的背景，不代表 User 已经说出或做出其他动作。请从此情景自然开始。',
+                                '。User 已接受邀请。这只是见面的背景，不代表 User 已说过或做过其他事情。请从这一情境自然开始。',
                         }),
                     episodeMode_2 &&
                         apiMessages.push({
                             role: 'system',
                             content:
-                                '当前为番外模式。只依据本次线下上下文、人设和世界书推进情景；不要引用或推断线上聊天、角色记忆或其他群聊经历。',
+                                '这是独立篇章。只使用当前线下上下文、人设和世界书推进剧情，不得引用或推断线上聊天、角色记忆或其他群聊的经历。',
                         }),
                     shouldAutoGenerateOfflineImage(activeFriend_59) &&
                         apiMessages.push({
@@ -7284,15 +7202,15 @@ The prompt must describe the same current moment with characters, action, settin
                 const entries_3 = Array.isArray(value_589?.memory?.shortTermEntries)
                     ? value_589.memory.shortTermEntries
                     : [];
-                if (entries_3.length === 0) return '无';
+                if (entries_3.length === 0) return '暂无';
                 return entries_3.slice(-30).map((entry_4) =>
                     [
                         'ID: ' + (entry_4.id || ''),
                         '标题: ' + (entry_4.title || '对话总结'),
                         '时间: ' + (entry_4.time || ''),
                         '事件: ' + (entry_4.event || ''),
-                        '标签: ' + (entry_4.memoryTags || entry_4.triggerKeywords || []).join('、'),
-                        '记忆程度: ' + (entry_4.degree || '高'),
+                        '标签: ' + (entry_4.memoryTags || entry_4.triggerKeywords || []).join(', '),
+                        '记忆重要度: ' + (entry_4.degree || '高'),
                     ].join(`
 `),
                 ).join(`
@@ -7321,7 +7239,7 @@ The prompt must describe the same current moment with characters, action, settin
                           trim_602 +
                           `
 </user_summary_instructions>
-除 JSON 结构、第三人称 Char 限定视角、群聊公开范围与隐私规则外，总结内容的重点、取舍、语言和表达必须服从以上自定义要求。
+请在保持 JSON 结构、第三人称 Char 限定视角、群聊公开范围及隐私规则的前提下，遵循以上自定义总结要求。
 `
                         : '',
                     value_605 = identityContext_4.isGroup
@@ -7330,14 +7248,14 @@ The prompt must describe the same current moment with characters, action, settin
 - 不得写入、推断或复述任何群成员私信或其他私密联系中的内容。
 - shortTermMemory.event 必须使用第三人称公开记录视角。`
                         : `
-- shortTermMemory.event 要作为 ` +
+- shortTermMemory.event 应写成 ` +
                           charName_6 +
                           ` 自己的短期记忆，使用 Char 第一人称视角。
-- 不得进入 User 或其他人的私密内心，只能写 Char 观察、经历或能合理推断的事。`,
+- 不得进入 User 或其他人的私密想法，只写 Char 观察、经历或能合理推断的内容。`,
                     content_16 =
-                        '请把下方已结束的' +
+                        '请将以下已经结束的' +
                         (identityContext_4.isGroup ? '群体线下见面' : '线下见面') +
-                        '同时整理成“线上见面总结”和“短期记忆”。' +
+                        '同时整理为线上见面总结与短期记忆。' +
                         value_604 +
                         `
 
@@ -7356,9 +7274,9 @@ Char：` +
 严格规则：
 - meetingSummary 必须使用第三人称 Char 限定视角，只写 Char 看到、听到、说出、做出、注意到或能合理推断的事情。
 - meetingSummary.title 不超过 10 字；meetingSummary.summary 说清前因、过程和结果，不得生成日期或时间。
-- shortTermMemory.memoryTags 输出 3-6 个 2-16 字、可独立触发的主题、人物、地点、物品或感受标签，必须包含“线下见面”。
-- shortTermMemory.degree 只能是“高”。
-- activatedEntryIds 只能使用上面已有短期记忆的 ID，没有相关记忆时输出空数组。` +
+- shortTermMemory.memoryTags 必须有 3 至 6 个可独立触发的标签，每个 2 至 16 字，描述主题、人物、地点、物品或感受，并包含固定标签“线下见面”。
+- shortTermMemory.degree 固定为“高”。
+- activatedEntryIds 只能包含上述已有短期记忆的 ID；没有相关记忆时返回空数组。` +
                         value_605 +
                         `
 
@@ -7369,22 +7287,22 @@ Char：` +
     "summary": "第三人称 Char 限定视角的完整见面总结"
   },
   "shortTermMemory": {
-    "title": "10字内的记忆标题",
-    "event": "本次见面形成的可召回记忆",
-    "memoryPoints": "关键参与者、目标或矛盾、情绪变化、结果或未决点",
+    "title": "不超过 10 字的记忆标题",
+    "event": "本次见面形成的可回忆事件",
+    "memoryPoints": "关键人物、目标或冲突、情绪变化、结果或未决事项",
     "memoryTags": ["线下见面", "具体主题", "具体人物"],
     "degree": "高"
   },
   "activatedEntryIds": []
 }
 
-线下见面全部楼层：
+本次线下见面全部楼层：
 ` +
                         value_130_600;
                 return value_312_2(value_1519, [
                     {
                         role: 'system',
-                        content: '你只输出严格、可解析的 JSON，不要 markdown，不要解释。',
+                        content: '只输出严格有效、可解析的 JSON，不要 Markdown 或解释。',
                     },
                     {
                         role: 'user',
@@ -7429,10 +7347,10 @@ Char：` +
 
 `),
                     value_1536 = value_292_1533.isGroup
-                        ? '只能总结本次群体线下见面里公开发生的内容；不得写入、推断或复述任何私聊或秘密联系内容。'
+                        ? '只总结本次群体线下见面中公开发生的内容，不得写入、推断或复述私聊及其他私密联系的内容。'
                         : '只写 ' +
                           value_292_1533.charName +
-                          ' 看到、听到、说出、做出、注意到或能合理推断的事情，不得进入 User 的私密内心。',
+                          ' 看到、听到、说出、做出、注意到或能合理推断的事情，不得进入 User 的私密想法。',
                     value_617 = trim_614
                         ? `
 <user_summary_instructions>
@@ -7440,17 +7358,17 @@ Char：` +
                           trim_614 +
                           `
 </user_summary_instructions>
-在不违背隐私规则的前提下，内容重点、取舍、语言和表达必须服从这份自定义要求。
+请在遵守隐私规则的前提下，按上述自定义要求选择重点并组织语言。
 `
                         : '',
                     content_20 =
-                        '请为下方线下见面的指定楼层生成一份可作为后续上下文的简明总结。' +
+                        '请把以下选定的线下见面楼层整理为简洁中文总结，供后续剧情作为上下文使用。' +
                         value_617 +
                         `
-User：` +
+User: ` +
                         value_292_1533.userName +
                         `
-Char：` +
+Char: ` +
                         value_292_1533.charName +
                         `
 
@@ -8598,7 +8516,7 @@ When the default language is Chinese, output only Chinese dialogue in corner quo
                     name: 'NSFW',
                     enabled: true,
                     content: `<nsfw_rules>
-允许符合当前角色关系、场景和用户设定的成人向描写。不要机械跳过情绪、动作、环境和人物反应。
+在符合当前人物关系、场景与 User 设置的前提下，可以描写成人内容。不要机械跳过情绪、动作、环境或角色反应。
 </nsfw_rules>`,
                     editable: true,
                     deletable: false,
@@ -8666,7 +8584,7 @@ Close with an incomplete sentence or a quiet image instead of explaining the emo
                     id: 'style_baimiao',
                     name: '文风-白描',
                     enabled: true,
-                    content: `<writing_style name="文风-白描">
+                    content: `<writing_style name="plain description">
 Use plain description. Prefer nouns and verbs over adjectives.
 Show emotion through actions, objects, silence, distance, light, sound, smell, and touch.
 Avoid ornate metaphors, abstract emotional labels, and author commentary.
@@ -8841,47 +8759,18 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                     name: '线下回顾byHaru',
                     enabled: false,
                     presetVersion: 2,
-                    content: `AI 必须在每轮正文回复的末尾，严格维护并更新【回顾】模块。
+                    content: `每次正文回复末尾，必须维护并更新【回顾】模块。
 
-【继承与更新硬性法则】（重点）
-在生成【回顾】前，你必须读取上一轮回复末尾的所有【回顾】内容：
-1. **内容继承**：你必须原样保留上一轮已有的所有“短期回顾”条目（1 到 N 条），绝对不能遗漏或删减！
-2. **递增追加**：在继承的历史条目下方，追加 1 条当轮产生的新回顾。
-3. **计数更新**：若上一轮是（N/10），本轮标题必须更新为（N+1/10）。严禁每轮都重新重置为（1/10）！
+强制继承与更新规则：
+写【回顾】之前，先读取上一条回复末尾【回顾】里的全部条目。
+1. 原封不动保留已有的所有短期回顾条目（从第 1 条到第 N 条），不得删减或缩写。
+2. 在继承的条目后，只新增当轮的 1 条短期回顾。
+3. 若上一轮标题是（N/10），本轮必须更新为（(N+1)/10）；不得每轮都重置为（1/10）。
 
-【回顾板块格式要求】
-在所有正文内容结束后，添加独立标题行：
-【回顾】
-标题下方分为“短期回顾”和“长期回顾”两个独立板块。
-
-【短期回顾机制】
-1. 标识格式：短期回顾（x/10）
-2. 单条字数：严格控制在 20-50 字之间。
-3. 满额归档重置（当达到 10/10 时）：
-- 当上一轮短期回顾已达到（10/10）时，在当前轮次触发归档。
-- 归档操作：将旧的 10 条短期回顾中具备纪念意义的核心事件，提炼融合为 1 条约 200 字的“长期回顾”，永久追加到【长期回顾】板块。
-- 重置操作：清空旧的 10 条短期回顾，仅保留当前轮次生成的新回顾，计数重置为：短期回顾（1/10）。
-
-【长期回顾机制】
-1. 标识格式：长期回顾（永久）
-2. 永久保留：归档生成的长期回顾一旦写入，后续每轮必须原样完整保留，不可删除。
-
-【多轮演化示范】（必须严格遵守此递增逻辑）
-▶ 第一轮输出示例：
-【回顾】
-短期回顾（1/10）：
-1. 在星月湖公园长椅上，将祖传的银色怀表送给了对方，并约定每年初雪在此相见。（36字）
-2. 下一条接上
-长期回顾：
-无
-▶ 第二轮输出示例（必须原样继承第1条，并追加第2条，计数变为2/10）：
-【回顾】
-短期回顾（2/10）：
-1. （上一条）在星月湖公园长椅上，将祖传的银色怀表送给了对方，并约定每年初雪在此相见。（36字）
-2. 共同在路边救助并领养了一只白色的三花幼猫，给它取名“奶油”。（28字）
-3. 下一条接上直到10
-长期记忆：
-无`,
+模块格式：
+正文结束后另起一行输出【回顾】，其下分别保留【短期回顾】与【长期回顾】。
+短期回顾使用“短期回顾（x/10）”标签，每条 20–50 字。上一轮短期回顾达到 10/10 时，把这 10 条的重要事件提炼为约 200 字的一条长期回顾，永久追加到【长期回顾】；清空旧短期条目，并以当轮的新条目重置为短期回顾（1/10）。
+长期回顾使用“长期回顾（永久）”标签；之后每轮都必须原封不动保留所有已归档的长期回顾。`,
                     editable: true,
                     deletable: false,
                 },
@@ -9687,14 +9576,14 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                             .filter(Boolean);
                         if (filter_750.length === 0) return '';
                         const value_1901 =
-                            value_748.nickname || value_748.realName || value_748.id || '成员';
+                            value_748.nickname || value_748.realName || value_748.id || '群成员';
                         return (
                             '<member_cross_group_memory member="' +
                             value_1901 +
                             `">
 规则：只有 ` +
                             value_1901 +
-                            ` 本人可以参考这些其他群公开记录；当前群其他成员默认不知道，也不能把它们当作当前群发言。
+                            ` 能使用其他群聊里的这些公开记录。当前群聊的其他成员默认不知道这些内容。不得把这些记录写成当前群聊中说过的话。
 ` +
                             filter_750.join(`
 `) +
@@ -12268,10 +12157,7 @@ Persona: ` +
                             : null,
                     senderName_2 =
                         groupUserIdentity?.name ||
-                        userState_2?.name ||
-                        userState_2?.realName ||
-                        userState_2?.nickname ||
-                        'User';
+                        handleAction_27(activeFriend_52, userState_2).name;
                 if (isGroupChat_3) {
                     const selectedMember = window.imChat
                         .getAvailableGroupRecipients(activeFriend_52)
@@ -12566,7 +12452,6 @@ Persona: ` +
         async function handleAction_371(
             imageGenerationPrompt_3,
             value_2326,
-            referenceImage_3 = '',
             value_2328 = {},
             value_2329 = {},
         ) {
@@ -12577,11 +12462,16 @@ Persona: ` +
                 return (window.showToast?.('这段聊天已有图片正在生成'), false);
             window.showToast?.('正在生成图片…');
             try {
-                const value_2332 = await window.imChat.generateChatImage(
+                const apk110New_2717 = window.imApp?.getFriendById?.(friendId_5) || value_2326,
+                    referenceImage_3 = await window.imChat.resolveImageReferenceFaces(
+                        apk110New_2717,
+                        value_2329,
+                    ),
+                    value_2332 = await window.imChat.generateChatImage(
                         imageGenerationPrompt_3,
                         value_2326,
                         {
-                            referenceImage: referenceImage_3,
+                            referenceImages: referenceImage_3,
                             basePrompt: value_2328.basePrompt || value_2328.lastPrompt || '',
                             charAppearance: value_2328.charAppearance || '',
                             userAppearance: value_2328.userAppearance || '',
@@ -12601,6 +12491,8 @@ Persona: ` +
                             imageModel: value_2332.model,
                             imageSize: value_2332.size,
                             faceReferenceUsed: value_2332.faceReferenceUsed,
+                            charFaceReferenceUsed: value_2332.charFaceReferenceUsed,
+                            userFaceReferenceUsed: value_2332.userFaceReferenceUsed,
                             imageGenerationPrompt: imageGenerationPrompt_3,
                             imageGenerationConfig: {
                                 basePrompt: value_2328.basePrompt || value_2328.lastPrompt || '',
@@ -12610,7 +12502,9 @@ Persona: ` +
                                 negativePrompt: value_2328.negativePrompt || '',
                                 includeCharAppearance: value_2329.charPresent !== false,
                                 includeUserAppearance: value_2329.userPresent !== false,
-                                useReferenceFace: !!referenceImage_3,
+                                useReferenceFace: value_2332.charFaceReferenceUsed,
+                                useCharReferenceFace: value_2332.charFaceReferenceUsed,
+                                useUserReferenceFace: value_2332.userFaceReferenceUsed,
                             },
                             imageGenerationCompiledPrompt: value_2332.compiledPrompt || '',
                             senderName: value_2326.nickname || value_2326.realName || 'Char',
@@ -12805,29 +12699,40 @@ Persona: ` +
                         (imageUrl_5 = await window.appStorage
                             .getAssetUrl(faceAssetId)
                             ['catch'](() => ''));
-                const supportsCharacterReference = latestTargetFriend.type !== 'group',
+                const apk110New_2755 = window.imChat.getUserFaceReferenceSettings(),
+                    apk110New_2756 =
+                        apk110New_2755.assetId &&
+                        typeof window.appStorage?.getAssetUrl === 'function'
+                            ? await window.appStorage
+                                  .getAssetUrl(apk110New_2755.assetId)
+                                  ['catch'](() => '')
+                            : '',
+                    supportsCharacterReference = latestTargetFriend.type !== 'group',
                     value_2351 = latestTargetFriend.imagePromptConfig || {},
-                    buildPromptConfig = (modalState_3 = {}, previous = value_2351) => ({
-                        ...(previous && typeof previous === 'object' ? previous : {}),
-                        charAppearance: String(modalState_3.charAppearance || '').trim(),
-                        userAppearance: String(modalState_3.userAppearance || '').trim(),
-                        artistPrompt: String(modalState_3.artistPrompt || '').trim(),
-                        negativePrompt: String(modalState_3.negativePrompt || '').trim(),
-                        basePrompt: String(modalState_3.promptValue || '').trim(),
-                        lastPrompt: String(modalState_3.promptValue || '').trim(),
-                        activePresetId: String(modalState_3.activePresetId || '').trim(),
-                        autoGenerate: modalState_3.autoGenerate === true,
-                        autoUseReferenceFace: modalState_3.autoUseReferenceFace === true,
-                        presets: Array.isArray(modalState_3.presets)
-                            ? modalState_3.presets
-                            : Array.isArray(previous?.presets)
-                              ? previous.presets
-                              : [],
-                    });
+                    buildPromptConfig = (modalState_3 = {}, previous = value_2351) => {
+                        const apk110New_2762 = {
+                            ...(previous && typeof previous === 'object' ? previous : {}),
+                            charAppearance: String(modalState_3.charAppearance || '').trim(),
+                            userAppearance: String(modalState_3.userAppearance || '').trim(),
+                            artistPrompt: String(modalState_3.artistPrompt || '').trim(),
+                            negativePrompt: String(modalState_3.negativePrompt || '').trim(),
+                            basePrompt: String(modalState_3.promptValue || '').trim(),
+                            lastPrompt: String(modalState_3.promptValue || '').trim(),
+                            activePresetId: String(modalState_3.activePresetId || '').trim(),
+                            autoGenerate: modalState_3.autoGenerate === true,
+                            presets: Array.isArray(modalState_3.presets)
+                                ? modalState_3.presets
+                                : Array.isArray(previous?.presets)
+                                  ? previous.presets
+                                  : [],
+                        };
+                        return (delete apk110New_2762.autoUseReferenceFace, apk110New_2762);
+                    };
                 showModal({
                     type: 'prompt',
                     title: '生成图片',
                     message: '将自动根据当前聊天上下文生成画面',
+                    textareaLabel: '正向提示词',
                     placeholder: '基础正向提示词：持续应用的主体、场景或质量要求（选填）',
                     defaultValue: value_2351.basePrompt || value_2351.lastPrompt || '',
                     multiline: true,
@@ -12841,103 +12746,200 @@ Persona: ` +
                         presets: Array.isArray(value_2351.presets) ? value_2351.presets : [],
                         activePresetId: value_2351.activePresetId || '',
                         autoGenerate: value_2351.autoGenerate === true,
-                        autoUseReferenceFace: value_2351.autoUseReferenceFace === true,
                     },
-                    referenceFace: supportsCharacterReference
+                    referenceFaces: supportsCharacterReference
                         ? {
-                              title:
-                                  (latestTargetFriend.nickname ||
+                              char: {
+                                  title:
+                                      latestTargetFriend.nickname ||
                                       latestTargetFriend.realName ||
-                                      '当前角色') + '的参考脸',
-                              imageUrl: imageUrl_5,
-                              fileName: latestTargetFriend.imageFaceReferenceFileName || '',
-                              onUpload: async (file) => {
-                                  if (!/^image\//i.test(file?.type || ''))
-                                      throw new Error('请选择图片文件');
-                                  if (
-                                      !window.imApp?.compressImageFile ||
-                                      !window.appStorage?.saveAssetFromDataUrl
-                                  )
-                                      throw new Error('图片存储服务不可用');
-                                  const dataUrl = await window.imApp.compressImageFile(file, {
-                                          maxWidth: 1536,
-                                          maxHeight: 1536,
-                                          quality: 0.9,
-                                          mimeType: 'image/jpeg',
-                                      }),
-                                      assetId_2 =
-                                          'im-face-reference-' +
-                                          targetFriend_20.id +
-                                          '-' +
-                                          Date.now(),
-                                      value_2356 =
-                                          (
-                                              window.imApp?.getFriendById?.(targetFriend_20.id) ||
-                                              targetFriend_20
-                                          ).imageFaceReferenceAssetId || '';
-                                  await window.appStorage.saveAssetFromDataUrl(assetId_2, dataUrl, {
-                                      ownerType: 'im_friend_face_reference',
-                                      ownerId: String(targetFriend_20.id),
-                                      fileName: file.name,
-                                  });
-                                  const imageUrl_6 = await window.appStorage.getAssetUrl(assetId_2),
-                                      saved_18 = await commitSheetFriendChange(
-                                          targetFriend_20,
-                                          (friend_19) => {
-                                              friend_19.imageFaceReferenceAssetId = assetId_2;
-                                              friend_19.imageFaceReferenceUrl = null;
-                                              friend_19.imageFaceReferenceFileName = file.name;
-                                          },
+                                      'Char',
+                                  imageUrl: imageUrl_5,
+                                  fileName: latestTargetFriend.imageFaceReferenceFileName || '',
+                                  onUpload: async (file) => {
+                                      if (!/^image\//i.test(file?.type || ''))
+                                          throw new Error('请选择图片文件');
+                                      if (
+                                          !window.imApp?.compressImageFile ||
+                                          !window.appStorage?.saveAssetFromDataUrl
+                                      )
+                                          throw new Error('图片存储服务不可用');
+                                      const dataUrl = await window.imApp.compressImageFile(file, {
+                                              maxWidth: 1536,
+                                              maxHeight: 1536,
+                                              quality: 0.9,
+                                              mimeType: 'image/jpeg',
+                                          }),
+                                          assetId_2 =
+                                              'im-face-reference-' +
+                                              targetFriend_20.id +
+                                              '-' +
+                                              Date.now(),
+                                          value_2356 =
+                                              (
+                                                  window.imApp?.getFriendById?.(
+                                                      targetFriend_20.id,
+                                                  ) || targetFriend_20
+                                              ).imageFaceReferenceAssetId || '';
+                                      await window.appStorage.saveAssetFromDataUrl(
+                                          assetId_2,
+                                          dataUrl,
                                           {
-                                              metaOnly: true,
+                                              ownerType: 'im_friend_face_reference',
+                                              ownerId: String(targetFriend_20.id),
+                                              fileName: file.name,
                                           },
                                       );
-                                  if (!saved_18) {
-                                      await window.appStorage
-                                          .deleteAsset(assetId_2)
-                                          ['catch'](() => undefined);
-                                      throw new Error('参考脸保存失败，请重试');
-                                  }
-                                  return (
-                                      value_2356 &&
-                                          value_2356 !== assetId_2 &&
-                                          (await window.appStorage
-                                              .deleteAsset(value_2356)
-                                              ['catch'](() => undefined)),
-                                      window.showToast?.('已保存当前角色的参考脸'),
-                                      {
-                                          imageUrl: imageUrl_6,
-                                          fileName: file.name,
+                                      const imageUrl_6 =
+                                              await window.appStorage.getAssetUrl(assetId_2),
+                                          saved_18 = await commitSheetFriendChange(
+                                              targetFriend_20,
+                                              (friend_19) => {
+                                                  friend_19.imageFaceReferenceAssetId = assetId_2;
+                                                  friend_19.imageFaceReferenceUrl = null;
+                                                  friend_19.imageFaceReferenceFileName = file.name;
+                                              },
+                                              {
+                                                  metaOnly: true,
+                                              },
+                                          );
+                                      if (!saved_18) {
+                                          await window.appStorage
+                                              .deleteAsset(assetId_2)
+                                              ['catch'](() => undefined);
+                                          throw new Error('参考脸保存失败，请重试');
                                       }
-                                  );
+                                      return (
+                                          value_2356 &&
+                                              value_2356 !== assetId_2 &&
+                                              (await window.appStorage
+                                                  .deleteAsset(value_2356)
+                                                  ['catch'](() => undefined)),
+                                          window.showToast?.('已保存当前角色的参考脸'),
+                                          {
+                                              imageUrl: imageUrl_6,
+                                              fileName: file.name,
+                                          }
+                                      );
+                                  },
+                                  onDelete: async () => {
+                                      const value_2360 =
+                                              (
+                                                  window.imApp?.getFriendById?.(
+                                                      targetFriend_20.id,
+                                                  ) || targetFriend_20
+                                              ).imageFaceReferenceAssetId || '',
+                                          saved_19 = await commitSheetFriendChange(
+                                              targetFriend_20,
+                                              (friend_20) => {
+                                                  friend_20.imageFaceReferenceAssetId = null;
+                                                  friend_20.imageFaceReferenceUrl = null;
+                                                  friend_20.imageFaceReferenceFileName = '';
+                                              },
+                                              {
+                                                  metaOnly: true,
+                                              },
+                                          );
+                                      if (!saved_19) throw new Error('参考脸删除失败，请重试');
+                                      value_2360 &&
+                                          (await window.appStorage
+                                              ?.deleteAsset?.(value_2360)
+                                              ['catch'](() => undefined));
+                                      window.showToast?.('已删除当前角色的参考脸');
+                                  },
                               },
-                              onDelete: async () => {
-                                  const value_2360 =
-                                          (
-                                              window.imApp?.getFriendById?.(targetFriend_20.id) ||
-                                              targetFriend_20
-                                          ).imageFaceReferenceAssetId || '',
-                                      saved_19 = await commitSheetFriendChange(
-                                          targetFriend_20,
-                                          (friend_20) => {
-                                              friend_20.imageFaceReferenceAssetId = null;
-                                              friend_20.imageFaceReferenceUrl = null;
-                                              friend_20.imageFaceReferenceFileName = '';
-                                              friend_20.imagePromptConfig = {
-                                                  ...(friend_20.imagePromptConfig || {}),
-                                                  autoUseReferenceFace: false,
+                              user: {
+                                  title: 'User',
+                                  imageUrl: apk110New_2756,
+                                  fileName: apk110New_2755.fileName,
+                                  onUpload: async (apk110New_2773) => {
+                                      if (!/^image\//i.test(apk110New_2773?.type || ''))
+                                          throw new Error('请选择图片文件');
+                                      if (
+                                          !window.imApp?.compressImageFile ||
+                                          !window.appStorage?.saveAssetFromDataUrl
+                                      )
+                                          throw new Error('图片存储服务不可用');
+                                      const apk110New_2774 = await window.imApp.compressImageFile(
+                                              apk110New_2773,
+                                              {
+                                                  maxWidth: 1536,
+                                                  maxHeight: 1536,
+                                                  quality: 0.9,
+                                                  mimeType: 'image/jpeg',
+                                              },
+                                          ),
+                                          apk110New_2775 = 'im-user-face-reference-' + Date.now(),
+                                          apk110New_2776 =
+                                              window.imChat.getUserFaceReferenceSettings().assetId;
+                                      await window.appStorage.saveAssetFromDataUrl(
+                                          apk110New_2775,
+                                          apk110New_2774,
+                                          {
+                                              ownerType: 'im_user_face_reference',
+                                              ownerId: 'global',
+                                              fileName: apk110New_2773.name,
+                                          },
+                                      );
+                                      try {
+                                          await window.appStorage.commitDomain(
+                                              'settings',
+                                              (apk110New_2778) => {
+                                                  apk110New_2778.imessageUserFaceReference = {
+                                                      assetId: apk110New_2775,
+                                                      fileName: apk110New_2773.name,
+                                                  };
+                                              },
+                                              {
+                                                  critical: true,
+                                                  reason: 'im-user-face-reference',
+                                              },
+                                          );
+                                      } catch (apk110New_2779) {
+                                          await window.appStorage
+                                              .deleteAsset(apk110New_2775)
+                                              ['catch'](() => undefined);
+                                          throw apk110New_2779;
+                                      }
+                                      const apk110New_2777 =
+                                          await window.appStorage.getAssetUrl(apk110New_2775);
+                                      return (
+                                          apk110New_2776 &&
+                                              apk110New_2776 !== apk110New_2775 &&
+                                              (await window.appStorage
+                                                  .deleteAsset(apk110New_2776)
+                                                  ['catch'](() => undefined)),
+                                          window.showToast?.(
+                                              '已保存 User 参考脸，可在所有单聊使用',
+                                          ),
+                                          {
+                                              imageUrl: apk110New_2777,
+                                              fileName: apk110New_2773.name,
+                                          }
+                                      );
+                                  },
+                                  onDelete: async () => {
+                                      const apk110New_2780 =
+                                          window.imChat.getUserFaceReferenceSettings().assetId;
+                                      await window.appStorage.commitDomain(
+                                          'settings',
+                                          (apk110New_2781) => {
+                                              apk110New_2781.imessageUserFaceReference = {
+                                                  assetId: '',
+                                                  fileName: '',
                                               };
                                           },
                                           {
-                                              metaOnly: true,
+                                              critical: true,
+                                              reason: 'im-user-face-reference-delete',
                                           },
                                       );
-                                  if (!saved_19) throw new Error('参考脸删除失败，请重试');
-                                  value_2360 &&
-                                      (await window.appStorage
-                                          ?.deleteAsset?.(value_2360)
-                                          ['catch'](() => undefined));
-                                  window.showToast?.('已删除当前角色的参考脸');
+                                      if (apk110New_2780)
+                                          await window.appStorage
+                                              .deleteAsset(apk110New_2780)
+                                              ['catch'](() => undefined);
+                                      window.showToast?.('已删除 User 参考脸');
+                                  },
                               },
                           }
                         : null,
@@ -12981,9 +12983,6 @@ Persona: ` +
                                     await handleAction_371(
                                         value_2369.scenePrompt,
                                         targetFriend_20,
-                                        modalState_4.toggleChecked
-                                            ? modalState_4.referenceImage
-                                            : '',
                                         imagePromptConfig_3,
                                         value_2369,
                                     );
@@ -13244,8 +13243,11 @@ Persona: ` +
                 imageModel: contact_877.imageModel || '',
                 imageSize: contact_877.imageSize || '',
                 faceReferenceUsed: !!contact_877.faceReferenceUsed,
+                charFaceReferenceUsed: !!contact_877.charFaceReferenceUsed,
+                userFaceReferenceUsed: !!contact_877.userFaceReferenceUsed,
                 imageGenerationPrompt: contact_877.imageGenerationPrompt || '',
                 imageGenerationConfig: contact_877.imageGenerationConfig || null,
+                imageGenerationCompiledPrompt: contact_877.imageGenerationCompiledPrompt || '',
                 fileName: contact_877.fileName || '',
                 albumImages: Array.isArray(contact_877.albumImages)
                     ? contact_877.albumImages.slice(0, 8).map((value_886) => ({

@@ -396,11 +396,11 @@
                         onConfirm: (value_21) => {
                             const trim_22 = String(value_21 || '').trim(),
                                 extraSystemPrompt_2 = trim_22
-                                    ? `【旁观推进提示｜仅影响本轮群聊】
-旁观者希望群成员接下来围绕以下方向自然聊天：` +
+                                    ? `Observer direction for this group-chat turn only:
+The observer wants members to chat naturally around this direction: ` +
                                       trim_22 +
                                       `
-这不是 User 在群内发送的消息，不得让任何成员声称看到 User 发言，也不得让 User 出现在群内。`
+This is not a message sent by User in the group. No member may claim to have seen User speak or place User in the group.`
                                     : '';
                             window.imChat.handleAiReply(latestGroup_3, msgContainer_2, aiBtn, {
                                 source: 'left_group_continue',
@@ -531,7 +531,11 @@
         </div>
     `),
             (shell_2.querySelector('.im-chat-loading-header span').textContent =
-                (value_116_2.type === 'official' && value_116_2.nickname === '有兔' ? 'LHV' : value_116_2.nickname) || value_116_2.realName || '聊天'),
+                (value_116_2.type === 'official' && value_116_2.nickname === '有兔'
+                    ? 'LHV'
+                    : value_116_2.nickname) ||
+                value_116_2.realName ||
+                '聊天'),
             element_117.appendChild(shell_2),
             {
                 shell: shell_2,
@@ -1876,6 +1880,18 @@
                 'timestamp-outside',
                 !!friend_6.showTimestamp && friend_6.timestampPosition === 'outside',
             );
+            page_9.classList.toggle(
+                'show-every-message-avatar',
+                friend_6.type === 'char' && friend_6.showEveryMessageAvatar === true,
+            );
+            page_9.classList.toggle(
+                'separate-bubbles',
+                friend_6.type === 'char' && friend_6.continuousBubbles === false,
+            );
+            page_9.classList.toggle(
+                'reply-outside',
+                friend_6.type === 'char' && friend_6.replyStyle === 'outside',
+            );
             if (friend_6.isPinned) page_9.classList.add('pinned-chat');
             else page_9.classList.remove('pinned-chat');
             if (window.imApp.applyFriendStatusBarCss)
@@ -2154,11 +2170,15 @@
                     setTimeout(() => (overlay.style.display = 'none'), 300));
             });
         }
-        const card_5 = overlay.querySelector('.group-member-profile-card'),
-            avatarUrl_3 = speakerInfo_2.avatarUrl || 'https://picsum.photos/seed/char/100/100',
+        const card_5 = overlay.querySelector('.group-member-profile-card');
+        overlay.dataset.groupId = String(latestGroup_5?.id || '');
+        overlay.dataset.memberId = memberProfileKey;
+        const avatarUrl_3 = speakerInfo_2.avatarUrl || 'https://picsum.photos/seed/char/100/100',
             name_2 = speakerInfo_2.nickname || '群成员',
             signature_2 = speakerInfo_2.signature || '这个人很懒，什么都没写',
-            title_3 = speakerInfo_2.groupTitle || '';
+            title_3 = window.imApp?.areGroupTitlesEnabled?.(latestGroup_5)
+                ? window.imApp?.getGroupMemberTitle?.(latestGroup_5, memberProfileKey) || ''
+                : '';
         let groupProfile = {};
         latestGroup_5 &&
             latestGroup_5.memberProfiles &&
@@ -2177,7 +2197,7 @@
         actualMember && (isSleeping_3 = window.imApp.isCharacterSleeping(actualMember));
         const innerText_2 = formatStatusLabel(groupProfile.status || 'online', isSleeping_3),
             value_188 = isSleeping_3 ? '#8e8e93' : '#34c759';
-        let value_309 = title_3 ? '<div class="gmp-title">' + title_3 + '</div>' : '';
+        let value_309 = title_3 ? '<div class="gmp-title"></div>' : '';
         card_5.innerHTML =
             `
             <div class="gmp-header">
@@ -2209,6 +2229,8 @@
             `</div>
             </div>
         `;
+        const apk110New_529 = card_5.querySelector('.gmp-title');
+        if (apk110New_529) apk110New_529.textContent = title_3;
         const statusBubble = card_5.querySelector('.gmp-status-bubble');
         statusBubble.addEventListener('blur', async (e_11) => {
             const status_2 = normalizeStatusForStorage(e_11.target.innerText);
@@ -2282,9 +2304,35 @@
         card_5.classList.add('active');
         value_293 && (card_5.style.transform = 'scale(1)');
     }
+    function apk110New_43(apk110New_547) {
+        const apk110New_548 = document.getElementById('global-gmp-overlay');
+        if (
+            !apk110New_548 ||
+            apk110New_548.style.display === 'none' ||
+            apk110New_548.dataset.groupId !== String(apk110New_547?.id)
+        )
+            return;
+        const apk110New_549 = apk110New_548.querySelector('.gmp-name-row');
+        if (!apk110New_549) return;
+        let apk110New_550 = apk110New_549.querySelector('.gmp-title');
+        const apk110New_551 = window.imApp?.areGroupTitlesEnabled?.(apk110New_547)
+            ? window.imApp?.getGroupMemberTitle?.(apk110New_547, apk110New_548.dataset.memberId) ||
+              ''
+            : '';
+        if (!apk110New_551) {
+            apk110New_550?.remove();
+            return;
+        }
+        !apk110New_550 &&
+            ((apk110New_550 = document.createElement('div')),
+            (apk110New_550.className = 'gmp-title'),
+            apk110New_549.appendChild(apk110New_550));
+        apk110New_550.textContent = apk110New_551;
+    }
     window.imChat.openChatTab = openChatTab_2;
     window.imChat.showContextMenu = showContextMenu_2;
     window.imChat.fitContextMenuToViewport = fitContextMenuToViewport_2;
     window.imChat.closeContextMenu = closeContextMenu_3;
     window.imChat.showGroupMemberProfileCard = showGroupMemberProfileCard_2;
+    window.imChat.refreshGroupMemberProfileTitle = apk110New_43;
 });

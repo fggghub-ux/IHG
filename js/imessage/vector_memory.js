@@ -696,10 +696,19 @@
                 Number.isFinite(requestedLimit) && requestedLimit > 0
                     ? Math.min(100, requestedLimit)
                     : RECALL_LIMIT_2,
-            results_2 = records_6
+            results_2 = Array.isArray(options_3?.kinds)
+                ? new Set(
+                      options_3.kinds
+                          .map((apk110New_247) => String(apk110New_247 || '').trim())
+                          .filter(Boolean),
+                  )
+                : null,
+            apk110New_246 = records_6
                 .filter(
                     (record_8) =>
-                        record_8.fingerprint === fingerprint_4 && Array.isArray(record_8.embedding),
+                        record_8.fingerprint === fingerprint_4 &&
+                        Array.isArray(record_8.embedding) &&
+                        (!results_2 || results_2.has(record_8.kind)),
                 )
                 .map((record_9) => ({
                     id: record_9.id,
@@ -709,7 +718,7 @@
                 .sort((left, right) => right.score - left.score || left.id.localeCompare(right.id))
                 .slice(0, limit_2);
         return {
-            results: results_2,
+            results: apk110New_246,
             skipped: false,
         };
     }

@@ -1813,7 +1813,7 @@
     box-sizing: border-box;
 }
 
-.storage-category-row + .storage-category-row,
+.storage-category-item + .storage-category-item,
 .data-management-action + .data-management-action,
 .data-import-preview:not([style*='display: none']) {
     border-top: 1px solid #e5e5ea;
@@ -2766,3 +2766,68 @@ button.sheet-action {
 button.settings-item {
     text-align: left;
 }
+
+.storage-category-button,
+.storage-asset-source-row {
+    width: 100%;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.storage-category-button:active,
+.storage-asset-source-row:active { background: rgba(60, 60, 67, 0.06); }
+
+.storage-category-button:focus-visible,
+.storage-asset-source-row:focus-visible { outline: 2px solid #007aff; outline-offset: -2px; }
+
+.storage-category-button[aria-expanded="true"] .storage-category-chevron,
+.storage-asset-source-row[aria-expanded="true"] .storage-category-chevron { transform: rotate(90deg); }
+
+.storage-asset-details {
+    border-top: 1px solid #e5e5ea;
+    background: #fafafa;
+}
+
+.storage-asset-details[hidden],
+.storage-asset-types[hidden] { display: none; }
+
+.storage-asset-note {
+    margin: 0;
+    padding: 12px 14px 9px;
+    color: #6c6c70;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.storage-asset-source-item + .storage-asset-source-item { border-top: 1px solid #e5e5ea; }
+
+.storage-asset-source-row,
+.storage-asset-type-row {
+    min-height: 54px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 14px 9px 30px;
+}
+
+.storage-asset-source-row .storage-category-copy strong { font-size: 14px; }
+
+.storage-asset-source-row .storage-category-size { font-size: 14px; }
+
+.storage-asset-type-row {
+    min-height: 46px;
+    padding-left: 46px;
+    background: #f2f2f7;
+}
+
+.storage-asset-type-row + .storage-asset-type-row { border-top: 1px solid #e5e5ea; }
+
+.storage-asset-type-row .storage-category-copy strong { font-size: 13px; font-weight: 500; }
+
+.storage-asset-type-row .storage-category-size { font-size: 13px; }

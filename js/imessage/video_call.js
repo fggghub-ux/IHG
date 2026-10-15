@@ -3,20 +3,20 @@
 
     window.imChat = window.imChat || {};
     const text_2 =
-            '只描述此刻画面中能直接看见的事实，包含显著文字、人物动作与场景变化。用简短中文，不猜测未显示的手机内容，不写社交媒体评论。',
+            'Describe only directly visible facts in the current frame, including prominent text, human actions, and scene changes. Write brief Simplified Chinese. Do not guess unseen phone content or write social-media commentary.',
         value_3 = (value_52) => /^(zh|cn|chinese)(-|$)/i.test(String(value_52 || 'zh')),
         options = {
-            en: '英语',
-            ja: '日语',
-            ko: '韩语',
-            fr: '法语',
-            de: '德语',
-            ru: '俄语',
-            es: '西班牙语',
-            pt: '葡萄牙语',
-            it: '意大利语',
-            th: '泰语',
-            vi: '越南语',
+            en: 'English',
+            ja: 'Japanese',
+            ko: 'Korean',
+            fr: 'French',
+            de: 'German',
+            ru: 'Russian',
+            es: 'Spanish',
+            pt: 'Portuguese',
+            it: 'Italian',
+            th: 'Thai',
+            vi: 'Vietnamese',
         },
         items = [5, 10, 20, 30];
     let value_4 = null,
@@ -780,7 +780,7 @@
                             ': ' +
                             value_208.text +
                             (value_208.visualSummary
-                                ? ' [看到：' + value_208.visualSummary + ']'
+                                ? ' [visible: ' + value_208.visualSummary + ']'
                                 : ''),
                     ).join(`
 `),
@@ -798,37 +798,37 @@
                         ).join(`
 `) || '',
                 content_2 =
-                    '你正在以 ' +
+                    'You are ' +
                     (value_186.friend.realName || value_186.friend.nickname || 'Char') +
-                    ' 的身份和 ' +
+                    ' in a private video call with ' +
                     value_193 +
-                    ' 进行单人视频通话。人物设定：' +
-                    (value_186.friend.persona || '自然交流') +
-                    '。与 User 的关系：' +
-                    (value_186.friend.relationship || '未指定') +
-                    `。
-最近聊天：` +
+                    '. Persona: ' +
+                    (value_186.friend.persona || 'natural conversation') +
+                    '. Relationship with User: ' +
+                    (value_186.friend.relationship || 'not specified') +
+                    `.
+Recent chat: ` +
                     value_197 +
                     `
-本次通话：` +
+This call: ` +
                     join_196 +
                     `
-只能根据明确提供的实时画面观察和已识别的声音反应，不要声称能看见未共享的手机内容。画面变化不值得说话时 shouldSpeak=false，避免连续解说。若开口，像真实通话那样自然回应，通常连续说 2 到 4 句简短口语；每句放进 segments 的独立条目，不要写长篇解说或重复画面。每条 text 必须使用角色默认语言 ` +
+Use only explicitly supplied live visual observations and recognized audio. Never claim to see phone content that User has not shared. When a visual change does not warrant speech, set shouldSpeak=false and avoid continuous narration. If you speak, respond like a real call, usually with two to four short conversational sentences. Put each sentence in a separate segments entry; do not write a long description or repeat the frame. Write every text in Char's default language, ` +
                     value_195 +
-                    '。' +
+                    '. ' +
                     (value_3(string_194)
-                        ? '每条 translation 必须为空字符串。'
-                        : '每条 translation 必须是对应 text 的准确、自然的简体中文翻译。') +
-                    'action 和 thought 为简短中文，可留空。只输出 JSON：{"shouldSpeak":true,"action":"","thought":"","segments":[{"text":"","translation":""},{"text":"","translation":""}]}。',
+                        ? 'Every translation must be empty.'
+                        : 'Every translation must be an accurate, natural Simplified Chinese rendering of its text.') +
+                    ' action and thought are brief Simplified Chinese and may be empty. Output JSON only: {"shouldSpeak":true,"action":"","thought":"","segments":[{"text":"","translation":""},{"text":"","translation":""}]}.',
                 content_3 =
-                    '本轮 User 说：' +
-                    (transcript_2 || '未说话') +
+                    'User said this turn: ' +
+                    (transcript_2 || 'nothing') +
                     `
-本轮可见画面：` +
-                    (visualSummary_2 || '不可见或识别失败') +
+Visible frame this turn: ` +
+                    (visualSummary_2 || 'unavailable or recognition failed') +
                     (value_188
                         ? `
-重回上一轮：重新回应相同依据，不要重复上一句。`
+Retry the last turn using the same evidence, without repeating the previous line.`
                         : ''),
                 chatCompletionsEndpoint_200 = window.u2Api.resolveChatCompletionsEndpoint(
                     value_192.endpoint,

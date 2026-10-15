@@ -4219,8 +4219,8 @@ Do not output markdown, tagged lines, explanations, or chain-of-thought.`,
         const options_836 = {
             index: 0,
             description:
-                '根据这条朋友圈内容生成一张自然、连贯、符合角色生活状态的真实画面：' +
-                (items_834[0]?.text || '日常生活记录'),
+                "Generate a natural, coherent, realistic image that fits Char's life based on this Moments post: " +
+                (items_834[0]?.text || 'everyday life update'),
         };
         if (!Array.isArray(items_834) || items_834.length === 0) return options_836;
         const map_837 = items_834.map((value_838, index_7) => ({
@@ -4245,7 +4245,7 @@ Do not output markdown, tagged lines, explanations, or chain-of-thought.`,
 Posts: ` +
                                 JSON.stringify(map_837) +
                                 `
-Output shape: {"postIndex":0,"description":"简体中文画面描述"}`,
+Output shape: {"postIndex":0,"description":"visual description in Simplified Chinese"}`,
                         },
                     ],
                     0.5,

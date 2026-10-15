@@ -28,6 +28,7 @@
         groupContextEnabledToggle = document.getElementById('group-context-enabled-toggle'),
         groupContextLimitInput = document.getElementById('group-context-limit-input'),
         groupTimeAwareToggle = document.getElementById('group-time-aware-toggle'),
+        apk110New_29 = document.getElementById('group-show-titles-toggle'),
         groupAutoExpandTranslationToggle = document.getElementById(
             'group-auto-expand-translation-toggle',
         ),
@@ -284,6 +285,175 @@
             });
         if (window.imChat?.renderChatsList) window.imChat.renderChatsList();
         return refreshedGroup;
+    }
+    function apk110New_76(apk110New_175, apk110New_176 = false) {
+        return apk110New_175
+            ? '<span class="im-group-title-badge' +
+                  (apk110New_176 ? ' is-admin' : '') +
+                  '">' +
+                  escapeGroupHtml(apk110New_175) +
+                  '</span>'
+            : '';
+    }
+    function apk110New_77(apk110New_177) {
+        const apk110New_178 = resolveLatestGroup(apk110New_177) || apk110New_177;
+        if (!apk110New_178) return;
+        if (groupPrivateChatDetailModal_2?.classList.contains('active'))
+            window.imApp.openGroupDetails(apk110New_178);
+        if (
+            groupMemberManageSheet?.classList.contains('active') &&
+            groupMemberManageSheet.dataset.groupId === String(apk110New_178.id)
+        ) {
+            const apk110New_181 = document.getElementById('gmm-title-btn'),
+                apk110New_182 = document.getElementById('gmm-current-title'),
+                apk110New_183 = window.imApp.areGroupTitlesEnabled(apk110New_178);
+            if (apk110New_181) apk110New_181.style.display = apk110New_183 ? '' : 'none';
+            if (apk110New_182)
+                apk110New_182.textContent = apk110New_183
+                    ? window.imApp.getGroupMemberTitle(
+                          apk110New_178,
+                          groupMemberManageSheet.dataset.memberId,
+                      ) || '未设置'
+                    : '';
+        }
+        window.imChat?.refreshGroupMemberProfileTitle?.(apk110New_178);
+        const apk110New_179 = document.getElementById('chat-interface-' + apk110New_178.id),
+            apk110New_180 = apk110New_179?.querySelector('.ins-chat-messages');
+        apk110New_180 &&
+            window.imChat?.rerenderChatContainer &&
+            window.imChat.rerenderChatContainer(apk110New_178, apk110New_180, {
+                scroll: false,
+            });
+    }
+    window.imApp.refreshGroupTitleUi = apk110New_77;
+    async function apk110New_78(apk110New_184, apk110New_185, apk110New_186, apk110New_187 = {}) {
+        const apk110New_188 = await window.imApp.appendGroupManagementNotice?.(
+            apk110New_184,
+            apk110New_185,
+            apk110New_186,
+            apk110New_187,
+        );
+        apk110New_77(apk110New_184);
+        if (!apk110New_188) window.showToast?.('设置已保存，但群聊提示保存失败');
+        return !!apk110New_188;
+    }
+    function apk110New_79(apk110New_189, apk110New_190 = null, apk110New_191 = '') {
+        const apk110New_192 = resolveLatestGroup(apk110New_189);
+        if (
+            !apk110New_192 ||
+            !window.imApp.areGroupTitlesEnabled(apk110New_192) ||
+            !window.showCustomModal
+        )
+            return;
+        const apk110New_193 = apk110New_190 == null,
+            apk110New_194 = apk110New_193
+                ? window.imApp.getGroupOwnerTitle(apk110New_192)
+                : window.imApp.getGroupMemberTitle(apk110New_192, apk110New_190);
+        window.showCustomModal({
+            type: 'prompt',
+            title: apk110New_193 ? '编辑群主头衔' : '编辑' + (apk110New_191 || '群成员') + '的头衔',
+            message: apk110New_193
+                ? '留空可恢复默认“群主”。'
+                : window.imApp.isGroupAdmin(apk110New_192, apk110New_190)
+                  ? '留空可恢复默认“管理员”。'
+                  : '留空可清除群头衔。',
+            defaultValue: apk110New_194,
+            placeholder: apk110New_193 ? '群主' : '输入群头衔',
+            confirmText: '保存',
+            onConfirm: async (apk110New_195) => {
+                const apk110New_196 = String(apk110New_195 || '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                if (apk110New_196.length > window.imApp.GROUP_TITLE_MAX_LENGTH)
+                    return (
+                        window.showToast?.(
+                            '群头衔最多' + window.imApp.GROUP_TITLE_MAX_LENGTH + '字',
+                        ),
+                        false
+                    );
+                const apk110New_197 = resolveLatestGroup(apk110New_192);
+                if (apk110New_197 && !window.imApp.areGroupTitlesEnabled(apk110New_197))
+                    return (window.showToast?.('请先开启群头衔'), false);
+                if (
+                    !apk110New_197 ||
+                    (!apk110New_193 &&
+                        !getCanonicalGroupMemberIds(apk110New_197).includes(String(apk110New_190)))
+                )
+                    return (window.showToast?.('群成员已不在群内'), false);
+                const apk110New_198 = apk110New_193
+                        ? window.imApp.getGroupOwnerTitle(apk110New_197)
+                        : window.imApp.getGroupMemberTitle(apk110New_197, apk110New_190),
+                    apk110New_199 =
+                        apk110New_196 ||
+                        (apk110New_193
+                            ? window.imApp.GROUP_OWNER_TITLE
+                            : window.imApp.isGroupAdmin(apk110New_197, apk110New_190)
+                              ? window.imApp.GROUP_ADMIN_TITLE
+                              : '');
+                if (apk110New_198 === apk110New_199) return;
+                let apk110New_200 = false;
+                const apk110New_201 = await commitCurrentGroupChange(
+                    (apk110New_207) => {
+                        if (!window.imApp.areGroupTitlesEnabled(apk110New_207)) return;
+                        apk110New_193
+                            ? ((apk110New_207.ownerTitle =
+                                  apk110New_196 || window.imApp.GROUP_OWNER_TITLE),
+                              (apk110New_200 = true))
+                            : (apk110New_200 = window.imApp.setGroupMemberTitle(
+                                  apk110New_207,
+                                  apk110New_190,
+                                  apk110New_196,
+                              ));
+                    },
+                    {
+                        silent: true,
+                        metaOnly: true,
+                        syncActive: true,
+                    },
+                );
+                if (!apk110New_201 || !apk110New_200)
+                    return (
+                        window.showToast?.(apk110New_200 ? '保存群头衔失败' : '请先开启群头衔'),
+                        false
+                    );
+                const apk110New_202 = resolveLatestGroup(apk110New_192.id) || apk110New_192,
+                    apk110New_203 = apk110New_193
+                        ? window.imApp.getGroupOwnerTitle(apk110New_202)
+                        : window.imApp.getGroupMemberTitle(apk110New_202, apk110New_190),
+                    apk110New_204 = apk110New_193
+                        ? getGroupUserDisplayMeta(apk110New_202).name
+                        : apk110New_191 || '群成员',
+                    apk110New_205 = apk110New_193
+                        ? '群主「' +
+                          apk110New_204 +
+                          '」的群头衔已' +
+                          (apk110New_196 ? '改为「' + apk110New_203 + '」' : '恢复为「群主」')
+                        : '「' +
+                          apk110New_204 +
+                          '」的群头衔已' +
+                          (apk110New_203
+                              ? (apk110New_196 ? '改为' : '恢复为') + '「' + apk110New_203 + '」'
+                              : '清除'),
+                    apk110New_206 = await apk110New_78(
+                        apk110New_202,
+                        'group_title_changed',
+                        apk110New_205,
+                        {
+                            actorRole: 'user',
+                            targetMemberId: apk110New_193 ? '__user__' : String(apk110New_190),
+                            newTitle: apk110New_203,
+                        },
+                    );
+                if (!apk110New_193) {
+                    const apk110New_208 = document.getElementById('gmm-current-title');
+                    if (apk110New_208)
+                        apk110New_208.textContent =
+                            window.imApp.getGroupMemberTitle(apk110New_202, apk110New_190) ||
+                            '未设置';
+                }
+                if (apk110New_206) window.showToast?.('群头衔已保存');
+            },
+        });
     }
     window.imApp.calculateChatMemoryTokenEstimate =
         window.imApp.calculateChatMemoryTokenEstimate ||
@@ -684,6 +854,7 @@
         updateCreateGroupConfirmBtn();
         openView_3(createGroupSheet);
     }
+    window.imApp.openCreateGroupSheet = openCreateGroupSheet;
     let lastGroupsListSnapshot = [];
     function getGroupsListRenderSnapshot() {
         return (window.imData.friends || [])
@@ -782,6 +953,8 @@
         groupContextLimitInput && (groupContextLimitInput.value = value_3);
         groupTimeAwareToggle &&
             (groupTimeAwareToggle.checked = currentViewingGroup.timeAware !== false);
+        apk110New_29 &&
+            (apk110New_29.checked = window.imApp.areGroupTitlesEnabled(currentViewingGroup));
         groupAutoExpandTranslationToggle &&
             (groupAutoExpandTranslationToggle.checked =
                 currentViewingGroup.autoExpandTranslation === true);
@@ -920,7 +1093,9 @@
                     return;
                 const userMeta = getGroupUserDisplayMeta(group_13),
                     name_133 = userMeta.name,
-                    myAvatarUrl = userMeta.avatarUrl;
+                    myAvatarUrl = userMeta.avatarUrl,
+                    apk110New_322 = window.imApp.areGroupTitlesEnabled(group_13),
+                    apk110New_323 = window.imApp.getGroupOwnerTitle(group_13);
                 let innerHTML_2 =
                     Number(group_13.leftGroupAt) > 0
                         ? ''
@@ -929,29 +1104,40 @@
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: #e5e5ea; display: flex; justify-content: center; align-items: center; overflow: hidden;">
                         <img src="` +
-                          myAvatarUrl +
+                          escapeGroupHtml(myAvatarUrl) +
                           `" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div>
-                        <div style="font-size: 16px; font-weight: 600; color: #000;">` +
-                          name_133 +
-                          `</div>
+                        <div class="im-group-member-name-line" style="font-size: 16px; font-weight: 600; color: #000;">
+                            <span class="im-group-member-name">` +
+                          escapeGroupHtml(name_133) +
+                          `</span>
+                            ` +
+                          (apk110New_322 ? apk110New_76(apk110New_323) : '') +
+                          `
+                            ` +
+                          (apk110New_322
+                              ? '<button class="im-group-owner-title-edit" type="button" aria-label="编辑群主头衔" title="编辑群主头衔"><i class="fas fa-pen" aria-hidden="true"></i></button>'
+                              : '') +
+                          `
+                        </div>
                         <div style="font-size: 12px; color: #007aff;">online</div>
                     </div>
                 </div>
-                <div style="font-size: 12px; color: #8e8e93; background: #f2f2f7; padding: 2px 8px; border-radius: 10px; color: #c084fc; background: #f3e8ff;">owner</div>
             </div>
         `;
                 getResolvedGroupMembers(group_13).forEach((value_136) => {
                     const value_137 = value_136.avatarUrl
-                        ? '<img src="' +
-                          value_136.avatarUrl +
-                          '" style="width: 100%; height: 100%; object-fit: cover;">'
-                        : '<i class="fas fa-user" style="color: #fff;"></i>';
+                            ? '<img src="' +
+                              escapeGroupHtml(value_136.avatarUrl) +
+                              '" style="width: 100%; height: 100%; object-fit: cover;">'
+                            : '<i class="fas fa-user" style="color: #fff;"></i>',
+                        apk110New_327 = window.imApp.getGroupMemberTitle(group_13, value_136.id),
+                        apk110New_328 = window.imApp.isGroupAdmin(group_13, value_136.id);
                     innerHTML_2 +=
                         `
                     <div class="group-detail-member-item" data-id="` +
-                        value_136.id +
+                        escapeGroupHtml(value_136.id) +
                         `" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f2f2f7; cursor: pointer;">
                         <div style="display: flex; align-items: center; gap: 15px;">
                             <div style="width: 40px; height: 40px; border-radius: 50%; background: #c7c7cc; display: flex; justify-content: center; align-items: center; overflow: hidden;">
@@ -960,8 +1146,10 @@
                         `
                             </div>
                             <div>
-                                <div style="font-size: 16px; font-weight: 600; color: #000;">` +
-                        value_136.nickname +
+                                <div class="im-group-member-name-line" style="font-size: 16px; font-weight: 600; color: #000;"><span class="im-group-member-name">` +
+                        escapeGroupHtml(value_136.nickname) +
+                        '</span>' +
+                        (apk110New_322 ? apk110New_76(apk110New_327, apk110New_328) : '') +
                         `</div>
                                 <div style="font-size: 12px; color: #8e8e93;">offline</div>
                             </div>
@@ -971,6 +1159,12 @@
                 });
                 if (listContainer) {
                     listContainer.innerHTML = innerHTML_2;
+                    listContainer
+                        .querySelector('.im-group-owner-title-edit')
+                        ?.addEventListener('click', (apk110New_330) => {
+                            apk110New_330.stopPropagation();
+                            apk110New_79(currentViewingGroup, null, name_133);
+                        });
                     const memberItems = listContainer.querySelectorAll('.group-detail-member-item');
                     memberItems.forEach((item_4) => {
                         item_4.addEventListener('click', () => {
@@ -1119,6 +1313,8 @@
         if (!sheet_3 || !value_153) return;
         const latestGroup_3 = resolveLatestGroup(value_153) || value_153;
         currentViewingGroup = latestGroup_3;
+        sheet_3.dataset.groupId = String(latestGroup_3.id);
+        sheet_3.dataset.memberId = String(memberId_4);
         const targetMember = window.imData.friends.find(
             (value_158) => String(value_158.id) === String(memberId_4),
         );
@@ -1131,6 +1327,108 @@
               (avatarIcon.style.display = 'none'))
             : ((avatarImg.style.display = 'none'), (avatarIcon.style.display = 'block'));
         document.getElementById('gmm-name').textContent = targetMember.nickname || '群成员';
+        const apk110New_358 = document.getElementById('gmm-title-btn'),
+            apk110New_359 = document.getElementById('gmm-current-title'),
+            apk110New_360 = window.imApp.areGroupTitlesEnabled(latestGroup_3);
+        if (apk110New_359)
+            apk110New_359.textContent = apk110New_360
+                ? window.imApp.getGroupMemberTitle(latestGroup_3, memberId_4) || '未设置'
+                : '';
+        if (apk110New_358) {
+            const apk110New_367 = apk110New_358.cloneNode(true);
+            apk110New_358.parentNode.replaceChild(apk110New_367, apk110New_358);
+            apk110New_367.style.display = apk110New_360 ? '' : 'none';
+            const apk110New_368 = () =>
+                apk110New_79(latestGroup_3, memberId_4, targetMember.nickname);
+            apk110New_367.addEventListener('click', apk110New_368);
+            apk110New_367.addEventListener('keydown', (apk110New_369) => {
+                if (apk110New_369.key !== 'Enter' && apk110New_369.key !== ' ') return;
+                apk110New_369.preventDefault();
+                apk110New_368();
+            });
+        }
+        const apk110New_361 = document.getElementById('gmm-admin-toggle');
+        if (apk110New_361) {
+            const apk110New_370 = apk110New_361.cloneNode(true);
+            apk110New_361.parentNode.replaceChild(apk110New_370, apk110New_361);
+            apk110New_370.checked = window.imApp.isGroupAdmin(latestGroup_3, memberId_4);
+            apk110New_370.addEventListener('change', async () => {
+                const apk110New_371 = resolveLatestGroup(latestGroup_3),
+                    apk110New_372 =
+                        !!apk110New_371 && window.imApp.isGroupAdmin(apk110New_371, memberId_4);
+                if (
+                    !apk110New_371 ||
+                    !getCanonicalGroupMemberIds(apk110New_371).includes(String(memberId_4))
+                ) {
+                    apk110New_370.checked = apk110New_372;
+                    return;
+                }
+                const apk110New_373 = apk110New_370.checked;
+                if (apk110New_373 === apk110New_372) return;
+                apk110New_370.disabled = true;
+                const apk110New_374 = await commitCurrentGroupChange(
+                    (apk110New_380) => {
+                        window.imApp.setGroupAdmin(apk110New_380, memberId_4, apk110New_373);
+                    },
+                    {
+                        silent: true,
+                        metaOnly: true,
+                        syncActive: true,
+                    },
+                );
+                apk110New_370.disabled = false;
+                if (!apk110New_374) {
+                    apk110New_370.checked = apk110New_372;
+                    window.showToast?.('设置管理员失败');
+                    return;
+                }
+                const apk110New_375 = resolveLatestGroup(apk110New_371.id) || apk110New_371;
+                apk110New_370.checked = window.imApp.isGroupAdmin(apk110New_375, memberId_4);
+                const apk110New_376 = document.getElementById('gmm-current-title');
+                apk110New_376 &&
+                    window.imApp.areGroupTitlesEnabled(apk110New_375) &&
+                    (apk110New_376.textContent =
+                        window.imApp.getGroupMemberTitle(apk110New_375, memberId_4) || '未设置');
+                const apk110New_377 = window.imApp.getGroupMemberTitle(apk110New_375, memberId_4),
+                    apk110New_378 = !window.imApp.areGroupTitlesEnabled(apk110New_375)
+                        ? '「' +
+                          targetMember.nickname +
+                          '」已' +
+                          (apk110New_373 ? '成为' : '不再是') +
+                          '群管理员'
+                        : apk110New_373
+                          ? '「' +
+                            targetMember.nickname +
+                            '」已成为群管理员，当前头衔为「' +
+                            apk110New_377 +
+                            '」'
+                          : '「' +
+                            targetMember.nickname +
+                            '」已不再是群管理员，' +
+                            (apk110New_377
+                                ? '当前头衔为「' + apk110New_377 + '」'
+                                : '群头衔已清除'),
+                    apk110New_379 = await apk110New_78(
+                        apk110New_375,
+                        apk110New_373 ? 'group_admin_promoted' : 'group_admin_removed',
+                        apk110New_378,
+                        {
+                            actorRole: 'user',
+                            targetMemberId: String(memberId_4),
+                            newTitle: apk110New_377,
+                            titleFreeText:
+                                '「' +
+                                targetMember.nickname +
+                                '」已' +
+                                (apk110New_373 ? '成为' : '不再是') +
+                                '群管理员',
+                            adminEnabled: apk110New_373,
+                        },
+                    );
+                if (apk110New_379)
+                    window.showToast?.(apk110New_373 ? '已设为管理员' : '已取消管理员');
+            });
+        }
         const gmmMemoryToggleElement = document.getElementById('gmm-memory-toggle'),
             memoryLimitInput = document.getElementById('gmm-memory-limit-input'),
             memoryLimitInput_2 = document.getElementById('gmm-cross-group-memory-toggle');
@@ -1259,6 +1557,14 @@
                                         memberStorageKeys.forEach(
                                             (key_4) => delete targetGroup_4.memberProfiles[key_4],
                                         );
+                                    if (targetGroup_4.memberTitles)
+                                        delete targetGroup_4.memberTitles[memberKey];
+                                    Array.isArray(targetGroup_4.adminMemberIds) &&
+                                        (targetGroup_4.adminMemberIds =
+                                            targetGroup_4.adminMemberIds.filter(
+                                                (apk110New_408) =>
+                                                    String(apk110New_408) !== memberKey,
+                                            ));
                                 },
                                 {
                                     silent: true,
@@ -2069,6 +2375,9 @@
                 timeAware_2 = groupTimeAwareToggle
                     ? !!groupTimeAwareToggle.checked
                     : currentViewingGroup.timeAware !== false,
+                apk110New_567 = apk110New_29
+                    ? apk110New_29.checked === true
+                    : window.imApp.areGroupTitlesEnabled(currentViewingGroup),
                 autoExpandTranslation_2 = groupAutoExpandTranslationToggle
                     ? !!groupAutoExpandTranslationToggle.checked
                     : currentViewingGroup.autoExpandTranslation === true,
@@ -2091,6 +2400,7 @@
                     targetGroup_7.memory.context.enabled = enabled_2;
                     targetGroup_7.memory.context.limit = limit_2;
                     targetGroup_7.timeAware = timeAware_2;
+                    targetGroup_7.showGroupTitles = apk110New_567;
                     targetGroup_7.autoExpandTranslation = autoExpandTranslation_2;
                     targetGroup_7.showGroupUserAvatar = showGroupUserAvatar_2;
                     targetGroup_7.allowGroupMemberPrivateChats = allowGroupMemberPrivateChats_2;
@@ -2111,6 +2421,8 @@
             activeContainer &&
                 window.imChat?.syncGroupUserAvatarState &&
                 window.imChat.syncGroupUserAvatarState(latestGroup_4, activeContainer);
+            apk110New_77(latestGroup_4);
+            window.imChat?.renderChatsList?.();
             closeView_2(groupContextSettingsSheet);
             if (window.showToast) window.showToast('设置已保存');
         });

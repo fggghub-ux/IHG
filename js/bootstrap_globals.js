@@ -143,6 +143,7 @@
             'openai',
             'openai-compatible',
             'elevenlabs',
+            'fish-audio',
             'azure',
             'google',
             'aws-polly',

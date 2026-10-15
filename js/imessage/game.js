@@ -189,8 +189,8 @@
                 const speaker = message_3.role === 'user' ? userName : charName,
                     value_73 =
                         message_3.type === 'image'
-                            ? '[图片：' +
-                              (message_3.description || message_3.text || '无描述') +
+                            ? '[Image: ' +
+                              (message_3.description || message_3.text || 'No description') +
                               ']'
                             : cleanText(
                                   message_3.content || message_3.text || message_3.transcript,
@@ -220,27 +220,27 @@
                 .filter(Boolean).join(`
 `),
             sections = [
-                '角色姓名：' + (friend_4?.nickname || friend_4?.realName || 'Char'),
-                '真实姓名：' + (friend_4?.realName || '未填写'),
-                '角色默认语言：' + (friend_4?.language || 'zh'),
-                `核心人设：
-` + (friend_4?.persona || '未填写'),
-                `与 User 的关系：
-` + (friend_4?.relationship || '未填写'),
-                `记忆概要：
-` + (memory_2.overview || '无'),
-                `长期记忆：
-` + (memory_2.longTerm || formatMemoryList(memory_2.longTermEntries) || '无'),
-                `短期记忆：
-` + (formatMemoryList(memory_2.shortTermEntries) || '无'),
-                `珍视记忆：
-` + (memory_2.cherished || formatMemoryList(memory_2.cherishedEntries) || '无'),
-                `关系网络：
-` + (relationships_2 || '无'),
-                `最近聊天（仅用于保持当前性格与剧情连续性）：
-` + (value_74.recentChat || '无'),
+                'Character name: ' + (friend_4?.nickname || friend_4?.realName || 'Char'),
+                'Real name: ' + (friend_4?.realName || 'Not provided'),
+                "Character's default language: " + (friend_4?.language || 'zh'),
+                `Core persona:
+` + (friend_4?.persona || 'Not provided'),
+                `Relationship with User:
+` + (friend_4?.relationship || 'Not provided'),
+                `Memory overview:
+` + (memory_2.overview || 'None'),
+                `Long-term memory:
+` + (memory_2.longTerm || formatMemoryList(memory_2.longTermEntries) || 'None'),
+                `Short-term memory:
+` + (formatMemoryList(memory_2.shortTermEntries) || 'None'),
+                `Cherished memories:
+` + (memory_2.cherished || formatMemoryList(memory_2.cherishedEntries) || 'None'),
+                `Relationship network:
+` + (relationships_2 || 'None'),
+                `Recent chat (only to maintain the current personality and story continuity):
+` + (value_74.recentChat || 'None'),
                 value_74.worldBookContext
-                    ? `当前生效的世界书：
+                    ? `Currently active world-book entries:
 ` + value_74.worldBookContext
                     : '',
             ].filter(Boolean);
@@ -591,36 +591,36 @@
                 value_119 = prepared.friend.language || 'zh',
                 value_120 =
                     mode_2 === 'manual'
-                        ? '匿名访客提交的问题是：' +
+                        ? 'An anonymous visitor submitted this question: ' +
                           question_4 +
                           `
-只回答这个问题。返回一个 JSON 对象。question 字段原样写入该问题。`
-                        : '生成恰好 ' +
+Answer only this question. Return one JSON object. Copy the question verbatim into the question field.`
+                        : 'Generate exactly ' +
                           expectedCount_3 +
-                          ' 条来自不同匿名访客的问题，并由 ' +
+                          ' distinct questions from different anonymous visitors, each answered by ' +
                           charName_2 +
-                          ' 分别回答。问题使用自然简体中文，避免重复。返回恰好 ' +
+                          '. Write the questions in natural Simplified Chinese and avoid repetition. Return a JSON array containing exactly ' +
                           expectedCount_3 +
-                          ' 个对象组成的 JSON 数组。',
+                          ' objects.',
                 value_121 =
-                    '你正在为匿名问答游戏扮演 ' +
+                    'You are roleplaying ' +
                     charName_2 +
-                    `。
+                    ` for an anonymous Q&A game.
 
 ` +
                     prepared.context +
                     `
 
-规则：
-1. 提问者是身份未知的匿名访客，绝对不能认定、暗示或猜测提问者就是 User。
-2. 匿名问答不是聊天中已经发生的事件，不要把它写成对最近聊天的直接续句。最近聊天只用于保持性格、关系阶段和口吻一致。
-3. 回答必须符合角色人设，使用角色默认语言 ` +
+Rules:
+1. The questioner is an unidentified anonymous visitor. Never identify, imply, or guess that the questioner is User.
+2. An anonymous Q&A is not an event that has already happened in the chat. Do not write it as a direct continuation of the most recent chat message. Use recent chat only to keep the personality, relationship stage, and voice consistent.
+3. Answers must fit the character's persona and use the character's default language: ` +
                     value_119 +
-                    `。
-4. question 必须使用简体中文。
-5. answerTranslationZh：answer 非中文时填写自然准确的简体中文翻译；answer 为中文时必须为空字符串。
-6. 只返回合法 JSON，不要 Markdown、代码围栏或解释。
-7. 每个对象格式严格为 {"question":"问题","answer":"角色回答原文","answerTranslationZh":"中文翻译或空字符串"}。`,
+                    `.
+4. The question field must be in Simplified Chinese.
+5. For answerTranslationZh, provide a natural and accurate Simplified Chinese translation when answer is not in Chinese; use an empty string when answer is in Chinese.
+6. Return valid JSON only, with no Markdown, code fence, or explanation.
+7. Each object must have exactly this shape: {"question":"question in Simplified Chinese","answer":"character's original answer","answerTranslationZh":"Simplified Chinese translation or empty string"}.`,
                 controller = new AbortController(),
                 timeout = setTimeout(() => controller.abort(), 90000);
             try {

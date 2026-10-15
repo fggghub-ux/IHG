@@ -4,6 +4,7 @@
             'openai',
             'openai-compatible',
             'elevenlabs',
+            'fish-audio',
             'azure',
             'google',
             'aws-polly',
@@ -55,6 +56,13 @@
                 label: 'ElevenLabs',
                 endpoint: 'https://api.elevenlabs.io/v1',
                 keyLabel: 'ElevenLabs API Key',
+                modelLabel: 'TTS 模型',
+                fields: [],
+            },
+            'fish-audio': {
+                label: 'Fish Audio',
+                endpoint: 'https://api.fish.audio',
+                keyLabel: 'Fish Audio API Key',
                 modelLabel: 'TTS 模型',
                 fields: [],
             },
@@ -377,6 +385,7 @@
                     'openai',
                     'openai-compatible',
                     'elevenlabs',
+                    'fish-audio',
                     'dashscope',
                     'volcengine',
                 ].includes(provider_6) &&
@@ -558,6 +567,36 @@
         const groupId_2 = cleanString(config_6.groupId);
         if (groupId_2) parsed_4.searchParams.set('GroupId', groupId_2);
         return parsed_4.toString();
+    }
+    function apk110New_37(apk110New_178) {
+        const apk110New_179 = handleAction_13(apk110New_178),
+            apk110New_180 = String(apk110New_179.pathname || '/').replace(/\/+$/, '');
+        if (/\/v1\/tts$/i.test(apk110New_180)) apk110New_179.pathname = apk110New_180;
+        else {
+            if (/\/v1$/i.test(apk110New_180)) apk110New_179.pathname = apk110New_180 + '/tts';
+            else apk110New_179.pathname = (apk110New_180 + '/v1/tts').replace(/\/+/g, '/');
+        }
+        return ((apk110New_179.hash = ''), apk110New_179.toString());
+    }
+    function apk110New_38(apk110New_181) {
+        const apk110New_182 = apk110New_37(apk110New_181),
+            apk110New_183 = new URL(apk110New_182),
+            apk110New_184 = String(window.location?.hostname || '').toLowerCase();
+        if (
+            apk110New_183.protocol === 'https:' &&
+            apk110New_183.hostname.toLowerCase() === 'api.fish.audio' &&
+            apk110New_183.pathname === '/v1/tts' &&
+            !apk110New_183.search &&
+            /\.pages\.dev$/.test(apk110New_184)
+        )
+            return {
+                url: '/api/fish-audio/tts',
+                throughRelay: true,
+            };
+        return {
+            url: apk110New_182,
+            throughRelay: false,
+        };
     }
     function resolveAzureEndpoint(config_7, value_120) {
         const region_3 = cleanString(config_7.region),
@@ -840,6 +879,40 @@
             'ElevenLabs TTS',
         );
         return responseToAudioUrl(response_4);
+    }
+    async function apk110New_54(apk110New_257, apk110New_258, apk110New_259) {
+        const apk110New_260 = apk110New_38(apk110New_257.endpoint);
+        let apk110New_261;
+        try {
+            apk110New_261 = await fetchWithTimeout(
+                apk110New_260.url,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + apk110New_257.apiKey,
+                        model: required(apk110New_257, 'model', 'TTS 模型'),
+                        ...getSilentHeaders(),
+                    },
+                    body: JSON.stringify({
+                        text: apk110New_258,
+                        reference_id: getVoiceId(apk110New_257, apk110New_259),
+                        prosody: {
+                            speed: apk110New_259.speed,
+                        },
+                        format: 'mp3',
+                    }),
+                },
+                'Fish Audio TTS',
+            );
+        } catch (apk110New_262) {
+            if (apk110New_260.throughRelay && apk110New_262?.status === 404)
+                throw new Error('当前网站未部署 Fish Audio 转发接口，请更新 Cloudflare Pages 部署');
+            throw apk110New_262;
+        }
+        if (apk110New_260.throughRelay && apk110New_261.headers.get('x-u2-fish-relay') !== '1')
+            throw new Error('当前网站未部署 Fish Audio 转发接口，请更新 Cloudflare Pages 部署');
+        return responseToAudioUrl(apk110New_261, 'Fish Audio TTS');
     }
     async function synthesizeAzure(config_12, value_183, voiceSettings_5) {
         const voiceId_185 = getVoiceId(config_12, voiceSettings_5),
@@ -1294,6 +1367,8 @@ GET ` +
             return synthesizeOpenAi(config_20, text_9, voiceSettings_11);
         if (config_20.provider === 'elevenlabs')
             return synthesizeElevenLabs(config_20, text_9, voiceSettings_11);
+        if (config_20.provider === 'fish-audio')
+            return apk110New_54(config_20, text_9, voiceSettings_11);
         if (config_20.provider === 'azure')
             return synthesizeAzure(config_20, text_9, voiceSettings_11);
         if (config_20.provider === 'google')
@@ -1553,16 +1628,26 @@ GET ` +
                         if (config_29.provider === 'aws-polly')
                             models_2 = await handleAction_39(config_29);
                         else {
-                            if (['minimax', 'volcengine', 'dashscope'].includes(config_29.provider))
+                            if (config_29.provider === 'fish-audio')
                                 throw new Error(
-                                    getProviderName_2(config_29.provider) +
-                                        ' 暂不支持可靠的 TTS 模型拉取，请手动填写 TTS 模型或音色 ID',
+                                    'Fish Audio 的 TTS 合成模型请手动填写；联系人音色 ID 请在 Chat Settings Info 中填写',
                                 );
-                            else
-                                throw new Error(
-                                    getProviderName_2(config_29.provider) +
-                                        ' 未提供可在浏览器中拉取的模型列表；请手动填写模型或音色 ID',
-                                );
+                            else {
+                                if (
+                                    ['minimax', 'volcengine', 'dashscope'].includes(
+                                        config_29.provider,
+                                    )
+                                )
+                                    throw new Error(
+                                        getProviderName_2(config_29.provider) +
+                                            ' 暂不支持可靠的 TTS 模型拉取，请手动填写 TTS 模型或音色 ID',
+                                    );
+                                else
+                                    throw new Error(
+                                        getProviderName_2(config_29.provider) +
+                                            ' 未提供可在浏览器中拉取的模型列表；请手动填写模型或音色 ID',
+                                    );
+                            }
                         }
                     }
                 }

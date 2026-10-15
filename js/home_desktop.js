@@ -604,7 +604,8 @@
             profileUsername: 'kendall',
             profileBio: '',
             postAuthor: 'you',
-            postBody: 'If you still exist in this world, then no matter what this world is like, it is meaningful to me.'
+            postBody:
+                'If you still exist in this world, then no matter what this world is like, it is meaningful to me.',
         };
     let appEl,
         pagesContainer,
@@ -621,6 +622,7 @@
         lastWidgetSheetOpenedAt = 0,
         desktopStateNeedsSave = false,
         value_18 = null,
+        apk110New_36 = false,
         value_19 = null,
         enabled = false,
         text_20 = 'all';
@@ -648,11 +650,14 @@
                   ['catch']((error_2) => {
                       return (
                           console.warn('[home_desktop] Global data recovery failed.', error_2),
+                          (apk110New_36 = true),
                           markAppShellReady_2(),
                           false
                       );
                   }))
-            : ((window.desktopDataReadyPromise = Promise.resolve(true)), markAppShellReady_2());
+            : ((apk110New_36 = true),
+              (window.desktopDataReadyPromise = Promise.resolve(true)),
+              markAppShellReady_2());
         window.openHomeWidgetEditor = openHomeWidgetEditor_3;
         window.openHomeWidgetPanelFromSettings = openHomeWidgetPanelFromSettings_3;
         window.updateHomeWidgetConfigFromPanel = updateHomeWidgetConfigFromPanel_3;
@@ -677,9 +682,9 @@
             ? (desktopState = handleAction_28(desktopState_146, value_18))
             : (desktopState = handleAction_28(desktopState_146, value_18 || handleAction_26()));
         const value_147 = desktopStateNeedsSave;
+        apk110New_36 = true;
         renderHomeDesktop_2();
         value_147 &&
-            Object.keys(desktopState.widgets || {}).length > 0 &&
             handleAction_27({
                 silent: true,
             });
@@ -807,12 +812,7 @@
         return null;
     }
     function handleAction_27(value_163 = {}) {
-        if (
-            !desktopState ||
-            !desktopState.widgets ||
-            Object.keys(desktopState.widgets).length === 0
-        )
-            return null;
+        if (!apk110New_36 || !desktopState || !desktopState.widgets) return null;
         try {
             if (typeof window.setAppState === 'function')
                 window.setAppState('desktop', desktopState);
@@ -915,17 +915,16 @@
                 .filter((value_186) => value_186.kind === 'widget')
                 .map((value_187) => value_187.id),
         );
-        (value_170 || Object.keys(widgets_3).length > 0) &&
-            items_178.forEach((value_188) => {
-                if (widgets_3[value_188]) return;
-                const handleAction_117_189 = handleAction_117(value_188);
-                widgets_3[value_188] = findPermanentWidgetPageIndex_2(
-                    value_188,
-                    fallback.widgets[value_188] ||
-                        createDefaultWidgetConfig(handleAction_117_189?.type || 'photo'),
-                );
-                desktopStateNeedsSave = true;
-            });
+        items_178.forEach((value_188) => {
+            if (widgets_3[value_188]) return;
+            const handleAction_117_189 = handleAction_117(value_188);
+            widgets_3[value_188] = findPermanentWidgetPageIndex_2(
+                value_188,
+                fallback.widgets[value_188] ||
+                    createDefaultWidgetConfig(handleAction_117_189?.type || 'photo'),
+            );
+            desktopStateNeedsSave = true;
+        });
         Object.keys(widgets_3).forEach((value_190) => {
             if (!items_178.has(value_190)) delete widgets_3[value_190];
         });
@@ -2351,10 +2350,7 @@
         }
     }
     function resetHomeDesktop_2(value_507 = {}) {
-        if (
-            value_507.confirm &&
-            !window.confirm('Resetting will clear everything. Continue?')
-        )
+        if (value_507.confirm && !window.confirm('Resetting will clear everything. Continue?'))
             return false;
         return (
             handleAction_62(),
@@ -3871,22 +3867,41 @@
         };
     }
     function getDefaultWidgetImages(type) {
-    if (type === 'profile') return { avatar: DEFAULT_WIDGET_IMAGE_ASSET };
-    if (type === 'pet') return { pet: DEFAULT_PET_IMAGE_SRC };
-    if (type === 'music') return { cover: DEFAULT_MUSIC_COVER_IMAGE_SRC };
-    if (type === 'couple') return { left: DEFAULT_COUPLE_LEFT_IMAGE_SRC, right: DEFAULT_COUPLE_RIGHT_IMAGE_SRC };
-    if (type === 'photo') {
-        return {
-            photo: DEFAULT_PHOTO_IMAGE_SRCS[0],
-            photo2: DEFAULT_PHOTO_IMAGE_SRCS[1],
-            photo3: DEFAULT_PHOTO_IMAGE_SRCS[2]
-        };
+        if (type === 'profile')
+            return {
+                avatar: DEFAULT_WIDGET_IMAGE_ASSET,
+            };
+        if (type === 'pet')
+            return {
+                pet: DEFAULT_PET_IMAGE_SRC,
+            };
+        if (type === 'music')
+            return {
+                cover: DEFAULT_MUSIC_COVER_IMAGE_SRC,
+            };
+        if (type === 'couple')
+            return {
+                left: DEFAULT_COUPLE_LEFT_IMAGE_SRC,
+                right: DEFAULT_COUPLE_RIGHT_IMAGE_SRC,
+            };
+        if (type === 'photo') {
+            return {
+                photo: DEFAULT_PHOTO_IMAGE_SRCS[0],
+                photo2: DEFAULT_PHOTO_IMAGE_SRCS[1],
+                photo3: DEFAULT_PHOTO_IMAGE_SRCS[2],
+            };
+        }
+        if (type === 'notification')
+            return {
+                avatar: DEFAULT_NOTIFICATION_AVATAR_SRC,
+            };
+        if (type === 'socialPost')
+            return {
+                avatar: DEFAULT_SOCIAL_POST_AVATAR_SRC,
+                postImage: DEFAULT_SOCIAL_POST_IMAGE_SRC,
+            };
+        return {};
     }
-    if (type === 'notification') return { avatar: DEFAULT_NOTIFICATION_AVATAR_SRC };
-    if (type === 'socialPost') return { avatar: DEFAULT_SOCIAL_POST_AVATAR_SRC, postImage: DEFAULT_SOCIAL_POST_IMAGE_SRC };
-    return {};
-}
-
     function mergeWidgetImagesWithDefaults(type_9, images_3 = {}) {
         const merged = {
             ...(images_3 || {}),
@@ -4107,7 +4122,7 @@
         if (type_11 === 'html') {
             wrapper.className = 'html-widget';
             wrapper.innerHTML = `
-                <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                <button type="button" class="delete-widget-btn" aria-label="删除小组件"><i class="fas fa-times" aria-hidden="true"></i></button>
                 <iframe class="html-widget-frame" sandbox="allow-scripts" referrerpolicy="no-referrer" title="HTML widget"></iframe>
                 <div class="html-widget-drag-shield" aria-hidden="true"></div>
             `;
@@ -4115,7 +4130,7 @@
             if (type_11 === 'profile') {
                 wrapper.className = 'ins-profile-widget';
                 wrapper.innerHTML = `
-                <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                <button type="button" class="delete-widget-btn" aria-label="删除小组件"><i class="fas fa-times" aria-hidden="true"></i></button>
                 <div class="custom-widget-top">
                     <div class="custom-widget-avatar-wrapper"><img src="" style="display:none;"><i class="fas fa-user"></i></div>
                     <div class="custom-widget-stats">
@@ -4135,7 +4150,7 @@
                 if (type_11 === 'pet') {
                     wrapper.className = 'pet-widget';
                     wrapper.innerHTML = `
-                <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                <button type="button" class="delete-widget-btn" aria-label="删除小组件"><i class="fas fa-times" aria-hidden="true"></i></button>
                 <div class="pet-widget-img-wrapper"><img src=""><i class="fas fa-image" style="font-size:30px;color:#ccc;"></i></div>
                 <div class="pet-widget-bubble">irrelevant</div>
                 <div class="pet-widget-music-icon"><i class="fas fa-music"></i></div>
@@ -4145,7 +4160,7 @@
                     if (type_11 === 'music') {
                         wrapper.className = 'custom-music-widget';
                         wrapper.innerHTML = `
-                <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                <button type="button" class="delete-widget-btn" aria-label="删除小组件"><i class="fas fa-times" aria-hidden="true"></i></button>
                 <div style="display: flex; align-items: center; width: 100%; height: 100%;">
                     <div style="position: relative; width: 140px; height: 140px; margin-left: 10px; display: flex; justify-content: center; align-items: center; flex-shrink: 0;">
                         <div style="width: 110px; height: 110px; border-radius: 50%; background: #111; position: absolute; display: flex; justify-content: center; align-items: center; animation: spin 4s linear infinite;">
@@ -4184,7 +4199,7 @@
                         if (type_11 === 'couple') {
                             wrapper.className = 'couple-widget';
                             wrapper.innerHTML = `
-                <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                <button type="button" class="delete-widget-btn" aria-label="删除小组件"><i class="fas fa-times" aria-hidden="true"></i></button>
                 <div class="couple-avatar-container"><div class="couple-bubble"></div><div class="couple-img-wrapper"><img src=""><i class="fas fa-image"></i></div></div>
                 <div class="couple-avatar-container"><div class="couple-bubble"></div><div class="couple-img-wrapper"><img src=""><i class="fas fa-image"></i></div></div>
             `;
@@ -4192,7 +4207,7 @@
                             if (type_11 === 'photo') {
                                 wrapper.className = 'photo-widget';
                                 wrapper.innerHTML = `
-                <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                <button type="button" class="delete-widget-btn" aria-label="删除小组件"><i class="fas fa-times" aria-hidden="true"></i></button>
                 <div style="display: flex; width: 100%; height: 100%; gap: 8px; padding: 12px; box-sizing: border-box;">
                     <div class="photo-widget-image" style="position: relative; flex: 1; border-radius: 14px; overflow: hidden; background: rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer;">
                         <img src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
@@ -4212,7 +4227,7 @@
                                 if (type_11 === 'notification') {
                                     wrapper.className = 'notification-widget';
                                     wrapper.innerHTML = `
-                <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                <button type="button" class="delete-widget-btn" aria-label="删除小组件"><i class="fas fa-times" aria-hidden="true"></i></button>
                 <div class="notification-widget-img-wrapper">
                     <img src="" style="display: none;">
                     <i class="fas fa-user"></i>
@@ -4226,7 +4241,7 @@
                                     type_11 === 'socialPost' &&
                                         ((wrapper.className = 'social-post-widget'),
                                         (wrapper.innerHTML = `
-                <div class="delete-widget-btn"><i class="fas fa-times"></i></div>
+                <button type="button" class="delete-widget-btn" aria-label="删除小组件"><i class="fas fa-times" aria-hidden="true"></i></button>
                 <div class="social-post-header">
                     <div class="social-post-avatar"><img src="" alt=""></div>
                     <div class="social-post-identity">
@@ -4492,24 +4507,24 @@
         }
         if (icon) icon.style.display = value ? 'none' : 'flex';
     }
-
     function isAllowedWidgetImageSrc(src) {
         if (typeof src !== 'string') return false;
         const value = src.trim();
-        return value.startsWith('data:')
-            || value.startsWith('blob:')
-            || /^https?:\/\//i.test(value)
-            || DEFAULT_PHOTO_IMAGE_SRCS.includes(value)
-            || value === DEFAULT_WIDGET_IMAGE_ASSET
-            || value === DEFAULT_PET_IMAGE_SRC
-            || value === DEFAULT_NOTIFICATION_AVATAR_SRC
-            || value === DEFAULT_MUSIC_COVER_IMAGE_SRC
-            || value === DEFAULT_COUPLE_LEFT_IMAGE_SRC
-            || value === DEFAULT_COUPLE_RIGHT_IMAGE_SRC
-            || value === DEFAULT_SOCIAL_POST_AVATAR_SRC
-            || value === DEFAULT_SOCIAL_POST_IMAGE_SRC;
+        return (
+            value.startsWith('data:') ||
+            value.startsWith('blob:') ||
+            /^https?:\/\//i.test(value) ||
+            DEFAULT_PHOTO_IMAGE_SRCS.includes(value) ||
+            value === DEFAULT_WIDGET_IMAGE_ASSET ||
+            value === DEFAULT_PET_IMAGE_SRC ||
+            value === DEFAULT_NOTIFICATION_AVATAR_SRC ||
+            value === DEFAULT_MUSIC_COVER_IMAGE_SRC ||
+            value === DEFAULT_COUPLE_LEFT_IMAGE_SRC ||
+            value === DEFAULT_COUPLE_RIGHT_IMAGE_SRC ||
+            value === DEFAULT_SOCIAL_POST_AVATAR_SRC ||
+            value === DEFAULT_SOCIAL_POST_IMAGE_SRC
+        );
     }
-
     function getPrimaryWidgetText(config_12) {
         const text_2_2 = config_12.text || {};
         if (config_12.type === 'profile')

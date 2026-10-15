@@ -59,6 +59,12 @@ window.imApp.getGroupUserIdentity = function (group_2, options_2 = {}) {
                 ? group_2.memory?.userOverride
                 : null,
         source_2 = override || currentAccount || user_2 || {},
+        apk110New_19 =
+            override?.id != null
+                ? accounts.find(
+                      (apk110New_22) => String(apk110New_22?.id) === String(override.id),
+                  ) || null
+                : currentAccount,
         name_2 =
             String(
                 source_2.name ||
@@ -72,15 +78,36 @@ window.imApp.getGroupUserIdentity = function (group_2, options_2 = {}) {
         accountId: String(source_2.id || currentAccount?.id || user_2.id || ''),
         name: name_2,
         avatarUrl: String(
-            source_2.avatarUrl ||
-                source_2.avatar ||
-                user_2.avatarUrl ||
-                user_2.avatar ||
-                'assets/moren-thumb.jpg',
+            apk110New_19
+                ? apk110New_19.avatarUrl || apk110New_19.avatar || 'assets/moren-thumb.jpg'
+                : source_2.avatarUrl ||
+                      source_2.avatar ||
+                      user_2.avatarUrl ||
+                      user_2.avatar ||
+                      'assets/moren-thumb.jpg',
         ),
         persona: String(source_2.persona || source_2.signature || user_2.persona || ''),
         signature: String(source_2.signature || source_2.persona || user_2.signature || ''),
     };
+};
+window.imApp.getGroupUserAvatarUrl = function (apk110New_23, apk110New_24 = null) {
+    const apk110New_25 = apk110New_24?.role === 'user' ? apk110New_24.userIdentity : null;
+    if (apk110New_25 && typeof apk110New_25 === 'object') {
+        const apk110New_26 = String(apk110New_25.accountId || '');
+        if (apk110New_26) {
+            const apk110New_27 =
+                    typeof window.getAccounts === 'function' ? window.getAccounts() : [],
+                apk110New_28 = apk110New_27.find(
+                    (apk110New_29) => String(apk110New_29?.id) === apk110New_26,
+                );
+            if (apk110New_28)
+                return String(
+                    apk110New_28.avatarUrl || apk110New_28.avatar || 'assets/moren-thumb.jpg',
+                );
+            return String(apk110New_25.avatarUrl || 'assets/moren-thumb.jpg');
+        }
+    }
+    return window.imApp.getGroupUserIdentity(apk110New_23).avatarUrl;
 };
 window.imApp.captureGroupUserIdentity = function (group_3, message_2) {
     if (!group_3 || group_3.type !== 'group' || !message_2 || message_2.role !== 'user')
@@ -258,7 +285,7 @@ window.imApp.commitCharUserRemark = async function (memberId_2, value_30, value_
     );
 };
 window.imApp.DEFAULT_STATUS_PROMPT =
-    '固定使用简体中文，写角色此刻没有说出口的三句真实心声。每句约10个汉字，每行一句，共三行；不要添加序号、引号、标题、前缀或解释。';
+    'Write exactly three genuine, unspoken thoughts the character has right now in Simplified Chinese. Each line should contain about 10 Chinese characters. Use exactly three lines, one thought per line, with no numbering, quotation marks, title, prefix, or explanation.';
 window.imApp.DEFAULT_STATUS_TEMPLATE_REGEX = '(?<thought>[\\s\\S]+)';
 window.imApp.DEFAULT_STATUS_TEMPLATE_HTML = `<div class="chat-profile-status-page" data-selected-index="{{index}}">
     <div class="chat-profile-status-time">{{time}}</div>
@@ -1837,7 +1864,6 @@ window.imApp.createMemoryRequestMessage = function (value_358, message_359 = {})
             160,
         );
     if (!value_361_364) return null;
-    const normalizeMemoryTriggerKeywords_365 = window.imChat?.normalizeMemoryTriggerKeywords;
     return {
         id: value_361_364,
         memoryRequestId: value_361_364,
@@ -1855,15 +1881,6 @@ window.imApp.createMemoryRequestMessage = function (value_358, message_359 = {})
             reason: value_361(entry_2.reason, 1200),
             createdAt: value_361(entry_2.createdAt || message_359.createdAt, 120),
             sourceThought: value_361(entry_2.sourceThought, 1800),
-            triggerKeywords:
-                typeof normalizeMemoryTriggerKeywords_365 === 'function'
-                    ? normalizeMemoryTriggerKeywords_365(entry_2.triggerKeywords || [])
-                    : Array.isArray(entry_2.triggerKeywords)
-                      ? entry_2.triggerKeywords
-                            .map((value_368) => value_361(value_368, 32))
-                            .filter(Boolean)
-                            .slice(0, 6)
-                      : [],
         },
     };
 };
@@ -2199,9 +2216,6 @@ window.imApp.normalizeFriendData = function (friend_8) {
         lastPrompt: slice_49,
         activePresetId: activePresetId_2,
         autoGenerate: imagePromptConfig_2.autoGenerate === true,
-        autoUseReferenceFace:
-            imagePromptConfig_2.autoUseReferenceFace === true &&
-            !!(normalized_2.imageFaceReferenceUrl || normalized_2.imageFaceReferenceAssetId),
         presets: presets_4,
     };
     normalized_2.messages = Array.isArray(normalized_2.messages) ? normalized_2.messages : [];
@@ -2254,6 +2268,9 @@ window.imApp.normalizeFriendData = function (friend_8) {
     normalized_2.isPinned = !!normalized_2.isPinned;
     normalized_2.unreadCount = Math.max(0, Number(normalized_2.unreadCount) || 0);
     normalized_2.showTimestamp = !!normalized_2.showTimestamp;
+    normalized_2.showEveryMessageAvatar = normalized_2.showEveryMessageAvatar === true;
+    normalized_2.continuousBubbles = normalized_2.continuousBubbles !== false;
+    normalized_2.replyStyle = normalized_2.replyStyle === 'outside' ? 'outside' : 'inside';
     normalized_2.timeAware = normalized_2.timeAware !== false;
     normalized_2.locationProfile = window.imDataUtils?.normalizeLocationProfile
         ? window.imDataUtils.normalizeLocationProfile(normalized_2.locationProfile)
@@ -2528,6 +2545,9 @@ window.imApp.normalizeFriendData = function (friend_8) {
     normalized_2.momentsCover = normalized_2.momentsCover || null;
     normalized_2.momentsCoverAssetId = normalized_2.momentsCoverAssetId || null;
     normalized_2.members = Array.isArray(normalized_2.members) ? normalized_2.members : [];
+    isGroupChat_2 &&
+        window.imApp.normalizeGroupTitleData &&
+        window.imApp.normalizeGroupTitleData(normalized_2);
     normalized_2.leftGroupAt = isGroupChat_2 ? Number(normalized_2.leftGroupAt) || 0 : 0;
     normalized_2.groupObserverMode =
         isGroupChat_2 && normalized_2.groupObserverMode === true && normalized_2.leftGroupAt > 0;
@@ -2597,7 +2617,6 @@ window.imApp.normalizeFriendData = function (friend_8) {
         normalizeRecallPresentationEntries = (entries_2) =>
             (Array.isArray(entries_2) ? entries_2 : [])
                 .filter((entry_4) => entry_4 && typeof entry_4 === 'object')
-                .slice(0, 100)
                 .map((entry_5) => ({
                     ...entry_5,
                 })),
@@ -2961,17 +2980,9 @@ window.imApp.commitShortTermMemoryPromotion = async function (value_512, draft_2
         );
     if (!friend_10 || selectedIds_2.length === 0 || !draft_2 || typeof draft_2 !== 'object')
         return false;
-    const normalizeTags = (value_19_2) =>
-            window.imChat?.normalizeMemoryTriggerKeywords
-                ? window.imChat.normalizeMemoryTriggerKeywords(value_19_2)
-                : (Array.isArray(value_19_2) ? value_19_2 : [value_19_2])
-                      .map((item_15) => String(item_15 || '').trim())
-                      .filter(Boolean)
-                      .slice(0, 6),
-        title_2 = String(draft_2.title || '').trim() || '长期记忆',
+    const title_2 = String(draft_2.title || '').trim() || '长期记忆',
         content_2 = String(draft_2.content || '').trim(),
-        time_2 = String(draft_2.time || '').trim(),
-        triggerKeywords_2 = normalizeTags(draft_2.triggerKeywords || draft_2.memoryTags || []);
+        time_2 = String(draft_2.time || '').trim();
     if (!content_2) return false;
     const id_5 = 'promoted-ltm-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
         value_522 = await window.imApp.commitScopedFriendChange(
@@ -2994,7 +3005,6 @@ window.imApp.commitShortTermMemoryPromotion = async function (value_512, draft_2
                     content: content_2,
                     time: time_2 || new Date().toISOString(),
                     createdAt: time_2 || new Date().toISOString(),
-                    triggerKeywords: triggerKeywords_2,
                     sourceType: 'manual',
                     sourceId: id_5,
                     promotedFromShortTermIds: selectedIds_2,
@@ -3211,12 +3221,27 @@ interpretation_rules:
 </SCENE_NARRATION>`
     );
 };
-window.imApp.formatSystemNoticeForApiContext = function (value_573) {
+window.imApp.formatSystemNoticeForApiContext = function (value_573, apk110New_639) {
     const message_574 = value_573 || {},
         noticeKind_2 = message_574.noticeKind || '',
-        value_576 = message_574.content || message_574.text || '';
+        value_576 = window.imApp.getGroupManagementNoticeText
+            ? window.imApp.getGroupManagementNoticeText(apk110New_639, message_574)
+            : message_574.content || message_574.text || '';
     if (noticeKind_2 === 'group_left') return '[系统事件：User 已退出群聊。]';
     if (noticeKind_2 === 'group_rejoined') return '[系统事件：User 重新进入群聊。]';
+    if (
+        ['group_admin_promoted', 'group_admin_removed', 'group_title_changed'].includes(
+            noticeKind_2,
+        )
+    ) {
+        if (!value_576) return '';
+        const apk110New_643 = String(message_574.targetMemberId || '').trim(),
+            apk110New_644 =
+                apk110New_643 && apk110New_643 !== '__user__'
+                    ? '；目标成员 ID：' + apk110New_643
+                    : '';
+        return '[群内公开事件：' + value_576 + apk110New_644 + ']';
+    }
     if (noticeKind_2 === 'narration')
         return window.imApp.formatSceneNarrationForApiContext(value_576, {
             source: message_574.narrationSource,
@@ -3262,8 +3287,12 @@ window.imApp.formatFakeLinkMessageForApiContext = function (value_90, options_5 
                 normalizedMessage_2.content ||
                 '',
         ).trim(),
-        platformLabel = String(fakeLinkData_2.siteName || fakeLinkData_2.domain || '假网页').trim(),
-        title_3 = String(fakeLinkData_2.title || displayUrl_2 || '未命名假网页').trim(),
+        platformLabel = String(
+            fakeLinkData_2.siteName || fakeLinkData_2.domain || 'Simulated webpage',
+        ).trim(),
+        title_3 = String(
+            fakeLinkData_2.title || displayUrl_2 || 'Untitled simulated webpage',
+        ).trim(),
         description_2 = String(fakeLinkData_2.summary || '').trim(),
         webPage_2 =
             fakeLinkData_2.webPage && typeof fakeLinkData_2.webPage === 'object'
@@ -3283,33 +3312,37 @@ window.imApp.formatFakeLinkMessageForApiContext = function (value_90, options_5 
         expandContent = options_5.expandLinkContent !== false,
         maxBodyChars = Math.max(1000, Number(options_5.maxLinkBodyChars) || 20000),
         fakeLines = [
-            '[User 分享了一个站内假网页]',
-            '站点：' + platformLabel,
-            '标题：' + title_3,
-            '显示地址：' + displayUrl_2,
+            '[User shared an in-app simulated webpage]',
+            'Site: ' + platformLabel,
+            'Title: ' + title_3,
+            'Displayed URL: ' + displayUrl_2,
         ];
-    if (description_2) fakeLines.push('摘要：' + description_2);
+    if (description_2) fakeLines.push('Summary: ' + description_2);
     if (!bodyText_2)
         return (
-            fakeLines.push('正文状态：用户未填写正文，只能参考标题、域名和摘要。'),
+            fakeLines.push(
+                'Body status: User provided no body text; use only title, domain, and summary.',
+            ),
             fakeLines.join(`
 `)
         );
     if (!expandContent)
         return (
-            fakeLines.push('页面摘要：' + (description_2 || bodyText_2.slice(0, 500))),
-            fakeLines.push('正文状态：这是较早的假网页记录，本轮只保留摘要。'),
+            fakeLines.push('Page summary: ' + (description_2 || bodyText_2.slice(0, 500))),
+            fakeLines.push(
+                'Body status: this is an older simulated-page record; only its summary is retained this turn.',
+            ),
             fakeLines.join(`
 `)
         );
     const fakeInjectedBody = bodyText_2.slice(0, maxBodyChars);
     return (
         fakeLines.push(
-            `页面正文：
+            `Page body:
 ` + fakeInjectedBody,
         ),
         bodyText_2.length > fakeInjectedBody.length &&
-            fakeLines.push('正文状态：内容过长，已截断。'),
+            fakeLines.push('Body status: long content was truncated.'),
         fakeLines.join(`
 `)
     );
@@ -3412,7 +3445,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
     if (normalizedMessage_3.type === 'system_notice')
         return {
             role: 'system',
-            content: window.imApp.formatSystemNoticeForApiContext(normalizedMessage_3),
+            content: window.imApp.formatSystemNoticeForApiContext(normalizedMessage_3, value_113),
         };
     if (normalizedMessage_3.type === 'chat_record_forward')
         value_601 = window.imApp.formatChatRecordForwardForApiContext
@@ -4686,15 +4719,19 @@ window.imApp.ensureFriendMessagesLoaded = async function (friendOrId_5, options_
         }
         if (targetFriend_7.messages.length > 0) {
             const visibleMessages = targetFriend_7.messages.filter((message_15) =>
-                    window.imApp.getFriendMessagePreview(message_15),
+                    window.imApp.getFriendMessagePreview(message_15, targetFriend_7),
                 ),
                 lastMessage_2 =
                     visibleMessages.length > 0 ? visibleMessages[visibleMessages.length - 1] : null;
             targetFriend_7.lastMessageTimestamp =
                 Number(lastMessage_2?.timestamp) || targetFriend_7.lastMessageTimestamp || 0;
             targetFriend_7.lastMessagePreview =
-                (lastMessage_2 ? window.imApp.getFriendMessagePreview(lastMessage_2) : '') ||
-                targetFriend_7.lastMessagePreview ||
+                (lastMessage_2
+                    ? window.imApp.getFriendMessagePreview(lastMessage_2, targetFriend_7)
+                    : '') ||
+                (targetFriend_7.type === 'group' && targetFriend_7.showGroupTitles === false
+                    ? ''
+                    : targetFriend_7.lastMessagePreview) ||
                 '';
         }
         return (
@@ -4748,7 +4785,7 @@ window.imApp.markMomentMessagesLoaded = function (loaded_3 = true) {
 window.imApp.markStickersLoaded = function (loaded_4 = true) {
     window.imData.stickersLoaded = !!loaded_4;
 };
-window.imApp.getFriendMessagePreview = function (value_230) {
+window.imApp.getFriendMessagePreview = function (value_230, apk110New_958) {
     const targetMessage_4 = value_230 || {};
     if (targetMessage_4.type === 'memory_request') return '';
     if (targetMessage_4.type === 'user_phone_access_card') {
@@ -4840,7 +4877,10 @@ window.imApp.getFriendMessagePreview = function (value_230) {
     if (targetMessage_4.type === 'offline_meeting_record') return '[见面记录]';
     if (targetMessage_4.type === 'system_notice') {
         const noticeKind_3 = targetMessage_4.noticeKind || '',
-            value_889 = targetMessage_4.content || targetMessage_4.text || '';
+            value_889 = window.imApp.getGroupManagementNoticeText
+                ? window.imApp.getGroupManagementNoticeText(apk110New_958, targetMessage_4)
+                : targetMessage_4.content || targetMessage_4.text || '';
+        if (noticeKind_3 === 'group_title_changed' && !value_889) return '';
         if (noticeKind_3 === 'group_left') return '你已退出群聊';
         if (noticeKind_3 === 'group_rejoined') return '你重新进入群聊';
         if (noticeKind_3 === 'narration') return ('[旁白] ' + value_889).trim();
@@ -4859,7 +4899,7 @@ window.imApp.syncFriendMessageSummary = function (friend_16) {
     if (!friend_16) return null;
     const messages_5 = Array.isArray(friend_16.messages) ? friend_16.messages : [],
         visibleMessages_2 = messages_5.filter((message_16) =>
-            window.imApp.getFriendMessagePreview(message_16),
+            window.imApp.getFriendMessagePreview(message_16, friend_16),
         ),
         lastMessage_3 =
             visibleMessages_2.length > 0 ? visibleMessages_2[visibleMessages_2.length - 1] : null;
@@ -4869,7 +4909,7 @@ window.imApp.syncFriendMessageSummary = function (friend_16) {
         (friend_16.messageCount = messages_5.length),
         (friend_16.lastMessageTimestamp = Number(lastMessage_3?.timestamp) || 0),
         (friend_16.lastMessagePreview = lastMessage_3
-            ? window.imApp.getFriendMessagePreview(lastMessage_3)
+            ? window.imApp.getFriendMessagePreview(lastMessage_3, friend_16)
             : ''),
         friend_16
     );
@@ -5335,8 +5375,10 @@ window.imApp.appendFriendMessage = async function (value_264, value_265, value_9
         ? ((targetFriend_10.messageCount = max_970 + 1),
           (targetFriend_10.lastMessageTimestamp = Number(targetMessage.timestamp) || Date.now()),
           (targetFriend_10.lastMessagePreview =
-              window.imApp.getFriendMessagePreview(targetMessage) ||
-              targetFriend_10.lastMessagePreview ||
+              window.imApp.getFriendMessagePreview(targetMessage, targetFriend_10) ||
+              (targetFriend_10.type === 'group' && targetFriend_10.showGroupTitles === false
+                  ? ''
+                  : targetFriend_10.lastMessagePreview) ||
               ''))
         : window.imApp.syncFriendMessageSummary(targetFriend_10);
     const isIncomingMessage = targetMessage.role !== 'user',
@@ -7859,6 +7901,13 @@ window.addEventListener('pagehide', () => {
         modalReferenceFaceUploadBtn = document.getElementById('modal-reference-face-upload-btn'),
         modalReferenceFaceDeleteBtn = document.getElementById('modal-reference-face-delete-btn'),
         modalReferenceFaceInput = document.getElementById('modal-reference-face-input'),
+        apk110New_1566 = document.getElementById('modal-user-reference-face-preview'),
+        apk110New_1567 = document.getElementById('modal-user-reference-face-title'),
+        apk110New_1568 = document.getElementById('modal-user-reference-face-status'),
+        apk110New_1569 = document.getElementById('modal-user-reference-face-upload-btn'),
+        apk110New_1570 = document.getElementById('modal-user-reference-face-delete-btn'),
+        apk110New_1571 = document.getElementById('modal-user-reference-face-input'),
+        apk110New_1572 = document.getElementById('modal-reference-face-warning'),
         modalImageComposerGroup = document.getElementById('modal-image-composer-group'),
         modalImageComposerPreview = document.getElementById('modal-image-composer-preview'),
         modalImageComposerStatus = document.getElementById('modal-image-composer-status'),
@@ -7867,13 +7916,12 @@ window.addEventListener('pagehide', () => {
         modalImageComposerInput = document.getElementById('modal-image-composer-input'),
         modalImageComposerListElement = document.getElementById('modal-image-composer-list'),
         modalGenerationPromptGroup = document.getElementById('modal-generation-prompt-group'),
+        apk110New_1581 = document.getElementById('modal-generation-preset-group'),
         modalGenerationPresetSelect = document.getElementById('modal-generation-preset-select'),
         modalGenerationSavePresetBtn = document.getElementById('modal-generation-save-preset-btn'),
         modalAutoImageGenerationToggle = document.getElementById(
             'modal-auto-image-generation-toggle',
         ),
-        modalAutoReferenceFaceToggle = document.getElementById('modal-auto-reference-face-toggle'),
-        modalAutoReferenceFaceHint = document.getElementById('modal-auto-reference-face-hint'),
         modalGenerationCharAppearance = document.getElementById('modal-generation-char-appearance'),
         modalGenerationUserAppearance = document.getElementById('modal-generation-user-appearance'),
         modalGenerationArtistPrompt = document.getElementById('modal-generation-artist-prompt'),
@@ -7883,7 +7931,7 @@ window.addEventListener('pagehide', () => {
         modalPromptConfirmBtn = document.getElementById('modal-prompt-confirm-btn');
     let currentModalCallback = null,
         currentModalCancelCallback = null,
-        currentModalReferenceFace = null,
+        apk110New_1594 = null,
         value_477 = null,
         currentModalGenerationPrompt = null,
         count_478 = 0,
@@ -7948,23 +7996,25 @@ window.addEventListener('pagehide', () => {
                 modalImageComposerListElement.appendChild(element_505);
             }));
     }
-    function renderModalReferenceFace(referenceFace_2, enableAfterUpload = false) {
-        currentModalReferenceFace = referenceFace_2 || null;
-        const src_3 = String(referenceFace_2?.imageUrl || ''),
-            imgElement_1456 = modalReferenceFacePreview?.querySelector('img'),
-            iElement_1457 = modalReferenceFacePreview?.querySelector('i');
-        if (modalReferenceFaceGroup)
-            modalReferenceFaceGroup.style.display = referenceFace_2 ? 'flex' : 'none';
-        if (modalReferenceFaceTitle)
-            modalReferenceFaceTitle.textContent = referenceFace_2?.title || '角色参考脸';
-        if (modalReferenceFaceStatus)
-            modalReferenceFaceStatus.textContent = src_3
-                ? referenceFace_2?.fileName || '已上传'
-                : '尚未上传';
-        if (modalReferenceFaceUploadBtn)
-            modalReferenceFaceUploadBtn.textContent = src_3 ? '更换' : '上传';
-        if (modalReferenceFaceDeleteBtn)
-            modalReferenceFaceDeleteBtn.style.display = src_3 ? '' : 'none';
+    function renderModalReferenceFace(apk110New_1768, referenceFace_2) {
+        if (!apk110New_1594) apk110New_1594 = {};
+        apk110New_1594[apk110New_1768] = referenceFace_2 || null;
+        const apk110New_1770 = apk110New_1768 === 'user',
+            apk110New_1771 = apk110New_1770 ? apk110New_1566 : modalReferenceFacePreview,
+            apk110New_1772 = apk110New_1770 ? apk110New_1567 : modalReferenceFaceTitle,
+            apk110New_1773 = apk110New_1770 ? apk110New_1568 : modalReferenceFaceStatus,
+            apk110New_1774 = apk110New_1770 ? apk110New_1569 : modalReferenceFaceUploadBtn,
+            apk110New_1775 = apk110New_1770 ? apk110New_1570 : modalReferenceFaceDeleteBtn,
+            src_3 = String(referenceFace_2?.imageUrl || ''),
+            imgElement_1456 = apk110New_1771?.querySelector('img'),
+            iElement_1457 = apk110New_1771?.querySelector('i');
+        if (apk110New_1772)
+            apk110New_1772.textContent =
+                referenceFace_2?.title || (apk110New_1770 ? 'User' : 'Char');
+        if (apk110New_1773)
+            apk110New_1773.textContent = src_3 ? referenceFace_2?.fileName || '已上传' : '尚未上传';
+        if (apk110New_1774) apk110New_1774.textContent = src_3 ? '更换' : '上传';
+        if (apk110New_1775) apk110New_1775.style.display = src_3 ? '' : 'none';
         imgElement_1456 &&
             iElement_1457 &&
             (src_3
@@ -7974,22 +8024,13 @@ window.addEventListener('pagehide', () => {
                 : (imgElement_1456.removeAttribute('src'),
                   (imgElement_1456.style.display = 'none'),
                   (iElement_1457.style.display = '')));
-        if (modalToggleGroup) modalToggleGroup.style.display = src_3 ? 'flex' : 'none';
-        if (modalToggleLabel) modalToggleLabel.textContent = '本次使用参考脸';
-        modalToggleInput &&
-            ((modalToggleInput.checked = src_3 && enableAfterUpload),
-            (modalToggleInput.disabled = !src_3));
-        handleAction_1412();
-    }
-    function handleAction_1412() {
-        if (!modalAutoReferenceFaceToggle) return;
-        const hasReferenceFace = !!String(currentModalReferenceFace?.imageUrl || '').trim();
-        modalAutoReferenceFaceToggle.disabled = !hasReferenceFace;
-        if (!hasReferenceFace) modalAutoReferenceFaceToggle.checked = false;
-        modalAutoReferenceFaceHint &&
-            (modalAutoReferenceFaceHint.textContent = hasReferenceFace
-                ? '自动生图时使用当前角色参考脸'
-                : '请先上传角色参考脸');
+        const hasReferenceFace = !!apk110New_1594.char?.imageUrl && !!apk110New_1594.user?.imageUrl,
+            apk110New_1780 =
+                window.getActiveImageGenerationConfig?.()?.provider ||
+                window.getImageGenerationConfig?.()?.activeProvider;
+        if (apk110New_1572)
+            apk110New_1572.style.display =
+                hasReferenceFace && apk110New_1780 === 'novelai' ? 'block' : 'none';
     }
     function showCustomModal_2(options_35) {
         if (!customModalOverlay) return;
@@ -7998,9 +8039,10 @@ window.addEventListener('pagehide', () => {
         modalTitle.textContent = options_35.title || '提示';
         currentModalCallback = options_35.onConfirm;
         currentModalCancelCallback = options_35.onCancel;
-        currentModalReferenceFace = null;
+        apk110New_1594 = null;
         value_477 = null;
         currentModalGenerationPrompt = options_35.generationPrompt || null;
+        customModalOverlay.classList.toggle('is-image-generation', !!options_35.generationPrompt);
         if (options_35.type === 'prompt') {
             const useTextarea = options_35.multiline === true,
                 value_1461 =
@@ -8040,6 +8082,8 @@ window.addEventListener('pagehide', () => {
                 modalGenerationPromptGroup.style.display = options_35.generationPrompt
                     ? 'block'
                     : 'none';
+            if (apk110New_1581)
+                apk110New_1581.style.display = options_35.generationPrompt ? 'flex' : 'none';
             if (modalGenerationPresetSelect) {
                 modalGenerationPresetSelect.replaceChildren();
                 const currentOption = document.createElement('option');
@@ -8064,9 +8108,6 @@ window.addEventListener('pagehide', () => {
             modalAutoImageGenerationToggle &&
                 (modalAutoImageGenerationToggle.checked =
                     options_35.generationPrompt?.autoGenerate === true);
-            modalAutoReferenceFaceToggle &&
-                (modalAutoReferenceFaceToggle.checked =
-                    options_35.generationPrompt?.autoUseReferenceFace === true);
             if (modalGenerationCharAppearance)
                 modalGenerationCharAppearance.value =
                     options_35.generationPrompt?.charAppearance || '';
@@ -8078,8 +8119,19 @@ window.addEventListener('pagehide', () => {
             if (modalGenerationNegativePrompt)
                 modalGenerationNegativePrompt.value =
                     options_35.generationPrompt?.negativePrompt || '';
-            if (options_35.referenceFace) renderModalReferenceFace(options_35.referenceFace);
-            else {
+            const apk110New_1785 =
+                options_35.referenceFaces ||
+                (options_35.referenceFace
+                    ? {
+                          char: options_35.referenceFace,
+                      }
+                    : null);
+            if (apk110New_1785) {
+                if (modalReferenceFaceGroup) modalReferenceFaceGroup.style.display = 'block';
+                if (modalToggleGroup) modalToggleGroup.style.display = 'none';
+                renderModalReferenceFace('char', apk110New_1785.char);
+                renderModalReferenceFace('user', apk110New_1785.user);
+            } else {
                 if (modalReferenceFaceGroup) modalReferenceFaceGroup.style.display = 'none';
                 if (modalToggleGroup)
                     modalToggleGroup.style.display = options_35.toggle ? 'flex' : 'none';
@@ -8087,7 +8139,6 @@ window.addEventListener('pagehide', () => {
                 modalToggleInput &&
                     ((modalToggleInput.checked = !!options_35.toggle?.checked),
                     (modalToggleInput.disabled = !!options_35.toggle?.disabled));
-                handleAction_1412();
             }
             modalPromptConfirmBtn.textContent = options_35.confirmText || '确认';
             modalPromptConfirmBtn.style.background =
@@ -8104,15 +8155,11 @@ window.addEventListener('pagehide', () => {
             if (modalReferenceFaceGroup) modalReferenceFaceGroup.style.display = 'none';
             if (modalImageComposerGroup) modalImageComposerGroup.style.display = 'none';
             if (modalGenerationPromptGroup) modalGenerationPromptGroup.style.display = 'none';
+            if (apk110New_1581) apk110New_1581.style.display = 'none';
             modalGenerationPresetSelect &&
                 (modalGenerationPresetSelect.replaceChildren(),
                 (modalGenerationPresetSelect.disabled = true));
             if (modalAutoImageGenerationToggle) modalAutoImageGenerationToggle.checked = false;
-            modalAutoReferenceFaceToggle &&
-                ((modalAutoReferenceFaceToggle.checked = false),
-                (modalAutoReferenceFaceToggle.disabled = true));
-            if (modalAutoReferenceFaceHint)
-                modalAutoReferenceFaceHint.textContent = '请先上传角色参考脸';
             modalMessage.textContent = options_35.message || '';
             modalConfirmBtn.textContent = options_35.confirmText || '确认';
             const isDeleteAction =
@@ -8152,7 +8199,7 @@ window.addEventListener('pagehide', () => {
                     ? modalSecondaryTextareaElement?.value || ''
                     : null,
             toggleChecked: !!modalToggleInput?.checked,
-            referenceImage: currentModalReferenceFace?.imageUrl || '',
+            referenceImage: apk110New_1594?.char?.imageUrl || '',
             uploadedImage: value_477?.imageUrl || '',
             uploadedFileName: value_477?.fileName || '',
             uploadedImages: Array.isArray(value_477?.images) ? value_477.images.slice() : [],
@@ -8175,7 +8222,6 @@ window.addEventListener('pagehide', () => {
             negativePrompt: modalGenerationNegativePrompt?.value || '',
             activePresetId: modalGenerationPresetSelect?.value || '',
             autoGenerate: modalAutoImageGenerationToggle?.checked === true,
-            autoUseReferenceFace: modalAutoReferenceFaceToggle?.checked === true,
             presets: Array.isArray(currentModalGenerationPrompt?.presets)
                 ? currentModalGenerationPrompt.presets
                 : [],
@@ -8194,7 +8240,8 @@ window.addEventListener('pagehide', () => {
             currentModalCancelCallback(handleAction_483());
         currentModalCallback = null;
         currentModalCancelCallback = null;
-        currentModalReferenceFace = null;
+        apk110New_1594 = null;
+        customModalOverlay.classList.remove('is-image-generation');
         value_477 = null;
         currentModalGenerationPrompt = null;
     }
@@ -8233,44 +8280,56 @@ window.addEventListener('pagehide', () => {
                     (handleAction_480(false), (modalPromptConfirmBtn.textContent = textContent_7));
             }
         });
-    modalReferenceFaceUploadBtn?.addEventListener('click', () => modalReferenceFaceInput?.click());
-    modalReferenceFaceInput?.addEventListener('change', async (event_1471) => {
-        const value_1472 = event_1471.target.files?.[0];
-        event_1471.target.value = '';
-        if (!value_1472 || typeof currentModalReferenceFace?.onUpload !== 'function') return;
-        try {
-            modalReferenceFaceUploadBtn.disabled = true;
-            const result_2 = await currentModalReferenceFace.onUpload(value_1472);
-            result_2?.imageUrl &&
-                renderModalReferenceFace(
-                    {
+    function apk110New_1605(apk110New_1800, apk110New_1801, apk110New_1802, apk110New_1803) {
+        apk110New_1801?.addEventListener('click', () => apk110New_1803?.click());
+        apk110New_1803?.addEventListener('change', async (event_1471) => {
+            const value_1472 = event_1471.target.files?.[0];
+            event_1471.target.value = '';
+            const currentModalReferenceFace = apk110New_1594?.[apk110New_1800];
+            if (!value_1472 || typeof currentModalReferenceFace?.onUpload !== 'function') return;
+            const apk110New_1807 = count_478;
+            try {
+                apk110New_1801.disabled = true;
+                const result_2 = await currentModalReferenceFace.onUpload(value_1472);
+                count_478 === apk110New_1807 &&
+                    result_2?.imageUrl &&
+                    renderModalReferenceFace(apk110New_1800, {
                         ...currentModalReferenceFace,
                         ...result_2,
-                    },
-                    true,
-                );
-        } catch (value_1474) {
-            window.showToast?.(value_1474?.message || '参考脸上传失败');
-        } finally {
-            modalReferenceFaceUploadBtn.disabled = false;
-        }
-    });
-    modalReferenceFaceDeleteBtn?.addEventListener('click', async () => {
-        if (typeof currentModalReferenceFace?.onDelete !== 'function') return;
-        try {
-            modalReferenceFaceDeleteBtn.disabled = true;
-            await currentModalReferenceFace.onDelete();
-            renderModalReferenceFace({
-                ...currentModalReferenceFace,
-                imageUrl: '',
-                fileName: '',
-            });
-        } catch (error_5) {
-            window.showToast?.(error_5?.message || '参考脸删除失败');
-        } finally {
-            modalReferenceFaceDeleteBtn.disabled = false;
-        }
-    });
+                    });
+            } catch (value_1474) {
+                window.showToast?.(value_1474?.message || '参考脸上传失败');
+            } finally {
+                apk110New_1801.disabled = false;
+            }
+        });
+        apk110New_1802?.addEventListener('click', async () => {
+            const apk110New_1810 = apk110New_1594?.[apk110New_1800];
+            if (typeof apk110New_1810?.onDelete !== 'function') return;
+            const apk110New_1811 = count_478;
+            try {
+                apk110New_1802.disabled = true;
+                await apk110New_1810.onDelete();
+                count_478 === apk110New_1811 &&
+                    renderModalReferenceFace(apk110New_1800, {
+                        ...apk110New_1810,
+                        imageUrl: '',
+                        fileName: '',
+                    });
+            } catch (error_5) {
+                window.showToast?.(error_5?.message || '参考脸删除失败');
+            } finally {
+                apk110New_1802.disabled = false;
+            }
+        });
+    }
+    apk110New_1605(
+        'char',
+        modalReferenceFaceUploadBtn,
+        modalReferenceFaceDeleteBtn,
+        modalReferenceFaceInput,
+    );
+    apk110New_1605('user', apk110New_1569, apk110New_1570, apk110New_1571);
     modalImageComposerUploadBtn?.addEventListener('click', () => modalImageComposerInput?.click());
     modalImageComposerInput?.addEventListener('change', async (event_525) => {
         const from_526 = Array.from(event_525.target.files || []);
@@ -9444,6 +9503,7 @@ window.addEventListener('pagehide', () => {
         memoryEntryEditorContentLabel = document.getElementById(
             'memory-entry-editor-content-label',
         ),
+        apk110New_1682 = document.getElementById('memory-entry-editor-tags-row'),
         memoryEntryEditorTagsInput = document.getElementById('memory-entry-editor-tags-input'),
         memoryEntryEditorDegreeRow = document.getElementById('memory-entry-editor-degree-row'),
         memoryEntryEditorDegreeSelect = document.getElementById(
@@ -9459,7 +9519,6 @@ window.addEventListener('pagehide', () => {
         memoryPromotionTitleInput = document.getElementById('memory-promotion-title-input'),
         memoryPromotionTimeInput = document.getElementById('memory-promotion-time-input'),
         memoryPromotionContentInput = document.getElementById('memory-promotion-content-input'),
-        memoryPromotionTagsInput = document.getElementById('memory-promotion-tags-input'),
         momentsContent = document.getElementById('moments-content');
     let currentMemoryFriendId = null,
         currentMemoryLocation = 'iphone',
@@ -9469,8 +9528,9 @@ window.addEventListener('pagehide', () => {
         if (!activeItem || !lineNavIndicator) return;
         const containerRect = activeItem.parentElement.getBoundingClientRect(),
             itemRect = activeItem.getBoundingClientRect(),
-            relativeLeft = itemRect.left - containerRect.left;
-        lineNavIndicator.style.width = itemRect.width + 'px';
+            relativeLeft = itemRect.left - containerRect.left,
+            apk110New_2012 = itemRect.width;
+        lineNavIndicator.style.width = apk110New_2012 + 'px';
         lineNavIndicator.style.left = relativeLeft + 'px';
     }
     setTimeout(() => {
@@ -9994,8 +10054,6 @@ window.addEventListener('pagehide', () => {
         if (memoryPromotionTitleInput) memoryPromotionTitleInput.value = draft.title || '';
         if (memoryPromotionTimeInput) memoryPromotionTimeInput.value = draft.time || '';
         if (memoryPromotionContentInput) memoryPromotionContentInput.value = draft.content || '';
-        if (memoryPromotionTagsInput)
-            memoryPromotionTagsInput.value = (draft.triggerKeywords || []).join('，');
         if (window.openView) window.openView(memoryPromotionPreviewModal);
     }
     async function handleAction_1429() {
@@ -10005,10 +10063,9 @@ window.addEventListener('pagehide', () => {
                 window.imApp.getFriendById?.(pending_2.friendId) || getCurrentMemoryFriend_2(),
             title_8 = String(memoryPromotionTitleInput?.value || '').trim(),
             content_4 = String(memoryPromotionContentInput?.value || '').trim(),
-            time_3 = String(memoryPromotionTimeInput?.value || '').trim(),
-            triggerKeywords_3 = handleAction_1428(memoryPromotionTagsInput?.value || '');
-        if (!title_8 || !content_4 || triggerKeywords_3.length === 0) {
-            if (window.showToast) window.showToast('请填写标题、内容和至少一个召回标签');
+            time_3 = String(memoryPromotionTimeInput?.value || '').trim();
+        if (!title_8 || !content_4) {
+            if (window.showToast) window.showToast('请填写标题和内容');
             return false;
         }
         if (!friend_36 || !window.imApp.commitShortTermMemoryPromotion) return false;
@@ -10022,7 +10079,6 @@ window.addEventListener('pagehide', () => {
                     title: title_8,
                     content: content_4,
                     time: time_3,
-                    triggerKeywords: triggerKeywords_3,
                 },
                 pending_2.selectedIds,
             );
@@ -10079,7 +10135,7 @@ window.addEventListener('pagehide', () => {
                 ? window.imChat?.getShortTermMemoryTags
                     ? window.imChat.getShortTermMemoryTags(entry_18 || {})
                     : entry_18?.memoryTags || entry_18?.triggerKeywords || []
-                : entry_18?.triggerKeywords || [];
+                : [];
         if (memoryEntryEditorTitle)
             memoryEntryEditorTitle.textContent = entry_18
                 ? '编辑' + (isShort ? '短期' : '长期') + '记忆'
@@ -10096,6 +10152,7 @@ window.addEventListener('pagehide', () => {
                 : entry_18?.content || '';
         if (memoryEntryEditorContentLabel)
             memoryEntryEditorContentLabel.textContent = isShort ? '事件内容' : '记忆内容';
+        if (apk110New_1682) apk110New_1682.style.display = isShort ? 'flex' : 'none';
         if (memoryEntryEditorTagsInput)
             memoryEntryEditorTagsInput.value = Array.isArray(tags) ? tags.join('，') : '';
         if (memoryEntryEditorDegreeRow)
@@ -10119,7 +10176,9 @@ window.addEventListener('pagehide', () => {
             time_4 =
                 String(memoryEntryEditorTimeInput?.value || '').trim() || formatManualMemoryTime(),
             content_5 = String(memoryEntryEditorContentInput?.value || '').trim(),
-            triggerKeywords_4 = handleAction_1428(memoryEntryEditorTagsInput?.value || '');
+            triggerKeywords_4 = isShort_2
+                ? handleAction_1428(memoryEntryEditorTagsInput?.value || '')
+                : [];
         if (!content_5) {
             if (window.showToast) window.showToast('请输入记忆内容');
             return (memoryEntryEditorContentInput?.focus(), false);
@@ -10164,7 +10223,6 @@ window.addEventListener('pagehide', () => {
                               content: content_5,
                               time: time_4,
                               createdAt: time_4,
-                              triggerKeywords: triggerKeywords_4,
                               sourceType: previous?.sourceType || 'manual',
                               sourceId: previous?.sourceId || id_6,
                           });
@@ -10378,9 +10436,7 @@ window.addEventListener('pagehide', () => {
                     : Array.isArray(entry_24.memoryTags)
                       ? entry_24.memoryTags
                       : []
-                : Array.isArray(entry_24.triggerKeywords)
-                  ? entry_24.triggerKeywords
-                  : [];
+                : [];
         memoryEntryDetailBody.innerHTML =
             `
             <div class="memory-entry-field">
@@ -10399,21 +10455,25 @@ window.addEventListener('pagehide', () => {
             ) +
             `</div>
             </div>
-            <div class="memory-entry-field">
+            ` +
+            (isShort_3
+                ? `<div class="memory-entry-field">
                 <div class="memory-entry-field-label">记忆标签</div>
                 <div class="memory-entry-field-value" style="display:flex; flex-wrap:wrap; gap:6px;">` +
-            (memoryTags_2.length > 0
-                ? memoryTags_2
-                      .map(
-                          (value_1810) =>
-                              '<span style="padding:3px 8px; border-radius:999px; background:#e8f2ff; color:#007aff; font-size:12px; font-weight:600;">' +
-                              escapeMemoryHtml(value_1810) +
-                              '</span>',
-                      )
-                      .join('')
-                : '暂无标签') +
-            `</div>
-            </div>
+                  (memoryTags_2.length > 0
+                      ? memoryTags_2
+                            .map(
+                                (value_1810) =>
+                                    '<span style="padding:3px 8px; border-radius:999px; background:#e8f2ff; color:#007aff; font-size:12px; font-weight:600;">' +
+                                    escapeMemoryHtml(value_1810) +
+                                    '</span>',
+                            )
+                            .join('')
+                      : '暂无标签') +
+                  `</div>
+            </div>`
+                : '') +
+            `
             ` +
             (isShort_3
                 ? `<div class="memory-entry-field">
@@ -10975,17 +11035,17 @@ window.addEventListener('pagehide', () => {
                   (value_1881) => String(value_1881.id) === String(value_1878?.id ?? value_1878),
               );
         if (!value_1880) return false;
+        if (!memoryLocationSheet?.classList.contains('active')) value_1422 = document.activeElement;
         setMemoryFriendSelection(value_1880);
         renderMemoryLocationSheet(value_1879);
-        if (memoryLocationSheet && window.openView) {
-            if (value_1879 === 'x-dm') value_1422 = document.activeElement;
-            window.openView(memoryLocationSheet);
-            if (value_1879 === 'x-dm')
+        if (memoryLocationSheet && window.openView)
+            return (
+                window.openView(memoryLocationSheet),
                 memorySocialCloseElement?.focus({
                     preventScroll: true,
-                });
-            return true;
-        }
+                }),
+                true
+            );
         return false;
     };
     window.imApp.openMemoryScheduleForFriend = function (value_1882) {

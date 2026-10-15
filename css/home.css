@@ -356,21 +356,43 @@ body:has(#u2-login-screen:not(.is-hidden)) #pages-container > .page-wrapper * {
 /* Delete Widget Button */
 .delete-widget-btn {
     position: absolute;
-    top: -4px;
-    left: -4px;
-    width: 24px;
-    height: 24px;
-    background-color: rgba(255, 59, 48, 0.94);
+    top: 0;
+    left: 0;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
     color: #fff;
-    border-radius: 50%;
     display: none;
     justify-content: center;
     align-items: center;
     font-size: 14px;
-    z-index: 50;
+    line-height: 1;
+    z-index: 80;
     cursor: pointer;
-
+    appearance: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
     pointer-events: auto;
+}
+
+.delete-widget-btn::before {
+    content: '';
+    position: absolute;
+    inset: 9px;
+    border-radius: 50%;
+    background-color: rgba(255, 59, 48, 0.94);
+}
+
+.delete-widget-btn i {
+    position: relative;
+    pointer-events: none;
+}
+
+.delete-widget-btn:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
 }
 
 .music-widget.playing .tonearm {

@@ -54,7 +54,10 @@
         const safe = value_2 && typeof value_2 === 'object' ? value_2 : {},
             permission_3 = handleAction_8();
         return {
-            enabled: !!safe.enabled && permission_3 !== 'unsupported',
+            enabled:
+                !!safe.enabled &&
+                permission_3 !== 'unsupported' &&
+                (!handleAction_4() || permission_3 !== 'denied'),
             permission: permission_3,
             soundAssetId: typeof safe.soundAssetId === 'string' ? safe.soundAssetId : '',
             soundFileName:
@@ -135,8 +138,9 @@
     function getSettings_2() {
         const permission_2 = handleAction_8(),
             permissionChanged = settings.permission !== permission_2;
+        settings.permission = permission_2;
+        if (handleAction_4() && permission_2 === 'denied') settings.enabled = false;
         return (
-            (settings.permission = permission_2),
             permissionChanged && (void saveSettings(), notifySettingsChanged('permission')),
             getSettingsSnapshot()
         );
@@ -181,7 +185,7 @@
                     })
                 );
             }
-        settings.enabled = enabled_2;
+        settings.enabled = enabled_2 && (!handleAction_4() || permission_4 === 'granted');
         settings.permission = permission_4;
         if (!settings.enabled) stopNotificationSound_2();
         return (await saveSettings(), notifySettingsChanged('settings'), getSettingsSnapshot());
@@ -357,17 +361,22 @@
             data: data_2,
         };
         try {
-            if (handleAction_4())
+            if (handleAction_4()) {
+                const apk110New_81 = await window.u2NativeBridge.showNotification({
+                    title: title_2,
+                    body: body_2,
+                    tag: tag_2,
+                    data: options_2.data,
+                    silent: options_2.silent,
+                });
+                if (apk110New_81) return true;
                 return (
-                    await window.u2NativeBridge.showNotification({
-                        title: title_2,
-                        body: body_2,
-                        tag: tag_2,
-                        data: options_2.data,
-                        silent: options_2.silent,
+                    window.showBannerNotification?.(value_64.friend || {}, body_2, {
+                        force: true,
                     }),
-                    true
+                    false
                 );
+            }
             if (handleAction_5()) {
                 const soundUrl_2 = await resolveCustomSoundUrl_2();
                 return (
@@ -392,6 +401,10 @@
         } catch (error_7) {
             return (
                 console.warn('[system_notifications] Failed to show notification:', error_7),
+                handleAction_4() &&
+                    window.showBannerNotification?.(value_64.friend || {}, body_2, {
+                        force: true,
+                    }),
                 false
             );
         }
@@ -437,6 +450,7 @@
     window.addEventListener('u2:native-notification-permission-changed', (value_81) => {
         const permission_5 = String(value_81?.detail?.permission || handleAction_8());
         settings.permission = permission_5;
+        if (handleAction_4() && permission_5 === 'denied') settings.enabled = false;
         void saveSettings();
         notifySettingsChanged('native-permission');
     });

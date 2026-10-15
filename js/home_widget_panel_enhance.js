@@ -49,7 +49,8 @@
             profileUsername: 'kendall',
             profileBio: '',
             postAuthor: 'you',
-            postBody: 'If you still exist in this world, then no matter what this world is like, it is meaningful to me.'
+            postBody:
+                'If you still exist in this world, then no matter what this world is like, it is meaningful to me.',
         },
         options = {
             profile: [
@@ -192,20 +193,36 @@
                 },
             ],
         };
-    let libraryObserver = null;
+    let libraryObserver = null,
+        loadSettings = {
+            showStatusBar: false,
+            showSearch: true,
+        };
     document.addEventListener('DOMContentLoaded', init);
     function init() {
         ensureStatusBar();
         ensurePanelSwitches();
         applyHomeChromeSettings();
-        window.u2OnStorageReady?.(applyHomeChromeSettings, { queue: false });
+        window.appStorage?.ready &&
+            window.appStorage.ready
+                .then(function () {
+                    loadSettings = apk110New_10();
+                    applyHomeChromeSettings();
+                    apk110New_12(false);
+                })
+                ['catch'](function (apk110New_53) {
+                    console.warn(
+                        '[home_widget_panel_enhance] Failed to load settings:',
+                        apk110New_53,
+                    );
+                });
         enhanceLibraryWhenReady();
         updateStatusClock();
         setInterval(updateStatusClock, 30000);
     }
-    function loadSettings() {
+    function apk110New_10() {
         try {
-            const parsed = window.StorageManager?.load(SETTINGS_KEY, {}) || {};
+            const parsed = window.appStorage?.loadLegacyKey?.(SETTINGS_KEY, {}) || {};
             return {
                 showStatusBar: parsed.showStatusBar === true,
                 showSearch: parsed.showSearch !== false,
@@ -217,8 +234,34 @@
             };
         }
     }
-    function saveSettings(next) {
-        window.StorageManager?.save(SETTINGS_KEY, next);
+    async function apk110New_11(apk110New_56) {
+        if (typeof window.appStorage?.saveLegacyKey !== 'function')
+            throw new Error('Storage is unavailable');
+        await window.appStorage.saveLegacyKey(SETTINGS_KEY, apk110New_56);
+    }
+    function apk110New_12(apk110New_57) {
+        const apk110New_58 = document.getElementById('home-statusbar-toggle'),
+            apk110New_59 = document.getElementById('home-search-toggle');
+        if (apk110New_58) apk110New_58.disabled = apk110New_57;
+        if (apk110New_59) apk110New_59.disabled = apk110New_57;
+    }
+    async function apk110New_13(apk110New_60, apk110New_61) {
+        const apk110New_62 = loadSettings;
+        loadSettings = Object.assign({}, loadSettings, {
+            [apk110New_60]: apk110New_61,
+        });
+        applyHomeChromeSettings();
+        apk110New_12(true);
+        try {
+            await apk110New_11(loadSettings);
+        } catch (apk110New_63) {
+            loadSettings = apk110New_62;
+            applyHomeChromeSettings();
+            console.warn('[home_widget_panel_enhance] Failed to save settings:', apk110New_63);
+            window.showToast?.('小组件设置保存失败，请重试');
+        } finally {
+            apk110New_12(false);
+        }
     }
     function getDesktopState() {
         try {
@@ -260,7 +303,7 @@
         const form = document.querySelector('.home-widget-form'),
             library_2 = document.getElementById('home-widget-library');
         if (!form || !library_2 || document.getElementById('home-panel-chrome-settings')) return;
-        const settings = loadSettings(),
+        const settings = loadSettings,
             group = document.createElement('div');
         group.className = 'home-widget-panel-settings';
         group.id = 'home-panel-chrome-settings';
@@ -271,11 +314,7 @@
                 inputId: 'home-statusbar-toggle',
                 checked: settings.showStatusBar,
                 onChange: function (checked_2) {
-                    const next_2 = Object.assign({}, loadSettings(), {
-                        showStatusBar: checked_2,
-                    });
-                    saveSettings(next_2);
-                    applyHomeChromeSettings();
+                    void apk110New_13('showStatusBar', checked_2);
                 },
             }),
         );
@@ -286,11 +325,7 @@
                 inputId: 'home-search-toggle',
                 checked: settings.showSearch,
                 onChange: function (checked_3) {
-                    const next_3 = Object.assign({}, loadSettings(), {
-                        showSearch: checked_3,
-                    });
-                    saveSettings(next_3);
-                    applyHomeChromeSettings();
+                    void apk110New_13('showSearch', checked_3);
                 },
             }),
         );
@@ -312,6 +347,7 @@
         input.type = 'checkbox';
         input.id = options_3.inputId;
         input.checked = !!options_3.checked;
+        input.disabled = true;
         const element_31 = document.createElement('span');
         return (
             (element_31.className = 'slider'),
@@ -326,7 +362,7 @@
         );
     }
     function applyHomeChromeSettings() {
-        const settings_2 = loadSettings();
+        const settings_2 = loadSettings;
         document.body.classList.toggle('home-statusbar-visible', settings_2.showStatusBar);
         document.body.classList.toggle('home-search-hidden', !settings_2.showSearch);
         const statusToggle = document.getElementById('home-statusbar-toggle'),
@@ -357,7 +393,10 @@
         const time = document.getElementById('home-ios-status-time');
         if (!time) return;
         const now = new Date();
-        time.textContent = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        time.textContent =
+            String(now.getHours()).padStart(2, '0') +
+            ':' +
+            String(now.getMinutes()).padStart(2, '0');
     }
     function enhanceLibraryWhenReady() {
         const library = document.getElementById('home-widget-library');

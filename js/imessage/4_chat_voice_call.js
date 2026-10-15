@@ -893,14 +893,14 @@
             return value_12
                 ? `
 
-【重回重新生成要求】：
-- User 按下了“重回”，这通常代表 User 对上一轮语音回复不满意。
-- 请先在内部思考：User 为什么重回、刚刚生成的内容不好的点在哪里、User 现在更需要怎样的电话回复。可能问题包括：语气不对、关系距离不对、动作氛围太泛、没有接住情绪、对话太长、太敷衍、太热情、偏离人设、节奏不像电话、没有回应重点。
-- 上一轮的 action、thought、text 是同一个被否定的完整轮次；必须重新生成三个非空字段，不得沿用旧心声。
-- 禁止与上一轮重复或高度相似，不能复用相同句式、称呼、情绪走向、动作安排、环境声细节或结尾。
-- 新 text 仍应是自然的 2–4 句电话口语，不要因为重回而缩成一句。
-- 不要在 action、thought 或 text 里解释“重回”。
-【刚刚被重回的回复】：
+Regenerate this call reply:
+- User chose to retry, often because the previous voice reply felt wrong.
+- Internally consider what failed and what User needs now: tone, relationship distance, generic atmosphere, missed emotion, excessive length or brevity, persona drift, unnatural call rhythm, or missing the point.
+- The previous action, thought, and text form one rejected turn. Regenerate all three as nonempty fields; do not reuse the old thought.
+- Avoid repeating or closely paraphrasing the old sentence pattern, form of address, emotional arc, action, background sound, or ending.
+- Keep text naturally conversational, generally two to four spoken sentences. Do not shrink it to one sentence just because this is a retry.
+- Do not mention retrying in action, thought, or text.
+Previous rejected call reply:
 ` + value_12
                 : '';
         }
@@ -927,14 +927,16 @@
                     previousTranslation: lastCallAiTurn.message.translationText || '',
                     previousReply: [
                         lastCallAiTurn.message.actionText
-                            ? '动作/氛围：' + lastCallAiTurn.message.actionText
+                            ? 'Action/atmosphere: ' + lastCallAiTurn.message.actionText
                             : '',
                         lastCallAiTurn.message.thoughtText
-                            ? '心声：' + lastCallAiTurn.message.thoughtText
+                            ? 'Private thought: ' + lastCallAiTurn.message.thoughtText
                             : '',
-                        lastCallAiTurn.message.text ? '对话：' + lastCallAiTurn.message.text : '',
+                        lastCallAiTurn.message.text
+                            ? 'Dialogue: ' + lastCallAiTurn.message.text
+                            : '',
                         lastCallAiTurn.message.translationText
-                            ? '翻译：' + lastCallAiTurn.message.translationText
+                            ? 'Translation: ' + lastCallAiTurn.message.translationText
                             : '',
                     ].filter(Boolean).join(`
 `),
@@ -952,7 +954,7 @@
                         : '',
                     effectiveUserPersona = window.imApp?.getEffectivePersonaForFriend
                         ? window.imApp.getEffectivePersonaForFriend(callFriend)
-                        : userState_2?.persona || '普通用户',
+                        : userState_2?.persona || 'ordinary user',
                     contextLimit = window.imApp?.getContextLimit
                         ? window.imApp.getContextLimit(callFriend)
                         : 20,
@@ -974,7 +976,7 @@
                     };
                 let text_21 = '',
                     text_170 =
-                        '{"action": "第三人称动作/环境声/氛围描写，必须带${charDisplayName}的名字", "thought": "角色当下心声，不说出口的话（第一人称视角）", "text": "角色说出口的对话内容"}',
+                        '{"action": "brief third-person action or audible atmosphere, including the name ${charDisplayName}; write in Chinese", "thought": "unspoken first-person thought in Chinese", "text": "spoken dialogue"}',
                     isChinese = ['zh', 'cn', 'zh-cn', 'chinese'].includes(
                         targetLanguage.toLowerCase(),
                     );
@@ -986,7 +988,7 @@
                     text_21 =
                         `
 
-【!!! CRITICAL LANGUAGE RULE / 绝对最高优先级语言指令 !!!】:
+CRITICAL LANGUAGE RULE / ABSOLUTE PRIORITY:
 - [ABSOLUTE REQUIREMENT]: You MUST speak ONLY in ` +
                         langName +
                         ` for the "text" field. This overrides ALL persona and memory settings.
@@ -996,11 +998,11 @@
 - [TRANSLATION]: You MUST provide an accurate Chinese translation of your ` +
                         langName +
                         ` "text" in the "translation" field.
-- [CHINESE ONLY]: The "thought" and "action" fields MUST ALWAYS be written in Chinese (必须使用中文).`;
+- [CHINESE ONLY]: The "thought" and "action" fields MUST ALWAYS be written in Simplified Chinese.`;
                     text_170 =
-                        '{"action": "第三人称动作/环境声/氛围描写，必须带${charDisplayName}的名字(必须用中文)", "thought": "角色当下心声，不说出口的话（第一人称视角）(必须用中文)", "text": "角色说出口的对话内容（使用' +
+                        '{"action": "brief third-person action or audible atmosphere with the name ${charDisplayName}, in Chinese", "thought": "unspoken first-person thought in Chinese", "text": "spoken dialogue in ' +
                         langName +
-                        '）", "translation": "text字段对应的中文翻译（必须用中文）"}';
+                        '", "translation": "Simplified Chinese translation of text"}';
                 }
                 let text_24 = '';
                 if (window.imApp?.getRecentContextMessages) {
@@ -1043,9 +1045,11 @@
                                     ? userState_2.name || 'User'
                                     : callFriend.nickname,
                                 items_191 = [];
-                            if (m_4.actionText) items_191.push('动作/氛围：' + m_4.actionText);
-                            if (m_4.thoughtText) items_191.push('心声：' + m_4.thoughtText);
-                            if (m_4.text) items_191.push('对话：' + m_4.text);
+                            if (m_4.actionText)
+                                items_191.push('Action/atmosphere: ' + m_4.actionText);
+                            if (m_4.thoughtText)
+                                items_191.push('Private thought: ' + m_4.thoughtText);
+                            if (m_4.text) items_191.push('Dialogue: ' + m_4.text);
                             return speaker_2 + ': ' + items_191.join(' / ');
                         }).join(`
 `),
@@ -1072,49 +1076,47 @@
                         'You are playing the role of ' +
                         charDisplayName +
                         `.
-【核心设定/Core Persona】：` +
+Core persona: ` +
                         (callFriend.persona || 'No specific persona') +
-                        `。
+                        `.
 You are talking to ` +
                         (userState_2.name || 'User') +
-                        ', whose persona is: ' +
+                        ', whose persona is ' +
                         effectiveUserPersona +
-                        `。
+                        `.
 
-【之前的文字聊天记录】：
+Previous text-chat history:
 ` +
-                        (text_24 || '无') +
+                        (text_24 || 'None') +
                         `
 
-【当前场景】：你和用户正处于实时的语音通话中。
-【要求】：
-1. 思考来电/接听背景：仔细思考用户打来电话或接听电话的原因，用户目前的情绪是怎样的，你（` +
+Current scene: You and User are in a live voice call.
+Requirements:
+1. Consider why User called or answered, User's current emotion, what you (` +
                         charDisplayName +
-                        `）现在在做什么，以及此时应该用怎样的语气来应对。
-2. 话题推进：如果这不是一通带有明确紧急事由的电话，仅仅是日常闲聊，你是否应该主动给用户分享你正在做的事情，或者主动挑起一些能够延续通话的有趣话题？请在内心（thought）进行推演，并在文本（text）中自然地表达出来。
-3. 结合记录：请结合之前的文字聊天记录以及当前的语音通话上下文，给出一个连贯自然的电话回复。
-4. action 必须用第三人称描写动作、环境声或通话氛围，必须包含角色名字“` +
+                        `) are doing, and an appropriate tone.
+2. If this is ordinary conversation rather than an urgent call, consider what you might proactively share about your present activity or what topic could sustain the call. Reflect privately in thought and express it naturally in text.
+3. Continue naturally from the previous text chat and this call's context.
+4. action describes visible action, audible environmental sound, or call atmosphere in third person. It must contain ` +
                         charDisplayName +
-                        `”，不要用“我/你”开头。
-5. action 要像电话那头能听到或感受到的细节，例如：` +
+                        `'s name and must not begin with "I" or "you".
+5. action should feel perceptible through the call, such as fabric rustling as ` +
                         charDisplayName +
-                        '翻了个身，电话那头传来布料摩擦声；' +
+                        ` turns over, or faint footsteps behind a quieter breath.
+6. thought is ` +
                         charDisplayName +
-                        `压低了呼吸，背景里有很轻的脚步声。
-6. thought 是 ` +
-                        charDisplayName +
-                        ` 此刻没说出口的当下心声，必须使用第一人称自述视角（即以“我”自称），可以体现口是心非、犹豫、压住的情绪、真正想说但没说的话；必须贴合人设和当前电话氛围。
-7. text 是角色真正说出口的话，可以和 thought 有反差，但不能让 text 解释 thought。
- 8. action 和 thought 要简短、聚焦当下；text 默认说 2–4 句自然口语，先回应 User 当前内容，再根据情境补充感受、细节、追问或主动分享，让电话能自然延续。
- 9. 2–4 句是自然目标，不是机械格式：简短应答、惊讶或紧急情境可以只说一句，确实需要解释时可以略多。不得为凑句数重复意思、连续盘问、写成长篇独白，也不得把多句话压成一个冗长的书面句。` +
+                        `'s present unspoken thought in first person, using "I". It may show hesitation, suppressed feeling, or a gap between words and thoughts, while fitting the persona and call mood.
+7. text is what Char actually says. It may contrast with thought but must not explain thought.
+8. Keep action and thought brief and present-focused. text is generally two to four natural spoken sentences: respond to User first, then add feeling, detail, a question, or proactive sharing to keep the call alive.
+9. Two to four sentences are a natural target, not a rigid format. A brief answer, surprise, or emergency may use one; a necessary explanation may use more. Do not repeat meaning, interrogate User, write a long monologue, or cram several thoughts into one formal sentence.` +
                         text_21 +
                         `
-【输出格式】：必须返回纯 JSON，格式为 ` +
+Output format: return plain JSON only, shaped as ` +
                         text_170 +
                         handleAction_10_28 +
                         `
 
-【当前的语音通话上下文】:
+Current voice-call context:
 ` +
                         join_25,
                     chatCompletionsEndpoint = window.u2Api.resolveChatCompletionsEndpoint(
@@ -1136,8 +1138,8 @@ You are talking to ` +
                                 {
                                     role: 'user',
                                     content: options_5.regenerate
-                                        ? '请重回并重新生成这一轮语音通话回复'
-                                        : '请继续语音通话',
+                                        ? 'Regenerate this turn of the voice call.'
+                                        : 'Continue the voice call.',
                                 },
                             ],
                             temperature: parseFloat(apiConfig_2.temperature) || 0.7,
@@ -1503,11 +1505,11 @@ You are talking to ` +
                           .map((value_243) => {
                               const items_244 = [];
                               if (value_243.actionText)
-                                  items_244.push('动作：' + value_243.actionText);
+                                  items_244.push('Action: ' + value_243.actionText);
                               if (value_243.text)
                                   items_244.push(value_243.senderName + ': ' + value_243.text);
                               if (value_243.translationText)
-                                  items_244.push('翻译：' + value_243.translationText);
+                                  items_244.push('Translation: ' + value_243.translationText);
                               return items_244.join(' / ');
                           })
                           .filter(Boolean).join(`
@@ -1606,11 +1608,11 @@ You are talking to ` +
             return (
                 `
 
-【重回重新生成要求】:
-- User 按下了“重回”，请直接重新生成刚才那一轮群通话对话。
-- 新一轮必须自然接住当前通话上下文，但不得复用下面旧回复中的句子、称呼、话题推进方式或结尾。
-- 不要提及“重回”、旧回复或重新生成。
-【刚才被重回的群通话对话】:
+Regenerate this group-call turn:
+- User chose Retry. Generate a new version of the previous group-call exchange.
+- Continue naturally from the live call context, but do not reuse the old reply's lines, forms of address, topic progression, or ending.
+- Do not mention retrying, the old reply, or regeneration.
+Previous rejected group-call dialogue:
 ` + value_57
             );
         }
@@ -1753,27 +1755,27 @@ Persona: ` +
                                     value_95 =
                                         `
 
-【挂载单聊记忆｜成员：` +
+Mounted private-chat memory | member: ` +
                                         contact_301.nickname +
-                                        '｜成员ID：' +
+                                        ' | member ID: ' +
                                         contact_301.id +
-                                        '｜User：' +
+                                        ' | User: ' +
                                         userName_2 +
-                                        `】
-以下内容只属于群成员「` +
+                                        `
+This is private-chat memory between group member ` +
                                         contact_301.nickname +
-                                        '」（ID: ' +
+                                        ' (ID: ' +
                                         contact_301.id +
-                                        '）与 User「' +
+                                        ') and User ' +
                                         userName_2 +
-                                        `」之间的单聊记忆，不是当前群通话内公开发生的内容。
-使用规则：
-- 只有 ` +
+                                        `. It did not occur publicly in this group call.
+Rules:
+- Only ` +
                                         contact_301.nickname +
-                                        ` 本人可以参考这段记忆，用于延续自己对 User 的称呼、态度、关系与共同经历。
-- 其他群成员不是全知视角，默认完全不知道这些单聊内容；除非 ` +
+                                        ` may use it to preserve their own forms of address, attitude, relationship, and shared experiences with User.
+- Other members are not omniscient and do not know this private content unless ` +
                                         contact_301.nickname +
-                                        ' 在当前群通话中主动说出，否则其他成员不得引用、回应或暗示知情。';
+                                        ' reveals it during this group call. They must not cite, respond to, or imply knowledge of it otherwise.';
                                 if (slice_304.length > 0) {
                                     const join_96 = slice_304.map((msg_2) => {
                                         const value_309 =
@@ -1818,7 +1820,7 @@ Persona: ` +
                                     value_92 +=
                                         value_95 +
                                         `
-已开启挂载，但暂未找到可注入的单聊上下文。`;
+Mounting is enabled, but no private-chat context is available.`;
                             }
                             return value_92;
                         }).join(`
@@ -1905,14 +1907,14 @@ Persona: ` +
                             groupUserIdentity_4?.persona ||
                             (window.imApp?.getEffectivePersonaForFriend
                                 ? window.imApp.getEffectivePersonaForFriend(groupCallTarget_2)
-                                : userState_3?.persona || '普通用户'),
+                                : userState_3?.persona || 'ordinary user'),
                         join_83 = groupCallMessages.slice(-20).map((value_319) => {
                             const items_320 = [];
                             if (value_319.actionText)
-                                items_320.push('动作：' + value_319.actionText);
-                            if (value_319.text) items_320.push('发言：' + value_319.text);
+                                items_320.push('Action: ' + value_319.actionText);
+                            if (value_319.text) items_320.push('Speech: ' + value_319.text);
                             if (value_319.translationText)
-                                items_320.push('翻译：' + value_319.translationText);
+                                items_320.push('Translation: ' + value_319.translationText);
                             return value_319.senderName + ': ' + items_320.join(' / ');
                         }).join(`
 `),
@@ -1922,7 +1924,7 @@ Persona: ` +
                     let text_85 = '';
                     if (value_74)
                         text_85 +=
-                            `【系统规则 (System Depth)】
+                            `System Depth Rules:
 ` +
                             value_74 +
                             `
@@ -1930,43 +1932,45 @@ Persona: ` +
 `;
                     if (value_75)
                         text_85 +=
-                            `【前置设定 (Before Role)】
+                            `Before Role Rules:
 ` +
                             value_75 +
                             `
 
 `;
                     text_85 +=
-                        'You are simulating a group voice call in the group "' +
+                        'You are simulating a live group voice call in "' +
                         groupCallTarget_2.nickname +
                         `".
-【群聊成员设定】:
+Group member profiles:
 ` +
                         join_70 +
                         `
 
-The user is ` +
+User is ` +
                         (groupUserIdentity_4?.name || userState_3?.name || 'User') +
-                        ', whose persona is: ' +
+                        ', whose persona is ' +
                         effectiveUserPersona_2 +
                         `.
 
-【进入通话前的群聊历史｜公开上下文】:
+Public group-chat history before this call:
 ` +
                         (join_73 ||
-                            (limit_2 > 0 ? '暂无可读取的公开群聊记录。' : '群聊上下文已关闭。')) +
+                            (limit_2 > 0
+                                ? 'No readable public group messages.'
+                                : 'Group-chat context is disabled.')) +
                         `
-边界规则：以上是进入本次通话前已经公开发生的群聊记录，只用于承接话题、公开关系和共同事件；不得将它们伪装成当前群通话里刚说出的发言，也不得推断任何未公开的成员私聊。
+Boundary: These public group records predate the call. Use them only for topic continuity, public relationships, and shared events. Do not present them as lines just spoken in this call or infer private member chats.
 
-【当前的语音通话记录】:
+Current voice-call record:
 ` +
-                        (join_83 || '无') +
+                        (join_83 || 'None') +
                         `
 `;
                     if (customGroupPrompt)
                         text_85 +=
                             `
-【群聊特殊设定】:
+Special group setting:
 ` +
                             customGroupPrompt +
                             `
@@ -1974,25 +1978,24 @@ The user is ` +
                     if (afterRole)
                         text_85 +=
                             `
-【补充设定 (After Role)】:
+After Role Rules:
 ` +
                             afterRole +
                             `
 `;
                     text_85 +=
                         `
-【!!!重要指示!!!】:
-你现在正处于真实的群聊实时语音通话中。
-【要求】:
-1. 这是一段连续发生的多人通话，不是点名发言。根据上一句的具体内容、语气和关系自然选择谁接话；后一条必须回应、补充、打断、追问或纠正前一条，禁止每个人各说一段互不相关的话。
-2. 每次生成 3-8 条按实际发生顺序排列的简短发言。无需让所有成员出现，也不限制一名成员只能说一次；允许两三个人围绕同一件事连续来回。有至少两名可用成员时，本轮通常应形成至少两人之间的接话。
-3. 已接入成员名单：` +
-                        (activeSpeakerNames.length > 0 ? activeSpeakerNames.join('、') : 'None') +
-                        `。senderName 必须严格使用名单中的准确名字，禁止添加名单外的人，禁止替 User 发言。
-4. 每条 text 都必须是成员真正说出口的短句，口语化、即时、自然；避免长篇独白、总结式轮流发言和重复上一句。
-5. translation 必须是 text 对应的自然中文翻译；text 本身是中文时也给出自然中文复述，不要留空。
-6. 只输出对话。严禁输出 action、thought、inner、monologue、心声、内心、心理活动、动作、环境声、旁白等字段或内容；不要展示任何未说出口的信息。
-7. 【输出格式】：只返回纯 JSON 数组，数组顺序就是实际接话顺序。每项只能包含 senderName、text、translation 三个字段，格式为：[{"senderName":"成员名","text":"原文台词","translation":"中文翻译"}]。` +
+Important: This is a real-time group voice call.
+Requirements:
+1. The call is a continuous exchange, not a roll call. Choose who follows from the previous line's content, tone, and relationships. Every next line should respond, add, interrupt, ask, or correct; never give each person an unrelated monologue.
+2. Generate three to eight short utterances in actual chronological order. Not every member must appear, and one member may speak repeatedly. Two or three members may exchange several lines about one topic. When at least two members are available, usually let at least two respond to each other.
+3. Connected members: ` +
+                        (activeSpeakerNames.length > 0 ? activeSpeakerNames.join(', ') : 'None') +
+                        `. senderName must match a name exactly. Do not add outsiders or write lines for User.
+4. Each text is a short line actually spoken by a member, immediate and conversational. Avoid long monologues, summary-like turns, and repetition.
+5. translation must be a natural Chinese rendering of text. Even if text is Chinese, provide a natural Chinese restatement rather than leaving it empty.
+6. Output dialogue only. Do not output action, thought, inner, monologue, private thoughts, psychological description, environmental sound, narration, or other unspoken material, as fields or content.
+7. Return only a plain JSON array in speaking order. Each item has exactly senderName, text, and translation: [{"senderName":"exact member name","text":"spoken original","translation":"Chinese rendering"}].` +
                         handleAction_45_78;
                     const chatCompletionsEndpoint_288 = window.u2Api.resolveChatCompletionsEndpoint(
                             apiConfig_3.endpoint,
@@ -2012,7 +2015,7 @@ The user is ` +
                                     },
                                     {
                                         role: 'user',
-                                        content: '请继续群语音通话',
+                                        content: 'Continue the group voice call.',
                                     },
                                 ],
                                 temperature: parseFloat(apiConfig_3.temperature) || 0.8,

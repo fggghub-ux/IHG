@@ -309,7 +309,7 @@
             };
         return null;
     }
-    async function handleAction_17(value_85, config_4, referenceImage_2 = '') {
+    async function handleAction_17(value_85, config_4, referenceImage_2 = []) {
         const aspectRatio =
                 config_4.size === '1024x1536'
                     ? '2:3'
@@ -317,8 +317,13 @@
                       ? '3:2'
                       : '1:1',
             input_2 = [];
-        if (referenceImage_2) {
-            const reference = dataUrlParts(referenceImage_2);
+        for (const apk110New_106 of referenceImage_2) {
+            const reference = dataUrlParts(apk110New_106.imageUrl);
+            input_2.push({
+                type: 'text',
+                text:
+                    (apk110New_106.role === 'user' ? 'User' : 'Char') + ' face identity reference:',
+            });
             input_2.push({
                 type: 'image',
                 data: reference.base64,
@@ -327,8 +332,8 @@
         }
         input_2.push({
             type: 'text',
-            text: referenceImage_2
-                ? '请以输入图片中的人物面部身份特征为参考，保持同一人物，但不要照搬背景、姿势或构图。' +
+            text: referenceImage_2.length
+                ? "Use each labeled face reference only for that person's identity. Do not copy its background, pose, or composition. " +
                   value_85
                 : value_85,
         });
@@ -365,30 +370,31 @@
     async function handleAction_18(
         prompt_2,
         config_5,
-        referenceImage_3 = '',
+        referenceImage_3 = [],
         negative_prompt_2 = '',
     ) {
         const [width_2, height_2] = config_5.size.split('x').map(Number);
-        if (referenceImage_3 && !/4[-_.]?5/i.test(config_5.model))
+        if (referenceImage_3.length && !/4[-_.]?5/i.test(config_5.model))
             throw new Error('NovelAI 参考脸需要支持 Precise Reference 的 V4.5 图片模型');
-        const reference_2 = referenceImage_3 ? dataUrlParts(referenceImage_3) : null,
-            referenceParameters = reference_2
+        const referenceParameters = referenceImage_3.length
                 ? {
-                      director_reference_images: [reference_2.base64],
-                      director_reference_descriptions: [
-                          {
-                              caption: {
-                                  base_caption: 'character',
-                                  char_captions: [],
-                              },
-                              legacy_uc: false,
-                              use_coords: false,
-                              use_order: true,
+                      director_reference_images: referenceImage_3.map(
+                          (apk110New_117) => dataUrlParts(apk110New_117.imageUrl).base64,
+                      ),
+                      director_reference_descriptions: referenceImage_3.map(() => ({
+                          caption: {
+                              base_caption: 'character',
+                              char_captions: [],
                           },
-                      ],
-                      director_reference_strength_values: [0.75],
-                      director_reference_secondary_strength_values: [0.85],
-                      director_reference_information_extracted: [1],
+                          legacy_uc: false,
+                          use_coords: false,
+                          use_order: true,
+                      })),
+                      director_reference_strength_values: referenceImage_3.map(() => 0.75),
+                      director_reference_secondary_strength_values: referenceImage_3.map(
+                          () => 0.85,
+                      ),
+                      director_reference_information_extracted: referenceImage_3.map(() => 1),
                   }
                 : {},
             data_4 = await fetchJson(
@@ -434,42 +440,53 @@
     async function generateImageEdit(prompt_3, config_6, value_104, url_4, value_106 = false) {
         const endpoint_3 = resolveEditsEndpoint_2(config_6.endpoint);
         if (value_104 === 'Grok') {
-            const value_110 = await fetchJson(
-                endpoint_3,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: 'Bearer ' + config_6.apiKey,
-                        ...getSilentHeaders(),
-                    },
-                    body: JSON.stringify({
-                        model: config_6.model,
-                        prompt: prompt_3,
-                        image: {
-                            url: url_4,
-                            type: 'image_url',
+            const value_110 = url_4.map((apk110New_127) => ({
+                    url: apk110New_127.imageUrl,
+                    type: 'image_url',
+                })),
+                apk110New_126 = await fetchJson(
+                    endpoint_3,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: 'Bearer ' + config_6.apiKey,
+                            ...getSilentHeaders(),
                         },
-                        aspect_ratio:
-                            config_6.size === '1024x1536'
-                                ? '2:3'
-                                : config_6.size === '1536x1024'
-                                  ? '3:2'
-                                  : '1:1',
-                        response_format: 'b64_json',
-                    }),
-                },
-                value_104,
-            );
-            return parseOpenAiImage_2(value_110);
+                        body: JSON.stringify({
+                            model: config_6.model,
+                            prompt: prompt_3,
+                            ...(value_110.length === 1
+                                ? {
+                                      image: value_110[0],
+                                  }
+                                : {
+                                      images: value_110,
+                                  }),
+                            aspect_ratio:
+                                config_6.size === '1024x1536'
+                                    ? '2:3'
+                                    : config_6.size === '1536x1024'
+                                      ? '3:2'
+                                      : '1:1',
+                            response_format: 'b64_json',
+                        }),
+                    },
+                    value_104,
+                );
+            return parseOpenAiImage_2(apk110New_126);
         }
-        const form = new FormData(),
-            handleAction_11_109 = handleAction_11(url_4);
-        form.append(
-            'image',
-            handleAction_11_109,
-            'face-reference.' + (handleAction_11_109.type === 'image/jpeg' ? 'jpg' : 'png'),
-        );
+        const form = new FormData();
+        for (const apk110New_128 of url_4) {
+            const handleAction_11_109 = handleAction_11(apk110New_128.imageUrl);
+            form.append(
+                url_4.length === 1 ? 'image' : 'image[]',
+                handleAction_11_109,
+                apk110New_128.role +
+                    '-face-reference.' +
+                    (handleAction_11_109.type === 'image/jpeg' ? 'jpg' : 'png'),
+            );
+        }
         form.append('model', config_6.model);
         form.append('prompt', prompt_3);
         form.append('n', '1');
@@ -493,7 +510,10 @@
         } catch (value_112) {
             if (config_6.provider === 'relay') {
                 value_112.message =
-                    '当前中转站不支持参考脸或图片编辑接口：' + (value_112?.message || '请求失败');
+                    '当前中转站不支持' +
+                    (url_4.length > 1 ? '多张参考脸' : '参考脸') +
+                    '或图片编辑接口：' +
+                    (value_112?.message || '请求失败');
                 throw value_112;
             }
             throw value_112;
@@ -504,9 +524,9 @@
         config_7,
         providerLabel,
         isRelay = false,
-        referenceImage_4 = '',
+        referenceImage_4 = [],
     ) {
-        if (referenceImage_4)
+        if (referenceImage_4.length)
             return generateImageEdit(prompt_4, config_7, providerLabel, referenceImage_4, isRelay);
         const endpoint_4 = isRelay ? resolveImagesEndpoint_2(config_7.endpoint) : config_7.endpoint,
             body_2 = {
@@ -727,7 +747,7 @@
 ` + artistPrompt_2
                 : '',
             negativePrompt_2
-                ? `【避免出现的元素】
+                ? `NEGATIVE PROMPT — exclusion constraints only. Never depict or include any of the following elements; they are not subjects to draw:
 ` + negativePrompt_2
                 : '',
         ].filter(Boolean);
@@ -750,26 +770,64 @@
                 options_2,
                 config_9.provider,
             ),
-            referenceImage_5 = options_2.referenceImage
-                ? await imageUrlToDataUrl(options_2.referenceImage)
-                : '';
+            apk110New_186 = Array.isArray(options_2.referenceImages)
+                ? options_2.referenceImages
+                : options_2.referenceImage
+                  ? [
+                        {
+                            role: 'char',
+                            imageUrl: options_2.referenceImage,
+                        },
+                    ]
+                  : [],
+            referenceImage_5 = [],
+            apk110New_188 = new Set();
+        for (const apk110New_193 of apk110New_186) {
+            const apk110New_194 =
+                apk110New_193?.role === 'user'
+                    ? 'user'
+                    : apk110New_193?.role === 'char'
+                      ? 'char'
+                      : '';
+            if (!apk110New_194 || apk110New_188.has(apk110New_194) || !apk110New_193?.imageUrl)
+                continue;
+            referenceImage_5.push({
+                role: apk110New_194,
+                imageUrl: await imageUrlToDataUrl(apk110New_193.imageUrl),
+            });
+            apk110New_188.add(apk110New_194);
+        }
+        const apk110New_189 = referenceImage_5
+                .map(
+                    (apk110New_195, apk110New_196) =>
+                        'Input image ' +
+                        (apk110New_196 + 1) +
+                        ' is the ' +
+                        (apk110New_195.role === 'user' ? 'User' : 'Char') +
+                        ' face identity reference.',
+                )
+                .join(' '),
+            apk110New_190 =
+                apk110New_189 && config_9.provider !== 'novelai'
+                    ? apk110New_189 +
+                      ` Use each face only for its assigned person; do not copy reference backgrounds or poses.
+
+` +
+                      handleAction_25_163.prompt
+                    : handleAction_25_163.prompt;
         let result_3 = null;
         if (config_9.provider === 'gemini')
-            result_3 = await handleAction_17(
-                handleAction_25_163.prompt,
-                config_9,
-                referenceImage_5,
-            );
+            result_3 = await handleAction_17(apk110New_190, config_9, referenceImage_5);
         if (config_9.provider === 'novelai')
             result_3 = await handleAction_18(
-                handleAction_25_163.prompt,
+                apk110New_190,
                 config_9,
                 referenceImage_5,
                 handleAction_25_163.negativePrompt,
             );
         if (config_9.provider === 'grok')
             result_3 = await handleAction_20(
-                handleAction_25_163.prompt,
+                apk110New_190,
                 config_9,
                 'Grok',
                 false,
@@ -777,7 +835,7 @@
             );
         if (config_9.provider === 'openai')
             result_3 = await handleAction_20(
-                handleAction_25_163.prompt,
+                apk110New_190,
                 config_9,
                 'OpenAI',
                 true,
@@ -785,7 +843,7 @@
             );
         if (config_9.provider === 'relay')
             result_3 = await handleAction_20(
-                handleAction_25_163.prompt,
+                apk110New_190,
                 config_9,
                 '中转站',
                 true,
@@ -799,8 +857,14 @@
             provider: config_9.provider,
             model: config_9.model,
             size: config_9.size,
-            faceReferenceUsed: !!referenceImage_5,
-            compiledPrompt: handleAction_25_163.prompt,
+            faceReferenceUsed: referenceImage_5.length > 0,
+            charFaceReferenceUsed: referenceImage_5.some(
+                (apk110New_197) => apk110New_197.role === 'char',
+            ),
+            userFaceReferenceUsed: referenceImage_5.some(
+                (apk110New_198) => apk110New_198.role === 'user',
+            ),
+            compiledPrompt: apk110New_190,
             promptParts: {
                 scenePrompt: handleAction_25_163.scenePrompt,
                 basePrompt: handleAction_25_163.basePrompt,

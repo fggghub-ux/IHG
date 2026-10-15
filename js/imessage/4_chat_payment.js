@@ -111,21 +111,48 @@
             .find((item_2) => String(item_2.id) === String(memberId_3));
         return member_6 ? member_6.nickname || member_6.realName || '群成员' : '群成员';
     }
-    function getPayUserName() {
+    function getPayUserName(apk110New_76) {
+        const apk110New_77 =
+            apk110New_76?.id != null
+                ? window.imApp?.getFriendById?.(apk110New_76.id) || apk110New_76
+                : apk110New_76;
+        if (!apk110New_77 || apk110New_77.type === 'group' || !apk110New_77.boundAccountId)
+            return null;
+        if (window.imApp?.getBoundAccountByFriend)
+            return window.imApp.getBoundAccountByFriend(apk110New_77);
+        const apk110New_78 = typeof window.getAccounts === 'function' ? window.getAccounts() : [];
+        return (
+            apk110New_78.find(
+                (apk110New_79) => String(apk110New_79?.id) === String(apk110New_77.boundAccountId),
+            ) || null
+        );
+    }
+    function apk110New_12(apk110New_80, apk110New_81 = getPayUserName(apk110New_80)) {
         const currentUserState = window.userState || userState_3 || {};
         return (
-            currentUserState.name ||
-            currentUserState.realName ||
-            currentUserState.nickname ||
-            'User'
+            String(
+                apk110New_81?.name ||
+                    apk110New_81?.realName ||
+                    apk110New_81?.nickname ||
+                    currentUserState.name ||
+                    currentUserState.realName ||
+                    currentUserState.nickname ||
+                    'User',
+            ).trim() || 'User'
         );
     }
     function getPayFriendName(friend, fallback = '') {
         return fallback || friend?.nickname || friend?.realName || friend?.name || 'Char';
     }
-    function getPayUserAvatar() {
+    function getPayUserAvatar(apk110New_85, apk110New_86 = getPayUserName(apk110New_85)) {
         const currentUserState_2 = window.userState || userState_3 || {};
-        return currentUserState_2.avatarUrl || currentUserState_2.avatar || '';
+        return (
+            apk110New_86?.avatarUrl ||
+            apk110New_86?.avatar ||
+            currentUserState_2.avatarUrl ||
+            currentUserState_2.avatar ||
+            ''
+        );
     }
     function getPayFriendAvatar(friend_2) {
         return friend_2?.avatarUrl || friend_2?.avatar || '';
@@ -133,7 +160,11 @@
     function normalizePayTransferMessage_2(msg_2 = {}, friend_3 = null) {
         const payKind_2 =
                 msg_2.payKind || (msg_2.role === 'user' ? 'user_to_char' : 'char_received'),
-            userName = getPayUserName(),
+            userName = getPayUserName(friend_3),
+            apk110New_93 = String(
+                userName?.name || userName?.realName || userName?.nickname || '',
+            ).trim(),
+            apk110New_94 = apk110New_12(friend_3, userName),
             charName_2 = getPayFriendName(friend_3, msg_2.speaker || msg_2.charName || ''),
             targetName_2 = msg_2.targetName || '',
             charToUserKinds = [
@@ -163,14 +194,18 @@
         if (status_2 === 'pending' && msg_2.claimed) status_2 = 'claimed';
         let payerName_2 = msg_2.payerName || '',
             payeeName_2 = msg_2.payeeName || '';
-        direction_2 === 'char_to_user'
-            ? ((payerName_2 = payerName_2 || msg_2.senderName || targetName_2 || charName_2),
-              (payeeName_2 = payeeName_2 || msg_2.receiverName || userName))
-            : ((payerName_2 = payerName_2 || msg_2.senderName || userName),
-              (payeeName_2 =
-                  payeeName_2 ||
-                  msg_2.receiverName ||
-                  (targetName_2 && targetName_2 !== userName ? targetName_2 : charName_2)));
+        if (direction_2 === 'char_to_user') {
+            payerName_2 = payerName_2 || msg_2.senderName || targetName_2 || charName_2;
+            payeeName_2 = payeeName_2 || msg_2.receiverName || apk110New_94;
+            if (apk110New_93) payeeName_2 = apk110New_93;
+        } else {
+            payerName_2 = payerName_2 || msg_2.senderName || apk110New_94;
+            payeeName_2 =
+                payeeName_2 ||
+                msg_2.receiverName ||
+                (targetName_2 && targetName_2 !== apk110New_94 ? targetName_2 : charName_2);
+            if (apk110New_93) payerName_2 = apk110New_93;
+        }
         const payerType_2 = direction_2 === 'user_to_char' ? 'user' : 'char',
             payeeType_2 = direction_2 === 'user_to_char' ? 'char' : 'user';
         return {
@@ -181,8 +216,14 @@
             payeeName: payeeName_2,
             payerType: payerType_2,
             payeeType: payeeType_2,
-            payerAvatar: payerType_2 === 'user' ? getPayUserAvatar() : getPayFriendAvatar(friend_3),
-            payeeAvatar: payeeType_2 === 'user' ? getPayUserAvatar() : getPayFriendAvatar(friend_3),
+            payerAvatar:
+                payerType_2 === 'user'
+                    ? getPayUserAvatar(friend_3, userName)
+                    : getPayFriendAvatar(friend_3),
+            payeeAvatar:
+                payeeType_2 === 'user'
+                    ? getPayUserAvatar(friend_3, userName)
+                    : getPayFriendAvatar(friend_3),
             canCurrentUserClaim:
                 direction_2 === 'char_to_user' && status_2 === 'pending' && !msg_2.claimed,
             senderName: payerName_2,

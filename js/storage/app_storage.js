@@ -2910,6 +2910,8 @@
                 : [],
             text: typeof safe.text === 'string' ? safe.text : '',
             transcript: typeof safe.transcript === 'string' ? safe.transcript : '',
+            ttsAudioAssetId: typeof safe.ttsAudioAssetId === 'string' ? safe.ttsAudioAssetId : '',
+            ttsAudioText: typeof safe.ttsAudioText === 'string' ? safe.ttsAudioText : '',
             stickerCategory: typeof safe.stickerCategory === 'string' ? safe.stickerCategory : '',
             stickerName: typeof safe.stickerName === 'string' ? safe.stickerName : '',
             stickerUrl: typeof safe.stickerUrl === 'string' ? safe.stickerUrl : '',
@@ -3028,6 +3030,8 @@
             imageModel: typeof safe.imageModel === 'string' ? safe.imageModel : '',
             imageSize: typeof safe.imageSize === 'string' ? safe.imageSize : '',
             faceReferenceUsed: !!safe.faceReferenceUsed,
+            charFaceReferenceUsed: !!safe.charFaceReferenceUsed,
+            userFaceReferenceUsed: !!safe.userFaceReferenceUsed,
             imageGenerationPrompt:
                 typeof safe.imageGenerationPrompt === 'string'
                     ? safe.imageGenerationPrompt.slice(0, 16000)
@@ -3062,6 +3066,12 @@
                           includeUserAppearance:
                               safe.imageGenerationConfig.includeUserAppearance !== false,
                           useReferenceFace: safe.imageGenerationConfig.useReferenceFace === true,
+                          useCharReferenceFace:
+                              safe.imageGenerationConfig.useCharReferenceFace === true ||
+                              (safe.imageGenerationConfig.useCharReferenceFace == null &&
+                                  safe.imageGenerationConfig.useReferenceFace === true),
+                          useUserReferenceFace:
+                              safe.imageGenerationConfig.useUserReferenceFace === true,
                       }
                     : null,
             imageRerollCount: Math.max(0, Number(safe.imageRerollCount) || 0),
@@ -3237,6 +3247,8 @@
                 : [],
             text: row.text,
             transcript: row.transcript,
+            ttsAudioAssetId: row.ttsAudioAssetId || '',
+            ttsAudioText: row.ttsAudioText || '',
             stickerCategory: row.stickerCategory,
             stickerName: row.stickerName,
             stickerUrl: row.stickerUrl,
@@ -3340,6 +3352,8 @@
             imageModel: row.imageModel || '',
             imageSize: row.imageSize || '',
             faceReferenceUsed: !!row.faceReferenceUsed,
+            charFaceReferenceUsed: !!row.charFaceReferenceUsed,
+            userFaceReferenceUsed: !!row.userFaceReferenceUsed,
             imageGenerationPrompt: row.imageGenerationPrompt || '',
             imageGenerationCompiledPrompt: row.imageGenerationCompiledPrompt || '',
             imageGenerationConfig:
@@ -7575,14 +7589,119 @@
         libraryDailyStats: '书库',
         storageCheckpoints: '冗余历史',
     };
+    const apk110New_290 = {
+        imessage: 'iMessage',
+        x: 'X',
+        desktop: '桌面小组件',
+        theme: '主题',
+        notifications: '通知',
+        other: '其他来源',
+    };
+    const apk110New_291 = {
+        image: '图片',
+        audio: '音频',
+        video: '视频',
+        font: '字体',
+        other: '其他文件',
+    };
+    function apk110New_292(apk110New_2092 = {}) {
+        const apk110New_2093 = String(apk110New_2092.ownerType || '')
+            .trim()
+            .toLowerCase();
+        const apk110New_2094 = String(apk110New_2092.kind || '')
+            .trim()
+            .toLowerCase();
+        if (apk110New_2093.startsWith('im_') || apk110New_2093.startsWith('imessage_'))
+            return 'imessage';
+        if (apk110New_2093.startsWith('x_')) return 'x';
+        if (apk110New_2093 === 'desktop_widget') return 'desktop';
+        if (apk110New_2093 === 'system_notification') return 'notifications';
+        if (apk110New_2093 === 'theme' || apk110New_2094 === 'theme-font') return 'theme';
+        return 'other';
+    }
+    function apk110New_293(apk110New_2095 = {}) {
+        const apk110New_2096 = String(apk110New_2095.blob?.type || apk110New_2095.mimeType || '')
+            .trim()
+            .toLowerCase();
+        if (apk110New_2096.startsWith('image/')) return 'image';
+        if (apk110New_2096.startsWith('audio/')) return 'audio';
+        if (apk110New_2096.startsWith('video/')) return 'video';
+        if (
+            String(apk110New_2095.kind || '')
+                .trim()
+                .toLowerCase() === 'theme-font' ||
+            apk110New_2096.startsWith('font/') ||
+            /^(application\/(?:font-|x-font-|woff|x-woff|vnd\.ms-fontobject))/.test(apk110New_2096)
+        )
+            return 'font';
+        return 'other';
+    }
+    function apk110New_294(apk110New_2097 = []) {
+        const apk110New_2098 = new Map();
+        let apk110New_2099 = 0;
+        let apk110New_2100 = 0;
+        apk110New_2097.forEach((apk110New_2102) => {
+            const apk110New_2103 = measureRecordBytes(apk110New_2102);
+            const apk110New_2104 = apk110New_292(apk110New_2102);
+            const apk110New_2105 = apk110New_293(apk110New_2102);
+            if (!apk110New_2098.has(apk110New_2104)) {
+                apk110New_2098.set(apk110New_2104, {
+                    key: apk110New_2104,
+                    label: apk110New_290[apk110New_2104],
+                    count: 0,
+                    bytes: 0,
+                    types: new Map(),
+                });
+            }
+            const apk110New_2106 = apk110New_2098.get(apk110New_2104);
+            if (!apk110New_2106.types.has(apk110New_2105)) {
+                apk110New_2106.types.set(apk110New_2105, {
+                    key: apk110New_2105,
+                    label: apk110New_291[apk110New_2105],
+                    count: 0,
+                    bytes: 0,
+                });
+            }
+            const apk110New_2107 = apk110New_2106.types.get(apk110New_2105);
+            apk110New_2099 += 1;
+            apk110New_2100 += apk110New_2103;
+            apk110New_2106.count += 1;
+            apk110New_2106.bytes += apk110New_2103;
+            apk110New_2107.count += 1;
+            apk110New_2107.bytes += apk110New_2103;
+        });
+        const apk110New_2101 = (apk110New_2108, apk110New_2109) =>
+            apk110New_2109.bytes - apk110New_2108.bytes ||
+            apk110New_2108.label.localeCompare(apk110New_2109.label, 'zh-CN');
+        return {
+            count: apk110New_2099,
+            bytes: apk110New_2100,
+            sources: Array.from(apk110New_2098.values(), (apk110New_2110) => ({
+                key: apk110New_2110.key,
+                label: apk110New_2110.label,
+                count: apk110New_2110.count,
+                bytes: apk110New_2110.bytes,
+                types: Array.from(apk110New_2110.types.values()).sort(apk110New_2101),
+            })).sort(apk110New_2101),
+        };
+    }
     async function getStorageBreakdown(options = {}) {
         if (!options.skipReady && storageReadyPromise) await storageReadyPromise;
         const stores = {};
         const groups = {};
         let indexedDbBytes = 0;
+        let apk110New_2115 = {
+            count: 0,
+            bytes: 0,
+            sources: [],
+        };
         for (const [storeKey, storeName] of Object.entries(STORES)) {
             const rows = await getAllRecords(storeName);
-            const bytes = rows.reduce((sum, row) => sum + measureRecordBytes(row), 0);
+            if (storeKey === 'assets') apk110New_2115 = apk110New_294(rows);
+            const bytes =
+                storeKey === 'assets'
+                    ? apk110New_2115.bytes
+                    : rows.reduce((sum, row) => sum + measureRecordBytes(row), 0);
             stores[storeName] = {
                 count: rows.length,
                 bytes,
@@ -7642,10 +7761,11 @@
                 bytes: browserOtherBytes,
             };
         return {
-            stores,
-            groups,
-            logicalGroups,
-            indexedDbBytes,
+            stores: stores,
+            groups: groups,
+            logicalGroups: logicalGroups,
+            assetBreakdown: apk110New_2115,
+            indexedDbBytes: indexedDbBytes,
             logicalBytes: indexedDbBytes,
             indexedDbReportedBytes,
             databaseOverheadBytes,
@@ -8846,6 +8966,7 @@
         getUsageSummary,
         saveAssetFromDataUrl,
         saveAssetFromBlob,
+        getAssetBlob,
         getAssetUrl,
         deleteAsset,
         markAssetOrphaned,

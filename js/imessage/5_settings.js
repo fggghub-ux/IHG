@@ -1373,11 +1373,10 @@
                         });
                     });
                 } else
-                    ui.contentEl.innerHTML = buildTextMemoryModalHtml(
-                        '珍视回忆',
-                        memory_3.cherished,
-                        currentConfig.emptyText,
-                    );
+                    ui.contentEl.innerHTML =
+                        '<div class="chat-memory-modal-empty">' +
+                        currentConfig.emptyText +
+                        '</div>';
             } else {
                 if (type_2 === 'overview') {
                     const value_325 = Array.isArray(friendData_313.messages)
@@ -2802,48 +2801,86 @@
             }
         }
     }
-  clearHistoryBtn_2 && clearHistoryBtn_2.addEventListener("click", () => {
-    window.imData.currentSettingsFriend && showCustomModal_2({
-      title: "清空聊天记录",
-      message: "确定清空线上聊天记录吗？上下文、记忆和状态栏会保留，此操作不可恢复。",
-      isDestructive: true,
-      confirmText: "清空",
-      onConfirm: async () => {
-        const friendId_3 = window.imData.currentSettingsFriend.id,
-          value_531 = window.imApp.resetFriendMessages ? await window.imApp.resetFriendMessages(friendId_3, {
-            silent: true
-          }) : await commitSettingsFriendChange(targetFriend_10 => {
-            targetFriend_10.messages = [];
-            window.imApp.syncActiveFriendReference && window.imApp.syncActiveFriendReference(targetFriend_10);
-            window.imApp.syncSettingsFriendReference && window.imApp.syncSettingsFriendReference(targetFriend_10);
-          }, {
-            silent: true,
-            metaOnly: false,
-            includeMessages: true
-          });
-        if (!value_531) {
-          showToast_2("清空聊天记录失败");
-          const elementById_534 = document.getElementById("chat-interface-" + friendId_3);
-          if (elementById_534) {
-            const failedContainer = elementById_534.querySelector(".ins-chat-messages");
-            failedContainer && (failedContainer.innerHTML = "", window.imChat.renderChatHistory(window.imData.currentSettingsFriend, failedContainer));
-          }
-          return;
-        }
-        const elementById_532 = document.getElementById("chat-interface-" + friendId_3);
-        if (elementById_532) {
-          const insChatMessagesElement_536 = elementById_532.querySelector(".ins-chat-messages"),
-            value_537 = window.imApp.getFriendById ? window.imApp.getFriendById(friendId_3) : window.imData.currentSettingsFriend;
-          if (insChatMessagesElement_536 && value_537 && window.imChat.rerenderChatContainer) window.imChat.rerenderChatContainer(value_537, insChatMessagesElement_536, {
-            scroll: false
-          });else insChatMessagesElement_536 && (insChatMessagesElement_536.innerHTML = "");
-        }
-        showToast_2("已清空聊天记录");
-        closeView_2(chatSettingsSheet);
-        if (window.imApp.renderChatsList) window.imApp.renderChatsList();
-      }
-    });
-  });
+    clearHistoryBtn_2 &&
+        clearHistoryBtn_2.addEventListener('click', () => {
+            window.imData.currentSettingsFriend &&
+                showCustomModal_2({
+                    title: '清空聊天记录',
+                    message: '确定清空线上聊天记录吗？上下文、记忆和状态栏会保留，此操作不可恢复。',
+                    isDestructive: true,
+                    confirmText: '清空',
+                    onConfirm: async () => {
+                        const friendId_3 = window.imData.currentSettingsFriend.id,
+                            value_531 = window.imApp.resetFriendMessages
+                                ? await window.imApp.resetFriendMessages(friendId_3, {
+                                      silent: true,
+                                  })
+                                : await commitSettingsFriendChange(
+                                      (targetFriend_10) => {
+                                          targetFriend_10.messages = [];
+                                          window.imApp.syncActiveFriendReference &&
+                                              window.imApp.syncActiveFriendReference(
+                                                  targetFriend_10,
+                                              );
+                                          window.imApp.syncSettingsFriendReference &&
+                                              window.imApp.syncSettingsFriendReference(
+                                                  targetFriend_10,
+                                              );
+                                      },
+                                      {
+                                          silent: true,
+                                          metaOnly: false,
+                                          includeMessages: true,
+                                      },
+                                  );
+                        if (!value_531) {
+                            showToast_2('清空聊天记录失败');
+                            const elementById_534 = document.getElementById(
+                                'chat-interface-' + friendId_3,
+                            );
+                            if (elementById_534) {
+                                const failedContainer =
+                                    elementById_534.querySelector('.ins-chat-messages');
+                                failedContainer &&
+                                    ((failedContainer.innerHTML = ''),
+                                    window.imChat.renderChatHistory(
+                                        window.imData.currentSettingsFriend,
+                                        failedContainer,
+                                    ));
+                            }
+                            return;
+                        }
+                        const elementById_532 = document.getElementById(
+                            'chat-interface-' + friendId_3,
+                        );
+                        if (elementById_532) {
+                            const insChatMessagesElement_536 =
+                                    elementById_532.querySelector('.ins-chat-messages'),
+                                value_537 = window.imApp.getFriendById
+                                    ? window.imApp.getFriendById(friendId_3)
+                                    : window.imData.currentSettingsFriend;
+                            if (
+                                insChatMessagesElement_536 &&
+                                value_537 &&
+                                window.imChat.rerenderChatContainer
+                            )
+                                window.imChat.rerenderChatContainer(
+                                    value_537,
+                                    insChatMessagesElement_536,
+                                    {
+                                        scroll: false,
+                                    },
+                                );
+                            else
+                                insChatMessagesElement_536 &&
+                                    (insChatMessagesElement_536.innerHTML = '');
+                        }
+                        showToast_2('已清空聊天记录');
+                        closeView_2(chatSettingsSheet);
+                        if (window.imApp.renderChatsList) window.imApp.renderChatsList();
+                    },
+                });
+        });
     deleteFriendBtn &&
         deleteFriendBtn.addEventListener('click', () => {
             window.imData.currentSettingsFriend &&
@@ -3550,7 +3587,7 @@
                 replyTask.enabled && momentTask.enabled
                     ? '全部开启'
                     : replyTask.enabled
-                      ? '回复开启'
+                      ? '主动消息开启'
                       : momentTask.enabled
                         ? '朋友圈开启'
                         : '关闭'),
@@ -3952,16 +3989,16 @@
         return slice_702.map(({ entry: entry_9 }) =>
             [
                 'ID: ' + entry_9.id,
-                '标题: ' + (entry_9.title || '对话总结'),
-                '时间: ' + (entry_9.time || ''),
-                '事件: ' + (entry_9.event || ''),
-                '记忆点: ' + (entry_9.memoryPoints || ''),
-                '记忆标签: ' +
+                'Title: ' + (entry_9.title || 'Conversation summary'),
+                'Time: ' + (entry_9.time || ''),
+                'Event: ' + (entry_9.event || ''),
+                'Memory points: ' + (entry_9.memoryPoints || ''),
+                'Memory tags: ' +
                     (window.imChat?.getShortTermMemoryTags
                         ? window.imChat.getShortTermMemoryTags(entry_9)
                         : entry_9.memoryTags || entry_9.triggerKeywords || []
-                    ).join('、'),
-                '记忆程度: ' + (entry_9.degree || '高'),
+                    ).join(', '),
+                'Memory importance: ' + (entry_9.degree || '高'),
             ].join(`
 `),
         ).join(`
@@ -4049,15 +4086,8 @@
             });
         }
         const title_2 = String(payload_2?.title || '').trim(),
-            content_4 = String(payload_2?.content || payload_2?.memory || '').trim(),
-            rawTags = payload_2?.triggerKeywords || payload_2?.memoryTags || [],
-            triggerKeywords_2 = window.imChat?.normalizeMemoryTriggerKeywords
-                ? window.imChat.normalizeMemoryTriggerKeywords(rawTags)
-                : (Array.isArray(rawTags) ? rawTags : [rawTags])
-                      .map((value_7) => String(value_7 || '').trim())
-                      .filter(Boolean)
-                      .slice(0, 6);
-        if (!title_2 || !content_4 || triggerKeywords_2.length === 0)
+            content_4 = String(payload_2?.content || payload_2?.memory || '').trim();
+        if (!title_2 || !content_4)
             throw createSummaryFailureError({
                 kind: 'response_format',
             });
@@ -4065,7 +4095,6 @@
             title: title_2,
             content: content_4,
             time: String(payload_2?.time || fallback_2.time || '').trim(),
-            triggerKeywords: triggerKeywords_2.slice(0, 6),
         };
     }
     function getSummaryApiPresets() {
@@ -4106,16 +4135,16 @@
             value_141 = entry_8.type === 'group',
             join_142 = entries_7.map((message_152, value_156) =>
                 [
-                    '条目 ' + (value_156 + 1) + '（ID: ' + message_152.id + '）',
-                    '标题: ' + (message_152.title || '对话总结'),
-                    '时间: ' + (message_152.time || message_152.createdAt || '未记录'),
-                    '事件: ' + (message_152.event || message_152.content || ''),
-                    '记忆点: ' + (message_152.memoryPoints || ''),
-                    '标签: ' +
+                    'Entry ' + (value_156 + 1) + ' (ID: ' + message_152.id + ')',
+                    'Title: ' + (message_152.title || 'Conversation summary'),
+                    'Time: ' + (message_152.time || message_152.createdAt || 'not recorded'),
+                    'Event: ' + (message_152.event || message_152.content || ''),
+                    'Memory points: ' + (message_152.memoryPoints || ''),
+                    'Tags: ' +
                         (window.imChat?.getShortTermMemoryTags
                             ? window.imChat.getShortTermMemoryTags(message_152)
                             : message_152.memoryTags || message_152.triggerKeywords || []
-                        ).join('、'),
+                        ).join(', '),
                 ].join(`
 `),
             ).join(`
@@ -4128,32 +4157,31 @@
             ),
             value_145 = value_141
                 ? `
-群聊隐私约束（最高优先级）：
-- 输入仅应来自该群公开总结；只保留公开发生的事实。
-- 禁止写入、推断或复述任何成员私信、好友私聊、私密想法或未公开信息。
-- 必须使用第三人称描述群聊共同事件。`
+Group privacy constraints, highest priority:
+- Input should come only from public summaries of this group. Preserve public facts only.
+- Do not include, infer, or repeat members' DMs, private friend chats, private thoughts, or undisclosed information.
+- Describe shared group events in third person.`
                 : `
-单聊约束：
-- 只合并输入条目中已经明确存在的事实，不得补写、猜测或虚构细节。
-- 用 ` +
+Private-chat constraints:
+- Merge only facts explicitly present in the input entries. Do not add, guess, or invent details.
+- Express them concisely in terms of ` +
                   value_140 +
-                  ' 与 User 的长期关系和稳定偏好可理解的简洁表述。',
+                  "'s lasting relationship with User and stable preferences.",
             content_5 =
-                '你是记忆整理员。请把以下 ' +
+                'You organize memories. Merge these ' +
                 entries_7.length +
-                ' 条短期记忆合并为一条可长期保存的记忆。保留稳定事实、承诺、偏好、关系变化和未完成事项；去掉重复与瞬时细节。' +
+                ' short-term memories into one memory suitable for long-term storage. Keep stable facts, promises, preferences, relationship changes, and unfinished matters; remove repetition and fleeting details.' +
                 value_145 +
                 `
 
-只输出可解析 JSON，禁止 markdown 或解释，结构必须完全如下：
+Output parseable JSON only, with no Markdown or explanation. Use exactly this structure, with generated content in Simplified Chinese:
 {
-  "title": "不超过16字的标题",
-  "time": "沿用输入中最晚的相关时间，不确定则留空",
-  "content": "60-180字的长期记忆正文",
-  "triggerKeywords": ["3到6个可单独触发的简短标签"]
+  "title": "title within 16 Chinese characters",
+  "time": "latest relevant time from the input, or empty if uncertain",
+  "content": "long-term memory of 60–180 Chinese characters"
 }
 
-短期记忆：
+Short-term memories:
 ` +
                 join_142,
             value_753 = await fetch(normalizeSummaryApiEndpoint(anchorDate_2), {
@@ -4171,7 +4199,7 @@
                     messages: [
                         {
                             role: 'system',
-                            content: '你只输出可解析 JSON。',
+                            content: 'Output parseable JSON only.',
                         },
                         {
                             role: 'user',
@@ -4317,108 +4345,103 @@
             customSummaryPrompt = String(friend_46.memory?.summary?.prompt || '').trim(),
             value_177 =
                 friend_46.type === 'group'
-                    ? `查看已有的群聊总结，将与本次需要总结的公开群聊内容相关的记忆条目激活（记忆程度改为高）。
+                    ? `Review existing group summaries and activate entries relevant to the public group messages in this batch by returning their IDs.
 
-已有群聊总结：
+Existing group summaries:
 ` +
                       handleAction_4_175 +
                       `
 
-你是群聊记录整理员。请用第三人称总结群聊「` +
-                      value_166 +
-                      '」中的公开聊天，把以下' +
+You organize public group-chat records. In third person, summarize ` +
                       batch.selectedRounds +
-                      '轮、共' +
+                      ' rounds and ' +
                       sourceMessages_2.length +
-                      `条公开消息整理为一份可供后续回顾的完整记录。按实际发生顺序保留事件缘由、参与者的立场与行动、关键对话或决定、情绪与氛围变化、最终结果、承诺和未解决事项；只整合真实公开内容，不要逐条复述，也不要虚构细节。
+                      ' public messages from "' +
+                      value_166 +
+                      `" as one complete record for later recall. In actual event order, preserve causes, participants' positions and actions, key dialogue or decisions, shifts in emotion and atmosphere, outcomes, promises, and unresolved matters. Integrate real public facts rather than listing every message or inventing details.
 
-当前真实总结时间：` +
+Current real summary time: ` +
                       nowString +
                       `
-本批对话实际发生时间：` +
+Actual time of these messages: ` +
                       time_2 +
                       `
-User 名称：` +
+User name: ` +
                       userName_2 +
                       `
 
-严格限制：
-- 只总结当前群聊里公开发生的消息。
-- 不要写入、推断或复述任何群成员给 User 的私信内容。
-- 不要写入、推断或复述任何群成员与自己好友/私有联系人的私信内容。
-- 如果记录里只有“有人发了私信”这类系统提示，也只能当作不可展开的背景事件，不得编造私信细节。
+Strict privacy rules:
+- Summarize only messages publicly visible in this group.
+- Do not include, infer, or repeat member DMs to User or private chats with their own friends or contacts.
+- A system notice saying someone sent a private message is only an opaque background event; do not invent its contents.
 
-必须只输出 JSON，不要 markdown，不要解释。JSON 字段如下：
+Output only parseable JSON, with no Markdown or explanation. Write generated content in Simplified Chinese, while preserving English JSON keys:
 {
-  "activatedEntryIds": ["与本次群聊相关、需要激活的已有总结ID，没有则为空数组"],
+  "activatedEntryIds": ["IDs of existing relevant group summaries, or empty array"],
   "summary": {
-    "title": "10字内，事件名称",
-    "time": "本批公开群聊实际发生时间，前端会按消息时间戳覆盖",
-    "event": "180-320字，第三人称完整叙述公开群聊的缘由、经过、关键互动/决定、情绪变化、结果与待办；信息不足时如实略过，不得编造",
-    "memoryPoints": "纯文本字符串，按“参与者/目标或分歧/关键决定/关系或情绪变化/结果与待办”概括可召回事实",
+    "title": "event title within 10 Chinese characters",
+    "time": "actual time of this public group batch; frontend overrides it from timestamps",
+    "event": "180–320 Chinese characters, third-person account of public causes, events, key interactions or decisions, emotional changes, results, and open tasks; omit unsupported details",
+    "memoryPoints": "plain text of recallable public facts: participants, goals or disagreements, key decisions, relationship or emotional changes, results and open tasks",
+    "memoryTags": ["3–6 short tags based only on public content"],
     "degree": "高"
   }
 }
 
-summary.degree 只可输出“高”。activatedEntryIds 只能使用已有群聊总结中的 ID。
+summary.degree must be exactly "高". activatedEntryIds may contain only IDs from existing group summaries.
 
-公开群聊：
+Public group chat:
 ` +
-                      join_174 +
-                      `
+                      join_174
+                    : `Review existing summaries and activate entries relevant to the conversation in this batch by returning their IDs.
 
-查看已有总结，将所有记忆程度超过真实时间1天的高改成中，超过7天的改成低，超过30天的改成遗忘。`
-                    : `查看已有的总结，将与本次需要总结的对话的内容相关的记忆点的记忆条目激活（记忆程度改为高）。
-
-已有短期记忆总结：
+Existing short-term summaries:
 ` +
                       handleAction_4_175 +
                       `
 
-你是` +
+You are ` +
                       value_166 +
-                      '，请站在' +
+                      '. In ' +
                       value_166 +
-                      '的第一人称视角，将以下' +
+                      "'s first-person viewpoint, turn " +
                       batch.selectedRounds +
-                      '轮、共' +
+                      ' rounds and ' +
                       sourceMessages_2.length +
-                      `条对话整理为一段可回顾的完整记忆。按实际发生顺序交代缘由、双方的主动表达与回应、重要细节或原话、情绪和关系变化、达成的约定/偏好，以及结果或未完成事项；不要机械罗列消息，也不得补写未发生的情节。
+                      ` messages into one complete memory. Follow actual event order: causes, both parties' statements and responses, important details or exact words, emotional and relationship changes, agreements or preferences, outcomes, and unfinished matters. Do not mechanically list messages or invent events.
 
-当前真实总结时间：` +
+Current real summary time: ` +
                       nowString +
                       `
-本批对话实际发生时间：` +
+Actual time of these messages: ` +
                       time_2 +
                       `
-User 名称：` +
+User name: ` +
                       userName_2 +
                       `
 
-必须只输出 JSON，不要 markdown，不要解释。JSON 字段如下：
+Output only parseable JSON, with no Markdown or explanation. Write generated content in Simplified Chinese, while preserving English JSON keys:
 {
-  "activatedEntryIds": ["与本次对话相关、需要激活的已有记忆ID，没有则为空数组"],
+  "activatedEntryIds": ["IDs of existing relevant memories, or empty array"],
   "summary": {
-    "title": "10字内，事件名称",
-    "time": "本批对话实际发生时间，前端会按消息时间戳覆盖",
-    "event": "160-300字，以第一人称完整记录这段对话的缘由、经过、关键细节、双方情绪与关系变化、结果和后续事项；仅依据对话事实，不得虚构",
-    "memoryPoints": "纯文本字符串，包含情绪、声音、画面、气味、环境及本次形成的偏好/约定等可召回要点；没有依据的感官信息留空，不得编造",
+    "title": "event title within 10 Chinese characters",
+    "time": "actual time of this batch; frontend overrides it from timestamps",
+    "event": "160–300 Chinese characters in first person, covering causes, key details, both parties' emotions, relationship changes, results, and follow-up, based only on the dialogue",
+    "memoryPoints": "plain text of supported emotional and relationship changes, preferences, agreements, results, and open tasks; do not invent sensory or environmental detail",
+    "memoryTags": ["3–6 short concrete tags"],
     "degree": "高"
   }
 }
 
-summary.degree 只可输出“高”。activatedEntryIds 只能使用已有短期记忆总结中的 ID。
+summary.degree must be exactly "高". activatedEntryIds may contain only IDs from existing short-term summaries.
 
-对话：
+Conversation:
 ` +
-                      join_174 +
-                      `
-
-查看已有的总结，将所有记忆程度超过真实时间1天的高改成中，超过7天的改成低，超过30天的改成遗忘。`,
+                      join_174,
             value_178 = customSummaryPrompt
-                ? '请总结以下' +
-                  (friend_46.type === 'group' ? '公开群聊' : '对话') +
-                  `。总结的内容取舍、重点、视角和表达方式必须以 <user_summary_instructions> 为最高优先级，不得套用其他内置总结风格。
+                ? 'Summarize the following ' +
+                  (friend_46.type === 'group' ? 'public group chat' : 'conversation') +
+                  `. Within the required JSON structure, real event time, and group privacy limits, follow <user_summary_instructions> as the highest priority for content selection, focus, viewpoint, and expression. Do not impose a built-in summary style.
 
 <user_summary_instructions>
 ` +
@@ -4426,34 +4449,35 @@ summary.degree 只可输出“高”。activatedEntryIds 只能使用已有短�
                   `
 </user_summary_instructions>
 
-已有总结：
+Existing summaries:
 ` +
                   handleAction_4_175 +
                   `
 
-当前真实总结时间：` +
+Current real summary time: ` +
                   nowString +
                   `
-本批对话实际发生时间：` +
+Actual time of these messages: ` +
                   time_2 +
                   `
-User 名称：` +
+User name: ` +
                   userName_2 +
                   `
 
-必须只输出以下 JSON 结构：
+Output only this parseable JSON structure, with generated content following User's custom language and style instructions:
 {
-  "activatedEntryIds": ["与本次内容相关的已有总结ID，没有则为空数组"],
+  "activatedEntryIds": ["IDs of relevant existing summaries, or empty array"],
   "summary": {
-    "title": "按自定义要求概括的简短标题",
-    "time": "本批对话实际发生时间，前端会按消息时间戳覆盖",
-    "event": "完全按自定义要求生成的总结正文",
-    "memoryPoints": "与自定义总结一致的可召回要点",
+    "title": "short title following custom instructions",
+    "time": "actual time of this batch; frontend overrides it from timestamps",
+    "event": "summary prose following custom instructions",
+    "memoryPoints": "recallable points consistent with the custom summary",
+    "memoryTags": ["3–6 short concrete tags"],
     "degree": "高"
   }
 }
 
-对话：
+Conversation:
 ` +
                   join_174
                 : value_177,
@@ -4461,39 +4485,19 @@ User 名称：` +
                 friend_46.type === 'group'
                     ? `
 
-最高优先级结构与隐私约束：只能总结当前群聊公开消息，禁止写入、推断或复述任何群成员私信及好友私聊内容。不能修改 JSON 字段，只输出可解析 JSON。`
+Highest-priority structure and privacy rule: summarize only this group's public messages. Do not include, infer, or repeat members' DMs or private chats with friends. Preserve JSON keys and output parseable JSON only.`
                     : `
 
-最高优先级结构约束：不能修改 JSON 字段，只输出可解析 JSON。`,
+Highest-priority structure rule: preserve JSON keys and output parseable JSON only.`,
             value_180 = customSummaryPrompt
                 ? `
-除上述结构、真实时间和群聊隐私约束外，总结内容必须完全服从 <user_summary_instructions>，禁止恢复内置的字数、感官、人称或表达风格要求。`
+Apart from structure, real event time, and group privacy, summary content must fully follow <user_summary_instructions>; do not restore built-in length, sensory, viewpoint, or style requirements.`
                 : '',
-            replace_181 = value_178
-                .replace(
-                    '"memoryPoints": "纯文本字符串，按“参与者/目标或分歧/关键决定/关系或情绪变化/结果与待办”概括可召回事实",',
-                    `"memoryPoints": "纯文本字符串，按“参与者/目标或分歧/关键决定/关系或情绪变化/结果与待办”概括可召回事实",
-    "memoryTags": ["3-6个仅来自公开内容的简短标签"],`,
-                )
-                .replace(
-                    '"memoryPoints": "纯文本字符串，包含情绪、声音、画面、气味、环境及本次形成的偏好/约定等可召回要点；没有依据的感官信息留空，不得编造",',
-                    `"memoryPoints": "纯文本字符串，概括对话中有依据的情绪、关系变化、偏好、约定、结果与待办；不得补写感官或环境细节",
-    "memoryTags": ["3-6个简短具体标签"],`,
-                )
-                .replace(
-                    '"memoryPoints": "与自定义总结一致的可召回要点",',
-                    `"memoryPoints": "与自定义总结一致的可召回要点",
-    "memoryTags": ["3-6个简短具体标签"],`,
-                )
-                .replace(
-                    /\n\n查看已有(?:的)?总结，将所有记忆程度超过真实时间1天的高改成中，超过7天的改成低，超过30天的改成遗忘。/g,
-                    '',
-                ),
-            content_6 =
-                replace_181 +
+            replace_181 =
+                value_178 +
                 `
 
-字段规则：summary.memoryPoints 必须保留为总结详情；summary.memoryTags 是召回标签字段，必须输出 3-6 个 2-16 字的简短具体标签，任意单个标签都应能独立触发对应记忆。群聊的记忆点和标签都只能来自公开内容。记忆衰减由前端处理，不要修改已有总结的程度。` +
+Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is the recall-tag field: output 3–6 short concrete tags, each 2–16 Chinese characters and independently able to trigger the memory. In group chat, memory points and tags must come only from public content. The frontend handles memory decay; do not change the importance of existing summaries. ` +
                 value_180 +
                 value_179,
             summaryApiEndpoint = normalizeSummaryApiEndpoint(anchorDate_3),
@@ -4512,11 +4516,11 @@ User 名称：` +
                     messages: [
                         {
                             role: 'system',
-                            content: '你只输出可解析 JSON。',
+                            content: 'Output parseable JSON only.',
                         },
                         {
                             role: 'user',
-                            content: content_6,
+                            content: replace_181,
                         },
                     ],
                     temperature: parseFloat(anchorDate_3.temperature ?? anchorDate_3.temp) || 0.7,
@@ -5247,6 +5251,9 @@ User 名称：` +
                 'timestamp-position-select',
             ),
             chatAvatarToggleElement_914 = document.getElementById('chat-avatar-toggle'),
+            apk110New_1226 = document.getElementById('chat-every-message-avatar-toggle'),
+            apk110New_1227 = document.getElementById('chat-continuous-bubbles-toggle'),
+            apk110New_1228 = document.getElementById('chat-reply-style-select'),
             chatLanguageSelect = document.getElementById('chat-language-select'),
             chatCustomLanguageRow_2 = document.getElementById('chat-custom-language-row'),
             chatCustomLanguageInput_2 = document.getElementById('chat-custom-language-input'),
@@ -5265,6 +5272,10 @@ User 名称：` +
             chatTtsSpeedInput = document.getElementById('chat-tts-speed-input');
         chatAvatarToggleElement_914 &&
             (chatAvatarToggleElement_914.checked = !!friend_57.showAvatar);
+        if (apk110New_1226) apk110New_1226.checked = friend_57.showEveryMessageAvatar === true;
+        if (apk110New_1227) apk110New_1227.checked = friend_57.continuousBubbles !== false;
+        if (apk110New_1228)
+            apk110New_1228.value = friend_57.replyStyle === 'outside' ? 'outside' : 'inside';
         if (chatLanguageSelect) {
             const language_2 = String(friend_57.language || 'zh').trim() || 'zh',
                 standardLanguages = new Set(['zh', 'ko', 'ja', 'en', 'fr', 'yue', 'ru']),
@@ -5348,6 +5359,18 @@ User 名称：` +
         page_3.classList.toggle(
             'timestamp-outside',
             !!friend_59.showTimestamp && friend_59.timestampPosition === 'outside',
+        );
+        page_3.classList.toggle(
+            'show-every-message-avatar',
+            friend_59.type === 'char' && friend_59.showEveryMessageAvatar === true,
+        );
+        page_3.classList.toggle(
+            'separate-bubbles',
+            friend_59.type === 'char' && friend_59.continuousBubbles === false,
+        );
+        page_3.classList.toggle(
+            'reply-outside',
+            friend_59.type === 'char' && friend_59.replyStyle === 'outside',
         );
     }
     function handleAction_89(currentSettingsFriend_9) {
@@ -5978,6 +6001,76 @@ User 名称：` +
         });
     function initTimestampSetting_3(currentSettingsFriend_12) {
         window.imData.currentSettingsFriend = currentSettingsFriend_12;
+    }
+    for (const [apk110New_1381, apk110New_1382, apk110New_1383, apk110New_1384, apk110New_1385] of [
+        [
+            'chat-every-message-avatar-toggle',
+            'showEveryMessageAvatar',
+            (apk110New_1386) => !!apk110New_1386,
+            '每条头像设置保存失败',
+            false,
+        ],
+        [
+            'chat-continuous-bubbles-toggle',
+            'continuousBubbles',
+            (apk110New_1387) => !!apk110New_1387,
+            '连续气泡设置保存失败',
+            false,
+        ],
+        [
+            'chat-reply-style-select',
+            'replyStyle',
+            (apk110New_1388) => (apk110New_1388 === 'outside' ? 'outside' : 'inside'),
+            '回复样式保存失败',
+            true,
+        ],
+    ]) {
+        const apk110New_1389 = document.getElementById(apk110New_1381);
+        if (!apk110New_1389 || apk110New_1389.dataset.bound === 'true') continue;
+        apk110New_1389.dataset.bound = 'true';
+        apk110New_1389.addEventListener('change', async () => {
+            const apk110New_1390 = window.imData.currentSettingsFriend;
+            if (!apk110New_1390 || apk110New_1390.type !== 'char') return;
+            const apk110New_1391 =
+                    apk110New_1382 === 'continuousBubbles'
+                        ? apk110New_1390[apk110New_1382] !== false
+                        : apk110New_1382 === 'replyStyle'
+                          ? apk110New_1390[apk110New_1382] === 'outside'
+                              ? 'outside'
+                              : 'inside'
+                          : apk110New_1390[apk110New_1382] === true,
+                apk110New_1392 = apk110New_1383(
+                    apk110New_1389.type === 'checkbox'
+                        ? apk110New_1389.checked
+                        : apk110New_1389.value,
+                ),
+                apk110New_1393 = await commitSettingsFriendChange(
+                    (apk110New_1395) => {
+                        apk110New_1395[apk110New_1382] = apk110New_1392;
+                    },
+                    {
+                        silent: true,
+                    },
+                );
+            if (!apk110New_1393) {
+                if (apk110New_1389.type === 'checkbox') apk110New_1389.checked = apk110New_1391;
+                else apk110New_1389.value = apk110New_1391;
+                showToast_2(apk110New_1384);
+                return;
+            }
+            const apk110New_1394 = window.imData.currentSettingsFriend;
+            handleAction_88(apk110New_1394);
+            if (apk110New_1385) {
+                const apk110New_1396 = document.getElementById(
+                        'chat-interface-' + apk110New_1394.id,
+                    ),
+                    apk110New_1397 = apk110New_1396?.querySelector('.ins-chat-messages');
+                if (apk110New_1397)
+                    window.imChat?.rerenderChatContainer?.(apk110New_1394, apk110New_1397, {
+                        scroll: false,
+                    });
+            }
+        });
     }
     function escapeCssAttributeValue(value_13) {
         return String(value_13 ?? '')

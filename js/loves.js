@@ -1,16 +1,45 @@
 const FRIEND_PHONE_APP_META = Object.freeze({
-    music: { name: 'Music', icon: 'assets/cphone/char-phone-music.jpg' },
-    health: { name: 'Health', icon: 'assets/cphone/char-phone-health.jpg' },
-    pay: { name: 'Wallet', icon: 'assets/cphone/char-phone-wallet.jpg' },
-    game: { name: 'Games', icon: 'assets/cphone/char-phone-games.jpg' },
-    call: { name: 'Phone', icon: 'assets/cphone/char-phone-phone.jpg' },
-    files: { name: 'Files', icon: 'assets/cphone/char-phone-files.jpg' },
-    weibo: { name: 'Weibo', icon: null },
-    settings: { name: 'Settings', icon: 'assets/cphone/char-phone-settings.jpg' },
-    imessage: { name: 'Message', icon: 'assets/cphone/char-phone-message.jpg' },
-    safari: { name: 'Safari', icon: 'assets/cphone/char-phone-safari.jpg' }
+    music: {
+        name: 'Music',
+        icon: 'assets/cphone/char-phone-music.jpg',
+    },
+    health: {
+        name: 'Health',
+        icon: 'assets/cphone/char-phone-health.jpg',
+    },
+    pay: {
+        name: 'Wallet',
+        icon: 'assets/cphone/char-phone-wallet.jpg',
+    },
+    game: {
+        name: 'Games',
+        icon: 'assets/cphone/char-phone-games.jpg',
+    },
+    call: {
+        name: 'Phone',
+        icon: 'assets/cphone/char-phone-phone.jpg',
+    },
+    files: {
+        name: 'Files',
+        icon: 'assets/cphone/char-phone-files.jpg',
+    },
+    weibo: {
+        name: 'Weibo',
+        icon: null,
+    },
+    settings: {
+        name: 'Settings',
+        icon: 'assets/cphone/char-phone-settings.jpg',
+    },
+    imessage: {
+        name: 'Message',
+        icon: 'assets/cphone/char-phone-message.jpg',
+    },
+    safari: {
+        name: 'Safari',
+        icon: 'assets/cphone/char-phone-safari.jpg',
+    },
 });
-
 window.lovesApp = {
     view: null,
     backBtn: null,
@@ -83,6 +112,10 @@ window.lovesApp = {
             return (await window.saveGlobalData(), true);
         }
         return false;
+    },
+    getGenerationUserPersona: function (friend) {
+        const identity = window.imApp?.getCharUserIdentity?.(friend);
+        return identity ? identity.persona || '普通用户' : window.userState?.persona || '普通用户';
     },
     bindLongPress: function (element_2, callback) {
         let pressTimer = null,
@@ -5490,7 +5523,7 @@ Char 已存：` +
                 (friend_27.persona || '普通角色') +
                 `
 【User 人设】` +
-                (window.userState?.persona || '普通用户') +
+                this.getGenerationUserPersona(friend_27) +
                 `
 【世界书】` +
                 text_368 +
@@ -5580,24 +5613,20 @@ Char 已存：` +
                 '<i class="fas fa-wand-magic-sparkles"></i><span>生成选中的应用数据</span>';
         }
     },
-    syncFriendPhoneAppMetadata: function() {
+    syncFriendPhoneAppMetadata: function () {
         Object.entries(FRIEND_PHONE_APP_META).forEach(([key, meta]) => {
             const app = document.getElementById(`friend-phone-app-${key}`);
             if (!app) return;
-
             app.setAttribute('aria-label', meta.name);
             app.setAttribute('title', meta.name);
-
             const label = app.querySelector('.friend-phone-app-label');
             if (label) label.textContent = meta.name;
-
             const image = app.querySelector('.friend-phone-app-icon');
             if (image && meta.icon && image.getAttribute('src') !== meta.icon) {
                 image.src = meta.icon;
             }
         });
     },
-
     openFriendPhone: function (friend_28) {
         this.syncFriendPhoneAppMetadata();
         const loversFriendPhoneViewElement = document.getElementById('lovers-friend-phone-view');
@@ -5755,7 +5784,7 @@ Char 已存：` +
                             `
 ` + globalWorldBookContextByPosition_407;
                 }
-                const value_394 = window.userState?.persona || '普通用户',
+                const value_394 = this.getGenerationUserPersona(friend_28),
                     value_397 = friend_28.persona || '普通角色';
                 let text_398 = '';
                 if (phoneIncludeChatContext_2) {

@@ -197,10 +197,8 @@
         'app-icon-8': APP_ICON_BASE + 'lover.jpg',
         'dock-icon-settings': APP_ICON_BASE + 'settings.jpg',
         'dock-icon-imessage': APP_ICON_BASE + 'imessage.jpg',
-        'dock-icon-youtube': APP_ICON_BASE + 'youtube.jpg'
+        'dock-icon-youtube': APP_ICON_BASE + 'youtube.jpg',
     };
-
-
     let themeState_2 = {
         bgUrl: null,
         uiChineseEnabled: false,
@@ -412,7 +410,8 @@
                     (savedThemeState.apps.forEach((savedApp) => {
                         const existingApp = themeState_2.apps.find((a_2) => a_2.id === savedApp.id);
                         if (existingApp) {
-                            existingApp.icon = savedApp.icon || DEFAULT_APP_ICONS[savedApp.id] || null;
+                            existingApp.icon =
+                                savedApp.icon || DEFAULT_APP_ICONS[savedApp.id] || null;
                             if (savedApp.id === 'app-icon-6') existingApp.name = 'Library';
                             else {
                                 if (savedApp.id === 'app-icon-10') existingApp.name = 'Gallery';
@@ -4731,12 +4730,16 @@
                     iconDiv.querySelector('i')
                 );
             };
-            const iconSource = app_7.icon || (app_7.id === 'app-icon-8' ? DEFAULT_APP_ICONS['app-icon-8'] : '');
-
+            const iconSource =
+                app_7.icon || (app_7.id === 'app-icon-8' ? DEFAULT_APP_ICONS['app-icon-8'] : '');
             if (iconSource) {
                 iconDiv.innerHTML = '';
                 iconDiv.classList.add('has-custom-app-icon');
-                iconDiv.style.setProperty('background', `url(${iconSource}) center / cover no-repeat`, 'important');
+                iconDiv.style.setProperty(
+                    'background',
+                    `url(${iconSource}) center / cover no-repeat`,
+                    'important',
+                );
                 iconDiv.style.setProperty('background-image', `url(${iconSource})`, 'important');
                 iconDiv.style.setProperty('background-size', 'cover', 'important');
                 iconDiv.style.setProperty('background-position', 'center', 'important');
@@ -6190,10 +6193,20 @@
                 UI.inputs.systemNotificationToggle.checked = !!result_4.enabled;
                 if (value_828 && typeof showToast === 'function') {
                     if (result_4.unsupported) showToast('当前浏览器不支持系统通知');
-                    else
-                        result_4.permission === 'denied'
-                            ? showToast('系统通知权限被拒绝，请在浏览器设置中开启')
-                            : showToast(result_4.enabled ? '消息通知已开启' : '消息通知已关闭');
+                    else {
+                        if (
+                            enabled_4 &&
+                            !result_4.enabled &&
+                            window.u2NativeBridge?.isNativeAndroid?.()
+                        )
+                            showToast(
+                                '通知权限未开启，请到安卓系统设置 → 应用 → u2phone → 通知中允许',
+                            );
+                        else
+                            result_4.permission === 'denied'
+                                ? showToast('系统通知权限被拒绝，请在浏览器设置中开启')
+                                : showToast(result_4.enabled ? '消息通知已开启' : '消息通知已关闭');
+                    }
                 }
                 return;
             }
@@ -6205,6 +6218,12 @@
                 UI.inputs.systemNotificationToggle.disabled = true;
                 try {
                     await applySystemNotificationControls(true);
+                } catch (apk110New_1186) {
+                    console.warn(
+                        '[settings] Failed to update notification setting:',
+                        apk110New_1186,
+                    );
+                    showToast('消息通知设置失败，请重试');
                 } finally {
                     UI.inputs.systemNotificationToggle.disabled = false;
                     syncSystemNotificationControls();
@@ -7599,8 +7618,15 @@
                 UI.inputs.ttsModelSelectLabel.textContent = '已获取' + textContent_2;
             UI.inputs.ttsEndpointHint &&
                 (UI.inputs.ttsEndpointHint.textContent =
-                    (definition_5?.label || 'TTS') +
-                    '：模型或音色列表仅从当前服务商在线拉取，不提供内置候选。');
+                    value_25 === 'fish-audio'
+                        ? 'Fish Audio：在此手动填写 TTS 合成模型 ID；每位联系人的音色 ID 请在 Chat Settings Info 中填写。'
+                        : (definition_5?.label || 'TTS') +
+                          '：模型或音色列表仅从当前服务商在线拉取，不提供内置候选。');
+            const apk110New_1398 = value_25 === 'fish-audio',
+                apk110New_1399 = document.getElementById('tts-model-select-row');
+            if (apk110New_1399) apk110New_1399.style.display = apk110New_1398 ? 'none' : '';
+            const apk110New_1400 = document.getElementById('fetch-tts-models-btn')?.parentElement;
+            if (apk110New_1400) apk110New_1400.style.display = apk110New_1398 ? 'none' : '';
             handleAction_192(value_25, config_9);
             renderTtsModelSelect(config_9);
         }
@@ -8370,7 +8396,9 @@
                 storageSummaryDescription = document.getElementById('storage-summary-description'),
                 storageUsageBar = document.getElementById('storage-usage-bar'),
                 storageUsageLegend = document.getElementById('storage-usage-legend'),
-                storageCategoryList = document.getElementById('storage-category-list'),
+                storageCategoryList = document.getElementById('storage-category-list');
+            let apk110New_1551 = false;
+            const apk110New_1552 = new Set(),
                 storageCategoryColors = {
                     iMessage: '#ff3b30',
                     X: '#0a84ff',
@@ -8426,6 +8454,83 @@
             }
             function getStorageCategoryColor(name_9) {
                 return storageCategoryColors[name_9] || '#c7c7cc';
+            }
+            function apk110New_1561(apk110New_1593) {
+                const apk110New_1594 = document.createElement('div'),
+                    apk110New_1595 = document.createElement('p'),
+                    apk110New_1596 = document.createElement('div'),
+                    apk110New_1597 = apk110New_1593?.breakdown?.assetBreakdown?.sources || [];
+                apk110New_1594.id = 'storage-asset-details';
+                apk110New_1594.className = 'storage-asset-details';
+                apk110New_1594.hidden = !apk110New_1551;
+                apk110New_1595.className = 'storage-asset-note';
+                apk110New_1595.textContent = '按资源记录的保存来源统计；同一文件只计一次。';
+                apk110New_1596.className = 'storage-asset-source-list';
+                apk110New_1596.setAttribute('role', 'list');
+                apk110New_1597.forEach((apk110New_1598) => {
+                    const apk110New_1599 = document.createElement('div'),
+                        apk110New_1600 = document.createElement('button'),
+                        apk110New_1601 = document.createElement('span'),
+                        apk110New_1602 = document.createElement('strong'),
+                        apk110New_1603 = document.createElement('small'),
+                        apk110New_1604 = document.createElement('span'),
+                        apk110New_1605 = document.createElement('i'),
+                        apk110New_1606 = document.createElement('div'),
+                        apk110New_1607 = 'storage-asset-types-' + apk110New_1598.key,
+                        apk110New_1608 = apk110New_1552.has(apk110New_1598.key);
+                    apk110New_1599.className = 'storage-asset-source-item';
+                    apk110New_1599.setAttribute('role', 'listitem');
+                    apk110New_1600.type = 'button';
+                    apk110New_1600.className = 'storage-asset-source-row';
+                    apk110New_1600.setAttribute('aria-expanded', String(apk110New_1608));
+                    apk110New_1600.setAttribute('aria-controls', apk110New_1607);
+                    apk110New_1601.className = 'storage-category-copy';
+                    apk110New_1602.textContent = apk110New_1598.label;
+                    apk110New_1603.textContent = apk110New_1598.count + ' 个文件';
+                    apk110New_1604.className = 'storage-category-size';
+                    apk110New_1604.textContent = formatBytesForUi(apk110New_1598.bytes);
+                    apk110New_1605.className = 'fas fa-chevron-right storage-category-chevron';
+                    apk110New_1605.setAttribute('aria-hidden', 'true');
+                    apk110New_1606.id = apk110New_1607;
+                    apk110New_1606.className = 'storage-asset-types';
+                    apk110New_1606.setAttribute('role', 'list');
+                    apk110New_1606.hidden = !apk110New_1608;
+                    (apk110New_1598.types || []).forEach((apk110New_1609) => {
+                        const apk110New_1610 = document.createElement('div'),
+                            apk110New_1611 = document.createElement('span'),
+                            apk110New_1612 = document.createElement('strong'),
+                            apk110New_1613 = document.createElement('small'),
+                            apk110New_1614 = document.createElement('span');
+                        apk110New_1610.className = 'storage-asset-type-row';
+                        apk110New_1610.setAttribute('role', 'listitem');
+                        apk110New_1611.className = 'storage-category-copy';
+                        apk110New_1612.textContent = apk110New_1609.label;
+                        apk110New_1613.textContent = apk110New_1609.count + ' 个文件';
+                        apk110New_1614.className = 'storage-category-size';
+                        apk110New_1614.textContent = formatBytesForUi(apk110New_1609.bytes);
+                        apk110New_1611.append(apk110New_1612, apk110New_1613);
+                        apk110New_1610.append(apk110New_1611, apk110New_1614);
+                        apk110New_1606.appendChild(apk110New_1610);
+                    });
+                    apk110New_1600.addEventListener('click', () => {
+                        const apk110New_1615 = !apk110New_1552.has(apk110New_1598.key);
+                        if (apk110New_1615) apk110New_1552.add(apk110New_1598.key);
+                        else apk110New_1552['delete'](apk110New_1598.key);
+                        apk110New_1600.setAttribute('aria-expanded', String(apk110New_1615));
+                        apk110New_1606.hidden = !apk110New_1615;
+                    });
+                    apk110New_1601.append(apk110New_1602, apk110New_1603);
+                    apk110New_1600.append(apk110New_1601, apk110New_1604, apk110New_1605);
+                    apk110New_1599.append(apk110New_1600, apk110New_1606);
+                    apk110New_1596.appendChild(apk110New_1599);
+                });
+                if (!apk110New_1597.length) {
+                    const apk110New_1616 = document.createElement('div');
+                    apk110New_1616.className = 'storage-category-empty';
+                    apk110New_1616.textContent = '暂无可统计的本地资源';
+                    apk110New_1596.appendChild(apk110New_1616);
+                }
+                return (apk110New_1594.append(apk110New_1595, apk110New_1596), apk110New_1594);
             }
             function handleAction_1124(health_2) {
                 const groups_2 = getStorageGroups(health_2),
@@ -8487,27 +8592,51 @@
                         return;
                     }
                     groups_2.forEach((value_1159) => {
-                        const row_3 = document.createElement('div'),
+                        const apk110New_1633 = value_1159.name === '本地资源',
+                            row_3 = document.createElement('div'),
+                            apk110New_1635 = document.createElement(
+                                apk110New_1633 ? 'button' : 'div',
+                            ),
                             dot_2 = document.createElement('span'),
                             copy_4 = document.createElement('span'),
                             name_10 = document.createElement('strong'),
                             detail_5 = document.createElement('small'),
-                            size_3 = document.createElement('span'),
-                            chevron = document.createElement('i');
-                        row_3.className = 'storage-category-row';
+                            size_3 = document.createElement('span');
+                        row_3.className = 'storage-category-item';
                         row_3.setAttribute('role', 'listitem');
+                        apk110New_1635.className = 'storage-category-row';
                         dot_2.className = 'storage-category-color-dot';
                         dot_2.style.backgroundColor = getStorageCategoryColor(value_1159.name);
                         copy_4.className = 'storage-category-copy';
                         name_10.textContent = value_1159.name;
                         detail_5.textContent =
-                            value_1159.count > 0 ? value_1159.count + ' 条记录' : '应用数据';
+                            value_1159.count > 0
+                                ? value_1159.count + ' ' + (apk110New_1633 ? '个文件' : '条记录')
+                                : '应用数据';
                         size_3.className = 'storage-category-size';
                         size_3.textContent = formatBytesForUi(value_1159.bytes);
-                        chevron.className = 'fas fa-chevron-right storage-category-chevron';
-                        chevron.setAttribute('aria-hidden', 'true');
                         copy_4.append(name_10, detail_5);
-                        row_3.append(dot_2, copy_4, size_3, chevron);
+                        apk110New_1635.append(dot_2, copy_4, size_3);
+                        if (apk110New_1633) {
+                            const chevron = document.createElement('i'),
+                                apk110New_1642 = apk110New_1561(health_2);
+                            apk110New_1635.type = 'button';
+                            apk110New_1635.classList.add('storage-category-button');
+                            apk110New_1635.setAttribute('aria-expanded', String(apk110New_1551));
+                            apk110New_1635.setAttribute('aria-controls', apk110New_1642.id);
+                            chevron.className = 'fas fa-chevron-right storage-category-chevron';
+                            chevron.setAttribute('aria-hidden', 'true');
+                            apk110New_1635.appendChild(chevron);
+                            apk110New_1635.addEventListener('click', () => {
+                                apk110New_1551 = !apk110New_1551;
+                                apk110New_1635.setAttribute(
+                                    'aria-expanded',
+                                    String(apk110New_1551),
+                                );
+                                apk110New_1642.hidden = !apk110New_1551;
+                            });
+                            row_3.append(apk110New_1635, apk110New_1642);
+                        } else row_3.appendChild(apk110New_1635);
                         storageCategoryList.appendChild(row_3);
                     });
                 }

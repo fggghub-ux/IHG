@@ -397,41 +397,41 @@ User persona:
     }) {
         const contextLines = [
             '',
-            '世界书上下文（只用于保持设定一致；为空则忽略）：',
-            worldBookContext || '无',
+            'World-book context (only for setting consistency; ignore if empty):',
+            worldBookContext || 'None',
         ];
         return (
             includeCharPersona &&
                 charPersonaContext &&
-                contextLines.push('', 'Char 人设：', charPersonaContext),
+                contextLines.push('', 'Char persona:', charPersonaContext),
             includeUserPersona &&
                 userPersonaContext &&
-                contextLines.push('', 'User 人设：', userPersonaContext),
+                contextLines.push('', 'User persona:', userPersonaContext),
             includeRecentContext &&
                 recentChatContext &&
                 contextLines.push(
                     '',
-                    '最近聊天上下文（把网页写成当前关系和剧情里自然出现的小剧场，不要逐句复述）：',
+                    'Recent chat context (make the page feel natural to this relationship and story; do not repeat messages line by line):',
                     recentChatContext,
                 ),
             [
-                '你正在为站内 iMessage 的“链接小剧场”生成一个虚构但可信、可交互的网页。',
-                '不要访问或声称读取真实网站；只根据域名、用户提示和提供的设定创作。',
-                '只返回合法 JSON，不要 Markdown、代码围栏、注释或解释。',
-                'JSON 顶层字段固定为：',
-                '{"siteName":"站点名","title":"聊天卡片标题","summary":"聊天卡片摘要","webPage":{"html":"页面主体HTML片段","css":"页面CSS","js":"页面原生JavaScript"}}',
-                'html、css、js 三个字段都必须是非空字符串。html 不要包含 html/head/body/style/script 外壳。',
-                '页面应像一个完整的小剧场：内容与当前人物、关系或情境自然相关，并包含 1-3 个有意义的交互。',
-                'JavaScript 必须是无需外部库即可运行的原生 JS；通过 DOM 查询绑定按钮、切换、计数、动画或面板。',
-                '禁止 fetch、XMLHttpRequest、WebSocket、外链、登录、支付、账号密码采集、弹窗和父页面访问。',
-                '不要使用 localStorage、sessionStorage、indexedDB、window.parent、window.top、window.opener 或 postMessage。',
-                '代码保持紧凑：HTML 目标不超过 8KB，CSS 不超过 6KB，JS 不超过 4KB；不要大型网站、多页路由或框架。',
-                '图片位置必须输出 <img>；src 可以留空或使用 https://picsum.photos/seed/...，系统会替换其他图片地址。',
+                'Create a fictional but credible, interactive webpage for the in-app iMessage link scene.',
+                'Do not visit or claim to have read a real website. Create only from the domain, User prompt, and supplied context.',
+                'Return valid JSON only, without Markdown, code fences, comments, or explanation.',
+                'Fixed top-level JSON shape:',
+                '{"siteName":"site name","title":"chat card title","summary":"chat card summary","webPage":{"html":"page body HTML fragment","css":"page CSS","js":"plain page JavaScript"}}',
+                'html, css, and js must each be nonempty strings. html must not include html/head/body/style/script wrapper tags.',
+                'Build a complete small interactive scene naturally related to the characters, relationship, or situation, with one to three meaningful interactions.',
+                'JavaScript must be native and dependency-free. Use DOM queries to bind buttons, toggles, counters, animations, or panels.',
+                'Do not use fetch, XMLHttpRequest, WebSocket, external links, login, payment, credential collection, pop-ups, or parent-page access.',
+                'Do not use localStorage, sessionStorage, indexedDB, window.parent, window.top, window.opener, or postMessage.',
+                'Keep code compact: aim below 8 KB HTML, 6 KB CSS, and 4 KB JS. Do not build a large site, multiple routes, or a framework.',
+                'Use <img> for image positions. src may be empty or use https://picsum.photos/seed/...; the system replaces other image URLs.',
                 '',
-                '域名：' + domain_4,
-                '用户提示：' +
+                'Domain: ' + domain_4,
+                'User prompt: ' +
                     (prompt_3 ||
-                        '生成一个与当前聊天情境自然相关、可读、精致且可交互的链接小剧场。'),
+                        'Create a readable, polished, interactive link scene that fits the current chat naturally.'),
             ].concat(contextLines).join(`
 `)
         );
@@ -472,7 +472,7 @@ User persona:
                         {
                             role: 'system',
                             content:
-                                '你是轻量交互网页生成器。只输出严格 JSON，并生成紧凑、无依赖的 HTML、CSS 和 JavaScript。',
+                                'You generate lightweight interactive webpages. Output strict JSON only, with compact, dependency-free HTML, CSS, and JavaScript.',
                         },
                         {
                             role: 'user',

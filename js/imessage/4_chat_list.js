@@ -15,23 +15,50 @@
             };
         const loadedMessages = Array.isArray(friend_2.messages) ? friend_2.messages : [],
             lastLoadedMsg =
-                loadedMessages.length > 0 ? loadedMessages[loadedMessages.length - 1] : null;
+                loadedMessages.length > 0 ? loadedMessages[loadedMessages.length - 1] : null,
+            apk110New_22 =
+                friend_2.type === 'group' &&
+                window.imApp?.areGroupTitlesEnabled?.(friend_2) === false;
         let preview_2 =
-                typeof friend_2.lastMessagePreview === 'string' ? friend_2.lastMessagePreview : '',
+                !apk110New_22 && typeof friend_2.lastMessagePreview === 'string'
+                    ? friend_2.lastMessagePreview
+                    : '',
             timestamp_2 = Number(friend_2.lastMessageTimestamp) || 0,
             count_2 = window.imApp.getFriendMessageCount
                 ? window.imApp.getFriendMessageCount(friend_2)
                 : Number(friend_2.messageCount) || loadedMessages.length || 0;
         if (lastLoadedMsg) {
+            let apk110New_26 = lastLoadedMsg;
+            if (
+                apk110New_22 &&
+                window.imApp.getFriendMessagePreview &&
+                !window.imApp.getFriendMessagePreview(apk110New_26, friend_2)
+            ) {
+                apk110New_26 = null;
+                for (
+                    let apk110New_27 = loadedMessages.length - 2;
+                    apk110New_27 >= 0;
+                    apk110New_27 -= 1
+                ) {
+                    if (
+                        window.imApp.getFriendMessagePreview(loadedMessages[apk110New_27], friend_2)
+                    ) {
+                        apk110New_26 = loadedMessages[apk110New_27];
+                        break;
+                    }
+                }
+            }
             preview_2 = window.imApp.getFriendMessagePreview
-                ? window.imApp.getFriendMessagePreview(lastLoadedMsg) || preview_2 || ''
-                : lastLoadedMsg.content || lastLoadedMsg.text || preview_2 || '';
+                ? apk110New_26
+                    ? window.imApp.getFriendMessagePreview(apk110New_26, friend_2)
+                    : preview_2
+                : apk110New_26?.content || apk110New_26?.text || preview_2 || '';
             timestamp_2 = Number(lastLoadedMsg.timestamp) || timestamp_2 || 0;
             if (friend_2.messagesLoaded === true) count_2 = loadedMessages.length;
         }
         return {
             hasMessages: count_2 > 0,
-            preview: preview_2 || 'No messages',
+            preview: preview_2 || (count_2 > 0 && apk110New_22 ? '群聊消息' : 'No messages'),
             timestamp: timestamp_2,
             count: count_2,
         };
@@ -105,9 +132,10 @@
             : '<i class="fas fa-user"></i>';
     }
     function handleAction_7(value_30) {
-        let nickname_31 = value_30.type === 'official' && value_30.nickname === '有兔'
-            ? 'LHV'
-            : value_30.nickname;
+        let nickname_31 =
+            value_30.type === 'official' && value_30.nickname === '有兔'
+                ? 'LHV'
+                : value_30.nickname;
         if (value_30.type === 'group')
             nickname_31 +=
                 ' <span style="background:#e5e5ea; color:#8e8e93; font-size:10px; padding:2px 6px; border-radius:10px; margin-left:6px; vertical-align: middle;">group</span>';

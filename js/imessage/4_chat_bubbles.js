@@ -33,13 +33,20 @@
         return '';
     }
     function getEffectiveUserProfile(friend_2 = null, message_2 = null) {
-        if (friend_2?.type === 'group' && window.imApp?.getMessageUserIdentity)
-            return window.imApp.getMessageUserIdentity(
+        if (friend_2?.type === 'group' && window.imApp?.getMessageUserIdentity) {
+            const apk110New_135 = window.imApp.getMessageUserIdentity(
                 friend_2,
                 message_2 || {
                     role: 'user',
                 },
             );
+            return {
+                ...apk110New_135,
+                avatarUrl:
+                    window.imApp.getGroupUserAvatarUrl?.(friend_2, message_2) ||
+                    apk110New_135.avatarUrl,
+            };
+        }
         const boundAccount = window.imApp?.getBoundAccountByFriend
                 ? window.imApp.getBoundAccountByFriend(friend_2)
                 : null,
@@ -117,20 +124,71 @@
                     (!messageId_2 ||
                         String(candidate.getAttribute('data-message-id') || '') === messageId_2),
             );
-        if (row_3) decorateMessageRowAvatar(row_3, friend_5, message_4);
-        if (message_4?.role === 'assistant') {
-            value_127?.querySelectorAll?.('.gift-message-card[data-gift-timestamp]').forEach(card => {
-                const giftTime = Number(card.dataset.giftTimestamp) || 0;
-                if ((Number(message_4.timestamp) || 0) <= giftTime) return;
-                card.classList.add('is-received');
-                const copy = card.querySelector('.gift-message-copy');
-                if (copy && !copy.querySelector('.gift-message-status')) {
-                    copy.insertAdjacentHTML('beforeend', '<div class="gift-message-status">Received</div>');
-                }
-            });
+        if (row_3) {
+            decorateMessageRowAvatar(row_3, friend_5, message_4);
+            apk110New_23(row_3, friend_5, message_4);
         }
-
+        if (message_4?.role === 'assistant') {
+            value_127
+                ?.querySelectorAll?.('.gift-message-card[data-gift-timestamp]')
+                .forEach((card) => {
+                    const giftTime = Number(card.dataset.giftTimestamp) || 0;
+                    if ((Number(message_4.timestamp) || 0) <= giftTime) return;
+                    card.classList.add('is-received');
+                    const copy = card.querySelector('.gift-message-copy');
+                    if (copy && !copy.querySelector('.gift-message-status')) {
+                        copy.insertAdjacentHTML(
+                            'beforeend',
+                            '<div class="gift-message-status">Received</div>',
+                        );
+                    }
+                });
+        }
         return true;
+    }
+    function apk110New_23(apk110New_155, apk110New_156, apk110New_157) {
+        if (
+            !apk110New_155 ||
+            !window.imApp?.areGroupTitlesEnabled?.(apk110New_156) ||
+            !['user', 'assistant'].includes(apk110New_157?.role)
+        )
+            return;
+        const apk110New_158 = apk110New_157.role === 'user',
+            apk110New_159 = apk110New_158
+                ? ''
+                : String(resolveGroupBubbleIdentity(apk110New_156, apk110New_157).memberId || ''),
+            apk110New_160 = apk110New_158
+                ? window.imApp?.getGroupOwnerTitle?.(apk110New_156)
+                : window.imApp?.getGroupMemberTitle?.(apk110New_156, apk110New_159);
+        if (!apk110New_160) return;
+        const apk110New_161 = document.createElement('span');
+        apk110New_161.className =
+            'im-group-title-badge' +
+            (!apk110New_158 && window.imApp?.isGroupAdmin?.(apk110New_156, apk110New_159)
+                ? ' is-admin'
+                : '');
+        apk110New_161.textContent = apk110New_160;
+        const apk110New_162 = apk110New_155.querySelector(
+            apk110New_158
+                ? '.user-header .chat-header-name'
+                : '.group-ai-speaker-name, .ai-header .chat-header-name',
+        );
+        if (apk110New_162) {
+            apk110New_162.appendChild(apk110New_161);
+            return;
+        }
+        if (!apk110New_158 || apk110New_155.classList.contains('has-prev')) return;
+        const apk110New_163 = apk110New_155.querySelector('.user-bubble')?.parentElement;
+        if (!apk110New_163?.parentElement) return;
+        const apk110New_164 = document.createElement('div');
+        apk110New_164.className = 'im-group-user-speaker-name';
+        apk110New_164.append(
+            document.createTextNode(
+                getEffectiveUserProfile(apk110New_156, apk110New_157).name || 'User',
+            ),
+            apk110New_161,
+        );
+        apk110New_163.parentElement.insertBefore(apk110New_164, apk110New_163);
     }
     function handleAction_20(
         row_4,
@@ -139,11 +197,75 @@
     ) {
         if (!row_4 || friend_6?.type !== 'group' || message_5?.role !== 'user') return;
         const profile_2 = getEffectiveUserProfile(friend_6, message_5);
-        row_4.setAttribute('data-user-account-id', profile_2.accountId || '');
-        row_4.style.setProperty(
-            '--group-user-avatar-image',
-            'url(' + JSON.stringify(String(profile_2.avatarUrl || 'assets/moren-thumb.jpg')) + ')',
+        return (
+            row_4.setAttribute('data-user-account-id', profile_2.accountId || ''),
+            row_4.style.setProperty(
+                '--group-user-avatar-image',
+                'url(' +
+                    JSON.stringify(String(profile_2.avatarUrl || 'assets/moren-thumb.jpg')) +
+                    ')',
+            ),
+            profile_2
         );
+    }
+    function apk110New_25() {
+        const apk110New_169 = Array.isArray(window.imData?.friends) ? window.imData.friends : [];
+        document
+            .querySelectorAll('.active-chat-interface.im-chat-group[id^="chat-interface-"]')
+            .forEach((apk110New_170) => {
+                const apk110New_171 = String(apk110New_170.id).replace(/^chat-interface-/, ''),
+                    apk110New_172 = apk110New_169.find(
+                        (apk110New_175) =>
+                            apk110New_175?.type === 'group' &&
+                            String(apk110New_175.id) === apk110New_171,
+                    ),
+                    apk110New_173 = apk110New_170.querySelector('.ins-chat-messages');
+                if (!apk110New_172 || !apk110New_173) return;
+                syncGroupUserAvatarState_3(apk110New_172, apk110New_173);
+                const apk110New_174 = new Map(
+                    (Array.isArray(apk110New_172.messages) ? apk110New_172.messages : [])
+                        .filter(
+                            (apk110New_176) =>
+                                apk110New_176?.role === 'user' && apk110New_176.id != null,
+                        )
+                        .map((apk110New_177) => [String(apk110New_177.id), apk110New_177]),
+                );
+                apk110New_173
+                    .querySelectorAll('.chat-row.user-row[data-message-id]')
+                    .forEach((apk110New_178) => {
+                        let apk110New_179 = apk110New_174.get(
+                            String(apk110New_178.getAttribute('data-message-id')),
+                        );
+                        if (!apk110New_179) {
+                            const apk110New_181 =
+                                    apk110New_178.getAttribute('data-user-account-id') || '',
+                                apk110New_182 = (window.getAccounts?.() || []).some(
+                                    (apk110New_183) => String(apk110New_183?.id) === apk110New_181,
+                                );
+                            if (apk110New_181 && !apk110New_182) return;
+                            apk110New_179 = {
+                                role: 'user',
+                                userIdentity: {
+                                    accountId: apk110New_181,
+                                },
+                            };
+                        }
+                        const apk110New_180 = handleAction_20(
+                            apk110New_178,
+                            apk110New_172,
+                            apk110New_179,
+                        );
+                        if (!apk110New_180) return;
+                        apk110New_178
+                            .querySelectorAll(
+                                '.user-header .chat-header-avatar img, .group-poll-voter.is-user-voter img',
+                            )
+                            .forEach((apk110New_184) => {
+                                if (apk110New_184.getAttribute('src') !== apk110New_180.avatarUrl)
+                                    apk110New_184.src = apk110New_180.avatarUrl;
+                            });
+                    });
+            });
     }
     function resolveGroupBubbleIdentity(friend_7, msg_2 = {}) {
         const member_2 =
@@ -175,6 +297,13 @@
             return window.imChat.resolvePayTransferParties(msg_3, friend_9);
         const payKind_2 =
                 msg_3.payKind || (msg_3.role === 'user' ? 'user_to_char' : 'char_received'),
+            apk110New_195 =
+                friend_9?.type !== 'group' && friend_9?.boundAccountId
+                    ? window.imApp?.getBoundAccountByFriend?.(friend_9)
+                    : null,
+            apk110New_196 = String(
+                apk110New_195?.name || apk110New_195?.realName || apk110New_195?.nickname || '',
+            ).trim(),
             userName = getEffectiveUserProfile(friend_9, msg_3).name,
             charName_2 =
                 msg_3.speaker ||
@@ -210,14 +339,18 @@
         if (status_2 === 'pending' && msg_3.claimed) status_2 = 'claimed';
         let payerName_2 = msg_3.payerName || '',
             payeeName_2 = msg_3.payeeName || '';
-        direction_2 === 'char_to_user'
-            ? ((payerName_2 = payerName_2 || msg_3.senderName || targetName_2 || charName_2),
-              (payeeName_2 = payeeName_2 || msg_3.receiverName || userName))
-            : ((payerName_2 = payerName_2 || msg_3.senderName || userName),
-              (payeeName_2 =
-                  payeeName_2 ||
-                  msg_3.receiverName ||
-                  (targetName_2 && targetName_2 !== userName ? targetName_2 : charName_2)));
+        if (direction_2 === 'char_to_user') {
+            payerName_2 = payerName_2 || msg_3.senderName || targetName_2 || charName_2;
+            payeeName_2 = payeeName_2 || msg_3.receiverName || userName;
+            if (apk110New_196) payeeName_2 = apk110New_196;
+        } else {
+            payerName_2 = payerName_2 || msg_3.senderName || userName;
+            payeeName_2 =
+                payeeName_2 ||
+                msg_3.receiverName ||
+                (targetName_2 && targetName_2 !== userName ? targetName_2 : charName_2);
+            if (apk110New_196) payerName_2 = apk110New_196;
+        }
         const payerType_2 = direction_2 === 'user_to_char' ? 'user' : 'char',
             payeeType_2 = direction_2 === 'user_to_char' ? 'char' : 'user';
         return {
@@ -1212,13 +1345,26 @@
         });
         element_136.appendChild(element_140);
     }
-    function renderSystemNoticeBubble_2(msg_6, friend_11, container_3, value_147 = Date.now()) {
+    function renderSystemNoticeBubble_2(apk110New_408, apk110New_409) {
+        return (
+            apk110New_408?.type === 'group' &&
+            apk110New_409?.type === 'system_notice' &&
+            apk110New_409.noticeKind === 'group_title_changed' &&
+            window.imApp?.areGroupTitlesEnabled?.(apk110New_408) === false
+        );
+    }
+    function apk110New_43(msg_6, friend_11, container_3, value_147 = Date.now()) {
+        if (renderSystemNoticeBubble_2(friend_11, msg_6)) return null;
         const row_6 = document.createElement('div');
         row_6.className = 'chat-system-row';
         row_6.setAttribute('data-timestamp', value_147);
         row_6.setAttribute('data-message-id', window.imChat.ensureMessageId(msg_6, 'notice'));
         const noticeKind_2 = msg_6.noticeKind || '',
-            noticeText = msg_6.text || msg_6.content || '系统提示';
+            noticeText =
+                window.imApp?.getGroupManagementNoticeText?.(friend_11, msg_6) ||
+                msg_6.text ||
+                msg_6.content ||
+                '系统提示';
         if (noticeKind_2 === 'user_phone_access' || noticeKind_2 === 'user_remark_changed')
             return (
                 row_6.classList.add('user-phone-access-notice-row'),
@@ -1354,6 +1500,18 @@
                 group_friend_private_chat: {
                     icon: 'fa-comments',
                     color: '#5856d6',
+                },
+                group_admin_promoted: {
+                    icon: 'fa-user-shield',
+                    color: '#007aff',
+                },
+                group_admin_removed: {
+                    icon: 'fa-user-minus',
+                    color: '#8e8e93',
+                },
+                group_title_changed: {
+                    icon: 'fa-award',
+                    color: '#ff9500',
                 },
                 mcp_tool_success: {
                     icon: 'fa-check',
@@ -2002,14 +2160,14 @@
                                         member_3?.nickname ||
                                         member_3?.realName ||
                                         (isUser_4 ? profile_3?.name : '群成员'),
-                                    avatarUrl_3 =
-                                        vote_3?.voterAvatarUrl ||
-                                        member_3?.avatarUrl ||
-                                        profile_3?.avatarUrl ||
-                                        'assets/moren-thumb.jpg';
+                                    avatarUrl_3 = isUser_4
+                                        ? profile_3?.avatarUrl
+                                        : vote_3?.voterAvatarUrl || member_3?.avatarUrl;
                                 return (
-                                    '<span class="group-poll-voter"><img src="' +
-                                    escapeHtml(avatarUrl_3) +
+                                    '<span class="group-poll-voter' +
+                                    (isUser_4 ? ' is-user-voter' : '') +
+                                    '"><img src="' +
+                                    escapeHtml(avatarUrl_3 || 'assets/moren-thumb.jpg') +
                                     '" alt="">' +
                                     escapeHtml(voterName_2) +
                                     '</span>'
@@ -2067,21 +2225,23 @@
             timestamp_2 +
             `" style="color:#c7c7cc;font-size:22px;"></i>
             </div>
-            <div style="flex:1;display:flex;justify-content:flex-end;min-width:0;">
-                <div class="chat-bubble user-bubble im-card-bubble" style="padding:0;background:transparent;">
-                    <div class="group-poll-card">
-                        <div class="group-poll-card-head">
-                            <div class="group-poll-card-kicker"><i class="fas fa-poll-h"></i> 群投票 · 公开单选</div>
-                            <div class="group-poll-card-title">` +
+            <div class="group-poll-message-content">
+                <div class="group-poll-bubble-line">
+                    <div class="chat-bubble user-bubble im-card-bubble group-poll-bubble">
+                        <div class="group-poll-card">
+                            <div class="group-poll-card-head">
+                                <div class="group-poll-card-kicker"><i class="fas fa-poll-h"></i> 群投票 · 公开单选</div>
+                                <div class="group-poll-card-title">` +
             escapeHtml(msg_8.pollQuestion || '群投票') +
             `</div>
-                        </div>
-                        <div class="group-poll-card-options">` +
+                            </div>
+                            <div class="group-poll-card-options">` +
             join_202 +
             `</div>
-                        <div class="group-poll-card-footer"><span>` +
+                            <div class="group-poll-card-footer"><span>` +
             value_388 +
             `</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2164,6 +2324,7 @@
     }
     function renderMessageBubble_3(msg_10, friend_16, container_6, timestamp_3 = Date.now()) {
         if (!msg_10 || !container_6) return false;
+        if (renderSystemNoticeBubble_2(friend_16, msg_10)) return true;
         if (friend_16 && typeof friend_16 === 'object')
             renderMessageContextByFriend.set(friend_16, msg_10);
         window.imChat.ensureMessageId(msg_10, msg_10.type === 'pay_transfer' ? 'pay' : 'msg');
@@ -2255,7 +2416,7 @@
         if (msg_10.type === 'unblock_request')
             return (
                 window.imChat.renderUnblockRequestBubble(msg_10, friend_16, container_6, msgTime),
-                true
+                handleAction_19(msg_10, friend_16, container_6)
             );
         if (msg_10.type === 'loves_unbind_request' || msg_10.type === 'loves_unbind_decision')
             return (
@@ -2292,7 +2453,11 @@
                 window.imChat.renderSystemNoticeBubble(msg_10, friend_16, container_6, msgTime),
                 true
             );
-        if (msg_10.type === 'gift' || (msg_10.type === 'html' && /Gift Received/i.test(`${msg_10.text || ''} ${msg_10.content || ''}`))) {
+        if (
+            msg_10.type === 'gift' ||
+            (msg_10.type === 'html' &&
+                /Gift Received/i.test(`${msg_10.text || ''} ${msg_10.content || ''}`))
+        ) {
             window.imChat.renderGiftBubble(msg_10, friend_16, container_6, msgTime);
             return handleAction_19(msg_10, friend_16, container_6);
         }
@@ -2325,37 +2490,43 @@
                 speakerAvatar_2 = groupIdentity_3.avatarUrl;
             }
             window.imChat.renderAiBubble(
-                    msg_10.content,
-                    friend_16,
-                    container_6,
-                    msgTime,
-                    msg_10.translation,
-                    msg_10.showTranslation,
-                    msg_10.replyTo,
-                    safeSpeakerName,
-                    speakerAvatar_2,
-                    msg_10.id,
-                    msg_10.thought || null,
-                    msg_10.offlineScene || null,
-                    msg_10.offlineAction || null,
-                    msg_10.speakerMemberId || msg_10.senderMemberId || null,
-                    msg_10,
-                );
+                msg_10.content,
+                friend_16,
+                container_6,
+                msgTime,
+                msg_10.translation,
+                msg_10.showTranslation,
+                msg_10.replyTo,
+                safeSpeakerName,
+                speakerAvatar_2,
+                msg_10.id,
+                msg_10.thought || null,
+                msg_10.offlineScene || null,
+                msg_10.offlineAction || null,
+                msg_10.speakerMemberId || msg_10.senderMemberId || null,
+                msg_10,
+            );
             const acceptedGift = findGiftAcceptedByAssistant(msg_10, friend_16);
             if (acceptedGift) {
                 const acceptanceId = `gift-accepted-${acceptedGift.id || acceptedGift.timestamp}`;
-                const alreadyRendered = Array.from(container_6.querySelectorAll('.chat-row[data-message-id]'))
-                    .some(row => String(row.dataset.messageId || '') === acceptanceId);
+                const alreadyRendered = Array.from(
+                    container_6.querySelectorAll('.chat-row[data-message-id]'),
+                ).some((row) => String(row.dataset.messageId || '') === acceptanceId);
                 if (!alreadyRendered) {
-                    window.imChat.renderGiftBubble({
-                        ...acceptedGift,
-                        id: acceptanceId,
-                        role: 'assistant',
-                        giftStatus: 'received',
-                        status: 'received',
-                        syntheticGiftAcceptance: true,
-                        timestamp: msgTime
-                    }, friend_16, container_6, msgTime);
+                    window.imChat.renderGiftBubble(
+                        {
+                            ...acceptedGift,
+                            id: acceptanceId,
+                            role: 'assistant',
+                            giftStatus: 'received',
+                            status: 'received',
+                            syntheticGiftAcceptance: true,
+                            timestamp: msgTime,
+                        },
+                        friend_16,
+                        container_6,
+                        msgTime,
+                    );
                 }
             }
             return handleAction_19(msg_10, friend_16, container_6);
@@ -2364,50 +2535,58 @@
     }
     function normalizeGiftMessage(msg) {
         const raw = `${msg?.text || ''} ${msg?.content || ''}`;
-        const legacyName = raw.match(/Pay for me\s*\n?\s*:\s*([^\n<]+)/i)?.[1]
-            || raw.match(/Gift Received:\s*([^。\n<]+)/i)?.[1]
-            || 'Gift';
+        const legacyName =
+            raw.match(/Pay for me\s*\n?\s*:\s*([^\n<]+)/i)?.[1] ||
+            raw.match(/Gift Received:\s*([^。\n<]+)/i)?.[1] ||
+            'Gift';
         const legacyValue = raw.match(/(?:Value|Price)\s*\$\s*([\d.]+)/i)?.[1];
         const legacyReceived = msg?.type === 'html' && /Gift Received/i.test(raw);
         return {
             name: String(msg?.giftName || legacyName || 'Gift').trim(),
             value: Math.max(0, Number(msg?.giftValue ?? legacyValue) || 0),
             description: String(msg?.giftDescription || msg?.description || '').trim(),
-            status: legacyReceived || msg?.giftStatus === 'received' || msg?.status === 'received' ? 'received' : 'pending'
+            status:
+                legacyReceived || msg?.giftStatus === 'received' || msg?.status === 'received'
+                    ? 'received'
+                    : 'pending',
         };
     }
-
     function findGiftAcceptedByAssistant(assistantMessage, friend) {
         if (!assistantMessage || assistantMessage.role !== 'assistant') return null;
         const messages = Array.isArray(friend?.messages) ? friend.messages : [];
-        let assistantIndex = messages.findIndex(message => message === assistantMessage);
+        let assistantIndex = messages.findIndex((message) => message === assistantMessage);
         if (assistantIndex < 0 && assistantMessage.id != null) {
-            assistantIndex = messages.findIndex(message => String(message?.id || '') === String(assistantMessage.id));
+            assistantIndex = messages.findIndex(
+                (message) => String(message?.id || '') === String(assistantMessage.id),
+            );
         }
         if (assistantIndex < 0) {
-            assistantIndex = messages.findIndex(message => Number(message?.timestamp) === Number(assistantMessage.timestamp));
+            assistantIndex = messages.findIndex(
+                (message) => Number(message?.timestamp) === Number(assistantMessage.timestamp),
+            );
         }
         if (assistantIndex < 0) return null;
-
         for (let index = assistantIndex - 1; index >= 0; index -= 1) {
             const candidate = messages[index];
-            if (!candidate || candidate.role === 'system' || candidate.type === 'hidden_context') continue;
+            if (!candidate || candidate.role === 'system' || candidate.type === 'hidden_context')
+                continue;
             if (candidate.role === 'assistant') return null;
             if (candidate.type === 'gift' && candidate.role === 'user') return candidate;
         }
         return null;
     }
-
     function openGiftDetailOverlay(msg, friend, anchor) {
         const page = anchor?.closest?.('.active-chat-interface');
         if (!page) return;
         page.querySelector('.gift-detail-overlay')?.remove();
         const data = normalizeGiftMessage(msg);
         const isUser = msg?.role === 'user';
-        const profile = isUser ? getEffectiveUserProfile(friend) : {
-            name: friend?.nickname || friend?.realName || friend?.name || 'Char',
-            avatarUrl: friend?.avatarUrl || friend?.avatar || 'assets/moren-thumb.jpg'
-        };
+        const profile = isUser
+            ? getEffectiveUserProfile(friend)
+            : {
+                  name: friend?.nickname || friend?.realName || friend?.name || 'Char',
+                  avatarUrl: friend?.avatarUrl || friend?.avatar || 'assets/moren-thumb.jpg',
+              };
         const overlay = document.createElement('div');
         overlay.className = 'gift-detail-overlay';
         overlay.innerHTML = `
@@ -2428,10 +2607,11 @@
         };
         overlay.addEventListener('click', close);
     }
-
     function renderGiftBubble(msg, friend, container, timestamp = Date.now()) {
         const isUser = msg.role === 'user';
-        const rows = Array.from(container.children).filter(el => el.classList?.contains('chat-row'));
+        const rows = Array.from(container.children).filter((el) =>
+            el.classList?.contains('chat-row'),
+        );
         const lastRow = rows[rows.length - 1] || null;
         let hasPrev = false;
         if (lastRow?.classList.contains(isUser ? 'user-row' : 'ai-row')) {
@@ -2444,22 +2624,39 @@
         row.dataset.messageId = window.imChat.ensureMessageId(msg, 'gift');
         handleAction_20(row, friend, msg);
         const data = normalizeGiftMessage(msg);
-        const bowSvg = `<svg class="gift-message-bow" viewBox="0 0 52 58" fill="none" aria-hidden="true"><path d="M25.8 27.5C16 16.1 7.4 15.1 5 20.3c-2.8 6.2 7.5 11.3 20.8 7.2Zm.4 0C36 16.1 44.6 15.1 47 20.3c2.8 6.2-7.5 11.3-20.8 7.2ZM26 27.5V56M13 31l13-3.5L7.5 48M39 31l-13-3.5L44.5 48M26 27.5V3" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        const bowSvg =
+            '<svg class="gift-message-bow" viewBox="0 0 52 58" fill="none" aria-hidden="true"><path d="M25.8 27.5C16 16.1 7.4 15.1 5 20.3c-2.8 6.2 7.5 11.3 20.8 7.2Zm.4 0C36 16.1 44.6 15.1 47 20.3c2.8 6.2-7.5 11.3-20.8 7.2ZM26 27.5V56M13 31l13-3.5L7.5 48M39 31l-13-3.5L44.5 48M26 27.5V3" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
         const card = `
             <div class="gift-message-card im-card-content${data.status === 'received' ? ' is-received' : ''}" data-gift-timestamp="${timestamp}" role="button" tabindex="0">
                 <div class="gift-message-main">${bowSvg}<div class="gift-message-copy"><div class="gift-message-title">A Gift For You</div>${data.status === 'received' ? '<div class="gift-message-status">Received</div>' : ''}</div></div>
                 <div class="gift-message-footer">Gift</div>
             </div>`;
-        const headerHtml = buildMessageHeaderHtml(isUser, friend, timestamp, null, null, hasPrev, msg);
+        const headerHtml = buildMessageHeaderHtml(
+            isUser,
+            friend,
+            timestamp,
+            null,
+            null,
+            hasPrev,
+            msg,
+        );
         row.innerHTML = `<div class="chat-checkbox-wrapper" style="display:${window.imData.batchSelectMode ? 'flex' : 'none'};width:40px;justify-content:center;align-items:flex-end;padding-bottom:10px;flex-shrink:0;"><i class="far fa-circle chat-checkbox" data-timestamp="${timestamp}" style="color:#c7c7cc;font-size:22px;"></i></div><div style="flex:1;display:flex;flex-direction:column;min-width:0;">${headerHtml}<div style="display:flex;justify-content:${isUser ? 'flex-end' : 'flex-start'};align-items:flex-end;width:100%;"><div class="chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'} im-card-bubble gift-message-bubble">${card}</div></div></div>`;
         const cardEl = row.querySelector('.gift-message-card');
-        cardEl?.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); openGiftDetailOverlay(msg, friend, cardEl); });
-        cardEl?.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openGiftDetailOverlay(msg, friend, cardEl); } });
+        cardEl?.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            openGiftDetailOverlay(msg, friend, cardEl);
+        });
+        cardEl?.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openGiftDetailOverlay(msg, friend, cardEl);
+            }
+        });
         container.appendChild(row);
         decorateMessageRowAvatar(row, friend, msg);
         window.imChat.scrollToBottom(container);
     }
-
     function getMessageUserRoundCount(value_429, value_430 = 0, endIndex_2 = null) {
         const safeMessages_2 = Array.isArray(value_429) ? value_429 : [];
         let count_2 = 0;
@@ -3107,6 +3304,16 @@
             return rerenderChatContainer_2(friend_22, container_12, {
                 resetWindow: value_556.scroll !== false,
             });
+        if (renderSystemNoticeBubble_2(friend_22, msg_13)) {
+            if (_imHistoryState_557?.friendId === String(friend_22.id)) {
+                const apk110New_729 = Array.isArray(friend_22.messages)
+                    ? friend_22.messages.length
+                    : _imHistoryState_557.totalMessages;
+                _imHistoryState_557.visibleEndIndex = apk110New_729;
+                _imHistoryState_557.totalMessages = apk110New_729;
+            }
+            return (markChatHistoryRenderCurrent(friend_22, container_12), true);
+        }
         const msgTime_2 = msg_13.timestamp || Date.now(),
             handleAction_18_559 = handleAction_18(
                 container_12,
@@ -3257,6 +3464,7 @@
                         handleAction_48_589.visibleEndIndex,
                     )
                     .forEach((message_597) => {
+                        if (renderSystemNoticeBubble_2(friend_25, message_597)) return;
                         window.imChat.ensureMessageId(
                             message_597,
                             message_597.type === 'pay_transfer' ? 'pay' : 'msg',
@@ -3340,7 +3548,10 @@
         );
         handleAction_20(element_618, friend_26, userMessage);
         let text_619 = '';
+        const apk110New_822 =
+            friend_26?.type === 'char' && friend_26.replyStyle === 'outside' && !!value_608_2;
         value_608_2 &&
+            !apk110New_822 &&
             (text_619 +=
                 '<div class="msg-reply-quote" style="font-size: 13px; color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.15); padding: 8px 12px; border-radius: 14px; margin-bottom: 8px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' +
                 value_608_2 +
@@ -3386,9 +3597,15 @@
                 ? '<i class="fas fa-exclamation-circle chat-delivery-failed is-user" aria-label="发送失败"></i>'
                 : '') +
             `
-                    <div class="chat-bubble user-bubble">` +
-            text_619 +
-            `</div>
+                    ` +
+            (apk110New_822
+                ? '<div class="im-reply-stack is-user"><div class="msg-reply-quote im-reply-outside-quote"><span>' +
+                  escapeHtml(String(value_608_2)) +
+                  '</span></div><div class="chat-bubble user-bubble">' +
+                  text_619 +
+                  '</div></div>'
+                : '<div class="chat-bubble user-bubble">' + text_619 + '</div>') +
+            `
                 </div>
             </div>
         `;
@@ -3453,7 +3670,10 @@
             row_12.setAttribute('data-speaker-member-id', String(speakerMemberId_2));
         thought_2 && row_12.setAttribute('data-thought', thought_2);
         let text_642 = '';
+        const apk110New_847 =
+            friend_27?.type === 'char' && friend_27.replyStyle === 'outside' && !!value_628;
         value_628 &&
+            !apk110New_847 &&
             (text_642 +=
                 '<div class="msg-reply-quote" style="font-size: 13px; color: rgba(0,0,0,0.6); background: rgba(0,0,0,0.05); padding: 8px 12px; border-radius: 14px; margin-bottom: 8px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' +
                 value_628 +
@@ -3512,7 +3732,14 @@
                     </div>
                 </div>
             `;
-        } else text_645 = '<div class="chat-bubble ai-bubble">' + text_642 + '</div>';
+        } else
+            text_645 = apk110New_847
+                ? '<div class="im-reply-stack is-ai"><div class="msg-reply-quote im-reply-outside-quote"><span>' +
+                  escapeHtml(String(value_628)) +
+                  '</span></div><div class="chat-bubble ai-bubble">' +
+                  text_642 +
+                  '</div></div>'
+                : '<div class="chat-bubble ai-bubble">' + text_642 + '</div>';
         row_12.innerHTML =
             `
             <div class="chat-checkbox-wrapper" style="display: ` +
@@ -3539,6 +3766,13 @@
             </div>
         `;
         element_245.appendChild(row_12);
+        decorateMessageRowAvatar(
+            row_12,
+            friend_27,
+            value_262 || {
+                role: 'assistant',
+            },
+        );
         window.imChat.scrollToBottom(element_245);
     }
     function getGeneratedChatImageFileName(timestamp_7, mimeType = '') {
@@ -3608,8 +3842,15 @@
                 includeUserAppearance: savedConfig?.includeUserAppearance !== false,
                 useReferenceFace: savedConfig
                     ? savedConfig.useReferenceFace === true
-                    : msg_15?.faceReferenceUsed === true ||
-                      currentConfig.autoUseReferenceFace === true,
+                    : msg_15?.faceReferenceUsed === true,
+                useCharReferenceFace: savedConfig
+                    ? savedConfig.useCharReferenceFace === true ||
+                      (savedConfig.useCharReferenceFace == null &&
+                          savedConfig.useReferenceFace === true)
+                    : msg_15?.charFaceReferenceUsed === true || msg_15?.faceReferenceUsed === true,
+                useUserReferenceFace: savedConfig
+                    ? savedConfig.useUserReferenceFace === true
+                    : msg_15?.userFaceReferenceUsed === true,
             },
         };
     }
@@ -3627,13 +3868,19 @@
                 liveFriend,
             );
         if (!prompt_2) throw new Error('这张图片没有可复用的生成提示词');
-        const referenceImage_2 = config_2.useReferenceFace
-                ? await window.imChat.resolveAutoImageReferenceFace(liveFriend, {
-                      force: true,
-                  })
-                : '',
+        const referenceImage_2 = await window.imChat.resolveImageReferenceFaces(
+                liveFriend,
+                {
+                    charPresent: config_2.useCharReferenceFace,
+                    userPresent: config_2.useUserReferenceFace,
+                },
+                {
+                    requireChar: config_2.useCharReferenceFace,
+                    requireUser: config_2.useUserReferenceFace,
+                },
+            ),
             result_3 = await window.imChat.generateChatImage(prompt_2, liveFriend, {
-                referenceImage: referenceImage_2,
+                referenceImages: referenceImage_2,
                 basePrompt: config_2.basePrompt,
                 charAppearance: config_2.charAppearance,
                 userAppearance: config_2.userAppearance,
@@ -3658,6 +3905,8 @@
                     targetMsg_3.imageModel = result_3.model || '';
                     targetMsg_3.imageSize = result_3.size || '';
                     targetMsg_3.faceReferenceUsed = !!result_3.faceReferenceUsed;
+                    targetMsg_3.charFaceReferenceUsed = !!result_3.charFaceReferenceUsed;
+                    targetMsg_3.userFaceReferenceUsed = !!result_3.userFaceReferenceUsed;
                     targetMsg_3.imageGenerationPrompt = prompt_2;
                     targetMsg_3.imageGenerationConfig = config_2;
                     targetMsg_3.imageGenerationCompiledPrompt = result_3.compiledPrompt || '';
@@ -4796,17 +5045,31 @@
                           );
                       })(),
             text_433 = '',
-            value_823 =
+            value_823 = !value_418 && window.imVoiceMessageAudio?.canManage?.(friend_33, msg_21),
+            apk111New_1110 = value_823
+                ? `
+            <div class="voice-message-actions" role="group" aria-label="语音操作">
+                <button type="button" class="voice-message-action" data-voice-action="regenerate" title="重新生成语音" aria-label="重新生成语音"><i class="fas fa-redo-alt" aria-hidden="true"></i></button>
+                <button type="button" class="voice-message-action" data-voice-action="download" title="下载语音" aria-label="下载语音"><i class="fas fa-download" aria-hidden="true"></i></button>
+            </div>
+        `
+                : '',
+            apk111New_1111 =
                 `
-            <button type="button" class="voice-message-bubble-inner" aria-expanded="false">
-                <span class="voice-message-mic"><i class="fas fa-microphone-alt"></i></span>
-                <span class="voice-message-wave" aria-hidden="true">
-                    <span></span><span></span><span></span><span></span><span></span>
-                </span>
-                <span class="voice-message-duration">` +
+            <div class="voice-message-bubble-main">
+                <button type="button" class="voice-message-bubble-inner" aria-expanded="false">
+                    <span class="voice-message-mic"><i class="fas fa-microphone-alt"></i></span>
+                    <span class="voice-message-wave" aria-hidden="true">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </span>
+                    <span class="voice-message-duration">` +
                 duration_2 +
                 `s</span>
-            </button>
+                </button>
+                ` +
+                apk111New_1110 +
+                `
+            </div>
             <div class="voice-message-transcript" hidden>` +
                 safeTranscript +
                 `</div>
@@ -4828,8 +5091,10 @@
             value_824 =
                 '<div class="chat-bubble ' +
                 (value_418 ? 'user-bubble' : 'ai-bubble') +
-                ' im-card-bubble voice-message-bubble">' +
-                value_823 +
+                ' im-card-bubble voice-message-bubble' +
+                (value_823 ? ' has-voice-actions' : '') +
+                '">' +
+                apk111New_1111 +
                 '</div>';
         let value_436 = value_824;
         if (isGroupMessage_3) {
@@ -4892,55 +5157,76 @@
             </div>
         `;
         const toggle_3 = row_17.querySelector('.voice-message-bubble-inner'),
-            transcriptEl = row_17.querySelector('.voice-message-transcript');
+            transcriptEl = row_17.querySelector('.voice-message-transcript'),
+            apk111New_1117 = Array.from(row_17.querySelectorAll('.voice-message-action')),
+            apk111New_1118 = (apk111New_1124) => {
+                apk111New_1117.forEach((apk111New_1125) => {
+                    apk111New_1125.disabled = apk111New_1124;
+                });
+                row_17
+                    .querySelector('.voice-message-actions')
+                    ?.setAttribute('aria-busy', apk111New_1124 ? 'true' : 'false');
+            };
+        apk111New_1117.forEach((apk111New_1126) =>
+            apk111New_1126.addEventListener('click', async (apk111New_1127) => {
+                apk111New_1127.preventDefault();
+                apk111New_1127.stopPropagation();
+                if (apk111New_1126.disabled) return;
+                const apk111New_1128 = apk111New_1126.querySelector('i'),
+                    apk111New_1129 = apk111New_1128?.className || '',
+                    apk111New_1130 = apk111New_1126.getAttribute('aria-label') || '';
+                if (apk111New_1128)
+                    apk111New_1128.className = 'fas fa-spinner voice-message-action-spinner';
+                apk111New_1126.setAttribute(
+                    'aria-label',
+                    apk111New_1126.dataset.voiceAction === 'regenerate'
+                        ? '正在重新生成语音'
+                        : '正在准备语音下载',
+                );
+                apk111New_1118(true);
+                try {
+                    if (apk111New_1126.dataset.voiceAction === 'regenerate') {
+                        await window.imVoiceMessageAudio.regenerate(friend_33, msg_21);
+                        window.showToast?.('语音已重新生成并保存');
+                    } else {
+                        const apk111New_1131 = await window.imVoiceMessageAudio.download(
+                            friend_33,
+                            msg_21,
+                        );
+                        if (apk111New_1131 === 'downloaded' || apk111New_1131 === 'shared')
+                            window.showToast?.('语音已保存');
+                    }
+                } catch (apk111New_1132) {
+                    console.error('Voice message action failed', apk111New_1132);
+                    (!window.u2Api?.isRequestError?.(apk111New_1132) ||
+                        !window.u2Api.reportError(apk111New_1132, {
+                            operation: '语音生成',
+                        })) &&
+                        window.showToast &&
+                        window.showToast(
+                            window.u2Tts?.getUserErrorMessage?.(apk111New_1132) ||
+                                apk111New_1132?.message ||
+                                '语音操作失败',
+                        );
+                } finally {
+                    if (apk111New_1128) apk111New_1128.className = apk111New_1129;
+                    apk111New_1126.setAttribute('aria-label', apk111New_1130);
+                    apk111New_1118(false);
+                }
+            }),
+        );
         toggle_3 &&
             transcriptEl &&
-            toggle_3.addEventListener('click', async (event_445) => {
-                event_445.preventDefault();
-                event_445.stopPropagation();
-                const friend_21_2 = transcriptEl.hidden;
-                transcriptEl.hidden = !friend_21_2;
-                toggle_3.setAttribute('aria-expanded', friend_21_2 ? 'true' : 'false');
-                if (!friend_21_2 || value_418) return;
-                const ttsFriend = window.u2Tts?.resolveMessageTtsFriend
-                        ? window.u2Tts.resolveMessageTtsFriend(friend_33, msg_21)
-                        : friend_33,
-                    canPlayTts = window.u2Tts?.canSpeakForFriend
-                        ? window.u2Tts.canSpeakForFriend(ttsFriend)
-                        : true;
-                if (
-                    canPlayTts &&
-                    window.u2Tts &&
-                    typeof window.u2Tts.speakTextCached === 'function'
-                )
+            toggle_3.addEventListener('click', async (apk111New_1133) => {
+                apk111New_1133.preventDefault();
+                apk111New_1133.stopPropagation();
+                const apk111New_1134 = transcriptEl.hidden;
+                transcriptEl.hidden = !apk111New_1134;
+                toggle_3.setAttribute('aria-expanded', apk111New_1134 ? 'true' : 'false');
+                if (!apk111New_1134 || value_418) return;
+                if (value_823)
                     try {
-                        const cacheOwner = msg_21 && typeof msg_21 === 'object' ? msg_21 : {},
-                            audioUrl = await window.u2Tts.speakTextCached(
-                                transcript_2,
-                                ttsFriend,
-                                cacheOwner,
-                            );
-                        audioUrl &&
-                            msg_21 &&
-                            typeof msg_21 === 'object' &&
-                            !msg_21.ttsAudioUrl &&
-                            window.imApp?.updateFriendMessage &&
-                            (await window.imApp.updateFriendMessage(
-                                friend_33.id,
-                                {
-                                    id: msg_21.id || row_17.getAttribute('data-message-id') || null,
-                                    timestamp:
-                                        row_17.getAttribute('data-timestamp') ||
-                                        timestamp_11 ||
-                                        null,
-                                },
-                                (targetMsg_4) => {
-                                    if (targetMsg_4) targetMsg_4.ttsAudioUrl = audioUrl;
-                                },
-                                {
-                                    silent: true,
-                                },
-                            ));
+                        await window.imVoiceMessageAudio.play(friend_33, msg_21);
                     } catch (error_5) {
                         console.error('Voice message playback failed', error_5);
                         if (
@@ -6176,7 +6462,7 @@
         element_582.appendChild(row_20);
         window.imChat.scrollToBottom(element_582);
     }
-    window.imChat.renderSystemNoticeBubble = renderSystemNoticeBubble_2;
+    window.imChat.renderSystemNoticeBubble = apk110New_43;
     window.imChat.renderUnblockRequestBubble = renderUnblockRequestBubble_2;
     window.imChat.renderMemoryRequestBubble = renderMemoryRequestBubble_3;
     window.imChat.renderLovesUnbindBubble = renderLovesUnbindBubble_2;
@@ -6470,4 +6756,6 @@
     window.imChat.renderMomentForwardBubble = renderMomentForwardBubble_2;
     window.imChat.renderVoiceCallRecordBubble = renderVoiceCallRecordBubble_2;
     window.imChat.renderHtmlBubble = renderHtmlBubble_2;
+    window.addEventListener('account-updated', apk110New_25);
+    window.addEventListener('user-state-updated', apk110New_25);
 });

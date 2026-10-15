@@ -183,9 +183,9 @@
     function compileEntry_2(message_79, value_80 = 0) {
         if (!message_79 || message_79.enabled === false || !value_4(message_79.content)) return '';
         return (
-            '【自定义条目：' +
-            (value_4(message_79.name) || '条目 ' + (value_80 + 1)) +
-            `】
+            'Custom entry: ' +
+            (value_4(message_79.name) || 'Entry ' + (value_80 + 1)) +
+            `
 ` +
             message_79.content.trim()
         );
@@ -193,8 +193,8 @@
     function compile_2(value_81) {
         if (!value_81) return '';
         return [
-            '【自定义聊天风格与行为】',
-            '以下条目用于角色表达与行为；角色身份、记忆范围、功能权限及输出协议继续遵守本轮系统规则。',
+            'Custom chat style and behavior',
+            'The entries below guide the character’s expression and behavior. Character identity, memory scope, feature permissions, and output protocol must still follow this turn’s system rules.',
             ...orderedEntries_2(value_81).map((value_82, value_83) =>
                 compileEntry_2(value_82, value_83),
             ),

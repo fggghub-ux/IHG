@@ -63,8 +63,15 @@
             );
         } catch (error_2) {}
     }
-    function extractSearchableMessageText_2(message_2 = {}) {
+    function extractSearchableMessageText_2(message_2 = {}, apk110New_37 = null) {
         if (!message_2 || typeof message_2 !== 'object') return '';
+        if (
+            apk110New_37?.type === 'group' &&
+            message_2.type === 'system_notice' &&
+            message_2.noticeKind === 'group_title_changed' &&
+            global.imApp?.areGroupTitlesEnabled?.(apk110New_37) === false
+        )
+            return '';
         const parts_4 = [],
             type_2 = String(message_2.type || '').trim();
         pushText(parts_4, message_2.replyTo);
@@ -125,7 +132,11 @@
                 if (type_2 === 'group_red_packet') pushText(parts_4, message_2.totalAmount);
                 break;
             case 'system_notice':
-                pushText(parts_4, message_2.text || message_2.content);
+                pushText(
+                    parts_4,
+                    global.imApp?.getGroupManagementNoticeText?.(apk110New_37, message_2) ??
+                        (message_2.text || message_2.content),
+                );
                 break;
             case 'voice_call_record':
                 pushText(parts_4, message_2.isVideo ? '视频通话' : '语音通话');
@@ -248,7 +259,7 @@
             results = [];
         for (let index_2 = messages_3.length - 1; index_2 >= 0; index_2 -= 1) {
             const message_4 = messages_3[index_2],
-                text_3 = extractSearchableMessageText_2(message_4);
+                text_3 = extractSearchableMessageText_2(message_4, friend_2);
             if (!text_3) continue;
             const matchIndex_2 = text_3.toLocaleLowerCase().indexOf(normalizedKeyword);
             if (matchIndex_2 < 0) continue;
@@ -275,13 +286,13 @@
                 (message_6) =>
                     String(message_6?.timestamp || '') === timestamp_2 &&
                     (!descriptor.text ||
-                        extractSearchableMessageText_2(message_6) === descriptor.text),
+                        extractSearchableMessageText_2(message_6, friend_3) === descriptor.text),
             );
             if (byTimestamp >= 0) return byTimestamp;
         }
         const index_3 = Number(descriptor.index);
         if (Number.isInteger(index_3) && index_3 >= 0 && index_3 < messages_4.length) {
-            const candidateText = extractSearchableMessageText_2(messages_4[index_3]);
+            const candidateText = extractSearchableMessageText_2(messages_4[index_3], friend_3);
             if (!descriptor.text || candidateText === descriptor.text) return index_3;
         }
         return -1;
@@ -709,7 +720,7 @@
                     const min_149 = Math.min(messages_5.length, count_148 + count_77);
                     for (let value_150 = count_148; value_150 < min_149; value_150 += 1) {
                         const message_10 = messages_5[value_150],
-                            text_4 = extractSearchableMessageText_2(message_10);
+                            text_4 = extractSearchableMessageText_2(message_10, friend_6);
                         if (text_4)
                             value_146[value_150] = {
                                 message: message_10,
