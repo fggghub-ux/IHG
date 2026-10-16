@@ -84,7 +84,7 @@
         </script>
         <link
             rel="stylesheet"
-            href="css/global.css?v=20261013-ipad-scroll&shop-moments=20261010-v1"
+            href="css/global.css?v=20261013-ipad-scroll&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016"
         />
         <link
             rel="stylesheet"
@@ -97,7 +97,7 @@
         <link rel="stylesheet" href="css/worldbook.css?v=20261007-107-r1" />
         <link rel="stylesheet" href="css/app_guide_modal.css?v=20261007-107-r1" />
         <link rel="stylesheet" href="css/online_prompts.css?v=20260905-v6&repair=20261003" />
-        <link rel="stylesheet" href="css/imessage.css?v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-sync=111-selective" />
+        <link rel="stylesheet" href="css/imessage.css?v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-sync=111-selective&apk-ui=111-rebuild-20261016" />
         <link rel="stylesheet" href="css/pay.css?v=20260923-gallery-layout-v1&repair=20261003" />
         <link
             rel="stylesheet"
@@ -7735,24 +7735,15 @@
                 </div>
             </div>
 
-            <div
-                class="bottom-sheet-overlay detail-sheet-overlay"
-                id="memory-location-sheet"
-                style="z-index: 1200;"
-            >
+            <div class="bottom-sheet-overlay detail-sheet-overlay" id="memory-location-sheet" style="z-index: 1200;">
                 <div class="bottom-sheet memory-location-bottom-sheet">
                     <div class="sheet-handle"></div>
-                    <button
-                        type="button"
-                        class="memory-social-close"
-                        id="memory-social-close"
-                        aria-label="关闭社交帐号"
-                        ><i class="fas fa-times"></i
-                    ></button>
-                    <div
-                        class="memory-location-sheet-empty"
-                        id="memory-location-sheet-content"
-                    ></div>
+                    <div class="memory-library-header">
+                        <div class="memory-library-header-title" id="memory-library-header-title">短期记忆</div>
+                        <div class="memory-library-header-subtitle" id="memory-library-header-subtitle"></div>
+                    </div>
+                    <button type="button" class="memory-social-close" id="memory-social-close" aria-label="关闭记忆弹窗"><i class="fas fa-times"></i></button>
+                    <div class="memory-location-sheet-empty" id="memory-location-sheet-content"></div>
                 </div>
             </div>
 
@@ -7781,71 +7772,35 @@
                 </div>
             </div>
 
-            <div
-                class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay"
-                id="memory-entry-editor-modal"
-                style="z-index: 1400; background: rgba(0, 0, 0, 0.4);"
-            >
+            <div class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay" id="memory-entry-editor-modal" style="z-index: 1400; background: rgba(0, 0, 0, 0.4);">
                 <div class="wb-centered-modal-card memory-entry-editor-card">
                     <div class="wb-centered-modal-header" style="position: relative;">
-                        <div class="wb-centered-modal-title" id="memory-entry-editor-title"
-                            >新增记忆</div
-                        >
-                        <button
-                            type="button"
-                            class="wb-centered-modal-close memory-entry-editor-close"
-                            id="memory-entry-editor-close"
-                            aria-label="关闭"
-                        >
+                        <div class="wb-centered-modal-title" id="memory-entry-editor-title">新增记忆</div>
+                        <button type="button" class="wb-centered-modal-close memory-entry-editor-close" id="memory-entry-editor-close" aria-label="关闭">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                     <div class="wb-centered-modal-body memory-entry-editor-body">
-                        <input type="hidden" id="memory-entry-editor-kind" value="short" />
-                        <input type="hidden" id="memory-entry-editor-id" value="" />
-                        <input
-                            type="hidden"
-                            id="memory-entry-editor-collection"
-                            value="shortTermEntries"
-                        />
+                        <input type="hidden" id="memory-entry-editor-kind" value="short">
+                        <input type="hidden" id="memory-entry-editor-id" value="">
+                        <input type="hidden" id="memory-entry-editor-collection" value="shortTermEntries">
                         <label class="memory-entry-editor-field">
                             <span>标题</span>
-                            <input
-                                type="text"
-                                id="memory-entry-editor-title-input"
-                                maxlength="80"
-                                placeholder="输入记忆标题"
-                            />
+                            <input type="text" id="memory-entry-editor-title-input" maxlength="80" placeholder="输入记忆标题">
                         </label>
                         <label class="memory-entry-editor-field">
                             <span>时间</span>
-                            <input
-                                type="text"
-                                id="memory-entry-editor-time-input"
-                                maxlength="80"
-                                placeholder="例如：2026年07月22日 18:30"
-                            />
+                            <input type="text" id="memory-entry-editor-time-input" maxlength="80" placeholder="例如：2026年07月22日 18:30">
                         </label>
                         <label class="memory-entry-editor-field">
                             <span id="memory-entry-editor-content-label">事件内容</span>
-                            <textarea
-                                id="memory-entry-editor-content-input"
-                                rows="5"
-                                placeholder="输入需要记住的内容"
-                            ></textarea>
+                            <textarea id="memory-entry-editor-content-input" rows="5" placeholder="输入需要记住的内容"></textarea>
                         </label>
-                        <label id="memory-entry-editor-tags-row" class="memory-entry-editor-field">
+                        <label class="memory-entry-editor-field" id="memory-entry-editor-tags-row">
                             <span>召回标签</span>
-                            <input
-                                type="text"
-                                id="memory-entry-editor-tags-input"
-                                placeholder="多个标签用逗号或换行分隔"
-                            />
+                            <input type="text" id="memory-entry-editor-tags-input" placeholder="多个标签用逗号或换行分隔">
                         </label>
-                        <label
-                            class="memory-entry-editor-field"
-                            id="memory-entry-editor-degree-row"
-                        >
+                        <label class="memory-entry-editor-field" id="memory-entry-editor-degree-row">
                             <span>记忆程度</span>
                             <select id="memory-entry-editor-degree-select">
                                 <option value="高">高</option>
@@ -7859,69 +7814,35 @@
                             <button type="button" id="memory-entry-editor-save">保存</button>
                         </div>
                     </div>
+
                 </div>
             </div>
 
-            <div
-                class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay"
-                id="memory-promotion-preview-modal"
-                style="z-index: 1450; background: rgba(0, 0, 0, 0.4);"
-            >
+            <div class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay" id="memory-promotion-preview-modal" style="z-index: 1450; background: rgba(0, 0, 0, 0.4);">
                 <div class="wb-centered-modal-card memory-entry-editor-card">
                     <div class="wb-centered-modal-header" style="position: relative;">
                         <div class="wb-centered-modal-title">归纳为长期记忆</div>
-                        <button
-                            type="button"
-                            class="wb-centered-modal-close memory-entry-editor-close"
-                            id="memory-promotion-preview-close"
-                            aria-label="关闭"
-                        >
+                        <button type="button" class="wb-centered-modal-close memory-entry-editor-close" id="memory-promotion-preview-close" aria-label="关闭">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                     <div class="wb-centered-modal-body memory-entry-editor-body">
-                        <div class="memory-promotion-hint"
-                            >确认后会新增这条长期记忆，并删除所选短期记忆。</div
-                        >
+                        <div class="memory-promotion-hint">确认后会新增这条长期记忆，并删除所选短期记忆。</div>
                         <label class="memory-entry-editor-field">
                             <span>标题</span>
-                            <input
-                                type="text"
-                                id="memory-promotion-title-input"
-                                maxlength="80"
-                                placeholder="长期记忆标题"
-                            />
+                            <input type="text" id="memory-promotion-title-input" maxlength="80" placeholder="长期记忆标题">
                         </label>
                         <label class="memory-entry-editor-field">
                             <span>时间</span>
-                            <input
-                                type="text"
-                                id="memory-promotion-time-input"
-                                maxlength="80"
-                                placeholder="相关事件时间"
-                            />
+                            <input type="text" id="memory-promotion-time-input" maxlength="80" placeholder="相关事件时间">
                         </label>
                         <label class="memory-entry-editor-field">
                             <span>长期记忆内容</span>
-                            <textarea
-                                id="memory-promotion-content-input"
-                                rows="7"
-                                placeholder="长期记忆内容"
-                            ></textarea>
-                        </label>
-                        <label class="memory-entry-editor-field">
-                            <span>召回标签</span>
-                            <input
-                                type="text"
-                                id="memory-promotion-tags-input"
-                                placeholder="多个标签用逗号或换行分隔"
-                            />
+                            <textarea id="memory-promotion-content-input" rows="7" placeholder="长期记忆内容"></textarea>
                         </label>
                         <div class="memory-entry-editor-actions memory-promotion-actions">
                             <button type="button" id="memory-promotion-preview-cancel">取消</button>
-                            <button type="button" id="memory-promotion-preview-confirm"
-                                >确认归纳并删除原短期记忆</button
-                            >
+                            <button type="button" id="memory-promotion-preview-confirm">确认归纳并删除原短期记忆</button>
                         </div>
                     </div>
                 </div>
@@ -12657,81 +12578,42 @@
                 </div>
             </div>
 
-            <div
-                class="bottom-sheet-overlay detail-sheet-overlay"
-                id="group-member-manage-sheet"
-                style="z-index: 600;"
-            >
+            <div class="bottom-sheet-overlay detail-sheet-overlay" id="group-member-manage-sheet" style="z-index: 600;">
                 <div class="bottom-sheet im-group-member-sheet">
                     <div class="sheet-handle"></div>
                     <div class="sheet-title" style="position: relative;">
                         管理群成员
-                        <div
-                            style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 18px; color: #8e8e93; cursor: pointer;"
-                            onclick="window.closeView(document.getElementById('group-member-manage-sheet'))"
-                        >
+                        <div style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 18px; color: #8e8e93; cursor: pointer;" onclick="window.closeView(document.getElementById('group-member-manage-sheet'))">
                             <i class="fas fa-times"></i>
                         </div>
                     </div>
 
                     <div class="detail-sheet-content im-group-member-content">
-                        <div
-                            style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;"
-                        >
-                            <div
-                                style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden; background: #e5e5ea; display: flex; justify-content: center; align-items: center; font-size: 30px; color: #8e8e93; margin-bottom: 10px;"
-                            >
-                                <img
-                                    src=""
-                                    id="gmm-avatar"
-                                    style="width: 100%; height: 100%; object-fit: cover; display: none;"
-                                />
+                        <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;">
+                            <div style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden; background: #e5e5ea; display: flex; justify-content: center; align-items: center; font-size: 30px; color: #8e8e93; margin-bottom: 10px;">
+                                <img src="" id="gmm-avatar" style="width: 100%; height: 100%; object-fit: cover; display: none;">
                                 <i class="fas fa-user" id="gmm-avatar-icon"></i>
                             </div>
-                            <div
-                                style="font-size: 18px; font-weight: 600; color: #000;"
-                                id="gmm-name"
-                                >Member Name</div
-                            >
+                            <div style="font-size: 18px; font-weight: 600; color: #000;" id="gmm-name">Member Name</div>
                         </div>
 
                         <div class="settings-group fully-rounded" style="margin: 0;">
-                            <div
-                                class="form-item"
-                                style="justify-content: space-between; border-bottom: 1px solid var(--separator-color); cursor: default; flex-wrap: wrap; gap: 10px;"
-                            >
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <div class="settings-icon" style="background-color: #5856d6;"
-                                        ><i class="fas fa-brain"></i
-                                    ></div>
-                                    <div class="settings-text">挂载单聊记忆</div>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <input
-                                        type="number"
-                                        id="gmm-memory-limit-input"
-                                        style="width: 50px; text-align: center; border: 1px solid #e5e5ea; border-radius: 8px; padding: 4px; font-size: 15px;"
-                                        value="20"
-                                        min="1"
-                                    />
+                            <div class="settings-item gmm-setting-row" style="cursor: default;">
+                                <div class="settings-icon" style="background-color: #5856d6;"><i class="fas fa-brain"></i></div>
+                                <div class="settings-text">挂载单聊记忆</div>
+                                <div class="gmm-row-controls">
+                                    <input type="number" id="gmm-memory-limit-input" value="20" min="1" aria-label="挂载单聊记忆条数">
                                     <label class="toggle-switch">
-                                        <input type="checkbox" id="gmm-memory-toggle" />
+                                        <input type="checkbox" id="gmm-memory-toggle">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
                             </div>
-                            <div
-                                class="form-item"
-                                style="justify-content: space-between; border-bottom: 1px solid var(--separator-color); cursor: default; flex-wrap: wrap; gap: 10px;"
-                            >
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <div class="settings-icon" style="background-color: #34c759;"
-                                        ><i class="fas fa-users"></i
-                                    ></div>
-                                    <div class="settings-text">跨群记忆</div>
-                                </div>
+                            <div class="settings-item gmm-setting-row" style="cursor: default;">
+                                <div class="settings-icon" style="background-color: #34c759;"><i class="fas fa-users"></i></div>
+                                <div class="settings-text">跨群记忆</div>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" id="gmm-cross-group-memory-toggle" />
+                                    <input type="checkbox" id="gmm-cross-group-memory-toggle">
                                     <span class="slider"></span>
                                 </label>
                             </div>
@@ -12741,7 +12623,7 @@
                                 <span class="gmm-current-title" id="gmm-current-title"></span>
                                 <i class="fas fa-chevron-right arrow" aria-hidden="true"></i>
                             </div>
-<div class="settings-item gmm-setting-row" id="gmm-admin-btn" style="cursor: default;">
+                            <div class="settings-item gmm-setting-row" id="gmm-admin-btn" style="cursor: default;">
                                 <div class="settings-icon" style="background-color: #007aff;"><i class="fas fa-user-shield"></i></div>
                                 <div class="settings-text" id="gmm-admin-text">设为管理</div>
                                 <label class="toggle-switch">
@@ -12749,24 +12631,12 @@
                                     <span class="slider"></span>
                                 </label>
                             </div>
-                            <div
-                                class="settings-item"
-                                id="gmm-mute-btn"
-                                style="border-bottom: 1px solid var(--separator-color); cursor: pointer;"
-                            >
-                                <div class="settings-icon" style="background-color: #ff9500;"
-                                    ><i class="fas fa-comment-slash"></i
-                                ></div>
+                            <div class="settings-item" id="gmm-mute-btn" style="border-bottom: 1px solid var(--separator-color); cursor: pointer;">
+                                <div class="settings-icon" style="background-color: #ff9500;"><i class="fas fa-comment-slash"></i></div>
                                 <div class="settings-text">禁止发言</div>
                             </div>
-                            <div
-                                class="settings-item"
-                                id="gmm-kick-btn"
-                                style="border-bottom: none; cursor: pointer;"
-                            >
-                                <div class="settings-icon" style="background-color: #ff3b30;"
-                                    ><i class="fas fa-user-times"></i
-                                ></div>
+                            <div class="settings-item" id="gmm-kick-btn" style="border-bottom: none; cursor: pointer;">
+                                <div class="settings-icon" style="background-color: #ff3b30;"><i class="fas fa-user-times"></i></div>
                                 <div class="settings-text" style="color: #ff3b30;">踢出群聊</div>
                             </div>
                         </div>
@@ -14157,80 +14027,35 @@
                 </div>
             </div>
 
-            <div
-                class="bottom-sheet-overlay detail-sheet-overlay"
-                id="chat-settings-sheet"
-                style="z-index: 500;"
-            >
-                <div
-                    class="bottom-sheet"
-                    style="max-height: 100%; height: 100%; top: 0; display: flex; flex-direction: column; background: #f2f2f7; border-radius: 0; padding: 0;"
-                >
-                    <div
-                        style="padding-top: env(safe-area-inset-top, 20px); height: calc(44px + env(safe-area-inset-top, 20px)); display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; background: #f2f2f7; box-sizing: border-box; z-index: 10;"
-                    >
-                        <div
-                            onclick="window.closeView(document.getElementById('chat-settings-sheet'))"
-                            style="position: absolute; left: 16px; font-size: 16px; color: #007aff; cursor: pointer; display: flex; align-items: center;"
-                        >
+            <div class="bottom-sheet-overlay detail-sheet-overlay" id="chat-settings-sheet" style="z-index: 500;">
+                <div class="bottom-sheet" style="max-height: 100%; height: 100%; top: 0; display: flex; flex-direction: column; background: #f2f2f7; border-radius: 0; padding: 0;">
+                    <div style="padding-top: env(safe-area-inset-top, 20px); height: calc(44px + env(safe-area-inset-top, 20px)); display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; background: #f2f2f7; box-sizing: border-box; z-index: 10;">
+                        <div onclick="window.closeView(document.getElementById('chat-settings-sheet'))" style="position: absolute; left: 16px; font-size: 16px; color: #007aff; cursor: pointer; display: flex; align-items: center;">
                             <i class="fas fa-chevron-left" style="margin-right: 4px;"></i> 返回
                         </div>
-                        <div
-                            style="font-size: 17px; font-weight: 600; color: #111;"
-                            data-u2-i18n="chat.settings"
-                            >Chat Settings</div
-                        >
+                        <div style="font-size: 17px; font-weight: 600; color: #111;" data-u2-i18n="chat.settings">Chat Settings</div>
                     </div>
 
-                    <div
-                        class="detail-sheet-content"
-                        style="flex: 1; overflow-y: auto; padding: 0;"
-                    >
+                    <div class="detail-sheet-content" style="flex: 1; overflow-y: auto; padding: 0;">
                         <!-- Chat Setting Header: Avatar & Name -->
-                        <div
-                            style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 16px 10px;"
-                        >
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 16px 10px;">
                             <div style="position: relative; margin-bottom: 15px;">
-                                <div
-                                    style="width: 100px; height: 100px; border-radius: 50%; background-color: #f2f2f7; display: flex; justify-content: center; align-items: center; font-size: 40px; color: #8e8e93; overflow: hidden; "
-                                >
-                                    <img
-                                        id="chat-settings-avatar-img"
-                                        src=""
-                                        style="width: 100%; height: 100%; object-fit: cover; display: none;"
-                                    />
+                                <div style="width: 100px; height: 100px; border-radius: 50%; background-color: #f2f2f7; display: flex; justify-content: center; align-items: center; font-size: 40px; color: #8e8e93; overflow: hidden; ">
+                                    <img id="chat-settings-avatar-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
                                     <i class="fas fa-user" id="chat-settings-avatar-icon"></i>
                                 </div>
-                                <div
-                                    style="position: absolute; bottom: 0; right: 0; width: 26px; height: 26px; background-color: #000; color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; border: 2px solid #fff; cursor: pointer; "
-                                >
+                                <div style="position: absolute; bottom: 0; right: 0; width: 26px; height: 26px; background-color: #000; color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; border: 2px solid #fff; cursor: pointer; ">
                                     <i class="fas fa-plus"></i>
                                 </div>
                             </div>
 
-                            <div
-                                id="chat-settings-name"
-                                style="font-size: 24px; font-weight: 700; color: #000; margin-bottom: 25px;"
-                                >Name</div
-                            >
+                            <div id="chat-settings-name" style="font-size: 24px; font-weight: 700; color: #000; margin-bottom: 25px;">Name</div>
 
                             <div style="display: flex; gap: 20px; margin-bottom: 10px;">
-                                <button
-                                    type="button"
-                                    id="chat-settings-favorites-btn"
-                                    aria-label="查看角色收藏"
-                                    title="查看角色收藏"
-                                    style="width: 50px; height: 50px; border: none; border-radius: 50%; background-color: #ffffff; display: flex; justify-content: center; align-items: center; font-size: 20px; color: #666; cursor: pointer; padding: 0;"
-                                >
+                                <button type="button" id="chat-settings-favorites-btn" aria-label="查看角色收藏" title="查看角色收藏" style="width: 50px; height: 50px; border: none; border-radius: 50%; background-color: #ffffff; display: flex; justify-content: center; align-items: center; font-size: 20px; color: #666; cursor: pointer; padding: 0;">
                                     <i class="far fa-star" aria-hidden="true"></i>
                                 </button>
-                                <button
-                                    type="button"
-                                    id="chat-settings-search-btn"
-                                    aria-label="搜索聊天记录"
-                                    title="搜索聊天记录"
-                                    style="width: 50px; height: 50px; border: none; border-radius: 50%; background-color: #ffffff; display: flex; justify-content: center; align-items: center; font-size: 20px; color: #666; cursor: pointer; padding: 0;"
-                                >
+                                <button type="button" id="chat-settings-search-btn" aria-label="搜索聊天记录" title="搜索聊天记录" style="width: 50px; height: 50px; border: none; border-radius: 50%; background-color: #ffffff; display: flex; justify-content: center; align-items: center; font-size: 20px; color: #666; cursor: pointer; padding: 0;">
                                     <i class="fas fa-search" aria-hidden="true"></i>
                                 </button>
                                 <div
@@ -14243,74 +14068,39 @@
                         </div>
 
                         <div class="custom-minimal-tabs" id="chat-settings-segment">
-                            <button type="button" class="char-settings-tab active" data-tab="info"
-                                >Info</button
-                            >
-                            <button type="button" class="char-settings-tab" data-tab="theme"
-                                >Theme</button
-                            >
-                            <button type="button" class="char-settings-tab" data-tab="memory"
-                                >Memory</button
-                            >
+                            <button type="button" class="char-settings-tab active" data-tab="info">Info</button>
+                            <button type="button" class="char-settings-tab" data-tab="theme">Theme</button>
+                            <button type="button" class="char-settings-tab" data-tab="memory">Memory</button>
                         </div>
 
                         <div class="char-settings-panel active" id="chat-settings-info-panel">
                             <!-- 基础设置 -->
                             <div class="settings-group fully-rounded" style="margin: 10px 16px;">
                                 <div class="settings-item" id="chat-settings-profile-trigger">
-                                    <div class="settings-icon" style="background-color: #007aff;"
-                                        ><i class="fas fa-user-edit"></i
-                                    ></div>
+                                    <div class="settings-icon" style="background-color: #007aff;"><i class="fas fa-user-edit"></i></div>
                                     <div class="settings-text">编辑角色资料</div>
                                     <i class="fas fa-chevron-right arrow"></i>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    id="chat-bind-id-btn"
-                                    style="position: relative;"
-                                >
-                                    <div class="settings-icon" style="background-color: #34c759;"
-                                        ><i class="fas fa-id-card"></i
-                                    ></div>
+                                <div class="settings-item" id="chat-bind-id-btn" style="position: relative;">
+                                    <div class="settings-icon" style="background-color: #34c759;"><i class="fas fa-id-card"></i></div>
                                     <div class="settings-text">绑定ID</div>
-                                    <span
-                                        id="chat-bind-id-label"
-                                        style="font-size: 13px; color: #8e8e93; margin-right: 4px; pointer-events: none;"
-                                    ></span>
-                                    <i
-                                        class="fas fa-chevron-right arrow"
-                                        style="pointer-events: none;"
-                                    ></i>
+                                    <span id="chat-bind-id-label" style="font-size: 13px; color: #8e8e93; margin-right: 4px; pointer-events: none;"></span>
+                                    <i class="fas fa-chevron-right arrow" style="pointer-events: none;"></i>
                                 </div>
                                 <div class="settings-item" id="world-book-btn">
-                                    <div class="settings-icon" style="background-color: #1c1c1e;"
-                                        ><i class="fas fa-book"></i
-                                    ></div>
+                                    <div class="settings-icon" style="background-color: #1c1c1e;"><i class="fas fa-book"></i></div>
                                     <div class="settings-text">绑定世界书</div>
                                     <i class="fas fa-chevron-right arrow"></i>
                                 </div>
-                                <button
-                                    type="button"
-                                    class="settings-item"
-                                    id="chat-reverse-phone-btn"
-                                    style="width: 100%; border: 0; text-align: left;"
-                                    hidden
-                                >
-                                    <div class="settings-icon" style="background-color: #1c1c1e;"
-                                        ><i class="fas fa-mobile-screen-button"></i
-                                    ></div>
+                                <button type="button" class="settings-item" id="chat-reverse-phone-btn" style="width: 100%; border: 0; text-align: left;" hidden>
+                                    <div class="settings-icon" style="background-color: #1c1c1e;"><i class="fas fa-mobile-screen-button"></i></div>
                                     <div class="settings-text">反查手机</div>
                                     <i class="fas fa-chevron-right arrow"></i>
                                 </button>
                                 <div class="settings-item">
-                                    <div class="settings-icon" style="background-color: #ff3b30;"
-                                        ><i class="fas fa-language"></i
-                                    ></div>
+                                    <div class="settings-icon" style="background-color: #ff3b30;"><i class="fas fa-language"></i></div>
                                     <div class="settings-text">默认语言</div>
-                                    <select
-                                        id="chat-language-select"
-                                        style="border: none; background: transparent; color: #8e8e93; font-size: 16px; outline: none; text-align: right; direction: rtl; appearance: none; -webkit-appearance: none; padding-right: 5px;"
-                                    >
+                                    <select id="chat-language-select" style="border: none; background: transparent; color: #8e8e93; font-size: 16px; outline: none; text-align: right; direction: rtl; appearance: none; -webkit-appearance: none; padding-right: 5px;">
                                         <option value="zh">中文</option>
                                         <option value="ko">韩语</option>
                                         <option value="ja">日语</option>
@@ -14322,236 +14112,107 @@
                                     </select>
                                     <i class="fas fa-chevron-right arrow"></i>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    id="chat-custom-language-row"
-                                    style="display: none; cursor: default;"
-                                >
-                                    <div class="settings-icon" style="background-color: #af52de;"
-                                        ><i class="fas fa-pen"></i
-                                    ></div>
+                                <div class="settings-item" id="chat-custom-language-row" style="display: none; cursor: default;">
+                                    <div class="settings-icon" style="background-color: #af52de;"><i class="fas fa-pen"></i></div>
                                     <div class="settings-text">自定义语言</div>
-                                    <input
-                                        type="text"
-                                        id="chat-custom-language-input"
-                                        maxlength="80"
-                                        placeholder="例如：德语或繁体中文夹粤语"
-                                        style="width: 190px; border: none; background: transparent; color: #8e8e93; font-size: 14px; outline: none; text-align: right;"
-                                    />
+                                    <input type="text" id="chat-custom-language-input" maxlength="80" placeholder="例如：德语或繁体中文夹粤语" style="width: 190px; border: none; background: transparent; color: #8e8e93; font-size: 14px; outline: none; text-align: right;">
                                 </div>
                                 <div class="settings-item" style="cursor: default;">
-                                    <div class="settings-icon" style="background-color: #ff9500;"
-                                        ><i class="fas fa-layer-group"></i
-                                    ></div>
+                                    <div class="settings-icon" style="background-color: #ff9500;"><i class="fas fa-layer-group"></i></div>
                                     <div class="settings-text">一次消息条数</div>
-                                    <div
-                                        style="display: flex; align-items: center; gap: 6px; color: #8e8e93; font-size: 14px;"
-                                    >
+                                    <div style="display: flex; align-items: center; gap: 6px; color: #8e8e93; font-size: 14px;">
                                         <span>最少</span>
-                                        <input
-                                            type="number"
-                                            id="chat-message-count-min-input"
-                                            value="2"
-                                            min="1"
-                                            max="20"
-                                            inputmode="numeric"
-                                            style="width: 42px; border: 1px solid #e5e5ea; border-radius: 8px; padding: 5px 4px; background: #f2f2f7; color: #111; text-align: center; outline: none;"
-                                        />
+                                        <input type="number" id="chat-message-count-min-input" value="2" min="1" max="20" inputmode="numeric" style="width: 42px; border: 1px solid #e5e5ea; border-radius: 8px; padding: 5px 4px; background: #f2f2f7; color: #111; text-align: center; outline: none;">
                                         <span>最多</span>
-                                        <input
-                                            type="number"
-                                            id="chat-message-count-max-input"
-                                            value="8"
-                                            min="1"
-                                            max="20"
-                                            inputmode="numeric"
-                                            style="width: 42px; border: 1px solid #e5e5ea; border-radius: 8px; padding: 5px 4px; background: #f2f2f7; color: #111; text-align: center; outline: none;"
-                                        />
+                                        <input type="number" id="chat-message-count-max-input" value="8" min="1" max="20" inputmode="numeric" style="width: 42px; border: 1px solid #e5e5ea; border-radius: 8px; padding: 5px 4px; background: #f2f2f7; color: #111; text-align: center; outline: none;">
                                     </div>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    style="justify-content: space-between; cursor: default;"
-                                >
-                                    <div class="settings-icon" style="background-color: #32ade6;"
-                                        ><i class="fas fa-clock"></i
-                                    ></div>
+                                <div class="settings-item" style="justify-content: space-between; cursor: default;">
+                                    <div class="settings-icon" style="background-color: #32ade6;"><i class="fas fa-clock"></i></div>
                                     <div class="settings-text">时间感知</div>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" id="chat-time-aware-toggle" />
+                                        <input type="checkbox" id="chat-time-aware-toggle">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
                                 <div class="settings-item" id="chat-location-profile-btn">
-                                    <div class="settings-icon" style="background-color: #4a4a4a;"
-                                        ><i class="fas fa-location-dot"></i
-                                    ></div>
+                                    <div class="settings-icon" style="background-color: #4a4a4a;"><i class="fas fa-location-dot"></i></div>
                                     <div class="settings-text">定位</div>
-                                    <span
-                                        id="chat-location-profile-label"
-                                        style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: #8e8e93; margin-right: 4px; pointer-events: none;"
-                                        >未设置</span
-                                    >
-                                    <i
-                                        class="fas fa-chevron-right arrow"
-                                        style="pointer-events: none;"
-                                    ></i>
+                                    <span id="chat-location-profile-label" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: #8e8e93; margin-right: 4px; pointer-events: none;">未设置</span>
+                                    <i class="fas fa-chevron-right arrow" style="pointer-events: none;"></i>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    style="justify-content: space-between; cursor: default;"
-                                >
-                                    <div class="settings-icon" style="background-color: #8e8e93;"
-                                        ><i class="fas fa-undo-alt"></i
-                                    ></div>
+                                <div class="settings-item" style="justify-content: space-between; cursor: default;">
+                                    <div class="settings-icon" style="background-color: #8e8e93;"><i class="fas fa-undo-alt"></i></div>
                                     <div class="settings-text">允许角色撤回</div>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" id="chat-role-recall-toggle" />
+                                        <input type="checkbox" id="chat-role-recall-toggle">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    style="justify-content: space-between; cursor: default;"
-                                >
-                                    <div class="settings-icon" style="background-color: #ff3b30;"
-                                        ><i class="fas fa-user-slash"></i
-                                    ></div>
+                                <div class="settings-item" style="justify-content: space-between; cursor: default;">
+                                    <div class="settings-icon" style="background-color: #ff3b30;"><i class="fas fa-user-slash"></i></div>
                                     <div class="settings-text">允许 Char 使用拉黑功能</div>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" id="chat-char-block-toggle" />
+                                        <input type="checkbox" id="chat-char-block-toggle">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    style="justify-content: space-between; cursor: default;"
-                                >
-                                    <div class="settings-icon" style="background-color: #34c759;"
-                                        ><i class="fas fa-language"></i
-                                    ></div>
+                                <div class="settings-item" style="justify-content: space-between; cursor: default;">
+                                    <div class="settings-icon" style="background-color: #34c759;"><i class="fas fa-language"></i></div>
                                     <div class="settings-text">自动展开翻译</div>
                                     <label class="toggle-switch">
-                                        <input
-                                            type="checkbox"
-                                            id="chat-auto-expand-translation-toggle"
-                                        />
+                                        <input type="checkbox" id="chat-auto-expand-translation-toggle">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    style="justify-content: space-between; cursor: default;"
-                                >
-                                    <div class="settings-icon" style="background-color: #5856d6;"
-                                        ><i class="fas fa-plug"></i
-                                    ></div>
+                                <div class="settings-item" style="justify-content: space-between; cursor: default;">
+                                    <div class="settings-icon" style="background-color: #5856d6;"><i class="fas fa-plug"></i></div>
                                     <div class="settings-text">MCP 工具调用</div>
-                                    <span
-                                        id="chat-mcp-status-label"
-                                        style="display: none; font-size: 12px; color: #8e8e93; margin-right: 8px; white-space: nowrap;"
-                                        >暂无可用服务器</span
-                                    >
+                                    <span id="chat-mcp-status-label" style="display: none; font-size: 12px; color: #8e8e93; margin-right: 8px; white-space: nowrap;">暂无可用服务器</span>
                                     <label class="toggle-switch" title="为当前聊天启用 MCP 工具">
-                                        <input type="checkbox" id="chat-mcp-enabled-toggle" />
+                                        <input type="checkbox" id="chat-mcp-enabled-toggle">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
-                                <div
-                                    class="settings-item chat-mcp-display-row"
-                                    id="chat-mcp-display-row"
-                                    style="justify-content: space-between; cursor: default;"
-                                    hidden
-                                >
-                                    <div class="settings-icon" style="background-color: #34c759;"
-                                        ><i class="fas fa-eye"></i
-                                    ></div>
+                                <div class="settings-item chat-mcp-display-row" id="chat-mcp-display-row" style="justify-content: space-between; cursor: default;" hidden>
+                                    <div class="settings-icon" style="background-color: #34c759;"><i class="fas fa-eye"></i></div>
                                     <div class="settings-text">显示工具调用</div>
-                                    <label
-                                        class="toggle-switch"
-                                        title="在聊天记录中保留工具调用成功提示"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            id="chat-mcp-display-toggle"
-                                            checked
-                                        />
+                                    <label class="toggle-switch" title="在聊天记录中保留工具调用成功提示">
+                                        <input type="checkbox" id="chat-mcp-display-toggle" checked>
                                         <span class="slider"></span>
                                     </label>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    id="chat-online-prompt-settings-btn"
-                                    role="button"
-                                    tabindex="0"
-                                >
-                                    <div class="settings-icon" style="background-color: #8e8e93;"
-                                        ><i class="fas fa-sliders-h"></i
-                                    ></div>
+                                <div class="settings-item" id="chat-online-prompt-settings-btn" role="button" tabindex="0">
+                                    <div class="settings-icon" style="background-color: #8e8e93;"><i class="fas fa-sliders-h"></i></div>
                                     <div class="settings-text">自定义提示词</div>
                                     <span id="chat-online-prompt-settings-label">内置预设</span>
-                                    <i
-                                        class="fas fa-chevron-right arrow"
-                                        style="pointer-events: none;"
-                                    ></i>
+                                    <i class="fas fa-chevron-right arrow" style="pointer-events: none;"></i>
                                 </div>
                                 <div class="settings-item" id="chat-cot-settings-btn">
-                                    <div
-                                        class="settings-icon cot-settings-menu-icon"
-                                        style="background-color: #5856d6;"
-                                        >COT</div
-                                    >
+                                    <div class="settings-icon cot-settings-menu-icon" style="background-color: #5856d6;">COT</div>
                                     <div class="settings-text">COT 思考</div>
-                                    <span
-                                        id="chat-cot-settings-label"
-                                        style="font-size: 13px; color: #8e8e93; margin-right: 4px; pointer-events: none;"
-                                        >关闭</span
-                                    >
-                                    <i
-                                        class="fas fa-chevron-right arrow"
-                                        style="pointer-events: none;"
-                                    ></i>
+                                    <span id="chat-cot-settings-label" style="font-size: 13px; color: #8e8e93; margin-right: 4px; pointer-events: none;">关闭</span>
+                                    <i class="fas fa-chevron-right arrow" style="pointer-events: none;"></i>
                                 </div>
                             </div>
 
                             <div class="settings-group fully-rounded" style="margin: 10px 16px;">
-                                <div
-                                    class="settings-item"
-                                    style="justify-content: space-between; cursor: default;"
-                                >
-                                    <div class="settings-icon" style="background-color: #ff9500;"
-                                        ><i class="fas fa-volume-up"></i
-                                    ></div>
+                                <div class="settings-item" style="justify-content: space-between; cursor: default;">
+                                    <div class="settings-icon" style="background-color: #ff9500;"><i class="fas fa-volume-up"></i></div>
                                     <div class="settings-text">TTS</div>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" id="chat-tts-enabled-toggle" />
+                                        <input type="checkbox" id="chat-tts-enabled-toggle">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
                                 <div id="chat-tts-settings-body" style="display: none;">
                                     <div class="form-item">
-                                        <label style="width: 100px; white-space: nowrap;"
-                                            >语音 ID</label
-                                        >
-                                        <input
-                                            type="text"
-                                            id="chat-tts-voice-id-input"
-                                            placeholder="填写服务商音色 ID"
-                                        />
+                                        <label style="width: 100px; white-space: nowrap;">语音 ID</label>
+                                        <input type="text" id="chat-tts-voice-id-input" placeholder="填写服务商音色 ID">
                                     </div>
                                     <div class="form-item" style="border-bottom: none;">
-                                        <label style="width: 100px; white-space: nowrap;"
-                                            >语速</label
-                                        >
-                                        <input
-                                            type="number"
-                                            id="chat-tts-speed-input"
-                                            min="0.5"
-                                            max="2"
-                                            step="0.1"
-                                            value="1"
-                                            style="text-align: right; padding-right: 5px;"
-                                        />
+                                        <label style="width: 100px; white-space: nowrap;">语速</label>
+                                        <input type="number" id="chat-tts-speed-input" min="0.5" max="2" step="0.1" value="1" style="text-align: right; padding-right: 5px;">
                                     </div>
                                 </div>
                             </div>
@@ -14559,134 +14220,73 @@
                             <!-- 其他工具 -->
                             <div class="settings-group fully-rounded" style="margin: 10px 16px;">
                                 <div class="settings-item" id="relationship-btn">
-                                    <div class="settings-icon" style="background-color: #5856d6;"
-                                        ><i class="fas fa-project-diagram"></i
-                                    ></div>
+                                    <div class="settings-icon" style="background-color: #5856d6;"><i class="fas fa-project-diagram"></i></div>
                                     <div class="settings-text">关系网</div>
                                     <i class="fas fa-chevron-right arrow"></i>
                                 </div>
                             </div>
 
                             <!-- 删除好友 -->
-                            <div
-                                class="settings-group fully-rounded"
-                                style="margin: 30px 16px 10px;"
-                            >
-                                <div
-                                    class="sheet-action"
-                                    id="chat-block-friend-btn"
-                                    style="margin: 0 0 10px 0; color: #ff3b30;"
-                                    >拉黑好友</div
-                                >
-                                <div
-                                    class="sheet-action"
-                                    id="clear-history-btn"
-                                    style="margin: 0 0 10px 0; color: #ff3b30;"
-                                    >清空聊天记录</div
-                                >
-                                <div
-                                    class="sheet-action"
-                                    id="delete-friend-btn"
-                                    style="margin: 0; color: #ff3b30;"
-                                    >删除好友</div
-                                >
+                            <div class="settings-group fully-rounded" style="margin: 30px 16px 10px;">
+                                <div class="sheet-action" id="chat-block-friend-btn" style="margin: 0 0 10px 0; color: #ff3b30;">拉黑好友</div>
+                                <div class="sheet-action" id="clear-history-btn" style="margin: 0 0 10px 0; color: #ff3b30;">清空聊天记录</div>
+                                <div class="sheet-action" id="delete-friend-btn" style="margin: 0; color: #ff3b30;">删除好友</div>
                             </div>
                         </div>
 
                         <div class="char-settings-panel" id="chat-settings-theme-panel">
+
                             <!-- 视觉调整区 (背景, 头像, 时间戳) -->
                             <div class="settings-group fully-rounded" style="margin: 10px 16px;">
-                                <div
-                                    class="settings-item"
-                                    style="justify-content: space-between; cursor: default; border-bottom: 1px solid var(--separator-color);"
-                                >
-                                    <div
-                                        class="settings-text"
-                                        style="color: #000; font-weight: 600;"
-                                        >聊天背景</div
-                                    >
+                                <div class="settings-item" style="justify-content: space-between; cursor: default; border-bottom: 1px solid var(--separator-color);">
+                                    <div class="settings-text" style="color: #000; font-weight: 600;">聊天背景</div>
                                     <div style="display: flex; gap: 20px; padding-right: 5px;">
-                                        <i
-                                            class="fas fa-upload"
-                                            id="chat-bg-upload-icon"
-                                            style="font-size: 18px; color: #007aff; cursor: pointer;"
-                                            title="上传背景"
-                                        ></i>
-                                        <i
-                                            class="fas fa-undo"
-                                            id="chat-bg-reset-icon"
-                                            style="font-size: 18px; color: #ff3b30; cursor: pointer;"
-                                            title="重置背景"
-                                        ></i>
+                                        <i class="fas fa-upload" id="chat-bg-upload-icon" style="font-size: 18px; color: #007aff; cursor: pointer;" title="上传背景"></i>
+                                        <i class="fas fa-undo" id="chat-bg-reset-icon" style="font-size: 18px; color: #ff3b30; cursor: pointer;" title="重置背景"></i>
                                     </div>
-                                    <input
-                                        type="file"
-                                        id="chat-bg-upload"
-                                        accept="image/*"
-                                        style="display:none;"
-                                    />
+                                    <input type="file" id="chat-bg-upload" accept="image/*" style="display:none;">
                                 </div>
 
-                                <div
-                                    class="form-item"
-                                    style="justify-content: space-between; border-bottom: 1px solid var(--separator-color);"
-                                >
-                                    <label style="width: auto; font-size: 16px; color: #000;"
-                                        >显示头像</label
-                                    >
+                                <div class="form-item" style="justify-content: space-between; border-bottom: 1px solid var(--separator-color);">
+                                    <label style="width: auto; font-size: 16px; color: #000;">单条显示头像</label>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" id="chat-avatar-toggle" />
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-<div class="form-item" style="justify-content: space-between; border-bottom: 1px solid var(--separator-color);">
+                                    <input type="checkbox" id="chat-avatar-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="form-item" style="justify-content: space-between; border-bottom: 1px solid var(--separator-color);">
                                 <label for="chat-every-message-avatar-toggle" style="width: auto; font-size: 16px; color: #000;">每条显示头像</label>
                                 <label class="toggle-switch"><input type="checkbox" id="chat-every-message-avatar-toggle"><span class="slider"></span></label>
                             </div>
-<div class="form-item" style="justify-content: space-between; border-bottom: 1px solid var(--separator-color);">
+                            <div class="form-item" style="justify-content: space-between; border-bottom: 1px solid var(--separator-color);">
                                 <label for="chat-continuous-bubbles-toggle" style="width: auto; font-size: 16px; color: #000;">连续气泡</label>
                                 <label class="toggle-switch"><input type="checkbox" id="chat-continuous-bubbles-toggle" checked><span class="slider"></span></label>
                             </div>
-<div class="form-item" style="justify-content: space-between; border-bottom: 1px solid var(--separator-color);">
+                            <div class="form-item" style="justify-content: space-between; border-bottom: 1px solid var(--separator-color);">
                                 <label for="chat-reply-style-select" style="width: auto; font-size: 16px; color: #000;">回复样式</label>
                                 <select id="chat-reply-style-select" style="width: 120px; padding: 6px 10px; border-radius: 8px; border: 1px solid #e5e5ea; background: #f2f2f7; font-size: 14px; color: #111;">
                                     <option value="inside">气泡内</option><option value="outside">气泡外</option>
                                 </select>
                             </div>
 
-                                <div
-                                    class="form-item"
-                                    style="justify-content: space-between; border-bottom: none;"
-                                    id="timestamp-header"
-                                >
-                                    <label style="width: auto; font-size: 16px; color: #000;"
-                                        >显示时间戳</label
-                                    >
+                                <div class="form-item" style="justify-content: space-between; border-bottom: none;" id="timestamp-header">
+                                    <label style="width: auto; font-size: 16px; color: #000;">显示时间戳</label>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" id="timestamp-toggle" />
+                                        <input type="checkbox" id="timestamp-toggle">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
-                                <div
-                                    id="timestamp-position-body"
-                                    style="display: none; padding: 0 16px 16px; background: #fff; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; flex-direction: column; gap: 8px;"
-                                >
-                                    <div
-                                        style="display: flex; justify-content: space-between; align-items: center; padding-top: 5px;"
-                                    >
-                                        <label style="font-size: 14px; color: #8e8e93;"
-                                            >时间戳位置</label
-                                        >
-                                        <select
-                                            id="timestamp-position-select"
-                                            style="width: 120px; padding: 6px 10px; border-radius: 8px; border: 1px solid #e5e5ea; background: #f2f2f7; font-size: 14px; outline: none; color: #111;"
-                                        >
+                                <div id="timestamp-position-body" style="display: none; padding: 0 16px 16px; background: #fff; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; flex-direction: column; gap: 8px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 5px;">
+                                        <label style="font-size: 14px; color: #8e8e93;">时间戳位置</label>
+                                        <select id="timestamp-position-select" style="width: 120px; padding: 6px 10px; border-radius: 8px; border: 1px solid #e5e5ea; background: #f2f2f7; font-size: 14px; outline: none; color: #111;">
                                             <option value="inside">气泡内</option>
                                             <option value="outside">气泡外</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
 
                         <div class="char-settings-panel" id="chat-settings-memory-panel">
@@ -14694,144 +14294,62 @@
                             <div id="chat-memory-overview-stats" style="margin: 10px 16px;"></div>
 
                             <div class="settings-group fully-rounded" style="margin: 10px 16px;">
-                                <div
-                                    class="settings-item"
-                                    style="justify-content: space-between; border-bottom: 1px solid var(--separator-color); cursor: default;"
-                                >
+                                <div class="settings-item" style="justify-content: space-between; border-bottom: 1px solid var(--separator-color); cursor: default;">
                                     <div style="display: flex; align-items: center;">
-                                        <div
-                                            class="settings-icon"
-                                            style="background-color: #ff9500;"
-                                            ><i class="fas fa-link"></i
-                                        ></div>
+                                        <div class="settings-icon" style="background-color: #ff9500;"><i class="fas fa-link"></i></div>
                                         <div class="settings-text">上下文</div>
                                     </div>
-                                    <div
-                                        style="display: flex; align-items: center; gap: 10px; padding-right: 10px;"
-                                    >
-                                        <input
-                                            type="number"
-                                            id="chat-memory-context-limit-input"
-                                            style="width: 50px; text-align: center; border: 1px solid #e5e5ea; border-radius: 8px; padding: 4px; font-size: 15px;"
-                                            value="50"
-                                        />
+                                    <div style="display: flex; align-items: center; gap: 10px; padding-right: 10px;">
+                                        <input type="number" id="chat-memory-context-limit-input" style="width: 50px; text-align: center; border: 1px solid #e5e5ea; border-radius: 8px; padding: 4px; font-size: 15px;" value="50">
                                         <label class="toggle-switch">
-                                            <input
-                                                type="checkbox"
-                                                id="chat-memory-context-enabled-toggle"
-                                                checked=""
-                                            />
+                                            <input type="checkbox" id="chat-memory-context-enabled-toggle" checked="">
                                             <span class="slider"></span>
                                         </label>
                                     </div>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    id="chat-memory-manual-summary-btn"
-                                    style="border-bottom: 1px solid var(--separator-color); cursor: pointer;"
-                                >
-                                    <div class="settings-icon" style="background-color: #007aff;"
-                                        ><i class="fas fa-wand-magic-sparkles"></i
-                                    ></div>
+                                <div class="settings-item" id="chat-memory-manual-summary-btn" style="border-bottom: 1px solid var(--separator-color); cursor: pointer;">
+                                    <div class="settings-icon" style="background-color: #007aff;"><i class="fas fa-wand-magic-sparkles"></i></div>
                                     <div class="settings-text">总结对话</div>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    id="chat-memory-autonomous-btn"
-                                    style="border-bottom: none; cursor: pointer;"
-                                >
-                                    <div class="settings-icon" style="background-color: #34c759;"
-                                        ><i class="fas fa-satellite-dish"></i
-                                    ></div>
+                                <div class="settings-item" id="chat-memory-autonomous-btn" style="border-bottom: none; cursor: pointer;">
+                                    <div class="settings-icon" style="background-color: #34c759;"><i class="fas fa-satellite-dish"></i></div>
                                     <div class="settings-text">自主活动</div>
-                                    <span
-                                        id="chat-memory-autonomous-status"
-                                        style="margin-left:auto; color:#8e8e93; font-size:14px;"
-                                        >关闭</span
-                                    >
+                                    <span id="chat-memory-autonomous-status" style="margin-left:auto; color:#8e8e93; font-size:14px;">关闭</span>
                                 </div>
                             </div>
 
-                            <div
-                                class="settings-group fully-rounded"
-                                id="chat-memory-library-group"
-                                style="margin: 20px 16px 10px;"
-                            >
-                                <div
-                                    class="settings-item"
-                                    id="chat-memory-group-context-btn"
-                                    style="border-bottom: 1px solid var(--separator-color); cursor: pointer;"
-                                >
-                                    <div class="settings-icon" style="background-color: #34c759;"
-                                        ><i class="fas fa-users"></i
-                                    ></div>
+                            <div class="settings-group fully-rounded" id="chat-memory-library-group" style="margin: 20px 16px 10px;">
+                                <div class="settings-item" id="chat-memory-group-context-btn" style="border-bottom: 1px solid var(--separator-color); cursor: pointer;">
+                                    <div class="settings-icon" style="background-color: #34c759;"><i class="fas fa-users"></i></div>
                                     <div class="settings-text">群聊记忆</div>
-                                    <span
-                                        id="chat-memory-group-context-count"
-                                        style="margin-left:auto; color:#8e8e93; font-size:14px;"
-                                    ></span>
+                                    <span id="chat-memory-group-context-count" style="margin-left:auto; color:#8e8e93; font-size:14px;"></span>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    id="chat-memory-shortterm-btn"
-                                    style="border-bottom: 1px solid var(--separator-color); cursor: pointer;"
-                                >
-                                    <div class="settings-icon" style="background-color: #007aff;"
-                                        ><i class="fas fa-mobile-alt"></i
-                                    ></div>
+                                <div class="settings-item" id="chat-memory-shortterm-btn" style="border-bottom: 1px solid var(--separator-color); cursor: pointer;">
+                                    <div class="settings-icon" style="background-color: #007aff;"><i class="fas fa-mobile-alt"></i></div>
                                     <div class="settings-text">短期记忆</div>
-                                    <span
-                                        id="chat-memory-shortterm-count"
-                                        style="margin-left:auto; color:#8e8e93; font-size:14px;"
-                                    ></span>
+                                    <span id="chat-memory-shortterm-count" style="margin-left:auto; color:#8e8e93; font-size:14px;"></span>
                                     <i class="fas fa-chevron-right arrow"></i>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    id="chat-memory-longterm-library-btn"
-                                    style="border-bottom: 1px solid var(--separator-color); cursor: pointer;"
-                                >
-                                    <div class="settings-icon" style="background-color: #5856d6;"
-                                        ><i class="fas fa-archive"></i
-                                    ></div>
+                                <div class="settings-item" id="chat-memory-longterm-library-btn" style="border-bottom: 1px solid var(--separator-color); cursor: pointer;">
+                                    <div class="settings-icon" style="background-color: #5856d6;"><i class="fas fa-archive"></i></div>
                                     <div class="settings-text">长期记忆</div>
-                                    <span
-                                        id="chat-memory-longterm-count"
-                                        style="margin-left:auto; color:#8e8e93; font-size:14px;"
-                                    ></span>
+                                    <span id="chat-memory-longterm-count" style="margin-left:auto; color:#8e8e93; font-size:14px;"></span>
                                     <i class="fas fa-chevron-right arrow"></i>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    id="chat-memory-x-dm-context-btn"
-                                    style="border-bottom: 1px solid var(--separator-color); cursor: pointer;"
-                                >
-                                    <div class="settings-icon" style="background-color: #5856d6;"
-                                        ><i class="fas fa-link"></i
-                                    ></div>
+                                <div class="settings-item" id="chat-memory-x-dm-context-btn" style="border-bottom: 1px solid var(--separator-color); cursor: pointer;">
+                                    <div class="settings-icon" style="background-color: #5856d6;"><i class="fas fa-link"></i></div>
                                     <div class="settings-text">社交帐号</div>
-                                    <span
-                                        id="chat-memory-x-dm-context-count"
-                                        style="margin-left:auto; color:#8e8e93; font-size:14px;"
-                                    ></span>
+                                    <span id="chat-memory-x-dm-context-count" style="margin-left:auto; color:#8e8e93; font-size:14px;"></span>
                                     <i class="fas fa-chevron-right arrow"></i>
                                 </div>
-                                <div
-                                    class="settings-item"
-                                    id="chat-memory-schedule-entry-btn"
-                                    style="border-bottom: none; cursor: pointer;"
-                                >
-                                    <div class="settings-icon" style="background-color: #ff9500;"
-                                        ><i class="fas fa-calendar-alt"></i
-                                    ></div>
+                                <div class="settings-item" id="chat-memory-schedule-entry-btn" style="border-bottom: none; cursor: pointer;">
+                                    <div class="settings-icon" style="background-color: #ff9500;"><i class="fas fa-calendar-alt"></i></div>
                                     <div class="settings-text">日程作息</div>
-                                    <span
-                                        id="chat-memory-schedule-status"
-                                        style="margin-left:auto; color:#8e8e93; font-size:14px;"
-                                    ></span>
+                                    <span id="chat-memory-schedule-status" style="margin-left:auto; color:#8e8e93; font-size:14px;"></span>
                                     <i class="fas fa-chevron-right arrow"></i>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -15036,214 +14554,35 @@
                 </div>
             </div>
 
-            <div
-                class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay"
-                id="custom-modal-overlay"
-                style="z-index: 9999;"
-            >
+            <div class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay" id="custom-modal-overlay" style="z-index: 9999;">
                 <div class="wb-centered-modal-card wb-group-modal-card">
                     <div class="wb-centered-modal-header">
                         <div class="wb-centered-modal-title" id="modal-title">提示</div>
                     </div>
 
                     <div class="wb-centered-modal-body" style="overflow-y: auto;">
-                        <p
-                            id="modal-message"
-                            style="text-align: center; margin-bottom: 20px; color: #8e8e93; font-size: 14px; padding: 0 20px; line-height: 1.5;"
-                        ></p>
+                        <p id="modal-message" style="text-align: center; margin-bottom: 20px; color: #8e8e93; font-size: 14px; padding: 0 20px; line-height: 1.5;"></p>
 
                         <div id="modal-confirm-content">
                             <!-- JS will toggle this for non-prompt -->
                         </div>
 
                         <div id="modal-prompt-content" style="display: none;">
-                            <div
-                                id="modal-image-composer-group"
-                                style="display: none; margin-bottom: 12px; padding: 12px; border-radius: 14px; background: #f2f2f7;"
-                            >
+                            <div id="modal-image-composer-group" style="display: none; margin-bottom: 12px; padding: 12px; border-radius: 14px; background: #f2f2f7;">
                                 <div style="display: flex; align-items: center; gap: 12px;">
-                                    <div
-                                        id="modal-image-composer-preview"
-                                        style="width: 54px; height: 54px; border-radius: 13px; overflow: hidden; background: #e5e5ea; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #8e8e93;"
-                                    >
+                                    <div id="modal-image-composer-preview" style="width: 54px; height: 54px; border-radius: 13px; overflow: hidden; background: #e5e5ea; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #8e8e93;">
                                         <i class="fas fa-image"></i>
-                                        <img
-                                            alt="待发送图片"
-                                            style="width: 100%; height: 100%; object-fit: cover; display: none;"
-                                        />
+                                        <img alt="待发送图片" style="width: 100%; height: 100%; object-fit: cover; display: none;">
                                     </div>
                                     <div style="min-width: 0; flex: 1;">
-                                        <div
-                                            style="font-size: 14px; font-weight: 600; color: #1c1c1e;"
-                                            >相册图片</div
-                                        >
-                                        <div
-                                            id="modal-image-composer-status"
-                                            style="font-size: 12px; color: #8e8e93; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
-                                            >未选择图片时发送虚拟图片</div
-                                        >
+                                        <div style="font-size: 14px; font-weight: 600; color: #1c1c1e;">相册图片</div>
+                                        <div id="modal-image-composer-status" style="font-size: 12px; color: #8e8e93; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">未选择图片时发送虚拟图片</div>
                                     </div>
-                                    <button
-                                        type="button"
-                                        id="modal-image-composer-upload-btn"
-                                        style="border: none; background: transparent; color: #007aff; font-size: 13px; padding: 8px 2px; white-space: nowrap;"
-                                        >上传</button
-                                    >
-                                    <button
-                                        type="button"
-                                        id="modal-image-composer-remove-btn"
-                                        aria-label="移除已选图片"
-                                        style="display: none; border: none; background: transparent; color: #ff3b30; font-size: 14px; padding: 8px 2px;"
-                                        ><i class="fas fa-times"></i
-                                    ></button>
-                                    <input
-                                        type="file"
-                                        id="modal-image-composer-input"
-                                        accept="image/*"
-                                        multiple
-                                        style="display: none;"
-                                    />
+                                    <button type="button" id="modal-image-composer-upload-btn" style="border: none; background: transparent; color: #007aff; font-size: 13px; padding: 8px 2px; white-space: nowrap;">上传</button>
+                                    <button type="button" id="modal-image-composer-remove-btn" aria-label="移除已选图片" style="display: none; border: none; background: transparent; color: #ff3b30; font-size: 14px; padding: 8px 2px;"><i class="fas fa-times"></i></button>
+                                    <input type="file" id="modal-image-composer-input" accept="image/*" multiple style="display: none;">
                                 </div>
-                                <div
-                                    id="modal-image-composer-list"
-                                    class="modal-image-composer-list"
-                                    aria-label="待发送图片"
-                                ></div>
-                            </div>
-                            <div
-                                class="form-group fully-rounded"
-                                id="modal-input-group"
-                                style="margin-bottom: 20px;"
-                            >
-                                <div class="form-item">
-                                    <input
-                                        type="text"
-                                        id="modal-input"
-                                        style="text-align: center;"
-                                        placeholder="请输入"
-                                    />
-                                </div>
-                            </div>
-                            <div
-                                id="modal-textarea-group"
-                                style="margin-bottom: 20px; display: none;"
-                            >
-                                <label
-                                    id="modal-textarea-label"
-                                    for="modal-textarea"
-                                    style="display: none; margin: 0 0 7px 2px; font-size: 13px; font-weight: 600; color: #6e6e73;"
-                                ></label>
-                                <textarea
-                                    id="modal-textarea"
-                                    class="global-textarea"
-                                    placeholder="请输入"
-                                ></textarea>
-                            </div>
-                            <div
-                                id="modal-secondary-textarea-group"
-                                style="margin-bottom: 20px; display: none;"
-                            >
-                                <label
-                                    id="modal-secondary-textarea-label"
-                                    for="modal-secondary-textarea"
-                                    style="display: block; margin: 0 0 7px 2px; font-size: 13px; font-weight: 600; color: #6e6e73;"
-                                    >翻译</label
-                                >
-                                <textarea
-                                    id="modal-secondary-textarea"
-                                    class="global-textarea"
-                                    placeholder="修改翻译（留空将清除）"
-                                ></textarea>
-                            </div>
-                            <div
-                                id="modal-generation-prompt-group"
-                                style="display: none; margin: -6px 0 14px;"
-                            >
-                                <div
-                                    id="modal-generation-preset-group"
-                                    style="display: flex; gap: 8px; margin-bottom: 10px;"
-                                >
-                                    <select
-                                        id="modal-generation-preset-select"
-                                        aria-label="选择生图提示词预设"
-                                        style="flex: 1; min-width: 0; border: none; border-radius: 12px; padding: 10px 12px; background: #f2f2f7; color: #1c1c1e; font-size: 13px; outline: none;"
-                                    >
-                                        <option value="">当前编辑内容</option>
-                                    </select>
-                                    <button
-                                        type="button"
-                                        id="modal-generation-save-preset-btn"
-                                        style="border: none; border-radius: 12px; padding: 0 12px; background: #e5e5ea; color: #1c1c1e; font-size: 13px; font-weight: 600; white-space: nowrap;"
-                                        >存为预设</button
-                                    >
-                                </div>
-                                <details
-                                    id="modal-generation-details"
-                                    style="border-radius: 14px; background: #f2f2f7; overflow: hidden;"
-                                >
-                                    <summary
-                                        style="padding: 12px 14px; cursor: pointer; font-size: 14px; font-weight: 650; color: #1c1c1e;"
-                                        >角色与负面提示词</summary
-                                    >
-                                    <div
-                                        style="padding: 0 12px 12px; display: flex; flex-direction: column; gap: 9px;"
-                                    >
-                                        <label style="font-size: 12px; color: #8e8e93;"
-                                            >Char 外貌提示词
-                                            <textarea
-                                                id="modal-generation-char-appearance"
-                                                class="global-textarea"
-                                                rows="2"
-                                                placeholder="仅在画面出现 Char 时应用"
-                                                style="margin-top: 5px; min-height: 58px;"
-                                            ></textarea>
-                                        </label>
-                                        <label style="font-size: 12px; color: #8e8e93;"
-                                            >User 外貌提示词
-                                            <textarea
-                                                id="modal-generation-user-appearance"
-                                                class="global-textarea"
-                                                rows="2"
-                                                placeholder="仅在画面出现 User 时应用"
-                                                style="margin-top: 5px; min-height: 58px;"
-                                            ></textarea>
-                                        </label>
-                                        <label style="font-size: 12px; color: #8e8e93;"
-                                            >画师串
-                                            <textarea
-                                                id="modal-generation-artist-prompt"
-                                                class="global-textarea"
-                                                rows="2"
-                                                placeholder="画师标签或风格提示词"
-                                                style="margin-top: 5px; min-height: 58px;"
-                                            ></textarea>
-                                        </label>
-                                        <label style="font-size: 12px; color: #8e8e93;"
-                                            >负面提示词
-                                            <textarea
-                                                id="modal-generation-negative-prompt"
-                                                class="global-textarea"
-                                                rows="2"
-                                                placeholder="不希望图片中出现的内容"
-                                                style="margin-top: 5px; min-height: 58px;"
-                                            ></textarea>
-                                        </label>
-                                    </div>
-                                </details>
-                                <label
-                                    id="modal-auto-image-generation-group"
-                                    style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; padding: 12px 14px; border-radius: 14px; background: #f2f2f7; cursor: pointer;"
-                                >
-                                    <span style="font-size: 14px; font-weight: 600; color: #1c1c1e;"
-                                        >自动生图</span
-                                    >
-                                    <input
-                                        type="checkbox"
-                                        id="modal-auto-image-generation-toggle"
-                                        style="width: 20px; height: 20px; accent-color: #1c1c1e;"
-                                    />
-                                </label>
-
+                                <div id="modal-image-composer-list" class="modal-image-composer-list" aria-label="待发送图片"></div>
                             </div>
                             <div id="modal-reference-face-group" class="im-image-reference-group" style="display: none;">
                                 <div class="im-image-section-title">人物参考照 <small>画面出现对应人物时自动使用</small></div>
@@ -15277,42 +14616,59 @@
                                 </div>
                                 <p id="modal-reference-face-warning" class="im-image-reference-warning" style="display: none;">NovelAI 同时使用两张人物参考照可能融合两人的面部特征。</p>
                             </div>
-                            <label
-                                id="modal-toggle-group"
-                                style="display: none; align-items: center; justify-content: space-between; gap: 12px; margin: -4px 0 20px; padding: 12px 14px; border-radius: 14px; background: #f2f2f7; cursor: pointer;"
-                            >
-                                <span
-                                    id="modal-toggle-label"
-                                    style="font-size: 15px; font-weight: 600; color: #1c1c1e;"
-                                    >使用参考脸</span
-                                >
-                                <input
-                                    type="checkbox"
-                                    id="modal-toggle-input"
-                                    style="width: 20px; height: 20px; accent-color: #1c1c1e;"
-                                />
+                            <div id="modal-generation-preset-group" class="im-image-preset-row" style="display: none;">
+                                <select id="modal-generation-preset-select" aria-label="选择生图提示词预设">
+                                    <option value="">当前编辑内容</option>
+                                </select>
+                                <button type="button" id="modal-generation-save-preset-btn">存为预设</button>
+                            </div>
+                            <div class="form-group fully-rounded" id="modal-input-group" style="margin-bottom: 20px;">
+                                <div class="form-item">
+                                    <input type="text" id="modal-input" style="text-align: center;" placeholder="请输入">
+                                </div>
+                            </div>
+                            <div id="modal-textarea-group" style="margin-bottom: 20px; display: none;">
+                                <label id="modal-textarea-label" for="modal-textarea" style="display: none; margin: 0 0 7px 2px; font-size: 13px; font-weight: 600; color: #6e6e73;"></label>
+                                <textarea id="modal-textarea" class="global-textarea" placeholder="请输入"></textarea>
+                            </div>
+                            <div id="modal-secondary-textarea-group" style="margin-bottom: 20px; display: none;">
+                                <label id="modal-secondary-textarea-label" for="modal-secondary-textarea" style="display: block; margin: 0 0 7px 2px; font-size: 13px; font-weight: 600; color: #6e6e73;">翻译</label>
+                                <textarea id="modal-secondary-textarea" class="global-textarea" placeholder="修改翻译（留空将清除）"></textarea>
+                            </div>
+                            <div id="modal-generation-prompt-group" class="im-image-prompt-options" style="display: none;">
+                                <details id="modal-generation-details" class="im-image-appearance-details">
+                                    <summary>外貌与画风</summary>
+                                    <div style="padding: 0 12px 12px; display: flex; flex-direction: column; gap: 9px;">
+                                        <label style="font-size: 12px; color: #8e8e93;">Char 外貌提示词
+                                            <textarea id="modal-generation-char-appearance" class="global-textarea" rows="2" placeholder="仅在画面出现 Char 时应用" style="margin-top: 5px; min-height: 58px;"></textarea>
+                                        </label>
+                                        <label style="font-size: 12px; color: #8e8e93;">User 外貌提示词
+                                            <textarea id="modal-generation-user-appearance" class="global-textarea" rows="2" placeholder="仅在画面出现 User 时应用" style="margin-top: 5px; min-height: 58px;"></textarea>
+                                        </label>
+                                        <label style="font-size: 12px; color: #8e8e93;">画师串
+                                            <textarea id="modal-generation-artist-prompt" class="global-textarea" rows="2" placeholder="画师标签或风格提示词" style="margin-top: 5px; min-height: 58px;"></textarea>
+                                        </label>
+                                    </div>
+                                </details>
+                                <label class="im-image-negative-field" for="modal-generation-negative-prompt">
+                                    <span>负面提示词 <small>不希望出现在图片中的内容</small></span>
+                                    <textarea id="modal-generation-negative-prompt" class="global-textarea" rows="2" placeholder="例如：watermark, blurry, extra fingers"></textarea>
+                                </label>
+                                <label id="modal-auto-image-generation-group" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; padding: 12px 14px; border-radius: 14px; background: #f2f2f7; cursor: pointer;">
+                                    <span style="font-size: 14px; font-weight: 600; color: #1c1c1e;">自动生图</span>
+                                    <input type="checkbox" id="modal-auto-image-generation-toggle" style="width: 20px; height: 20px; accent-color: #1c1c1e;">
+                                </label>
+                            </div>
+                            <label id="modal-toggle-group" style="display: none; align-items: center; justify-content: space-between; gap: 12px; margin: -4px 0 20px; padding: 12px 14px; border-radius: 14px; background: #f2f2f7; cursor: pointer;">
+                                <span id="modal-toggle-label" style="font-size: 15px; font-weight: 600; color: #1c1c1e;">使用参考脸</span>
+                                <input type="checkbox" id="modal-toggle-input" style="width: 20px; height: 20px; accent-color: #1c1c1e;">
                             </label>
                         </div>
 
                         <div style="display: flex; gap: 10px;">
-                            <div
-                                class="sheet-action"
-                                id="modal-cancel-btn"
-                                style="flex: 1; margin: 0; background: #e5e5ea; color: #000; font-weight: 500; font-size: 15px; padding: 12px; border-radius: 12px;"
-                                >取消</div
-                            >
-                            <div
-                                class="sheet-action"
-                                id="modal-confirm-btn"
-                                style="flex: 1; margin: 0; background: #ff3b30; color: #fff; font-weight: 600; font-size: 15px; padding: 12px; border-radius: 12px;"
-                                >确定</div
-                            >
-                            <div
-                                class="sheet-action"
-                                id="modal-prompt-confirm-btn"
-                                style="flex: 1; margin: 0; background: #007aff; color: #fff; font-weight: 600; font-size: 15px; padding: 12px; border-radius: 12px; display: none;"
-                                >确定</div
-                            >
+                            <div class="sheet-action" id="modal-cancel-btn" style="flex: 1; margin: 0; background: #e5e5ea; color: #000; font-weight: 500; font-size: 15px; padding: 12px; border-radius: 12px;">取消</div>
+                            <div class="sheet-action" id="modal-confirm-btn" style="flex: 1; margin: 0; background: #ff3b30; color: #fff; font-weight: 600; font-size: 15px; padding: 12px; border-radius: 12px;">确定</div>
+                            <div class="sheet-action" id="modal-prompt-confirm-btn" style="flex: 1; margin: 0; background: #007aff; color: #fff; font-weight: 600; font-size: 15px; padding: 12px; border-radius: 12px; display: none;">确定</div>
                         </div>
                     </div>
                 </div>
@@ -15421,124 +14777,48 @@
                 </div>
             </div>
 
-            <div
-                class="bottom-sheet-overlay detail-sheet-overlay"
-                id="chat-memory-autonomous-sheet"
-                style="z-index: 1300;"
-            >
+            <div class="bottom-sheet-overlay detail-sheet-overlay" id="chat-memory-autonomous-sheet" style="z-index: 1300;">
                 <div class="bottom-sheet chat-memory-autonomous-sheet">
                     <div class="sheet-handle"></div>
                     <div class="sheet-title">自主活动</div>
                     <div class="detail-sheet-content chat-memory-autonomous-content">
-                        <div
-                            class="settings-group fully-rounded chat-memory-autonomous-group chat-memory-autonomous-card"
-                        >
-                            <div
-                                class="settings-item chat-memory-autonomous-toggle-row"
-                                style="justify-content: space-between; cursor: default;"
-                            >
+                        <div class="settings-group fully-rounded chat-memory-autonomous-group chat-memory-autonomous-card">
+                            <div class="settings-item chat-memory-autonomous-toggle-row" style="justify-content: space-between; cursor: default;">
                                 <div style="display: flex; align-items: center;">
-                                    <div class="settings-icon" style="background-color: #34c759;"
-                                        ><i class="fas fa-comment-dots"></i
-                                    ></div>
-                                    <div class="settings-text">自动回复</div>
+                                    <div class="settings-icon" style="background-color: #34c759;"><i class="fas fa-comment-dots"></i></div>
+                                    <div class="settings-text">主动发消息</div>
                                 </div>
                                 <label class="toggle-switch">
-                                    <input
-                                        type="checkbox"
-                                        id="chat-memory-autonomous-enabled-toggle"
-                                    />
+                                    <input type="checkbox" id="chat-memory-autonomous-enabled-toggle">
                                     <span class="slider"></span>
                                 </label>
                             </div>
                             <div class="chat-memory-autonomous-intervals">
-                                <label
-                                    >最短间隔
-                                    <input
-                                        type="number"
-                                        id="chat-memory-autonomous-reply-min-input"
-                                        min="1"
-                                        value="30"
-                                    />
-                                    分钟</label
-                                >
-                                <label
-                                    >最长间隔
-                                    <input
-                                        type="number"
-                                        id="chat-memory-autonomous-reply-max-input"
-                                        min="1"
-                                        value="240"
-                                    />
-                                    分钟</label
-                                >
+                                <label class="chat-memory-autonomous-interval-row"><span>最短间隔</span><input type="number" id="chat-memory-autonomous-reply-min-input" min="1" value="30"><span>分钟</span></label>
+                                <label class="chat-memory-autonomous-interval-row"><span>最长间隔</span><input type="number" id="chat-memory-autonomous-reply-max-input" min="1" value="240"><span>分钟</span></label>
                             </div>
-                            <div
-                                class="chat-memory-autonomous-note"
-                                id="chat-memory-autonomous-next-label"
-                                >关闭后不会主动发消息</div
-                            >
+                            <div class="chat-memory-autonomous-note" id="chat-memory-autonomous-next-label">关闭后不会主动发消息</div>
                         </div>
-                        <div
-                            class="settings-group fully-rounded chat-memory-autonomous-group chat-memory-autonomous-card"
-                        >
-                            <div
-                                class="settings-item chat-memory-autonomous-toggle-row"
-                                style="justify-content: space-between; cursor: default;"
-                            >
+                        <div class="settings-group fully-rounded chat-memory-autonomous-group chat-memory-autonomous-card">
+                            <div class="settings-item chat-memory-autonomous-toggle-row" style="justify-content: space-between; cursor: default;">
                                 <div style="display: flex; align-items: center;">
-                                    <div class="settings-icon" style="background-color: #ff9500;"
-                                        ><i class="fas fa-images"></i
-                                    ></div>
+                                    <div class="settings-icon" style="background-color: #ff9500;"><i class="fas fa-images"></i></div>
                                     <div class="settings-text">自动发朋友圈</div>
                                 </div>
                                 <label class="toggle-switch">
-                                    <input
-                                        type="checkbox"
-                                        id="chat-memory-autonomous-moment-toggle"
-                                    />
+                                    <input type="checkbox" id="chat-memory-autonomous-moment-toggle">
                                     <span class="slider"></span>
                                 </label>
                             </div>
                             <div class="chat-memory-autonomous-intervals">
-                                <label
-                                    >最短间隔
-                                    <input
-                                        type="number"
-                                        id="chat-memory-autonomous-moment-min-input"
-                                        min="1"
-                                        value="30"
-                                    />
-                                    分钟</label
-                                >
-                                <label
-                                    >最长间隔
-                                    <input
-                                        type="number"
-                                        id="chat-memory-autonomous-moment-max-input"
-                                        min="1"
-                                        value="240"
-                                    />
-                                    分钟</label
-                                >
+                                <label class="chat-memory-autonomous-interval-row"><span>最短间隔</span><input type="number" id="chat-memory-autonomous-moment-min-input" min="1" value="30"><span>分钟</span></label>
+                                <label class="chat-memory-autonomous-interval-row"><span>最长间隔</span><input type="number" id="chat-memory-autonomous-moment-max-input" min="1" value="240"><span>分钟</span></label>
                             </div>
-                            <div
-                                class="chat-memory-autonomous-note"
-                                id="chat-memory-autonomous-moment-next-label"
-                                >关闭后不会自动发朋友圈</div
-                            >
+                            <div class="chat-memory-autonomous-note" id="chat-memory-autonomous-moment-next-label">关闭后不会自动发朋友圈</div>
                         </div>
                     </div>
-                    <div
-                        class="sheet-action confirm-action chat-memory-autonomous-save"
-                        id="chat-memory-autonomous-save-btn"
-                        >保存</div
-                    >
-                    <div
-                        class="sheet-action chat-memory-autonomous-cancel"
-                        id="chat-memory-autonomous-close-btn"
-                        >取消</div
-                    >
+                    <div class="sheet-action confirm-action chat-memory-autonomous-save" id="chat-memory-autonomous-save-btn">保存</div>
+                    <div class="sheet-action chat-memory-autonomous-cancel" id="chat-memory-autonomous-close-btn">取消</div>
                 </div>
             </div>
 
@@ -20811,16 +20091,16 @@
         <script src="js/imessage/weather_context.js?v=20261007-107-r1"></script>
         <script src="js/imessage/online_prompts.js?v=20260905-v2&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/group_titles.js?v=apk110-selective&apk-sync=111-selective"></script>
-<script src="js/imessage/2_core.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-sync=111-selective"></script>
+<script src="js/imessage/2_core.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-sync=111-selective&apk-ui=111-rebuild-20261016"></script>
         <script src="js/imessage/vector_memory.js?v=20260807-local-vector-memory-v1&memory-recall-promotion=20260813-v1&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/3_contacts.js?v=20260718-friend-profile-import-v1&render-cache=20260801-v1&vendor-lazy=20260803-v1&startup-queue=20260804-v1&official=20260827-v1&contact-card-actions=20260916-v4&repair=20261003"></script>
-        <script src="js/imessage/3_groups.js?v=20260718-group-poll-v4-group-memory-editor-v1&observer=20260730-v1&render-cache=20260801-v1&user-avatar=20260802-v1&group-auto-translation=20260803-v1&startup-queue=20260804-v1&context-limit=20260804-v1&group-identity-css-v1&member-sync-private-permissions=20260812-v1&theme-avatar-hooks=20260814-v2&worldbook=20260817-v1&online-chat-optimization=20260818-v1&token-usage=20260822-v1&online-prompts=20260905-v2&history-index=20260907-v1&cross-group-memory=20260919-v1&group-chat-search=20260924-v1&tap-response=20260924-v1&repair=20261003&apk-sync=111-selective"></script>
+        <script src="js/imessage/3_groups.js?v=20260718-group-poll-v4-group-memory-editor-v1&observer=20260730-v1&render-cache=20260801-v1&user-avatar=20260802-v1&group-auto-translation=20260803-v1&startup-queue=20260804-v1&context-limit=20260804-v1&group-identity-css-v1&member-sync-private-permissions=20260812-v1&theme-avatar-hooks=20260814-v2&worldbook=20260817-v1&online-chat-optimization=20260818-v1&token-usage=20260822-v1&online-prompts=20260905-v2&history-index=20260907-v1&cross-group-memory=20260919-v1&group-chat-search=20260924-v1&tap-response=20260924-v1&repair=20261003&apk-sync=111-selective&apk-ui=111-rebuild-20261016"></script>
         <script src="js/imessage/chat_record_forward.js?v=20261007-107-r1&apk-sync=111-selective"></script>
         <script src="js/imessage/4_chat_common.js?v=image-assets-20260803-v1&auto-image=20260807-v1&startup-queue=20260804-v1&auto-face-lock=20260813-v1&prompt-parts=20260819-v1&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/4_chat_status.js?v=20260821-status-memory-request-v1&template-avatar=20260821-v1&template-history-fallback=20260821-v1&paging=20260801-button-only-v1&startup-queue=20260804-v1&status-refresh=20260821-v1&offline-html-template-sanitize=20260822-v1&status-css-snapshot=20260822-v1&imessage-performance=20260825-v1&mcp-chat-settings=20260901-v2&repair=20261003"></script>
         <script src="js/imessage/4_chat_payment.js?v=20260725-single-chat-cot-v1&startup-queue=20260804-v1&group-identity-css-v1&group-member-resolution=20260812-v1&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/voice_message_audio.js?v=20261015-apk111&apk-sync=111-selective"></script>
-        <script src="js/imessage/4_chat_bubbles.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-sync=111-selective"></script>
+        <script src="js/imessage/4_chat_bubbles.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-sync=111-selective&apk-ui=111-rebuild-20261016"></script>
         <script src="js/imessage/chat_search.js?v=20260718-chat-history-search-v2&keyboard-guard=20260801-v1&startup-queue=20260804-v1&location-timezone=20260825-v1&location-translation=20260825-v1&history-index=20260907-v1&group-chat-search=20260924-v3&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/chat_favorites.js?v=20260723-chat-favorites-v3&startup-queue=20260804-v1&repair=20261003"></script>
         <script src="js/imessage/tts.js?v=20261007-107-r1&apk-sync=111-selective"></script>
@@ -20831,7 +20111,7 @@
         <script src="js/imessage/4_chat_sheet.js?v=20261007-107-r1&apk-sync=111-selective"></script>
         <script src="js/imessage/4_chat_link.js?v=20260726-light-link-theatre-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&picsum-cdn=20260815-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/4_chat_list.js?chat-runtime-performance=20260803-v1&startup-queue=20260804-v1&theme-surfaces=20260814-v1&imessage-performance=20260825-v2&mobile-latest=20260825-v1&mobile-performance=20260825-v1&official=20260827-v1&history-index=20260907-v1&chat-observer-lifecycle=20260920-v1&group-chat-search=20260924-v1&repair=20261003&settings=20261010-r1&apk-sync=111-selective"></script>
-        <script src="js/imessage/4_chat_interface.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=111-selective"></script>
+        <script src="js/imessage/4_chat_interface.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=111-selective&apk-ui=111-rebuild-20261016"></script>
         <script src="js/imessage/4_chat_voice_call.js?v=20261009-restored-repairs&apk-sync=111-selective"></script>
         <script src="js/imessage/video_call.js?v=20261009-restored-repairs&apk-sync=111-selective"></script>
         <script src="js/imessage/4_chat_main.js?v=20261007-107-r1&apk-sync=111-selective"></script>
@@ -20850,7 +20130,7 @@
         <!-- 引入核心 UI 管理与设置模块脚本 -->
         <script src="js/ui.js?v=20260811-no-glass-v1&toast-full-message=20260822-v1&notification-banner-v3&repair=20261003&shop-moments=20261010-v1"></script>
         <script src="js/ui_translation.js?v=20260807-global-ui-zh-v1&repair=20261003"></script>
-        <script src="js/settings.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=111-selective"></script>
+        <script src="js/settings.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=111-selective&apk-ui=111-rebuild-20261016"></script>
         <script src="js/imessage/official_accounts.js?v=20260828-youtu-preview-stable-v5&api-error-dialog=20260923-v1&official-css-generation=20260928-v1&ihg=20260929-106-r1&repair=20261003&settings=20261010-r1&apk-sync=111-selective"></script>
         <script src="js/vendor/mcp_client_sdk.js?v=20260901-mobile-mcp-v3&repair=20261003"></script>
         <script src="js/mcp_relay_config.js?v=20260906-relay-v2&repair=20261003"></script>

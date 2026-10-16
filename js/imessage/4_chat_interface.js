@@ -624,17 +624,14 @@ This is not a message sent by User in the group. No member may claim to have see
                 : (value_143_2 = friend_6.avatarUrl
                       ? '<img src="' + friend_6.avatarUrl + '" style="display: block;">'
                       : '<i class="fas fa-user"></i>');
-            const value_144_2 = isGroupChat
-                ? 'position: relative; top: 0; padding: 0 16px; align-items: center; justify-content: space-between; display: flex; pointer-events: none; width: 100%;'
-                : 'position: relative; top: 0; padding: 0 16px; align-items: center;';
             let text_57 = '';
             if (isGroupChat)
                 text_57 =
-                    `<div class="im-chat-group-title-wrap" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; padding: 4px 16px; background: rgba(242, 242, 247, 0.85);   border-radius: 40px;  pointer-events: auto;">
-                        <div class="ins-chat-name" style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;">` +
+                    `<div class="im-chat-group-title-wrap">
+                        <div class="ins-chat-name">` +
                     friend_6.nickname +
                     `</div>
-                        <div class="ins-chat-sign" style="font-size: 11px; font-weight: 500; color: #8e8e93; margin-top: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px;">` +
+                        <div class="ins-chat-sign">` +
                     formatGroupMemberCount(getGroupMemberCount(friend_6)) +
                     `</div>
                    </div>`;
@@ -714,18 +711,16 @@ This is not a message sent by User in the group. No member may claim to have see
             isGroupChat
                 ? (text_60 =
                       `
-                    <div class="chat-top-bar" style="` +
-                      value_144_2 +
-                      `">
+                    <div class="chat-top-bar im-chat-group-top-bar">
                         ` +
                       value_147_2 +
                       `
-                        <div style="display: flex; align-items: center; justify-content: center; flex: 1; pointer-events: none;" class="ins-chat-header" id="active-chat-header">
+                        <div class="ins-chat-header im-chat-group-header" id="active-chat-header">
                             ` +
                       text_57 +
                       `
                         </div>
-                        <div id="active-chat-right-avatar-container">
+                        <div class="im-chat-group-right" id="active-chat-right-avatar-container">
                             ` +
                       text_146 +
                       `

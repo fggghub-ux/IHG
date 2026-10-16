@@ -959,6 +959,13 @@ html.app-viewport-managed.app-ipad-layout {
 .app-viewport-managed #app {
     overscroll-behavior-y: none;
 }
+/* Hidden overflow still permits focus/scrollIntoView to pan the entire app.
+   Clip the web frame only; its nested pages and sheets retain their scrollports. */
+@supports (overflow: clip) {
+    .app-viewport-managed #app {
+        overflow: clip;
+    }
+}
 .app-viewport-managed.app-keyboard-open #app {
     top: var(--app-viewport-top, 0px);
     height: var(--app-viewport-height, 100%);

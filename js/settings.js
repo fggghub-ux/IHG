@@ -2592,7 +2592,7 @@
             themeBubbleCopyBtn.addEventListener('click', () => {
                 const bubbleTemplate = `/* iMessage 真实气泡源码（单聊文本气泡）
    运行时结构：.chat-row.user-row/.ai-row > .chat-bubble.user-bubble/.ai-bubble
-   提示：在主题编辑器里，:scope 代表当前聊天页根节点 */
+   :scope 代表当前聊天页根节点；卡片旧类名也可在此覆盖内置默认值。 */
 
 .chat-row {
   display: flex;
@@ -2650,19 +2650,19 @@
 }
 
 /* 连续气泡圆角 */
-.user-row.has-prev .user-bubble {
+.user-row.has-prev .user-bubble:not(.im-card-bubble) {
   border-top-right-radius: 4px;
 }
 
-.user-row.has-next .user-bubble {
+.user-row.has-next .user-bubble:not(.im-card-bubble) {
   border-bottom-right-radius: 4px;
 }
 
-.ai-row.has-prev .ai-bubble {
+.ai-row.has-prev .ai-bubble:not(.im-card-bubble) {
   border-top-left-radius: 4px;
 }
 
-.ai-row.has-next .ai-bubble {
+.ai-row.has-next .ai-bubble:not(.im-card-bubble) {
   border-bottom-left-radius: 4px;
 }
 
@@ -2748,8 +2748,7 @@
   object-fit: cover;
 }
 
-/* 单聊的每条实际消息都带一个隐藏头像节点，Theme 可按需显示。
-   群聊继续使用原生的 .group-ai-avatar-slot，不使用这个节点。 */
+/* 单聊的每条消息头像由 Chat Settings > Theme 开关控制。 */
 .im-message-avatar {
   display: none;
   width: var(--im-message-avatar-size, 30px);
@@ -2771,6 +2770,10 @@
   height: 100%;
   object-fit: cover;
 }
+:scope.show-every-message-avatar .chat-row > .im-message-avatar { display: block; }
+:scope.separate-bubbles .chat-row.has-prev { margin-top: 4px; }
+:scope.separate-bubbles.show-every-message-avatar .chat-row.has-prev { margin-top: 10px; }
+:scope.separate-bubbles .chat-bubble:not(.im-card-bubble) { border-radius: 20px !important; }
 
 /* 单聊居中时间分隔 */
 .chat-timestamp {
@@ -2970,6 +2973,12 @@
   background: rgba(0,0,0,0.05);
 }
 
+/* 气泡外回复由真实 .im-reply-stack 包住引用和气泡 */
+.im-reply-stack { display: inline-flex; flex-direction: column; width: max-content; max-width: min(70%, 300px); }
+.im-reply-stack > .chat-bubble { max-width: 100%; }
+.im-reply-outside-quote { position: relative; width: 100%; margin-bottom: 7px; color: #8e8e93; background: transparent; }
+.im-reply-outside-quote > span { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
 .msg-translation {
   margin-top: 6px;
   padding-top: 6px;
@@ -3002,7 +3011,8 @@
             themeChatCopyBtn.addEventListener('click', () => {
                 const chatTemplate = `/* iMessage 真实单聊 Chat 源码
    运行时根节点：.active-chat-interface.im-chat-single
-   提示：在主题编辑器里，:scope 代表当前单聊根节点 */
+   :scope 代表当前单聊根节点。以下是各类卡片原有的独立样式入口，
+   复制后可按需修改当前聊天的卡片外观；卡片高度会按内容收起并限制上限。 */
 
 :scope {
   --im-chat-bg-color: #ffffff;
@@ -3243,7 +3253,7 @@
   font-size: 12px !important;
 }
 
-/* 单聊每条实际消息的隐藏头像钩子；没有设置开关，由 Theme CSS 自行决定是否显示。 */
+/* 单聊每条消息头像由 Chat Settings > Theme 开关控制。 */
 .im-message-avatar {
   display: none;
   width: var(--im-message-avatar-size, 30px);
@@ -3255,6 +3265,10 @@
 .im-message-avatar.is-user { /* 当前用户消息头像 */ }
 .im-message-avatar.is-assistant { /* 单聊好友消息头像 */ }
 .im-message-avatar img { width: 100%; height: 100%; object-fit: cover; }
+:scope.show-every-message-avatar .chat-row > .im-message-avatar { display: block; }
+:scope.separate-bubbles .chat-row.has-prev { margin-top: 4px; }
+:scope.separate-bubbles.show-every-message-avatar .chat-row.has-prev { margin-top: 10px; }
+:scope.separate-bubbles .chat-bubble:not(.im-card-bubble) { border-radius: 20px !important; }
 
 /* 单聊时间戳：居中分隔时间、气泡内时间和外置时间 */
 .chat-timestamp {
@@ -3524,20 +3538,20 @@
    消息卡片通用层
    结构：.chat-row > .chat-bubble.im-card-bubble > .im-card-content
    ========================================================= */
-.chat-row .chat-bubble.im-card-bubble {
-  width: auto !important;
-  min-width: 0 !important;
-  max-width: min(70%, 260px) !important;
-  flex: 0 1 auto !important;
-  white-space: normal !important;
-  box-sizing: border-box !important;
+.im-card-bubble {
+  width: auto;
+  min-width: 0;
+  max-width: min(70%, 260px);
+  flex: 0 1 auto;
+  white-space: normal;
+  box-sizing: border-box;
 }
 
-.chat-row .chat-bubble.im-card-bubble .im-card-content {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
+:where(.im-card-bubble) .im-card-content {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 :scope.timestamp-outside .pay-transfer-bubble .bubble-meta { bottom: 12px; }
@@ -3546,22 +3560,27 @@
 .chat-row .chat-bubble.image-message-bubble { max-width: min(62vw, 204px) !important; padding: 0; background: transparent; }
 .chat-image-bubble-img { width: min(56vw, 200px) !important; height: min(56vw, 200px) !important; max-width: 200px !important; max-height: 200px !important; display: block; object-fit: cover; border-radius: 18px; }
 
-/* 转账、亲属卡与收款凭证 */
-.pay-transfer-bubble { padding: 4px 6px !important; min-width: 156px; max-width: min(56vw, 210px) !important; background: transparent !important; color: #111 !important; }
-.pay-transfer-bubble .bubble-meta { margin-top: 4px; }
-.pay-transfer-card { padding: 11px 12px; border: 1px solid rgba(0,0,0,0.05); border-radius: 20px; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,248,250,0.98)); color: #111; }
-.pay-transfer-card.is-received { background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,249,246,0.98)); }
-.pay-transfer-card.is-income { background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,247,255,0.98)); }
-.pay-transfer-card.is-pending { background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(249,249,251,0.98)); cursor: pointer; }
-.pay-transfer-card.is-rejected { opacity: 0.72; }
-.pay-transfer-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.pay-transfer-card-icon { width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: #111; color: #fff; font-size: 12px; }
-.pay-transfer-card-meta { min-width: 0; flex: 1; }
-.pay-transfer-card-title { color: #111; font-size: 12px; font-weight: 700; line-height: 1.1; }
-.pay-transfer-card-subtitle { margin-top: 2px; overflow: hidden; color: #8e8e93; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; }
-.pay-transfer-card-amount { margin-bottom: 4px; color: #111; font-size: 20px; font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
-.pay-transfer-card-desc { margin-bottom: 0; color: #636366; font-size: 11px; line-height: 1.35; word-break: break-word; }
-.pay-receipt-card { width: min(76vw, 280px) !important; max-width: 280px !important; padding: 16px; border-radius: 12px; background: #fff; color: #111; box-sizing: border-box; }
+/* 卡片沿用各自原有样式；这些选择器对应聊天中的真实元素 */
+:scope .pay-transfer-bubble { padding: 4px 6px; max-width: min(56vw, 210px); }
+:scope .pay-transfer-card { padding: 11px 12px; border: 1px solid rgba(0,0,0,.05); border-radius: 20px; background: linear-gradient(180deg, rgba(255,255,255,.98) 0%, rgba(248,248,250,.98) 100%); color: #111; }
+:scope .pay-transfer-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+:scope .pay-transfer-card-icon { width: 28px; height: 28px; border-radius: 10px; background: #111; color: #fff; }
+:scope .pay-transfer-card-title { color: #111; font-size: 12px; font-weight: 700; }
+:scope .pay-transfer-card-subtitle, :scope .pay-transfer-card-status { color: #8e8e93; font-size: 10px; }
+:scope .pay-transfer-card-amount { color: #111; font-size: 20px; font-weight: 700; }
+:scope .pay-transfer-card-desc { color: #636366; font-size: 11px; }
+:scope .pay-receipt-card { width: min(76vw, 280px); padding: 16px; border-radius: 12px; background: #fff; color: #111; }
+:scope .pay-receipt-card-amount { font-size: 28px; }
+:scope .im-contact-card-bubble { width: min(70vw, 250px); padding: 12px 14px; border: 1px solid rgba(60,60,67,.12); border-radius: 20px; background: #fff; }
+:scope .im-contact-card-topline { display: flex; gap: 7px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f3; color: #8e8e93; }
+:scope .im-contact-card-profile { display: flex; align-items: center; gap: 11px; padding: 11px 0 0; }
+:scope .location-message-bubble { width: min(72vw, 280px); height: 176px; border-radius: 14px; background: #fff; }
+:scope .location-message-map { height: 120px; flex: 0 0 120px; }
+:scope .location-message-copy { height: 56px; padding: 4px 12px; background: #fff; }
+:scope .offline-invite-card { width: min(70vw, 252px); padding: 14px; border: 1px solid #d5d8d4; border-radius: 14px; background: #fff; }
+:scope .offline-invite-card-heading { display: flex; align-items: center; gap: 9px; }
+:scope .chat-link-card { width: min(64vw, 228px); border: 1px solid rgba(0,0,0,.07); border-radius: 15px; background: #fbfbfd; }
+:scope .moment-forward-bubble { padding: 10px; border: 1px solid #e5e5ea; background: #fff; }
 
 /* 语音卡片 */
 .voice-message-bubble { min-width: 0; max-width: min(70%, 240px) !important; padding: 10px 14px; overflow: visible; }
@@ -3581,7 +3600,7 @@
 .sticker-group-wrap { max-width: min(78%, 190px); }
 
 /* 朋友圈转发卡片 */
-.moment-forward-bubble { width: min(62vw, 220px) !important; min-width: 0 !important; max-width: min(62vw, 220px) !important; display: flex; align-items: center; gap: 12px; margin: 4px 0; padding: 10px !important; border: 1px solid #e5e5ea !important; border-radius: 16px; background: #fff !important; color: #111; box-sizing: border-box; cursor: pointer; }
+.moment-forward-bubble { width: min(292px, 72vw); display: flex; flex-direction: column; margin: 0; padding: 0; border: 1px solid #d9d9de; border-radius: 22px; background: #fff; color: #111; box-sizing: border-box; cursor: pointer; }
 
 /* 链接卡片 */
 .chat-link-card { width: min(64vw, 228px); overflow: hidden; border: 1px solid rgba(0,0,0,0.07); border-radius: 15px; background: #fbfbfd; color: #111; cursor: pointer; text-align: left; }
@@ -3600,9 +3619,9 @@
 .html-bubble.im-card-bubble .loves-invite-bubble { width: min(62vw, 220px) !important; max-width: 100% !important; box-sizing: border-box !important; }
 
 /* 通话记录与线下见面记录 */
-.voice-call-record-bubble { min-width: 176px !important; padding: 0; background: transparent; }
-.voice-call-record-card { display: flex; align-items: center; gap: 10px; overflow: hidden; padding: 10px 14px; border-radius: 18px; background: #f2f2f7; color: #111; cursor: pointer; }
-.offline-meeting-record-card { max-width: 84%; padding: 11px 15px; align-items: flex-start; background: rgba(0,0,0,0.05); text-align: left; }
+.chat-bubble.voice-call-record-bubble { min-width: 176px; padding: 0; background: transparent; border: 0; box-shadow: none; outline: 0; }
+.voice-call-record-card { display: flex; align-items: center; gap: 10px; overflow: hidden; padding: 10px 14px; border: 0; border-radius: 18px; background: rgba(0,0,0,0.05); color: #111; box-shadow: none; cursor: pointer; }
+.offline-meeting-record-card { max-width: 84%; padding: 11px 15px; align-items: flex-start; background: rgba(0,0,0,0.05); color: #000; text-align: left; }
 
 /* 系统通知、撤回提示与群私聊入口 */
 .chat-system-row { width: 100%; display: flex; justify-content: center; }
@@ -3627,13 +3646,15 @@
             themeGroupCopyBtn.addEventListener('click', () => {
                 const groupTemplate = `/* iMessage Group CSS source
    Runtime root: .active-chat-interface.im-chat-group
-   In this editor, :scope represents that group-chat root only. */
+   :scope represents that group-chat root. Card selectors below match the
+   individual card styles rendered in group chats; height follows content with a cap. */
 
 :scope {
   --group-chat-bg: #ffffff;
-  --group-chat-header-bg: #ffffff;
   --group-chat-input-bg: #ffffff;
   --group-chat-accent: #007aff;
+  --im-group-header-surface: #ffffff;
+  --im-group-header-shadow: 0 2px 10px rgba(0, 0, 0, .12);
   position: absolute;
   inset: 0;
   display: flex;
@@ -3644,13 +3665,24 @@
 }
 
 :scope .chat-sticky-container.is-group {
-  background: var(--group-chat-header-bg);
-  border-bottom: 1px solid #e5e5ea;
+  background: transparent;
+  border-bottom: 0;
   z-index: 20;
 }
 
-:scope .im-chat-group-title-wrap { color: #111; }
-:scope .group-header-right-avatar { border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.16); }
+/* 群聊悬浮顶栏：分别修改返回、标题胶囊和右侧头像即可生效。 */
+:scope .im-chat-group-top-bar { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; align-items: center; gap: 8px; padding: 0 16px; }
+:scope .im-chat-group-header { display: flex; align-items: center; justify-content: center; min-width: 0; margin: 0; pointer-events: none; }
+:scope .im-chat-group-back-btn,
+:scope .group-header-right-avatar { width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--im-group-header-surface); box-shadow: var(--im-group-header-shadow); color: #1c1c1e; }
+:scope .im-chat-group-back-btn { font-size: 18px; }
+:scope .im-chat-group-title-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; max-width: min(100%, 210px); min-height: 40px; padding: 4px 14px; border-radius: 999px; background: var(--im-group-header-surface); box-shadow: var(--im-group-header-shadow); pointer-events: auto; cursor: pointer; }
+:scope .im-chat-group-title-wrap .ins-chat-name,
+:scope .im-chat-group-title-wrap .ins-chat-sign { display: block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: center; }
+:scope .im-chat-group-title-wrap .ins-chat-name { color: #111; font-size: 14px; font-weight: 700; line-height: 1.15; }
+:scope .im-chat-group-title-wrap .ins-chat-sign { margin-top: 0; color: #8e8e93; font-size: 11px; font-weight: 500; line-height: 1.2; }
+:scope .im-chat-group-right { display: flex; justify-content: flex-end; min-width: 0; }
+:scope .group-header-right-avatar-inner { width: 34px; height: 34px; }
 :scope .ins-chat-messages { flex: 1; min-height: 0; background: transparent; }
 :scope .ins-chat-input-container { background: var(--group-chat-input-bg); border-top: 1px solid #e5e5ea; }
 
@@ -3660,8 +3692,8 @@
 :scope .group-ai-avatar-slot { width: 34px; height: 34px; }
 :scope .group-ai-avatar-placeholder { background: #e5e5ea; color: #6d6d72; }
 
-:scope .group-poll-card { width: min(232px, 64vw); border: 1px solid #e5e5ea; background: #fff; }
-:scope .group-poll-card-head { padding: 13px 14px 8px; }
+:scope .group-poll-card { width: min(232px, 64vw); border: 1px solid #e5e5ea; border-radius: 14px; background: #fff; }
+:scope .group-poll-card-head { padding: 11px 12px 9px; border-bottom: 1px solid #f2f2f7; }
 :scope .group-poll-card-kicker { color: var(--group-chat-accent); }
 :scope .group-poll-card-title { color: #111; }
 :scope .group-poll-card-options { padding: 0 10px; }
@@ -3672,9 +3704,13 @@
 :scope .group-poll-voters, :scope .group-poll-voter { color: #6d6d72; }
 :scope .group-poll-card-footer { color: #8e8e93; }
 
-:scope .group-red-packet-card, :scope .group-red-packet-bubble { background: #fa9d3b; color: #fff; }
-:scope .group-red-packet-card .group-red-packet-amount { color: #fff7dd; }
-:scope .group-red-packet-card .group-red-packet-footer { color: rgba(255,255,255,.72); }
+:scope .group-red-packet-card { width: 100%; max-width: 268px; padding: 12px 14px; border: 1px solid rgba(0,0,0,.08); border-radius: 18px; background: #fff; color: #111; }
+:scope .group-red-packet-main { display: flex; align-items: center; gap: 12px; }
+:scope .group-red-packet-icon { width: 40px; height: 40px; border-radius: 14px; background: #111; color: #fff; }
+:scope .group-red-packet-title { color: #111; font-size: 15px; }
+:scope .group-red-packet-status { color: #8e8e93; font-size: 12px; }
+:scope .group-red-packet-amount { margin-top: 10px; color: #111; font-size: 26px; }
+:scope .group-voice-call-record-card { max-width: 80%; padding: 10px 16px; border-radius: 18px; background: rgba(0, 0, 0, .05); }
 
 :scope .chat-system-row .system-notice-card,
 :scope .group-system-notice-card,

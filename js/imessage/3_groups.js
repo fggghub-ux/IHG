@@ -480,18 +480,7 @@
                 : null,
             tokenEstimate = window.imApp.calculateChatMemoryTokenEstimate
                 ? window.imApp.calculateChatMemoryTokenEstimate(latestGroup)
-                : 0,
-            value_63 =
-                value_61?.inputTokens != null || value_61?.outputTokens != null
-                    ? '输入 ' +
-                      (value_61?.inputTokens != null
-                          ? Math.max(0, Math.round(Number(value_61.inputTokens))).toLocaleString()
-                          : '—') +
-                      ' · 输出 ' +
-                      (value_61?.outputTokens != null
-                          ? Math.max(0, Math.round(Number(value_61.outputTokens))).toLocaleString()
-                          : '—')
-                    : '发送消息后显示；需接口返回 usage';
+                : 0;
         groupSummaryMoreStats &&
             (groupSummaryMoreStats.innerHTML =
                 `
@@ -510,9 +499,6 @@
                       ? '未返回总量'
                       : '暂未实测') +
                 `</strong>
-                    <small>` +
-                value_63 +
-                `</small>
                 </div>
             `);
         if (!groupSummaryMoreList) return;
@@ -1062,7 +1048,6 @@
         });
         openView_3(groupAddMemberSheet);
     }
-    let count = 0;
     window.imApp.openGroupDetails = function (group_13) {
         if (!group_13 || group_13.type !== 'group') return;
         currentViewingGroup = resolveLatestGroup(group_13) || group_13;
@@ -1080,112 +1065,103 @@
         const count_3 = getGroupMemberCount(group_13);
         document.getElementById('group-details-count').textContent =
             formatGroupMemberCount(count_3);
-        const listContainer = document.getElementById('group-details-members-list'),
-            value_131 = ++count;
-        if (listContainer) listContainer.textContent = '正在载入成员…';
-        if (groupPrivateChatDetailModal_2) openView_3(groupPrivateChatDetailModal_2);
-        requestAnimationFrame(() =>
-            requestAnimationFrame(() => {
-                if (
-                    value_131 !== count ||
-                    !groupPrivateChatDetailModal_2?.classList.contains('active')
-                )
-                    return;
-                const userMeta = getGroupUserDisplayMeta(group_13),
-                    name_133 = userMeta.name,
-                    myAvatarUrl = userMeta.avatarUrl,
-                    apk110New_322 = window.imApp.areGroupTitlesEnabled(group_13),
-                    apk110New_323 = window.imApp.getGroupOwnerTitle(group_13);
-                let innerHTML_2 =
-                    Number(group_13.leftGroupAt) > 0
-                        ? ''
-                        : `
+        const listContainer = document.getElementById('group-details-members-list');
+        // Render atomically: settings/title saves must not paint an empty member list.
+        const userMeta = getGroupUserDisplayMeta(group_13),
+            name_133 = userMeta.name,
+            myAvatarUrl = userMeta.avatarUrl,
+            apk110New_322 = window.imApp.areGroupTitlesEnabled(group_13),
+            apk110New_323 = window.imApp.getGroupOwnerTitle(group_13);
+        let innerHTML_2 =
+            Number(group_13.leftGroupAt) > 0
+                ? ''
+                : `
             <div class="group-detail-member-item" data-id="__user__" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f2f2f7; cursor: pointer;">
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: #e5e5ea; display: flex; justify-content: center; align-items: center; overflow: hidden;">
                         <img src="` +
-                          escapeGroupHtml(myAvatarUrl) +
-                          `" style="width: 100%; height: 100%; object-fit: cover;">
+                  escapeGroupHtml(myAvatarUrl) +
+                  `" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div>
                         <div class="im-group-member-name-line" style="font-size: 16px; font-weight: 600; color: #000;">
                             <span class="im-group-member-name">` +
-                          escapeGroupHtml(name_133) +
-                          `</span>
+                  escapeGroupHtml(name_133) +
+                  `</span>
                             ` +
-                          (apk110New_322 ? apk110New_76(apk110New_323) : '') +
-                          `
+                  (apk110New_322 ? apk110New_76(apk110New_323) : '') +
+                  `
                             ` +
-                          (apk110New_322
-                              ? '<button class="im-group-owner-title-edit" type="button" aria-label="编辑群主头衔" title="编辑群主头衔"><i class="fas fa-pen" aria-hidden="true"></i></button>'
-                              : '') +
-                          `
+                  (apk110New_322
+                      ? '<button class="im-group-owner-title-edit" type="button" aria-label="编辑群主头衔" title="编辑群主头衔"><i class="fas fa-pen" aria-hidden="true"></i></button>'
+                      : '') +
+                  `
                         </div>
                         <div style="font-size: 12px; color: #007aff;">online</div>
                     </div>
                 </div>
             </div>
         `;
-                getResolvedGroupMembers(group_13).forEach((value_136) => {
-                    const value_137 = value_136.avatarUrl
-                            ? '<img src="' +
-                              escapeGroupHtml(value_136.avatarUrl) +
-                              '" style="width: 100%; height: 100%; object-fit: cover;">'
-                            : '<i class="fas fa-user" style="color: #fff;"></i>',
-                        apk110New_327 = window.imApp.getGroupMemberTitle(group_13, value_136.id),
-                        apk110New_328 = window.imApp.isGroupAdmin(group_13, value_136.id);
-                    innerHTML_2 +=
-                        `
+        getResolvedGroupMembers(group_13).forEach((value_136) => {
+            const value_137 = value_136.avatarUrl
+                    ? '<img src="' +
+                      escapeGroupHtml(value_136.avatarUrl) +
+                      '" style="width: 100%; height: 100%; object-fit: cover;">'
+                    : '<i class="fas fa-user" style="color: #fff;"></i>',
+                apk110New_327 = window.imApp.getGroupMemberTitle(group_13, value_136.id),
+                apk110New_328 = window.imApp.isGroupAdmin(group_13, value_136.id);
+            innerHTML_2 +=
+                `
                     <div class="group-detail-member-item" data-id="` +
-                        escapeGroupHtml(value_136.id) +
-                        `" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f2f2f7; cursor: pointer;">
+                escapeGroupHtml(value_136.id) +
+                `" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f2f2f7; cursor: pointer;">
                         <div style="display: flex; align-items: center; gap: 15px;">
                             <div style="width: 40px; height: 40px; border-radius: 50%; background: #c7c7cc; display: flex; justify-content: center; align-items: center; overflow: hidden;">
                                 ` +
-                        value_137 +
-                        `
+                value_137 +
+                `
                             </div>
                             <div>
                                 <div class="im-group-member-name-line" style="font-size: 16px; font-weight: 600; color: #000;"><span class="im-group-member-name">` +
-                        escapeGroupHtml(value_136.nickname) +
-                        '</span>' +
-                        (apk110New_322 ? apk110New_76(apk110New_327, apk110New_328) : '') +
-                        `</div>
+                escapeGroupHtml(value_136.nickname) +
+                '</span>' +
+                (apk110New_322 ? apk110New_76(apk110New_327, apk110New_328) : '') +
+                `</div>
                                 <div style="font-size: 12px; color: #8e8e93;">offline</div>
                             </div>
                         </div>
                     </div>
                 `;
+        });
+        if (listContainer) {
+            listContainer.innerHTML = innerHTML_2;
+            listContainer
+                .querySelector('.im-group-owner-title-edit')
+                ?.addEventListener('click', (apk110New_330) => {
+                    apk110New_330.stopPropagation();
+                    apk110New_79(currentViewingGroup, null, name_133);
                 });
-                if (listContainer) {
-                    listContainer.innerHTML = innerHTML_2;
-                    listContainer
-                        .querySelector('.im-group-owner-title-edit')
-                        ?.addEventListener('click', (apk110New_330) => {
-                            apk110New_330.stopPropagation();
-                            apk110New_79(currentViewingGroup, null, name_133);
-                        });
-                    const memberItems = listContainer.querySelectorAll('.group-detail-member-item');
-                    memberItems.forEach((item_4) => {
-                        item_4.addEventListener('click', () => {
-                            const memberId_3 = item_4.getAttribute('data-id');
-                            memberId_3 === '__user__'
-                                ? window.openView &&
-                                  document.getElementById('group-account-switch-sheet') &&
-                                  window.imApp &&
-                                  window.imApp.showGroupAccountSwitchSheet &&
-                                  window.imApp.showGroupAccountSwitchSheet(currentViewingGroup)
-                                : window.imApp &&
-                                  window.imApp.showGroupMemberManageSheet &&
-                                  window.imApp.showGroupMemberManageSheet(
-                                      currentViewingGroup,
-                                      memberId_3,
-                                  );
-                        });
-                    });
-                }
-            }),
-        );
+            const memberItems = listContainer.querySelectorAll('.group-detail-member-item');
+            memberItems.forEach((item_4) => {
+                item_4.addEventListener('click', () => {
+                    const memberId_3 = item_4.getAttribute('data-id');
+                    memberId_3 === '__user__'
+                        ? window.openView &&
+                          document.getElementById('group-account-switch-sheet') &&
+                          window.imApp &&
+                          window.imApp.showGroupAccountSwitchSheet &&
+                          window.imApp.showGroupAccountSwitchSheet(currentViewingGroup)
+                        : window.imApp &&
+                          window.imApp.showGroupMemberManageSheet &&
+                          window.imApp.showGroupMemberManageSheet(currentViewingGroup, memberId_3);
+                });
+            });
+        }
+        if (
+            groupPrivateChatDetailModal_2 &&
+            !groupPrivateChatDetailModal_2.classList.contains('active')
+        )
+            openView_3(groupPrivateChatDetailModal_2);
     };
     window.imApp.showGroupAccountSwitchSheet = function (value_139) {
         const sheet_2 = document.getElementById('group-account-switch-sheet'),

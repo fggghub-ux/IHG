@@ -8181,10 +8181,18 @@ window.addEventListener('pagehide', () => {
         customModalOverlay.classList.add('active');
         const bottomSheetElement = customModalOverlay.querySelector('.bottom-sheet');
         if (bottomSheetElement) bottomSheetElement.style.transform = 'translateY(0)';
-        options_35.type === 'prompt' &&
-            (options_35.multiline === true
-                ? setTimeout(() => modalTextarea?.focus(), 300)
-                : setTimeout(() => modalInput.focus(), 300));
+        if (options_35.type === 'prompt') {
+            const modalSession = count_478;
+            setTimeout(() => {
+                // A quick save may close or replace this prompt before its animation ends.
+                if (modalSession !== count_478 || !customModalOverlay.classList.contains('active'))
+                    return;
+                const input = options_35.multiline === true ? modalTextarea : modalInput;
+                input?.focus({
+                    preventScroll: true,
+                });
+            }, 300);
+        }
     }
     function handleAction_483() {
         const value_515 = count_478,
@@ -8231,9 +8239,13 @@ window.addEventListener('pagehide', () => {
         if (!customModalOverlay) return;
         count_478++;
         handleAction_480(false);
+        if (customModalOverlay.contains(document.activeElement)) document.activeElement.blur();
         customModalOverlay.classList.remove('active');
+        const closingSession = count_478;
         setTimeout(() => {
-            customModalOverlay.style.display = 'none';
+            if (closingSession === count_478 && !customModalOverlay.classList.contains('active')) {
+                customModalOverlay.style.display = 'none';
+            }
         }, 300);
         value_518 &&
             typeof currentModalCancelCallback === 'function' &&
@@ -9464,10 +9476,12 @@ window.addEventListener('pagehide', () => {
         chatsContent = document.getElementById('chats-content'),
         memoryLocationSheet = document.getElementById('memory-location-sheet'),
         memoryLocationSheetContent = document.getElementById('memory-location-sheet-content'),
-        memorySocialCloseElement = document.getElementById('memory-social-close');
+        memorySocialCloseElement = document.getElementById('memory-social-close'),
+        apk110New_1662 = document.getElementById('memory-library-header-title'),
+        apk110New_1663 = document.getElementById('memory-library-header-subtitle');
     let value_1422 = null;
     const value_1423 = () => {
-        if (!memoryLocationSheet?.classList.contains('memory-social-centered')) return;
+        if (!memoryLocationSheet?.classList.contains('active')) return;
         if (window.closeView) window.closeView(memoryLocationSheet);
         if (value_1422?.isConnected)
             value_1422.focus({
@@ -9480,8 +9494,15 @@ window.addEventListener('pagehide', () => {
         if (event_555.target === memoryLocationSheet) value_1423();
     });
     document.addEventListener('keydown', (value_1641) => {
-        if (value_1641.key === 'Escape' && memoryLocationSheet?.classList.contains('active'))
-            value_1423();
+        if (value_1641.key !== 'Escape' || !memoryLocationSheet?.classList.contains('active'))
+            return;
+        if (
+            document.querySelector(
+                '#memory-entry-detail-modal.active, #memory-entry-editor-modal.active, #memory-promotion-preview-modal.active',
+            )
+        )
+            return;
+        value_1423();
     });
     const memoryEntryDetailModal = document.getElementById('memory-entry-detail-modal'),
         scheduleModal = document.getElementById('chat-memory-schedule-modal'),
@@ -10512,20 +10533,81 @@ window.addEventListener('pagehide', () => {
         if (!memoryLocationSheetContent) return;
         location_2 = location_2 || 'iphone';
         currentMemoryLocation = location_2;
-        const value_1812 = location_2 === 'x-dm';
+        const value_1812 = location_2 === 'x-dm',
+            apk110New_2209 = location_2 === 'iphone' || location_2 === 'downloads';
         memoryLocationSheet?.classList.toggle('memory-social-centered', value_1812);
+        memoryLocationSheet?.classList.toggle('memory-library-centered', apk110New_2209);
         const memoryLocationBottomSheetElement = memoryLocationSheet?.querySelector(
             '.memory-location-bottom-sheet',
         );
-        value_1812
+        value_1812 || apk110New_2209
             ? (memoryLocationBottomSheetElement?.setAttribute('role', 'dialog'),
               memoryLocationBottomSheetElement?.setAttribute('aria-modal', 'true'),
-              memoryLocationBottomSheetElement?.setAttribute('aria-label', '社交帐号'))
+              memoryLocationBottomSheetElement?.setAttribute(
+                  'aria-label',
+                  value_1812 ? '社交帐号' : location_2 === 'downloads' ? '长期记忆' : '短期记忆',
+              ))
             : (memoryLocationBottomSheetElement?.removeAttribute('role'),
               memoryLocationBottomSheetElement?.removeAttribute('aria-modal'),
               memoryLocationBottomSheetElement?.removeAttribute('aria-label'));
+        if (memorySocialCloseElement)
+            memorySocialCloseElement.setAttribute(
+                'aria-label',
+                value_1812 ? '关闭社交帐号' : '关闭记忆弹窗',
+            );
+        if (apk110New_1662)
+            apk110New_1662.textContent = location_2 === 'downloads' ? '长期记忆' : '短期记忆';
         const friend_41 = getCurrentMemoryFriend_2(),
             normalizedFriend_13 = friend_41 ? window.imApp.normalizeFriendData(friend_41) : null;
+        if (apk110New_1663 && apk110New_2209) {
+            const apk110New_2220 = normalizedFriend_13?.type === 'group',
+                apk110New_2221 =
+                    location_2 === 'downloads'
+                        ? (normalizedFriend_13?.memory?.longTermEntries?.length || 0) +
+                          (normalizedFriend_13?.memory?.cherishedEntries?.length || 0) +
+                          (!apk110New_2220 &&
+                          String(normalizedFriend_13?.memory?.longTerm || '').trim()
+                              ? 1
+                              : 0)
+                        : normalizedFriend_13?.memory?.shortTermEntries?.length || 0;
+            apk110New_1663.textContent =
+                location_2 === 'downloads'
+                    ? apk110New_2220
+                        ? apk110New_2221 + ' 条记录 · 手动长期记忆每轮常驻'
+                        : apk110New_2221 + ' 条记录 · 线上聊天每轮常驻'
+                    : apk110New_2221 + ' 条记录 · 关键词优先，启用向量记忆时补充语义';
+        }
+        const apk110New_2213 = (apk110New_2222, apk110New_2223) => {
+                if (!apk110New_2223) return '';
+                const apk110New_2224 =
+                        window.imChat?.getShortTermMemoryTags?.(apk110New_2222) ||
+                        apk110New_2222?.memoryTags ||
+                        [],
+                    apk110New_2225 = (Array.isArray(apk110New_2224) ? apk110New_2224 : [])
+                        .map((apk110New_2226) => String(apk110New_2226 || '').trim())
+                        .filter(Boolean);
+                if (!apk110New_2225.length) return '';
+                return (
+                    '<div class="memory-short-tags">' +
+                    apk110New_2225
+                        .slice(0, 3)
+                        .map(
+                            (apk110New_2227) =>
+                                '<span>' + escapeMemoryHtml(apk110New_2227) + '</span>',
+                        )
+                        .join('') +
+                    (apk110New_2225.length > 3
+                        ? '<span>+' + (apk110New_2225.length - 3) + '</span>'
+                        : '') +
+                    '</div>'
+                );
+            },
+            apk110New_2214 = (apk110New_2228) =>
+                escapeMemoryHtml(
+                    String(apk110New_2228 || '')
+                        .trim()
+                        .slice(0, 140),
+                );
         if (location_2 === 'x-dm') {
             if (!normalizedFriend_13 || normalizedFriend_13.type !== 'char') {
                 memoryLocationSheetContent.innerHTML = `
@@ -10783,18 +10865,13 @@ window.addEventListener('pagehide', () => {
             memoryLocationSheetContent.innerHTML =
                 `
                 <div class="memory-sheet-title-row">
-                    <div class="memory-sheet-title">长期记忆</div>
+                    <div class="memory-library-section-label">全部记忆</div>
                     <button type="button" class="memory-sheet-add-btn" data-memory-add-kind="long" aria-label="新增长期记忆"><i class="fas fa-plus"></i></button>
-                </div>
-                <div class="memory-recall-limit-row">
-                    <span>读取条数 <small>长期记忆与珍视回忆共用</small></span>
-                    <input type="number" min="1" max="100" step="1" value="` +
-                escapeMemoryHtml(normalizedFriend_13.memory?.recallLimits?.longTerm || 30) +
-                `" data-memory-recall-limit="longTerm" aria-label="长期记忆读取条数">
                 </div>
                 <div class="memory-short-list">
                     ` +
-                (items_591.length === 0
+                (items_591.length === 0 &&
+                (normalizedFriend_13?.type === 'group' || !normalizedFriend_13?.memory?.longTerm)
                     ? '<div class="memory-short-empty">暂无长期记忆</div>'
                     : items_591
                           .slice()
@@ -10807,13 +10884,32 @@ window.addEventListener('pagehide', () => {
                                   '" data-memory-collection="' +
                                   collection_10 +
                                   `">
-                            <span class="memory-short-summary-title">` +
+                            <div class="memory-short-main">
+                                <div class="memory-short-summary-title">` +
                                   escapeMemoryHtml(entry_27.title || '长期记忆') +
-                                  `</span>
+                                  `</div>
+                                <div class="memory-short-meta"><span>` +
+                                  (collection_10 === 'cherishedEntries' ? '珍视回忆' : '长期记忆') +
+                                  '</span><span>' +
+                                  (normalizedFriend_13?.type === 'group' &&
+                                  (collection_10 === 'cherishedEntries' ||
+                                      String(entry_27.sourceType || '') !== 'manual')
+                                      ? '不注入群聊'
+                                      : '每轮常驻') +
+                                  '</span>' +
+                                  (entry_27.time || entry_27.createdAt
+                                      ? '<span>' +
+                                        escapeMemoryHtml(entry_27.time || entry_27.createdAt) +
+                                        '</span>'
+                                      : '') +
+                                  `</div>
+                                <div class="memory-short-preview">` +
+                                  apk110New_2214(
+                                      entry_27.content || entry_27.detail || entry_27.reason,
+                                  ) +
+                                  `</div>
+                            </div>
                             <div class="memory-short-actions">
-                                <span style="font-size:11px; color:#8e8e93;">` +
-                                  (collection_10 === 'cherishedEntries' ? '珍视' : '长期') +
-                                  `</span>
                                 <button type="button" class="memory-short-delete-btn" aria-label="删除长期记忆"><i class="fas fa-trash-alt"></i></button>
                                 <i class="fas fa-chevron-right"></i>
                             </div>
@@ -10822,13 +10918,15 @@ window.addEventListener('pagehide', () => {
                           )
                           .join('')) +
                 `
+                    ` +
+                (normalizedFriend_13?.type !== 'group' && normalizedFriend_13?.memory?.longTerm
+                    ? '<div class="memory-short-item memory-legacy-item"><div class="memory-short-main"><div class="memory-short-summary-title">旧版长期记忆文本</div><div class="memory-short-meta">每轮常驻</div><div class="memory-short-preview">' +
+                      apk110New_2214(normalizedFriend_13.memory.longTerm) +
+                      '</div></div></div>'
+                    : '') +
+                `
                 </div>
             `;
-            memoryLocationSheetContent
-                .querySelector('[data-memory-recall-limit="longTerm"]')
-                ?.addEventListener('change', (event_10) => {
-                    void saveMemoryRecallLimit('longTerm', event_10.target.value);
-                });
             memoryLocationSheetContent
                 .querySelector('[data-memory-add-kind="long"]')
                 ?.addEventListener('click', () => openMemoryEntryEditor('long'));
@@ -10881,14 +10979,14 @@ window.addEventListener('pagehide', () => {
         memoryLocationSheetContent.innerHTML =
             `
             <div class="memory-sheet-title-row">
-                <div class="memory-sheet-title">短期记忆</div>
+                <div class="memory-library-section-label">记忆条目</div>
                 <div class="memory-sheet-toolbar">
                     <button type="button" class="memory-sheet-text-btn" data-memory-select-all>全选</button>
                     <button type="button" class="memory-sheet-add-btn" data-memory-add-kind="short" aria-label="新增短期记忆"><i class="fas fa-plus"></i></button>
                 </div>
             </div>
             <div class="memory-recall-limit-row">
-                <span>读取条数 <small>按相关度最多注入</small></span>
+                <span>本轮最多召回 <small>关键词优先，语义补充</small></span>
                 <input type="number" min="1" max="100" step="1" value="` +
             escapeMemoryHtml(normalizedFriend_13.memory?.recallLimits?.shortTerm || 30) +
             `" data-memory-recall-limit="shortTerm" aria-label="短期记忆读取条数">
@@ -10904,16 +11002,33 @@ window.addEventListener('pagehide', () => {
                           (entry_28) =>
                               `
                     <div class="memory-short-item memory-short-summary-item" role="button" tabindex="0" data-memory-entry-id="` +
-                              entry_28.id +
+                              escapeMemoryHtml(entry_28.id) +
                               `">
                         <input type="checkbox" class="memory-short-select" data-memory-select-id="` +
                               escapeMemoryHtml(entry_28.id) +
                               '" aria-label="选择' +
                               escapeMemoryHtml(entry_28.title || '短期记忆') +
                               `">
-                        <span class="memory-short-summary-title">` +
+                        <div class="memory-short-main">
+                            <div class="memory-short-summary-title">` +
                               escapeMemoryHtml(entry_28.title || '对话总结') +
-                              `</span>
+                              `</div>
+                            <div class="memory-short-meta"><span>` +
+                              escapeMemoryHtml(entry_28.degree || '高') +
+                              '权重</span>' +
+                              (entry_28.time || entry_28.createdAt
+                                  ? '<span>' +
+                                    escapeMemoryHtml(entry_28.time || entry_28.createdAt) +
+                                    '</span>'
+                                  : '') +
+                              `</div>
+                            <div class="memory-short-preview">` +
+                              apk110New_2214(entry_28.event || entry_28.content) +
+                              `</div>
+                            ` +
+                              apk110New_2213(entry_28, true) +
+                              `
+                        </div>
                         <div class="memory-short-actions">
                             <button type="button" class="memory-short-delete-btn" aria-label="删除已总结记录" title="删除已总结记录"><i class="fas fa-trash-alt"></i></button>
                             <i class="fas fa-chevron-right"></i>

@@ -1994,23 +1994,21 @@
                   : '点击领取红包',
             value_366_2 =
                 `
-            <div class="group-red-packet-card im-card-content" style="width:100%; min-width:0; max-width:268px; border-radius:18px; padding:12px 14px; background:#fff; color:#111;  border:1px solid rgba(0,0,0,0.08); cursor:pointer;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="width:40px; height:40px; border-radius:14px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">
-                        <i class="fas fa-gift"></i>
-                    </div>
-                    <div style="min-width:0; flex:1;">
-                        <div style="font-size:15px; font-weight:800; color:#111; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">` +
-                (msg_7.description || '恭喜发财') +
-                `</div>
-                        <div style="font-size:12px; color:#8e8e93; margin-top:4px;">` +
-                value_365_2 +
-                `</div>
+            <div class="group-red-packet-card im-card-content" role="button" tabindex="0">
+                <div class="group-red-packet-main">
+                    <i class="fas fa-gift group-red-packet-icon" aria-hidden="true"></i>
+                    <div class="group-red-packet-copy">
+                        <strong class="group-red-packet-title">` +
+                escapeHtml(msg_7.description || '恭喜发财') +
+                `</strong>
+                        <span class="group-red-packet-status">` +
+                escapeHtml(value_365_2) +
+                `</span>
                     </div>
                 </div>
-                <div style="margin-top:10px; font-size:26px; font-weight:800; color:#111; letter-spacing:0.2px;">¥` +
+                <strong class="group-red-packet-amount">¥` +
                 totalAmount_2.toFixed(2) +
-                `</div>
+                `</strong>
             </div>
         `,
             value_187 =
@@ -2049,7 +2047,7 @@
                 handleAction_7_188 +
                 `
                     <div style="display: flex; justify-content: flex-end; align-items: flex-end; width: 100%;">
-                        <div class="chat-bubble user-bubble im-card-bubble pay-transfer-bubble group-red-packet-bubble" style="padding:6px;">` +
+                        <div class="chat-bubble user-bubble im-card-bubble pay-transfer-bubble group-red-packet-bubble">` +
                 value_366_2 +
                 text_192 +
                 `</div>
@@ -2078,7 +2076,7 @@
                             <div class="group-ai-avatar-slot">` +
                     (enabled_170 ? '<div class="group-ai-avatar-placeholder"></div>' : value_196) +
                     `</div>
-                            <div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble group-red-packet-bubble" style="padding:6px;">` +
+                            <div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble group-red-packet-bubble">` +
                     value_366_2 +
                     text_372 +
                     `</div>
@@ -2087,7 +2085,7 @@
                 `;
             } else
                 text_373 =
-                    '<div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble group-red-packet-bubble" style="padding:6px;">' +
+                    '<div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble group-red-packet-bubble">' +
                     value_366_2 +
                     text_372 +
                     '</div>';
@@ -2114,7 +2112,7 @@
         }
         const clickableBubble = row_7.querySelector('.group-red-packet-card');
         clickableBubble &&
-            clickableBubble.addEventListener('click', (event_376) => {
+            (clickableBubble.addEventListener('click', (event_376) => {
                 event_376.preventDefault();
                 event_376.stopPropagation();
                 const activePage = element_351.closest('.active-chat-interface');
@@ -2126,7 +2124,12 @@
                     );
                 activePage._openGroupRedPacketInteraction &&
                     activePage._openGroupRedPacketInteraction(msg_7);
-            });
+            }),
+            clickableBubble.addEventListener('keydown', (apk110New_527) => {
+                if (apk110New_527.key !== 'Enter' && apk110New_527.key !== ' ') return;
+                apk110New_527.preventDefault();
+                clickableBubble.click();
+            }));
         element_351.appendChild(row_7);
         window.imChat.scrollToBottom(element_351);
     }
@@ -4591,7 +4594,7 @@
         handleAction_20(row_15, friend_32, msg_19);
         const amount_2 = Number(msg_19.amount) || 0,
             value_758 = '¥' + amount_2.toFixed(2),
-            description_2 = msg_19.description || '转账',
+            description_2 = String(msg_19.description || '').trim(),
             parties = handleAction_23(msg_19, friend_32),
             {
                 payKind: payKind_3,
@@ -4649,7 +4652,24 @@
                 : msg_19.familyCardStatus === 'pending'
                   ? ' is-pending'
                   : ' is-income'));
-        const handleAction_7_389 = buildMessageHeaderHtml(
+        const apk110New_1052 =
+                msg_19.familyCardStatus === 'pending'
+                    ? '待领取'
+                    : msg_19.familyCardStatus === 'rejected'
+                      ? '已退回'
+                      : msg_19.familyCardStatus === 'unbound'
+                        ? '已解绑'
+                        : '已生效',
+            apk110New_1053 = isFamilyCard
+                ? apk110New_1052
+                : status_4 === 'rejected'
+                  ? '已退回'
+                  : status_4 === 'claimed'
+                    ? ''
+                    : payKind_3 === 'char_to_user_pending'
+                      ? '待收款'
+                      : '',
+            handleAction_7_389 = buildMessageHeaderHtml(
                 value_366,
                 friend_32,
                 value_365,
@@ -4677,24 +4697,25 @@
                 `" style="color: #c7c7cc; font-size: 22px;"></i>
                 </div>
                     <div style="width:100%; display:flex; justify-content:center; padding:10px 0;">
-                    <div class="im-card-content pay-receipt-card" style="width:280px; background:#fff; border-radius:12px; padding:16px;  display:flex; flex-direction:column; align-items:center;">
-                        <div style="font-size:14px; color:#111; margin-bottom:8px;">` +
-                description_2 +
+                    <div class="im-card-content pay-receipt-card">
+                        <div class="pay-receipt-card-title">` +
+                escapeHtml(msg_19.cardTitle || '支付通知') +
                 `</div>
-                        <div style="font-size:28px; font-weight:bold; color:#111; margin-bottom:12px;">` +
+                        <strong class="pay-receipt-card-amount">` +
                 sign +
                 '¥' +
                 amount_2.toFixed(2) +
-                `</div>
-                          <div style="background:#f2f2f7; border-radius:16px; padding:4px 12px; font-size:12px; color:#8e8e93; margin-bottom:16px;">
-                              ` +
-                value_391 +
+                `</strong>
+                        <span class="pay-receipt-card-status">` +
+                (msg_19.cardTitle === '收款通知' ? '已收款' : '已付款') +
+                `</span>
+                        ` +
+                (description_2
+                    ? '<small class="pay-receipt-card-description">' +
+                      escapeHtml(description_2) +
+                      '</small>'
+                    : '') +
                 `
-                          </div>
-                        <div style="width:100%; border-top:1px solid #f2f2f7; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-size:13px; color:#8e8e93;">账单详情</span>
-                            <i class="fas fa-chevron-right" style="font-size:12px; color:#c7c7cc;"></i>
-                        </div>
                     </div>
                 </div>
             `;
@@ -4705,7 +4726,7 @@
                 extraClass +
                 `">
                     <div class="pay-transfer-card-top">
-                        <div class="pay-transfer-card-icon"><i class="fas fa-wallet"></i></div>
+                        <div class="pay-transfer-card-icon"><i class="fas fa-wallet" aria-hidden="true"></i></div>
                         <div class="pay-transfer-card-meta">
                             <div class="pay-transfer-card-title">` +
                 escapeHtml(cardTitle_2) +
@@ -4719,12 +4740,23 @@
                 `
                         </div>
                     </div>
-                    <div class="pay-transfer-card-amount">` +
+                    <strong class="pay-transfer-card-amount">` +
                 value_758 +
-                `</div>
-                    <div class="pay-transfer-card-desc">` +
-                escapeHtml(description_2) +
-                `</div>
+                `</strong>
+                    ` +
+                (apk110New_1053
+                    ? '<span class="pay-transfer-card-status">' +
+                      escapeHtml(apk110New_1053) +
+                      '</span>'
+                    : '') +
+                `
+                    ` +
+                (description_2 && (!/^转账$/.test(description_2) || isFamilyCard)
+                    ? '<small class="pay-transfer-card-desc">' +
+                      escapeHtml(description_2) +
+                      '</small>'
+                    : '') +
+                `
                 </div>
             `;
             if (value_366) {
@@ -4878,7 +4910,7 @@
         row_16.setAttribute('data-message-id', window.imChat.ensureMessageId(msg_20, 'moment'));
         handleAction_20(row_16, value_400, msg_20);
         const text_407 = `
-            <div class="moment-forward-bubble im-card-content" style="cursor: pointer; background: #fff; border-radius: 16px; padding: 12px;  border: 1px solid rgba(0,0,0,0.04); display: flex; align-items: center; gap: 12px; width: 220px; text-align: left; margin: 4px 0;">
+            <div class="moment-forward-bubble im-card-content">
                 <div style="width: 44px; height: 44px; border-radius: 12px; background: #1c1c1e; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; font-size: 20px;">
                     <i class="far fa-images"></i>
                 </div>
@@ -6193,7 +6225,7 @@
             value_1011 =
                 '<div class="chat-bubble ' +
                 (value_989 ? 'user-bubble' : 'ai-bubble') +
-                ' im-card-bubble" style="padding:0; background:transparent;">' +
+                ' im-card-bubble">' +
                 value_1010 +
                 '</div>';
         let value_561 = value_1011;
@@ -6432,7 +6464,7 @@
         row_20.innerHTML =
             `
             <div style="width:100%; display:flex; justify-content:center; padding:2px 0; margin:10px 0;">
-                <div class="voice-call-record-card im-card-content offline-meeting-record-card" aria-label="查看见面总结" style="max-width:84%; padding:11px 15px; border-radius:18px; background:rgba(0,0,0,0.05); color:#000; display:flex; align-items:flex-start; gap:10px; text-align:left;">
+                <div class="voice-call-record-card im-card-content offline-meeting-record-card" aria-label="查看见面总结">
                     <div style="width:32px; height:32px; border-radius:16px; background:#34c759; color:#fff; display:flex; justify-content:center; align-items:center; flex-shrink:0;">
                         <i class="fas fa-user-friends"></i>
                     </div>
@@ -6558,7 +6590,7 @@
                 handleAction_7_596 +
                 `
                     <div style="display: flex; justify-content: flex-end; align-items: flex-end; width: 100%;">
-                        <div class="chat-bubble html-bubble im-card-bubble" style="position: relative; background: transparent; padding: 0;">
+                        <div class="chat-bubble html-bubble im-card-bubble">
                             ` +
                 value_595 +
                 `
@@ -6585,7 +6617,7 @@
                 handleAction_7_596 +
                 `
                     <div style="display: flex; justify-content: flex-start; align-items: flex-end; width: 100%;">
-                        <div class="chat-bubble html-bubble im-card-bubble" style="position: relative; background: transparent; padding: 0;">
+                        <div class="chat-bubble html-bubble im-card-bubble">
                             ` +
                 value_595 +
                 `
@@ -6623,7 +6655,7 @@
             element_621.innerHTML =
                 `
                 <div style="width:100%; display:flex; justify-content:center; padding:2px 0; margin: 10px 0; cursor: pointer;">
-                    <div class="voice-call-record-card im-card-content" style="max-width:80%; padding:10px 16px; border-radius:18px; background:rgba(0,0,0,0.05); color:#000; font-size:13px; line-height:1.4; text-align:center; display: flex; align-items: center; gap: 8px;">
+                    <div class="voice-call-record-card im-card-content group-voice-call-record-card">
                         <i class="fas fa-phone-alt" style="color: #34c759;"></i>
                         <span>` +
                 (msg_30.statusText || '群通话记录') +
@@ -6670,9 +6702,9 @@
                   '</div>');
         const value_618 =
                 `
-            <div class="voice-call-record-card im-card-content" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: ` +
-                (isUser_5 ? '#e5e5ea' : '#f2f2f7') +
-                `; border-radius: 18px; cursor: pointer; color: #111;">
+            <div class="voice-call-record-card im-card-content` +
+                (isUser_5 ? ' is-user' : '') +
+                `">
                 <div style="width: 32px; height: 32px; border-radius: 16px; background: ` +
                 (statusText_2 === '已拒绝' || statusText_2 === '已取消' ? '#ff3b30' : '#34c759') +
                 `; color: #fff; display: flex; justify-content: center; align-items: center; flex-shrink: 0;">
@@ -6717,7 +6749,7 @@
                 headerHtml_3 +
                 `
                     <div style="display: flex; justify-content: flex-end; align-items: flex-end; width: 100%;">
-                        <div class="chat-bubble user-bubble im-card-bubble voice-call-record-bubble" style="padding: 0; background: transparent;">` +
+                        <div class="chat-bubble user-bubble im-card-bubble voice-call-record-bubble">` +
                 value_618 +
                 text_625 +
                 `</div>
@@ -6733,7 +6765,7 @@
                 headerHtml_3 +
                 `
                     <div style="display: flex; justify-content: flex-start; align-items: flex-end; width: 100%;">
-                        <div class="chat-bubble ai-bubble im-card-bubble voice-call-record-bubble" style="padding: 0; background: transparent;">` +
+                        <div class="chat-bubble ai-bubble im-card-bubble voice-call-record-bubble">` +
                 value_618 +
                 text_626 +
                 `</div>
