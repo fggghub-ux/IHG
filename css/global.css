@@ -970,9 +970,23 @@ html.app-viewport-managed.app-ipad-layout {
     top: var(--app-viewport-top, 0px);
     height: var(--app-viewport-height, 100%);
 }
-.app-ipad-layout.app-keyboard-open #app {
+.app-ipad-layout:not(.app-ipad-viewport).app-keyboard-open #app {
     position: absolute;
     left: 0;
+}
+/* iPad keeps one positioning context through focus, send, blur and dismissal.
+   Only #app is fixed: html retains 100vh, avoiding the 1148/1180 clipping bug.
+   Nested pages/sheets still own their scrolling. */
+.app-ipad-viewport #app {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 0;
+}
+.app-ipad-viewport.app-keyboard-open #app {
+    top: var(--app-viewport-top, 0px);
+    height: var(--app-viewport-height, 100%);
 }
 .app-keyboard-open {
     --safe-bottom: 0px;

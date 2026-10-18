@@ -14,7 +14,7 @@ for (const [label, userAgent, maxTouchPoints, ipad] of [
  const viewport = {height:1180,width:820,offsetTop:0,scale:1,addEventListener(){}};
  const window = {innerHeight:1180,innerWidth:820,visualViewport:viewport,addEventListener(){},scrollX:0,scrollY:0,scrollTo(x,y){this.scrollX=x;this.scrollY=y}};
  vm.runInNewContext(source,{document,window,navigator:{userAgent,maxTouchPoints},requestAnimationFrame:f=>(callbacks.push(f),callbacks.length),setTimeout,clearTimeout});
- const refresh=()=>{window.appViewport.refresh(); callbacks.shift()()};
+ const refresh=()=>{window.appViewport.refresh(); callbacks.shift()?.()};
  assert.equal(classes.has('app-ipad-layout'),ipad,label);
  assert.equal(classes.has('app-keyboard-open'),false);
  document.activeElement={tagName:'INPUT',type:'text'};
