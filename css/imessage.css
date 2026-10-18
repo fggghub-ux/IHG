@@ -5388,12 +5388,9 @@ button.group-private-chat-detail-bubble {
     outline: 2px solid #007aff;
     outline-offset: 2px;
 }
+#add-char-btn,
 #new-friends-btn {
     position: relative;
-}
-
-#add-char-btn {
-    position: absolute;
 }
 
 #add-char-btn.has-friend-request::after,
@@ -5409,8 +5406,8 @@ button.group-private-chat-detail-bubble {
 }
 
 #add-char-btn.has-friend-request::after {
-    top: 4px;
-    right: 3px;
+    top: -5px;
+    right: -6px;
 }
 
 #new-friends-btn.has-friend-request::after {
@@ -18476,6 +18473,11 @@ button.moment-private-chat-bubble.has-translation {
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+}
+
+/* Only the iPad image composer opts out of the local rubber-band effect. */
+#custom-modal-overlay.is-ipad-image-generation .wb-centered-modal-body {
+    overscroll-behavior-y: none;
 }
 
 #custom-modal-overlay.is-image-generation #modal-message {

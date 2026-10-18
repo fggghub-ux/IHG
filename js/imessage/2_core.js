@@ -8043,6 +8043,11 @@ window.addEventListener('pagehide', () => {
         value_477 = null;
         currentModalGenerationPrompt = options_35.generationPrompt || null;
         customModalOverlay.classList.toggle('is-image-generation', !!options_35.generationPrompt);
+        const isIPadComposer = !!options_35.generationPrompt &&
+            !/iPhone|iPod/.test(navigator.userAgent) &&
+            (/iPad/.test(navigator.userAgent) ||
+                (/Mac/.test(navigator.userAgent + navigator.platform) && navigator.maxTouchPoints > 1));
+        customModalOverlay.classList.toggle('is-ipad-image-generation', isIPadComposer);
         if (options_35.type === 'prompt') {
             const useTextarea = options_35.multiline === true,
                 value_1461 =
@@ -8253,7 +8258,7 @@ window.addEventListener('pagehide', () => {
         currentModalCallback = null;
         currentModalCancelCallback = null;
         apk110New_1594 = null;
-        customModalOverlay.classList.remove('is-image-generation');
+        customModalOverlay.classList.remove('is-image-generation', 'is-ipad-image-generation');
         value_477 = null;
         currentModalGenerationPrompt = null;
     }

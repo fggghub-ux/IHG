@@ -273,16 +273,16 @@
                 name: 'call',
                 icon: null,
             },
-            ({
-                id: 'app-icon-16',
-                name: 'Cycle',
-                icon: null,
-            },
             {
                 id: 'app-icon-15',
                 name: 'Cphone',
                 icon: null,
-            }),
+            },
+            {
+                id: 'app-icon-16',
+                name: 'Cycle',
+                icon: null,
+            },
             {
                 id: 'dock-icon-settings',
                 name: '设置',
