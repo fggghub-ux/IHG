@@ -1442,10 +1442,62 @@ Retry the last turn using the same evidence, without repeating the previous line
         formElement.elements.observeSeconds.value = String(value_311.observeSeconds);
         imVideoCallConfigElement.classList.add('open');
     }
+    function bindIPadCallKeyboard(session, input) {
+        const view = session.view;
+        const viewport = window.visualViewport;
+        let frame = 0;
+        let keyboardOpen = false;
+        let disposed = false;
+        let timers = [];
+        const update = () => {
+            frame = 0;
+            if (disposed || !handleAction_15(session)) return;
+            if (viewport && Math.abs(viewport.scale - 1) > 0.02) return;
+            const fullHeight = view.clientHeight || window.innerHeight;
+            const visibleHeight = viewport?.height || window.innerHeight;
+            if (fullHeight <= 0 || visibleHeight <= 0) return;
+            const focused = document.activeElement === input;
+            const next = (focused || keyboardOpen) &&
+                fullHeight - visibleHeight > (keyboardOpen ? 72 : 100);
+            if (next === keyboardOpen) return;
+            keyboardOpen = next;
+            // Reuse the call's compact UI only. Safari continues to own the
+            // page pan; neither this view nor the app frame is repositioned.
+            view.classList.toggle('im-video-call-keyboard-open', keyboardOpen);
+            if (keyboardOpen) handleAction_22(session);
+        };
+        const schedule = () => {
+            if (!disposed && !frame) frame = requestAnimationFrame(update);
+        };
+        const settle = () => {
+            timers.forEach(clearTimeout);
+            schedule();
+            timers = [80, 200, 450].map(delay => setTimeout(schedule, delay));
+        };
+        input.addEventListener('focus', settle);
+        input.addEventListener('blur', settle);
+        viewport?.addEventListener('resize', schedule, { passive: true });
+        window.addEventListener('resize', schedule, { passive: true });
+        schedule();
+        return () => {
+            disposed = true;
+            if (frame) cancelAnimationFrame(frame);
+            timers.forEach(clearTimeout);
+            input.removeEventListener('focus', settle);
+            input.removeEventListener('blur', settle);
+            viewport?.removeEventListener('resize', schedule);
+            window.removeEventListener('resize', schedule);
+            view.classList.remove('im-video-call-keyboard-open');
+        };
+    }
     function handleAction_49(value_313, value_314) {
         // Web pages inherit the shared app frame; applying its offset again exposes Home.
         // The native host keeps its existing viewport handling.
-        if (window.appViewport?.managed || !window.mobileInputCompat?.isAndroid) return () => {};
+        if (window.appViewport?.managed) return () => {};
+        if (document.documentElement.classList.contains('app-ipad-layout')) {
+            return bindIPadCallKeyboard(value_313, value_314);
+        }
+        if (!window.mobileInputCompat?.isAndroid) return () => {};
         const view_315 = value_313.view,
             visualViewport_316 = window.visualViewport,
             options_317 = {
