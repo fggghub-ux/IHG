@@ -5,9 +5,16 @@
     const viewport = window.visualViewport;
     const isNative = window.u2NativeBridge?.isNativeAndroid?.() === true;
     if (isNative) return; // The Android host owns its WebView size and insets.
-    const isIPad = /iPad/.test(navigator.userAgent) ||
-        (/Mac/.test(navigator.userAgent + navigator.platform) && navigator.maxTouchPoints > 1);
+    const isIPad = !/iPhone|iPod/.test(navigator.userAgent) && (
+        /iPad/.test(navigator.userAgent) ||
+        (/Mac/.test(navigator.userAgent + navigator.platform) && navigator.maxTouchPoints > 1)
+    );
     root.classList.toggle('app-ipad-layout', isIPad);
+    // The APK keeps a relative 100vh app frame. Preserve that layout on iPad:
+    // Safari owns keyboard panning; a second owner moving/resizing #app creates
+    // stale offsets during dismissal and moves the nested scrollports as well.
+    // Keep only the platform marker used by the existing iPad CSS repairs.
+    if (isIPad) return;
 
     let frame = 0;
     let restingHeight = window.innerHeight;

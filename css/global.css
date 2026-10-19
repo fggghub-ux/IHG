@@ -934,7 +934,7 @@ html.app-viewport-managed {
 /* Standalone iPad reports a shorter initial containing block than 100vh
    (1148px vs 1180px on the affected device). Its clipping root must use the
    same full height as #app, without a second fixed-position clipping box. */
-html.app-viewport-managed.app-ipad-layout {
+html.app-ipad-layout {
     height: 100vh;
 }
 .app-viewport-managed:not(.app-ipad-layout) body {
@@ -969,10 +969,6 @@ html.app-viewport-managed.app-ipad-layout {
 .app-viewport-managed.app-keyboard-open #app {
     top: var(--app-viewport-top, 0px);
     height: var(--app-viewport-height, 100%);
-}
-.app-ipad-layout.app-keyboard-open #app {
-    position: absolute;
-    left: 0;
 }
 .app-keyboard-open {
     --safe-bottom: 0px;
