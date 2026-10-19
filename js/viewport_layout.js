@@ -8,13 +8,9 @@
     const isIPad = /iPad/.test(navigator.userAgent) ||
         (/Mac/.test(navigator.userAgent + navigator.platform) && navigator.maxTouchPoints > 1);
     root.classList.toggle('app-ipad-layout', isIPad);
-    // Keep the existing layout/scroll rules unchanged on other platforms. iPhone
-    // Safari also says 'like Mac OS X', so exclude it from the iPad keyboard path.
-    const stabilizeIPad = isIPad && !/iPhone|iPod/.test(navigator.userAgent);
-    root.classList.toggle('app-ipad-viewport', stabilizeIPad);
 
     let frame = 0;
-    let restingHeight = stabilizeIPad ? (viewport?.height || window.innerHeight) : window.innerHeight;
+    let restingHeight = window.innerHeight;
     let restingWidth = window.innerWidth;
     let keyboardOpen = false;
     let appliedHeight = -1;
@@ -45,27 +41,16 @@
         if (viewport && Math.abs(viewport.scale - 1) > 0.02) return;
         const height = Math.round(viewport?.height || window.innerHeight);
         const width = Math.round(viewport?.width || window.innerWidth);
-        let top = Math.max(0, Math.round(viewport?.offsetTop || 0));
+        const top = Math.max(0, Math.round(viewport?.offsetTop || 0));
         if (height <= 0 || width <= 0) return;
         if (Math.abs(width - restingWidth) > 48) {
             restingWidth = width;
             restingHeight = Math.max(height, window.innerHeight);
         }
         const focused = isEditable(document.activeElement);
-        if (!focused && !keyboardOpen) {
-            restingHeight = stabilizeIPad ? height : Math.max(height, window.innerHeight);
-        }
-        if (stabilizeIPad) {
-            // Follow the entire resize, including the last <100px of dismissal.
-            // Blurring/sending is not proof that the keyboard has finished closing.
-            keyboardOpen = restingHeight - height > 1 && (focused || keyboardOpen);
-            // WebKit can deliver the restored height before the matching scroll
-            // event. An old offset must not move a full-height app down the screen.
-            top = keyboardOpen ? Math.min(top, Math.max(0, restingHeight - height)) : 0;
-        } else {
-            keyboardOpen = restingHeight - height > 100 && (focused || keyboardOpen);
-            if (height >= restingHeight - 72) keyboardOpen = false;
-        }
+        if (!focused && !keyboardOpen) restingHeight = Math.max(height, window.innerHeight);
+        keyboardOpen = restingHeight - height > 100 && (focused || keyboardOpen);
+        if (height >= restingHeight - 72) keyboardOpen = false;
         root.classList.toggle('app-keyboard-open', keyboardOpen);
         if (height !== appliedHeight) {
             root.style.setProperty('--app-viewport-height', height + 'px');
@@ -81,12 +66,6 @@
         }
     }
     function schedule() {
-        // Viewport resize/scroll already runs on the UI thread. Applying iPad
-        // geometry here avoids painting one frame with the previous keyboard size.
-        if (stabilizeIPad) {
-            update();
-            return;
-        }
         if (!frame) frame = requestAnimationFrame(update);
     }
     function settle() {
