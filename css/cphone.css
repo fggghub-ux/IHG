@@ -1178,3 +1178,11 @@
         min-width: 90px;
     }
 }
+
+.cphone-view[hidden], .cphone-switcher[hidden], .cphone-sms-page[hidden], .cphone-contact-sheet[hidden], .cphone-create-menu[hidden], .cphone-create-group-sheet[hidden], .cphone-thread-action[hidden], .cphone-create-group-error[hidden], .cphone-generation-status[hidden] { display: none !important; }
+.cphone-generation-status { margin: -7px 0 14px; padding: 10px 12px; border-radius: 12px; background: #eef3ff; color: #315489; font-size: 12px; line-height: 1.45; }
+.cphone-contact-delete { width: 100%; min-height: 45px; margin-top: 9px; border: 1px solid #f1d8dc; border-radius: 15px; background: #fff6f7; color: #b42332; font-size: 14px; font-weight: 650; cursor: pointer; }
+.cphone-contact-delete:disabled { opacity: .55; cursor: wait; }
+.cphone-contact-delete:focus-visible { outline: 2px solid #b42332; outline-offset: 2px; }
+
+.cphone-generation-status[hidden] { display:none !important; }

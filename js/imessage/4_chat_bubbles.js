@@ -1365,17 +1365,47 @@
                 msg_6.text ||
                 msg_6.content ||
                 '系统提示';
-        if (noticeKind_2 === 'user_phone_access' || noticeKind_2 === 'user_remark_changed')
-            return (
-                row_6.classList.add('user-phone-access-notice-row'),
-                (row_6.innerHTML =
-                    '<div class="user-phone-access-notice-pill" role="status">' +
-                    escapeHtml(noticeText) +
-                    '</div>'),
-                container_3.appendChild(row_6),
-                window.imChat.scrollToBottom(container_3),
-                row_6
-            );
+        if (noticeKind_2 === 'user_phone_access' || noticeKind_2 === 'user_remark_changed') {
+            row_6.classList.add('user-phone-access-notice-row');
+            const change = msg_6.remarkChange;
+            const hasDetails =
+                noticeKind_2 === 'user_remark_changed' &&
+                typeof change?.oldRemark === 'string' &&
+                typeof change?.newRemark === 'string';
+            row_6.innerHTML =
+                '<div class="user-phone-access-notice-pill" role="status">' +
+                escapeHtml(noticeText) +
+                (hasDetails
+                    ? '<button type="button" class="char-user-remark-view-link" aria-label="查看备注修改详情">查看</button>'
+                    : '') +
+                '</div>';
+            row_6
+                .querySelector('.char-user-remark-view-link')
+                ?.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const modal = document.getElementById('char-user-remark-detail-modal');
+                    if (!modal) return;
+                    document.getElementById('char-user-remark-detail-old').textContent =
+                        change.oldRemark || '未设置备注';
+                    document.getElementById('char-user-remark-detail-new').textContent =
+                        change.newRemark;
+                    if (!modal.dataset.bound) {
+                        modal.dataset.bound = 'true';
+                        modal.addEventListener('click', (event) => {
+                            if (
+                                event.target === modal ||
+                                event.target.closest('[data-char-user-remark-close]')
+                            )
+                                window.closeView?.(modal);
+                        });
+                    }
+                    window.openView?.(modal);
+                });
+            container_3.appendChild(row_6);
+            window.imChat.scrollToBottom(container_3);
+            return row_6;
+        }
         if (
             [
                 'user_blocked_char',
@@ -1513,6 +1543,7 @@
                     icon: 'fa-award',
                     color: '#ff9500',
                 },
+                family_card_spend: { icon: 'fa-credit-card', color: '#a97642' },
                 mcp_tool_success: {
                     icon: 'fa-check',
                     color: '#34c759',
@@ -1550,6 +1581,29 @@
                 </div>
             </div>
         `;
+        if (noticeKind_2 === 'family_card_spend') {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'family-card-spend-delete';
+            button.setAttribute('aria-label', '删除亲属卡消费通知');
+            button.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
+            row_6.querySelector('.system-notice-card')?.appendChild(button);
+            button.addEventListener('click', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                button.disabled = true;
+                const saved = await window.imApp.removeFriendMessages?.(
+                    friend_11.id,
+                    { id: msg_6.id || null, timestamp: msg_6.timestamp || null },
+                    { silent: true },
+                );
+                if (saved) row_6.remove();
+                else {
+                    button.disabled = false;
+                    window.showToast?.('删除通知失败');
+                }
+            });
+        }
         if (noticeKind_2 === 'narration') {
             const card_3 = row_6.querySelector('.system-notice-card');
             card_3 &&
@@ -5089,7 +5143,8 @@
             apk111New_1111 =
                 `
             <div class="voice-message-bubble-main">
-                <button type="button" class="voice-message-bubble-inner" aria-expanded="false">
+                ${value_823 ? '<button type="button" class="voice-message-play" aria-label="生成或播放语音" title="生成或播放语音"><i class="fas fa-play" aria-hidden="true"></i></button>' : ''}
+                <button type="button" class="voice-message-bubble-inner" aria-expanded="false" aria-label="展开语音转文字">
                     <span class="voice-message-mic"><i class="fas fa-microphone-alt"></i></span>
                     <span class="voice-message-wave" aria-hidden="true">
                         <span></span><span></span><span></span><span></span><span></span>
@@ -5102,6 +5157,7 @@
                 apk111New_1110 +
                 `
             </div>
+            <span class="voice-message-playback-status" role="status" aria-live="polite"></span>
             <div class="voice-message-transcript" hidden>` +
                 safeTranscript +
                 `</div>
@@ -5192,6 +5248,9 @@
             transcriptEl = row_17.querySelector('.voice-message-transcript'),
             apk111New_1117 = Array.from(row_17.querySelectorAll('.voice-message-action')),
             apk111New_1118 = (apk111New_1124) => {
+                row_17.querySelectorAll('.voice-message-play').forEach((button) => {
+                    button.disabled = apk111New_1124;
+                });
                 apk111New_1117.forEach((apk111New_1125) => {
                     apk111New_1125.disabled = apk111New_1124;
                 });
@@ -5219,6 +5278,8 @@
                 try {
                     if (apk111New_1126.dataset.voiceAction === 'regenerate') {
                         await window.imVoiceMessageAudio.regenerate(friend_33, msg_21);
+                        const status = row_17.querySelector('.voice-message-playback-status');
+                        if (status) status.textContent = '语音已准备好，再点播放';
                         window.showToast?.('语音已重新生成并保存');
                     } else {
                         const apk111New_1131 = await window.imVoiceMessageAudio.download(
@@ -5247,31 +5308,48 @@
                 }
             }),
         );
+        const playButton = row_17.querySelector('.voice-message-play');
+        const playbackStatus = row_17.querySelector('.voice-message-playback-status');
+        playButton?.addEventListener('click', async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (playButton.disabled) return;
+            const ready = window.imVoiceMessageAudio.isReady?.(friend_33, msg_21);
+            playbackStatus.textContent = ready ? '' : '正在准备语音…';
+            playButton.querySelector('i').className = 'fas fa-spinner voice-message-action-spinner';
+            apk111New_1118(true);
+            try {
+                const result = await window.imVoiceMessageAudio.play(friend_33, msg_21);
+                playbackStatus.textContent = result?.readyForTap ? '语音已准备好，再点播放' : '';
+            } catch (error) {
+                playbackStatus.textContent = '';
+                console.error('Voice message playback failed', error);
+                if (
+                    !window.u2Api?.isRequestError?.(error) ||
+                    !window.u2Api.reportError(error, { operation: '语音生成' })
+                )
+                    window.showToast?.(
+                        window.u2Tts?.getUserErrorMessage?.(error) || '语音播放失败',
+                    );
+            } finally {
+                playButton.querySelector('i').className = 'fas fa-play';
+                const label = window.imVoiceMessageAudio.isReady?.(friend_33, msg_21)
+                    ? '播放语音'
+                    : '生成或播放语音';
+                playButton.setAttribute('aria-label', label);
+                playButton.title = label;
+                apk111New_1118(false);
+            }
+        });
         toggle_3 &&
             transcriptEl &&
-            toggle_3.addEventListener('click', async (apk111New_1133) => {
-                apk111New_1133.preventDefault();
-                apk111New_1133.stopPropagation();
-                const apk111New_1134 = transcriptEl.hidden;
-                transcriptEl.hidden = !apk111New_1134;
-                toggle_3.setAttribute('aria-expanded', apk111New_1134 ? 'true' : 'false');
-                if (!apk111New_1134 || value_418) return;
-                if (value_823)
-                    try {
-                        await window.imVoiceMessageAudio.play(friend_33, msg_21);
-                    } catch (error_5) {
-                        console.error('Voice message playback failed', error_5);
-                        if (
-                            (!window.u2Api?.isRequestError?.(error_5) ||
-                                !window.u2Api.reportError(error_5, {
-                                    operation: '语音生成',
-                                })) &&
-                            window.showToast
-                        )
-                            window.showToast(
-                                window.u2Tts?.getUserErrorMessage?.(error_5) || '语音播放失败',
-                            );
-                    }
+            toggle_3.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const expanded = transcriptEl.hidden;
+                transcriptEl.hidden = !expanded;
+                toggle_3.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+                toggle_3.setAttribute('aria-label', expanded ? '收起语音转文字' : '展开语音转文字');
             });
         element_805.appendChild(row_17);
         window.imChat.scrollToBottom(element_805);

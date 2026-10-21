@@ -1,62 +1,65 @@
 (function () {
     'use strict';
 
-    const text_2 = 'cphone:selected-char-id',
-        value_3 = (value_10) => 'cphone:groups:' + value_10,
-        value_4 = (value_11) =>
+    const text_2 = 'cphone:selected-char-id';
+    const value_3 = (value_10) => 'cphone:groups:' + value_10;
+    const value_4 = (value_11) =>
             value_11 &&
             value_11.excludedFromContext !== true &&
             value_11.noticeKind !== 'group_private_to_user' &&
-            value_11.noticeKind !== 'group_friend_private_chat',
-        value_5 = (value_12) => value_12?.noticeKind !== 'user_remark_changed',
-        value_6 = (value_13) =>
-            value_13?.nickname || value_13?.realName || value_13?.realname || 'Char',
-        value_7 = (value_14) =>
-            value_14 + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10),
-        value_8 = (value_15) =>
+            value_11.noticeKind !== 'group_friend_private_chat';
+    const value_5 = (value_12) => value_12?.noticeKind !== 'user_remark_changed';
+    const value_6 = (value_13) =>
+            value_13?.nickname || value_13?.realName || value_13?.realname || 'Char';
+    const value_7 = (value_14) =>
+            value_14 + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+    const value_8 = (value_15) =>
             (window.imData?.friends || []).find(
                 (value_16) => String(value_16?.id) === String(value_15),
-            ) || null,
-        value_9 = (message_17) =>
-            Number(message_17?.timestamp || message_17?.updatedAt || message_17?.generatedAt) || 0,
-        cphoneApp_3 = {
-            initialized: false,
-            selectedId: '',
-            activeThread: null,
-            activeContact: null,
-            tab: 'threads',
-            rows: new Map(),
-            searchRows: null,
-            searchTimer: null,
-            renderedThreadKey: '',
-            renderedMessageCount: 0,
-            renderedSignatures: [],
-            renderedLastSpeakerKey: '',
-            renderedLastTime: 0,
-            migration: null,
-            groupMigration: null,
-            groupsByChar: new Map(),
-            groupLoads: new Map(),
-            groupWrites: new Map(),
-            progressing: false,
-            clearing: false,
-            creatingGroup: false,
-            creatingContact: false,
-            wallpaperSaving: false,
-            openSequence: 0,
-            wallpaperRevision: 0,
-            getFriends() {
+            ) || null;
+    const value_9 = (message_17) =>
+            Number(message_17?.timestamp || message_17?.updatedAt || message_17?.generatedAt) || 0;
+    const cphoneApp_3 = {
+        initialized: false,
+        selectedId: '',
+        activeThread: null,
+        activeContact: null,
+        tab: 'threads',
+        rows: new Map(),
+        searchRows: null,
+        searchTimer: null,
+        renderedThreadKey: '',
+        renderedMessageCount: 0,
+        renderedSignatures: [],
+        renderedLastSpeakerKey: '',
+        renderedLastTime: 0,
+        migration: null,
+        groupMigration: null,
+        groupsByChar: new Map(),
+        groupLoads: new Map(),
+        groupWrites: new Map(),
+        progressing: false,
+        clearing: false,
+        deletingContact: false,
+        creatingGroup: false,
+        creatingContact: false,
+        creationJob: null,
+        creationNotice: '',
+        wallpaperSaving: false,
+        openSequence: 0,
+        wallpaperRevision: 0,
+        getFriends() {
                 return (window.imData?.friends || []).filter(
                     (value_18) => value_18?.type === 'char',
                 );
             },
-            getSelectedFriend() {
+        getSelectedFriend() {
                 return (
                     this.getFriends().find((value_19) => String(value_19.id) === this.selectedId) ||
                     null
                 );
             },
-            getUserIdentity(value_20_2) {
+        getUserIdentity(value_20_2) {
                 return (
                     window.imApp?.getCharUserIdentity?.(value_20_2) || {
                         name: window.userState?.name || window.imData?.profile?.name || 'User',
@@ -66,7 +69,7 @@
                     }
                 );
             },
-            refreshUserIdentity() {
+        refreshUserIdentity() {
                 const selectedFriend = this.getSelectedFriend();
                 if (!selectedFriend) return;
                 const userIdentity_21 = this.getUserIdentity(selectedFriend);
@@ -97,14 +100,14 @@
                 if (this.activeThread) this.renderThread();
                 else this.renderList();
             },
-            async readSelection() {
+        async readSelection() {
                 try {
                     return String((await window.appStorage?.getMeta?.(text_2)) || '');
                 } catch (value_20) {
                     return '';
                 }
             },
-            saveSelection(value_23) {
+        saveSelection(value_23) {
                 this.selectedId = String(value_23 || '');
                 window.appStorage?.setMeta &&
                     window.appStorage
@@ -113,266 +116,261 @@
                             'catch'
                         ]((value_24) => console.warn('[Cphone] Failed to save selected Char', value_24));
             },
-            init() {
-                if (this.initialized) return;
-                this.phoneView = document.getElementById('lovers-friend-phone-view');
-                this.emptyView = document.getElementById('cphone-view');
-                this.smsView = document.getElementById('friend-imessage-view');
-                if (!this.phoneView || !this.emptyView || !this.smsView) return;
-                window.mobileInputCompat?.registerFocusScope?.({
-                    selector: '#friend-imessage-view.active',
-                    priority: 40,
-                    preferFocusScope: true,
-                    followViewportOrigin: true,
-                    resolveScrollContainer: (value_25) =>
-                        value_25.closest('.cphone-create-group-card') ||
-                        this.smsView.querySelector('.cphone-sms-scroll'),
-                    scrollBehavior: 'focus',
-                });
-                document
-                    .getElementById('cphone-back-btn')
-                    ?.addEventListener('click', () => this.closeEmpty());
-                document
-                    .getElementById('cphone-owner-button')
-                    ?.addEventListener('click', () => this.showSwitcher());
-                document
-                    .getElementById('friend-phone-app-settings')
-                    ?.addEventListener('click', () => this.syncWallpaperSettings());
-                document.getElementById('cphone-wallpaper-apply')?.addEventListener('click', () => {
+        init() {
+            if (this.initialized) return;
+            this.phoneView = document.getElementById('lovers-friend-phone-view');
+            this.emptyView = document.getElementById('cphone-view');
+            this.smsView = document.getElementById('friend-imessage-view');
+            if (!this.phoneView || !this.emptyView || !this.smsView) return;
+            window.mobileInputCompat?.registerFocusScope?.({
+                selector: '#friend-imessage-view.active',
+                priority: 40,
+                preferFocusScope: true,
+                followViewportOrigin: true,
+                resolveScrollContainer: (value_25) =>
+                    value_25.closest('.cphone-create-group-card') ||
+                    this.smsView.querySelector('.cphone-sms-scroll'),
+                scrollBehavior: 'focus',
+            });
+            document
+                .getElementById('cphone-back-btn')
+                ?.addEventListener('click', () => this.closeEmpty());
+            document
+                .getElementById('cphone-owner-button')
+                ?.addEventListener('click', () => this.showSwitcher());
+            document
+                .getElementById('friend-phone-app-settings')
+                ?.addEventListener('click', () => this.syncWallpaperSettings());
+            document.getElementById('cphone-wallpaper-apply')?.addEventListener('click', () => {
+                void this.applyWallpaperUrl();
+            });
+            document.getElementById('cphone-wallpaper-reset')?.addEventListener('click', () => {
+                void this.saveWallpaper('');
+            });
+            document
+                .getElementById('cphone-wallpaper-url')
+                ?.addEventListener('keydown', (event) => {
+                    if (event.key !== 'Enter' || event.isComposing || event.keyCode === 229) return;
+                    event.preventDefault();
+                    event.target.blur?.();
                     void this.applyWallpaperUrl();
                 });
-                document.getElementById('cphone-wallpaper-reset')?.addEventListener('click', () => {
-                    void this.saveWallpaper('');
-                });
-                document
-                    .getElementById('cphone-wallpaper-url')
-                    ?.addEventListener('keydown', (event) => {
-                        if (event.key !== 'Enter' || event.isComposing || event.keyCode === 229)
-                            return;
-                        event.preventDefault();
-                        event.target.blur?.();
-                        void this.applyWallpaperUrl();
-                    });
-                document
-                    .getElementById('cphone-switch-close')
-                    ?.addEventListener('click', () => this.hideSwitcher());
-                document
-                    .getElementById('cphone-switcher')
-                    ?.addEventListener('click', (event_26) => {
-                        if (event_26.target.id === 'cphone-switcher') this.hideSwitcher();
-                        const closest_27 = event_26.target.closest('[data-cphone-friend-id]');
-                        if (closest_27) void this.openFriend(closest_27.dataset.cphoneFriendId);
-                    });
-                document
-                    .getElementById('friend-imsg-back-btn')
-                    ?.addEventListener('click', () => this.closeMessages());
-                document
-                    .getElementById('cphone-create-menu-open')
-                    ?.addEventListener('click', () => this.toggleCreateMenu());
-                document
-                    .getElementById('cphone-create-contact-open')
-                    ?.addEventListener('click', () => {
-                        this.closeCreateMenu();
-                        this.openCreateContact();
-                    });
-                document
-                    .getElementById('cphone-create-group-open')
-                    ?.addEventListener('click', () => {
-                        this.closeCreateMenu();
-                        this.openCreateGroup();
-                    });
-                document.addEventListener('click', (event_22) => {
-                    const cphoneCreateMenuElement = document.getElementById('cphone-create-menu');
-                    if (
-                        cphoneCreateMenuElement &&
-                        !cphoneCreateMenuElement.hidden &&
-                        !cphoneCreateMenuElement.contains(event_22.target) &&
-                        !document
-                            .getElementById('cphone-create-menu-open')
-                            ?.contains(event_22.target)
-                    )
-                        this.closeCreateMenu();
-                });
-                document
-                    .getElementById('cphone-create-contact-close')
-                    ?.addEventListener('click', () => this.closeCreateContact());
-                document
-                    .getElementById('cphone-create-contact-sheet')
-                    ?.addEventListener('click', (event_23) => {
-                        if (event_23.target.id === 'cphone-create-contact-sheet')
-                            this.closeCreateContact();
-                    });
-                document
-                    .getElementById('cphone-create-contact-form')
-                    ?.addEventListener('submit', (event_24) => {
-                        event_24.preventDefault();
-                        void this.createContacts();
-                    });
-                document
-                    .getElementById('cphone-create-group-close')
-                    ?.addEventListener('click', () => this.closeCreateGroup());
-                document
-                    .getElementById('cphone-create-group-sheet')
-                    ?.addEventListener('click', (event_28) => {
-                        if (event_28.target.id === 'cphone-create-group-sheet')
-                            this.closeCreateGroup();
-                    });
-                document
-                    .getElementById('cphone-create-group-form')
-                    ?.addEventListener('submit', (event_29) => {
-                        event_29.preventDefault();
-                        void this.createGroup();
-                    });
-                [
-                    'cphone-sms-search',
-                    'cphone-create-group-form',
-                    'cphone-create-contact-form',
-                    'cphone-progress-form',
-                ].forEach((value_30) => {
-                    document
-                        .getElementById(value_30)
-                        ?.addEventListener('keydown', (value_31) =>
-                            this.handleInputEnter(value_31),
-                        );
-                });
-                document.addEventListener('keydown', (value_32_2) => {
-                    if (
-                        value_32_2.key === 'Escape' &&
-                        !document.getElementById('cphone-create-group-sheet')?.hidden
-                    )
-                        this.closeCreateGroup();
-                    if (
-                        value_32_2.key === 'Escape' &&
-                        !document.getElementById('cphone-create-contact-sheet')?.hidden
-                    )
+            document
+                .getElementById('cphone-switch-close')
+                ?.addEventListener('click', () => this.hideSwitcher());
+            document.getElementById('cphone-switcher')?.addEventListener('click', (event_26) => {
+                if (event_26.target.id === 'cphone-switcher') this.hideSwitcher();
+                const closest_27 = event_26.target.closest('[data-cphone-friend-id]');
+                if (closest_27) void this.openFriend(closest_27.dataset.cphoneFriendId);
+            });
+            document
+                .getElementById('friend-imsg-back-btn')
+                ?.addEventListener('click', () => this.closeMessages());
+            document
+                .getElementById('cphone-create-menu-open')
+                ?.addEventListener('click', () => this.toggleCreateMenu());
+            document.getElementById('cphone-create-contact-open')?.addEventListener('click', () => {
+                this.closeCreateMenu();
+                this.openCreateContact();
+            });
+            document.getElementById('cphone-create-group-open')?.addEventListener('click', () => {
+                this.closeCreateMenu();
+                this.openCreateGroup();
+            });
+            document.addEventListener('click', (event_22) => {
+                const cphoneCreateMenuElement = document.getElementById('cphone-create-menu');
+                if (
+                    cphoneCreateMenuElement &&
+                    !cphoneCreateMenuElement.hidden &&
+                    !cphoneCreateMenuElement.contains(event_22.target) &&
+                    !document.getElementById('cphone-create-menu-open')?.contains(event_22.target)
+                )
+                    this.closeCreateMenu();
+            });
+            document
+                .getElementById('cphone-create-contact-close')
+                ?.addEventListener('click', () => this.closeCreateContact());
+            document
+                .getElementById('cphone-create-contact-sheet')
+                ?.addEventListener('click', (event_23) => {
+                    if (event_23.target.id === 'cphone-create-contact-sheet')
                         this.closeCreateContact();
-                    if (
-                        value_32_2.key === 'Escape' &&
-                        !document.getElementById('cphone-create-menu')?.hidden
-                    )
-                        this.closeCreateMenu(true);
-                    if (
-                        value_32_2.key === 'Escape' &&
-                        !document.getElementById('cphone-progress-sheet')?.hidden
-                    )
-                        this.closeProgress();
-                    if (
-                        value_32_2.key === 'Escape' &&
-                        !document.getElementById('cphone-switcher')?.hidden
-                    )
-                        this.hideSwitcher();
                 });
-                document
-                    .getElementById('cphone-thread-back')
-                    ?.addEventListener('click', () => this.closeThread());
-                document
-                    .getElementById('cphone-progress-open')
-                    ?.addEventListener('click', () => this.openProgress());
-                document.getElementById('cphone-clear-chat')?.addEventListener('click', () => {
-                    void this.clearThread();
+            document
+                .getElementById('cphone-create-contact-form')
+                ?.addEventListener('submit', (event_24) => {
+                    event_24.preventDefault();
+                    void this.createContacts();
                 });
-                document
-                    .getElementById('cphone-progress-close')
-                    ?.addEventListener('click', () => this.closeProgress());
-                document
-                    .getElementById('cphone-progress-sheet')
-                    ?.addEventListener('click', (event_33) => {
-                        if (event_33.target.id === 'cphone-progress-sheet') this.closeProgress();
-                    });
-                document
-                    .getElementById('cphone-progress-form')
-                    ?.addEventListener('submit', (event_34) => {
-                        event_34.preventDefault();
-                        void this.progressThread();
-                    });
-                document.getElementById('cphone-sms-search')?.addEventListener('input', () => {
-                    if (this.searchTimer) clearTimeout(this.searchTimer);
-                    this.searchTimer = setTimeout(() => {
-                        this.searchTimer = null;
-                        this.renderList(true);
-                    }, 80);
+            document
+                .getElementById('cphone-create-group-close')
+                ?.addEventListener('click', () => this.closeCreateGroup());
+            document
+                .getElementById('cphone-create-group-sheet')
+                ?.addEventListener('click', (event_28) => {
+                    if (event_28.target.id === 'cphone-create-group-sheet') this.closeCreateGroup();
                 });
-                document
-                    .getElementById('cphone-sms-tabs')
-                    ?.addEventListener('click', (event_35) => {
-                        const closest_36 = event_35.target.closest('[data-cphone-tab]');
-                        closest_36 &&
-                            ((this.tab = closest_36.dataset.cphoneTab), this.renderList());
-                    });
-                document
-                    .getElementById('cphone-sms-list')
-                    ?.addEventListener('click', (event_37) => {
-                        const closest_38 = event_37.target.closest('[data-cphone-row]'),
-                            value_39 = closest_38 && this.rows.get(closest_38.dataset.cphoneRow);
-                        if (value_39)
-                            this.tab === 'contacts'
-                                ? this.openContact(value_39)
-                                : void this.openThread(value_39);
-                    });
-                document
-                    .getElementById('cphone-contact-close')
-                    ?.addEventListener('click', () => this.closeContact());
-                document
-                    .getElementById('cphone-contact-sheet')
-                    ?.addEventListener('click', (event_40) => {
-                        if (event_40.target.id === 'cphone-contact-sheet') this.closeContact();
-                    });
-                document.getElementById('cphone-contact-send')?.addEventListener('click', () => {
-                    const activeContact_41 = this.activeContact;
-                    this.closeContact();
-                    if (activeContact_41) void this.openThread(activeContact_41);
+            document
+                .getElementById('cphone-create-group-form')
+                ?.addEventListener('submit', (event_29) => {
+                    event_29.preventDefault();
+                    void this.createGroup();
                 });
+            [
+                'cphone-sms-search',
+                'cphone-create-group-form',
+                'cphone-create-contact-form',
+                'cphone-progress-form',
+            ].forEach((value_30) => {
                 document
-                    .getElementById('cphone-sms-messages')
-                    ?.addEventListener('click', (event_42) => {
-                        const closest_43 = event_42.target.closest?.(
+                    .getElementById(value_30)
+                    ?.addEventListener('keydown', (value_31) => this.handleInputEnter(value_31));
+            });
+            document.addEventListener('keydown', (value_32_2) => {
+                if (
+                    value_32_2.key === 'Escape' &&
+                    !document.getElementById('cphone-create-group-sheet')?.hidden
+                )
+                    this.closeCreateGroup();
+                if (
+                    value_32_2.key === 'Escape' &&
+                    !document.getElementById('cphone-create-contact-sheet')?.hidden
+                )
+                    this.closeCreateContact();
+                if (
+                    value_32_2.key === 'Escape' &&
+                    !document.getElementById('cphone-create-menu')?.hidden
+                )
+                    this.closeCreateMenu(true);
+                if (
+                    value_32_2.key === 'Escape' &&
+                    !document.getElementById('cphone-progress-sheet')?.hidden
+                )
+                    this.closeProgress();
+                if (
+                    value_32_2.key === 'Escape' &&
+                    !document.getElementById('cphone-switcher')?.hidden
+                )
+                    this.hideSwitcher();
+            });
+            document
+                .getElementById('cphone-thread-back')
+                ?.addEventListener('click', () => this.closeThread());
+            document
+                .getElementById('cphone-progress-open')
+                ?.addEventListener('click', () => this.openProgress());
+            document.getElementById('cphone-clear-chat')?.addEventListener('click', () => {
+                void this.clearThread();
+            });
+            document
+                .getElementById('cphone-progress-close')
+                ?.addEventListener('click', () => this.closeProgress());
+            document
+                .getElementById('cphone-progress-sheet')
+                ?.addEventListener('click', (event_33) => {
+                    if (event_33.target.id === 'cphone-progress-sheet') this.closeProgress();
+                });
+            document
+                .getElementById('cphone-progress-form')
+                ?.addEventListener('submit', (event_34) => {
+                    event_34.preventDefault();
+                    void this.progressThread();
+                });
+            document.getElementById('cphone-sms-search')?.addEventListener('input', () => {
+                if (this.searchTimer) clearTimeout(this.searchTimer);
+                this.searchTimer = setTimeout(() => {
+                    this.searchTimer = null;
+                    this.renderList(true);
+                }, 80);
+            });
+            document.getElementById('cphone-sms-tabs')?.addEventListener('click', (event_35) => {
+                const closest_36 = event_35.target.closest('[data-cphone-tab]');
+                closest_36 && ((this.tab = closest_36.dataset.cphoneTab), this.renderList());
+            });
+            document.getElementById('cphone-sms-list')?.addEventListener('click', (event_37) => {
+                const closest_38 = event_37.target.closest('[data-cphone-row]');
+                const value_39 = closest_38 && this.rows.get(closest_38.dataset.cphoneRow);
+                if (value_39)
+                    this.tab === 'contacts'
+                        ? this.openContact(value_39)
+                        : void this.openThread(value_39);
+            });
+            document
+                .getElementById('cphone-contact-close')
+                ?.addEventListener('click', () => this.closeContact());
+            document
+                .getElementById('cphone-contact-sheet')
+                ?.addEventListener('click', (event_40) => {
+                    if (event_40.target.id === 'cphone-contact-sheet') this.closeContact();
+                });
+            document.getElementById('cphone-contact-send')?.addEventListener('click', () => {
+                const activeContact_41 = this.activeContact;
+                this.closeContact();
+                if (activeContact_41) void this.openThread(activeContact_41);
+            });
+            document
+                .getElementById('cphone-contact-delete')
+                ?.addEventListener('click', () => this.requestDeleteContact());
+            document
+                .getElementById('cphone-sms-messages')
+                ?.addEventListener('click', (event_42) => {
+                    const closest_43 = event_42.target.closest?.(
                             '.group-private-chat-detail-bubble.has-translation',
                         );
-                        if (closest_43) this.toggleBubbleTranslation(closest_43);
-                    });
-                window.addEventListener('u2:linked-accounts-changed', (value_44) => {
+                    if (closest_43) this.toggleBubbleTranslation(closest_43);
+                });
+            window.addEventListener('u2:linked-accounts-changed', (value_44) => {
+                if (
+                    String(value_44.detail?.friendId || '') === this.selectedId &&
+                    (!this.activeThread || this.activeThread.kind === 'linked')
+                )
+                    this.refreshMessages();
+            });
+            window.addEventListener('u2:friend-message-appended', (value_45) => {
+                const string = String(value_45.detail?.friendId || '');
+                if (this.activeThread) {
                     if (
-                        String(value_44.detail?.friendId || '') === this.selectedId &&
-                        (!this.activeThread || this.activeThread.kind === 'linked')
+                        (this.activeThread.kind === 'user' && string === this.selectedId) ||
+                        (this.activeThread.kind === 'group' &&
+                            string === String(this.activeThread.groupId))
                     )
                         this.refreshMessages();
-                });
-                window.addEventListener('u2:friend-message-appended', (value_45) => {
-                    const string = String(value_45.detail?.friendId || '');
-                    if (this.activeThread) {
-                        if (
-                            (this.activeThread.kind === 'user' && string === this.selectedId) ||
-                            (this.activeThread.kind === 'group' &&
-                                string === String(this.activeThread.groupId))
+                } else {
+                    if (
+                        string === this.selectedId ||
+                        this.getGroupsForChar(this.getSelectedFriend()).some(
+                            (value_46) => String(value_46.id) === string,
                         )
-                            this.refreshMessages();
-                    } else {
-                        if (
-                            string === this.selectedId ||
-                            this.getGroupsForChar(this.getSelectedFriend()).some(
-                                (value_46) => String(value_46.id) === string,
-                            )
-                        )
-                            this.refreshMessages();
-                    }
-                });
-                window.addEventListener('u2:friend-removed', () => {
-                    if (!this.getSelectedFriend()) void this.open();
-                });
-                window.addEventListener('account-updated', () => this.refreshUserIdentity());
-                window.addEventListener('user-state-updated', () => this.refreshUserIdentity());
-                window.addEventListener('u2:friend-account-binding-changed', (value_47_2) => {
-                    if (String(value_47_2.detail?.friendId || '') === this.selectedId)
-                        this.refreshUserIdentity();
-                });
-                window.addEventListener('u2:char-user-remark-changed', (value_48_2) => {
-                    if (String(value_48_2.detail?.friendId || '') === this.selectedId)
-                        this.refreshUserIdentity();
-                });
-                this.initialized = true;
-                void this.migrateLegacyGroups();
-            },
-            handleInputEnter(event_49) {
+                    )
+                        this.refreshMessages();
+                }
+            });
+            window.addEventListener('u2:friend-removed', () => {
+                if (!this.getSelectedFriend()) void this.open();
+            });
+            window.addEventListener('u2:friend-type-changed', (_value) => {
+                if (
+                    String(_value.detail?.friendId || '') !== this.selectedId ||
+                    this.getSelectedFriend()
+                )
+                    return;
+                this.saveSelection('');
+                if (this.smsView?.classList.contains('active')) this.closeMessages();
+            });
+            window.addEventListener('account-updated', () => this.refreshUserIdentity());
+            window.addEventListener('user-state-updated', () => this.refreshUserIdentity());
+            window.addEventListener('u2:friend-account-binding-changed', (value_47_2) => {
+                if (String(value_47_2.detail?.friendId || '') === this.selectedId)
+                    this.refreshUserIdentity();
+            });
+            window.addEventListener('u2:char-user-remark-changed', (value_48_2) => {
+                if (String(value_48_2.detail?.friendId || '') === this.selectedId)
+                    this.refreshUserIdentity();
+            });
+            this.initialized = true;
+            void this.migrateLegacyGroups();
+        },
+        handleInputEnter(event_49) {
                 const value_50 =
                     window.mobileInputCompat?.isSendEnter?.(event_49) ??
                     (event_49?.key === 'Enter' &&
@@ -397,12 +395,12 @@
                     value_51_2 &&
                         (event_49.preventDefault(), document.getElementById(value_51_2)?.focus?.());
             },
-            blurActiveWithin(value_52_2) {
+        blurActiveWithin(value_52_2) {
                 const activeElement_53 = document.activeElement;
                 if (activeElement_53 && value_52_2?.contains?.(activeElement_53))
                     activeElement_53.blur?.();
             },
-            async cleanupLegacySms() {
+        async cleanupLegacySms() {
                 if (this.migration) return this.migration;
                 return (
                     (this.migration = (async () => {
@@ -450,10 +448,10 @@
                     this.migration
                 );
             },
-            getCphoneGroups(value_61_2) {
+        getCphoneGroups(value_61_2) {
                 return this.groupsByChar.get(String(value_61_2?.id || '')) || [];
             },
-            async loadCphoneGroups(value_37) {
+        async loadCphoneGroups(value_37) {
                 const string_63 = String(value_37 || '');
                 if (this.groupsByChar.has(string_63)) return this.groupsByChar.get(string_63);
                 if (this.groupLoads.has(string_63)) return this.groupLoads.get(string_63);
@@ -464,7 +462,7 @@
                 })()['finally'](() => this.groupLoads['delete'](string_63));
                 return (this.groupLoads.set(string_63, value_64_2), value_64_2);
             },
-            saveCphoneGroups(value_40, value_68) {
+        saveCphoneGroups(value_40, value_68) {
                 const string_69 = String(value_40 || ''),
                     value_70_2 = this.groupWrites.get(string_69) || Promise.resolve(),
                     then_71 = value_70_2['catch'](() => {}).then(async () => {
@@ -487,7 +485,7 @@
                     then_71
                 );
             },
-            migrateLegacyGroups() {
+        migrateLegacyGroups() {
                 if (this.groupMigration) return this.groupMigration;
                 return (
                     (this.groupMigration = (async () => {
@@ -630,7 +628,7 @@
                     this.groupMigration
                 );
             },
-            async open() {
+        async open() {
                 this.init();
                 await this.migrateLegacyGroups();
                 const friends_110 = this.getFriends(),
@@ -651,7 +649,7 @@
                 }
                 return this.openFriend(value_112.id);
             },
-            async openFriend(value_114) {
+        async openFriend(value_114) {
                 this.init();
                 const result_115 = this.getFriends().find(
                     (value_119) => String(value_119.id) === String(value_114),
@@ -679,7 +677,7 @@
                     this.paintWallpaper(value_118_2);
                 return true;
             },
-            async resolveWallpaper(value_120) {
+        async resolveWallpaper(value_120) {
                 const trim_121 = String(value_120?.cphoneWallpaperAssetId || '').trim();
                 if (trim_121)
                     try {
@@ -695,7 +693,7 @@
                     return '';
                 }
             },
-            paintWallpaper(value_70) {
+        paintWallpaper(value_70) {
                 if (!this.phoneView) return;
                 const string_127 = String(value_70 || '');
                 this.phoneView.classList.toggle('has-custom-wallpaper', !!string_127);
@@ -707,7 +705,7 @@
                     );
                 else this.phoneView.style.removeProperty('--cphone-wallpaper-image');
             },
-            syncWallpaperSettings() {
+        syncWallpaperSettings() {
                 const selectedFriend_128 = this.getSelectedFriend(),
                     cphoneWallpaperUrlElement = document.getElementById('cphone-wallpaper-url'),
                     cphoneWallpaperStatusElement =
@@ -724,7 +722,7 @@
                               ? '当前使用 URL 图片'
                               : '当前使用默认背景';
             },
-            async applyWallpaperUrl() {
+        async applyWallpaperUrl() {
                 const trim_129_2 = String(
                     document.getElementById('cphone-wallpaper-url')?.value || '',
                 ).trim();
@@ -738,7 +736,7 @@
                 }
                 return this.saveWallpaper(value_130_2.href);
             },
-            async saveWallpaper(cphoneWallpaperUrl_2) {
+        async saveWallpaper(cphoneWallpaperUrl_2) {
                 const selectedFriend_133 = this.getSelectedFriend();
                 if (!selectedFriend_133 || this.wallpaperSaving) return false;
                 const string_134 = String(selectedFriend_133.id),
@@ -791,14 +789,14 @@
                     this.wallpaperSaving = false;
                 }
             },
-            closeEmpty() {
+        closeEmpty() {
                 if (!this.emptyView) return;
                 window.closeView?.(this.emptyView);
                 this.emptyView.classList.remove('active');
                 this.emptyView.inert = true;
                 this.emptyView.setAttribute('aria-hidden', 'true');
             },
-            fillAvatar(element, src_2, value_143) {
+        fillAvatar(element, src_2, value_143) {
                 if (!element) return;
                 element.replaceChildren();
                 if (src_2) {
@@ -815,7 +813,7 @@
                     element.appendChild(element_145);
                 }
             },
-            renderDesktop(value_146) {
+        renderDesktop(value_146) {
                 const cphoneOwnerButtonElement = document.getElementById('cphone-owner-button');
                 if (cphoneOwnerButtonElement)
                     cphoneOwnerButtonElement.setAttribute(
@@ -830,7 +828,7 @@
                     value_6(value_146),
                 );
             },
-            showSwitcher() {
+        showSwitcher() {
                 const cphoneSwitcherElement = document.getElementById('cphone-switcher'),
                     cphoneSwitchListElement = document.getElementById('cphone-switch-list');
                 if (!cphoneSwitcherElement || !cphoneSwitchListElement) return;
@@ -866,7 +864,7 @@
                     preventScroll: true,
                 });
             },
-            hideSwitcher() {
+        hideSwitcher() {
                 const cphoneSwitcherElement_153 = document.getElementById('cphone-switcher');
                 if (!cphoneSwitcherElement_153) return;
                 const activeElement_154 = document.activeElement;
@@ -880,43 +878,44 @@
                 cphoneSwitcherElement_153.inert = true;
                 cphoneSwitcherElement_153.hidden = true;
             },
-            async openMessages() {
-                await this.migrateLegacyGroups();
-                const selectedFriend_114 = this.getSelectedFriend();
-                if (!selectedFriend_114) return;
-                await this.loadCphoneGroups(selectedFriend_114.id);
-                await window.imApp?.ensureFriendMessagesLoaded?.(selectedFriend_114);
+        async openMessages() {
+            await this.migrateLegacyGroups();
+            const selectedFriend_114 = this.getSelectedFriend();
+            if (!selectedFriend_114) return;
+            await this.loadCphoneGroups(selectedFriend_114.id);
+            await window.imApp?.ensureFriendMessagesLoaded?.(selectedFriend_114);
+            this.activeThread = null;
+            this.tab = 'threads';
+            const cphoneSmsSearchElement = document.getElementById('cphone-sms-search');
+            if (cphoneSmsSearchElement) cphoneSmsSearchElement.value = '';
+            window.openView?.(this.smsView);
+            this.smsView.classList.add('active');
+            this.renderList();
+            this.updateCreationStatus();
+        },
+        closeMessages() {
+            if (!this.smsView) return;
+            if (this.searchTimer) clearTimeout(this.searchTimer);
+            this.searchTimer = null;
+            this.blurActiveWithin(this.smsView);
+            this.activeThread = null;
+            this.searchRows = null;
+            this.renderedThreadKey = '';
+            this.closeContact();
+            this.closeCreateMenu();
+            this.closeCreateContact();
+            this.closeCreateGroup();
+            this.closeProgress(true);
+            window.closeView?.(this.smsView);
+            this.smsView.classList.remove('active');
+        },
+        closeThread() {
+                this.closeProgress(true);
                 this.activeThread = null;
-                this.tab = 'threads';
-                const cphoneSmsSearchElement = document.getElementById('cphone-sms-search');
-                if (cphoneSmsSearchElement) cphoneSmsSearchElement.value = '';
-                window.openView?.(this.smsView);
-                this.smsView.classList.add('active');
+                this.renderedThreadKey = '';
                 this.renderList();
             },
-            closeMessages() {
-                if (!this.smsView) return;
-                if (this.searchTimer) clearTimeout(this.searchTimer);
-                this.searchTimer = null;
-                this.blurActiveWithin(this.smsView);
-                this.activeThread = null;
-                this.searchRows = null;
-                this.renderedThreadKey = '';
-                this.closeContact();
-                this.closeCreateMenu();
-                this.closeCreateContact(true);
-                this.closeCreateGroup();
-                this.closeProgress(true);
-                window.closeView?.(this.smsView);
-                this.smsView.classList.remove('active');
-            },
-            closeThread() {
-                this.closeProgress(true);
-                this.activeThread = null;
-                this.renderedThreadKey = '';
-                this.renderList();
-            },
-            getGroupsForChar(value_156) {
+        getGroupsForChar(value_156) {
                 if (!value_156) return [];
                 return (window.imData?.friends || []).filter((value_157) => {
                     if (value_157?.type !== 'group') return false;
@@ -930,14 +929,14 @@
                     );
                 });
             },
-            getLinkedChats(value_160_2) {
+        getLinkedChats(value_160_2) {
                 return window.imApp?.normalizeLinkedAccountChats
                     ? window.imApp.normalizeLinkedAccountChats(value_160_2?.linkedAccountChats)
                     : Array.isArray(value_160_2?.linkedAccountChats)
                       ? value_160_2.linkedAccountChats
                       : [];
             },
-            getRelationships(value_161_2) {
+        getRelationships(value_161_2) {
                 return (
                     Array.isArray(value_161_2?.memory?.relationships)
                         ? value_161_2.memory.relationships
@@ -953,7 +952,7 @@
                             (event_163.target.type === 'char' || event_163.target.type === 'npc'),
                     );
             },
-            findLinkedForTarget(
+        findLinkedForTarget(
                 value_117,
                 value_165_2,
                 items_166 = this.getLinkedChats(value_117),
@@ -982,7 +981,7 @@
                     );
                 return filter_169.length === 1 ? filter_169[0] : null;
             },
-            getThreadRows(value_174_2) {
+        getThreadRows(value_174_2) {
                 if (!value_174_2) return [];
                 const items_175 = [],
                     userIdentity_176 = this.getUserIdentity(value_174_2),
@@ -1059,7 +1058,7 @@
                     )
                 );
             },
-            getContactRows(value_185) {
+        getContactRows(value_185) {
                 if (!value_185) return [];
                 const userIdentity_186 = this.getUserIdentity(value_185),
                     items_187 = [
@@ -1119,7 +1118,7 @@
                     items_187
                 );
             },
-            messageText(message_193) {
+        messageText(message_193) {
                 const options_194 = {
                         image: '[图片]',
                         sticker: '[表情]',
@@ -1146,7 +1145,7 @@
                         .find(Boolean) || '[消息]'
                 );
             },
-            messageTime(value_198_2) {
+        messageTime(value_198_2) {
                 if (!value_198_2) return '';
                 const value_199_2 = new Date(value_198_2);
                 if (Number.isNaN(value_199_2.getTime())) return '';
@@ -1159,7 +1158,7 @@
                     ? value_201
                     : value_199_2.getMonth() + 1 + '/' + value_199_2.getDate() + ' ' + value_201;
             },
-            messageChipTime(value_203_2) {
+        messageChipTime(value_203_2) {
                 const value_204_2 = new Date(Number(value_203_2) || 0);
                 if (!value_203_2 || Number.isNaN(value_204_2.getTime())) return '';
                 const value_205 = (value_139) => String(value_139).padStart(2, '0');
@@ -1174,7 +1173,7 @@
                     value_205(value_204_2.getMinutes())
                 );
             },
-            renderList(value_140 = false) {
+        renderList(value_140 = false) {
                 if (!this.smsView?.classList.contains('active') || this.activeThread) return;
                 !value_140 &&
                     this.searchTimer &&
@@ -1279,28 +1278,188 @@
                 });
                 if (documentFragment) cphoneSmsListElement.appendChild(documentFragment);
             },
-            openContact(activeContact_2) {
-                this.activeContact = activeContact_2;
-                const cphoneContactSheetElement = document.getElementById('cphone-contact-sheet');
-                document.getElementById('cphone-contact-name').textContent = activeContact_2.title;
-                document.getElementById('cphone-contact-relationship').textContent =
-                    activeContact_2.relationship || '联系人';
-                document.getElementById('cphone-contact-persona').textContent =
-                    activeContact_2.persona || '';
-                this.fillAvatar(
-                    document.getElementById('cphone-contact-avatar'),
-                    activeContact_2.avatarUrl,
-                    activeContact_2.title,
-                );
-                cphoneContactSheetElement.hidden = false;
-            },
-            closeContact() {
+        openContact(activeContact_2) {
+            this.activeContact = activeContact_2;
+            const cphoneContactSheetElement = document.getElementById('cphone-contact-sheet');
+            document.getElementById('cphone-contact-name').textContent = activeContact_2.title;
+            document.getElementById('cphone-contact-relationship').textContent =
+                activeContact_2.relationship || '联系人';
+            document.getElementById('cphone-contact-persona').textContent =
+                activeContact_2.persona || '';
+            this.fillAvatar(
+                document.getElementById('cphone-contact-avatar'),
+                activeContact_2.avatarUrl,
+                activeContact_2.title,
+            );
+            const _value5 = document.getElementById('cphone-contact-delete');
+            _value5 &&
+                ((_value5.hidden = activeContact_2.kind === 'user'),
+                (_value5.disabled = this.deletingContact));
+            cphoneContactSheetElement.hidden = false;
+        },
+        closeContact() {
                 this.activeContact = null;
                 const cphoneContactSheetElement_148 =
                     document.getElementById('cphone-contact-sheet');
                 if (cphoneContactSheetElement_148) cphoneContactSheetElement_148.hidden = true;
             },
-            async openThread(value_231_2) {
+        requestDeleteContact() {
+            const _value6 = this.activeContact;
+            if (!_value6 || _value6.kind === 'user' || this.deletingContact) return;
+            const _value7 = this.getLinkedChats(this.getSelectedFriend()).find(
+                (_value1) => String(_value1.id) === String(_value6.chatId || ''),
+            );
+            const _value8 = String(_value6.targetId || _value7?.sourceNpcId || '');
+            const _value9 = _value8 ? value_8(_value8) : null;
+            const _value0 =
+                _value9?.type === 'npc'
+                    ? '确定删除 ' +
+                      _value6.title +
+                      ' 吗？此 NPC 会从所有角色及群聊中移除，相关会话也会删除，且无法恢复。'
+                    : '确定从当前 Char 手机删除 ' +
+                      _value6.title +
+                      ' 吗？当前手机中的关联和会话将被删除，且无法恢复。';
+            if (typeof window.showCustomModal === 'function')
+                window.showCustomModal({
+                    title: '删除联系人',
+                    message: _value0,
+                    isDestructive: true,
+                    confirmText: '删除',
+                    onConfirm: () => this.deleteContact(_value6),
+                });
+            else window.confirm?.(_value0) && void this.deleteContact(_value6);
+        },
+        async deleteContact(_value10 = this.activeContact) {
+            if (
+                this.deletingContact ||
+                !_value10 ||
+                _value10.kind === 'user' ||
+                _value10 !== this.activeContact
+            )
+                return false;
+            const _value11 = String(this.selectedId);
+            const _value12 = this.getSelectedFriend();
+            if (!_value12) return false;
+            const _value13 = this.getLinkedChats(_value12).find(
+                (_value19) => String(_value19.id) === String(_value10.chatId || ''),
+            );
+            const _value14 = String(_value10.targetId || _value13?.sourceNpcId || '');
+            const _value15 = _value14 ? value_8(_value14) : null;
+            const _value16 = _value15?.type === 'npc';
+            const _value17 = String(_value10.chatId || '');
+            if (!_value14 && !_value17) return false;
+            this.deletingContact = true;
+            const _value18 = document.getElementById('cphone-contact-delete');
+            if (_value18) _value18.disabled = true;
+            try {
+                const _value20 = await window.imApp?.commitFriendsChange?.(
+                    () => {
+                        if (this.selectedId !== _value11 || !value_8(_value11))
+                            throw new Error('当前 Char 已变化');
+                        const _value21 = window.imData.friends;
+                        if (_value16 && value_8(_value14)?.type !== 'npc')
+                            throw new Error('NPC 已变化');
+                        const _value22 = _value16
+                            ? _value21.filter((_value23) => String(_value23.id) !== _value14)
+                            : [value_8(_value11)];
+                        _value22.forEach((_value24) => {
+                            Array.isArray(_value24.memory?.relationships) &&
+                                (_value24.memory.relationships =
+                                    _value24.memory.relationships.filter(
+                                        (_value25) =>
+                                            !_value14 ||
+                                            String(_value25?.targetId ?? _value25?.npcId ?? '') !==
+                                                _value14,
+                                    ));
+                            Array.isArray(_value24.linkedAccountChats) &&
+                                (_value24.linkedAccountChats = this.getLinkedChats(_value24).filter(
+                                    (_value26) =>
+                                        (!_value14 ||
+                                            String(_value26.sourceNpcId || '') !== _value14) &&
+                                        !(
+                                            String(_value24.id) === _value11 &&
+                                            _value17 &&
+                                            String(_value26.id) === _value17
+                                        ),
+                                ));
+                            if (_value16 && _value24.type === 'group') {
+                                const _value27 =
+                                    Array.isArray(_value24.members) &&
+                                    _value24.members.some(
+                                        (_value28) => String(_value28) === _value14,
+                                    );
+                                if (_value27) {
+                                    _value24.members = _value24.members.filter(
+                                        (_value30) => String(_value30) !== _value14,
+                                    );
+                                    const _value29 = [
+                                        _value14,
+                                        _value15.nickname,
+                                        _value15.realName,
+                                    ]
+                                        .map((_value31) => String(_value31 || '').trim())
+                                        .filter(Boolean);
+                                    for (const _value32 of _value29) {
+                                        delete _value24.memory?.mountSettings?.[_value32];
+                                        delete _value24.memory?.mountLimits?.[_value32];
+                                        delete _value24.memory?.crossGroupMemorySettings?.[
+                                            _value32
+                                        ];
+                                        delete _value24.memberProfiles?.[_value32];
+                                    }
+                                    if (_value24.memberTitles)
+                                        delete _value24.memberTitles[_value14];
+                                    Array.isArray(_value24.adminMemberIds) &&
+                                        (_value24.adminMemberIds = _value24.adminMemberIds.filter(
+                                            (_value33) => String(_value33) !== _value14,
+                                        ));
+                                }
+                                Array.isArray(_value24.leftGroupMemberSnapshot) &&
+                                    (_value24.leftGroupMemberSnapshot =
+                                        _value24.leftGroupMemberSnapshot.filter(
+                                            (_value34) =>
+                                                String(_value34?.id ?? _value34) !== _value14,
+                                        ));
+                            }
+                        });
+                        if (_value16)
+                            window.imData.friends = _value21.filter(
+                                (_value35) => String(_value35.id) !== _value14,
+                            );
+                    },
+                    {
+                        silent: true,
+                        deletedFriendIds: _value16 ? [_value14] : [],
+                    },
+                );
+                if (!_value20) throw new Error('删除失败，数据已恢复');
+                this.closeContact();
+                this.searchRows = null;
+                this.renderList();
+                window.imApp?.renderFriendsList?.({
+                    force: true,
+                });
+                window.imApp?.updateChatsView?.();
+                window.imApp?.requestChatsListRefresh?.();
+                window.dispatchEvent(
+                    new CustomEvent('u2:linked-accounts-changed', {
+                        detail: {
+                            friendId: _value11,
+                            changedCount: 1,
+                        },
+                    }),
+                );
+                window.showToast?.('已删除联系人');
+                return true;
+            } catch (_value36) {
+                window.showToast?.(_value36?.message || '删除失败，数据已恢复');
+                return false;
+            } finally {
+                this.deletingContact = false;
+                if (_value18) _value18.disabled = false;
+            }
+        },
+        async openThread(value_231_2) {
                 const selectedFriend_232 = this.getSelectedFriend();
                 if (!selectedFriend_232 || !value_231_2) return;
                 if (this.searchTimer) clearTimeout(this.searchTimer);
@@ -1350,7 +1509,7 @@
                 );
                 this.renderThread();
             },
-            currentMessages() {
+        currentMessages() {
                 const activeThread_237 = this.activeThread,
                     selectedFriend_238 = this.getSelectedFriend();
                 if (!activeThread_237 || !selectedFriend_238) return [];
@@ -1385,7 +1544,7 @@
                         );
                 return Array.isArray(value_240_2?.messages) ? value_240_2.messages : [];
             },
-            isOwnMessage(message_244, value_245, value_246, value_247) {
+        isOwnMessage(message_244, value_245, value_246, value_247) {
                 if (value_245.kind === 'user')
                     return message_244?.role === 'assistant' || message_244?.sender === 'char';
                 if (value_245.kind === 'linked') return message_244?.role === 'char';
@@ -1408,7 +1567,7 @@
                 );
                 return String(groupSpeaker?.id || '') === String(value_246.id);
             },
-            messageSpeaker(message_248, value_249, value_250, value_251_2, value_252_2) {
+        messageSpeaker(message_248, value_249, value_250, value_251_2, value_252_2) {
                 const name_2 =
                     value_252_2?.userIdentity?.name || this.getUserIdentity(value_250).name;
                 if (value_249.kind === 'user')
@@ -1479,7 +1638,7 @@
                     name: value_176,
                 };
             },
-            toggleBubbleTranslation(element_261) {
+        toggleBubbleTranslation(element_261) {
                 const groupPrivateChatDetailTranslationElement = element_261?.querySelector(
                     '.group-private-chat-detail-translation',
                 );
@@ -1490,7 +1649,7 @@
                 element_261.setAttribute('aria-expanded', String(hidden_262));
                 element_261.title = hidden_262 ? '点击收起翻译' : '点击展开翻译';
             },
-            messageRenderSignature(message_263) {
+        messageRenderSignature(message_263) {
                 return JSON.stringify([
                     message_263?.id,
                     message_263?.role,
@@ -1511,7 +1670,7 @@
                     value_9(message_263),
                 ]);
             },
-            renderThread() {
+        renderThread() {
                 const cphoneSmsMessagesElement = document.getElementById('cphone-sms-messages'),
                     activeThread_264 = this.activeThread,
                     selectedFriend_265 = this.getSelectedFriend();
@@ -1682,12 +1841,12 @@
                     if (!value_271_2) cphoneSmsMessagesElement.scrollTop = scrollTop_187;
                 }
             },
-            refreshMessages() {
+        refreshMessages() {
                 if (!this.smsView?.classList.contains('active')) return;
                 if (this.activeThread) this.renderThread();
                 else this.renderList();
             },
-            toggleCreateMenu() {
+        toggleCreateMenu() {
                 if (!this.getSelectedFriend()) return;
                 const cphoneCreateMenuElement_218 = document.getElementById('cphone-create-menu'),
                     cphoneCreateMenuOpenElement =
@@ -1701,7 +1860,7 @@
                 if (!cphoneCreateMenuElement_218.hidden)
                     document.getElementById('cphone-create-contact-open')?.focus();
             },
-            closeCreateMenu(value_219 = false) {
+        closeCreateMenu(value_219 = false) {
                 const cphoneCreateMenuElement_220 = document.getElementById('cphone-create-menu'),
                     cphoneCreateMenuOpenElement_221 =
                         document.getElementById('cphone-create-menu-open');
@@ -1712,65 +1871,75 @@
                         preventScroll: true,
                     });
             },
-            openCreateContact() {
-                if (!this.getSelectedFriend() || this.creatingContact) return;
-                const cphoneCreateContactFormElement = document.getElementById(
+        updateCreationStatus() {
+            const _value37 = this.creationJob;
+            const _value38 = document.getElementById('cphone-generation-status');
+            _value38 &&
+                ((_value38.textContent = _value37
+                    ? _value37.ownerName +
+                      ' 的' +
+                      (_value37.kind === 'contact' ? '联系人' : '群聊') +
+                      '正在生成，关闭弹窗后仍会继续。'
+                    : this.creationNotice),
+                (_value38.hidden = !_value38.textContent));
+            const _value39 = document.getElementById('cphone-create-contact-submit');
+            const _value40 = document.getElementById('cphone-create-group-submit');
+            _value39 &&
+                ((_value39.disabled = !!_value37),
+                (_value39.textContent =
+                    _value37?.kind === 'contact' ? '正在生成联系人…' : '生成联系人和对话'));
+            _value40 &&
+                ((_value40.disabled = !!_value37),
+                (_value40.textContent =
+                    _value37?.kind === 'group' ? '正在生成群聊…' : '生成 10 轮群聊'));
+        },
+        openCreateContact() {
+            if (!this.getSelectedFriend()) return;
+            const cphoneCreateContactFormElement = document.getElementById(
                         'cphone-create-contact-form',
-                    ),
-                    cphoneCreateContactSheetElement = document.getElementById(
+                    );
+            const cphoneCreateContactSheetElement = document.getElementById(
                         'cphone-create-contact-sheet',
                     );
-                if (!cphoneCreateContactFormElement || !cphoneCreateContactSheetElement) return;
-                cphoneCreateContactFormElement.reset();
-                document.getElementById('cphone-create-contact-count').value = '1';
-                document.getElementById('cphone-create-contact-rounds').value = '10';
-                const cphoneCreateContactErrorElement = document.getElementById(
+            if (!cphoneCreateContactFormElement || !cphoneCreateContactSheetElement) return;
+            cphoneCreateContactFormElement.reset();
+            document.getElementById('cphone-create-contact-count').value = '1';
+            document.getElementById('cphone-create-contact-rounds').value = '10';
+            const cphoneCreateContactErrorElement = document.getElementById(
                     'cphone-create-contact-error',
                 );
-                cphoneCreateContactErrorElement &&
-                    ((cphoneCreateContactErrorElement.textContent = ''),
-                    (cphoneCreateContactErrorElement.hidden = true));
-                cphoneCreateContactSheetElement.hidden = false;
-                document.getElementById('cphone-create-contact-count')?.focus();
-            },
-            closeCreateContact(value_222 = false) {
-                if (this.creatingContact && !value_222) return;
-                const cphoneCreateContactSheetElement_223 = document.getElementById(
-                    'cphone-create-contact-sheet',
-                );
-                this.blurActiveWithin(cphoneCreateContactSheetElement_223);
-                if (cphoneCreateContactSheetElement_223)
-                    cphoneCreateContactSheetElement_223.hidden = true;
-            },
-            openCreateGroup() {
-                if (!this.getSelectedFriend() || this.creatingGroup) return;
-                const cphoneCreateGroupFormElement = document.getElementById(
-                        'cphone-create-group-form',
-                    ),
-                    cphoneCreateGroupSheetElement = document.getElementById(
-                        'cphone-create-group-sheet',
-                    );
-                if (!cphoneCreateGroupFormElement || !cphoneCreateGroupSheetElement) return;
-                cphoneCreateGroupFormElement.reset();
-                const cphoneCreateGroupErrorElement = document.getElementById(
-                    'cphone-create-group-error',
-                );
-                cphoneCreateGroupErrorElement &&
-                    ((cphoneCreateGroupErrorElement.textContent = ''),
-                    (cphoneCreateGroupErrorElement.hidden = true));
-                cphoneCreateGroupSheetElement.hidden = false;
-                document.getElementById('cphone-create-group-name')?.focus();
-            },
-            closeCreateGroup() {
-                if (this.creatingGroup) return;
-                const cphoneCreateGroupSheetElement_224 = document.getElementById(
+            cphoneCreateContactErrorElement &&
+                ((cphoneCreateContactErrorElement.textContent = ''),
+                (cphoneCreateContactErrorElement.hidden = true));
+            cphoneCreateContactSheetElement.hidden = false;
+            this.updateCreationStatus();
+            document.getElementById('cphone-create-contact-count')?.focus();
+        },
+        closeCreateContact() {
+            const _value41 = document.getElementById('cphone-create-contact-sheet');
+            this.blurActiveWithin(_value41);
+            if (_value41) _value41.hidden = true;
+        },
+        openCreateGroup() {
+            if (!this.getSelectedFriend()) return;
+            const _value42 = document.getElementById('cphone-create-group-form');
+            const _value43 = document.getElementById('cphone-create-group-sheet');
+            if (!_value42 || !_value43) return;
+            _value42.reset();
+            const _value44 = document.getElementById('cphone-create-group-error');
+            _value44 && ((_value44.textContent = ''), (_value44.hidden = true));
+            _value43.hidden = false;
+            this.updateCreationStatus();
+            document.getElementById('cphone-create-group-name')?.focus();
+        },
+        closeCreateGroup() {
+            const cphoneCreateGroupSheetElement_224 = document.getElementById(
                     'cphone-create-group-sheet',
                 );
-                this.blurActiveWithin(cphoneCreateGroupSheetElement_224);
-                if (cphoneCreateGroupSheetElement_224)
-                    cphoneCreateGroupSheetElement_224.hidden = true;
-            },
-            buildContactGenerationPrompt(contact_225, value_226, value_227, value_228) {
+            this.blurActiveWithin(cphoneCreateGroupSheetElement_224);
+            if (cphoneCreateGroupSheetElement_224) cphoneCreateGroupSheetElement_224.hidden = true;
+        },
+        buildContactGenerationPrompt(contact_225, value_226, value_227, value_228) {
                 const map_229 = (window.imData?.friends || [])
                     .filter((value_230) => value_230?.type === 'char' || value_230?.type === 'npc')
                     .map((value_231) => ({
@@ -1807,7 +1976,7 @@ User 不参与这些聊天，也不是新联系人。每轮包含 2 到 5 条自
                     ' 项；speaker 只能是 char 或 account。'
                 );
             },
-            normalizeContactGeneration(value_232, value_233, value_234, value_235) {
+        normalizeContactGeneration(value_232, value_233, value_234, value_235) {
                 if (!Array.isArray(value_232?.contacts) || value_232.contacts.length !== value_234)
                     throw new Error('AI 未生成准确 ' + value_234 + ' 位联系人，请重试');
                 const value_236 = new Set(
@@ -1907,55 +2076,56 @@ User 不参与这些聊天，也不是新联系人。每轮包含 2 到 5 条自
                     };
                 });
             },
-            async createContacts() {
-                if (this.creatingContact || this.creatingGroup) return false;
-                const selectedFriend_259 = this.getSelectedFriend(),
-                    trim_260 = String(
+        async createContacts() {
+            if (this.creationJob) return false;
+            const selectedFriend_259 = this.getSelectedFriend();
+            const trim_260 = String(
                         document.getElementById('cphone-create-contact-count')?.value || '',
-                    ).trim(),
-                    trim_261 = String(
+                    ).trim();
+            const trim_261 = String(
                         document.getElementById('cphone-create-contact-rounds')?.value || '',
-                    ).trim(),
-                    changedCount_2 = Number(trim_260),
-                    number_262 = Number(trim_261),
-                    trim_263 = String(
+                    ).trim();
+            const changedCount_2 = Number(trim_260);
+            const number_262 = Number(trim_261);
+            const trim_263 = String(
                         document.getElementById('cphone-create-contact-direction')?.value || '',
-                    ).trim(),
-                    cphoneCreateContactErrorElement_264 = document.getElementById(
+                    ).trim();
+            const cphoneCreateContactErrorElement_264 = document.getElementById(
                         'cphone-create-contact-error',
-                    ),
-                    cphoneCreateContactSubmitElement = document.getElementById(
-                        'cphone-create-contact-submit',
                     );
-                if (
-                    !selectedFriend_259 ||
-                    !trim_260 ||
-                    !Number.isInteger(changedCount_2) ||
-                    changedCount_2 < 1 ||
-                    changedCount_2 > 5 ||
-                    !trim_261 ||
-                    !Number.isInteger(number_262) ||
-                    number_262 < 1 ||
-                    number_262 > 20 ||
-                    !trim_263 ||
-                    trim_263.length > 2000
-                )
-                    return (
-                        cphoneCreateContactErrorElement_264 &&
-                            ((cphoneCreateContactErrorElement_264.textContent =
-                                '请填写 1–5 位联系人、每人 1–20 轮对话和对话内容'),
-                            (cphoneCreateContactErrorElement_264.hidden = false)),
-                        false
-                    );
-                this.creatingContact = true;
-                cphoneCreateContactSubmitElement &&
-                    ((cphoneCreateContactSubmitElement.disabled = true),
-                    (cphoneCreateContactSubmitElement.textContent = '正在生成联系人…'));
+            if (
+                !selectedFriend_259 ||
+                !trim_260 ||
+                !Number.isInteger(changedCount_2) ||
+                changedCount_2 < 1 ||
+                changedCount_2 > 5 ||
+                !trim_261 ||
+                !Number.isInteger(number_262) ||
+                number_262 < 1 ||
+                number_262 > 20 ||
+                !trim_263 ||
+                trim_263.length > 2000
+            ) {
                 cphoneCreateContactErrorElement_264 &&
-                    ((cphoneCreateContactErrorElement_264.textContent = ''),
-                    (cphoneCreateContactErrorElement_264.hidden = true));
-                try {
-                    const value_265 = await this.requestJsonGeneration(
+                    ((cphoneCreateContactErrorElement_264.textContent =
+                        '请填写 1–5 位联系人、每人 1–20 轮对话和对话内容'),
+                    (cphoneCreateContactErrorElement_264.hidden = false));
+                return false;
+            }
+            const _value45 = {
+                kind: 'contact',
+                ownerId: String(selectedFriend_259.id),
+                ownerName: value_6(selectedFriend_259),
+            };
+            this.creationJob = _value45;
+            this.creatingContact = true;
+            this.creationNotice = '';
+            this.updateCreationStatus();
+            cphoneCreateContactErrorElement_264 &&
+                ((cphoneCreateContactErrorElement_264.textContent = ''),
+                (cphoneCreateContactErrorElement_264.hidden = true));
+            try {
+                const value_265 = await this.requestJsonGeneration(
                         this.buildContactGenerationPrompt(
                             selectedFriend_259,
                             changedCount_2,
@@ -1963,39 +2133,31 @@ User 不参与这些聊天，也不是新联系人。每轮包含 2 到 5 条自
                             trim_263,
                         ),
                     );
-                    if (
-                        !value_8(selectedFriend_259.id) ||
-                        this.selectedId !== String(selectedFriend_259.id)
-                    )
-                        throw new Error('当前 Char 已变化，请重试');
-                    const contactGeneration = this.normalizeContactGeneration(
+                if (!value_8(_value45.ownerId))
+                    throw new Error('发起生成的角色已被删除，结果未保存');
+                const contactGeneration = this.normalizeContactGeneration(
                             value_265,
                             selectedFriend_259,
                             changedCount_2,
                             number_262,
-                        ),
-                        map_266 = contactGeneration.map((value_93_268) =>
+                        );
+                const map_266 = contactGeneration.map((value_93_268) =>
                             String(value_93_268.npc.id),
-                        ),
-                        value_267 = await window.imApp?.commitFriendsChange?.(
-                            () => {
-                                const value_8_269 = value_8(selectedFriend_259.id);
-                                if (
-                                    !value_8_269 ||
-                                    value_8_269.type !== 'char' ||
-                                    this.selectedId !== String(selectedFriend_259.id)
-                                )
-                                    throw new Error('当前 Char 已变化，请重试');
-                                const friends_270 = window.imData.friends;
-                                if (
-                                    map_266.some((string_2) =>
-                                        friends_270.some(
-                                            (value_46_2) => String(value_46_2.id) === string_2,
-                                        ),
-                                    )
-                                )
-                                    throw new Error('联系人 ID 已存在，请重试');
-                                const value_271 = new Set(
+                        );
+                const value_267 = await window.imApp?.commitFriendsChange?.(
+                    () => {
+                        const value_8_269 = value_8(_value45.ownerId);
+                        if (!value_8_269) throw new Error('发起生成的角色已被删除，结果未保存');
+                        const friends_270 = window.imData.friends;
+                        if (
+                            map_266.some((string_2) =>
+                                friends_270.some(
+                                    (value_46_2) => String(value_46_2.id) === string_2,
+                                ),
+                            )
+                        )
+                            throw new Error('联系人 ID 已存在，请重试');
+                        const value_271 = new Set(
                                     friends_270
                                         .filter(
                                             (value_274) =>
@@ -2013,93 +2175,84 @@ User 不参与这些聊天，也不是新联系人。每轮包含 2 到 5 条自
                                         )
                                         .filter(Boolean),
                                 );
-                                if (
-                                    contactGeneration.some(({ npc: npc_3 }) =>
-                                        [npc_3.nickname, npc_3.realName].some((value_278) =>
-                                            value_271.has(String(value_278).toLowerCase()),
-                                        ),
-                                    )
-                                )
-                                    throw new Error('已有同名联系人，请重试');
-                                value_8_269.memory =
-                                    value_8_269.memory || window.imApp.createDefaultMemory();
-                                value_8_269.memory.relationships = Array.isArray(
-                                    value_8_269.memory.relationships,
-                                )
-                                    ? value_8_269.memory.relationships
-                                    : [];
-                                value_8_269.linkedAccountChats = this.getLinkedChats(value_8_269);
-                                friends_270.push(
-                                    ...contactGeneration.map((value_279) => value_279.npc),
-                                );
-                                value_8_269.memory.relationships.push(
-                                    ...contactGeneration.map((value_282) => value_282.relation),
-                                );
-                                value_8_269.linkedAccountChats.unshift(
-                                    ...contactGeneration.map((value_283) => value_283.chat),
-                                );
+                        if (
+                            contactGeneration.some(({ npc: npc_3 }) =>
+                                [npc_3.nickname, npc_3.realName].some((value_278) =>
+                                    value_271.has(String(value_278).toLowerCase()),
+                                ),
+                            )
+                        )
+                            throw new Error('已有同名联系人，请重试');
+                        value_8_269.memory =
+                            value_8_269.memory || window.imApp.createDefaultMemory();
+                        value_8_269.memory.relationships = Array.isArray(
+                            value_8_269.memory.relationships,
+                        )
+                            ? value_8_269.memory.relationships
+                            : [];
+                        value_8_269.linkedAccountChats = this.getLinkedChats(value_8_269);
+                        friends_270.push(...contactGeneration.map((value_279) => value_279.npc));
+                        value_8_269.memory.relationships.push(
+                            ...contactGeneration.map((value_282) => value_282.relation),
+                        );
+                        value_8_269.linkedAccountChats.unshift(
+                            ...contactGeneration.map((value_283) => value_283.chat),
+                        );
+                    },
+                    {
+                        friendIds: [_value45.ownerId, ...map_266],
+                        silent: true,
+                    },
+                );
+                if (!value_267) throw new Error('联系人保存失败，已撤销本次生成');
+                this.creationNotice =
+                    _value45.ownerName + ' 的 ' + changedCount_2 + ' 位联系人已生成。';
+                window.showToast?.(this.creationNotice);
+                if (this.selectedId === _value45.ownerId) this.closeCreateContact();
+                try {
+                    window.imApp?.renderFriendsList?.({
+                        force: true,
+                    });
+                    window.dispatchEvent(
+                        new CustomEvent('u2:linked-accounts-changed', {
+                            detail: {
+                                friendId: _value45.ownerId,
+                                changedCount: changedCount_2,
                             },
-                            {
-                                friendIds: [selectedFriend_259.id, ...map_266],
-                                silent: true,
-                            },
-                        );
-                    if (!value_267) throw new Error('联系人保存失败，已撤销本次生成');
-                    this.creatingContact = false;
-                    this.closeCreateContact();
-                    if (this.selectedId !== String(selectedFriend_259.id)) return true;
-                    try {
-                        window.imApp?.renderFriendsList?.({
-                            force: true,
-                        });
-                        window.dispatchEvent(
-                            new CustomEvent('u2:linked-accounts-changed', {
-                                detail: {
-                                    friendId: String(selectedFriend_259.id),
-                                    changedCount: changedCount_2,
-                                },
-                            }),
-                        );
-                        this.searchRows = null;
-                        this.tab = 'threads';
-                        this.renderList();
-                        const result_359 = this.getThreadRows(this.getSelectedFriend()).find(
-                            (value_287) =>
-                                value_287.kind === 'linked' &&
-                                value_287.chatId === String(contactGeneration[0].chat.id),
-                        );
-                        if (result_359) await this.openThread(result_359);
-                    } catch (value_288) {
-                        console.warn(
-                            '[Cphone] Contacts saved but the SMS view did not refresh',
-                            value_288,
-                        );
-                        window.showToast?.('联系人已保存，请重新打开短信查看');
-                    }
-                    return true;
-                } catch (value_291) {
-                    if (
-                        window.u2Api?.isRequestError?.(value_291) &&
-                        window.u2Api.reportError(value_291, {
-                            operation: '联系人生成',
-                        })
-                    ) {
-                        if (cphoneCreateContactErrorElement_264)
-                            cphoneCreateContactErrorElement_264.hidden = true;
-                    } else
-                        cphoneCreateContactErrorElement_264 &&
-                            ((cphoneCreateContactErrorElement_264.textContent =
-                                value_291?.message || '联系人生成失败，请重试'),
-                            (cphoneCreateContactErrorElement_264.hidden = false));
-                    return false;
-                } finally {
-                    this.creatingContact = false;
-                    cphoneCreateContactSubmitElement &&
-                        ((cphoneCreateContactSubmitElement.disabled = false),
-                        (cphoneCreateContactSubmitElement.textContent = '生成联系人和对话'));
+                        }),
+                    );
+                    this.selectedId === _value45.ownerId &&
+                        this.smsView?.classList.contains('active') &&
+                        ((this.searchRows = null), this.refreshMessages());
+                } catch (_value46) {
+                    console.warn(
+                        '[Cphone] Contacts saved but the SMS view did not refresh',
+                        _value46,
+                    );
+                    window.showToast?.('联系人已保存，请重新打开短信查看');
                 }
-            },
-            buildGroupGenerationPrompt(contact_292, value_293, value_294) {
+                return true;
+            } catch (_value47) {
+                const _value48 = _value47?.message || '联系人生成失败，请重试';
+                this.creationNotice = _value45.ownerName + ' 的联系人生成失败：' + _value48;
+                window.u2Api?.isRequestError?.(_value47) &&
+                    window.u2Api.reportError?.(_value47, {
+                        operation: '联系人生成',
+                    });
+                !document.getElementById('cphone-create-contact-sheet')?.hidden &&
+                    this.selectedId === _value45.ownerId &&
+                    cphoneCreateContactErrorElement_264 &&
+                    ((cphoneCreateContactErrorElement_264.textContent = _value48),
+                    (cphoneCreateContactErrorElement_264.hidden = false));
+                window.showToast?.(this.creationNotice);
+                return false;
+            } finally {
+                this.creatingContact = false;
+                if (this.creationJob === _value45) this.creationJob = null;
+                this.updateCreationStatus();
+            }
+        },
+        buildGroupGenerationPrompt(contact_292, value_293, value_294) {
                 return (
                     '你要为 ' +
                     value_6(contact_292) +
@@ -2121,12 +2274,12 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
 只返回合法 JSON，不要 Markdown 或说明。格式：{"members":[{"slot":"s1","name":"姓名","persona":"性格和与群的关系"}],"rounds":[[{"speaker":"char","text":"消息","translation":""},{"speaker":"s1","text":"消息","translation":""}]]}。members 必须 2-8 项，slot 按 s1、s2 递增；rounds 必须恰好 10 项；speaker 只能是 char 或 members 中的 slot。`
                 );
             },
-            async requestGroupGeneration(value_308, value_309, value_310) {
+        async requestGroupGeneration(value_308, value_309, value_310) {
                 return this.requestJsonGeneration(
                     this.buildGroupGenerationPrompt(value_308, value_309, value_310),
                 );
             },
-            async requestJsonGeneration(content_2) {
+        async requestJsonGeneration(content_2) {
                 const value_312 = window.getApiConfig?.() || window.apiConfig || {};
                 if (!value_312.endpoint || !value_312.apiKey)
                     throw new Error('请先在系统设置中配置 API');
@@ -2177,7 +2330,7 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                     throw new Error('AI 返回的聊天格式无效，请重试');
                 }
             },
-            normalizeGroupGeneration(value_319_2, value_320, value_321) {
+        normalizeGroupGeneration(value_319_2, value_320, value_321) {
                 const members_322 = value_319_2?.members,
                     rounds_323 = value_319_2?.rounds;
                 if (
@@ -2277,70 +2430,68 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                     }
                 );
             },
-            async createGroup() {
-                if (this.creatingGroup) return false;
-                const selectedFriend_350 = this.getSelectedFriend(),
-                    trim_351 = String(
+        async createGroup() {
+            if (this.creationJob) return false;
+            const selectedFriend_350 = this.getSelectedFriend();
+            const trim_351 = String(
                         document.getElementById('cphone-create-group-name')?.value || '',
-                    ).trim(),
-                    title_2 = trim_351.replace(/[<>&"'`]/g, '').trim(),
-                    purpose_2 = String(
+                    ).trim();
+            const title_2 = trim_351.replace(/[<>&"'`]/g, '').trim();
+            const purpose_2 = String(
                         document.getElementById('cphone-create-group-purpose')?.value || '',
-                    ).trim(),
-                    trim_354 = String(
+                    ).trim();
+            const trim_354 = String(
                         document.getElementById('cphone-create-group-count')?.value || '',
-                    ).trim(),
-                    displayCount_2 = Number(trim_354),
-                    cphoneCreateGroupErrorElement_355 = document.getElementById(
+                    ).trim();
+            const displayCount_2 = Number(trim_354);
+            const cphoneCreateGroupErrorElement_355 = document.getElementById(
                         'cphone-create-group-error',
-                    ),
-                    cphoneCreateGroupSubmitElement = document.getElementById(
-                        'cphone-create-group-submit',
                     );
-                if (
-                    !selectedFriend_350 ||
-                    !title_2 ||
-                    title_2 !== trim_351 ||
-                    title_2.length > 40 ||
-                    !purpose_2 ||
-                    purpose_2.length > 2000 ||
-                    !trim_354 ||
-                    !Number.isInteger(displayCount_2) ||
-                    displayCount_2 < 1 ||
-                    displayCount_2 > 9999
-                )
-                    return (
-                        cphoneCreateGroupErrorElement_355 &&
-                            ((cphoneCreateGroupErrorElement_355.textContent =
-                                '请填写有效群名（不含 HTML 符号）、1–9999 的展示人数和用途'),
-                            (cphoneCreateGroupErrorElement_355.hidden = false)),
-                        false
-                    );
-                this.creatingGroup = true;
-                cphoneCreateGroupSubmitElement &&
-                    ((cphoneCreateGroupSubmitElement.disabled = true),
-                    (cphoneCreateGroupSubmitElement.textContent = '正在生成群聊…'));
+            if (
+                !selectedFriend_350 ||
+                !title_2 ||
+                title_2 !== trim_351 ||
+                title_2.length > 40 ||
+                !purpose_2 ||
+                purpose_2.length > 2000 ||
+                !trim_354 ||
+                !Number.isInteger(displayCount_2) ||
+                displayCount_2 < 1 ||
+                displayCount_2 > 9999
+            ) {
                 cphoneCreateGroupErrorElement_355 &&
-                    ((cphoneCreateGroupErrorElement_355.textContent = ''),
-                    (cphoneCreateGroupErrorElement_355.hidden = true));
-                try {
-                    const value_356_2 = await this.requestGroupGeneration(
+                    ((cphoneCreateGroupErrorElement_355.textContent =
+                        '请填写有效群名（不含 HTML 符号）、1–9999 的展示人数和用途'),
+                    (cphoneCreateGroupErrorElement_355.hidden = false));
+                return false;
+            }
+            const _value61 = {
+                kind: 'group',
+                ownerId: String(selectedFriend_350.id),
+                ownerName: value_6(selectedFriend_350),
+            };
+            this.creationJob = _value61;
+            this.creatingGroup = true;
+            this.creationNotice = '';
+            this.updateCreationStatus();
+            cphoneCreateGroupErrorElement_355 &&
+                ((cphoneCreateGroupErrorElement_355.textContent = ''),
+                (cphoneCreateGroupErrorElement_355.hidden = true));
+            try {
+                const value_356_2 = await this.requestGroupGeneration(
                             selectedFriend_350,
                             title_2,
                             purpose_2,
-                        ),
-                        id_2 = value_7('cphone-group'),
-                        groupGeneration = this.normalizeGroupGeneration(
+                        );
+                const id_2 = value_7('cphone-group');
+                const groupGeneration = this.normalizeGroupGeneration(
                             value_356_2,
                             selectedFriend_350,
                             id_2,
                         );
-                    if (
-                        !value_8(selectedFriend_350.id) ||
-                        this.selectedId !== String(selectedFriend_350.id)
-                    )
-                        throw new Error('当前 Char 已变化，请重试');
-                    const options_358 = {
+                if (!value_8(_value61.ownerId))
+                    throw new Error('发起生成的角色已被删除，结果未保存');
+                const options_358 = {
                         id: id_2,
                         title: title_2,
                         displayCount: displayCount_2,
@@ -2350,48 +2501,39 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                         createdAt: groupGeneration.createdAt,
                         updatedAt: value_9(groupGeneration.messages.at(-1)),
                     };
-                    await this.saveCphoneGroups(selectedFriend_350.id, (items_360) => {
-                        if (
-                            !value_8(selectedFriend_350.id) ||
-                            this.selectedId !== String(selectedFriend_350.id)
-                        )
-                            throw new Error('当前 Char 已变化，请重试');
-                        items_360.push(options_358);
+                await this.saveCphoneGroups(_value61.ownerId, (items_360) => {
+                    if (!value_8(_value61.ownerId))
+                        throw new Error('发起生成的角色已被删除，结果未保存');
+                    items_360.push(options_358);
+                });
+                this.creationNotice = _value61.ownerName + ' 的群聊“' + title_2 + '”已生成。';
+                window.showToast?.(this.creationNotice);
+                if (this.selectedId === _value61.ownerId) this.closeCreateGroup();
+                this.selectedId === _value61.ownerId &&
+                    this.smsView?.classList.contains('active') &&
+                    ((this.searchRows = null), this.refreshMessages());
+                return true;
+            } catch (value_362_2) {
+                const _value62 = value_362_2?.message || '群聊生成失败，请重试';
+                this.creationNotice = _value61.ownerName + ' 的群聊生成失败：' + _value62;
+                window.u2Api?.isRequestError?.(value_362_2) &&
+                    window.u2Api.reportError?.(value_362_2, {
+                        operation: '群聊生成',
                     });
-                    this.creatingGroup = false;
-                    this.closeCreateGroup();
-                    this.tab = 'threads';
-                    this.renderList();
-                    const result_359_2 = this.getThreadRows(this.getSelectedFriend()).find(
-                        (value_361) =>
-                            value_361.kind === 'cphoneGroup' &&
-                            value_361.groupId === String(options_358.id),
-                    );
-                    if (result_359_2) await this.openThread(result_359_2);
-                    return true;
-                } catch (value_362_2) {
-                    if (
-                        window.u2Api?.isRequestError?.(value_362_2) &&
-                        window.u2Api.reportError(value_362_2, {
-                            operation: '群聊生成',
-                        })
-                    ) {
-                        if (cphoneCreateGroupErrorElement_355)
-                            cphoneCreateGroupErrorElement_355.hidden = true;
-                    } else
-                        cphoneCreateGroupErrorElement_355 &&
-                            ((cphoneCreateGroupErrorElement_355.textContent =
-                                value_362_2?.message || '群聊生成失败，请重试'),
-                            (cphoneCreateGroupErrorElement_355.hidden = false));
-                    return false;
-                } finally {
-                    this.creatingGroup = false;
-                    cphoneCreateGroupSubmitElement &&
-                        ((cphoneCreateGroupSubmitElement.disabled = false),
-                        (cphoneCreateGroupSubmitElement.textContent = '生成 10 轮群聊'));
-                }
-            },
-            progressKey(value_363_2) {
+                !document.getElementById('cphone-create-group-sheet')?.hidden &&
+                    this.selectedId === _value61.ownerId &&
+                    cphoneCreateGroupErrorElement_355 &&
+                    ((cphoneCreateGroupErrorElement_355.textContent = _value62),
+                    (cphoneCreateGroupErrorElement_355.hidden = false));
+                window.showToast?.(this.creationNotice);
+                return false;
+            } finally {
+                this.creatingGroup = false;
+                if (this.creationJob === _value61) this.creationJob = null;
+                this.updateCreationStatus();
+            }
+        },
+        progressKey(value_363_2) {
                 return (
                     (value_363_2?.kind || '') +
                     ':' +
@@ -2402,7 +2544,7 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                         '')
                 );
             },
-            progressMarker(value_323) {
+        progressMarker(value_323) {
                 const value_365_2 = Array.isArray(value_323) ? value_323 : [],
                     at_366 = value_365_2.at(-1);
                 return (
@@ -2415,7 +2557,7 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                     this.messageText(at_366)
                 );
             },
-            openProgress() {
+        openProgress() {
                 const activeThread_367 = this.activeThread;
                 if (
                     this.progressing ||
@@ -2438,14 +2580,14 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                 cphoneProgressSheetElement.hidden = false;
                 cphoneProgressRoundsElement?.focus();
             },
-            closeProgress(value_368 = false) {
+        closeProgress(value_368 = false) {
                 if (this.progressing && !value_368) return;
                 const cphoneProgressSheetElement_330 =
                     document.getElementById('cphone-progress-sheet');
                 this.blurActiveWithin(cphoneProgressSheetElement_330);
                 if (cphoneProgressSheetElement_330) cphoneProgressSheetElement_330.hidden = true;
             },
-            getProgressCharacters(value_370, value_371_2, value_372_2, value_373_2) {
+        getProgressCharacters(value_370, value_371_2, value_372_2, value_373_2) {
                 const items_374 = [value_370];
                 if (value_371_2.kind === 'cphoneGroup')
                     (value_372_2.members || []).forEach((value_375) => {
@@ -2466,7 +2608,7 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                     ).values(),
                 ];
             },
-            getCharUserMemory(value_378) {
+        getCharUserMemory(value_378) {
                 return (Array.isArray(value_378.messages) ? value_378.messages : [])
                     .filter(
                         (message_379) =>
@@ -2482,7 +2624,7 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                         translation: String(message_380.translation || '').slice(0, 1000),
                     }));
             },
-            getProgressWorldBooks(items_335, value_382, value_383_2) {
+        getProgressWorldBooks(items_335, value_382, value_383_2) {
                 const items_384 = ['system_depth', 'before_role', 'after_role'];
                 return items_384
                     .map((value_385_2) => {
@@ -2541,23 +2683,23 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
 
 `);
             },
-            buildProgressPrompt(
-                value_390_2,
-                contact_391,
-                value_392_2,
-                contact_393,
-                value_354,
-                value_395,
-                value_396,
-                items_397 = [value_390_2],
-            ) {
-                const value_398 = new Map(
+        buildProgressPrompt(
+            value_390_2,
+            contact_391,
+            value_392_2,
+            contact_393,
+            value_354,
+            value_395,
+            value_396,
+            items_397 = [value_390_2],
+        ) {
+            const value_398 = new Map(
                         items_397.map((value_404) => [
                             String(value_404.id),
                             this.getCharUserMemory(value_404),
                         ]),
-                    ),
-                    map_399 = (Array.isArray(value_396) ? value_396 : [])
+                    );
+            const map_399 = (Array.isArray(value_396) ? value_396 : [])
                         .slice(-20)
                         .map((message_405) => ({
                             speaker:
@@ -2570,94 +2712,93 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                                       : 'account',
                             text: this.messageText(message_405).slice(0, 2000),
                             translation: String(message_405.translation || '').slice(0, 1000),
-                        })),
-                    join_400 = [
+                        }));
+            const join_400 = [
                         value_395,
                         contact_391.title,
                         value_392_2?.purpose,
                         ...map_399.map((value_406) => value_406.text),
                     ].filter(Boolean).join(`
-`),
-                    progressWorldBooks = this.getProgressWorldBooks(items_397, join_400, value_398),
-                    map_401 = items_397.map((contact_407) => ({
+`);
+            const progressWorldBooks = this.getProgressWorldBooks(items_397, join_400, value_398);
+            const map_401 = items_397.map((contact_407) => ({
                         id: String(contact_407.id),
                         name: value_6(contact_407),
                         persona: String(
                             contact_407.persona || contact_407.signature || '未设置',
                         ).slice(0, 5000),
-                    })),
-                    map_402 = items_397.map((value_408) => ({
+                    }));
+            const map_402 = items_397.map((value_408) => ({
                         charId: String(value_408.id),
                         charName: value_6(value_408),
                         userChat: value_398.get(String(value_408.id)),
-                    })),
-                    value_362 =
-                        '你要续写 ' +
-                        value_6(value_390_2) +
-                        ' 手机里的真实聊天。只返回严格合法 JSON，不要说明或 Markdown。准确生成 ' +
-                        value_354 +
-                        ' 轮。聊天方向：' +
-                        (value_395 || '自行选择自然的发展方向') +
-                        `。
-参与的 Char 人设：` +
-                        JSON.stringify(map_401) +
-                        `。
-以下每位 Char 与 User 的最近 20 条私聊、以及其绑定世界书，分别只属于标注的 Char 的私人记忆；其他角色默认不知道内容，除非该 Char 在当前会话中自然透露。不得让 User 参与当前会话或代 User 发言。
-各 Char 私人记忆：` +
-                        JSON.stringify(map_402) +
-                        `
-世界书：` +
-                        (progressWorldBooks || '无') +
-                        `
-当前会话最近消息：` +
-                        JSON.stringify(map_399) +
-                        `
-非中文消息请提供自然中文 translation；中文消息的 translation 留空。每条消息 text 不超过 1000 字。`;
-                if (contact_391.kind === 'cphoneGroup') {
-                    const map_409 = (value_392_2.members || []).map((contact_410, value_411) => ({
+                    }));
+            const _value63 = this.getUserIdentity(value_390_2).persona || '普通用户';
+            const value_362 =
+                '你要续写 ' +
+                value_6(value_390_2) +
+                ' 手机里的真实聊天。只返回严格合法 JSON，不要说明或 Markdown。准确生成 ' +
+                value_354 +
+                ' 轮。聊天方向：' +
+                (value_395 || '自行选择自然的发展方向') +
+                '。\n参与的 Char 人设：' +
+                JSON.stringify(map_401) +
+                '。\n当前手机 Char 绑定的 User 人设（仅 ' +
+                value_6(value_390_2) +
+                ' 可知，其他成员默认不知道）：' +
+                _value63 +
+                '。\n以下每位 Char 与 User 的最近 20 条私聊、以及其绑定世界书，分别只属于标注的 Char 的私人记忆；其他角色默认不知道内容，除非该 Char 在当前会话中自然透露。不得让 User 参与当前会话或代 User 发言。\n各 Char 私人记忆：' +
+                JSON.stringify(map_402) +
+                '\n世界书：' +
+                (progressWorldBooks || '无') +
+                '\n当前会话最近消息：' +
+                JSON.stringify(map_399) +
+                '\n非中文消息请提供自然中文 translation；中文消息的 translation 留空。每条消息 text 不超过 1000 字。';
+            if (contact_391.kind === 'cphoneGroup') {
+                const map_409 = (value_392_2.members || []).map((contact_410, value_411) => ({
                         slot: 'm' + (value_411 + 1),
                         id: contact_410.id,
                         name: contact_410.nickname,
                         persona: contact_410.persona || '',
                     }));
-                    return (
-                        value_362 +
-                        `
-群名：` +
-                        value_392_2.title +
-                        '。群聊用途（只供 AI 参考，不写入消息）：' +
-                        (value_392_2.purpose || '未设置') +
-                        '。成员：' +
-                        JSON.stringify([
-                            {
-                                slot: 'char',
-                                id: value_390_2.id,
-                                name: value_6(value_390_2),
-                            },
-                            ...map_409,
-                        ]) +
-                        `。沿用这些成员，不得新增成员。每轮 2 到 5 条消息，至少两位不同成员发言，整批至少包含一次 Char 发言。
-格式：{"rounds":[[{"speaker":"char","text":"原文","translation":""},{"speaker":"m1","text":"原文","translation":""}]]}。speaker 只能为 char 或列出的 m 序号，rounds 必须恰好 ` +
-                        value_354 +
-                        ' 项。'
-                    );
-                }
                 return (
                     value_362 +
                     `
-联系人：` +
-                    JSON.stringify({
-                        name: contact_391.title,
-                        relationship: contact_391.relationship || contact_393?.relationship || '',
-                        persona: contact_391.persona || contact_393?.persona || '',
-                    }) +
-                    `。每轮 2 到 5 条消息，Char 与联系人双方都必须发言，顺序自然。
-格式：{"rounds":[[{"speaker":"char","text":"原文","translation":""},{"speaker":"account","text":"原文","translation":""}]]}。speaker 只能为 char 或 account，rounds 必须恰好 ` +
+群名：` +
+                    value_392_2.title +
+                    '。群聊用途（只供 AI 参考，不写入消息）：' +
+                    (value_392_2.purpose || '未设置') +
+                    '。成员：' +
+                    JSON.stringify([
+                        {
+                            slot: 'char',
+                            id: value_390_2.id,
+                            name: value_6(value_390_2),
+                        },
+                        ...map_409,
+                    ]) +
+                    `。沿用这些成员，不得新增成员。每轮 2 到 5 条消息，至少两位不同成员发言，整批至少包含一次 Char 发言。
+格式：{"rounds":[[{"speaker":"char","text":"原文","translation":""},{"speaker":"m1","text":"原文","translation":""}]]}。speaker 只能为 char 或列出的 m 序号，rounds 必须恰好 ` +
                     value_354 +
                     ' 项。'
                 );
-            },
-            normalizeProgressRounds(value_412_2, value_413, value_414_2, value_415) {
+            }
+            return (
+                value_362 +
+                `
+联系人：` +
+                JSON.stringify({
+                    name: contact_391.title,
+                    relationship: contact_391.relationship || contact_393?.relationship || '',
+                    persona: contact_391.persona || contact_393?.persona || '',
+                }) +
+                `。每轮 2 到 5 条消息，Char 与联系人双方都必须发言，顺序自然。
+格式：{"rounds":[[{"speaker":"char","text":"原文","translation":""},{"speaker":"account","text":"原文","translation":""}]]}。speaker 只能为 char 或 account，rounds 必须恰好 ` +
+                value_354 +
+                ' 项。'
+            );
+        },
+        normalizeProgressRounds(value_412_2, value_413, value_414_2, value_415) {
                 if (!Array.isArray(value_412_2?.rounds) || value_412_2.rounds.length !== value_415)
                     throw new Error('AI 未生成准确 ' + value_415 + ' 轮聊天，请重试');
                 const value_416 =
@@ -2707,7 +2848,7 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                 if (!enabled_417) throw new Error('生成内容缺少 Char 发言，请重试');
                 return map_419.flat();
             },
-            materializeProgress(items_430, value_371, value_432, value_433, value_434) {
+        materializeProgress(items_430, value_371, value_432, value_433, value_434) {
                 const value_435 = Array.isArray(value_371) ? value_371 : [],
                     reduce_436 = value_435.reduce(
                         (value_438, value_439) => Math.max(value_438, Number(value_439.round) || 0),
@@ -2744,7 +2885,7 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                     };
                 });
             },
-            appendLinkedProgress(value_444, value_445, contact_446, items_447, value_448 = false) {
+        appendLinkedProgress(value_444, value_445, contact_446, items_447, value_448 = false) {
                 value_444.linkedAccountChats = window.imApp?.normalizeLinkedAccountChats
                     ? window.imApp.normalizeLinkedAccountChats(value_444.linkedAccountChats)
                     : Array.isArray(value_444.linkedAccountChats)
@@ -2796,7 +2937,7 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                     result_450.id
                 );
             },
-            async saveLinkedProgress(value_455, value_456, value_457, value_458, value_459 = '') {
+        async saveLinkedProgress(value_455, value_456, value_457, value_458, value_459 = '') {
                 const result_460 = this.getLinkedChats(value_455).find(
                         (value_465) => String(value_465.id) === String(value_456.chatId),
                     ),
@@ -2935,7 +3076,7 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                     true
                 );
             },
-            async clearThread() {
+        async clearThread() {
                 if (this.clearing || this.progressing || !this.activeThread) return false;
                 const selectedFriend_484 = this.getSelectedFriend(),
                     options_485 = {
@@ -3087,7 +3228,7 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                         cphoneClearChatElement_490.disabled = !this.currentMessages().length;
                 }
             },
-            async progressThread() {
+        async progressThread() {
                 if (this.progressing || this.clearing || !this.activeThread) return false;
                 const selectedFriend_510 = this.getSelectedFriend(),
                     options_511 = {
@@ -3269,7 +3410,7 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                         (cphoneProgressSubmitElement.textContent = '生成聊天'));
                 }
             },
-        };
+    };
     window.cphoneApp = cphoneApp_3;
     (
         window.u2OnStorageReady ||

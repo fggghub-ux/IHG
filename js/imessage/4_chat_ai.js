@@ -1380,8 +1380,42 @@ Requirements for this turn:
             const options_1420 = {};
             options_1420.source = 'send';
             void window.u2OfficialAccounts.generate(liveFriend_3, container_3, options_1420);
-        }
+        } else maybeAutoReplyAfterUserMessage(liveFriend_3, container_3, msgObj);
         return true;
+    }
+    function maybeAutoReplyAfterUserMessage(friend, container, message) {
+        const live = getLiveFriendById(friend?.id) || friend;
+        if (
+            live?.type !== 'char' ||
+            live.autoReplyEnabled !== true ||
+            message?.role !== 'user' ||
+            message.excludedFromContext === true ||
+            message.deliveryStatus === 'blocked' ||
+            live.blockState?.charBlocksUser === true ||
+            typeof window.imChat.handleAiReply !== 'function'
+        )
+            return false;
+        void window.imChat
+            .handleAiReply(live, container, null, { source: 'auto_reply' })
+            .catch((error) => console.error('[iMessage] auto reply failed', error));
+        return true;
+    }
+    window.imChat.maybeAutoReplyAfterUserMessage = maybeAutoReplyAfterUserMessage;
+    function normalizeCharShopGift(raw) {
+        const itemName = typeof raw?.itemName === 'string' ? raw.itemName.trim() : '';
+        const price = Number(raw?.price);
+        const note = String(raw?.note || raw?.description || '').trim();
+        if (
+            !itemName ||
+            itemName.length > 80 ||
+            /[\u0000-\u001f\u007f]/.test(itemName) ||
+            !Number.isFinite(price) ||
+            price <= 0 ||
+            Math.abs(Math.round(price * 100) - price * 100) > 1e-6 ||
+            note.length > 180
+        )
+            return null;
+        return { kind: 'shop_gift', itemName, price, note };
     }
     function extractTaggedBlock_2(value_1508, value_1422) {
         if (
@@ -1790,6 +1824,7 @@ Char's independent gallery: avatar selection.
                           }
                         : null;
                 }
+                if (value_1579 === 'shop_gift') return normalizeCharShopGift(value_1578);
                 if (value_1579 === 'offline_invite') return handleAction_79(value_1578);
                 if (value_1579 === 'music_control') {
                     const action_2 =
@@ -1990,9 +2025,14 @@ Char's independent gallery: avatar selection.
             value_1591.some(
                 (value_1559_2) =>
                     value_1559_2 &&
-                    !['music_control', 'recall', 'call', 'contact_card', 'offline_invite'].includes(
-                        String(value_1559_2.kind || 'text'),
-                    ),
+                    ![
+                        'music_control',
+                        'recall',
+                        'call',
+                        'contact_card',
+                        'offline_invite',
+                        'shop_gift',
+                    ].includes(String(value_1559_2.kind || 'text')),
             )
         );
     }
@@ -5923,7 +5963,10 @@ Inside the tag, output only a JSON array shaped like [{"memberId":"exact member 
             isConversationEpochCurrent = () =>
                 getConversationEpoch(friendId_7) === conversationEpoch,
             isConversationCurrent = () =>
-                isConversationEpochCurrent() && !requestController.signal.aborted,
+                isConversationEpochCurrent() &&
+                !requestController.signal.aborted &&
+                (!['auto_reply', 'autonomous'].includes(options_7.source) ||
+                    getLiveFriendById(friendId_7)?.type === 'char'),
             value_2437 = () => {
                 if (row_3?.parentNode) row_3.remove();
                 row_3 = null;
@@ -8750,7 +8793,7 @@ Reply naturally as your character in a chat app.
                         `
 ` +
                         (friend_31.type === 'char'
-                            ? '5g. Offline invitation card: {"type":"offline_invite","title":"short title","message":"invitation in your voice","place":"optional place or empty string"}. title is at most 40 characters, message at most 200, place at most 80. At most one per turn; it does not count as a normal bubble, and a normal response is still required.'
+                            ? '5g. Offline invitation card: {"type":"offline_invite","title":"short title","message":"invitation in your voice","place":"optional place or empty string"}. title is at most 40 characters, message at most 200, place at most 80. At most one per turn; it does not count as a normal bubble, and a normal response is still required.\n5h. You may give User a gift when it naturally fits your Profile, relationship, and conversation. Output at most one {"type":"shop_gift","itemName":"specific item","price":88.88,"note":"a short in-character personal gift note"}. itemName is at most 80 characters, note is required and at most 180 characters. Price must be positive with no more than two decimal places. Include an ordinary chat reply too. This simulated gift creates no Shop order and debits no Pay balance. Do not send a payment action for the gift or give one mechanically.'
                             : '') +
                         `
 6. Payment object: {"type":"payment","paymentAction":"receive|reject|transfer|pay_for_friend","amount":88.88,"description":"reason or product name"}.
@@ -10056,6 +10099,7 @@ Before output, internally verify paired tags, complete arrays and objects, doubl
                                   }
                                 : null;
                         }
+                        if (value_3364 === 'shop_gift') return normalizeCharShopGift(currentItem_3);
                         if (value_3364 === 'offline_invite') return handleAction_79(currentItem_3);
                         if (value_3364 === 'music_control') {
                             const action_3 =
@@ -10395,6 +10439,26 @@ Before output, internally verify paired tags, complete arrays and objects, doubl
                 (queueItems = queueItems.filter(
                     (value_3391) => value_3391?.kind !== 'offline_invite',
                 ));
+            let hasCharGift = false;
+            queueItems = queueItems.filter((item) => {
+                if (item?.kind !== 'shop_gift') return true;
+                if (
+                    friend_31.type !== 'char' ||
+                    hasCharGift ||
+                    !some_2904 ||
+                    (options_7.userPhoneAuto === true && value_2434_2?.send === false)
+                )
+                    return false;
+                hasCharGift = true;
+                if (!item.note)
+                    item.note = String(
+                        queueItems.find((reply) => reply?.kind === 'text' && reply.text)?.text ||
+                            '',
+                    )
+                        .trim()
+                        .slice(0, 180);
+                return true;
+            });
             if (friend_31.type !== 'group' && !reason_7 && nextProfilePanel_2?.memoryRequest) {
                 const options_3372 = {};
                 options_3372.kind = 'memory_request';
@@ -10906,6 +10970,68 @@ Before output, internally verify paired tags, complete arrays and objects, doubl
                                 '[一起听] ' + value_3476_2.title + ' - ' + value_3476_2.artist,
                             );
                     return (qIndex++, true);
+                }
+                if (currentItem_4.kind === 'shop_gift') {
+                    const live = getLiveFriendById(friend_31.id);
+                    if (!live || live.type !== 'char') {
+                        qIndex++;
+                        return true;
+                    }
+                    if (
+                        (live.messages || []).some(
+                            (message) =>
+                                message.type === 'gift' &&
+                                message.role === 'assistant' &&
+                                message.apiRunId === apiRunId_4,
+                        )
+                    ) {
+                        qIndex++;
+                        return true;
+                    }
+                    const timestamp = Date.now();
+                    const gift = {
+                        id: window.imChat.createMessageId('char-gift'),
+                        role: 'assistant',
+                        type: 'gift',
+                        content: '[Gift] ' + currentItem_4.itemName,
+                        text: '[Gift] ' + currentItem_4.itemName,
+                        giftName: currentItem_4.itemName,
+                        giftValue: currentItem_4.price,
+                        giftDescription: currentItem_4.note,
+                        giftStatus: 'received',
+                        timestamp,
+                        apiRunId: apiRunId_4,
+                        shopGift: {
+                            itemName: currentItem_4.itemName,
+                            price: currentItem_4.price,
+                            senderRole: 'assistant',
+                            senderName: live.nickname || live.realName || 'Char',
+                            note: currentItem_4.note,
+                        },
+                    };
+                    handleAction_2861(gift);
+                    const saved = await window.imApp.appendFriendMessage(live.id, gift, {
+                        silent: true,
+                    });
+                    if (!saved) {
+                        window.showToast?.('礼物保存失败');
+                        return false;
+                    }
+                    const container = getSafeContainer();
+                    if (
+                        String(window.imData.currentActiveFriend?.id) === String(live.id) &&
+                        container
+                    )
+                        handleAction_2862(
+                            gift,
+                            getLiveFriendById(live.id) || live,
+                            container,
+                            timestamp,
+                        );
+                    else if (!window.imApp.isChatConversationOpen?.())
+                        window.showBannerNotification?.(live, '[礼物] ' + currentItem_4.itemName);
+                    qIndex++;
+                    return true;
                 }
                 if (currentItem_4.kind === 'offline_invite') {
                     const value_3484 = getLiveFriendById(friend_31.id) || friend_31;

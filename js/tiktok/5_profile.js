@@ -92,7 +92,11 @@
         return tkState.settings.boundWorldBookIds;
     }
     function tkProfileBoundWorldBookLabel() {
-        const ids = new Set(tkProfileGetBoundWorldBookIds().map((id_2) => String(id_2)));
+        const ids = new Set(
+            (window.getVisibleWorldBookMountIds?.(tkProfileGetBoundWorldBookIds()) || []).map(
+                String,
+            ),
+        );
         if (!ids.size) return '未挂载';
         const books = typeof window.getWorldBooks === 'function' ? window.getWorldBooks() : [],
             names = (Array.isArray(books) ? books : [])

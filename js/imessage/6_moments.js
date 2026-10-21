@@ -4178,26 +4178,35 @@ Do not output markdown, tagged lines, explanations, or chain-of-thought.`,
     }
     async function generateAndPublishMoment_2(latestMoment_11, value_826 = {}) {
         const normalizedOptions_2 =
-                typeof value_826 === 'boolean'
-                    ? {
-                          silent: value_826,
-                      }
-                    : value_826,
-            silent_2 = normalizedOptions_2.silent === true,
-            currentApiConfig_2 = getCurrentMomentApiConfig();
-        if (!currentApiConfig_2.endpoint || !currentApiConfig_2.apiKey) {
+            typeof value_826 === 'boolean'
+                ? {
+                      silent: value_826,
+                  }
+                : value_826;
+        const silent_2 = normalizedOptions_2.silent === true;
+        const currentApiConfig_2 =
+            normalizedOptions_2.source === 'autonomous' ? String(latestMoment_11?.id ?? '') : '';
+        const _value8 = () =>
+            !currentApiConfig_2 ||
+            (window.imData.friends || []).some(
+                (_value0) => String(_value0.id) === currentApiConfig_2 && _value0.type === 'char',
+            );
+        if (!_value8()) return false;
+        const _value9 = getCurrentMomentApiConfig();
+        if (!_value9.endpoint || !_value9.apiKey) {
             if (!silent_2) showToast_2('请先配置 API');
             return false;
         }
         if (!silent_2) showToast_2('正在编写朋友圈内容...');
         try {
             const aiResponse_7 = await generateAutoCommentForMoment_2(
-                    latestMoment_11,
-                    normalizedOptions_2,
-                ),
-                value_831 = await commitMomentsChange(aiResponse_7.id, () => {
-                    window.imData.moments.unshift(aiResponse_7);
-                });
+                latestMoment_11,
+                normalizedOptions_2,
+            );
+            if (!_value8()) return false;
+            const value_831 = await commitMomentsChange(aiResponse_7.id, () => {
+                window.imData.moments.unshift(aiResponse_7);
+            });
             if (!value_831) return false;
             const list_3 = document.getElementById('moments-list');
             if (list_3 && momentsContent?.classList.contains('active')) {

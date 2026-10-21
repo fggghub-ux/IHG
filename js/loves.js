@@ -4219,21 +4219,21 @@ Char 已存：` +
         if (String(this.currentFriend?.id || '') === String(friend_17.id))
             this.renderRelationshipState(friend_17);
     },
-    getWeiboRandomAvatar: function (friend_18) {
-        const seed = encodeURIComponent(String(friend_18?.id || friend_18?.nickname || Date.now()));
-        return 'https://picsum.photos/seed/weibo_alt_' + seed + '/160/160';
+    getWeiboRandomAvatar: function (_value5) {
+        const _value6 = encodeURIComponent('weibo_alt_' + (_value5?.id || 'friend'));
+        return 'https://picsum.photos/seed/' + _value6 + '/160/160';
     },
-    getWeiboRandomImage: function (value_579, value_580 = 0, value_581 = 'main') {
-        const encodeURIComponent_582 = encodeURIComponent(
-            (value_579?.id || value_579?.nickname || 'friend') + '_' + value_581 + '_' + value_580,
+    getWeiboRandomImage: function (_value, _value2 = 'main', _value3 = 0) {
+        const _value4 = encodeURIComponent(
+            'weibo_' + (_value?.id || 'friend') + '_' + _value2 + '_' + _value3,
         );
-        return 'https://picsum.photos/seed/weibo_photo_' + encodeURIComponent_582 + '/600/600';
+        return 'https://picsum.photos/seed/' + _value4 + '/400/400';
     },
-    getWeiboRandomCover: function (value_583, value_584 = 'main') {
-        const encodeURIComponent_585 = encodeURIComponent(
-            (value_583?.id || value_583?.nickname || 'friend') + '_' + value_584,
+    getWeiboRandomCover: function (_value7, _value8 = 'main') {
+        const _value9 = encodeURIComponent(
+            'weibo_cover_' + (_value7?.id || 'friend') + '_' + _value8,
         );
-        return 'https://picsum.photos/seed/weibo_cover_' + encodeURIComponent_585 + '/800/300';
+        return 'https://picsum.photos/seed/' + _value9 + '/800/240';
     },
     normalizeWeiboPost: function (value_586, value_587 = 0, value_588 = false) {
         const message_589 = value_586 && typeof value_586 === 'object' ? value_586 : {},
@@ -4280,7 +4280,7 @@ Char 已存：` +
                 message_598.url ||
                 message_598.image ||
                 message_598.imageUrl ||
-                this.getWeiboRandomImage(friend_19, index_4, account_2),
+                this.getWeiboRandomImage(friend_19, account_2, index_4),
             description: message_598.description || message_598.desc || message_598.content || '',
         };
     },
@@ -4760,32 +4760,29 @@ Char 已存：` +
     renderFriendWeibo: function (friend_26) {
         const weiboView = document.getElementById('friend-weibo-view');
         if (!weiboView) return;
-        const hasGeneratedWeiboData = !!(
-                friend_26?.weiboData && typeof friend_26.weiboData === 'object'
-            ),
-            allData = this.getFriendWeiboData(friend_26);
+        const allData = this.getFriendWeiboData(friend_26);
         if (this.currentWeiboAccount === 'alt' && !allData.altAccount)
             this.currentWeiboAccount = 'main';
-        const accountKey = this.currentWeiboAccount === 'alt' ? 'altAccount' : 'mainAccount',
-            accountData = allData[accountKey] || allData.mainAccount,
-            profileName = document.getElementById('friend-weibo-profile-name'),
-            signatureEl = document.getElementById('friend-weibo-profile-signature'),
-            postCountEl = document.getElementById('friend-weibo-post-count'),
-            switchBtn = document.getElementById('friend-weibo-switch-account-btn'),
-            coverEl = document.getElementById('friend-weibo-cover');
+        const accountKey = this.currentWeiboAccount === 'alt' ? 'altAccount' : 'mainAccount';
+        const accountData = allData[accountKey] || allData.mainAccount;
+        const profileName = document.getElementById('friend-weibo-profile-name');
+        const signatureEl = document.getElementById('friend-weibo-profile-signature');
+        const postCountEl = document.getElementById('friend-weibo-post-count');
+        const switchBtn = document.getElementById('friend-weibo-switch-account-btn');
+        const coverEl = document.getElementById('friend-weibo-cover');
         if (profileName) profileName.textContent = accountData.name || '微博用户';
         if (signatureEl) signatureEl.textContent = accountData.signature || '';
         if (postCountEl) postCountEl.textContent = String((accountData.posts || []).length);
         if (switchBtn)
             switchBtn.textContent = this.currentWeiboAccount === 'alt' ? '切换大号' : '切换账号';
         if (coverEl) {
-            const coverUrl = hasGeneratedWeiboData
-                ? this.getWeiboRandomCover(friend_26, this.currentWeiboAccount)
-                : '';
+            const coverUrl =
+                accountData.coverUrl ||
+                this.getWeiboRandomCover(friend_26, this.currentWeiboAccount);
             coverEl.style.backgroundImage = coverUrl
-                ? 'linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.34)), url("' +
-                  coverUrl +
-                  '")'
+                ? 'linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.34)), url(' +
+                  JSON.stringify(coverUrl) +
+                  ')'
                 : 'none';
             coverEl.style.backgroundSize = 'cover';
             coverEl.style.backgroundPosition = 'center';
@@ -4799,78 +4796,75 @@ Char 已存：` +
         weiboView.querySelectorAll('.friend-weibo-avatar-icon').forEach((icon_2) => {
             icon_2.style.display = accountData.avatarUrl ? 'none' : 'inline-block';
         });
-        const homeList = document.getElementById('friend-weibo-home-list'),
-            albumGrid = document.getElementById('friend-weibo-album-grid'),
-            likedList = document.getElementById('friend-weibo-liked-list'),
-            albumImages = accountData.album || [];
-        if (homeList) {
-            const posts_4 = accountData.posts || [];
-            homeList.innerHTML = posts_4.length
+        const homeList = document.getElementById('friend-weibo-home-list');
+        const albumGrid = document.getElementById('friend-weibo-album-grid');
+        const likedList = document.getElementById('friend-weibo-liked-list');
+        const albumImages = accountData.album || [];
+        const posts_4 = accountData.posts || [];
+        const _value17 = this.distributeWeiboAlbum(posts_4, albumImages);
+        homeList &&
+            ((homeList.innerHTML = posts_4.length
                 ? posts_4
                       .map((post_6, index_8) => {
-                          const previewImages = index_8 === 0 ? albumImages.slice(0, 3) : [];
                           return this.renderWeiboPostCard(post_6, accountData, {
                               type: 'home',
                               index: index_8,
-                              images: previewImages,
+                              images: _value17[index_8],
                           });
                       })
                       .join('')
-                : '<div style="padding: 38px 16px; text-align: center; color: #999; font-size: 14px;">暂无微博<br><span style="font-size: 12px; display: inline-block; margin-top: 6px;">请在设置中生成</span></div>';
-            homeList.querySelectorAll('.friend-weibo-post-card').forEach((card) => {
-                card.addEventListener('click', () => {
-                    const index_9 = Number(card.getAttribute('data-index') || 0);
-                    this.showWeiboPostDetail(posts_4[index_9], accountData, {
-                        images: index_9 === 0 ? albumImages.slice(0, 3) : [],
+                : '<div style="padding: 38px 16px; text-align: center; color: #999; font-size: 14px;">暂无微博<br><span style="font-size: 12px; display: inline-block; margin-top: 6px;">请在设置中生成</span></div>'),
+            (homeList.onclick = (_value18) => {
+                const _value19 = _value18.target.closest?.('.friend-weibo-post-card');
+                if (!_value19) return;
+                const _value20 = Number(_value19.dataset.index);
+                if (posts_4[_value20])
+                    this.showWeiboPostDetail(posts_4[_value20], accountData, {
+                        images: _value17[_value20],
                     });
-                });
-            });
-        }
+            }));
         albumGrid &&
             ((albumGrid.innerHTML = albumImages.length
                 ? albumImages
                       .map(
-                          (value_347, value_348) =>
-                              `
-                <div class="friend-weibo-album-item" data-index="` +
-                              value_348 +
-                              `" style="aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: #f2f2f2; cursor: pointer; position: relative;">
-                    <img src="` +
-                              this.escapeHTML(value_347.url) +
-                              `" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-            `,
+                          (_value21, _value22) =>
+                              '\n                <div class="friend-weibo-album-item" data-index="' +
+                              _value22 +
+                              '" style="aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: #f2f2f2; cursor: pointer; position: relative;">\n                    ' +
+                              this.renderWeiboPhotoImage(_value21) +
+                              '\n                </div>\n            ',
                       )
                       .join('')
                 : '<div style="grid-column: span 3; padding: 38px 0; text-align: center; color: #999; font-size: 14px;">暂无相册</div>'),
-            albumGrid.querySelectorAll('.friend-weibo-album-item').forEach((itemEl) => {
-                itemEl.addEventListener('click', () => {
-                    const index_10 = Number(itemEl.getAttribute('data-index') || 0);
-                    this.showWeiboImageDetail(albumImages[index_10]);
-                });
+            (albumGrid.onclick = (_value23) => {
+                const _value24 = _value23.target.closest?.('.friend-weibo-album-item');
+                if (!_value24) return;
+                const _value25 = albumImages[Number(_value24.dataset.index)];
+                if (_value25) this.showWeiboImageDetail(_value25);
             }));
         if (likedList) {
-            const likedPosts = accountData.liked || [];
-            likedList.innerHTML = likedPosts.length
-                ? likedPosts
-                      .map((post_7, index_11) => {
-                          return this.renderWeiboPostCard(post_7, accountData, {
+            const _value26 = accountData.liked || [];
+            likedList.innerHTML = _value26.length
+                ? _value26
+                      .map((value_347, value_348) => {
+                          return this.renderWeiboPostCard(value_347, accountData, {
                               type: 'liked',
-                              index: index_11,
+                              index: value_348,
                               likedLabel: true,
-                              authorName: post_7.author || '微博用户',
+                              authorName: value_347.author || '微博用户',
                           });
                       })
                       .join('')
                 : '<div style="padding: 38px 16px; text-align: center; color: #999; font-size: 14px;">暂无赞过</div>';
-            likedList.querySelectorAll('.friend-weibo-post-card').forEach((card_2) => {
-                card_2.addEventListener('click', () => {
-                    const index_12 = Number(card_2.getAttribute('data-index') || 0);
-                    this.showWeiboPostDetail(likedPosts[index_12], accountData, {
-                        authorName: likedPosts[index_12]?.author || '微博用户',
+            likedList.onclick = (itemEl) => {
+                const _value27 = itemEl.target.closest?.('.friend-weibo-post-card');
+                if (!_value27) return;
+                const index_10 = Number(_value27.dataset.index);
+                if (_value26[index_10])
+                    this.showWeiboPostDetail(_value26[index_10], accountData, {
+                        authorName: _value26[index_10].author || '微博用户',
                     });
-                });
-            });
+            };
         }
     },
     enterLovesSpace: function (value_706) {
@@ -5897,7 +5891,7 @@ Char 已存：` +
                             weiboPostSplit.secondary +
                             ' 条主页帖子和 ' +
                             weiboPhotoSplit.secondary +
-                            ' 张相册照片。每条主页帖子尽量生成 2-5 条自然评论；大号和小号的赞过列表各保持 3 条。大号像可被熟人看到的公开主页，小号则贴近隐藏身份，可以写关于 User 的情绪、珍视的记忆、关系思考或只有小号才敢保存的瞬间，但不要让所有内容围绕 User，也不要让小号只有负面情绪。所有帖子必须在主题、篇幅、语气、叙事视角和互动氛围上有真实差异，禁止套用固定开头、固定剧情、编号化文案、同义改写和重复句式；照片描述也要覆盖不同主体、场景、构图、光线和拍摄质感。小号头像 avatarUrl 可以留空，由系统随机补图。',
+                            ' 张相册照片。每条主页帖子尽量生成 2-5 条自然评论；大号和小号的赞过列表各保持 3 条。大号像可被熟人看到的公开主页，小号则贴近隐藏身份，可以写关于 User 的情绪、珍视的记忆、关系思考或只有小号才敢保存的瞬间，但不要让所有内容围绕 User，也不要让小号只有负面情绪。所有帖子必须在主题、篇幅、语气、叙事视角和互动氛围上有真实差异，禁止套用固定开头、固定剧情、编号化文案、同义改写和重复句式；照片描述也要覆盖不同主体、场景、构图、光线和拍摄质感。小号头像 avatarUrl 留空，由系统补充外部图片链接。',
                     },
                     requirements_2 = {
                         safari: `"safari": {
@@ -6255,23 +6249,11 @@ Char 已存：` +
                                                 0,
                                                 postLimit,
                                             )),
-                                            (normalized_2.album = normalized_2.album
-                                                .slice(0, photoLimit)
-                                                .map((item_18, index_13) => ({
-                                                    ...item_18,
-                                                    url:
-                                                        item_18.url ||
-                                                        this.getWeiboRandomImage(
-                                                            friend_28,
-                                                            index_13,
-                                                            isAltAccount ? 'alt' : 'main',
-                                                        ),
-                                                }))),
+                                            (normalized_2.album = normalized_2.album.slice(
+                                                0,
+                                                photoLimit,
+                                            )),
                                             (normalized_2.liked = normalized_2.liked.slice(0, 3)),
-                                            isAltAccount &&
-                                                !normalized_2.avatarUrl &&
-                                                (normalized_2.avatarUrl =
-                                                    this.getWeiboRandomAvatar(friend_28)),
                                             normalized_2
                                         );
                                     };
@@ -6756,6 +6738,8 @@ Extracted:`,
                 const tabs = Array.from(weiboView_2.querySelectorAll('.friend-weibo-tab')),
                     pages = document.getElementById('friend-weibo-pages'),
                     setActiveWeiboTab = (activeIndex) => {
+                        if (pages?._activeWeiboIndex === activeIndex) return;
+                        if (pages) pages._activeWeiboIndex = activeIndex;
                         tabs.forEach((tab, index_14) => {
                             const isActive = index_14 === activeIndex;
                             tab.style.color = isActive ? '#111' : '#777';
@@ -6776,12 +6760,20 @@ Extracted:`,
                         };
                     }),
                     (pages.onscroll = () => {
-                        const pageWidth = pages.clientWidth || 1,
-                            activeIndex_2 = Math.max(
-                                0,
-                                Math.min(2, Math.round(pages.scrollLeft / pageWidth)),
-                            );
-                        setActiveWeiboTab(activeIndex_2);
+                        if (pages._weiboScrollPending) return;
+                        pages._weiboScrollPending = true;
+                        requestAnimationFrame(() => {
+                            pages._weiboScrollPending = false;
+                            const pageWidth = pages.clientWidth || 1,
+                                activeIndex_2 = Math.max(
+                                    0,
+                                    Math.min(
+                                        tabs.length - 1,
+                                        Math.round(pages.scrollLeft / pageWidth),
+                                    ),
+                                );
+                            setActiveWeiboTab(activeIndex_2);
+                        });
                     }),
                     pages.scrollTo({
                         left: 0,
@@ -8521,6 +8513,27 @@ Extracted:`,
             const lovesDetailAreaElement_1122 = document.getElementById('loves-detail-area');
             if (lovesDetailAreaElement_1122) lovesDetailAreaElement_1122.style.display = 'none';
         }
+    },
+    distributeWeiboAlbum: function (_value0, _value1) {
+        const _value10 = _value0.map(() => []);
+        if (!_value0.length) return _value10;
+        _value1.forEach((_value11, _value12) =>
+            _value10[(_value12 + 1) % _value0.length].push(_value11),
+        );
+        return _value10;
+    },
+    renderWeiboPhotoImage: function (_value13, _value14 = 'preview') {
+        const _value15 = this.escapeHTML(String(_value13?.description || '').trim() || '照片');
+        const _value16 = this.escapeHTML(String(_value13?.url || ''));
+        return (
+            '<img style="width:100%;height:100%;object-fit:cover;" class="friend-weibo-photo is-' +
+            _value14 +
+            '" src="' +
+            _value16 +
+            '" alt="' +
+            _value15 +
+            '" loading="lazy" decoding="async">'
+        );
     },
 };
 (

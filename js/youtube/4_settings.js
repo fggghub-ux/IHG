@@ -85,9 +85,7 @@ function closeYtSettingsSheet() {
 }
 function updateYtBoundWorldBookLabel() {
     if (!ytBoundWbName) return;
-    const ids = Array.isArray(channelState?.boundWorldBookIds)
-        ? channelState.boundWorldBookIds
-        : [];
+    const ids = window.getVisibleWorldBookMountIds?.(channelState?.boundWorldBookIds) || [];
     if (ids.length === 0) {
         ytBoundWbName.textContent = '未绑定';
         return;

@@ -2027,3 +2027,9 @@ body:has(#u2-login-screen:not(.is-hidden)) #pages-container > .page-wrapper * {
 .home-search-hidden .page-indicators {
     bottom: 112px;
 }
+
+.desktop-dragging-source { will-change: transform, opacity; }
+.desktop-drag-ghost { transform: translate3d(0,0,0); }
+.home-desktop-dragging .main-grid, .home-desktop-dragging .app-item { contain: layout; }
+.home-desktop-dragging [data-desktop-kind="widget"]:not(.desktop-dragging-source) { contain:layout style; }
+.home-desktop-dragging [data-desktop-kind="widget"]:not(.desktop-dragging-source), .home-desktop-dragging .app-item:not(.desktop-dragging-source) { will-change:auto; }

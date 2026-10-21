@@ -85,7 +85,14 @@
             .commitDomain(
                 'settings',
                 (draft_2) => {
-                    const nextDraft = {
+                    const nextDraft = clonePlainData(themeState_2);
+                    if (nextDraft.bgAssetId && /^blob:/i.test(nextDraft.bgUrl || ''))
+                        nextDraft.bgUrl = null;
+                    nextDraft.apps?.forEach((_value2) => {
+                        if (_value2.iconAssetId && /^blob:/i.test(_value2.icon || ''))
+                            _value2.icon = null;
+                    });
+                    const _value = {
                         ...draft_2,
                         userState: clonePlainData(userState_2),
                         accounts: clonePlainData(accounts_2),
@@ -98,9 +105,10 @@
                         apiPresets: clonePlainData(apiPresets_2),
                         fetchedModels: clonePlainData(fetchedModels_2),
                         assistiveBallSettings: clonePlainData(assistiveBallSettings_2),
-                        themeState: clonePlainData(themeState_2),
+                        themeState: nextDraft,
                     };
-                    return (delete nextDraft.minimaxConfig, nextDraft);
+                    delete _value.minimaxConfig;
+                    return _value;
                 },
                 {
                     critical: true,
@@ -108,7 +116,8 @@
                 },
             )
             ['catch']((error_2) => {
-                return (console.warn('Failed to persist settings:', error_2), false);
+                console.warn('Failed to persist settings:', error_2);
+                return false;
             });
     }
     handleAction_6();
@@ -412,6 +421,7 @@
                         if (existingApp) {
                             existingApp.icon =
                                 savedApp.icon || DEFAULT_APP_ICONS[savedApp.id] || null;
+                            existingApp.iconAssetId = savedApp.iconAssetId || '';
                             if (savedApp.id === 'app-icon-6') existingApp.name = 'Library';
                             else {
                                 if (savedApp.id === 'app-icon-10') existingApp.name = 'Gallery';
@@ -452,6 +462,7 @@
                     (enabled_33 = true));
             });
             window.u2ThemeState = themeState_2;
+            await _value22();
             handleAction_40();
         }
         themeState_2.uiChineseEnabled = themeState_2.uiChineseEnabled === true;
@@ -1100,6 +1111,8 @@
             renderThemeFontPresetLists();
             renderThemeFontPreview();
             renderThemeAppList();
+            _value13();
+            _value16();
             openView(desktopThemeConfigSheet);
         }
         const value_34 = `/* 线下界面真实可编辑源码
@@ -4447,15 +4460,817 @@
             savePreset: savePreset_2,
         };
         handleAction_116();
-        const hOME_THEME_PACKAGE_FORMAT = 'u2-home-theme',
-            HOME_THEME_PACKAGE_VERSION = 2,
-            HOME_THEME_SUPPORTED_VERSIONS = new Set([1, HOME_THEME_PACKAGE_VERSION]),
-            themeExportBtn = document.getElementById('theme-export-btn'),
-            themeImportBtn = document.getElementById('theme-import-btn'),
-            themeImportFileInput = document.getElementById('theme-import-file-input'),
-            themeBgUploadBtn = document.getElementById('theme-bg-upload-btn'),
-            themeBgResetBtn = document.getElementById('theme-bg-reset-btn'),
-            themeBgFileInput = document.getElementById('theme-bg-file-input');
+        const hOME_THEME_PACKAGE_FORMAT = 'u2-home-theme';
+        const HOME_THEME_PACKAGE_VERSION = 2;
+        const HOME_THEME_SUPPORTED_VERSIONS = new Set([1, HOME_THEME_PACKAGE_VERSION]);
+        const themeExportBtn = document.getElementById('theme-export-btn');
+        const themeImportFileInput = document.getElementById('theme-import-file-input');
+        const themeBgUploadBtn = document.getElementById('theme-bg-upload-btn');
+        const themeBgResetBtn = document.getElementById('theme-bg-reset-btn');
+        const themeBgFileInput = document.getElementById('theme-bg-file-input');
+        const _value3 = 'desktop_theme_presets';
+        const _value4 = document.getElementById('desktop-preset-name');
+        const _value5 = document.getElementById('desktop-preset-list');
+        const _value6 = document.getElementById('desktop-preset-count');
+        const _value7 = document.getElementById('desktop-preset-status');
+        const _value8 = document.getElementById('desktop-preset-switch-dialog');
+        const _value9 = document.getElementById('desktop-preset-dialog-name');
+        let _value1 = false;
+        let _value10 = false;
+        let _value11 = {
+            version: 1,
+            activeId: '',
+            fingerprint: '',
+            presets: [],
+        };
+        const _value12 = (_value44) => 'desktop_theme_preset:' + _value44;
+        function _value13() {
+            const _value45 = window.appStorage?.readDomain?.(_value3, {}) || {};
+            _value11 = {
+                version: 1,
+                activeId: typeof _value45.activeId === 'string' ? _value45.activeId : '',
+                fingerprint: typeof _value45.fingerprint === 'string' ? _value45.fingerprint : '',
+                presets: Array.isArray(_value45.presets)
+                    ? _value45.presets.filter(
+                          (_value46) => _value46 && _value46.id && _value46.name,
+                      )
+                    : [],
+            };
+            return _value11;
+        }
+        async function _value14(_value47) {
+            await window.appStorage.commitDomain(_value3, () => _value47, {
+                critical: true,
+                reason: 'desktop-theme-presets',
+            });
+            _value11 = _value47;
+            _value16();
+        }
+        function _value15(_value48, _value49 = '') {
+            _value1 = _value48;
+            if (_value7) _value7.textContent = _value49;
+            document
+                .querySelectorAll('#desktop-preset-save, #desktop-preset-list button')
+                .forEach((_value50) => {
+                    _value50.disabled = _value48;
+                });
+        }
+        function _value16() {
+            if (!_value5) return;
+            _value5.replaceChildren();
+            _value6 &&
+                ((_value6.textContent = String(_value11.presets.length)),
+                _value6.setAttribute('aria-label', _value11.presets.length + ' 套预设'));
+            if (!_value11.presets.length) {
+                const _value51 = document.createElement('p');
+                _value51.className = 'desktop-preset-empty';
+                _value51.setAttribute('aria-label', '暂无桌面预设');
+                const _value52 = document.createElement('i');
+                _value52.className = 'far fa-images';
+                _value52.setAttribute('aria-hidden', 'true');
+                _value51.appendChild(_value52);
+                _value5.appendChild(_value51);
+                return;
+            }
+            _value11.presets.forEach((_value53) => {
+                const _value54 = document.createElement('div');
+                _value54.className = 'desktop-preset-card';
+                if (_value53.id === _value11.activeId) _value54.classList.add('is-active');
+                _value54.setAttribute('role', 'listitem');
+                const _value55 = document.createElement('div');
+                _value55.className = 'desktop-preset-card-main';
+                const _value56 = document.createElement('strong');
+                const _value57 = document.createElement('span');
+                _value57.textContent = _value53.name;
+                _value56.appendChild(_value57);
+                if (_value53.id === _value11.activeId) {
+                    const _value61 = document.createElement('i');
+                    _value61.className = 'fas fa-circle-check';
+                    _value61.setAttribute('aria-label', '当前预设');
+                    _value56.appendChild(_value61);
+                }
+                const _value58 = document.createElement('small');
+                const _value59 = _value53.updatedAt
+                    ? new Date(_value53.updatedAt).toLocaleDateString('zh-CN')
+                    : '';
+                _value58.textContent = _value59;
+                _value55.append(_value56, _value58);
+                const _value60 = document.createElement('div');
+                _value60.className = 'desktop-preset-card-actions';
+                [
+                    ['切换', 'fa-arrow-right-arrow-left', () => _value33(_value53.id)],
+                    ['覆盖', 'fa-floppy-disk', () => _value30(_value53.name, _value53.id)],
+                    ['删除', 'fa-trash-can', () => _value34(_value53.id)],
+                ].forEach(([_value62, _value63, _value64]) => {
+                    const _value65 = document.createElement('button');
+                    _value65.type = 'button';
+                    _value65.setAttribute('aria-label', _value62 + '预设“' + _value53.name + '”');
+                    _value65.title = _value62 + '预设“' + _value53.name + '”';
+                    const _value66 = document.createElement('i');
+                    _value66.className = 'fas ' + _value63;
+                    _value66.setAttribute('aria-hidden', 'true');
+                    _value65.appendChild(_value66);
+                    _value65.className =
+                        'desktop-preset-action desktop-preset-' +
+                        (_value62 === '切换'
+                            ? 'switch'
+                            : _value62 === '覆盖'
+                              ? 'overwrite'
+                              : 'delete');
+                    _value65.disabled = _value1;
+                    _value65.addEventListener('click', _value64);
+                    _value60.appendChild(_value65);
+                });
+                _value54.append(_value55, _value60);
+                _value5.appendChild(_value54);
+            });
+        }
+        async function _value17(_value67) {
+            const _value68 = await _value67.arrayBuffer();
+            if (!window.crypto?.subtle)
+                return 'random_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+            const _value69 = await window.crypto.subtle.digest('SHA-256', _value68);
+            return Array.from(new Uint8Array(_value69), (_value70) =>
+                _value70.toString(16).padStart(2, '0'),
+            ).join('');
+        }
+        async function _value18(_value71, _value72) {
+            const _value73 = 'desktop_theme_' + _value72 + '_' + (await _value17(_value71));
+            !(await window.appStorage.getAssetBlob(_value73)) &&
+                (await window.appStorage.saveAssetFromBlob(_value73, _value71, {
+                    ownerType: 'desktop_theme_preset',
+                    kind: _value72,
+                }));
+            return _value73;
+        }
+        async function _value19(_value74, _value75 = '') {
+            if (typeof _value74 === 'string' && _value74.startsWith('data:'))
+                return window.appStorage.dataUrlToBlob(_value74);
+            if (typeof _value74 === 'string' && /^https?:\/\//i.test(_value74)) return null;
+            if (_value75) {
+                const _value76 = await window.appStorage.getAssetBlob(_value75);
+                if (_value76) return _value76;
+                throw new Error('主题图片资源已丢失');
+            }
+            if (typeof _value74 !== 'string') return null;
+            if (_value74.startsWith('blob:')) return (await fetch(_value74)).blob();
+            return null;
+        }
+        async function _value20(_value77, _value78 = '') {
+            _value78 = String(_value78 || '');
+            if (!_value77 && !_value78) return null;
+            if (typeof _value77 === 'string' && /^https?:\/\//i.test(_value77))
+                return {
+                    url: _value77,
+                };
+            if (typeof _value77 === 'string' && _value77.startsWith('data:'))
+                return {
+                    assetId: await _value18(window.appStorage.dataUrlToBlob(_value77), 'image'),
+                };
+            if (_value78.startsWith('desktop_theme_')) {
+                if (await window.appStorage.getAssetBlob(_value78))
+                    return {
+                        assetId: _value78,
+                    };
+            }
+            const _value79 = await _value19(_value77, _value78);
+            if (_value79)
+                return {
+                    assetId: await _value18(_value79, 'image'),
+                };
+            return {
+                url: String(_value77),
+            };
+        }
+        async function _value21(_value80) {
+            if (!_value80)
+                return {
+                    url: null,
+                    assetId: '',
+                };
+            if (_value80.assetId) {
+                const _value81 = await window.appStorage.getAssetUrl(_value80.assetId);
+                if (!_value81) throw new Error('预设图片资源已丢失');
+                return {
+                    url: _value81,
+                    assetId: _value80.assetId,
+                };
+            }
+            return {
+                url: _value80.url || null,
+                assetId: '',
+            };
+        }
+        async function _value22() {
+            const _value82 = [];
+            if (themeState_2.bgAssetId)
+                _value82.push(
+                    (async () => {
+                        try {
+                            themeState_2.bgUrl = (
+                                await _value21({
+                                    assetId: themeState_2.bgAssetId,
+                                })
+                            ).url;
+                        } catch (_value83) {
+                            console.warn('Missing desktop background asset', _value83);
+                            themeState_2.bgAssetId = '';
+                            themeState_2.bgUrl = null;
+                        }
+                    })(),
+                );
+            themeState_2.apps.forEach((_value84) => {
+                if (!_value84.iconAssetId) return;
+                _value82.push(
+                    (async () => {
+                        try {
+                            _value84.icon = (
+                                await _value21({
+                                    assetId: _value84.iconAssetId,
+                                })
+                            ).url;
+                        } catch (_value85) {
+                            console.warn('Missing desktop icon asset', _value85);
+                            _value84.iconAssetId = '';
+                            _value84.icon = null;
+                        }
+                    })(),
+                );
+            });
+            await Promise.all(_value82);
+        }
+        async function _value23() {
+            if (typeof themeState_2.bgUrl === 'string' && themeState_2.bgUrl.startsWith('data:')) {
+                const _value86 = await _value20(themeState_2.bgUrl);
+                themeState_2.bgAssetId = _value86.assetId;
+                themeState_2.bgUrl = (await _value21(_value86)).url;
+            }
+            for (const _value87 of themeState_2.apps) {
+                if (typeof _value87.icon === 'string' && _value87.icon.startsWith('data:')) {
+                    const _value88 = await _value20(_value87.icon);
+                    _value87.iconAssetId = _value88.assetId;
+                    _value87.icon = (await _value21(_value88)).url;
+                }
+            }
+            return saveGlobalData();
+        }
+        async function _value24() {
+            if ((await window.desktopDataReadyPromise) === false)
+                throw new Error('桌面数据尚未恢复，无法保存预设');
+            const _value89 = window.getHomeWidgetThemeConfigs?.() || {};
+            const _value90 = {
+                background: await _value20(themeState_2.bgUrl, themeState_2.bgAssetId || ''),
+                apps: {},
+                widgets: {},
+            };
+            for (const _value91 of themeState_2.apps) {
+                _value90.apps[String(_value91.id)] = await _value20(
+                    _value91.icon,
+                    _value91.iconAssetId || '',
+                );
+            }
+            for (const [_value92, _value93] of Object.entries(_value89)) {
+                if (!_value93 || typeof _value93 !== 'object') continue;
+                const _value94 = {
+                    type: _value93.type,
+                    name: _value93.name,
+                    color: _value93.color,
+                    text: _value93.text || {},
+                    images: {},
+                };
+                for (const [_value96, _value97] of Object.entries(_value93.images || {})) {
+                    _value94.images[_value96] = await _value20(
+                        _value97,
+                        _value93.imageAssetIds?.[_value96] || '',
+                    );
+                }
+                const _value95 = typeof _value93.html === 'string' ? _value93.html : '';
+                if (_value95.length > 16384)
+                    _value94.htmlAssetId = await _value18(
+                        new Blob([_value95], {
+                            type: 'text/html',
+                        }),
+                        'html',
+                    );
+                else _value94.html = _value95;
+                _value90.widgets[_value92] = _value94;
+            }
+            return _value90;
+        }
+        async function _value25(_value98, _value99 = null) {
+            const _value100 = await _value21(_value98.background);
+            const _value101 = {};
+            const _value102 = {};
+            for (const [_value103, _value104] of Object.entries(_value98.apps || {}))
+                _value101[_value103] = await _value21(_value104);
+            for (const [_value105, _value106] of Object.entries(_value98.widgets || {})) {
+                if (_value99 && _value99[_value105] !== _value106.type) continue;
+                const _value107 = {};
+                const _value108 = {};
+                for (const [_value112, _value113] of Object.entries(_value106.images || {})) {
+                    const _value114 = await _value21(_value113);
+                    _value107[_value112] = _value114.url;
+                    if (_value114.assetId) _value108[_value112] = _value114.assetId;
+                }
+                let _value109 = _value106.html || '';
+                if (_value106.htmlAssetId) {
+                    const _value115 = await window.appStorage.getAssetBlob(_value106.htmlAssetId);
+                    if (!_value115) throw new Error('预设 HTML 资源已丢失');
+                    _value109 = await _value115.text();
+                }
+                const { htmlAssetId: _value110, ..._value111 } = _value106;
+                _value102[_value105] = {
+                    ..._value111,
+                    images: _value107,
+                    imageAssetIds: _value108,
+                    html: _value109,
+                };
+            }
+            return {
+                background: _value100,
+                apps: _value101,
+                widgets: _value102,
+            };
+        }
+        async function _value26(_value116) {
+            const _value117 = new Set();
+            if (_value116.background.url) _value117.add(_value116.background.url);
+            Object.values(_value116.apps).forEach((_value120) => {
+                if (_value120.url) _value117.add(_value120.url);
+            });
+            Object.values(_value116.widgets).forEach((_value121) => {
+                Object.values(_value121.images || {}).forEach((_value122) => {
+                    if (_value122) _value117.add(_value122);
+                });
+            });
+            const _value118 = [..._value117];
+            const _value119 = async () => {
+                while (_value118.length) {
+                    const _value123 = new Image();
+                    _value123.src = _value118.shift();
+                    try {
+                        if (_value123.decode) await _value123.decode();
+                        else
+                            await new Promise((_value124, _value125) => {
+                                _value123.onload = _value124;
+                                _value123.onerror = _value125;
+                                if (_value123.complete)
+                                    (_value123.naturalWidth ? _value124 : _value125)();
+                            });
+                    } catch (_value126) {
+                        throw new Error('预设图片加载失败，桌面未切换');
+                    }
+                }
+            };
+            await Promise.all([_value119(), _value119()]);
+        }
+        async function _value27() {
+            const _value127 = window.getHomeWidgetThemeConfigs?.() || {};
+            const _value128 = (_value132, _value133) =>
+                _value133 && (!_value132 || String(_value132).startsWith('blob:'))
+                    ? 'asset:' + _value133
+                    : _value132 || '';
+            const _value129 = {
+                background: _value128(themeState_2.bgUrl, themeState_2.bgAssetId),
+                apps: themeState_2.apps.map((_value134) => [
+                    _value134.id,
+                    _value128(_value134.icon, _value134.iconAssetId),
+                ]),
+                widgets: Object.entries(_value127).map(([_value135, _value136]) => [
+                    _value135,
+                    {
+                        type: _value136.type,
+                        name: _value136.name,
+                        color: _value136.color,
+                        text: _value136.text || {},
+                        images: Object.entries(_value136.images || {}).map(
+                            ([_value137, _value138]) => [
+                                _value137,
+                                _value128(_value138, _value136.imageAssetIds?.[_value137]),
+                            ],
+                        ),
+                        html: _value136.html || '',
+                    },
+                ]),
+            };
+            const _value130 = new TextEncoder().encode(JSON.stringify(_value129));
+            if (!window.crypto?.subtle) {
+                let _value139 = 2166136261;
+                _value130.forEach((_value140) => {
+                    _value139 = Math.imul(_value139 ^ _value140, 16777619);
+                });
+                return _value130.length + ':' + (_value139 >>> 0);
+            }
+            const _value131 = await window.crypto.subtle.digest('SHA-256', _value130);
+            return Array.from(new Uint8Array(_value131), (_value141) =>
+                _value141.toString(16).padStart(2, '0'),
+            ).join('');
+        }
+        function _value28(_value142, _value143, _value144 = '') {
+            if (!_value142) return !_value143 && !_value144;
+            if (_value142.assetId)
+                return (
+                    _value142.assetId === _value144 &&
+                    (!_value143 || String(_value143).startsWith('blob:'))
+                );
+            return (_value142.url || null) === (_value143 || null) && !_value144;
+        }
+        async function _value29() {
+            const _value145 = window.appStorage.readDomain(
+                _value12(_value11.activeId),
+                {},
+            ).snapshot;
+            if (!_value145) return true;
+            if (!_value28(_value145.background, themeState_2.bgUrl, themeState_2.bgAssetId || ''))
+                return true;
+            for (const _value148 of themeState_2.apps) {
+                if (!Object.prototype.hasOwnProperty.call(_value145.apps || {}, _value148.id))
+                    continue;
+                if (
+                    !_value28(
+                        _value145.apps[_value148.id],
+                        _value148.icon,
+                        _value148.iconAssetId || '',
+                    )
+                )
+                    return true;
+            }
+            const _value146 = window.getHomeWidgetPresetTargets?.() || {};
+            const _value147 = window.getHomeWidgetThemeConfigs?.() || {};
+            for (const [_value149, _value150] of Object.entries(_value145.widgets || {})) {
+                if (_value146[_value149] !== _value150.type || !_value147[_value149]) continue;
+                const _value151 = _value147[_value149];
+                if (
+                    _value151.name !== _value150.name ||
+                    _value151.color !== _value150.color ||
+                    JSON.stringify(_value151.text || {}) !== JSON.stringify(_value150.text || {})
+                )
+                    return true;
+                const _value152 = _value150.htmlAssetId
+                    ? await (await window.appStorage.getAssetBlob(_value150.htmlAssetId))?.text()
+                    : _value150.html || '';
+                if (_value152 === undefined || (_value151.html || '') !== _value152) return true;
+                const _value153 = _value151.images || {};
+                const _value154 = _value150.images || {};
+                const _value155 = Object.keys(_value153).sort();
+                const _value156 = Object.keys(_value154).sort();
+                if (JSON.stringify(_value155) !== JSON.stringify(_value156)) return true;
+                for (const _value157 of _value156) {
+                    if (
+                        !_value28(
+                            _value154[_value157],
+                            _value153[_value157],
+                            _value151.imageAssetIds?.[_value157] || '',
+                        )
+                    )
+                        return true;
+                }
+            }
+            return false;
+        }
+        async function _value30(_value158, _value159 = '') {
+            if (_value1) return false;
+            const _value160 = String(_value158 || '').trim();
+            if (!_value160) {
+                _value4?.focus();
+                showToast('请先填写预设名称');
+                return false;
+            }
+            if (!_value159 && _value11.presets.some((_value164) => _value164.name === _value160)) {
+                showToast('已有同名预设，请使用“覆盖”');
+                return false;
+            }
+            _value15(true, '正在保存预设…');
+            const _value161 = {
+                bgUrl: themeState_2.bgUrl,
+                bgAssetId: themeState_2.bgAssetId || '',
+                apps: themeState_2.apps.map((_value165) => ({
+                    id: _value165.id,
+                    icon: _value165.icon,
+                    iconAssetId: _value165.iconAssetId || '',
+                })),
+            };
+            let _value162 = null;
+            let _value163 = false;
+            try {
+                const _value166 = await _value24();
+                const _value167 = await _value25(_value166);
+                _value162 = window.getHomeWidgetThemeConfigs?.() || null;
+                _value163 = true;
+                if ((await _value23()) === false) throw new Error('当前主题保存失败');
+                if ((await window.applyHomeWidgetPresetVisuals?.(_value167.widgets)) === false)
+                    throw new Error('小组件保存失败');
+                const _value168 = await _value27();
+                const _value169 = _value11.presets.find((_value175) => _value175.id === _value159);
+                const _value170 = new Date().toISOString();
+                const _value171 = {
+                    id:
+                        _value169?.id ||
+                        'desktop-preset-' + Date.now() + '-' + Math.random().toString(36).slice(2),
+                    name: _value160,
+                    createdAt: _value169?.createdAt || _value170,
+                    updatedAt: _value170,
+                };
+                const _value172 = _value12(_value171.id);
+                const _value173 = _value169
+                    ? window.appStorage.readDomain(_value172, {}).snapshot
+                    : null;
+                await window.appStorage.commitDomain(
+                    _value172,
+                    () => ({
+                        version: 1,
+                        snapshot: _value166,
+                    }),
+                    {
+                        critical: true,
+                        reason: 'desktop-theme-preset-save',
+                    },
+                );
+                const _value174 = {
+                    ..._value11,
+                    activeId: _value171.id,
+                    fingerprint: _value168,
+                    presets: _value169
+                        ? _value11.presets.map((_value176) =>
+                              _value176.id === _value169.id ? _value171 : _value176,
+                          )
+                        : [..._value11.presets, _value171],
+                };
+                try {
+                    await _value14(_value174);
+                } catch (_value177) {
+                    await window.appStorage.commitDomain(_value172, () =>
+                        _value173
+                            ? {
+                                  version: 1,
+                                  snapshot: _value173,
+                              }
+                            : {
+                                  version: 1,
+                                  deleted: true,
+                              },
+                    );
+                    throw _value177;
+                }
+                if (_value173)
+                    setTimeout(
+                        () =>
+                            window.appStorage
+                                .releaseAssetsFromDeletedRecords([_value173])
+                                ['catch'](console.warn),
+                        0,
+                    );
+                if (_value4) _value4.value = '';
+                showToast('桌面预设已保存');
+                return true;
+            } catch (_value178) {
+                if (_value163) {
+                    themeState_2.bgUrl = _value161.bgUrl;
+                    themeState_2.bgAssetId = _value161.bgAssetId;
+                    themeState_2.apps.forEach((_value179) => {
+                        const _value180 = _value161.apps.find(
+                            (_value181) => _value181.id === _value179.id,
+                        );
+                        _value180 &&
+                            ((_value179.icon = _value180.icon),
+                            (_value179.iconAssetId = _value180.iconAssetId));
+                    });
+                    applyThemeBackground(themeState_2);
+                    applyThemeAppIcons(themeState_2);
+                    try {
+                        if (_value162) await window.applyHomeWidgetPresetVisuals?.(_value162);
+                        await saveGlobalData();
+                    } catch (_value182) {
+                        console.error('Failed to restore desktop after preset save', _value182);
+                    }
+                }
+                console.error('Failed to save desktop preset', _value178);
+                showToast(_value178?.message || '预设保存失败');
+                return false;
+            } finally {
+                _value15(false);
+                _value16();
+            }
+        }
+        function _value31() {
+            return new Promise((_value183) => {
+                if (!_value8)
+                    return _value183({
+                        action: 'cancel',
+                    });
+                const _value184 = _value11.presets.some(
+                    (_value191) => _value191.id === _value11.activeId,
+                );
+                _value9.hidden = _value184;
+                _value9.value = _value4?.value.trim() || '';
+                const _value185 = document.activeElement;
+                _value8.hidden = false;
+                const _value186 = document.getElementById('desktop-preset-dialog-cancel');
+                const _value187 = document.getElementById('desktop-preset-dialog-discard');
+                const _value188 = document.getElementById('desktop-preset-dialog-save');
+                const _value189 = (_value192) => {
+                    if (_value192 === 'save' && !_value184 && !_value9.value.trim()) {
+                        _value9.focus();
+                        showToast('请先填写当前配置的预设名称');
+                        return;
+                    }
+                    _value8.hidden = true;
+                    _value186.onclick = _value187.onclick = _value188.onclick = null;
+                    _value8.removeEventListener('keydown', _value190);
+                    _value185?.focus?.();
+                    _value183({
+                        action: _value192,
+                        name: _value9.value.trim(),
+                    });
+                };
+                const _value190 = (_value193) => {
+                    if (_value193.key === 'Escape') _value189('cancel');
+                    else
+                        _value193.target === _value9 &&
+                            getThemeFontActiveSurfaceFor_2(_value193) &&
+                            (_value193.preventDefault(), _value189('save'));
+                };
+                _value186.onclick = () => _value189('cancel');
+                _value187.onclick = () => _value189('discard');
+                _value188.onclick = () => _value189('save');
+                _value8.addEventListener('keydown', _value190);
+                (_value184 ? _value186 : _value9).focus();
+            });
+        }
+        async function _value32(_value194) {
+            _value15(true, '正在加载图片并切换…');
+            const _value195 = {
+                bgUrl: themeState_2.bgUrl,
+                bgAssetId: themeState_2.bgAssetId || '',
+                apps: themeState_2.apps.map((_value197) => ({
+                    id: _value197.id,
+                    icon: _value197.icon,
+                    iconAssetId: _value197.iconAssetId || '',
+                })),
+            };
+            let _value196 = null;
+            try {
+                if ((await window.desktopDataReadyPromise) === false)
+                    throw new Error('桌面数据尚未恢复，无法切换预设');
+                const _value198 = window.appStorage.readDomain(_value12(_value194.id), {}).snapshot;
+                if (!_value198) throw new Error('预设内容已丢失');
+                const _value199 = await _value25(
+                    _value198,
+                    window.getHomeWidgetPresetTargets?.() || null,
+                );
+                await _value26(_value199);
+                _value196 = window.getHomeWidgetThemeConfigs?.() || {};
+                await new Promise((_value201) => requestAnimationFrame(_value201));
+                themeState_2.bgUrl = _value199.background.url;
+                themeState_2.bgAssetId = _value199.background.assetId;
+                themeState_2.apps.forEach((_value202) => {
+                    if (!Object.prototype.hasOwnProperty.call(_value199.apps, _value202.id)) return;
+                    _value202.icon = _value199.apps[_value202.id].url;
+                    _value202.iconAssetId = _value199.apps[_value202.id].assetId;
+                });
+                applyThemeBackground(themeState_2);
+                applyThemeAppIcons(themeState_2);
+                if ((await window.applyHomeWidgetPresetVisuals?.(_value199.widgets)) === false)
+                    throw new Error('小组件保存失败');
+                if ((await saveGlobalData()) === false) throw new Error('主题保存失败');
+                const _value200 = await _value27();
+                await _value14({
+                    ..._value11,
+                    activeId: _value194.id,
+                    fingerprint: _value200,
+                });
+                renderThemeAppList();
+                showToast('已切换到“' + _value194.name + '”');
+                return true;
+            } catch (_value203) {
+                themeState_2.bgUrl = _value195.bgUrl;
+                themeState_2.bgAssetId = _value195.bgAssetId;
+                themeState_2.apps.forEach((_value204) => {
+                    const _value205 = _value195.apps.find(
+                        (_value206) => _value206.id === _value204.id,
+                    );
+                    _value205 &&
+                        ((_value204.icon = _value205.icon),
+                        (_value204.iconAssetId = _value205.iconAssetId));
+                });
+                applyThemeBackground(themeState_2);
+                applyThemeAppIcons(themeState_2);
+                if (_value196)
+                    try {
+                        await window.applyHomeWidgetPresetVisuals?.(_value196);
+                    } catch (_value207) {
+                        console.error('Failed to restore widgets', _value207);
+                    }
+                await saveGlobalData();
+                renderThemeAppList();
+                console.error('Failed to apply desktop preset', _value203);
+                showToast(_value203?.message || '预设切换失败');
+                return false;
+            } finally {
+                _value15(false);
+                _value16();
+            }
+        }
+        async function _value33(_value208) {
+            if (_value1 || _value10) return;
+            _value10 = true;
+            try {
+                const _value209 = _value11.presets.find((_value212) => _value212.id === _value208);
+                if (!_value209) return;
+                const _value210 = await _value27();
+                const _value211 =
+                    !_value11.activeId ||
+                    !_value11.fingerprint ||
+                    (_value210 !== _value11.fingerprint && (await _value29()));
+                if (_value209.id === _value11.activeId && !_value211) return;
+                if (_value211) {
+                    const _value213 = await _value31();
+                    if (_value213.action === 'cancel') return;
+                    if (_value213.action === 'save') {
+                        const _value214 = _value11.presets.find(
+                            (_value215) => _value215.id === _value11.activeId,
+                        );
+                        if (
+                            !(await _value30(
+                                _value214?.name || _value213.name,
+                                _value214?.id || '',
+                            ))
+                        )
+                            return;
+                        if (_value209.id === _value11.activeId) return;
+                    }
+                }
+                await _value32(
+                    _value11.presets.find((_value216) => _value216.id === _value208) || _value209,
+                );
+            } catch (_value217) {
+                console.error('Failed to switch desktop preset', _value217);
+                showToast('预设切换失败');
+            } finally {
+                _value10 = false;
+            }
+        }
+        async function _value34(_value218) {
+            if (_value1) return;
+            const _value219 = _value11.presets.find((_value221) => _value221.id === _value218);
+            if (!_value219 || !window.confirm('删除桌面预设“' + _value219.name + '”？')) return;
+            _value15(true, '正在删除预设…');
+            const _value220 = _value11;
+            try {
+                const _value222 = _value12(_value218);
+                const _value223 = window.appStorage.readDomain(_value222, {}).snapshot;
+                await _value14({
+                    ..._value11,
+                    activeId: _value11.activeId === _value218 ? '' : _value11.activeId,
+                    fingerprint: _value11.activeId === _value218 ? '' : _value11.fingerprint,
+                    presets: _value11.presets.filter((_value224) => _value224.id !== _value218),
+                });
+                await window.appStorage.commitDomain(
+                    _value222,
+                    () => ({
+                        version: 1,
+                        deleted: true,
+                    }),
+                    {
+                        critical: true,
+                        reason: 'desktop-theme-preset-delete',
+                    },
+                );
+                if (_value223)
+                    setTimeout(
+                        () =>
+                            window.appStorage
+                                .releaseAssetsFromDeletedRecords([_value223])
+                                ['catch'](console.warn),
+                        0,
+                    );
+                showToast('桌面预设已删除');
+            } catch (_value225) {
+                if (!_value11.presets.some((_value226) => _value226.id === _value218))
+                    try {
+                        await _value14(_value220);
+                    } catch (_value227) {
+                        console.error('Failed to restore preset index', _value227);
+                    }
+                console.error('Failed to delete desktop preset', _value225);
+                showToast('删除失败，请重试');
+            } finally {
+                _value15(false);
+                _value16();
+            }
+        }
+        _value13();
+        _value16();
+        document
+            .getElementById('desktop-preset-save')
+            ?.addEventListener('click', () => _value30(_value4?.value));
+        _value4?.addEventListener('keydown', (_value228) => {
+            if (!getThemeFontActiveSurfaceFor_2(_value228)) return;
+            _value228.preventDefault();
+            const _value229 = _value4.value;
+            _value4.blur();
+            _value30(_value229);
+        });
         function buildHomeThemePackage() {
             const widgetConfigs =
                 typeof window.getHomeWidgetThemeConfigs === 'function'
@@ -4473,6 +5288,31 @@
                 })),
                 widgets: widgetConfigs,
             };
+        }
+        async function _value35() {
+            const _value230 = buildHomeThemePackage();
+            const _value231 = async (_value232, _value233) => {
+                const _value234 = await _value19(_value232, _value233 || '');
+                return _value234 ? window.appStorage.blobToDataUrl(_value234) : _value232;
+            };
+            _value230.background = await _value231(_value230.background, themeState_2.bgAssetId);
+            for (let _value235 = 0; _value235 < _value230.apps.length; _value235 += 1) {
+                _value230.apps[_value235].icon = await _value231(
+                    _value230.apps[_value235].icon,
+                    themeState_2.apps[_value235]?.iconAssetId,
+                );
+            }
+            for (const _value236 of Object.values(_value230.widgets || {})) {
+                if (!_value236 || typeof _value236 !== 'object') continue;
+                for (const [_value237, _value238] of Object.entries(_value236.images || {})) {
+                    _value236.images[_value237] = await _value231(
+                        _value238,
+                        _value236.imageAssetIds?.[_value237],
+                    );
+                }
+                delete _value236.imageAssetIds;
+            }
+            return _value230;
         }
         function parseHomeThemePackage(rawText_2) {
             let payload_3;
@@ -4529,33 +5369,141 @@
                 widgets: widgets_2,
             };
         }
-        function applyImportedHomeTheme(importedTheme_3) {
-            themeState_2.bgUrl = importedTheme_3.background;
-            themeState_2.apps.forEach((app_3) => {
-                importedTheme_3.apps.has(String(app_3.id)) &&
-                    (app_3.icon = importedTheme_3.apps.get(String(app_3.id)));
-            });
-            applyThemeBackground(themeState_2);
-            applyThemeAppIcons(themeState_2);
-            importedTheme_3.widgets &&
-                typeof window.applyHomeWidgetThemeConfigs === 'function' &&
-                window.applyHomeWidgetThemeConfigs(importedTheme_3.widgets);
-            renderThemeAppList();
-            saveGlobalData();
+        function applyImportedHomeTheme(importedTheme_3, _value239, _value240) {
+            const _value241 = {};
+            for (const [_value242, _value243] of Object.entries(importedTheme_3 || {})) {
+                const _value244 = _value239[_value242];
+                if (
+                    !_value244 ||
+                    !_value240[_value242] ||
+                    _value240[_value242] !== _value244.type ||
+                    (_value243.type && _value243.type !== _value244.type)
+                )
+                    continue;
+                const _value245 =
+                    _value243.images &&
+                    typeof _value243.images === 'object' &&
+                    !Array.isArray(_value243.images)
+                        ? _value243.images
+                        : {};
+                const _value246 = {
+                    ...(_value244.imageAssetIds || {}),
+                };
+                for (const _value247 of Object.keys(_value245)) delete _value246[_value247];
+                _value241[_value242] = {
+                    type: _value244.type,
+                    name: typeof _value243.name === 'string' ? _value243.name : _value244.name,
+                    color: typeof _value243.color === 'string' ? _value243.color : _value244.color,
+                    text:
+                        _value243.text &&
+                        typeof _value243.text === 'object' &&
+                        !Array.isArray(_value243.text)
+                            ? {
+                                  ...(_value244.text || {}),
+                                  ..._value243.text,
+                              }
+                            : _value244.text,
+                    images: {
+                        ...(_value244.images || {}),
+                        ..._value245,
+                    },
+                    imageAssetIds: _value246,
+                    html: typeof _value243.html === 'string' ? _value243.html : _value244.html,
+                };
+            }
+            return _value241;
+        }
+        async function _value36(_value248) {
+            if (!window.desktopDataReadyPromise || (await window.desktopDataReadyPromise) === false)
+                throw new Error('桌面数据尚未恢复，无法导入主题');
+            const _value249 = {
+                bgUrl: themeState_2.bgUrl,
+                bgAssetId: themeState_2.bgAssetId || '',
+                apps: themeState_2.apps.map((_value254) => ({
+                    id: _value254.id,
+                    icon: _value254.icon,
+                    iconAssetId: _value254.iconAssetId || '',
+                })),
+            };
+            const _value250 = window.getHomeWidgetThemeConfigs?.() || {};
+            const _value251 = applyImportedHomeTheme(
+                _value248.widgets,
+                _value250,
+                window.getHomeWidgetPresetTargets?.() || {},
+            );
+            const _value252 = Object.fromEntries(
+                Object.keys(_value251).map((_value255) => [_value255, _value250[_value255]]),
+            );
+            if (
+                Object.keys(_value251).length &&
+                typeof window.applyHomeWidgetPresetVisuals !== 'function'
+            )
+                throw new Error('桌面小组件尚未准备好，无法导入主题');
+            let _value253 = false;
+            try {
+                _value253 = true;
+                themeState_2.bgUrl = _value248.background;
+                themeState_2.bgAssetId = '';
+                themeState_2.apps.forEach((_value256) => {
+                    _value248.apps.has(String(_value256.id)) &&
+                        ((_value256.icon = _value248.apps.get(String(_value256.id))),
+                        (_value256.iconAssetId = ''));
+                });
+                applyThemeBackground(themeState_2);
+                applyThemeAppIcons(themeState_2);
+                if (
+                    Object.keys(_value251).length &&
+                    (await window.applyHomeWidgetPresetVisuals(_value251)) === false
+                )
+                    throw new Error('小组件保存失败');
+                if ((await _value23()) === false) throw new Error('主题保存失败');
+                _value13();
+                _value11.activeId &&
+                    (await _value14({
+                        ..._value11,
+                        activeId: '',
+                        fingerprint: '',
+                    }));
+                renderThemeAppList();
+            } catch (_value257) {
+                if (_value253) {
+                    themeState_2.bgUrl = _value249.bgUrl;
+                    themeState_2.bgAssetId = _value249.bgAssetId;
+                    themeState_2.apps.forEach((_value258) => {
+                        const _value259 = _value249.apps.find(
+                            (_value260) => _value260.id === _value258.id,
+                        );
+                        _value259 &&
+                            ((_value258.icon = _value259.icon),
+                            (_value258.iconAssetId = _value259.iconAssetId));
+                    });
+                    applyThemeBackground(themeState_2);
+                    applyThemeAppIcons(themeState_2);
+                    try {
+                        if (Object.keys(_value252).length)
+                            await window.applyHomeWidgetPresetVisuals(_value252);
+                        await saveGlobalData();
+                        renderThemeAppList();
+                    } catch (_value261) {
+                        console.error('Failed to restore home theme after import', _value261);
+                    }
+                }
+                throw _value257;
+            }
         }
         themeExportBtn &&
             themeExportBtn.addEventListener('click', async () => {
                 try {
-                    const serialized = JSON.stringify(buildHomeThemePackage(), null, 2),
-                        blob_2 = new Blob([serialized], {
-                            type: 'application/json;charset=utf-8',
-                        }),
-                        result_3 = await window.u2ExportFile({
-                            blob: blob_2,
-                            fileName:
-                                'u2-home-theme-' + new Date().toISOString().slice(0, 10) + '.json',
-                            title: 'U2 主屏主题',
-                        });
+                    const serialized = JSON.stringify(await _value35(), null, 2);
+                    const blob_2 = new Blob([serialized], {
+                        type: 'application/json;charset=utf-8',
+                    });
+                    const result_3 = await window.u2ExportFile({
+                        blob: blob_2,
+                        fileName:
+                            'u2-home-theme-' + new Date().toISOString().slice(0, 10) + '.json',
+                        title: 'U2 主屏主题',
+                    });
                     if (result_3 === 'shared' || result_3 === 'downloaded')
                         showToast('主屏主题已导出');
                     else {
@@ -4566,9 +5514,7 @@
                     showToast('主题导出失败');
                 }
             });
-        themeImportBtn &&
-            themeImportFileInput &&
-            (themeImportBtn.addEventListener('click', () => themeImportFileInput.click()),
+        themeImportFileInput &&
             themeImportFileInput.addEventListener('change', async () => {
                 const file = themeImportFileInput.files?.[0];
                 themeImportFileInput.value = '';
@@ -4583,18 +5529,19 @@
                 }
                 try {
                     const importedTheme = parseHomeThemePackage(await file.text());
-                    applyImportedHomeTheme(importedTheme);
+                    await _value36(importedTheme);
                     showToast('主屏主题已导入');
                 } catch (error_9) {
                     console.error('Failed to import home theme', error_9);
                     showToast(error_9?.message || '主题导入失败');
                 }
-            }));
+            });
         if (themeBgUploadBtn)
             themeBgUploadBtn.addEventListener('click', () => themeBgFileInput?.click());
         themeBgResetBtn &&
             themeBgResetBtn.addEventListener('click', () => {
                 themeState_2.bgUrl = null;
+                themeState_2.bgAssetId = '';
                 commitThemeBackgroundChanges('背景已重置');
             });
         themeBgFileInput &&
@@ -4639,10 +5586,15 @@
                   (document.body.style.backgroundPosition = ''));
             window.dispatchEvent(new CustomEvent('u2:home-wallpaper-changed'));
         }
-        function commitThemeBackgroundChanges(toastMessage = '') {
+        async function commitThemeBackgroundChanges(toastMessage = '') {
             applyThemeBackground(themeState_2);
-            saveGlobalData();
-            if (toastMessage) showToast(toastMessage);
+            try {
+                if ((await _value23()) === false) throw new Error('save failed');
+                if (toastMessage) showToast(toastMessage);
+            } catch (_value262) {
+                console.error('Failed to save desktop background', _value262);
+                showToast('背景保存失败');
+            }
         }
         const themeAppListContainer = document.getElementById('theme-app-list'),
             themeAppFileInput = document.getElementById('theme-app-file-input'),
@@ -4652,6 +5604,7 @@
             resetAllIconsBtn.addEventListener('click', () => {
                 themeState_2.apps.forEach((app_4) => {
                     app_4.icon = DEFAULT_APP_ICONS[app_4.id] || null;
+                    app_4.iconAssetId = '';
                 });
                 commitThemeAppIconChanges('应用图标已全部重置');
             });
@@ -4668,6 +5621,7 @@
                         }),
                         appName = themeState_2.apps[appIndex]?.name || '应用';
                     themeState_2.apps[appIndex].icon = icon_2;
+                    themeState_2.apps[appIndex].iconAssetId = '';
                     commitThemeAppIconChanges(appName + ' 图标已更新');
                 } catch (error_10) {
                     console.error('Failed to process app icon.', error_10);
@@ -4737,10 +5691,10 @@
             if (!Array.isArray(state.apps)) return;
             state.apps.forEach((app_6) => applyAppIconStyles(app_6));
         }
-        function commitThemeAppIconChanges(toastMessage_2 = '') {
+        async function commitThemeAppIconChanges(toastMessage_2 = '') {
             applyThemeAppIcons(themeState_2);
             renderThemeAppList();
-            saveGlobalData();
+            await _value23();
             if (toastMessage_2) showToast(toastMessage_2);
         }
         function applyAppIconStyles(app_7) {

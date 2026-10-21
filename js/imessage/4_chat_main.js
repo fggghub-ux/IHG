@@ -502,7 +502,12 @@
                                 ) {
                                     window.imChat.closeContextMenu();
                                     try {
-                                        await window.imVoiceMessageAudio.play(liveFriend_4, msg_2);
+                                        const result = await window.imVoiceMessageAudio.play(
+                                            liveFriend_4,
+                                            msg_2,
+                                        );
+                                        if (result?.readyForTap)
+                                            window.showToast?.('语音已准备好，请再次点击播放');
                                     } catch (error) {
                                         console.error('Voice message playback failed', error);
                                         (!window.u2Api?.isRequestError?.(error) ||

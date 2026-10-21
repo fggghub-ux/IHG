@@ -435,14 +435,16 @@
                 original: original_2,
                 translation: '',
             };
-        const match_2 = original_2.match(/^([\s\S]+)（([^（）]*[\u3400-\u9fff][^（）]*)）$/);
+        const match_2 = original_2.match(
+            /^([\s\S]+?)(?:（([^（）]*[\u3400-\u9fff][^（）]*)）|\(([^()]*[\u3400-\u9fff][^()]*)\))$/,
+        );
         if (!match_2)
             return {
                 original: original_2,
                 translation: '',
             };
         const original_3 = String(match_2[1] || '').trim(),
-            translation_3 = String(match_2[2] || '').trim();
+            translation_3 = String(match_2[2] || match_2[3] || '').trim();
         if (!original_3 || !translation_3)
             return {
                 original: original_2,

@@ -731,11 +731,11 @@ class NetflixApp {
                   this.escapeHtml(name_2.slice(0, 1).toUpperCase()) +
                   '</span>';
     }
-    ['renderHome']() {
+    renderHome() {
         const catalog = this.normalizeCatalog(this.state.homeCatalog);
         this.state.homeCatalog = catalog;
-        const banners_3 = catalog.banners,
-            rows = [
+        const banners_3 = catalog.banners;
+        const rows = [
                 catalog.recent.length
                     ? this.renderCatalogRow('继续你的故事', catalog.recent, true)
                     : '',
@@ -744,53 +744,39 @@ class NetflixApp {
                 ),
             ]
                 .filter(Boolean)
-                .join(''),
-            hasTitles =
+                .join('');
+        const hasTitles =
                 banners_3.length ||
                 catalog.recent.length ||
                 Object.values(catalog.sections).some((items_3) => items_3.length);
         this.homeContent.innerHTML = hasTitles
-            ? `
-            ` +
+            ? '\n            ' +
               (banners_3.length
-                  ? `<div class="netflix-hero-scroll">
-                ` +
+                  ? '<div class="netflix-hero-scroll">\n                ' +
                     banners_3
                         .map(
                             (value_95, value_96) =>
-                                `
-                    <article class="netflix-hero" style="--hero-image:url('` +
+                                '\n                    <article class="netflix-hero" style="--hero-image:url(\'' +
                                 this.escapeAttr(value_95.coverUrl) +
-                                `')">
-                        <div class="netflix-hero-copy">
-                            <span>` +
+                                '\')">\n                        <div class="netflix-hero-copy">\n                            <span>' +
                                 this.escapeHtml(value_95.category) +
-                                `</span>
-                            <h1>` +
+                                '</span>\n                            <h1>' +
                                 this.escapeHtml(value_95.title) +
-                                `</h1>
-                            <p>` +
+                                '</h1>\n                            <p>' +
                                 this.escapeHtml(value_95.summary || '开启一段属于你的互动故事。') +
-                                `</p>
-                            <button type="button" data-catalog-id="` +
+                                '</p>\n                            <button type="button" data-catalog-id="' +
                                 this.escapeAttr(value_95.id) +
-                                `"><i class="fas fa-play"></i> 播放</button>
-                        </div>
-                        <div class="netflix-hero-index">0` +
+                                '"><i class="fas fa-play"></i> 播放</button>\n                        </div>\n                        <div class="netflix-hero-index">0' +
                                 (value_96 + 1) +
-                                `</div>
-                    </article>`,
+                                '</div>\n                    </article>',
                         )
                         .join('') +
-                    `
-            </div>`
+                    '\n            </div>'
                   : '') +
-              `
-            ` +
+              '\n            ' +
               rows +
-              `
-        `
-            : '<div class="netflix-catalog-empty"><i class="fas fa-film"></i><h2>片库是空的</h2><p>可以通过右上角搜索生成新的互动故事。</p><button type="button" data-action="open-search">创建故事</button></div>';
+              '\n        '
+            : '<div class="netflix-catalog-empty"><i class="fas fa-film"></i><h2>片库是空的</h2><p>可以通过右上角搜索生成新的互动故事。</p></div>';
     }
     ['renderCatalogRow'](value_97, items_98, value_99) {
         return (
@@ -1018,54 +1004,28 @@ class NetflixApp {
         this.setupView.classList.remove('is-active');
         this.setupView.setAttribute('aria-hidden', 'true');
     }
-    ['renderSetup']() {
+    renderSetup() {
         if (!this.setupDraft) return;
-        const worldBooks_130 = this.getWorldBooks(),
-            selectedBooks = new Set((this.setupDraft.worldBookIds || []).map(String));
+        const worldBooks_130 = this.getSelectableWorldBooks();
+        const selectedBooks = new Set((this.setupDraft.worldBookIds || []).map(String));
         this.setupBody.innerHTML =
-            `
-            <section class="netflix-setup-cover" style="--setup-cover:url('` +
+            '\n            <section class="netflix-setup-cover" style="--setup-cover:url(\'' +
             this.escapeAttr(this.setupDraft.coverUrl) +
-            `')">
-                <div><span>GAME PROJECT</span><h1>` +
+            '\')">\n                <div><span>GAME PROJECT</span><h1>' +
             this.escapeHtml(this.setupDraft.title || '未命名游戏') +
-            `</h1></div>
-            </section>
-            <section class="netflix-setup-section">
-                <div class="netflix-section-heading"><span>01</span><div><h2>故事设定</h2><p>影片资料已预填，可以完全改写。</p></div></div>
-                <label class="netflix-field"><span>游戏标题</span><input type="text" maxlength="60" data-setup-field="title" value="` +
+            '</h1></div>\n            </section>\n            <section class="netflix-setup-section">\n                <div class="netflix-section-heading"><span>01</span><div><h2>故事设定</h2><p>影片资料已预填，可以完全改写。</p></div></div>\n                <label class="netflix-field"><span>游戏标题</span><input type="text" maxlength="60" data-setup-field="title" value="' +
             this.escapeAttr(this.setupDraft.title) +
-            `"></label>
-                <label class="netflix-field"><span>世界观设定</span><textarea maxlength="8000" data-setup-field="worldview" placeholder="时代、地点、社会规则与不可违背的设定">` +
+            '"></label>\n                <label class="netflix-field"><span>世界观设定</span><textarea maxlength="8000" data-setup-field="worldview" placeholder="时代、地点、社会规则与不可违背的设定">' +
             this.escapeHtml(this.setupDraft.worldview) +
-            `</textarea></label>
-                <label class="netflix-field"><span>故事前提</span><textarea maxlength="4000" data-setup-field="premise" placeholder="主线矛盾、开局处境与希望体验的故事方向">` +
+            '</textarea></label>\n                <label class="netflix-field"><span>故事前提</span><textarea maxlength="4000" data-setup-field="premise" placeholder="主线矛盾、开局处境与希望体验的故事方向">' +
             this.escapeHtml(this.setupDraft.premise) +
-            `</textarea></label>
-            </section>
-            <section class="netflix-setup-section">
-                <div class="netflix-section-heading"><span>02</span><div><h2>主演人设</h2><p>玩家固定参与；Char 与自定义 NPC 会保存为独立快照。</p></div><button type="button" class="netflix-section-action" data-action="open-cast-picker"><i class="fas fa-plus"></i> 添加</button></div>
-                <div class="netflix-setup-cast-list">
-                    ` +
+            '</textarea></label>\n            </section>\n            <section class="netflix-setup-section">\n                <div class="netflix-section-heading"><span>02</span><div><h2>主演人设</h2><p>玩家固定参与；Char 与自定义 NPC 会保存为独立快照。</p></div><button type="button" class="netflix-section-action" data-action="open-cast-picker"><i class="fas fa-plus"></i> 添加</button></div>\n                <div class="netflix-setup-cast-list">\n                    ' +
             this.setupDraft.cast.map((actor_6) => this.renderSetupActor(actor_6)).join('') +
-            `
-                </div>
-            </section>
-            <section class="netflix-setup-section">
-                <div class="netflix-section-heading"><span>03</span><div><h2>User 属性</h2><p>初始值随机 0–100，可直接修改。</p></div><button type="button" class="netflix-section-action" data-action="reroll-attributes"><i class="fas fa-dice"></i> 重随机</button></div>
-                <div class="netflix-attribute-grid">
-                    ` +
+            '\n                </div>\n            </section>\n            <section class="netflix-setup-section">\n                <div class="netflix-section-heading"><span>03</span><div><h2>User 属性</h2><p>初始值随机 0–100，可直接修改。</p></div><button type="button" class="netflix-section-action" data-action="reroll-attributes"><i class="fas fa-dice"></i> 重随机</button></div>\n                <div class="netflix-attribute-grid">\n                    ' +
             this.setupDraft.attributes
                 .map((attribute_3) => this.renderSetupAttribute(attribute_3))
                 .join('') +
-            `
-                </div>
-                <button type="button" class="netflix-dashed-button" data-action="add-attribute"><i class="fas fa-plus"></i> 添加自定义属性</button>
-            </section>
-            <section class="netflix-setup-section">
-                <div class="netflix-section-heading"><span>04</span><div><h2>世界书</h2><p>开始后保存词条快照，不受后续修改影响。</p></div></div>
-                <div class="netflix-worldbook-options">
-                    ` +
+            '\n                </div>\n                <button type="button" class="netflix-dashed-button" data-action="add-attribute"><i class="fas fa-plus"></i> 添加自定义属性</button>\n            </section>\n            <section class="netflix-setup-section">\n                <div class="netflix-section-heading"><span>04</span><div><h2>世界书</h2><p>单独挂载保存快照；全局世界书实时生效。</p></div></div>\n                <div class="netflix-worldbook-options">\n                    ' +
             (worldBooks_130.length
                 ? worldBooks_130
                       .map(
@@ -1082,13 +1042,7 @@ class NetflixApp {
                       )
                       .join('')
                 : '<div class="netflix-empty-state">暂无世界书，可直接使用上方世界观开始。</div>') +
-            `
-                </div>
-            </section>
-            <div class="netflix-setup-actions">
-                <button type="button" class="netflix-secondary-button" data-action="open-load"><i class="fas fa-folder-open"></i> 读档</button>
-                <button type="button" class="netflix-primary-button" data-action="start-game" id="netflix-start-game-button"><i class="fas fa-play"></i> 开始播放</button>
-            </div>`;
+            '\n                </div>\n            </section>\n            <div class="netflix-setup-actions">\n                <button type="button" class="netflix-secondary-button" data-action="open-load"><i class="fas fa-folder-open"></i> 读档</button>\n                <button type="button" class="netflix-primary-button" data-action="start-game" id="netflix-start-game-button"><i class="fas fa-play"></i> 开始播放</button>\n            </div>';
     }
     ['renderSetupActor'](contact_135) {
         return (
@@ -1450,24 +1404,20 @@ class NetflixApp {
             this.setBusy(false);
         }
     }
-    ['buildScenePrompt'](run_4, phase_2, value_172) {
-        const value_173 = run_4.setup || {},
-            join_174 = (value_173.worldBooks || [])
-                .map(
-                    (message_183) =>
-                        '《' +
-                        message_183.name +
-                        `》
-` +
-                        message_183.content,
-                )
-                .filter(Boolean).join(`
-
-`),
-            join_175 = (run_4.attributes || [])
-                .map((value_184) => value_184.id + '（' + value_184.name + '）=' + value_184.value)
-                .join('；'),
-            join_176 = (run_4.cast || []).map((actor_12) => {
+    buildScenePrompt(run_4, phase_2, value_172) {
+        const value_173 = run_4.setup || {};
+        const join_174 = this.getWorldBookPromptContext(
+            run_4,
+            [value_172?.text, run_4.currentScene?.title].filter(Boolean).join('\n'),
+        );
+        const _value16 = (run_4.attributes || [])
+            .map(
+                (message_183) =>
+                    message_183.id + '（' + message_183.name + '）=' + message_183.value,
+            )
+            .join('；');
+        const _value17 = (run_4.cast || [])
+            .map((actor_12) => {
                 if (actor_12.type === 'user')
                     return (
                         actor_12.id +
@@ -1477,19 +1427,19 @@ class NetflixApp {
                         actor_12.name +
                         '”'
                     );
-                const relation = actor_12.acquainted ? '已结识' : '已登场但未结识',
-                    value_187 = actor_12.profileComplete
-                        ? '身份：' +
-                          actor_12.identity +
-                          '；职业：' +
-                          actor_12.occupation +
-                          '；阵营：' +
-                          actor_12.faction +
-                          '；角色属性：' +
-                          actor_12.characterAttributes
-                              .map((value_188) => '' + value_188.name + value_188.value)
-                              .join('、')
-                        : '身份档案尚未补全，本次实际登场时必须返回 characterProfiles 档案';
+                const relation = actor_12.acquainted ? '已结识' : '已登场但未结识';
+                const value_187 = actor_12.profileComplete
+                    ? '身份：' +
+                      actor_12.identity +
+                      '；职业：' +
+                      actor_12.occupation +
+                      '；阵营：' +
+                      actor_12.faction +
+                      '；角色属性：' +
+                      actor_12.characterAttributes
+                          .map((value_188) => '' + value_188.name + value_188.value)
+                          .join('、')
+                    : '身份档案尚未补全，本次实际登场时必须返回 characterProfiles 档案';
                 return (
                     actor_12.id +
                     ' | ' +
@@ -1502,121 +1452,80 @@ class NetflixApp {
                     actor_12.affinity +
                     ' | ' +
                     (actor_12.companionEligible ? '可同行' : '不可同行') +
-                    `
-` +
+                    '\n' +
                     value_187 +
-                    `
-人设：` +
+                    '\n人设：' +
                     (actor_12.persona || '未填写')
                 );
-            }).join(`
-
-`),
-            join_177 = (run_4.storyLog || []).slice(-2).map(
+            })
+            .join('\n\n');
+        const join_177 = (run_4.storyLog || [])
+            .slice(-2)
+            .map(
                 (value_189) =>
                     value_189.title +
-                    `
-` +
-                    value_189.beats.map(
-                        (value_190) =>
-                            '' +
-                            (value_190.speakerName ? value_190.speakerName + '：' : '') +
-                            value_190.text,
-                    ).join(`
-`),
-            ).join(`
-
-`),
-            trainingRecent =
-                (run_4.training?.recentEventSummaries || []).slice(-3).join(`
-`) || '无',
-            value_179 =
-                `【固定设定】
-标题：` +
-                value_173.title +
-                `
-分类：` +
-                (value_173.category || '剧情') +
-                `
-世界观：` +
-                value_173.worldview +
-                `
-故事前提：` +
-                value_173.premise +
-                `
-
-【世界书快照】
-` +
-                (join_174 || '无') +
-                `
-
-【主演】
-` +
-                join_176 +
-                `
-
-【当前 User 属性】
-` +
-                join_175 +
-                `
-
-【累计剧情摘要】
-` +
-                (run_4.storySummary || '尚未开始') +
-                `
-
-【事件标记】
-` +
-                ((run_4.flags || []).join('、') || '无') +
-                `
-
-【最近养成事件】
-` +
-                trainingRecent +
-                `
-
-【最近场景】
-` +
-                (join_177 || '无'),
-            text_180 = `只返回合法 JSON，不要 Markdown、代码围栏或解释。结构：
-{"scene":{"id":"scene-id","title":"场景标题","beats":[{"id":"beat-1","kind":"narration","text":"旁白"},{"id":"beat-2","kind":"dialogue","speakerId":"稳定角色id","speakerName":"显示姓名","text":"对话"}],"characterProfiles":[{"id":"角色稳定id","triggerBeatId":"角色首次实际登场的beat id","name":"姓名","identity":"身份定位","occupation":"职业","faction":"阵营","persona":"完整人设","attributes":[{"id":"开局User属性id","value":0}],"initialAffinity":50,"companionEligible":false}]},"outcome":{"attributeDeltas":{"属性id":0},"affinityDeltas":{"已登记角色id":0},"summary":"更新后的完整剧情摘要","flags":["新增事件标记"]},"choices":[{"id":"choice-id","text":"玩家可执行的行动","requirements":{"attributes":{"属性id":最低值},"affinities":{"已登记角色id":最低值}}}],"storySummary":"更新后的完整剧情摘要","ending":null}。characterProfiles 只为首次登场的新具名角色或档案未补全的已有角色返回；每份档案必须绑定实际登场 beat。角色 attributes 必须逐项完整复用【当前 User 属性】中的全部属性 id，数量和 id 完全一致，只由你为每项选择 0–100 整数值；禁止新增、删除、改名或输出其他属性。剧情新角色 initialAffinity 必须为 30–70；无名路人不要建档。已登记人物必须复用原 id，禁止同名重复建档。单场数值变化只能为 -10 到 10。`;
+                    '\n' +
+                    value_189.beats
+                        .map(
+                            (value_190) =>
+                                '' +
+                                (value_190.speakerName ? value_190.speakerName + '：' : '') +
+                                value_190.text,
+                        )
+                        .join('\n'),
+            )
+            .join('\n\n');
+        const trainingRecent =
+            (run_4.training?.recentEventSummaries || []).slice(-3).join('\n') || '无';
+        const value_179 =
+            '【固定设定】\n标题：' +
+            value_173.title +
+            '\n分类：' +
+            (value_173.category || '剧情') +
+            '\n世界观：' +
+            value_173.worldview +
+            '\n故事前提：' +
+            value_173.premise +
+            '\n\n【世界书设定】\n' +
+            (join_174 || '无') +
+            '\n\n【主演】\n' +
+            _value17 +
+            '\n\n【当前 User 属性】\n' +
+            _value16 +
+            '\n\n【累计剧情摘要】\n' +
+            (run_4.storySummary || '尚未开始') +
+            '\n\n【事件标记】\n' +
+            ((run_4.flags || []).join('、') || '无') +
+            '\n\n【最近养成事件】\n' +
+            trainingRecent +
+            '\n\n【最近场景】\n' +
+            (join_177 || '无');
+        const text_180 =
+            '只返回合法 JSON，不要 Markdown、代码围栏或解释。结构：\n{"scene":{"id":"scene-id","title":"场景标题","beats":[{"id":"beat-1","kind":"narration","text":"旁白"},{"id":"beat-2","kind":"dialogue","speakerId":"稳定角色id","speakerName":"显示姓名","text":"对话"}],"characterProfiles":[{"id":"角色稳定id","triggerBeatId":"角色首次实际登场的beat id","name":"姓名","identity":"身份定位","occupation":"职业","faction":"阵营","persona":"完整人设","attributes":[{"id":"开局User属性id","value":0}],"initialAffinity":50,"companionEligible":false}]},"outcome":{"attributeDeltas":{"属性id":0},"affinityDeltas":{"已登记角色id":0},"summary":"更新后的完整剧情摘要","flags":["新增事件标记"]},"choices":[{"id":"choice-id","text":"玩家可执行的行动","requirements":{"attributes":{"属性id":最低值},"affinities":{"已登记角色id":最低值}}}],"storySummary":"更新后的完整剧情摘要","ending":null}。characterProfiles 只为首次登场的新具名角色或档案未补全的已有角色返回；每份档案必须绑定实际登场 beat。角色 attributes 必须逐项完整复用【当前 User 属性】中的全部属性 id，数量和 id 完全一致，只由你为每项选择 0–100 整数值；禁止新增、删除、改名或输出其他属性。剧情新角色 initialAffinity 必须为 30–70；无名路人不要建档。已登记人物必须复用原 id，禁止同名重复建档。单场数值变化只能为 -10 到 10。';
         if (phase_2 === 'prologue')
             return (
-                `你是中文养成文游的主笔。根据设定生成一次完整序章。序章必须有 8–14 条可逐条显示的内容，旁白与人物对话交错，对话必须有 speakerName 和稳定 speakerId；玩家角色只能使用主演快照中的真实姓名，禁止称为 U、User 或“玩家”。所有非 User 角色第一次实际登场都要按契约提供身份档案。只负责建立世界、人物关系和开局事件，不提供选项、不进行属性结算、不产生结局。
-
-` +
+                '你是中文养成文游的主笔。根据设定生成一次完整序章。序章必须有 8–14 条可逐条显示的内容，旁白与人物对话交错，对话必须有 speakerName 和稳定 speakerId；玩家角色只能使用主演快照中的真实姓名，禁止称为 U、User 或“玩家”。所有非 User 角色第一次实际登场都要按契约提供身份档案。只负责建立世界、人物关系和开局事件，不提供选项、不进行属性结算、不产生结局。\n\n' +
                 value_179 +
-                `
-
-` +
+                '\n\n' +
                 text_180 +
-                `
-序章的 choices 必须是空数组，outcome 中所有变化为 0，ending 必须为 null。`
+                '\n序章的 choices 必须是空数组，outcome 中所有变化为 0，ending 必须为 null。'
             );
         const value_181 = value_172
                 ? '玩家刚刚选择：' + value_172.text + '（id=' + value_172.id + '）'
-                : '这是第一章的第一个场景，没有上一选择。',
-            canEnd = run_4.sceneNumber >= 8 || phase_2 === 'epilogue';
+                : '这是第一章的第一个场景，没有上一选择。';
+        const canEnd = run_4.sceneNumber >= 8 || phase_2 === 'epilogue';
         return (
             '你是中文养成文游的主笔。生成下一个完整场景包：严格 12–18 条旁白/对话和 2–4 个差异明确的行动选项。先在 outcome 中结算上一选择，再写新场景。选项可以设置属性或好感度门槛，但必须至少有一个无门槛或按当前数值可满足的选项。所有对话必须使用稳定 speakerId；所有非 User 角色第一次实际登场都要按契约提供身份档案。玩家角色只能使用主演快照中的真实姓名，禁止称为 U、User 或“玩家”。如果玩家输入了不合理的自定义行动，应写出符合设定的失败尝试，不能扭曲世界规则。人物必须遵守人设，剧情要推进而非复述。' +
             (canEnd
                 ? '如果剧情、属性和关系已经形成完整收束，可以返回自然结局；否则 ending 为 null。'
                 : '主线不足 8 个场景，ending 必须为 null。') +
-            `
-
-` +
+            '\n\n' +
             value_179 +
-            `
-
-【本次输入】
-` +
+            '\n\n【本次输入】\n' +
             value_181 +
-            `
-
-` +
+            '\n\n' +
             text_180 +
-            `
-` +
+            '\n' +
             (phase_2 === 'epilogue' ? '这是结局后的番外，不要重复解锁同一个结局。' : '')
         );
     }
@@ -2206,36 +2115,40 @@ class NetflixApp {
         this.hubOpen = true;
         this.renderGameHub();
     }
-    ['showGameStory']() {
+    showGameStory() {
         if (this.hubDraftOpen && this.setupDraft) {
-            const setupDraft_265 = this.setupDraft,
-                worldBooks_266 = this.getWorldBooks(),
-                selectedBooks_2 = new Set((setupDraft_265.worldBookIds || []).map(String)),
-                join_268 = (setupDraft_265.worldBooks || [])
-                    .map(
-                        (message_269) =>
-                            '<label class="netflix-field"><span>' +
-                            this.escapeHtml(message_269.name || '未命名世界书') +
-                            ' · 词条文本</span><textarea data-worldbook-content="' +
-                            this.escapeAttr(message_269.id) +
-                            '" rows="5">' +
-                            this.escapeHtml(message_269.content || '') +
-                            '</textarea></label>',
-                    )
-                    .join('');
+            const setupDraft_265 = this.setupDraft;
+            const worldBooks_266 = this.getSelectableWorldBooks();
+            const _value22 = new Set(
+                this.getWorldBooks()
+                    .filter((_value23) => _value23?.isGlobal)
+                    .map((_value24) => String(_value24.id)),
+            );
+            const selectedBooks_2 = new Set((setupDraft_265.worldBookIds || []).map(String));
+            const join_268 = (setupDraft_265.worldBooks || [])
+                .filter((_value25) => !_value22.has(String(_value25.id)))
+                .map(
+                    (message_269) =>
+                        '<label class="netflix-field"><span>' +
+                        this.escapeHtml(message_269.name || '未命名世界书') +
+                        ' · 词条文本</span><textarea data-worldbook-content="' +
+                        this.escapeAttr(message_269.id) +
+                        '" rows="5">' +
+                        this.escapeHtml(message_269.content || '') +
+                        '</textarea></label>',
+                )
+                .join('');
             this.infoTitle.textContent = '故事';
             this.infoBody.innerHTML =
                 '<div class="netflix-hub-info"><div class="netflix-hub-story-lead"><span>NEW STORY</span><h3>' +
                 this.escapeHtml(setupDraft_265.title || '未命名故事') +
-                `</h3><p>设置世界与人物后，从这里开始生成序章。</p><button type="button" class="netflix-primary-button" data-action="start-game" id="netflix-start-game-button"><i class="fas fa-play"></i> 开始剧情</button></div>
-                <section><h3>故事设定</h3><label class="netflix-field"><span>故事标题</span><input type="text" maxlength="60" data-setup-field="title" value="` +
+                '</h3><p>设置世界与人物后，从这里开始生成序章。</p><button type="button" class="netflix-primary-button" data-action="start-game" id="netflix-start-game-button"><i class="fas fa-play"></i> 开始剧情</button></div>\n                <section><h3>故事设定</h3><label class="netflix-field"><span>故事标题</span><input type="text" maxlength="60" data-setup-field="title" value="' +
                 this.escapeAttr(setupDraft_265.title) +
                 '"></label><label class="netflix-field"><span>故事前提</span><textarea maxlength="4000" data-setup-field="premise">' +
                 this.escapeHtml(setupDraft_265.premise) +
                 '</textarea></label><label class="netflix-field"><span>世界观设定</span><textarea maxlength="8000" data-setup-field="worldview">' +
                 this.escapeHtml(setupDraft_265.worldview) +
-                `</textarea></label></section>
-                <section><h3>世界书</h3><p>勾选并编辑当前故事使用的词条文本。</p><div class="netflix-worldbook-options">` +
+                '</textarea></label></section>\n                <section><h3>世界书</h3><p>勾选并编辑当前故事使用的词条文本。</p><div class="netflix-worldbook-options">' +
                 (worldBooks_266.length
                     ? worldBooks_266
                           .map(
@@ -2260,32 +2173,38 @@ class NetflixApp {
         }
         const activeRun_256 = this.state.activeRun;
         if (!activeRun_256) return;
-        const setup_3 = this.getEditableSetup(),
-            value_258 =
+        const setup_3 = this.getEditableSetup();
+        const value_258 =
                 activeRun_256.phase === 'prologue'
                     ? '序章'
                     : activeRun_256.phase === 'ending'
                       ? '结局'
                       : activeRun_256.phase === 'epilogue'
                         ? '番外'
-                        : '第 ' + activeRun_256.sceneNumber + ' 章',
-            worldBooks_259 = this.getWorldBooks(),
-            selectedBooks_3 = new Set(worldBooks_259.map((value_271) => String(value_271.id))),
-            items_261 = [
-                ...worldBooks_259,
-                ...(setup_3.worldBooks || [])
-                    .filter((book_5) => !selectedBooks_3.has(String(book_5.id)))
-                    .map((value_273) => ({
-                        ...value_273,
-                        isSavedOnly: true,
-                    })),
-            ],
-            selectedBooks_4 = new Set(
+                        : '第 ' + activeRun_256.sceneNumber + ' 章';
+        const worldBooks_259 = this.getWorldBooks();
+        const selectedBooks_3 = worldBooks_259.filter((_value26) => _value26 && !_value26.isGlobal);
+        const _value20 = new Set(worldBooks_259.map((_value27) => String(_value27.id)));
+        const _value21 = new Set(
+            worldBooks_259
+                .filter((_value28) => _value28?.isGlobal)
+                .map((value_271) => String(value_271.id)),
+        );
+        const items_261 = [
+            ...selectedBooks_3,
+            ...(setup_3.worldBooks || [])
+                .filter((book_5) => !_value20.has(String(book_5.id)))
+                .map((value_273) => ({
+                    ...value_273,
+                    isSavedOnly: true,
+                })),
+        ];
+        const selectedBooks_4 = new Set(
                 (setup_3.worldBookIds || (setup_3.worldBooks || []).map((book_6) => book_6.id)).map(
                     String,
                 ),
-            ),
-            join_263 = items_261
+            );
+        const join_263 = items_261
                 .map(
                     (book_7) =>
                         '<label><span><i class="fas fa-book"></i><b>' +
@@ -2301,23 +2220,23 @@ class NetflixApp {
                         (selectedBooks_4.has(String(book_7.id)) ? 'checked' : '') +
                         '></label>',
                 )
-                .join(''),
-            join_264 = (setup_3.worldBooks || [])
-                .map(
-                    (message_276) =>
-                        '<label class="netflix-field"><span>' +
-                        this.escapeHtml(message_276.name || '未命名世界书') +
-                        ' · 词条快照</span><textarea data-worldbook-content="' +
-                        this.escapeAttr(message_276.id) +
-                        '" rows="5">' +
-                        this.escapeHtml(message_276.content || '') +
-                        '</textarea></label>',
-                )
                 .join('');
+        const join_264 = (setup_3.worldBooks || [])
+            .filter((_value29) => !_value21.has(String(_value29.id)))
+            .map(
+                (message_276) =>
+                    '<label class="netflix-field"><span>' +
+                    this.escapeHtml(message_276.name || '未命名世界书') +
+                    ' · 词条快照</span><textarea data-worldbook-content="' +
+                    this.escapeAttr(message_276.id) +
+                    '" rows="5">' +
+                    this.escapeHtml(message_276.content || '') +
+                    '</textarea></label>',
+            )
+            .join('');
         this.infoTitle.textContent = '故事';
         this.infoBody.innerHTML =
-            `<div class="netflix-hub-info">
-            <div class="netflix-hub-story-lead"><span>` +
+            '<div class="netflix-hub-info">\n            <div class="netflix-hub-story-lead"><span>' +
             this.escapeHtml(value_258) +
             ' · ' +
             this.escapeHtml(activeRun_256.currentScene?.title || '') +
@@ -2325,21 +2244,17 @@ class NetflixApp {
             this.escapeHtml(setup_3.title || '未命名故事') +
             '</h3><p>' +
             this.escapeHtml(activeRun_256.storySummary || setup_3.premise || '故事即将开始。') +
-            `</p><button type="button" class="netflix-primary-button" data-action="resume-game-story"><i class="fas fa-play"></i> 继续剧情</button></div>
-            <button type="button" class="netflix-hub-link" data-action="show-history"><i class="fas fa-history"></i> 剧情回看 <i class="fas fa-chevron-right"></i></button>
-            <section><h3>故事设定</h3><label class="netflix-field"><span>故事标题</span><input type="text" maxlength="60" data-setup-field="title" value="` +
+            '</p><button type="button" class="netflix-primary-button" data-action="resume-game-story"><i class="fas fa-play"></i> 继续剧情</button></div>\n            <button type="button" class="netflix-hub-link" data-action="show-history"><i class="fas fa-history"></i> 剧情回看 <i class="fas fa-chevron-right"></i></button>\n            <section><h3>故事设定</h3><label class="netflix-field"><span>故事标题</span><input type="text" maxlength="60" data-setup-field="title" value="' +
             this.escapeAttr(setup_3.title) +
             '"></label><label class="netflix-field"><span>故事前提</span><textarea maxlength="4000" data-setup-field="premise">' +
             this.escapeHtml(setup_3.premise) +
             '</textarea></label><label class="netflix-field"><span>世界观设定</span><textarea maxlength="8000" data-setup-field="worldview">' +
             this.escapeHtml(setup_3.worldview) +
-            `</textarea></label></section>
-            <section><h3>世界书</h3><p>勾选词条来源，或直接修改当前故事保存的词条文本。修改会用于后续剧情。</p><div class="netflix-worldbook-options">` +
+            '</textarea></label></section>\n            <section><h3>世界书</h3><p>勾选词条来源，或直接修改当前故事保存的词条文本。修改会用于后续剧情。</p><div class="netflix-worldbook-options">' +
             (join_263 || '<div class="netflix-empty-state">暂无可选世界书。</div>') +
             '</div>' +
             (join_264 || '<p>当前故事未选择世界书。</p>') +
-            `</section>
-        </div>`;
+            '</section>\n        </div>';
         this.closeSheet(this.menuSheet);
         this.openSheet(this.infoSheet);
     }
@@ -2783,17 +2698,13 @@ class NetflixApp {
         const raw_8 = await this.requestJson(this.buildMapPrompt(run_17));
         return this.core.normalizeMapPayload(raw_8);
     }
-    ['buildMapPrompt'](run_18) {
-        const value_344 = run_18.setup || {},
-            value_345 =
-                (value_344.worldBooks || []).map(
-                    (message_348) => '《' + message_348.name + '》' + message_348.content,
-                ).join(`
-`) || '无',
-            join_346 = (run_18.attributes || [])
+    buildMapPrompt(run_18) {
+        const value_344 = run_18.setup || {};
+        const value_345 = this.getWorldBookPromptContext(run_18) || '无';
+        const join_346 = (run_18.attributes || [])
                 .map((value_349) => value_349.id + '=' + value_349.name)
-                .join('、'),
-            join_347 = (run_18.cast || [])
+                .join('、');
+        const join_347 = (run_18.cast || [])
                 .filter(
                     (actor_22) =>
                         actor_22.type === 'user' ||
@@ -2802,43 +2713,39 @@ class NetflixApp {
                 .map((value_351) => value_351.id + '=' + value_351.name)
                 .join('、');
         return (
-            `你是中文养成文游的地图设计师。根据以下资料生成一张可长期探索的互动节点地图。只返回合法 JSON，不要 Markdown。
-
-标题：` +
+            '你是中文养成文游的地图设计师。根据以下资料生成一张可长期探索的互动节点地图。只返回合法 JSON，不要 Markdown。\n\n标题：' +
             value_344.title +
-            `
-世界观：` +
+            '\n世界观：' +
             value_344.worldview +
-            `
-故事前提：` +
+            '\n故事前提：' +
             value_344.premise +
-            `
-当前剧情：` +
+            '\n当前剧情：' +
             (run_18.storySummary || '序章之后') +
-            `
-世界书：` +
+            '\n世界书：' +
             value_345 +
-            `
-属性 id：` +
+            '\n属性 id：' +
             join_346 +
-            `
-主演 id：` +
+            '\n主演 id：' +
             join_347 +
-            `
-
-严格结构：{"map":{"id":"英文id","name":"地图名","description":"地图整体说明","nodes":[{"id":"英文唯一id","name":"地点名","description":"地点介绍","type":"地点类型","icon":"Font Awesome 图标类名，如 fa-school","x":5到95的整数,"y":8到92的整数,"focusAttributes":["属性id"],"featuredCastIds":["主演id"]}],"edges":[{"from":"地点id","to":"地点id"}]}}。nodes 必须 6–10 个，分布不能重叠；edges 必须全部引用有效节点并让地图整体连通。`
+            '\n\n严格结构：{"map":{"id":"英文id","name":"地图名","description":"地图整体说明","nodes":[{"id":"英文唯一id","name":"地点名","description":"地点介绍","type":"地点类型","icon":"Font Awesome 图标类名，如 fa-school","x":5到95的整数,"y":8到92的整数,"focusAttributes":["属性id"],"featuredCastIds":["主演id"]}],"edges":[{"from":"地点id","to":"地点id"}]}}。nodes 必须 6–10 个，分布不能重叠；edges 必须全部引用有效节点并让地图整体连通。'
         );
     }
-    ['buildTrainingEventPrompt'](run_19, location) {
-        const training_3 = run_19.training,
-            companion = run_19.cast.find(
+    buildTrainingEventPrompt(run_19, location) {
+        const training_3 = run_19.training;
+        const _value33 =
+            this.getWorldBookPromptContext(
+                run_19,
+                (location.name || '') + '\n' + (location.description || ''),
+            ) || '无';
+        const companion = run_19.cast.find(
                 (actor_23) => actor_23.id === training_3.companionId && actor_23.type !== 'user',
-            ),
-            familiarity = training_3.familiarityByLocation[location.id] || 0,
-            join_357 = run_19.attributes
+            );
+        const familiarity = training_3.familiarityByLocation[location.id] || 0;
+        const join_357 = run_19.attributes
                 .map((value_360) => value_360.id + '（' + value_360.name + '）=' + value_360.value)
-                .join('；'),
-            join_358 = run_19.cast.map(
+                .join('；');
+        const join_358 = run_19.cast
+            .map(
                 (contact_361) =>
                     contact_361.id +
                     ' | ' +
@@ -2852,53 +2759,38 @@ class NetflixApp {
                     ' | ' +
                     (contact_361.persona || '未填写') +
                     (contact_361.profileComplete ? '' : ' | 档案待补全'),
-            ).join(`
-`);
+            )
+            .join('\n');
         return (
-            `你是中文养成文游的事件设计师。为一次地点行动生成完整小剧情。只返回合法 JSON，不要 Markdown。
-
-作品：` +
+            '你是中文养成文游的事件设计师。为一次地点行动生成完整小剧情。只返回合法 JSON，不要 Markdown。\n\n作品：' +
             run_19.setup.title +
-            `
-世界观：` +
+            '\n世界观：' +
             run_19.setup.worldview +
-            `
-主线摘要：` +
+            '\n主线摘要：' +
             run_19.storySummary +
-            `
-地点：` +
+            '\n世界书：' +
+            _value33 +
+            '\n地点：' +
             location.name +
             '（' +
             location.type +
-            `）
-地点说明：` +
+            '）\n地点说明：' +
             location.description +
-            `
-熟悉度：` +
+            '\n熟悉度：' +
             familiarity +
-            `/5
-同行角色：` +
+            '/5\n同行角色：' +
             (companion
                 ? companion.id + ' | ' + companion.name + ' | ' + companion.persona
                 : '独自行动') +
-            `
-当前属性：` +
+            '\n当前属性：' +
             join_357 +
-            `
-已登记人物：
-` +
+            '\n已登记人物：\n' +
             join_358 +
-            `
-已有事件标记：` +
+            '\n已有事件标记：' +
             (run_19.flags.join('、') || '无') +
-            `
-最近事件，严禁重复冲突和桥段：
-` +
-            (training_3.recentEventSummaries.slice(-12).join(`
-`) || '无') +
-            `
-
-严格结构：{"event":{"id":"英文id","locationId":"` +
+            '\n最近事件，严禁重复冲突和桥段：\n' +
+            (training_3.recentEventSummaries.slice(-12).join('\n') || '无') +
+            '\n\n严格结构：{"event":{"id":"英文id","locationId":"' +
             location.id +
             '","title":"事件标题","summary":"事件摘要","beats":[{"id":"beat-1","kind":"narration","text":"旁白"},{"id":"beat-2","kind":"dialogue","speakerId":"稳定角色id","speakerName":"显示姓名","text":"对话"}],"characterProfiles":[{"id":"角色稳定id","triggerBeatId":"实际登场beat id","name":"姓名","identity":"身份定位","occupation":"职业","faction":"阵营","persona":"完整人设","attributes":[{"id":"开局User属性id","value":50}],"initialAffinity":50,"companionEligible":false}],"choices":[{"id":"a","text":"行动选项","outcome":{"attributeDeltas":{"属性id":0},"affinityDeltas":{"已登记角色id":0},"flags":["事件标记"],"summary":"选择结果摘要"}},{"id":"b","text":"另一行动","outcome":{"attributeDeltas":{},"affinityDeltas":{},"flags":[],"summary":"选择结果摘要"}}]}}。beats 必须 3–6 条，choices 必须恰好 2 个。首次实际登场的新具名角色或档案待补全角色必须提供 characterProfiles；角色 attributes 必须逐项完整复用“当前属性”中的全部属性 id，数量和 id 完全一致，只选择每项 0–100 整数值，禁止新增、删除、改名或输出其他属性；新角色初始好感 30–70，无名路人不要建档，已登记人物必须复用原 id。每个数值变化只能为 -5 到 5；不能产生结局。玩家角色必须显示快照姓名，禁止称为 U、User 或“玩家”。'
         );
@@ -3219,7 +3111,7 @@ class NetflixApp {
         this.trainingEvent.classList.add('is-active');
         this.trainingEvent.setAttribute('aria-hidden', 'false');
     }
-    ['advanceTrainingEvent']() {
+    advanceTrainingEvent() {
         const run_26 = this.state.activeRun;
         if (this.isBusy || this.isTransitioning || !run_26?.training?.currentEvent) return;
         const commit_2 = () => {
@@ -3241,6 +3133,7 @@ class NetflixApp {
             commit_2();
             this.trainingEvent.firstElementChild?.classList.add('netflix-stage-entering');
             setTimeout(() => {
+                const _value40 = _value39;
                 this.isTransitioning = false;
             }, 170);
         }, 90);
@@ -4083,7 +3976,7 @@ class NetflixApp {
             : '<div class="netflix-empty-state">还没有解锁结局。每一个选择都会把故事推向不同方向。</div>';
         this.openSheet(this.infoSheet);
     }
-    ['showWorldBooksInfo']() {
+    showWorldBooksInfo() {
         const worldBooks_530 = this.getWorldBooks();
         this.infoTitle.textContent = '世界书';
         this.infoBody.innerHTML = worldBooks_530.length
@@ -4098,7 +3991,7 @@ class NetflixApp {
                           ' 条词条</small></span></article>',
                   )
                   .join('') +
-              '</div><p class="netflix-info-note">世界书会在初始化游戏时选择，并随存档保存独立文本快照。</p>'
+              '</div><p class="netflix-info-note">单独挂载的世界书随存档保存词条快照；全局世界书实时生效。</p>'
             : '<div class="netflix-empty-state">暂无世界书，请先在系统设置中创建。</div>';
         this.openSheet(this.infoSheet);
     }
@@ -4255,6 +4148,38 @@ class NetflixApp {
         this.isOpen = false;
         this.view.classList.remove('active');
         this.view.style.display = 'none';
+    }
+    getSelectableWorldBooks() {
+        return this.getWorldBooks().filter((_value4) => _value4 && !_value4.isGlobal);
+    }
+    getWorldBookPromptContext(_value5, _value6 = '') {
+        const _value7 = this.getWorldBooks();
+        const _value8 = new Set(
+            _value7.filter((_value10) => _value10?.isGlobal).map((_value11) => String(_value11.id)),
+        );
+        const _value9 = (_value5?.setup?.worldBooks || [])
+            .filter((_value12) => _value12 && !_value8.has(String(_value12.id)))
+            .map((_value13) => '《' + _value13.name + '》\n' + _value13.content)
+            .filter(Boolean)
+            .join('\n\n');
+        const _value0 = [
+            _value5?.setup?.worldview,
+            _value5?.setup?.premise,
+            _value5?.storySummary,
+            _value6,
+        ]
+            .filter(Boolean)
+            .join('\n');
+        const _value1 = ['system_depth', 'before_role', 'after_role']
+            .map(
+                (_value14) =>
+                    window.getGlobalWorldBookContextByPosition?.(_value14, _value0, {
+                        includeBuiltin: false,
+                    }) || '',
+            )
+            .filter(Boolean)
+            .join('\n\n');
+        return [_value1, _value9].filter(Boolean).join('\n\n');
     }
 }
 function initializeNetflixApp() {

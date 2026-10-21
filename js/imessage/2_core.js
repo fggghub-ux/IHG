@@ -255,6 +255,10 @@ window.imApp.commitCharUserRemark = async function (memberId_2, value_30, value_
                 content: value_41 + '更改了你的备注',
                 timestamp: Date.now(),
                 apiRunId: apiRunId_2,
+                remarkChange: {
+                    oldRemark: charUserIdentity_40.remark,
+                    newRemark: trim_34,
+                },
             };
             targetFriend_2.messages.push(notice_2);
             window.imApp.syncFriendMessageSummary?.(targetFriend_2);
@@ -2222,10 +2226,7 @@ window.imApp.normalizeFriendData = function (friend_8) {
     normalized_2.userPhoneAccess = window.imApp.normalizeUserPhoneAccess(
         normalized_2.userPhoneAccess,
     );
-    normalized_2.type !== 'char' &&
-        ((normalized_2.userPhoneAccess.enabled = false),
-        (normalized_2.userPhoneAccess.autoTrigger.enabled = false),
-        (normalized_2.userPhoneAccess.autoTrigger.nextRunAt = 0));
+
     normalized_2.language = String(normalized_2.language || 'zh').trim() || 'zh';
     const chatMessageRange = window.imDataUtils?.normalizeChatMessageRange
         ? window.imDataUtils.normalizeChatMessageRange(
@@ -2272,6 +2273,7 @@ window.imApp.normalizeFriendData = function (friend_8) {
     normalized_2.continuousBubbles = normalized_2.continuousBubbles !== false;
     normalized_2.replyStyle = normalized_2.replyStyle === 'outside' ? 'outside' : 'inside';
     normalized_2.timeAware = normalized_2.timeAware !== false;
+    normalized_2.autoReplyEnabled = normalized_2.autoReplyEnabled === true;
     normalized_2.locationProfile = window.imDataUtils?.normalizeLocationProfile
         ? window.imDataUtils.normalizeLocationProfile(normalized_2.locationProfile)
         : {
@@ -3259,6 +3261,13 @@ window.imApp.formatSystemNoticeForApiContext = function (value_573, apk110New_63
             ? '[系统事件：' + trim_577 + ' 撤回了一条消息。]'
             : '[系统事件：你撤回了一条消息。]';
     }
+    if (noticeKind_2 === 'family_card_spend') {
+        const spend = message_574.familyCardSpend || {},
+            amount = Number(spend.amount),
+            balance = Number(spend.balance);
+        if (!Number.isFinite(amount) || amount <= 0) return '';
+        return `[亲属卡消费通知：User 使用了你赠送的亲属卡，消费 $${amount.toFixed(2)}，用途：${String(spend.title || '消费').slice(0, 160)}${Number.isFinite(balance) ? `，剩余额度 $${balance.toFixed(2)}` : ''}。]`;
+    }
     return value_576 ? '[系统事件：' + value_576 + ']' : '[系统事件]';
 };
 window.imApp.stripFakeLinkHtmlForApiContext = function (value_21_2, maxLength = 20000) {
@@ -3354,6 +3363,16 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                 : window.imApp.normalizeFriendData(value_113 || {}),
         normalizedMessage_3 = value_110 || {},
         value_117 = normalizedFriend_4.type === 'group';
+    if (normalizedMessage_3.type === 'gift' && normalizedMessage_3.excludedFromContext !== true) {
+        const gift = normalizedMessage_3.shopGift || {};
+        const name = normalizedMessage_3.giftName || gift.itemName || 'Gift';
+        const value = Number(normalizedMessage_3.giftValue ?? gift.price) || 0;
+        const note = normalizedMessage_3.giftDescription || gift.note || '';
+        return {
+            role: normalizedMessage_3.role,
+            content: `[${normalizedMessage_3.role === 'assistant' ? '你赠送给 User' : 'User 赠送给你'}一份礼物]\n商品：${name}\n价值：$${value.toFixed(2)}${note ? `\n赠礼备注：${note}` : ''}`,
+        };
+    }
     let value_601 = normalizedMessage_3.content || '';
     if (
         normalizedMessage_3.excludedFromContext === true ||
@@ -6473,6 +6492,43 @@ window.imApp.commitFriendsChange = async function (value_1161, options_26 = {}) 
         );
     }
 };
+window.imApp.changeFriendType = async function (_value11, _value12) {
+    const _value13 = String(window.imApp.resolveFriendId(_value11) ?? '');
+    const _value14 = window.imApp.getFriendById(_value13);
+    if (
+        !_value13 ||
+        !_value14 ||
+        !['char', 'npc'].includes(_value14.type) ||
+        !['char', 'npc'].includes(_value12)
+    )
+        return false;
+    if (_value14.type === _value12) return true;
+    const _value15 = _value14.type;
+    const _value16 = [_value13];
+    return window.imApp.commitFriendsChange(
+        () => {
+            const _value17 = window.imApp.getFriendById(_value13);
+            if (!_value17 || _value17.type !== _value15) throw new Error('角色身份已变化');
+            _value17.type = _value12;
+            (window.imData.friends || []).forEach((_value18) => {
+                const _value19 = _value18?.memory?.relationships;
+                if (!Array.isArray(_value19)) return;
+                let _value20 = false;
+                _value19.forEach((_value21) => {
+                    if (String(_value21?.targetId ?? _value21?.npcId ?? '') !== _value13) return;
+                    _value21.targetType = _value12;
+                    _value20 = true;
+                });
+                if (_value20) _value16.push(String(_value18.id));
+            });
+        },
+        {
+            friendIds: _value16,
+            includeMessages: false,
+            silent: true,
+        },
+    );
+};
 window.imApp.commitMomentChange = async function (momentId_4, value_1174, options_27 = {}) {
     const moments_2 = Array.isArray(window.imData.moments) ? window.imData.moments : [],
         index_1177 = moments_2.findIndex(
@@ -7029,6 +7085,7 @@ window.imApp.getWorldBookContextForFriendByPosition = function (
                 .filter(
                     (value_395) =>
                         value_395 &&
+                        !value_395.isGlobal &&
                         value_378.includes(String(value_395.id)) &&
                         Array.isArray(value_395.entries),
                 )
@@ -7263,6 +7320,7 @@ window.imApp.getWorldBookContextForFriendByPosition = function (
                 .filter(
                     (value_455) =>
                         value_455 &&
+                        !value_455.isGlobal &&
                         value_437.includes(String(value_455.id)) &&
                         Array.isArray(value_455.entries),
                 )
@@ -8043,10 +8101,12 @@ window.addEventListener('pagehide', () => {
         value_477 = null;
         currentModalGenerationPrompt = options_35.generationPrompt || null;
         customModalOverlay.classList.toggle('is-image-generation', !!options_35.generationPrompt);
-        const isIPadComposer = !!options_35.generationPrompt &&
+        const isIPadComposer =
+            !!options_35.generationPrompt &&
             !/iPhone|iPod/.test(navigator.userAgent) &&
             (/iPad/.test(navigator.userAgent) ||
-                (/Mac/.test(navigator.userAgent + navigator.platform) && navigator.maxTouchPoints > 1));
+                (/Mac/.test(navigator.userAgent + navigator.platform) &&
+                    navigator.maxTouchPoints > 1));
         customModalOverlay.classList.toggle('is-ipad-image-generation', isIPadComposer);
         if (options_35.type === 'prompt') {
             const useTextarea = options_35.multiline === true,

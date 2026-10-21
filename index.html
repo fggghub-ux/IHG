@@ -92,12 +92,12 @@
         />
         <link
             rel="stylesheet"
-            href="css/home.css?v=20260731-ios-swipe-icon-flicker-v1&layout=20260801-fixed-grid-v1&performance=20260801-v1&desktop=20260830-widget-grid-heights-v1&drag=20260920-v1&repair=20261003&settings=20261010-r1&apk-sync=111-selective"
+            href="css/home.css?v=20260731-ios-swipe-icon-flicker-v1&layout=20260801-fixed-grid-v1&performance=20260801-v1&desktop=20260830-widget-grid-heights-v1&drag=20260920-v1&repair=20261003&settings=20261010-r1&apk-sync=113-selective-20261022"
         />
-        <link rel="stylesheet" href="css/worldbook.css?v=20261007-107-r1" />
+        <link rel="stylesheet" href="css/worldbook.css?v=20261007-107-r1&apk-sync=113-selective-20261022" />
         <link rel="stylesheet" href="css/app_guide_modal.css?v=20261007-107-r1" />
         <link rel="stylesheet" href="css/online_prompts.css?v=20260905-v6&repair=20261003" />
-        <link rel="stylesheet" href="css/imessage.css?v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-sync=111-selective&apk-ui=111-rebuild-20261016&ui-fixes=20261018" />
+        <link rel="stylesheet" href="css/imessage.css?v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-sync=113-selective-20261022&apk-ui=111-rebuild-20261016&ui-fixes=20261018" />
         <link rel="stylesheet" href="css/pay.css?v=20260923-gallery-layout-v1&repair=20261003" />
         <link
             rel="stylesheet"
@@ -109,7 +109,7 @@
         />
         <link
             rel="stylesheet"
-            href="css/shopping.css?v=20260820-orders-v1&layout=20260923-gallery-v2&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1&shop-repair=20261010-v2"
+            href="css/shopping.css?v=20260820-orders-v1&layout=20260923-gallery-v2&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1&shop-repair=20261010-v2&apk-sync=113-selective-20261022"
         />
         <link rel="stylesheet" href="css/x.css?v=20261007-107-r1" />
 
@@ -119,12 +119,12 @@
         <link rel="stylesheet" href="css/loves.css?v=20261007-107-r1&dock=20261010-r3" />
         <link
             rel="stylesheet"
-            href="css/library.css?v=20260911-netease-mobile-web-v1&reader-comments=20260817-v3&reader-selection=20260819-v1&repair=20261003"
+            href="css/library.css?v=20260911-netease-mobile-web-v1&reader-comments=20260817-v3&reader-selection=20260819-v1&repair=20261003&apk-sync=113-selective-20261022"
         />
         <!-- App Styles -->
         <link
             rel="stylesheet"
-            href="css/settings.css?v=20261009-restored-repairs&apk-sync=111-selective"
+            href="css/settings.css?v=20261009-restored-repairs&apk-sync=113-selective-20261022"
         />
         <link
             rel="stylesheet"
@@ -132,12 +132,12 @@
         />
         <link
             rel="stylesheet"
-            href="css/netflix.css?v=20260928-story-hub-direct-v4&ihg=20260929-106-r1&repair=20261003"
+            href="css/netflix.css?v=20260928-story-hub-direct-v4&ihg=20260929-106-r1&repair=20261003&apk-sync=113-selective-20261022"
         />
         <link rel="stylesheet" href="css/appstore.css?v=20260830-runner-back-v7&repair=20261003" />
         <link rel="stylesheet" href="css/gallery.css?v=20260829-gallery-ios26-v8&repair=20261003" />
         <link rel="stylesheet" href="css/cycle.css?v=20261009-gpt-restore1" />
-        <link rel="stylesheet" href="css/cphone.css?v=20261007-107-r1&settings=20261010-r1&cphone=20261010-r2&dock=20261010-r3" />
+        <link rel="stylesheet" href="css/cphone.css?v=20261007-107-r1&settings=20261010-r1&cphone=20261010-r2&dock=20261010-r3&apk-sync=113-selective-20261022" />
         <link
             rel="stylesheet"
             href="css/imessage_user_phone_access.css?v=20260928-auto-toggle-scroll-v1&ihg=20260929-106-r1&repair=20261003"
@@ -3771,6 +3771,7 @@
                             ><small id="library-mini-artist">Library</small></span
                         >
                     </button>
+                    <button class="library-mini-control library-mini-mode" id="library-mini-mode" type="button" aria-label="播放方式：列表循环，点击切换" title="列表循环"><i class="fas fa-repeat" aria-hidden="true"></i></button>
                     <button
                         class="library-mini-control"
                         id="library-mini-play"
@@ -3957,7 +3958,7 @@
                             ><i class="fas fa-chevron-down"></i
                         ></button>
                         <div><strong>正在播放</strong><small>NOW PLAYING</small></div>
-                        <span></span>
+                        <button type="button" id="library-player-mode" class="library-player-mode" aria-label="播放方式：列表循环，点击切换" title="列表循环"><i class="fas fa-repeat" aria-hidden="true"></i></button>
                     </header>
                     <div class="library-player-body">
                         <div class="library-player-stage" id="library-player-stage">
@@ -3992,6 +3993,7 @@
                                 >
                             </div>
                             <div class="library-player-controls">
+
                                 <button type="button" id="library-player-prev"
                                     ><i class="fas fa-backward-step"></i
                                 ></button>
@@ -6491,6 +6493,24 @@
                 >
                     <i class="fas fa-chevron-down" aria-hidden="true"></i>
                 </button>
+                <div class="offline-speech-overlay" id="offline-speech-overlay" hidden>
+                  <section class="offline-speech-dialog" role="dialog" aria-modal="true" aria-labelledby="offline-speech-title" aria-describedby="offline-speech-text">
+                      <button type="button" class="offline-speech-close" id="offline-speech-close" aria-label="关闭语音弹窗" title="关闭"><i class="fas fa-xmark" aria-hidden="true"></i></button>
+                      <h2 id="offline-speech-title">线下语音</h2>
+                      <div class="offline-speech-wave" id="offline-speech-wave" aria-hidden="true"></div>
+                      <p class="offline-speech-text" id="offline-speech-text"></p>
+                      <label class="offline-speech-speaker-row" id="offline-speech-speaker-row" for="offline-speech-speaker" hidden>
+                          <span>角色音色</span>
+                          <select id="offline-speech-speaker" aria-label="选择朗读角色"><option value="">选择角色</option></select>
+                      </label>
+                      <div class="offline-speech-controls">
+                          <button type="button" id="offline-speech-play" aria-label="播放语音" title="播放语音"><i class="fas fa-play" aria-hidden="true"></i></button>
+                          <button type="button" id="offline-speech-regenerate" aria-label="重回语音" title="重新生成语音"><i class="fas fa-rotate" aria-hidden="true"></i></button>
+                          <button type="button" id="offline-speech-download" aria-label="下载语音" title="下载语音"><i class="fas fa-download" aria-hidden="true"></i></button>
+                      </div>
+                      <p class="offline-speech-status" id="offline-speech-status" role="status" aria-live="polite"></p>
+                  </section>
+              </div>
                 <div class="offline-chat-input-area">
                     <div class="offline-chat-input-bar">
                         <div class="offline-chat-attachment" id="offline-chat-attachment-btn">
@@ -8406,6 +8426,7 @@
                 <input
                     type="file"
                     id="wb-import-file"
+                    multiple
                     accept=".txt,.docx,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     style="display: none;"
                 />
@@ -8559,13 +8580,6 @@
                             ></select
                             ><i class="fas fa-chevron-right"></i
                         ></label>
-                        <div class="wb-editor-section-head"
-                            ><span>词条</span
-                            ><button id="add-book-entry-btn" type="button"
-                                ><i class="fas fa-plus"></i> 添加词条</button
-                            ></div
-                        >
-                        <div id="wb-entries-list-container" class="wb-editor-entry-list"></div>
                         <section class="wb-book-settings-section">
                             <div class="wb-book-settings-title">世界书设置</div>
                             <label class="wb-book-setting-row" for="wb-editor-global-toggle"
@@ -8580,14 +8594,22 @@
                                     aria-hidden="true"
                                 ></i
                             ></label>
-                            <button
+
+                        </section>
+                        <div class="wb-editor-section-head"
+                            ><span>词条</span
+                            ><button id="add-book-entry-btn" type="button"
+                                ><i class="fas fa-plus"></i> 添加词条</button
+                            ></div
+                        >
+                        <div id="wb-entries-list-container" class="wb-editor-entry-list"></div>
+                        <button
                                 class="wb-delete-book-btn"
                                 id="delete-world-book-btn"
                                 type="button"
                                 hidden
                                 >删除世界书</button
                             >
-                        </section>
                     </div>
                 </section>
             </div>
@@ -10278,34 +10300,25 @@
                         class="detail-sheet-content"
                         style="padding-bottom: 30px; overflow-y: auto; flex: 1;"
                     >
-                        <div
-                            style="display: flex; margin: 0 16px 20px; padding: 10px; gap: 10px; background: #ffffff; border: 1px solid rgba(60, 60, 67, 0.08); border-radius: 16px; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);"
-                        >
-                            <button
-                                class="sheet-action"
-                                id="theme-export-btn"
-                                type="button"
-                                style="flex: 1; margin: 0; border: 1px solid rgba(0, 122, 255, 0.12); background: #eef5ff; color: var(--blue-color); font-size: 14px; border-radius: 12px; height: 44px; display: flex; justify-content: center; align-items: center; box-shadow: none;"
-                            >
-                                <i class="fas fa-file-export" style="margin-right: 6px;"></i>
-                                Export
-                            </button>
-                            <button
-                                class="sheet-action"
-                                id="theme-import-btn"
-                                type="button"
-                                style="flex: 1; margin: 0; border: 1px solid rgba(60, 60, 67, 0.08); background: #f2f2f7; color: #1c1c1e; font-size: 14px; border-radius: 12px; height: 44px; display: flex; justify-content: center; align-items: center; box-shadow: none;"
-                            >
-                                <i class="fas fa-file-import" style="margin-right: 6px;"></i>
-                                Import
-                            </button>
-                            <input
-                                type="file"
-                                id="theme-import-file-input"
-                                accept=".json,application/json"
-                                style="display:none;"
-                            />
+                        <section class="desktop-preset-section" aria-labelledby="desktop-preset-heading">
+                        <div class="desktop-preset-heading">
+                            <strong id="desktop-preset-heading"><i class="fas fa-layer-group" aria-hidden="true"></i>桌面预设</strong>
+                            <div class="desktop-preset-heading-actions">
+                                <span id="desktop-preset-count" aria-label="0 套预设">0</span>
+                                <label id="theme-import-btn" class="desktop-preset-file-action" title="Import current desktop theme JSON">
+                                    <i class="fas fa-file-import" aria-hidden="true"></i>
+                                    <input type="file" id="theme-import-file-input" accept=".json,application/json" aria-label="Import current desktop theme JSON">
+                                </label>
+                                <button id="theme-export-btn" type="button" aria-label="Export current desktop theme JSON" title="Export current desktop theme JSON"><i class="fas fa-file-export" aria-hidden="true"></i></button>
+                            </div>
                         </div>
+                        <div class="desktop-preset-save-row">
+                            <input id="desktop-preset-name" type="text" maxlength="40" autocomplete="off" autocapitalize="off" enterkeyhint="done" placeholder="预设名称" aria-label="桌面预设名称">
+                            <button id="desktop-preset-save" type="button" aria-label="保存当前桌面为新预设" title="保存当前桌面为新预设"><i class="fas fa-plus" aria-hidden="true"></i></button>
+                        </div>
+                        <div id="desktop-preset-list" class="desktop-preset-list" role="list"></div>
+                        <div id="desktop-preset-status" class="desktop-preset-status" role="status" aria-live="polite"></div>
+                    </section>
 
                         <!-- Background Customization -->
                         <div class="settings-group fully-rounded" style="margin: 0 16px 20px;">
@@ -13479,7 +13492,34 @@
                 </div>
             </div>
 
-            <div
+            <div class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay" id="char-user-remark-detail-modal" style="z-index: 910;">
+                <div class="wb-centered-modal-card char-user-remark-detail-card" role="dialog" aria-modal="true" aria-labelledby="char-user-remark-detail-title">
+                    <div class="group-private-chat-detail-header">
+                        <div class="group-private-chat-detail-title" id="char-user-remark-detail-title">备注修改详情</div>
+                        <button type="button" class="group-private-chat-detail-close" data-char-user-remark-close aria-label="关闭备注修改详情">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="char-user-remark-detail-body">
+                        <div class="char-user-remark-detail-item"><span>旧备注</span><strong id="char-user-remark-detail-old"></strong></div>
+                        <div class="char-user-remark-detail-item"><span>新备注</span><strong id="char-user-remark-detail-new"></strong></div>
+                    </div>
+                </div>
+            </div>
+<div id="desktop-preset-switch-dialog" class="desktop-preset-dialog" role="alertdialog" aria-modal="true" aria-labelledby="desktop-preset-dialog-title" hidden>
+            <div class="desktop-preset-dialog-card">
+                <div class="desktop-preset-dialog-icon" aria-hidden="true"><i class="fas fa-arrow-right-arrow-left"></i></div>
+                <strong id="desktop-preset-dialog-title">切换桌面预设</strong>
+                <p>切换后，这些修改会被替换。你可以先保存当前配置。</p>
+                <input id="desktop-preset-dialog-name" type="text" maxlength="40" autocomplete="off" autocapitalize="off" enterkeyhint="done" placeholder="当前配置的预设名称" aria-label="当前配置的预设名称" hidden>
+                <div class="desktop-preset-dialog-actions">
+                    <button id="desktop-preset-dialog-cancel" type="button" aria-label="取消切换" title="取消切换"><i class="fas fa-xmark" aria-hidden="true"></i></button>
+                    <button id="desktop-preset-dialog-discard" type="button" aria-label="放弃改动并切换" title="放弃改动并切换"><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                    <button id="desktop-preset-dialog-save" type="button" aria-label="保存当前配置并切换" title="保存当前配置并切换"><i class="fas fa-floppy-disk" aria-hidden="true"></i></button>
+                </div>
+            </div>
+        </div>
+<div
                 class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay"
                 id="group-add-member-sheet"
                 style="z-index: 550;"
@@ -14081,7 +14121,15 @@
                                     <div class="settings-text">编辑角色资料</div>
                                     <i class="fas fa-chevron-right arrow"></i>
                                 </div>
-                                <div class="settings-item" id="chat-bind-id-btn" style="position: relative;">
+                                <label class="settings-item" for="chat-contact-type-select">
+                                    <div class="settings-icon" style="background-color: #5856d6;"><i class="fas fa-user-tag"></i></div>
+                                    <span class="settings-text">身份类型</span>
+                                    <select id="chat-contact-type-select" aria-label="身份类型">
+                                        <option value="char">Char</option>
+                                        <option value="npc">NPC</option>
+                                    </select>
+                                </label>
+<div class="settings-item" id="chat-bind-id-btn" style="position: relative;">
                                     <div class="settings-icon" style="background-color: #34c759;"><i class="fas fa-id-card"></i></div>
                                     <div class="settings-text">绑定ID</div>
                                     <span id="chat-bind-id-label" style="font-size: 13px; color: #8e8e93; margin-right: 4px; pointer-events: none;"></span>
@@ -14135,7 +14183,15 @@
                                         <span class="slider"></span>
                                     </label>
                                 </div>
-                                <div class="settings-item" id="chat-location-profile-btn">
+                                <div class="settings-item" id="chat-auto-reply-row" style="justify-content: space-between; cursor: default;">
+                                    <div class="settings-icon" style="background-color: #007aff;"><i class="fas fa-bolt"></i></div>
+                                    <div class="settings-text">自动回复</div>
+                                    <label class="toggle-switch" title="发送消息后立即调用聊天 API">
+                                        <input type="checkbox" id="chat-auto-reply-toggle" aria-label="自动回复">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+<div class="settings-item" id="chat-location-profile-btn">
                                     <div class="settings-icon" style="background-color: #4a4a4a;"><i class="fas fa-location-dot"></i></div>
                                     <div class="settings-text">定位</div>
                                     <span id="chat-location-profile-label" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: #8e8e93; margin-right: 4px; pointer-events: none;">未设置</span>
@@ -14459,6 +14515,14 @@
                         </div>
 
                         <div class="settings-group fully-rounded npc-settings-group">
+<label class="settings-item" for="npc-chat-contact-type-select">
+                                <div class="settings-icon" style="background-color: #5856d6;"><i class="fas fa-user-tag"></i></div>
+                                <span class="settings-text">身份类型</span>
+                                <select id="npc-chat-contact-type-select" aria-label="身份类型">
+                                    <option value="char">Char</option>
+                                    <option value="npc">NPC</option>
+                                </select>
+                            </label>
                             <div class="settings-item" id="npc-chat-settings-profile-trigger">
                                 <div class="settings-icon" style="background-color: #007aff;"
                                     ><i class="fas fa-user-edit"></i
@@ -17040,6 +17104,7 @@
                 <div class="shopping-topbar">
                     <button type="button" class="shopping-brand" id="shopping-close-btn" data-u2-i18n="shopping.shop">Shop</button>
                     <div class="shopping-top-actions">
+                        <button type="button" class="shopping-icon-btn" id="shopping-manual-add-btn" aria-label="Add item" title="Add item"><i class="fas fa-plus" aria-hidden="true"></i></button>
                         <button type="button" class="shopping-icon-btn" id="shopping-search-btn" aria-label="Search" data-u2-i18n-aria-label="shopping.search"><i class="fas fa-search"></i></button>
                         <button type="button" class="shopping-icon-btn" id="shopping-settings-btn" aria-label="Settings" data-u2-i18n-aria-label="shopping.settings"><i class="fas fa-cog"></i></button>
                         <button type="button" class="shopping-icon-btn" aria-label="Bag" data-u2-i18n-aria-label="shopping.bag"><i class="fas fa-bag-shopping"></i></button>
@@ -17190,6 +17255,25 @@
                     <button type="button" class="shopping-nav-item" data-tab="me"><i class="fas fa-user"></i><span>Me</span></button>
                 </nav>
 
+                <!-- Add a product to the current Food or Mall category -->
+                <div class="bottom-sheet-overlay detail-sheet-overlay shopping-centered-overlay" id="shopping-manual-add-modal" style="z-index: 1250;">
+                    <section class="shopping-centered-card" role="dialog" aria-modal="true" aria-labelledby="shopping-manual-add-title">
+                        <div class="shopping-modal-header">
+                            <h2 id="shopping-manual-add-title">ADD · FOOD</h2>
+                            <button type="button" class="shopping-modal-close" id="shopping-manual-add-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
+                        </div>
+                        <form id="shopping-manual-add-form" class="shopping-modal-form">
+                            <label for="shopping-manual-name">Name</label>
+                            <input id="shopping-manual-name" type="text" maxlength="80" required autocomplete="off" placeholder="Enter item name">
+                            <label for="shopping-manual-price">Price</label>
+                            <input id="shopping-manual-price" type="number" min="0" step="0.01" inputmode="decimal" required placeholder="0.00">
+                            <label for="shopping-manual-desc">Description</label>
+                            <textarea id="shopping-manual-desc" maxlength="500" rows="3" placeholder="Enter item description"></textarea>
+                            <button type="submit" class="shopping-modal-primary">Add</button>
+                        </form>
+                    </section>
+                </div>
+
                 <!-- Shopping Settings Sheet -->
                 <div
                     class="bottom-sheet-overlay detail-sheet-overlay"
@@ -17243,6 +17327,7 @@
                         <div class="detail-sheet-content" style="padding: 16px; overflow-y: auto;">
                             <textarea id="shopping-search-input" placeholder="Assets bring cash inflows; liabilities cause cash outflows." style="width: 100%; height: 120px; border: none; background: #fff; border-radius: 12px; padding: 16px; font-size: 15px; resize: none; outline: none; margin-bottom: 20px; box-sizing: border-box; "></textarea>
 
+                            <label class="shopping-search-count" for="shopping-search-count"><span>Quantity</span><input id="shopping-search-count" type="number" min="1" max="10" step="1" inputmode="numeric" value="3" aria-label="Quantity, 1-10"><small>1-10</small></label>
                             <button type="button" id="shopping-search-confirm-btn" style="width: 100%; padding: 16px; background: #111; color: #fff; border-radius: 12px; font-size: 16px; font-weight: 700; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
                                 <i class="fas fa-magic"></i> Generate
                             </button>
@@ -19343,6 +19428,7 @@
                             ><h1>信息</h1
                             ><span id="cphone-sms-count" class="cphone-sms-count"></span
                         ></div>
+                        <div id="cphone-generation-status" class="cphone-generation-status" role="status" aria-live="polite" hidden></div>
                         <label class="cphone-sms-search"
                             ><i class="fas fa-magnifying-glass" aria-hidden="true"></i
                             ><input
@@ -19449,6 +19535,7 @@
                         <button type="button" id="cphone-contact-send" class="cphone-contact-send"
                             ><i class="far fa-comment-dots" aria-hidden="true"></i> 打开聊天</button
                         >
+                        <button type="button" id="cphone-contact-delete" class="cphone-contact-delete" hidden><i class="fas fa-trash-can" aria-hidden="true"></i> 删除联系人</button>
                     </section>
                 </div>
                 <div id="cphone-create-group-sheet" class="cphone-create-group-sheet" hidden>
@@ -19466,6 +19553,7 @@
                             aria-label="关闭"
                             ><i class="fas fa-xmark" aria-hidden="true"></i
                         ></button>
+
                         <span class="cphone-eyebrow">CHAR'S GROUP</span>
                         <h2 id="cphone-create-group-title">添加群聊</h2>
                         <label
@@ -20065,7 +20153,7 @@
         </div>
 
         <script src="js/vendor/native_bridge.js?v=20260916-android-save-v1&native-backup=20260917-v1&repair=20261003"></script>
-        <script src="js/storage/app_storage.js?v=20261007-107-r1&apk-sync=111-selective"></script>
+        <script src="js/storage/app_storage.js?v=20261007-107-r1&apk-sync=113-selective-20261022"></script>
         <script src="js/storage/imessage_storage.js?v=20260710-storage-v8-idb1&imessage-performance=20260825-v2&offline-tts=20260827-v1&gallery=20260829-v1&history-index=20260907-v1&char-lite=20260923-v2&repair=20261003"></script>
         <script src="js/gallery_data.js?v=20260829-char-gallery-avatar-v1&repair=20261003"></script>
         <script src="storage.js?v=20260710-storage-v7-cache1"></script>
@@ -20087,73 +20175,73 @@
 
         <!-- 引入 iMessage 模块分段代码 -->
         <script src="js/imessage/game.js?v=20260830-appstore-anonymous-qa-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=111-selective"></script>
-        <script src="js/imessage/data_utils.js?v=20261007-107-r1"></script>
+        <script src="js/imessage/data_utils.js?v=20261007-107-r1&apk-sync=113-selective-20261022"></script>
         <script src="js/imessage/weather_context.js?v=20261007-107-r1"></script>
         <script src="js/imessage/online_prompts.js?v=20260905-v2&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/group_titles.js?v=apk110-selective&apk-sync=111-selective"></script>
-<script src="js/imessage/2_core.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-sync=111-selective&apk-ui=111-rebuild-20261016&ui-fixes=20261018"></script>
+<script src="js/imessage/2_core.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-sync=113-selective-20261022&apk-ui=111-rebuild-20261016&ui-fixes=20261018"></script>
         <script src="js/imessage/vector_memory.js?v=20260807-local-vector-memory-v1&memory-recall-promotion=20260813-v1&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/3_contacts.js?v=20260718-friend-profile-import-v1&render-cache=20260801-v1&vendor-lazy=20260803-v1&startup-queue=20260804-v1&official=20260827-v1&contact-card-actions=20260916-v4&repair=20261003"></script>
-        <script src="js/imessage/3_groups.js?v=20260718-group-poll-v4-group-memory-editor-v1&observer=20260730-v1&render-cache=20260801-v1&user-avatar=20260802-v1&group-auto-translation=20260803-v1&startup-queue=20260804-v1&context-limit=20260804-v1&group-identity-css-v1&member-sync-private-permissions=20260812-v1&theme-avatar-hooks=20260814-v2&worldbook=20260817-v1&online-chat-optimization=20260818-v1&token-usage=20260822-v1&online-prompts=20260905-v2&history-index=20260907-v1&cross-group-memory=20260919-v1&group-chat-search=20260924-v1&tap-response=20260924-v1&repair=20261003&apk-sync=111-selective&apk-ui=111-rebuild-20261016"></script>
+        <script src="js/imessage/3_groups.js?v=20260718-group-poll-v4-group-memory-editor-v1&observer=20260730-v1&render-cache=20260801-v1&user-avatar=20260802-v1&group-auto-translation=20260803-v1&startup-queue=20260804-v1&context-limit=20260804-v1&group-identity-css-v1&member-sync-private-permissions=20260812-v1&theme-avatar-hooks=20260814-v2&worldbook=20260817-v1&online-chat-optimization=20260818-v1&token-usage=20260822-v1&online-prompts=20260905-v2&history-index=20260907-v1&cross-group-memory=20260919-v1&group-chat-search=20260924-v1&tap-response=20260924-v1&repair=20261003&apk-sync=113-selective-20261022&apk-ui=111-rebuild-20261016"></script>
         <script src="js/imessage/chat_record_forward.js?v=20261007-107-r1&apk-sync=111-selective"></script>
         <script src="js/imessage/4_chat_common.js?v=image-assets-20260803-v1&auto-image=20260807-v1&startup-queue=20260804-v1&auto-face-lock=20260813-v1&prompt-parts=20260819-v1&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/4_chat_status.js?v=20260821-status-memory-request-v1&template-avatar=20260821-v1&template-history-fallback=20260821-v1&paging=20260801-button-only-v1&startup-queue=20260804-v1&status-refresh=20260821-v1&offline-html-template-sanitize=20260822-v1&status-css-snapshot=20260822-v1&imessage-performance=20260825-v1&mcp-chat-settings=20260901-v2&repair=20261003"></script>
         <script src="js/imessage/4_chat_payment.js?v=20260725-single-chat-cot-v1&startup-queue=20260804-v1&group-identity-css-v1&group-member-resolution=20260812-v1&repair=20261003&apk-sync=111-selective"></script>
-        <script src="js/imessage/voice_message_audio.js?v=20261015-apk111&apk-sync=111-selective"></script>
-        <script src="js/imessage/4_chat_bubbles.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-sync=111-selective&apk-ui=111-rebuild-20261016"></script>
+        <script src="js/imessage/voice_message_audio.js?v=20261015-apk111&apk-sync=113-selective-20261022"></script>
+        <script src="js/imessage/4_chat_bubbles.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-sync=113-selective-20261022&apk-ui=111-rebuild-20261016"></script>
         <script src="js/imessage/chat_search.js?v=20260718-chat-history-search-v2&keyboard-guard=20260801-v1&startup-queue=20260804-v1&location-timezone=20260825-v1&location-translation=20260825-v1&history-index=20260907-v1&group-chat-search=20260924-v3&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/chat_favorites.js?v=20260723-chat-favorites-v3&startup-queue=20260804-v1&repair=20261003"></script>
         <script src="js/imessage/tts.js?v=20261007-107-r1&apk-sync=111-selective"></script>
-        <script src="js/imessage/4_chat_ai.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=111-selective"></script>
+        <script src="js/imessage/4_chat_ai.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=113-selective-20261022"></script>
         <script src="js/imessage/offline_regex.js?v=20260705-offline-regex-v1&html-template=20260822-v3&offline-text-replacement=20260913-v1&repair=20261003"></script>
         <script src="js/imessage/offline_reasoning.js?v=20260718-offline-cot-v1&custom-cot=20260823-v1&repair=20261003"></script>
         <script src="js/imessage/offline_summary_errors.js?v=20260907-detailed-errors-v1&repair=20261003"></script>
-        <script src="js/imessage/4_chat_sheet.js?v=20261007-107-r1&apk-sync=111-selective"></script>
-        <script src="js/imessage/4_chat_link.js?v=20260726-light-link-theatre-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&picsum-cdn=20260815-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=111-selective"></script>
+        <script src="js/imessage/4_chat_sheet.js?v=20261007-107-r1&apk-sync=113-selective-20261022"></script>
+        <script src="js/imessage/4_chat_link.js?v=20260726-light-link-theatre-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&picsum-cdn=20260815-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=113-selective-20261022"></script>
         <script src="js/imessage/4_chat_list.js?chat-runtime-performance=20260803-v1&startup-queue=20260804-v1&theme-surfaces=20260814-v1&imessage-performance=20260825-v2&mobile-latest=20260825-v1&mobile-performance=20260825-v1&official=20260827-v1&history-index=20260907-v1&chat-observer-lifecycle=20260920-v1&group-chat-search=20260924-v1&repair=20261003&settings=20261010-r1&apk-sync=111-selective"></script>
         <script src="js/imessage/4_chat_interface.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=111-selective&apk-ui=111-rebuild-20261016"></script>
         <script src="js/imessage/4_chat_voice_call.js?v=20261009-restored-repairs&apk-sync=111-selective"></script>
         <script src="js/imessage/video_call.js?v=20261020-ipad-call-keyboard&apk-sync=111-selective"></script>
-        <script src="js/imessage/4_chat_main.js?v=20261007-107-r1&apk-sync=111-selective"></script>
+        <script src="js/imessage/4_chat_main.js?v=20261007-107-r1&apk-sync=113-selective-20261022"></script>
         <script src="js/imessage/online_prompt_settings.js?v=20260905-v6&repair=20261003"></script>
-        <script src="js/imessage/5_settings.js?v=20261009-original-layout-clear&apk-sync=111-selective"></script>
-        <script src="js/imessage/6_moments.js?v=20260718-moments-target-reply-v1&auto-translation=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&current-account-avatar-v1&moment-visibility=20260811-v1&relationship-engagement=20260811-v1&char-batch=20260825-v1&comment-threads=20260825-v3&private-chat-labels=20260825-v1&moment-private-chats=20260825-v4&interaction-render=20260911-v1&api-error-dialog=20260923-v1&moments-home=20260923-v2&repair=20261003&shop-moments=20261010-v1&apk-sync=111-selective"></script>
+        <script src="js/imessage/5_settings.js?v=20261009-original-layout-clear&apk-sync=113-selective-20261022"></script>
+        <script src="js/imessage/6_moments.js?v=20260718-moments-target-reply-v1&auto-translation=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&current-account-avatar-v1&moment-visibility=20260811-v1&relationship-engagement=20260811-v1&char-batch=20260825-v1&comment-threads=20260825-v3&private-chat-labels=20260825-v1&moment-private-chats=20260825-v4&interaction-render=20260911-v1&api-error-dialog=20260923-v1&moments-home=20260923-v2&repair=20261003&shop-moments=20261010-v1&apk-sync=113-selective-20261022"></script>
 
         <script src="js/imessage/user_phone_access_ui.js?v=20260928-auto-toggle-scroll-v1&ihg=20260929-106-r1&repair=20261003"></script>
 
         <!-- 引入其他应用模块 -->
-        <script src="js/pay.js?v=20260710-storage-ready-v1&open-performance=20260801-v1&startup-queue=20260804-v1&pay-transfer-bank=20260812-v1&family-card=20260921-v4&repair=20261003"></script>
+        <script src="js/pay.js?v=20260710-storage-ready-v1&open-performance=20260801-v1&startup-queue=20260804-v1&pay-transfer-bank=20260812-v1&family-card=20260921-v4&repair=20261003&apk-sync=113-selective-20261022"></script>
         <script src="js/bstage.js?v=20260725-android-keyboard-actions-v2&subscribers=20260730-cap-compact-v1&keyboard-guard=20260801-v1&api=20260803-unified-v1&provider=20260807-v1&image-assets=20260803-v1&startup-queue=20260804-v1&frequency-penalty=20260822-v1&bstage-pop-memory=20260921-v1&api-error-dialog=20260923-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003"></script>
         <!-- 引入世界书核心模块脚本 -->
         <script src="js/builtin_worldbook.js?v=20260713-disable-override-limit-v2&repair=20261003"></script>
-        <script src="js/worldbook.js?v=20261007-107-r1"></script>
+        <script src="js/worldbook.js?v=20261007-107-r1&apk-sync=113-selective-20261022"></script>
         <!-- 引入核心 UI 管理与设置模块脚本 -->
         <script src="js/ui.js?v=20260811-no-glass-v1&toast-full-message=20260822-v1&notification-banner-v3&repair=20261003&shop-moments=20261010-v1"></script>
         <script src="js/ui_translation.js?v=20260807-global-ui-zh-v1&repair=20261003"></script>
-        <script src="js/settings.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=111-selective&apk-ui=111-rebuild-20261016&ui-fixes=20261018"></script>
+        <script src="js/settings.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=113-selective-20261022&apk-ui=111-rebuild-20261016&ui-fixes=20261018"></script>
         <script src="js/imessage/official_accounts.js?v=20260828-youtu-preview-stable-v5&api-error-dialog=20260923-v1&official-css-generation=20260928-v1&ihg=20260929-106-r1&repair=20261003&settings=20261010-r1&apk-sync=111-selective"></script>
         <script src="js/vendor/mcp_client_sdk.js?v=20260901-mobile-mcp-v3&repair=20261003"></script>
         <script src="js/mcp_relay_config.js?v=20260906-relay-v2&repair=20261003"></script>
         <script src="js/imessage/mcp_integration.js?v=20260906-relay-v3&version-compat=20260907-v1&storage-persistence=20260907-v1&repair=20261003"></script>
         <script src="js/imessage/mcp_chat_config.js?v=20260901-mobile-mcp-v3&mcp-tool-history=20260906-v1&repair=20261003"></script>
-        <script src="js/library.js?v=20260911-netease-android-v1&player-performance=20260817-v1&open-performance=20260801-v1&vendor-lazy=20260803-v1&startup-queue=20260804-v1&reader-comments=20260817-v3&reader-selection=20260819-v1&reader-touch-compat=20260830-v1&netease-pagination=20260912-v1&together-listening-invite=20260916-v1&api-error-dialog=20260923-v1&repair=20261003"></script>
-        <script src="js/loves.js?v=20261007-107-r1&cphone=20261010-r2&apk-sync=111-selective"></script>
+        <script src="js/library.js?v=20260911-netease-android-v1&player-performance=20260817-v1&open-performance=20260801-v1&vendor-lazy=20260803-v1&startup-queue=20260804-v1&reader-comments=20260817-v3&reader-selection=20260819-v1&reader-touch-compat=20260830-v1&netease-pagination=20260912-v1&together-listening-invite=20260916-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=113-selective-20261022"></script>
+        <script src="js/loves.js?v=20261007-107-r1&cphone=20261010-r2&apk-sync=113-selective-20261022"></script>
         <script src="js/tiktok/2_core.js?v=20260712-tiktok-feed-cleanup-v1&open-performance=20260801-v1&startup-queue=20260804-v1&fluidity=20260927-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003"></script>
-        <script src="js/cphone.js?v=20261007-107-r1&cphone=20261010-r2"></script>
+        <script src="js/cphone.js?v=20261007-107-r1&cphone=20261010-r2&apk-sync=113-selective-20261022"></script>
         <script src="js/tiktok/3_home.js?v=20261007-107-r1"></script>
         <script src="js/tiktok/4_chat.js?v=20260712-tiktok-polish-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003"></script>
-        <script src="js/tiktok/5_profile.js?v=20260712-tiktok-polish-v1&performance=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&fluidity=20260927-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003"></script>
+        <script src="js/tiktok/5_profile.js?v=20260712-tiktok-polish-v1&performance=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&fluidity=20260927-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=113-selective-20261022"></script>
         <script src="js/youtube/2_core.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v2&ihg=20260929-106-r1&repair=20261003"></script>
         <script src="js/youtube/3_channel.js?v=20260717-char-lottery-consistency-v18&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003"></script>
-        <script src="js/youtube/4_settings.js?repair=20261003"></script>
+        <script src="js/youtube/4_settings.js?repair=20261003&apk-sync=113-selective-20261022"></script>
         <script src="js/youtube/5_player.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v2&ihg=20260929-106-r1&repair=20261003"></script>
         <script src="js/youtube/6_community.js?v=20260801-dm-generation-fix-v19&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&composer-focus=20260811-v1&api-error-dialog=20260923-v1&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003"></script>
         <script src="js/youtube/7_trending.js?worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&repair=20261003"></script>
         <script src="js/youtube/8_user_live.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003"></script>
         <script src="js/netflix_game_core.js?v=20260811-character-relations-v3&repair=20261003"></script>
-        <script src="js/netflix.js?v=20260928-story-hub-direct-v3&open-performance=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&ihg=20260929-106-r1&repair=20261003"></script>
-        <script src="js/shopping.js?v=20260710-storage-ready-v1&performance=20260801-v2&api=20260803-unified-v1&startup-queue=20260804-v1&shop-fixes=20260820-v2&api-error-dialog=20260923-v1&layout=20260923-gallery-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1"></script>
-        <script src="js/xapp.js?v=20261007-107-r1"></script>
+        <script src="js/netflix.js?v=20260928-story-hub-direct-v3&open-performance=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=113-selective-20261022"></script>
+        <script src="js/shopping.js?v=20260710-storage-ready-v1&performance=20260801-v2&api=20260803-unified-v1&startup-queue=20260804-v1&shop-fixes=20260820-v2&api-error-dialog=20260923-v1&layout=20260923-gallery-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1&apk-sync=113-selective-20261022"></script>
+        <script src="js/xapp.js?v=20261007-107-r1&apk-sync=113-selective-20261022"></script>
         <script src="js/custom_app_template_source.js?v=20260830-custom-apps-v6-user-profile&repair=20261003"></script>
         <script src="js/custom_app_runtime.js?v=20260830-custom-apps-v13-icon-only-same-origin&repair=20261003"></script>
         <script src="js/appstore.js?v=20260830-app-details-v7-profile-permission&repair=20261003"></script>
@@ -20162,8 +20250,8 @@
         <script src="js/call.js?v=20260917-call-history-v8&api-error-dialog=20260923-v1&repair=20261003"></script>
         <script src="js/mcp.js?v=20260906-relay-ui-v1&android-input=20260906-v1&storage-persistence=20260907-v1&repair=20261003"></script>
         <script src="js/diary.js?v=20260913-diary-v6-prompt-toggle-scroll&api-error-dialog=20260923-v1&repair=20261003"></script>
-        <script src="js/ao3.js?v=20260904-ao3-cp-search-v12&persona=20260920-v4&api-error-dialog=20260923-v2&repair=20261003"></script>
-        <script src="js/home_desktop.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=111-selective"></script>
+        <script src="js/ao3.js?v=20260904-ao3-cp-search-v12&persona=20260920-v4&api-error-dialog=20260923-v2&repair=20261003&apk-sync=113-selective-20261022"></script>
+        <script src="js/home_desktop.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=113-selective-20261022"></script>
         <script src="js/home_widget_panel_enhance.js?v=20260830-widget-image-flush-v1&couple-text=20260911-v1&repair=20261003&settings=20261010-r1&apk-sync=111-selective"></script>
         <!-- 引入主逻辑脚本 -->
         <script src="script.js?v=20260725-modal-owner-v1&home-swipe=20260801-scrollend-v2&performance=20260801-v1&splash-notice-handshake=20260813-v1&reader-selection=20260819-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1"></script>

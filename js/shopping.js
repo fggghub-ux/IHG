@@ -1,5 +1,7 @@
-(function() {
-    const durableStorage = window.u2LegacyStorageFacade, count = 8000, count_3 = 16000;
+(function () {
+    const durableStorage = window.u2LegacyStorageFacade,
+        count = 8000,
+        count_3 = 16000;
     function handleAction_4(value_10) {
         const replace_11 = String(value_10 == null ? '' : value_10)
                 .replace(/[，,\s]/g, '')
@@ -81,6 +83,17 @@
             this.searchBtn = document.getElementById('shopping-search-btn');
             this.searchSheet = document.getElementById('shopping-search-sheet');
             this.searchInput = document.getElementById('shopping-search-input');
+            this.searchCountInput = document.getElementById('shopping-search-count');
+            for (const [field, id] of Object.entries({
+                manualAddBtn: 'shopping-manual-add-btn',
+                manualAddModal: 'shopping-manual-add-modal',
+                manualAddForm: 'shopping-manual-add-form',
+                manualNameInput: 'shopping-manual-name',
+                manualPriceInput: 'shopping-manual-price',
+                manualDescInput: 'shopping-manual-desc',
+            }))
+                this[field] = document.getElementById(id);
+            this.manualTargetTab = 'food';
             this.searchConfirmBtn = document.getElementById('shopping-search-confirm-btn');
             this.bindWbBtn = document.getElementById('shopping-bind-wb-btn');
             this.boundWbName = document.getElementById('shopping-bound-wb-name');
@@ -99,11 +112,73 @@
             });
             this.renderCart();
             this.loadGeneratedProducts();
+            this.loadManualProducts();
+        }
+        loadManualProducts() {
+            for (const tab of ['food', 'mall']) {
+                try {
+                    const products = JSON.parse(
+                        durableStorage.getItem('shopping_manual_' + tab) || '[]',
+                    );
+                    if (Array.isArray(products)) this.renderProductCards(products, tab, 'manual');
+                } catch (error) {
+                    console.error('Failed to load manual products', error);
+                }
+            }
+        }
+        openManualAdd() {
+            if (!['food', 'mall'].includes(this.currentTab) || !this.manualAddModal) return;
+            this.manualTargetTab = this.currentTab;
+            this.manualAddForm?.reset();
+            document.getElementById('shopping-manual-add-title').textContent =
+                this.manualTargetTab === 'food' ? 'ADD · FOOD' : 'ADD · MALL';
+            this.manualAddModal.classList.add('active');
+            this.manualNameInput?.focus();
+        }
+        closeManualAdd() {
+            this.manualAddModal?.classList.remove('active');
+            this.manualAddBtn?.focus();
+        }
+        handleManualAdd() {
+            const name = this.manualNameInput?.value.trim() || '',
+                price = this.manualPriceInput?.value.trim() || '',
+                desc = this.manualDescInput?.value.trim() || '';
+            if (!name || !/^\d+(?:\.\d{1,2})?$/.test(price) || !Number.isFinite(Number(price))) {
+                window.showToast?.('请填写商品名称和有效价格');
+                return false;
+            }
+            const tab = this.manualTargetTab;
+            if (!['food', 'mall'].includes(tab)) return false;
+            const product = {
+                name,
+                price: '$' + Number(price).toFixed(2),
+                desc,
+                iconClass: tab === 'food' ? 'fa-utensils' : 'fa-box',
+                bgGrad:
+                    tab === 'food'
+                        ? 'linear-gradient(135deg, #c69b77, #81614d)'
+                        : 'linear-gradient(135deg, #979ba5, #525660)',
+                tags: [],
+            };
+            try {
+                const key = 'shopping_manual_' + tab,
+                    stored = JSON.parse(durableStorage.getItem(key) || '[]');
+                durableStorage.setItem(
+                    key,
+                    JSON.stringify([...(Array.isArray(stored) ? stored : []), product]),
+                );
+            } catch (error) {
+                console.error('Failed to save manual product', error);
+                window.showToast?.('保存商品失败');
+                return false;
+            }
+            this.renderProductCards([product], tab, 'manual');
+            this.closeManualAdd();
+            window.showToast?.('商品已添加');
+            return true;
         }
         ['clearGeneratedProducts']() {
-            const confirm_17 = window.confirm(
-                'Are you sure you want to clear all items?',
-            );
+            const confirm_17 = window.confirm('Are you sure you want to clear all items?');
             if (!confirm_17) return false;
             return (
                 durableStorage.removeItem('shopping_generated_food'),
@@ -114,7 +189,9 @@
                 this.productListContainer
                     ?.querySelectorAll('[data-shopping-generated="true"]')
                     .forEach((value_19) => value_19.remove()),
-                window.showToast ? window.showToast('Generated items cleared') : alert('Generated items cleared'),
+                window.showToast
+                    ? window.showToast('Generated items cleared')
+                    : alert('Generated items cleared'),
                 true
             );
         }
@@ -213,7 +290,7 @@
                     this.renderProductCards(mallData, 'mall');
                 }
             } catch (e) {
-                console.error("Failed to load generated products", e);
+                console.error('Failed to load generated products', e);
             }
         }
 
@@ -249,13 +326,13 @@
             }
 
             return ids
-                .map(id => String(id))
+                .map((id) => String(id))
                 .filter((id, index, allIds) => id && allIds.indexOf(id) === index);
         }
 
         saveBoundWorldBookIds(ids = []) {
             const nextIds = (Array.isArray(ids) ? ids : [])
-                .map(id => String(id))
+                .map((id) => String(id))
                 .filter((id, index, allIds) => id && allIds.indexOf(id) === index);
 
             if (nextIds.length > 0) {
@@ -277,8 +354,8 @@
 
             const books = this.getAvailableWorldBooks();
             const boundBooks = boundIds
-                .map(id => books.find(book => String(book.id) === String(id)))
-                .filter(Boolean);
+                .map((id) => books.find((book) => String(book.id) === String(id)))
+                .filter((book) => book && !book.isGlobal);
 
             if (boundBooks.length === 1) {
                 this.boundWbName.textContent = boundBooks[0].name || '未命名世界书';
@@ -290,6 +367,20 @@
         }
 
         ['bindEvents']() {
+            this.manualAddBtn?.addEventListener('click', () => this.openManualAdd());
+            this.manualAddForm?.addEventListener('submit', (event) => {
+                event.preventDefault();
+                this.handleManualAdd();
+            });
+            document
+                .getElementById('shopping-manual-add-close')
+                ?.addEventListener('click', () => this.closeManualAdd());
+            this.manualAddModal?.addEventListener('click', (event) => {
+                if (event.target === this.manualAddModal) this.closeManualAdd();
+            });
+            this.manualAddModal?.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') this.closeManualAdd();
+            });
             this.closeBtn?.addEventListener('click', () => this.close());
             this.foodCloseBtn?.addEventListener('click', () => this.closeDetail());
             this.settingsBtn &&
@@ -536,23 +627,32 @@
             );
         }
         async handleGenerateProducts() {
+            if (this.searchConfirmBtn?.disabled) return;
+            const quantity = Number(this.searchCountInput?.value ?? 3);
+            if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) {
+                window.showToast?.('请输入 1 到 10 的生成数量');
+                this.searchCountInput?.focus();
+                return;
+            }
             let userInput = this.searchInput ? this.searchInput.value.trim() : '';
 
             const targetTab = this.currentTab === 'food' ? 'food' : 'mall';
 
             // If empty, generate random items based on the current tab
             if (!userInput) {
-                userInput = targetTab === 'food'
-                    ? "随机生成一些高质量的米其林餐或雪茄吧饮品"
-                    : "随机生成一些高品质的奢侈品牌商品或酒";
+                userInput =
+                    targetTab === 'food'
+                        ? '随机生成一些高质量的米其林餐或雪茄吧饮品'
+                        : '随机生成一些高品质的奢侈品牌商品或酒';
             }
 
             if (this.searchConfirmBtn) {
-                this.searchConfirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+                this.searchConfirmBtn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Generating...';
                 this.searchConfirmBtn.disabled = true;
             }
 
-            let systemPrompt = `你现在是一个商品、评价及问答生成器。根据用户的输入，生成不少于10个商品。每个商品生成5-10条用户评价，以及5-10条问答(Q&A)。
+            let systemPrompt = `你现在是一个商品、评价及问答生成器。根据用户的输入，恰好生成${quantity}个商品。每个商品生成5-10条用户评价，以及5-10条问答(Q&A)。
 当前分类是 ${targetTab === 'food' ? 'Food(米其林餐)' : 'Mall(奢侈品牌商品)'}。
 
 **关键要求**：
@@ -562,7 +662,11 @@
 \n\n`;
 
             // Append World Book context if bound
-            const boundIds = this.getBoundWorldBookIds();
+            const allBooks = this.getAvailableWorldBooks();
+            const globalIds = new Set(
+                allBooks.filter((book) => book?.isGlobal).map((book) => String(book.id)),
+            );
+            const boundIds = this.getBoundWorldBookIds().filter((id) => !globalIds.has(String(id)));
             if (boundIds.length > 0 && window.wbManager) {
                 const bookContexts = [];
                 for (const boundId of boundIds) {
@@ -574,6 +678,18 @@
                 }
             }
 
+            const globalContext =
+                typeof window.getGlobalWorldBookContextByPosition === 'function'
+                    ? ['system_depth', 'before_role', 'after_role']
+                          .map((position) =>
+                              window.getGlobalWorldBookContextByPosition(position, userInput, {
+                                  includeBuiltin: false,
+                              }),
+                          )
+                          .filter(Boolean)
+                          .join('\n\n')
+                    : '';
+            if (globalContext) systemPrompt += `[全局世界书上下文]\n${globalContext}\n\n`;
             systemPrompt += `输出必须为纯 JSON 数组格式，不要任何多余文本或 markdown 标签。格式：字符串内如需强调词语、菜名、品牌名或俚语，一律使用单引号 ' 包裹（例如 the 'wagyu' course），禁止在字符串内使用双引号 " ，否则破坏 JSON 结构导致解析失败。tags 数组长度严格为2。格式要求：\n
 
 [
@@ -596,7 +712,10 @@
 ]`;
 
             try {
-                const apiConfig = typeof window.getApiConfig === 'function' ? window.getApiConfig() : (window.apiConfig || {});
+                const apiConfig =
+                    typeof window.getApiConfig === 'function'
+                        ? window.getApiConfig()
+                        : window.apiConfig || {};
                 if (!apiConfig || !apiConfig.endpoint || !apiConfig.apiKey) {
                     throw new Error('请先在系统设置中配置 API');
                 }
@@ -607,16 +726,16 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiConfig.apiKey}`
+                        Authorization: `Bearer ${apiConfig.apiKey}`,
                     },
                     body: JSON.stringify({
                         model: apiConfig.model || 'gpt-3.5-turbo',
                         messages: [
                             { role: 'system', content: systemPrompt },
-                            { role: 'user', content: userInput }
+                            { role: 'user', content: userInput },
                         ],
-                        temperature: parseFloat(apiConfig.temperature) || 0.8
-                    })
+                        temperature: parseFloat(apiConfig.temperature) || 0.8,
+                    }),
                 });
 
                 if (!response.ok) {
@@ -631,36 +750,44 @@
 
                 // Clean up possible markdown wrappers
                 if (jsonText.startsWith('```')) {
-                    jsonText = jsonText.replace(/```json/g, '').replace(/```/g, '').trim();
+                    jsonText = jsonText
+                        .replace(/```json/g, '')
+                        .replace(/```/g, '')
+                        .trim();
                 }
 
                 let productsData = null;
                 try {
                     productsData = JSON.parse(jsonText);
-                } catch(e) {
+                } catch (e) {
                     // Try to extract array if parsing fails
                     const startIdx = jsonText.indexOf('[');
                     const endIdx = jsonText.lastIndexOf(']');
-                    if(startIdx !== -1 && endIdx !== -1) {
+                    if (startIdx !== -1 && endIdx !== -1) {
                         productsData = JSON.parse(jsonText.substring(startIdx, endIdx + 1));
                     } else {
-                        throw new Error("JSON 解析失败");
+                        throw new Error('JSON 解析失败');
                     }
                 }
 
                 if (!Array.isArray(productsData) || productsData.length === 0) {
-                     throw new Error("生成数据为空");
+                    throw new Error('生成数据为空');
                 }
 
-                // Append generated products to UI
+                if (productsData.length < quantity)
+                    throw new Error(
+                        `生成数量不足：需要 ${quantity} 个，实际 ${productsData.length} 个`,
+                    );
+                productsData = productsData.slice(0, quantity);
                 this.injectGeneratedProducts(productsData, targetTab);
 
                 if (this.searchSheet) this.searchSheet.classList.remove('active');
                 if (this.searchInput) this.searchInput.value = '';
-
-            } catch(e) {
-                console.error("Generate error:", e);
-                window.showToast ? window.showToast('生成失败: ' + e.message) : alert('生成失败: ' + e.message);
+            } catch (e) {
+                console.error('Generate error:', e);
+                window.showToast
+                    ? window.showToast('生成失败: ' + e.message)
+                    : alert('生成失败: ' + e.message);
             } finally {
                 if (this.searchConfirmBtn) {
                     this.searchConfirmBtn.innerHTML = '<i class="fas fa-magic"></i> Generate';
@@ -669,23 +796,26 @@
             }
         }
 
-        renderProductCards(productsData, targetTab) {
+        renderProductCards(productsData, targetTab, source = 'generated') {
             let container = null;
             if (targetTab === 'food') container = this.foodListContainer;
             if (targetTab === 'mall') container = this.productListContainer;
 
             if (!container) return;
 
-            productsData.forEach(p => {
+            productsData.forEach((p) => {
                 const article = document.createElement('article');
-                article.dataset.shoppingGenerated = 'true';
+                if (source === 'manual') article.dataset.shoppingManual = 'true';
+                else article.dataset.shoppingGenerated = 'true';
 
                 // Set rating randomly if not provided (for tags)
                 const rndRating = (Math.random() * (5.0 - 4.0) + 4.0).toFixed(1);
 
                 if (targetTab === 'food') {
                     article.className = 'shopping-food-card';
-                    let tagsHtml = (p.tags || ['30 min', rndRating]).map(t => `<span>${t}</span>`).join('');
+                    let tagsHtml = (p.tags || ['30 min', rndRating])
+                        .map((t) => `<span>${t}</span>`)
+                        .join('');
 
                     article.innerHTML = `
                         <div class="shopping-food-media" style="background: ${p.bgGrad || '#f2f2f7'}"><i class="fas ${p.iconClass || 'fa-utensils'}"></i></div>
@@ -716,7 +846,8 @@
 
             // Save generated products to localStorage
             try {
-                const key = targetTab === 'food' ? 'shopping_generated_food' : 'shopping_generated_mall';
+                const key =
+                    targetTab === 'food' ? 'shopping_generated_food' : 'shopping_generated_mall';
                 let saved = [];
                 const stored = durableStorage.getItem(key);
                 if (stored) saved = JSON.parse(stored);
@@ -728,24 +859,24 @@
             try {
                 const stored = durableStorage.getItem('shopping_comments');
                 if (stored) commentsObj = JSON.parse(stored);
-            } catch(err) {}
+            } catch (err) {}
 
             let qaObj = {};
             try {
                 const storedQa = durableStorage.getItem('shopping_qa');
                 if (storedQa) qaObj = JSON.parse(storedQa);
-            } catch(err) {}
+            } catch (err) {}
 
-            productsData.forEach(p => {
+            productsData.forEach((p) => {
                 // Save comments
                 if (p.reviews && Array.isArray(p.reviews)) {
                     // Prepend date if missing
-                    const datedReviews = p.reviews.map(r => ({
+                    const datedReviews = p.reviews.map((r) => ({
                         ...r,
-                        date: r.date || new Date().toLocaleDateString()
+                        date: r.date || new Date().toLocaleDateString(),
                     }));
 
-                    if(commentsObj[p.name]) {
+                    if (commentsObj[p.name]) {
                         commentsObj[p.name] = [...datedReviews, ...commentsObj[p.name]];
                     } else {
                         commentsObj[p.name] = datedReviews;
@@ -767,8 +898,10 @@
         }
 
         bindProductClicks() {
-            const products = this.view.querySelectorAll('.shopping-food-card, .shopping-product-card');
-            products.forEach(product => {
+            const products = this.view.querySelectorAll(
+                '.shopping-food-card, .shopping-product-card',
+            );
+            products.forEach((product) => {
                 // Prevent multiple bindings
                 if (product.hasAttribute('data-bound')) return;
                 product.setAttribute('data-bound', 'true');
@@ -777,23 +910,32 @@
                 product.addEventListener('click', () => {
                     let name, price, desc;
 
-            const isFood = product.classList.contains('shopping-food-card');
-            const media = product.querySelector(isFood ? '.shopping-food-media' : '.shopping-product-media');
-            if (isFood) {
-                name = product.querySelector('strong')?.textContent || 'Food Item';
-                price = product.querySelector('.shopping-card-topline span')?.textContent || '$0';
-                desc = product.querySelector('p')?.textContent || '';
-            } else {
-                name = product.querySelector('strong')?.textContent || 'Product';
-                price = product.querySelector('span')?.textContent.split('·')[0].trim() || '$0';
-                // For generated mall items, desc is in the hidden span
-                const spans = product.querySelectorAll('span');
-                desc = (spans.length > 1) ? spans[1].textContent : '';
-            }
+                    const isFood = product.classList.contains('shopping-food-card');
+                    const media = product.querySelector(
+                        isFood ? '.shopping-food-media' : '.shopping-product-media',
+                    );
+                    if (isFood) {
+                        name = product.querySelector('strong')?.textContent || 'Food Item';
+                        price =
+                            product.querySelector('.shopping-card-topline span')?.textContent ||
+                            '$0';
+                        desc = product.querySelector('p')?.textContent || '';
+                    } else {
+                        name = product.querySelector('strong')?.textContent || 'Product';
+                        price =
+                            product.querySelector('span')?.textContent.split('·')[0].trim() || '$0';
+                        // For generated mall items, desc is in the hidden span
+                        const spans = product.querySelectorAll('span');
+                        desc = spans.length > 1 ? spans[1].textContent : '';
+                    }
 
                     const iconHtml = media?.innerHTML || '';
-                    const mediaBg = media ? (media.style.background || window.getComputedStyle(media).background) : '';
-                    const mediaImage = media ? window.getComputedStyle(media, '::after').backgroundImage : 'none';
+                    const mediaBg = media
+                        ? media.style.background || window.getComputedStyle(media).background
+                        : '';
+                    const mediaImage = media
+                        ? window.getComputedStyle(media, '::after').backgroundImage
+                        : 'none';
                     this.openDetail({ name, price, desc, iconHtml, mediaBg, mediaImage }, isFood);
                 });
             });
@@ -802,8 +944,11 @@
         async openGiftCharSelection(order, orderIndex) {
             if (!this.charSelectionModal || !this.charList) return;
 
-            const originalTitle = this.charSelectionModal.querySelector('.wb-centered-modal-title').textContent;
-            this.charSelectionModal.querySelector('.wb-centered-modal-title').textContent = 'Select a friend to gift';
+            const originalTitle = this.charSelectionModal.querySelector(
+                '.wb-centered-modal-title',
+            ).textContent;
+            this.charSelectionModal.querySelector('.wb-centered-modal-title').textContent =
+                'Select a friend to gift';
 
             this.charList.innerHTML = '';
 
@@ -812,15 +957,17 @@
                 try {
                     const allFriends = await window.imStorage.loadFriends();
                     friends = allFriends;
-                } catch(e) {}
+                } catch (e) {}
             }
 
             if (friends.length === 0) {
-                this.charList.innerHTML = '<div style="text-align: center; padding: 20px; color: #73706a;">no friends yet</div>';
+                this.charList.innerHTML =
+                    '<div style="text-align: center; padding: 20px; color: #73706a;">no friends yet</div>';
             } else {
-                friends.forEach(friend => {
+                friends.forEach((friend) => {
                     const el = document.createElement('div');
-                    el.style.cssText = 'background: rgba(255, 255, 255, 0.82); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 1px solid rgba(17,17,17,0.09); ';
+                    el.style.cssText =
+                        'background: rgba(255, 255, 255, 0.82); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 1px solid rgba(17,17,17,0.09); ';
 
                     const name = friend.name || friend.nickname || 'Unknown Char';
                     let avatarHtml = `<div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(17,17,17,0.06); display: flex; justify-content: center; align-items: center; color: #73706a;"><i class="fas fa-user"></i></div>`;
@@ -842,7 +989,9 @@
                     el.addEventListener('click', () => {
                         this.charSelectionModal.style.display = 'none';
                         this.charSelectionModal.classList.remove('active');
-                        this.charSelectionModal.querySelector('.wb-centered-modal-title').textContent = originalTitle;
+                        this.charSelectionModal.querySelector(
+                            '.wb-centered-modal-title',
+                        ).textContent = originalTitle;
                         this.openGiftComposer(friend, order, orderIndex);
                     });
 
@@ -856,7 +1005,8 @@
             newCloseBtn.addEventListener('click', () => {
                 this.charSelectionModal.style.display = 'none';
                 this.charSelectionModal.classList.remove('active');
-                this.charSelectionModal.querySelector('.wb-centered-modal-title').textContent = originalTitle;
+                this.charSelectionModal.querySelector('.wb-centered-modal-title').textContent =
+                    originalTitle;
             });
 
             this.charSelectionModal.style.display = 'flex';
@@ -883,25 +1033,32 @@
             overlay.style.display = 'flex';
             const input = overlay.querySelector('.shopping-gift-compose-input');
             const close = () => overlay.remove();
-            overlay.querySelector('.shopping-gift-compose-cancel')?.addEventListener('click', close);
-            overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
-            overlay.querySelector('.shopping-gift-compose-submit')?.addEventListener('click', async () => {
-                const submit = overlay.querySelector('.shopping-gift-compose-submit');
-                if (submit.disabled) return;
-                submit.disabled = true;
-                const success = await this.sendGiftMessage(friend, order, input?.value || '');
-                submit.disabled = false;
-                if (!success) return;
-                if (orderIndex !== undefined && this.orders[orderIndex]) {
-                    this.orders[orderIndex].gifted = true;
-                    this.orders[orderIndex].giftedAt = Date.now();
-                    this.orders[orderIndex].giftedToFriendId = String(friend.id);
-                    this.orders[orderIndex].giftedToName = friend.name || friend.nickname || 'Unknown Char';
-                    this.saveOrders();
-                    this.renderOrders();
-                }
-                close();
+            overlay
+                .querySelector('.shopping-gift-compose-cancel')
+                ?.addEventListener('click', close);
+            overlay.addEventListener('click', (event) => {
+                if (event.target === overlay) close();
             });
+            overlay
+                .querySelector('.shopping-gift-compose-submit')
+                ?.addEventListener('click', async () => {
+                    const submit = overlay.querySelector('.shopping-gift-compose-submit');
+                    if (submit.disabled) return;
+                    submit.disabled = true;
+                    const success = await this.sendGiftMessage(friend, order, input?.value || '');
+                    submit.disabled = false;
+                    if (!success) return;
+                    if (orderIndex !== undefined && this.orders[orderIndex]) {
+                        this.orders[orderIndex].gifted = true;
+                        this.orders[orderIndex].giftedAt = Date.now();
+                        this.orders[orderIndex].giftedToFriendId = String(friend.id);
+                        this.orders[orderIndex].giftedToName =
+                            friend.name || friend.nickname || 'Unknown Char';
+                        this.saveOrders();
+                        this.renderOrders();
+                    }
+                    close();
+                });
             requestAnimationFrame(() => input?.focus());
         }
 
@@ -910,71 +1067,103 @@
             if (!orderId || this.giftOrdersInFlight.has(orderId)) return false;
             this.giftOrdersInFlight.add(orderId);
             try {
-            const itemNames = order.items.map(i => i.name).join(', ');
-            const cleanDescription = String(description || '').trim();
-            const msgText = `Gift: ${itemNames}\nValue $${order.total.toFixed(2)}${cleanDescription ? `\nDescription: ${cleanDescription}` : ''}`;
+                const itemNames = order.items.map((i) => i.name).join(', ');
+                const cleanDescription = String(description || '').trim();
+                const msgText = `Gift: ${itemNames}\nValue $${order.total.toFixed(2)}${cleanDescription ? `\nDescription: ${cleanDescription}` : ''}`;
 
-            let success = false;
-            if (window.imApp && window.imApp.appendFriendMessage) {
-                try {
-                    if (window.imApp.ensureFriendMessagesLoaded) {
-                        await window.imApp.ensureFriendMessagesLoaded(friend.id);
-                    }
-
-                    const newMsg = {
-                        role: 'user',
-                        shopGift: { orderId, itemName: itemNames, price: Number(order.itemTotal ?? order.total) || 0, paymentMethod: String(order.method || 'Pay') },
-                        type: 'gift',
-                        text: msgText,
-                        content: msgText,
-                        giftName: itemNames,
-                        giftValue: Number(order.total) || 0,
-                        giftDescription: cleanDescription,
-                        giftStatus: 'pending',
-                        giftPaymentMethod: order.method || '',
-                        timestamp: Date.now()
-                    };
-
-                    success = await window.imApp.appendFriendMessage(friend.id, newMsg, { silent: false });
-                    const giftContextText = `[Gift event] User sent ${itemNames}. Value $${order.total.toFixed(2)}.${cleanDescription ? ` Description: ${cleanDescription}.` : ''} Paid via ${order.method}. 理解礼物描述含义，并根据你的角色人设对她送你的这份礼物做出你真实的反应。。`;
-                    const aiMsg = {
-                        role: 'system',
-                        type: 'text',
-                        text: giftContextText,
-                        content: giftContextText,
-                        timestamp: Date.now() + 1
-                    };
-                    await window.imApp.appendFriendMessage(friend.id, aiMsg, { silent: true });
-
-                    if (window.imData && window.imData.currentActiveFriend && String(window.imData.currentActiveFriend.id) === String(friend.id)) {
-                        const activeContainer = document.querySelector('.active-chat-interface .ins-chat-messages');
-                        if (activeContainer && window.imChat && window.imChat.appendMessageToContainer) {
-                            window.imChat.appendMessageToContainer(window.imData.currentActiveFriend, activeContainer, newMsg);
+                let success = false;
+                if (window.imApp && window.imApp.appendFriendMessage) {
+                    try {
+                        if (window.imApp.ensureFriendMessagesLoaded) {
+                            await window.imApp.ensureFriendMessagesLoaded(friend.id);
                         }
+
+                        const newMsg = {
+                            role: 'user',
+                            shopGift: {
+                                orderId,
+                                itemName: itemNames,
+                                price: Number(order.itemTotal ?? order.total) || 0,
+                                paymentMethod: String(order.method || 'Pay'),
+                            },
+                            type: 'gift',
+                            text: msgText,
+                            content: msgText,
+                            giftName: itemNames,
+                            giftValue: Number(order.total) || 0,
+                            giftDescription: cleanDescription,
+                            giftStatus: 'pending',
+                            giftPaymentMethod: order.method || '',
+                            timestamp: Date.now(),
+                        };
+
+                        success = await window.imApp.appendFriendMessage(friend.id, newMsg, {
+                            silent: false,
+                        });
+                        const giftContextText = `[Gift event] User sent ${itemNames}. Value $${order.total.toFixed(2)}.${cleanDescription ? ` Description: ${cleanDescription}.` : ''} Paid via ${order.method}. 理解礼物描述含义，并根据你的角色人设对她送你的这份礼物做出你真实的反应。。`;
+                        const aiMsg = {
+                            role: 'system',
+                            type: 'text',
+                            text: giftContextText,
+                            content: giftContextText,
+                            timestamp: Date.now() + 1,
+                        };
+                        await window.imApp.appendFriendMessage(friend.id, aiMsg, {
+                            silent: true,
+                        });
+
+                        if (
+                            window.imData &&
+                            window.imData.currentActiveFriend &&
+                            String(window.imData.currentActiveFriend.id) === String(friend.id)
+                        ) {
+                            const activeContainer = document.querySelector(
+                                '.active-chat-interface .ins-chat-messages',
+                            );
+                            if (
+                                activeContainer &&
+                                window.imChat &&
+                                window.imChat.appendMessageToContainer
+                            ) {
+                                window.imChat.appendMessageToContainer(
+                                    window.imData.currentActiveFriend,
+                                    activeContainer,
+                                    newMsg,
+                                );
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Failed to append gift message:', e);
                     }
-                } catch(e) {
-                    console.error('Failed to append gift message:', e);
                 }
-            }
 
-            if (success) {
-                if (window.showToast) window.showToast('Gift sent');
-                else alert('Gift sent successfully.');
-            } else {
-                if (window.showToast) window.showToast('赠送失败');
-                else alert('赠送失败');
-            }
+                if (success) {
+                    if (window.showToast) window.showToast('Gift sent');
+                    else alert('Gift sent successfully.');
+                } else {
+                    if (window.showToast) window.showToast('赠送失败');
+                    else alert('赠送失败');
+                }
 
-            if (success && window.imChat?.handleAiReply) {
-                const giftFriend = (window.imData?.friends || []).find(candidate => String(candidate.id) === String(friend.id)) || friend;
-                const activeContainer = document.getElementById('chat-interface-' + friend.id)?.querySelector('.ins-chat-messages') || null;
-                void window.imChat.handleAiReply(giftFriend, activeContainer, null, {
-                    source: 'shop_gift', silent: true,
-                    extraSystemPrompt: `User 刚刚赠送了礼物“${itemNames}”（价值 $${order.total.toFixed(2)}）。${cleanDescription ? ` Description: ${cleanDescription}.` : ''}请以 Char 身份结合人设和关系自然回应这份礼物。`
-                });
+                if (success && window.imChat?.handleAiReply) {
+                    const giftFriend =
+                        (window.imData?.friends || []).find(
+                            (candidate) => String(candidate.id) === String(friend.id),
+                        ) || friend;
+                    const activeContainer =
+                        document
+                            .getElementById('chat-interface-' + friend.id)
+                            ?.querySelector('.ins-chat-messages') || null;
+                    void window.imChat.handleAiReply(giftFriend, activeContainer, null, {
+                        source: 'shop_gift',
+                        silent: true,
+                        extraSystemPrompt: `User 刚刚赠送了礼物“${itemNames}”（价值 $${order.total.toFixed(2)}）。${cleanDescription ? ` Description: ${cleanDescription}.` : ''}请以 Char 身份结合人设和关系自然回应这份礼物。`,
+                    });
+                }
+                return success;
+            } finally {
+                this.giftOrdersInFlight.delete(orderId);
             }
-            return success;
-            } finally { this.giftOrdersInFlight.delete(orderId); }
         }
 
         ['loadOrders']() {
@@ -1004,8 +1193,18 @@
             }
             if (!cards || cards.length === 0) {
                 cards = [
-                    { id: 'card1', name: 'AMERICAN EXPRESS', number: '**** **** **** 9898', icon: 'fa-university' },
-                    { id: 'card2', name: 'J.P. Morgan', number: '**** **** **** 8888', icon: 'fa-credit-card' }
+                    {
+                        id: 'card1',
+                        name: 'AMERICAN EXPRESS',
+                        number: '**** **** **** 9898',
+                        icon: 'fa-university',
+                    },
+                    {
+                        id: 'card2',
+                        name: 'J.P. Morgan',
+                        number: '**** **** **** 8888',
+                        icon: 'fa-credit-card',
+                    },
                 ];
             }
 
@@ -1014,7 +1213,7 @@
             if (window.imStorage && window.imStorage.loadFriends) {
                 try {
                     friends = await window.imStorage.loadFriends();
-                } catch(e) {}
+                } catch (e) {}
             }
 
             if (!this.selectedCard && cards.length > 0) {
@@ -1022,7 +1221,10 @@
             }
             // Ensure selected friend exists in current friends list, otherwise pick first
             if (friends.length > 0) {
-                if (!this.selectedFriend || !friends.find(f => String(f.id) === String(this.selectedFriend.id))) {
+                if (
+                    !this.selectedFriend ||
+                    !friends.find((f) => String(f.id) === String(this.selectedFriend.id))
+                ) {
                     this.selectedFriend = friends[0];
                 }
             } else {
@@ -1033,7 +1235,9 @@
                 this.payDesc.textContent = `${this.selectedCard.name} (${this.selectedCard.number.slice(-4)})`;
             }
             if (this.friendDesc) {
-                this.friendDesc.textContent = this.selectedFriend ? (this.selectedFriend.name || this.selectedFriend.nickname || 'Unknown Char') : 'select friends';
+                this.friendDesc.textContent = this.selectedFriend
+                    ? this.selectedFriend.name || this.selectedFriend.nickname || 'Unknown Char'
+                    : 'select friends';
             }
         }
 
@@ -1053,8 +1257,18 @@
 
             if (!cards || cards.length === 0) {
                 cards = [
-                    { id: 'card1', name: 'AMERICAN EXPRESS', number: '**** **** **** 9898', icon: 'fa-university' },
-                    { id: 'card2', name: 'J.P. Morgan', number: '**** **** **** 8888', icon: 'fa-credit-card' }
+                    {
+                        id: 'card1',
+                        name: 'AMERICAN EXPRESS',
+                        number: '**** **** **** 9898',
+                        icon: 'fa-university',
+                    },
+                    {
+                        id: 'card2',
+                        name: 'J.P. Morgan',
+                        number: '**** **** **** 8888',
+                        icon: 'fa-credit-card',
+                    },
                 ];
             }
 
@@ -1062,11 +1276,13 @@
                 this.cardBalance.textContent = `$${balance.toFixed(2)}`;
             }
 
-            cards.forEach(card => {
+            cards.forEach((card) => {
                 const el = document.createElement('div');
-                el.style.cssText = 'background: rgba(255, 255, 255, 0.82); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 1px solid rgba(17,17,17,0.09); ';
+                el.style.cssText =
+                    'background: rgba(255, 255, 255, 0.82); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 1px solid rgba(17,17,17,0.09); ';
 
-                const isSelected = this.selectedCard && String(this.selectedCard.id) === String(card.id);
+                const isSelected =
+                    this.selectedCard && String(this.selectedCard.id) === String(card.id);
 
                 el.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 12px;">
@@ -1108,17 +1324,20 @@
             if (window.imStorage && window.imStorage.loadFriends) {
                 try {
                     friends = await window.imStorage.loadFriends();
-                } catch(e) {}
+                } catch (e) {}
             }
 
             if (friends.length === 0) {
-                this.charList.innerHTML = '<div style="text-align: center; padding: 20px; color: #73706a;">no friends yet</div>';
+                this.charList.innerHTML =
+                    '<div style="text-align: center; padding: 20px; color: #73706a;">no friends yet</div>';
             } else {
-                friends.forEach(friend => {
+                friends.forEach((friend) => {
                     const el = document.createElement('div');
-                    el.style.cssText = 'background: rgba(255, 255, 255, 0.82); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 1px solid rgba(17,17,17,0.09); ';
+                    el.style.cssText =
+                        'background: rgba(255, 255, 255, 0.82); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: 1px solid rgba(17,17,17,0.09); ';
 
-                    const isSelected = this.selectedFriend && String(this.selectedFriend.id) === String(friend.id);
+                    const isSelected =
+                        this.selectedFriend && String(this.selectedFriend.id) === String(friend.id);
                     const name = friend.name || friend.nickname || 'Unknown Char';
                     let avatarHtml = `<div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(17,17,17,0.06); display: flex; justify-content: center; align-items: center; color: #73706a;"><i class="fas fa-user"></i></div>`;
                     if (friend.avatar) {
@@ -1156,12 +1375,14 @@
         }
 
         async processPayment() {
-            const method = document.querySelector('input[name="shopping-payment-method"]:checked')?.value;
+            const method = document.querySelector(
+                'input[name="shopping-payment-method"]:checked',
+            )?.value;
             let subtotal = 0;
-            this.cart.forEach(item => subtotal += item.priceVal);
+            this.cart.forEach((item) => (subtotal += item.priceVal));
             const total = subtotal + 5; // +5 delivery
 
-            const itemNames = this.cart.map(item => item.name).join(', ');
+            const itemNames = this.cart.map((item) => item.name).join(', ');
 
             if (method === 'pay') {
                 if (!this.selectedCard) {
@@ -1169,24 +1390,46 @@
                     return;
                 }
 
-                const cardBalance = this.selectedCard.balance !== undefined ? this.selectedCard.balance : (typeof window.getPayBalance === 'function' ? window.getPayBalance() : 0);
+                const latestCard = window
+                    .getPayCards?.()
+                    .find((card) => String(card.id) === String(this.selectedCard.id));
+                if (!latestCard) {
+                    window.showToast?.('支付卡片不存在，请重新选择');
+                    return;
+                }
+                this.selectedCard = latestCard;
+                const cardBalance = Number(latestCard.balance);
 
                 if (cardBalance >= total) {
-                    let paymentSuccess = true;
+                    let paymentSuccess = false;
                     if (typeof window.addPayTransaction === 'function') {
-                        paymentSuccess = window.addPayTransaction(total, 'Shopping', 'expense', this.selectedCard.id);
+                        paymentSuccess = window.addPayTransaction(
+                            total,
+                            'Shopping',
+                            'expense',
+                            this.selectedCard.id,
+                        );
                     }
 
                     if (paymentSuccess) {
                         // Save to orders
-                        this.orders.unshift(...this.createOrdersFromCart(this.selectedCard.type === 'family' ? `Family (${this.selectedCard.name})` : 'Pay', 'Paid'));
+                        this.orders.unshift(
+                            ...this.createOrdersFromCart(
+                                this.selectedCard.type === 'family'
+                                    ? `Family (${this.selectedCard.name})`
+                                    : 'Pay',
+                                'Paid',
+                            ),
+                        );
                         this.saveOrders();
 
                         this.cart = [];
                         this.saveCart();
                         this.renderCart();
                         this.checkoutSheet?.classList.remove('active');
-                        window.showToast ? window.showToast('Payment successful') : alert('Payment successful');
+                        window.showToast
+                            ? window.showToast('Payment successful')
+                            : alert('Payment successful');
                     } else {
                         window.showToast ? window.showToast('支付失败') : alert('支付失败');
                     }
@@ -1199,7 +1442,8 @@
                     return;
                 }
 
-                const friendName = this.selectedFriend.name || this.selectedFriend.nickname || 'Unknown Char';
+                const friendName =
+                    this.selectedFriend.name || this.selectedFriend.nickname || 'Unknown Char';
 
                 // Construct fallback text message
                 const msgText = `Pay for me\n: ${itemNames}\n Price: $${total.toFixed(2)}`;
@@ -1230,34 +1474,63 @@
                             type: 'html',
                             text: msgText,
                             content: htmlCard,
-                            timestamp: Date.now()
+                            timestamp: Date.now(),
                         };
 
-                        success = await window.imApp.appendFriendMessage(this.selectedFriend.id, newMsg, { silent: true });
+                        success = await window.imApp.appendFriendMessage(
+                            this.selectedFriend.id,
+                            newMsg,
+                            { silent: true },
+                        );
 
                         // Trigger render if this chat is currently active
-                        if (success && window.imData && window.imData.currentActiveFriend && String(window.imData.currentActiveFriend.id) === String(this.selectedFriend.id)) {
-                            const activeContainer = document.querySelector('.active-chat-interface .ins-chat-messages');
-                            if (activeContainer && window.imChat && window.imChat.appendMessageToContainer) {
-                                window.imChat.appendMessageToContainer(window.imData.currentActiveFriend, activeContainer, newMsg);
+                        if (
+                            success &&
+                            window.imData &&
+                            window.imData.currentActiveFriend &&
+                            String(window.imData.currentActiveFriend.id) ===
+                                String(this.selectedFriend.id)
+                        ) {
+                            const activeContainer = document.querySelector(
+                                '.active-chat-interface .ins-chat-messages',
+                            );
+                            if (
+                                activeContainer &&
+                                window.imChat &&
+                                window.imChat.appendMessageToContainer
+                            ) {
+                                window.imChat.appendMessageToContainer(
+                                    window.imData.currentActiveFriend,
+                                    activeContainer,
+                                    newMsg,
+                                );
                             }
                         }
-                    } catch(e) {
+                    } catch (e) {
                         console.error('Failed to append shop request message:', e);
                     }
                 }
 
                 if (success) {
-                    this.orders.unshift(...this.createOrdersFromCart(`pay for me (${friendName})`, 'Payment request sent'));
+                    this.orders.unshift(
+                        ...this.createOrdersFromCart(
+                            `pay for me (${friendName})`,
+                            'Payment request sent',
+                        ),
+                    );
                     this.saveOrders();
 
                     this.cart = [];
                     this.saveCart();
                     this.renderCart();
                     this.checkoutSheet?.classList.remove('active');
-                    window.showToast ? window.showToast('Payment request sent') : alert('Payment request sent');
+                    window.showToast
+                        ? window.showToast('Payment request sent')
+                        : alert('Payment request sent');
                 } else {
-                    window.showToast ? window.showToast('无法发送代付请求') : alert('无法发送代付请求');
+                    window.showToast
+                        ? window.showToast('无法发送代付请求')
+                        : alert('无法发送代付请求');
                 }
             }
         }
@@ -1278,11 +1551,12 @@
 
             this.orders.forEach((order, index) => {
                 const el = document.createElement('div');
-                el.style.cssText = 'background: #fff; border-radius: 16px; padding: 16px;  position: relative;';
+                el.style.cssText =
+                    'background: #fff; border-radius: 16px; padding: 16px;  position: relative;';
 
-                const itemNames = order.items.map(i => i.name).join(', ');
+                const itemNames = order.items.map((i) => i.name).join(', ');
                 let mediaHtml = '';
-                order.items.slice(0, 3).forEach(item => {
+                order.items.slice(0, 3).forEach((item) => {
                     mediaHtml += `<div style="width: 40px; height: 40px; border-radius: 8px; background: ${item.mediaBg}; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 16px; flex-shrink: 0;">${item.iconHtml}</div>`;
                 });
                 if (order.items.length > 3) {
@@ -1293,7 +1567,7 @@
 
                 const ts = order.timestamp || order.id; // fallback to id which is Date.now()
                 const elapsed = (Date.now() - ts) / 1000;
-                const isFood = order.items.some(i => i.isFood);
+                const isFood = order.items.some((i) => i.isFood);
 
                 const step1Text = isFood ? 'picked' : 'shipped';
                 const step2Text = isFood ? 'delivery' : 'in transit';
@@ -1346,20 +1620,22 @@
 
                     <div class="shopping-order-item-inline-wrap">
                         <div class="shopping-order-items-scroll inline-mode">
-                            ${order.items.map(item => {
-                                const mediaImage = this.getProductImage(item);
-                                return `
+                            ${order.items
+                                .map((item) => {
+                                    const mediaImage = this.getProductImage(item);
+                                    return `
                                     <div class="shopping-order-item-media" style="background: ${item.mediaBg}; ${mediaImage ? `background-image: ${mediaImage}; background-position: center; background-size: cover; background-repeat: no-repeat;` : ''}">
                                         ${mediaImage ? '' : item.iconHtml}
                                     </div>
                                 `;
-                            }).join('')}
+                                })
+                                .join('')}
                         </div>
                         <div class="shopping-order-title inline-mode">${itemNames}</div>
                     </div>
 
                     <div class="shopping-order-footer">
-                        <div class="shopping-order-method">${order.method}</div>
+                        <div class="shopping-order-method">Pay</div>
                         <div class="shopping-order-price-wrap">
                             <button class="shopping-order-gift-btn" data-index="${index}" style="margin-right: 8px; background: #000; color: #fff; border: none; border-radius: 12px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer;">Gift</button>
                             <button class="shopping-order-comment-btn" data-product="${order.items.length > 0 ? order.items[0].name : ''}">Review</button>
@@ -1372,10 +1648,11 @@
                 const giftBtn = el.querySelector('.shopping-order-gift-btn');
                 if (giftBtn) {
                     if (order.gifted) {
-                        giftBtn.textContent = 'Gifted';
-                        giftBtn.style.background = '#e5e5ea';
-                        giftBtn.style.color = '#8e8e93';
-                        giftBtn.style.cursor = 'default';
+                        giftBtn.innerHTML = '<i class="fas fa-gift" aria-hidden="true"></i>';
+                        giftBtn.classList.add('shopping-order-gifted-icon');
+                        giftBtn.setAttribute('aria-label', 'Gifted');
+                        giftBtn.disabled = true;
+                        giftBtn.removeAttribute('style');
                     } else {
                         giftBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -1408,9 +1685,10 @@
                         if (!this.ratingSheet) this.initRatingSheet();
 
                         // Reset form
+                        this.currentRating = 5;
                         this.ratingText.value = '';
                         if (this.ratingStars) {
-                            Array.from(this.ratingStars).forEach(s => {
+                            Array.from(this.ratingStars).forEach((s) => {
                                 s.className = 'fas fa-star';
                                 s.style.color = '#ff9500';
                             });
@@ -1426,13 +1704,13 @@
 
         getProductImage(product) {
             const defaults = {
-                'Espresson': 'assets/shopping/food-coffee.jpg',
+                Espresson: 'assets/shopping/food-coffee.jpg',
                 'Per Se Menu': 'assets/shopping/food-per-se.jpg',
                 'Mase Omakase': 'assets/shopping/food-mase.jpg',
                 'Romanée-Conti': 'assets/shopping/mall-drc.jpg',
                 'Serpenti Viper Bracelet': 'assets/shopping/mall-bylgarl.jpg',
                 'Hermes Birkin': 'assets/shopping/mall-hermes.jpg',
-                'Vintage Alhambra': 'assets/shopping/mall-vca.jpg'
+                'Vintage Alhambra': 'assets/shopping/mall-vca.jpg',
             };
             if (product.mediaImage && product.mediaImage !== 'none') {
                 return product.mediaImage.replace(/"/g, "'");
@@ -1506,7 +1784,7 @@
             try {
                 const stored = durableStorage.getItem('shopping_qa');
                 if (stored) qaObj = JSON.parse(stored);
-            } catch(err) {}
+            } catch (err) {}
 
             const qaList = qaObj[productName] || [];
 
@@ -1521,10 +1799,11 @@
                 `;
 
                 if (qaList.length === 0) {
-                    qaTrigger.innerHTML += '<div style="font-size: 14px; color: #8e8e93;">no answers yet</div>';
+                    qaTrigger.innerHTML +=
+                        '<div style="font-size: 14px; color: #8e8e93;">no answers yet</div>';
                 } else {
                     const topQa = qaList.slice(0, 2);
-                    topQa.forEach(qa => {
+                    topQa.forEach((qa) => {
                         const randomAnswersCount = Math.floor(Math.random() * 5) + 1;
                         qaTrigger.innerHTML += `
                             <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
@@ -1539,11 +1818,13 @@
 
             qaContainer.innerHTML = '';
             if (qaList.length === 0) {
-                qaContainer.innerHTML = '<div style="text-align: center; color: #8e8e93; font-size: 14px; padding: 20px 0;">no answers yet</div>';
+                qaContainer.innerHTML =
+                    '<div style="text-align: center; color: #8e8e93; font-size: 14px; padding: 20px 0;">no answers yet</div>';
             } else {
-                qaList.forEach(qa => {
+                qaList.forEach((qa) => {
                     const el = document.createElement('div');
-                    el.style.cssText = 'display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid rgba(17,17,17,0.05);';
+                    el.style.cssText =
+                        'display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid rgba(17,17,17,0.05);';
                     el.innerHTML = `
                         <div style="display: flex; align-items: flex-start; gap: 8px;">
                             <span style="background: #111; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 2px;">Q</span>
@@ -1565,33 +1846,19 @@
             if (!sheet) return;
 
             // hide old comment section
-            const oldContainer = sheet.querySelector(isFood ? '#shopping-food-detail-comments' : '#shopping-detail-comments');
+            const oldContainer = sheet.querySelector(
+                isFood ? '#shopping-food-detail-comments' : '#shopping-detail-comments',
+            );
             if (oldContainer) {
                 oldContainer.style.display = 'none';
             }
 
-            // find the "Reviews (128)" or "DELIVERY REVIEW (458)" element
-            let reviewsContainerList;
-            let titleEl;
-            if (isFood) {
-                const allDivs = sheet.querySelectorAll('div');
-                for (let div of allDivs) {
-                    if (div.textContent.includes('DELIVERY REVIEW') && div.style.fontSize === '15px') {
-                        titleEl = div;
-                        reviewsContainerList = div.parentElement.lastElementChild;
-                        break;
-                    }
-                }
-            } else {
-                const allDivs = sheet.querySelectorAll('div');
-                for (let div of allDivs) {
-                    if (div.textContent.includes('Reviews') && div.style.fontSize === '16px') {
-                        titleEl = div;
-                        reviewsContainerList = div.parentElement.lastElementChild;
-                        break;
-                    }
-                }
-            }
+            const reviewsContainerList = document.getElementById(
+                isFood ? 'shopping-food-reviews-list' : 'shopping-reviews-list',
+            );
+            const titleEl = document.getElementById(
+                isFood ? 'shopping-food-reviews-title' : 'shopping-reviews-title',
+            );
 
             if (!reviewsContainerList) return;
 
@@ -1599,18 +1866,21 @@
             try {
                 const stored = durableStorage.getItem('shopping_comments');
                 if (stored) commentsObj = JSON.parse(stored);
-            } catch(err) {}
+            } catch (err) {}
 
             const comments = commentsObj[productName] || [];
 
             if (titleEl) {
-                titleEl.textContent = isFood ? `DELIVERY REVIEW (${comments.length})` : `Reviews (${comments.length})`;
+                titleEl.textContent = isFood
+                    ? `DELIVERY REVIEW (${comments.length})`
+                    : `Reviews (${comments.length})`;
             }
 
             reviewsContainerList.innerHTML = '';
 
             if (comments.length === 0) {
-                reviewsContainerList.innerHTML = '<div style="font-size: 14px; color: #8e8e93; text-align: center; padding: 10px 0;">no reviews yet</div>';
+                reviewsContainerList.innerHTML =
+                    '<div style="font-size: 14px; color: #8e8e93; text-align: center; padding: 10px 0;">no reviews yet</div>';
             }
         }
 
@@ -1618,22 +1888,15 @@
             if (document.getElementById('shopping-rating-sheet')) return;
 
             const sheetHtml = `
-            <div class="bottom-sheet-overlay detail-sheet-overlay" id="shopping-rating-sheet" style="z-index: 1200;">
-                <div class="bottom-sheet" style="height: auto; max-height: 70%; padding-bottom: max(20px, env(safe-area-inset-bottom, 0px)); background: #ffffff;">
-                    <div class="sheet-handle"></div>
-                    <div class="sheet-title" id="shopping-rating-title">PRODUCT REVIEWS</div>
-                    <div class="detail-sheet-content" style="padding: 16px;">
-                        <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 24px;" id="shopping-rating-stars">
-                            <i class="fas fa-star" data-val="1" style="font-size: 32px; color: #ff9500; cursor: pointer;"></i>
-                            <i class="fas fa-star" data-val="2" style="font-size: 32px; color: #ff9500; cursor: pointer;"></i>
-                            <i class="fas fa-star" data-val="3" style="font-size: 32px; color: #ff9500; cursor: pointer;"></i>
-                            <i class="fas fa-star" data-val="4" style="font-size: 32px; color: #ff9500; cursor: pointer;"></i>
-                            <i class="fas fa-star" data-val="5" style="font-size: 32px; color: #ff9500; cursor: pointer;"></i>
-                        </div>
-                        <textarea id="shopping-rating-text" placeholder="If you want to create something of value, be prepared to be judged." style="width: 100%; height: 120px; border: none; background: #f7f7f5; border-radius: 12px; padding: 16px; font-size: 15px; resize: none; outline: none; margin-bottom: 20px; box-sizing: border-box;"></textarea>
-                        <button type="button" id="shopping-rating-submit" style="width: 100%; padding: 16px; background: #111; color: #fff; border-radius: 12px; font-size: 16px; font-weight: 700; border: none; cursor: pointer;">submit review</button>
-                    </div>
+            <div class="bottom-sheet-overlay detail-sheet-overlay shopping-centered-overlay" id="shopping-rating-sheet" style="z-index:1200;">
+              <section class="shopping-centered-card" role="dialog" aria-modal="true" aria-labelledby="shopping-rating-title">
+                <div class="shopping-modal-header"><h2 id="shopping-rating-title">PRODUCT REVIEWS</h2><button type="button" class="shopping-modal-close" id="shopping-rating-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+                <div class="shopping-modal-scroll" style="padding:20px;">
+                  <div id="shopping-rating-stars" style="display:flex;justify-content:center;gap:15px;margin-bottom:24px;">${[1, 2, 3, 4, 5].map((value) => `<i class="fas fa-star" data-val="${value}" style="font-size:32px;color:#ff9500;cursor:pointer;"></i>`).join('')}</div>
+                  <textarea id="shopping-rating-text" placeholder="If you want to create something of value, be prepared to be judged." style="width:100%;height:120px;border:none;background:#f7f7f5;border-radius:12px;padding:16px;font-size:15px;resize:none;outline:none;margin-bottom:20px;box-sizing:border-box;"></textarea>
+                  <button type="button" id="shopping-rating-submit" class="shopping-modal-primary">submit review</button>
                 </div>
+              </section>
             </div>`;
 
             document.body.insertAdjacentHTML('beforeend', sheetHtml);
@@ -1643,13 +1906,19 @@
             this.ratingText = document.getElementById('shopping-rating-text');
             this.ratingSubmit = document.getElementById('shopping-rating-submit');
 
-            let currentRating = 5;
+            document
+                .getElementById('shopping-rating-close')
+                .addEventListener('click', () => this.ratingSheet.classList.remove('active'));
+            this.ratingSheet.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') this.ratingSheet.classList.remove('active');
+            });
+            this.currentRating = 5;
 
-            Array.from(this.ratingStars).forEach(star => {
+            Array.from(this.ratingStars).forEach((star) => {
                 star.addEventListener('click', (e) => {
-                    currentRating = parseInt(e.target.dataset.val, 10);
+                    this.currentRating = parseInt(e.target.dataset.val, 10);
                     Array.from(this.ratingStars).forEach((s, idx) => {
-                        if (idx < currentRating) {
+                        if (idx < this.currentRating) {
                             s.className = 'fas fa-star';
                             s.style.color = '#ff9500';
                         } else {
@@ -1674,7 +1943,7 @@
                 try {
                     const stored = durableStorage.getItem('shopping_comments');
                     if (stored) commentsObj = JSON.parse(stored);
-                } catch(err) {}
+                } catch (err) {}
 
                 if (!commentsObj[this.currentReviewProduct]) {
                     commentsObj[this.currentReviewProduct] = [];
@@ -1683,8 +1952,8 @@
                 commentsObj[this.currentReviewProduct].unshift({
                     user: '我',
                     text: text,
-                    rating: currentRating,
-                    date: new Date().toLocaleDateString()
+                    rating: this.currentRating,
+                    date: new Date().toLocaleDateString(),
                 });
 
                 durableStorage.setItem('shopping_comments', JSON.stringify(commentsObj));
@@ -1702,7 +1971,7 @@
 
             // Allow closing by clicking outside
             this.ratingSheet.addEventListener('click', (e) => {
-                if(e.target === this.ratingSheet) {
+                if (e.target === this.ratingSheet) {
                     this.ratingSheet.classList.remove('active');
                 }
             });
@@ -1719,30 +1988,36 @@
             try {
                 const stored = durableStorage.getItem('shopping_comments');
                 if (stored) commentsObj = JSON.parse(stored);
-            } catch(err) {}
+            } catch (err) {}
 
             const comments = commentsObj[productName] || [];
 
             if (titleEl) {
-                 titleEl.textContent = isFood ? `DELIVERY REVIEW (${comments.length})` : `Reviews (${comments.length})`;
+                titleEl.textContent = isFood
+                    ? `DELIVERY REVIEW (${comments.length})`
+                    : `Reviews (${comments.length})`;
             }
 
             container.innerHTML = '';
 
             if (comments.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #8e8e93;">no reviews yet</div>';
+                container.innerHTML =
+                    '<div style="text-align: center; padding: 40px; color: #8e8e93;">no reviews yet</div>';
             } else {
-                comments.forEach(c => {
+                comments.forEach((c) => {
                     const cEl = document.createElement('div');
-                    cEl.style.cssText = 'display: flex; gap: 12px; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid rgba(17,17,17,0.05);';
+                    cEl.style.cssText =
+                        'display: flex; gap: 12px; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid rgba(17,17,17,0.05);';
 
                     let starsHtml = '';
                     const stars = c.rating || 5;
                     for (let i = 0; i < 5; i++) {
                         if (i < stars) {
-                            starsHtml += '<i class="fas fa-star" style="color: #ff9500; font-size: 10px;"></i>';
+                            starsHtml +=
+                                '<i class="fas fa-star" style="color: #ff9500; font-size: 10px;"></i>';
                         } else {
-                            starsHtml += '<i class="far fa-star" style="color: #e5e5ea; font-size: 10px;"></i>';
+                            starsHtml +=
+                                '<i class="far fa-star" style="color: #e5e5ea; font-size: 10px;"></i>';
                         }
                     }
 
@@ -1865,7 +2140,8 @@
 
             if (this.cartSubtotal) this.cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
             const deliveryFee = 5;
-            if (this.cartTotal) this.cartTotal.textContent = `$${(subtotal + deliveryFee).toFixed(2)}`;
+            if (this.cartTotal)
+                this.cartTotal.textContent = `$${(subtotal + deliveryFee).toFixed(2)}`;
         }
 
         ['open']() {
@@ -1890,6 +2166,8 @@
             document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#ffffff');
         }
         ['switchTab'](tab_3, options_2 = {}) {
+            if (this.manualAddBtn)
+                this.manualAddBtn.hidden = !['food', 'mall'].includes(arguments[0]);
             const currentTab_2 = this.tabs.includes(tab_3) ? tab_3 : 'food';
             if (this.hasSelectedTab && this.currentTab === currentTab_2 && !options_2.force) return;
             const shouldScroll = options_2.scroll !== false;
@@ -1915,7 +2193,9 @@
         }
         updateIndicator() {
             if (!this.indicator || !this.navItems || !this.navItems.length) return;
-            const activeItem = this.navItems.find((item) => item.dataset.tab === this.currentTab) || this.navItems[0];
+            const activeItem =
+                this.navItems.find((item) => item.dataset.tab === this.currentTab) ||
+                this.navItems[0];
             const nav = activeItem.closest('.shopping-bottom-nav');
             if (!nav) return;
 
@@ -1951,12 +2231,17 @@
             return true;
         };
 
-        if (window.globalDataReadyPromise && typeof window.globalDataReadyPromise.then === 'function') {
-            window.shoppingDataReadyPromise = window.globalDataReadyPromise.then(initialize).catch((error) => {
-                console.warn('Shopping global data recovery failed:', error);
-                initialize();
-                return false;
-            });
+        if (
+            window.globalDataReadyPromise &&
+            typeof window.globalDataReadyPromise.then === 'function'
+        ) {
+            window.shoppingDataReadyPromise = window.globalDataReadyPromise
+                .then(initialize)
+                .catch((error) => {
+                    console.warn('Shopping global data recovery failed:', error);
+                    initialize();
+                    return false;
+                });
         } else {
             initialize();
             window.shoppingDataReadyPromise = Promise.resolve(true);
@@ -1964,5 +2249,8 @@
         return window.shoppingDataReadyPromise;
     }
 
-    (window.u2OnStorageReady || (callback => document.addEventListener('DOMContentLoaded', callback)))(initShoppingAppAfterStorageReady);
+    (
+        window.u2OnStorageReady ||
+        ((callback) => document.addEventListener('DOMContentLoaded', callback))
+    )(initShoppingAppAfterStorageReady);
 })();

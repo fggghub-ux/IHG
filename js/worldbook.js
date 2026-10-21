@@ -153,6 +153,14 @@ function calculateTokens(value_18) {
 window.calculateTokens = calculateTokens;
 window.invalidateWorldBookLocalBindings = invalidateWorldBookLocalBindings;
 window.getWorldBooks = () => (Array.isArray(worldBooks) ? worldBooks : []);
+window.getVisibleWorldBookMountIds = (ids = []) => {
+    const available = new Set(
+        worldBooks.filter((book) => book && !book.isGlobal).map((book) => String(book.id)),
+    );
+    return [...new Set((Array.isArray(ids) ? ids : []).map(String))].filter((id) =>
+        available.has(id),
+    );
+};
 function cloneWorldBookAgentValue(value_21) {
     if (typeof structuredClone === 'function') return structuredClone(value_21);
     return JSON.parse(JSON.stringify(value_21));
@@ -1023,7 +1031,7 @@ async function readWorldBookImportText(file_2) {
             console.warn('[worldbook] Could not load DOCX parser.', error_2);
         }
         if (!window.mammoth?.extractRawText)
-            return (window.showToast?.('DOCX 解析器加载失败，请先另存为 TXT 后导入'), null);
+            throw new Error('DOCX 解析器加载失败，请先另存为 TXT 后导入');
         const result_2 = await window.mammoth.extractRawText({
             arrayBuffer: await file_2.arrayBuffer(),
         });
@@ -1070,7 +1078,11 @@ function sanitizeImportedWorldBook(rawBook, fallbackName = '导入的世界书')
         attachedRoles: Array.isArray(source_2.attachedRoles) ? source_2.attachedRoles : [],
     };
 }
-function parseImportedWorldBooks(value_158, file_3) {
+function parseImportedWorldBooks(
+    value_158,
+    file_3,
+    targetGroup = activeWbGroupName || WB_UNGROUPED,
+) {
     const name_10 = getFileBaseName(file_3?.name || ''),
         content_2 = String(value_158 || '').trim();
     if (!content_2) throw new Error('文件内容为空');
@@ -1078,7 +1090,7 @@ function parseImportedWorldBooks(value_158, file_3) {
         sanitizeImportedWorldBook(
             {
                 name: name_10,
-                group: activeWbGroupName || WB_UNGROUPED,
+                group: targetGroup,
                 entries: [
                     {
                         title: name_10,
@@ -1090,29 +1102,42 @@ function parseImportedWorldBooks(value_158, file_3) {
         ),
     ];
 }
-async function importWorldBookFile(file_4) {
-    if (!file_4) return;
-    if (!isSupportedWorldBookImportFile(file_4))
-        return window.showToast?.('仅支持导入 TXT 和 DOCX 文件');
-    try {
-        const text_3 = await readWorldBookImportText(file_4);
-        if (text_3 === null) return;
-        const importedBooks = parseImportedWorldBooks(text_3, file_4);
-        worldBooks.push(...importedBooks);
-        importedBooks.forEach((book_15) => {
-            const group_6 = normalizeGroupName(book_15.group);
-            if (group_6 !== WB_UNGROUPED && !wbGroups.includes(group_6)) wbGroups.push(group_6);
-        });
-        saveWorldBooksData();
-        renderWorldBooks({
-            force: true,
-        });
-        if (activeWbGroupName) renderGroupBookList(activeWbGroupName);
-        window.showToast?.('已导入 ' + importedBooks.length + ' 本世界书');
-    } catch (error_3) {
-        console.error('Failed to import world book:', error_3);
-        window.showToast?.('导入失败：请检查 TXT 或 DOCX 文件内容');
+async function importWorldBookFiles(files) {
+    const selectedFiles = Array.from(files || []);
+    if (!selectedFiles.length) return;
+    const targetGroup = activeWbGroupName || WB_UNGROUPED;
+    const importedBooks = [],
+        usedIds = new Set(worldBooks.map((book) => String(book.id)));
+    let failed = 0,
+        nextId = Date.now();
+    for (const file of selectedFiles) {
+        try {
+            if (!isSupportedWorldBookImportFile(file)) throw new Error('仅支持 TXT 和 DOCX 文件');
+            const text = await readWorldBookImportText(file);
+            for (const book of parseImportedWorldBooks(text, file, targetGroup)) {
+                while (usedIds.has(String(nextId))) nextId++;
+                book.id = nextId++;
+                usedIds.add(String(book.id));
+                importedBooks.push(book);
+            }
+        } catch (error) {
+            failed++;
+            console.warn('[worldbook] Failed to import file:', file?.name, error);
+        }
     }
+    if (importedBooks.length) {
+        worldBooks.push(...importedBooks);
+        if (targetGroup !== WB_UNGROUPED && !wbGroups.includes(targetGroup))
+            wbGroups.push(targetGroup);
+        saveWorldBooksData();
+        renderWorldBooks({ force: true });
+        if (activeWbGroupName) renderGroupBookList(activeWbGroupName);
+    }
+    window.showToast?.(
+        failed
+            ? `导入完成：成功 ${importedBooks.length} 本，失败 ${failed} 个文件`
+            : `已导入 ${importedBooks.length} 本世界书`,
+    );
 }
 function triggerWorldBookImport() {
     getWbElement('wb-import-file')?.click();
@@ -1261,7 +1286,7 @@ window.renderWorldBookSelector = function renderWorldBookSelector(selectedIds = 
         renderBooks = () => {
             const selected = new Set(selectedBookIds.map(String)),
                 books_4 = getBooksInGroup(groupSelect.value).filter(
-                    (book_18) => !selected.has(String(book_18.id)),
+                    (book_18) => !book_18.isGlobal && !selected.has(String(book_18.id)),
                 );
             bookSelect.disabled = books_4.length === 0;
             bookSelect.innerHTML = books_4.length
@@ -1279,12 +1304,18 @@ window.renderWorldBookSelector = function renderWorldBookSelector(selectedIds = 
                       )
                       .join('')
                 : '<option value="">暂无可挂载世界书</option>';
-            empty.textContent = books_4.length ? '' : '此文件夹没有可挂载的世界书';
+            const folderBooks = getBooksInGroup(groupSelect.value);
+            empty.textContent = books_4.length
+                ? ''
+                : folderBooks.length && folderBooks.every((book) => book.isGlobal)
+                  ? '此文件夹的世界书均已全局启用'
+                  : '此文件夹没有可挂载的世界书';
         },
         renderMounted = () => {
-            mountedCount.textContent = selectedBookIds.length + ' 项';
-            mountedList.innerHTML = selectedBookIds.length
-                ? selectedBookIds
+            const visibleIds = window.getVisibleWorldBookMountIds(selectedBookIds);
+            mountedCount.textContent = visibleIds.length + ' 项';
+            mountedList.innerHTML = visibleIds.length
+                ? visibleIds
                       .map((value_201) => {
                           const book_19 = getBook(value_201);
                           if (!book_19) return '';
@@ -1416,9 +1447,9 @@ function initializeWorldBookUi() {
         saveGroupName();
     });
     getWbElement('wb-import-file')?.addEventListener('change', async (event_13) => {
-        const file_5 = event_13.target.files && event_13.target.files[0];
-        await importWorldBookFile(file_5);
+        const files = Array.from(event_13.target.files || []);
         event_13.target.value = '';
+        await importWorldBookFiles(files);
     });
     getWbElement('wb-search-input')?.addEventListener('input', (event_14) => {
         if (wbSearchTimer) clearTimeout(wbSearchTimer);

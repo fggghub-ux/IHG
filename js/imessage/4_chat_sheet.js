@@ -4,19 +4,19 @@
 )(() => {
     const { apiConfig: value_2, userState: userState_2 } = window;
     window.imChat = window.imChat || {};
-    const imChat_2 = window.imChat,
-        offlineRegexEngine = window.imOfflineRegex,
-        offlineReasoning = window.imOfflineReasoning,
-        imOfflineSummaryErrors_6 = window.imOfflineSummaryErrors,
-        count = 30000,
-        OFFLINE_STREAM_RENDER_INTERVAL = 80,
-        count_8 = 10,
-        count_9 = 10,
-        scrollTop_2 = 1000000000,
-        threshold_2 = 2,
-        count_12 = 2,
-        count_13 = 1200,
-        OFFLINE_COT_PROMPT_IDS = new Set([
+    const imChat_2 = window.imChat;
+    const offlineRegexEngine = window.imOfflineRegex;
+    const offlineReasoning = window.imOfflineReasoning;
+    const imOfflineSummaryErrors_6 = window.imOfflineSummaryErrors;
+    const count = 30000;
+    const OFFLINE_STREAM_RENDER_INTERVAL = 80;
+    const count_8 = 10;
+    const count_9 = 10;
+    const scrollTop_2 = 1000000000;
+    const threshold_2 = 2;
+    const count_12 = 2;
+    const count_13 = 1200;
+    const OFFLINE_COT_PROMPT_IDS = new Set([
             'cot_before',
             'cot_scene_planning',
             'cot_literary_guidance',
@@ -24,8 +24,8 @@
             'cot_read_previous_recap_haru',
             'cot_output_audit',
             'cot_after',
-        ]),
-        value_15 = (value_46) => {
+        ]);
+    const value_15 = (value_46) => {
             if (offlineReasoning?.isCotEntry)
                 return offlineReasoning.isCotEntry(value_46, OFFLINE_COT_PROMPT_IDS);
             if (OFFLINE_COT_PROMPT_IDS.has(value_46?.id)) return true;
@@ -33,21 +33,21 @@
             if (value_46?.cotEnabled === false) return false;
             if (!/^custom-/i.test(String(value_46?.id || '').trim())) return false;
             return /\bcot(?:\b|\d)|(?:思维|思考)链/i.test(String(value_46?.name || '').trim());
-        },
-        OFFLINE_CHAT_HISTORY_PROMPT_ID = 'chat_history',
-        type_3 = 'offline_summary',
-        type_2 = 'offline_generated_image',
-        value_19 = new Set(),
-        value_20 = (value_47) => {
+        };
+    const OFFLINE_CHAT_HISTORY_PROMPT_ID = 'chat_history';
+    const type_3 = 'offline_summary';
+    const type_2 = 'offline_generated_image';
+    const value_19 = new Set();
+    const value_20 = (value_47) => {
             const value_48 =
                 typeof value_47 === 'object' && value_47 !== null ? value_47.id : value_47;
             return value_48 == null ? '' : String(value_48);
-        },
-        isOfflineAutoImageMessage_2 = (value_49) => {
+        };
+    const isOfflineAutoImageMessage_2 = (value_49) => {
             const value_20_50 = value_20(value_49);
             return !!value_20_50 && value_19.has(value_20_50);
-        },
-        buildOfflineThinkingHtml_2 = (value_51, value_52) => {
+        };
+    const buildOfflineThinkingHtml_2 = (value_51, value_52) => {
             const value_20_53 = value_20(value_51);
             if (!value_20_53) return;
             if (value_52) value_19.add(value_20_53);
@@ -64,9 +64,9 @@
                         value_55.dataset.offlineBusy === 'true' &&
                             ((value_55.disabled = false), delete value_55.dataset.offlineBusy);
                 });
-        },
-        OFFLINE_AUTO_IMAGE_MARKER = '【线下生图】',
-        OFFLINE_CHAT_PROMPT_ORDER = [
+        };
+    const OFFLINE_AUTO_IMAGE_MARKER = '【线下生图】';
+    const OFFLINE_CHAT_PROMPT_ORDER = [
             'role_identity',
             'data_zone',
             'memory_system',
@@ -92,8 +92,8 @@
             'cot_read_previous_recap_haru',
             'cot_output_audit',
             'cot_after',
-        ],
-        value_25_2 = (() => {
+        ];
+    const value_25_2 = (() => {
             let value_56 = null,
                 count_57 = 0;
             const value_58 = () => document.getElementById('offline-result-preview-modal'),
@@ -458,10 +458,10 @@
             fromChat: true,
         });
     }
-    const isOfflineAutoImageMessage = (value_70) => value_70?.type === type_2,
-        shouldAutoGenerateOfflineImage = (friend) =>
-            !!friend && friend.type === 'char' && friend.offlineAutoImageGeneration === true,
-        splitOfflineAutoImageMarker = (value_71) => {
+    const isOfflineAutoImageMessage = (value_70) => value_70?.type === type_2;
+    const shouldAutoGenerateOfflineImage = (friend) =>
+            !!friend && friend.type === 'char' && friend.offlineAutoImageGeneration === true;
+    const splitOfflineAutoImageMarker = (value_71) => {
             const source_3 = String(value_71 || ''),
                 markerIndex = source_3.lastIndexOf(OFFLINE_AUTO_IMAGE_MARKER);
             if (markerIndex < 0)
@@ -487,9 +487,9 @@
                     .trim(),
                 scene: scene_2,
             };
-        },
-        value_35 = (value_157) => String(value_157 || '').trim(),
-        buildOfflineAutoImageRequirement = () =>
+        };
+    const value_35 = (value_157) => String(value_157 || '').trim();
+    const buildOfflineAutoImageRequirement = () =>
             `<offline_auto_image_rule>
 Only when the current offline story reaches a moment that is genuinely worth visualizing, append exactly one final line in this exact format:
   ` +
@@ -498,12 +498,11 @@ Only when the current offline story reaches a moment that is genuinely worth vis
 The prompt must describe the same current moment with characters, action, setting, composition, light, and atmosphere. Do not use this marker for ordinary dialogue or routine transitions. If no visual image is needed, do not output the marker at all. The marker line is frontend-only and must be the final line after all prose, barrage, choices, and recap content.
 </offline_auto_image_rule>`;
     function createAttachmentSheet_2(page) {
-        if (window.imData.attachmentSheet)
-            return (
-                window.imData.attachmentSheet.parentNode !== page &&
-                    page.appendChild(window.imData.attachmentSheet),
-                window.imData.attachmentSheet
-            );
+        if (window.imData.attachmentSheet) {
+            window.imData.attachmentSheet.parentNode !== page &&
+                page.appendChild(window.imData.attachmentSheet);
+            return window.imData.attachmentSheet;
+        }
         const attachmentSheet_2 = document.createElement('div');
         attachmentSheet_2.id = 'chat-attachment-sheet';
         window.imData.attachmentSheet = attachmentSheet_2;
@@ -912,107 +911,107 @@ The prompt must describe the same current moment with characters, action, settin
             </div>
         `;
         page.appendChild(attachmentSheet_2);
-        const sheetOverlayElement = attachmentSheet_2.querySelector('.sheet-overlay'),
-            content_4 = attachmentSheet_2.querySelector('.sheet-content'),
-            closeBtn = attachmentSheet_2.querySelector('.close-sheet-btn'),
-            tabsContainer = attachmentSheet_2.querySelector('.sheet-tabs-container'),
-            tabItems = attachmentSheet_2.querySelectorAll('.sheet-tab-item'),
-            payEntry = attachmentSheet_2.querySelector('.attachment-more-pay-entry'),
-            linkEntry = attachmentSheet_2.querySelector('.attachment-more-link-entry'),
-            attachmentMoreContactEntryElement = attachmentSheet_2.querySelector(
+        const sheetOverlayElement = attachmentSheet_2.querySelector('.sheet-overlay');
+        const content_4 = attachmentSheet_2.querySelector('.sheet-content');
+        const closeBtn = attachmentSheet_2.querySelector('.close-sheet-btn');
+        const tabsContainer = attachmentSheet_2.querySelector('.sheet-tabs-container');
+        const tabItems = attachmentSheet_2.querySelectorAll('.sheet-tab-item');
+        const payEntry = attachmentSheet_2.querySelector('.attachment-more-pay-entry');
+        const linkEntry = attachmentSheet_2.querySelector('.attachment-more-link-entry');
+        const attachmentMoreContactEntryElement = attachmentSheet_2.querySelector(
                 '.attachment-more-contact-entry',
-            ),
-            regenerateEntry = attachmentSheet_2.querySelector('.attachment-more-regenerate-entry'),
-            voiceEntry = attachmentSheet_2.querySelector('.attachment-more-voice-entry'),
-            attachmentMoreListenEntryElement = attachmentSheet_2.querySelector(
+            );
+        const regenerateEntry = attachmentSheet_2.querySelector('.attachment-more-regenerate-entry');
+        const voiceEntry = attachmentSheet_2.querySelector('.attachment-more-voice-entry');
+        const attachmentMoreListenEntryElement = attachmentSheet_2.querySelector(
                 '.attachment-more-listen-entry',
-            ),
-            narrationEntry = attachmentSheet_2.querySelector('.attachment-more-narration-entry'),
-            attachmentMoreDynamicActionEntryElement = attachmentSheet_2.querySelector(
+            );
+        const narrationEntry = attachmentSheet_2.querySelector('.attachment-more-narration-entry');
+        const attachmentMoreDynamicActionEntryElement = attachmentSheet_2.querySelector(
                 '.attachment-more-dynamic-action-entry',
-            ),
-            attachmentMoreDynamicActionLabelElement = attachmentSheet_2.querySelector(
+            );
+        const attachmentMoreDynamicActionLabelElement = attachmentSheet_2.querySelector(
                 '.attachment-more-dynamic-action-label',
-            ),
-            attachmentMoreOfflineEntryElement = attachmentSheet_2.querySelector(
+            );
+        const attachmentMoreOfflineEntryElement = attachmentSheet_2.querySelector(
                 '.attachment-more-offline-entry',
-            ),
-            attachmentMoreOfflineLabelElement = attachmentSheet_2.querySelector(
+            );
+        const attachmentMoreOfflineLabelElement = attachmentSheet_2.querySelector(
                 '.attachment-more-offline-label',
-            ),
-            payFormOverlay = attachmentSheet_2.querySelector('.pay-transfer-form-overlay'),
-            voiceFormOverlay = attachmentSheet_2.querySelector('.voice-message-form-overlay'),
-            voiceTranscriptInput = attachmentSheet_2.querySelector(
+            );
+        const payFormOverlay = attachmentSheet_2.querySelector('.pay-transfer-form-overlay');
+        const voiceFormOverlay = attachmentSheet_2.querySelector('.voice-message-form-overlay');
+        const voiceTranscriptInput = attachmentSheet_2.querySelector(
                 '.voice-message-transcript-input',
-            ),
-            voiceCancelBtn = attachmentSheet_2.querySelector('.voice-message-cancel-btn'),
-            voiceSubmitBtn = attachmentSheet_2.querySelector('.voice-message-submit-btn'),
-            narrationFormOverlay = attachmentSheet_2.querySelector('.narration-form-overlay'),
-            narrationInput = attachmentSheet_2.querySelector('.narration-message-input'),
-            narrationCancelBtn = attachmentSheet_2.querySelector('.narration-cancel-btn'),
-            narrationSubmitBtn = attachmentSheet_2.querySelector('.narration-submit-btn'),
-            regenerateFormOverlay = attachmentSheet_2.querySelector('.regenerate-form-overlay'),
-            regenerateRequirementInput = attachmentSheet_2.querySelector(
+            );
+        const voiceCancelBtn = attachmentSheet_2.querySelector('.voice-message-cancel-btn');
+        const voiceSubmitBtn = attachmentSheet_2.querySelector('.voice-message-submit-btn');
+        const narrationFormOverlay = attachmentSheet_2.querySelector('.narration-form-overlay');
+        const narrationInput = attachmentSheet_2.querySelector('.narration-message-input');
+        const narrationCancelBtn = attachmentSheet_2.querySelector('.narration-cancel-btn');
+        const narrationSubmitBtn = attachmentSheet_2.querySelector('.narration-submit-btn');
+        const regenerateFormOverlay = attachmentSheet_2.querySelector('.regenerate-form-overlay');
+        const regenerateRequirementInput = attachmentSheet_2.querySelector(
                 '.regenerate-requirement-input',
-            ),
-            regenerateReferenceBtn = attachmentSheet_2.querySelector('.regenerate-reference-btn'),
-            regenerateDirectBtn = attachmentSheet_2.querySelector('.regenerate-direct-btn'),
-            stickersList = attachmentSheet_2.querySelector('.sheet-stickers-list'),
-            stickerCategoryTabs = attachmentSheet_2.querySelector('.sheet-sticker-category-tabs'),
-            payAmountInput = attachmentSheet_2.querySelector('.pay-transfer-amount-input'),
-            payDescInput = attachmentSheet_2.querySelector('.pay-transfer-desc-input'),
-            payCancelBtn = attachmentSheet_2.querySelector('.pay-transfer-cancel-btn'),
-            paySubmitBtn = attachmentSheet_2.querySelector('.pay-transfer-submit-btn'),
-            payModeTabs = attachmentSheet_2.querySelectorAll('.pay-mode-tab'),
-            payTransferPanel = attachmentSheet_2.querySelector('.pay-mode-panel-transfer'),
-            payRedPacketPanel = attachmentSheet_2.querySelector('.pay-mode-panel-red-packet'),
-            payRecipientField = attachmentSheet_2.querySelector('.pay-group-recipient-field'),
-            payRecipientTrigger = attachmentSheet_2.querySelector('.pay-group-recipient-trigger'),
-            payRecipientAvatar = attachmentSheet_2.querySelector('.pay-group-recipient-avatar'),
-            payRecipientLabel = attachmentSheet_2.querySelector('.pay-group-recipient-label'),
-            payRecipientArrow = attachmentSheet_2.querySelector('.pay-group-recipient-arrow'),
-            payRecipientDropdown = attachmentSheet_2.querySelector('.pay-group-recipient-dropdown'),
-            payRedPacketCountInput = attachmentSheet_2.querySelector('.pay-red-packet-count-input'),
-            payRedPacketAmountInput = attachmentSheet_2.querySelector(
+            );
+        const regenerateReferenceBtn = attachmentSheet_2.querySelector('.regenerate-reference-btn');
+        const regenerateDirectBtn = attachmentSheet_2.querySelector('.regenerate-direct-btn');
+        const stickersList = attachmentSheet_2.querySelector('.sheet-stickers-list');
+        const stickerCategoryTabs = attachmentSheet_2.querySelector('.sheet-sticker-category-tabs');
+        const payAmountInput = attachmentSheet_2.querySelector('.pay-transfer-amount-input');
+        const payDescInput = attachmentSheet_2.querySelector('.pay-transfer-desc-input');
+        const payCancelBtn = attachmentSheet_2.querySelector('.pay-transfer-cancel-btn');
+        const paySubmitBtn = attachmentSheet_2.querySelector('.pay-transfer-submit-btn');
+        const payModeTabs = attachmentSheet_2.querySelectorAll('.pay-mode-tab');
+        const payTransferPanel = attachmentSheet_2.querySelector('.pay-mode-panel-transfer');
+        const payRedPacketPanel = attachmentSheet_2.querySelector('.pay-mode-panel-red-packet');
+        const payRecipientField = attachmentSheet_2.querySelector('.pay-group-recipient-field');
+        const payRecipientTrigger = attachmentSheet_2.querySelector('.pay-group-recipient-trigger');
+        const payRecipientAvatar = attachmentSheet_2.querySelector('.pay-group-recipient-avatar');
+        const payRecipientLabel = attachmentSheet_2.querySelector('.pay-group-recipient-label');
+        const payRecipientArrow = attachmentSheet_2.querySelector('.pay-group-recipient-arrow');
+        const payRecipientDropdown = attachmentSheet_2.querySelector('.pay-group-recipient-dropdown');
+        const payRedPacketCountInput = attachmentSheet_2.querySelector('.pay-red-packet-count-input');
+        const payRedPacketAmountInput = attachmentSheet_2.querySelector(
                 '.pay-red-packet-amount-input',
-            ),
-            payRedPacketDescInput = attachmentSheet_2.querySelector('.pay-red-packet-desc-input'),
-            linkedAccountsEmpty = attachmentSheet_2.querySelector('.linked-accounts-empty'),
-            linkedAccountsControls = attachmentSheet_2.querySelector('.linked-accounts-controls'),
-            linkedAccountsToggle = attachmentSheet_2.querySelector('.linked-accounts-toggle'),
-            linkedAccountsIntervalRow = attachmentSheet_2.querySelector(
+            );
+        const payRedPacketDescInput = attachmentSheet_2.querySelector('.pay-red-packet-desc-input');
+        const linkedAccountsEmpty = attachmentSheet_2.querySelector('.linked-accounts-empty');
+        const linkedAccountsControls = attachmentSheet_2.querySelector('.linked-accounts-controls');
+        const linkedAccountsToggle = attachmentSheet_2.querySelector('.linked-accounts-toggle');
+        const linkedAccountsIntervalRow = attachmentSheet_2.querySelector(
                 '.linked-accounts-interval-row',
-            ),
-            linkedAccountsIntervalInput = attachmentSheet_2.querySelector(
+            );
+        const linkedAccountsIntervalInput = attachmentSheet_2.querySelector(
                 '.linked-accounts-interval-input',
-            ),
-            linkedAccountsStatus = attachmentSheet_2.querySelector('.linked-accounts-status'),
-            linkedAccountsList = attachmentSheet_2.querySelector('.linked-accounts-list'),
-            summarySheet = attachmentSheet_2.querySelector('.contact-card-picker-overlay'),
-            contactCardPickerListElement = attachmentSheet_2.querySelector(
+            );
+        const linkedAccountsStatus = attachmentSheet_2.querySelector('.linked-accounts-status');
+        const linkedAccountsList = attachmentSheet_2.querySelector('.linked-accounts-list');
+        const summarySheet = attachmentSheet_2.querySelector('.contact-card-picker-overlay');
+        const contactCardPickerListElement = attachmentSheet_2.querySelector(
                 '.contact-card-picker-list',
-            ),
-            contactCardPickerCancelElement = attachmentSheet_2.querySelector(
+            );
+        const contactCardPickerCancelElement = attachmentSheet_2.querySelector(
                 '.contact-card-picker-cancel',
-            ),
-            contactCardPickerConfirmElement = attachmentSheet_2.querySelector(
+            );
+        const contactCardPickerConfirmElement = attachmentSheet_2.querySelector(
                 '.contact-card-picker-confirm',
-            ),
-            sheetViews = attachmentSheet_2.querySelectorAll('.sheet-view');
-        let currentPayMode = 'transfer',
-            selectedRecipientId = null,
-            text_160 = '',
-            activeStickerCategoryName = '',
-            value_161 = null,
-            value_162 = null,
-            count_163 = 0,
-            renderTimerId_2 = null,
-            renderFrameId_2 = null,
-            count_166 = 0,
-            value_167 = null,
-            value_168 = null,
-            renderFrameId_3 = null,
-            count_170 = 0;
+            );
+        const sheetViews = attachmentSheet_2.querySelectorAll('.sheet-view');
+        let currentPayMode = 'transfer';
+        let selectedRecipientId = null;
+        let text_160 = '';
+        let activeStickerCategoryName = '';
+        let value_161 = null;
+        let value_162 = null;
+        let count_163 = 0;
+        let renderTimerId_2 = null;
+        let renderFrameId_2 = null;
+        let count_166 = 0;
+        let value_167 = null;
+        let value_168 = null;
+        let renderFrameId_3 = null;
+        let count_170 = 0;
         const value_171 = () => {
                 count_166 += 1;
                 if (renderFrameId_2 === null) return;
@@ -1020,8 +1019,8 @@ The prompt must describe the same current moment with characters, action, settin
                     window.cancelAnimationFrame(renderFrameId_2);
                 else clearTimeout(renderFrameId_2);
                 renderFrameId_2 = null;
-            },
-            scheduleAttachmentSheetOpenAnimation_2 = () => {
+            };
+        const scheduleAttachmentSheetOpenAnimation_2 = () => {
                 renderTimerId_2 !== null &&
                     (clearTimeout(renderTimerId_2), (renderTimerId_2 = null));
                 value_171();
@@ -1036,8 +1035,8 @@ The prompt must describe the same current moment with characters, action, settin
                 typeof window.requestAnimationFrame === 'function'
                     ? (renderFrameId_2 = window.requestAnimationFrame(render))
                     : (renderFrameId_2 = setTimeout(render, 0));
-            },
-            value_173 = (value_374) => {
+            };
+        const value_173 = (value_374) => {
                 value_168 = value_374;
                 if (value_167 !== null) return;
                 const render_2 = () => {
@@ -1066,28 +1065,28 @@ The prompt must describe the same current moment with characters, action, settin
                 if (typeof window.requestAnimationFrame === 'function')
                     value_167 = window.requestAnimationFrame(render_2);
                 else value_167 = setTimeout(render_2, 0);
-            },
-            escapeSheetHtml = (value_4) =>
+            };
+        const escapeSheetHtml = (value_4) =>
                 String(value_4 == null ? '' : value_4)
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;')
                     .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;'),
-            value_175 = (value_380) =>
+                    .replace(/'/g, '&#039;');
+        const value_175 = (value_380) =>
                 (window.imData.friends || []).filter(
                     (value_381) =>
                         value_381 &&
                         (value_381.type === 'char' || value_381.type === 'npc') &&
                         String(value_381.id) !== String(value_380?.id || ''),
-                ),
-            closeOfflineSummarySheet = () => {
+                );
+        const closeOfflineSummarySheet = () => {
                 text_160 = '';
                 if (summarySheet) summarySheet.style.display = 'none';
                 if (contactCardPickerConfirmElement)
                     contactCardPickerConfirmElement.disabled = true;
-            },
-            value_176 = (value_382) => {
+            };
+        const value_176 = (value_382) => {
                 if (!contactCardPickerListElement || !contactCardPickerConfirmElement) return;
                 const value_175_383 = value_175(value_382);
                 contactCardPickerListElement.innerHTML = '';
@@ -1142,8 +1141,8 @@ The prompt must describe the same current moment with characters, action, settin
                     });
                     contactCardPickerListElement.appendChild(element_389_2);
                 });
-            },
-            handleClick = () => {
+            };
+        const handleClick = () => {
                 const value_370_390 = getAttachmentTargetFriend();
                 if (!value_370_390 || value_370_390.type !== 'char') {
                     window.showToast?.('名片仅支持 Char 单聊');
@@ -1152,19 +1151,19 @@ The prompt must describe the same current moment with characters, action, settin
                 text_160 = '';
                 value_176(value_370_390);
                 if (summarySheet) summarySheet.style.display = 'flex';
-            },
-            value_178_2 = () => {
-                const value_370_391 = getAttachmentTargetFriend();
-                if (!value_370_391 || value_370_391.type !== 'char') {
-                    window.showToast?.('定位仅支持 Char 单聊');
-                    return;
-                }
-                attachmentSheet_2.querySelector('.location-composer-overlay')?.remove();
-                const element_392 = document.createElement('div');
-                element_392.className = 'location-composer-overlay';
-                element_392.style.cssText =
-                    'position:absolute;inset:0;z-index:90;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
-                element_392.innerHTML = `
+            };
+        const value_178_2 = () => {
+            const value_370_391 = getAttachmentTargetFriend();
+            if (!value_370_391 || value_370_391.type !== 'char') {
+                window.showToast?.('定位仅支持 Char 单聊');
+                return;
+            }
+            attachmentSheet_2.querySelector('.location-composer-overlay')?.remove();
+            const element_392 = document.createElement('div');
+            element_392.className = 'location-composer-overlay';
+            element_392.style.cssText =
+                'position:absolute;inset:0;z-index:90;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
+            element_392.innerHTML = `
                 <div style="width:min(100%,360px);background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.24);">
                     <div style="height:136px;position:relative;overflow:hidden;background-color:#d8d8d8;background-image:linear-gradient(32deg,transparent 45%,rgba(245,245,245,.92) 46%,rgba(245,245,245,.92) 51%,transparent 52%),linear-gradient(145deg,transparent 37%,rgba(238,238,238,.86) 38%,rgba(238,238,238,.86) 43%,transparent 44%),linear-gradient(90deg,rgba(60,60,60,.08) 1px,transparent 1px),linear-gradient(rgba(60,60,60,.08) 1px,transparent 1px);background-size:auto,auto,28px 28px,28px 28px;">
                         <span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-58%);width:42px;height:42px;border-radius:50% 50% 50% 8px;background:#333;rotate:-45deg;box-shadow:0 5px 13px rgba(0,0,0,.24);"></span>
@@ -1180,63 +1179,63 @@ The prompt must describe the same current moment with characters, action, settin
                         </div>
                     </div>
                 </div>`;
-                attachmentSheet_2.appendChild(element_392);
-                const textarea = element_392.querySelector('.location-composer-name'),
-                    locationComposerAddressElement = element_392.querySelector(
+            attachmentSheet_2.appendChild(element_392);
+            const textarea = element_392.querySelector('.location-composer-name');
+            const locationComposerAddressElement = element_392.querySelector(
                         '.location-composer-address',
-                    ),
-                    value_393 = () => element_392.remove();
-                element_392.addEventListener('click', (event_394) => {
-                    if (
-                        event_394.target === element_392 ||
-                        event_394.target.closest('.location-composer-cancel')
-                    )
-                        value_393();
-                });
-                element_392
-                    .querySelector('.location-composer-submit')
-                    ?.addEventListener('click', async () => {
-                        const slice_395 = String(textarea?.value || '')
+                    );
+            const value_393 = () => element_392.remove();
+            element_392.addEventListener('click', (event_394) => {
+                if (
+                    event_394.target === element_392 ||
+                    event_394.target.closest('.location-composer-cancel')
+                )
+                    value_393();
+            });
+            element_392
+                .querySelector('.location-composer-submit')
+                ?.addEventListener('click', async () => {
+                    const slice_395 = String(textarea?.value || '')
                                 .trim()
-                                .slice(0, 80),
-                            slice_396 = String(locationComposerAddressElement?.value || '')
+                                .slice(0, 80);
+                    const slice_396 = String(locationComposerAddressElement?.value || '')
                                 .trim()
                                 .slice(0, 160);
-                        if (!slice_395) {
-                            window.showToast?.('请填写地点名');
-                            textarea?.focus();
-                            return;
-                        }
-                        const value_397 = await window.imChat.sendLocationMessage?.(
+                    if (!slice_395) {
+                        window.showToast?.('请填写地点名');
+                        textarea?.focus();
+                        return;
+                    }
+                    const value_397 = await window.imChat.sendLocationMessage?.(
                             slice_395,
                             slice_396,
                             {
                                 friendId: value_370_391.id,
                             },
                         );
-                        if (!value_397) return;
-                        value_393();
-                        closeSheet();
-                    });
-                [textarea, locationComposerAddressElement].forEach((value_398, value_399) =>
-                    value_398?.addEventListener('keydown', (event_400) => {
-                        if (
-                            event_400.isComposing ||
-                            event_400.keyCode === 229 ||
-                            event_400.key !== 'Enter'
-                        )
-                            return;
-                        event_400.preventDefault();
-                        if (value_399 === 0) locationComposerAddressElement?.focus();
-                        else element_392.querySelector('.location-composer-submit')?.click();
-                    }),
-                );
-                setTimeout(() => textarea?.focus(), 0);
-            },
-            value_179 = new Map(),
-            offlineBarrageRuntimeStore = new Map(),
-            value_181 = new Map(),
-            parseOfflineTagAttributes = (value_401) => {
+                    if (!value_397) return;
+                    value_393();
+                    _value4();
+                });
+            [textarea, locationComposerAddressElement].forEach((value_398, value_399) =>
+                value_398?.addEventListener('keydown', (event_400) => {
+                    if (
+                        event_400.isComposing ||
+                        event_400.keyCode === 229 ||
+                        event_400.key !== 'Enter'
+                    )
+                        return;
+                    event_400.preventDefault();
+                    if (value_399 === 0) locationComposerAddressElement?.focus();
+                    else element_392.querySelector('.location-composer-submit')?.click();
+                }),
+            );
+            setTimeout(() => textarea?.focus(), 0);
+        };
+        const value_179 = new Map();
+        const offlineBarrageRuntimeStore = new Map();
+        const value_181 = new Map();
+        const parseOfflineTagAttributes = (value_401) => {
                 const attrs_2 = {};
                 return (
                     String(value_401 || '').replace(
@@ -1251,39 +1250,39 @@ The prompt must describe the same current moment with characters, action, settin
                     ),
                     attrs_2
                 );
-            },
-            isLikelyChineseText = (value_5_2) => /[\u3400-\u9fff]/.test(String(value_5_2 || '')),
-            parseOfflineBilingualDialogue = (value_6, language_2) => {
+            };
+        const isLikelyChineseText = (value_5_2) => /[\u3400-\u9fff]/.test(String(value_5_2 || ''));
+        const parseOfflineBilingualDialogue = (value_6, language_2) => {
                 if (window.imDataUtils?.parseBilingualDialogue)
                     return window.imDataUtils.parseBilingualDialogue(value_6, language_2);
                 return {
                     original: String(value_6 || '').trim(),
                     translation: '',
                 };
-            },
-            getOfflineChatLanguageName = (language_3) =>
+            };
+        const getOfflineChatLanguageName = (language_3) =>
                 window.imDataUtils?.getChatLanguageName
                     ? window.imDataUtils.getChatLanguageName(language_3)
-                    : 'Chinese',
-            value_185 = (value_413) => {
+                    : 'Chinese';
+        const value_185 = (value_413) => {
                 const text_2 = String(value_413 || '').trim();
                 if (!text_2) return '';
                 if (text_2.startsWith('「') && text_2.endsWith('」')) return text_2;
                 return '「' + text_2 + '」';
-            },
-            getOfflineSpeechDisplayText = (value_415, value_416 = '') => {
+            };
+        const getOfflineSpeechDisplayText = (value_415, value_416 = '') => {
                 const trim_417 = String(value_415 || '').trim(),
                     trim_418 = String(value_416 || '').trim();
                 if (!trim_417) return '';
                 if (trim_418 && trim_418 !== trim_417 && !isLikelyChineseText(trim_417))
                     return value_185(trim_417 + '（' + trim_418 + '）');
                 return value_185(trim_417);
-            },
-            normalizeOfflineSectionHeading = (value_7_2) =>
+            };
+        const normalizeOfflineSectionHeading = (value_7_2) =>
                 String(value_7_2 || '')
                     .trim()
-                    .replace(/[ \t]/g, ''),
-            isOfflineSectionHeading = (value_420, value_421) => {
+                    .replace(/[ \t]/g, '');
+        const isOfflineSectionHeading = (value_420, value_421) => {
                 const value_186_422 = normalizeOfflineSectionHeading(value_420);
                 return value_421.some(
                     (value_423) =>
@@ -1292,19 +1291,19 @@ The prompt must describe the same current moment with characters, action, settin
                         value_186_422 === value_423 + ':' ||
                         value_186_422 === value_423 + '：',
                 );
-            },
-            isOfflineBarrageSectionHeading = (line) =>
-                isOfflineSectionHeading(line, ['弹幕', '弹幕评论', '观众弹幕']),
-            isOfflineChoiceSectionHeading = (line_2) =>
+            };
+        const isOfflineBarrageSectionHeading = (line) =>
+                isOfflineSectionHeading(line, ['弹幕', '弹幕评论', '观众弹幕']);
+        const isOfflineChoiceSectionHeading = (line_2) =>
                 isOfflineSectionHeading(line_2, [
                     '选项',
                     '玩家选项',
                     '后续选项',
                     '可选行动',
                     '选择',
-                ]),
-            isOfflineRecapSectionHeading = (line_3) => isOfflineSectionHeading(line_3, ['回顾']),
-            extractOfflineRecapBlock = (value_160) => {
+                ]);
+        const isOfflineRecapSectionHeading = (line_3) => isOfflineSectionHeading(line_3, ['回顾']);
+        const extractOfflineRecapBlock = (value_160) => {
                 const keptLines = [],
                     recapLines = [];
                 let capturing = false,
@@ -1368,15 +1367,15 @@ The prompt must describe the same current moment with characters, action, settin
                             : '',
                     }
                 );
-            },
-            normalizeOfflineListLine = (value_9) =>
+            };
+        const normalizeOfflineListLine = (value_9) =>
                 String(value_9 || '')
                     .replace(/<[^>]+>/g, '')
                     .replace(/^[\s\-*•·]+/, '')
                     .replace(/^(?:\d+|[①②③④⑤⑥⑦⑧⑨]|[A-Za-z])[\).、:：-]?\s*/, '')
-                    .trim(),
-            getOfflineBarrageRandomLikes = () => Math.floor(Math.random() * 999) + 1,
-            parseOfflineBarrageTextBlock = (value_10) =>
+                    .trim();
+        const getOfflineBarrageRandomLikes = () => Math.floor(Math.random() * 999) + 1;
+        const parseOfflineBarrageTextBlock = (value_10) =>
                 String(value_10 || '')
                     .split(/\r?\n/)
                     .map((line_5) => normalizeOfflineListLine(line_5))
@@ -1397,8 +1396,8 @@ The prompt must describe the same current moment with characters, action, settin
                             likes: getOfflineBarrageRandomLikes(),
                         };
                     })
-                    .filter((value_434) => value_434.text),
-            parseOfflineBarrageBlocks = (value_163) => {
+                    .filter((value_434) => value_434.text);
+        const parseOfflineBarrageBlocks = (value_163) => {
                 const barragesByParagraph_3 = [],
                     plainBarrageSections_2 = [],
                     replace_166 = String(value_163 || '').replace(
@@ -1500,12 +1499,12 @@ The prompt must describe the same current moment with characters, action, settin
                         plainBarrageSections: plainBarrageSections_2,
                     }
                 );
-            },
-            normalizeOfflineChoiceText = (value_11) =>
+            };
+        const normalizeOfflineChoiceText = (value_11) =>
                 normalizeOfflineListLine(value_11)
                     .replace(/^(?:选项|选择|Choice)\s*\d*\s*[:：.、-]?\s*/i, '')
-                    .trim(),
-            parseOfflineChoiceBlocks = (value_178) => {
+                    .trim();
+        const parseOfflineChoiceBlocks = (value_178) => {
                 let choices_2 = [],
                     cleanText_2 = String(value_178 || '').replace(
                         /<choices?\b[^>]*>([\s\S]*?)<\/choices?>/gi,
@@ -1629,8 +1628,8 @@ The prompt must describe the same current moment with characters, action, settin
                         .filter(Boolean)
                         .slice(0, 3),
                 };
-            },
-            stripOfflineDecorativeMarkup = (value_204) => {
+            };
+        const stripOfflineDecorativeMarkup = (value_204) => {
                 let text_5 = String(value_204 == null ? '' : value_204).replace(
                     /\r\n/g,
                     `
@@ -1684,154 +1683,164 @@ The prompt must describe the same current moment with characters, action, settin
 `,
                     )
                     .trim();
-            },
-            renderOfflinePlainTextWithFallbackSpeech = (
-                value_490,
-                items_491,
-                value_492,
-                value_493,
-                language_4,
-            ) => {
-                const text_6 = String(value_490 || '');
-                if (!value_493) return escapeSheetHtml(text_6).replace(/\n/g, '<br>');
-                const value_496 = /「([^」\n]{1,180})」/g;
-                let html_2 = '',
-                    lastIndex = 0,
-                    match_4 = null;
-                while ((match_4 = value_496.exec(text_6)) !== null) {
-                    const bilingual = parseOfflineBilingualDialogue(match_4[1], language_4);
-                    if (!bilingual.original) continue;
-                    html_2 += escapeSheetHtml(text_6.slice(lastIndex, match_4.index)).replace(
-                        /\n/g,
-                        '<br>',
-                    );
-                    const length_501 = items_491.length;
-                    if (value_492) items_491.push(bilingual);
-                    const value_502 = value_492 ? ' is-playable' : '',
-                        value_503 = value_492
-                            ? ' data-offline-speech-index="' +
-                              length_501 +
-                              '" role="button" tabindex="0" title="播放语音" aria-label="播放这段对话" aria-busy="false"'
-                            : '';
-                    html_2 +=
-                        '<span class="offline-chat-speech offline-chat-dialogue' +
-                        value_502 +
-                        '"' +
-                        value_503 +
-                        '>' +
-                        escapeSheetHtml(match_4[0]) +
-                        '</span>';
-                    lastIndex = match_4.index + match_4[0].length;
-                }
-                return (
-                    (html_2 += escapeSheetHtml(text_6.slice(lastIndex)).replace(/\n/g, '<br>')),
-                    html_2
+            };
+        const renderOfflinePlainTextWithFallbackSpeech = (
+            value_490,
+            items_491,
+            value_492,
+            value_493,
+            language_4,
+        ) => {
+            const text_6 = String(value_490 || '');
+            if (!value_493) return escapeSheetHtml(text_6).replace(/\n/g, '<br>');
+            const value_496 = /「([^」\n]{1,180})」/g;
+            let html_2 = '';
+            let lastIndex = 0;
+            let match_4 = null;
+            while ((match_4 = value_496.exec(text_6)) !== null) {
+                const bilingual = parseOfflineBilingualDialogue(match_4[1], language_4);
+                if (!bilingual.original) continue;
+                html_2 += escapeSheetHtml(text_6.slice(lastIndex, match_4.index)).replace(
+                    /\n/g,
+                    '<br>',
                 );
-            },
-            renderOfflineParagraphText = (value_504, speechItems, enableVoice_2, language_5) => {
-                const text_7 = String(value_504 || ''),
-                    speechRegex = /<speech\b([^>]*?)>([\s\S]*?)<\/speech>|<speech\b([^>]*?)\/>/gi;
-                let html_3 = '',
-                    lastIndex_2 = 0,
-                    hasExplicitSpeech = false,
-                    match_5 = null;
-                while ((match_5 = speechRegex.exec(text_7)) !== null) {
-                    hasExplicitSpeech = true;
-                    html_3 += renderOfflinePlainTextWithFallbackSpeech(
-                        text_7.slice(lastIndex_2, match_5.index),
-                        speechItems,
-                        enableVoice_2,
-                        false,
-                        language_5,
-                    );
-                    const attrText_2 = match_5[1] || match_5[3] || '',
-                        attrs_5 = parseOfflineTagAttributes(attrText_2),
-                        innerText_2 = String(match_5[2] || '')
+                const length_501 = items_491.length;
+                if (value_492) items_491.push(bilingual);
+                const value_502 = value_492 ? ' is-playable' : '';
+                const value_503 = value_492
+                    ? ' data-offline-speech-index="' +
+                      length_501 +
+                      '" role="button" tabindex="0" title="打开语音" aria-label="打开这段对话的语音弹窗"'
+                    : '';
+                html_2 +=
+                    '<span class="offline-chat-speech offline-chat-dialogue' +
+                    value_502 +
+                    '"' +
+                    value_503 +
+                    '>' +
+                    escapeSheetHtml(match_4[0]) +
+                    '</span>';
+                lastIndex = match_4.index + match_4[0].length;
+            }
+            html_2 += escapeSheetHtml(text_6.slice(lastIndex)).replace(/\n/g, '<br>');
+            return html_2;
+        };
+        const renderOfflineParagraphText = (value_504, speechItems, enableVoice_2, language_5) => {
+            const text_7 = String(value_504 || '');
+            const speechRegex = /<speech\b([^>]*?)>([\s\S]*?)<\/speech>|<speech\b([^>]*?)\/>/gi;
+            let html_3 = '';
+            let lastIndex_2 = 0;
+            let hasExplicitSpeech = false;
+            let match_5 = null;
+            while ((match_5 = speechRegex.exec(text_7)) !== null) {
+                hasExplicitSpeech = true;
+                html_3 += renderOfflinePlainTextWithFallbackSpeech(
+                    text_7.slice(lastIndex_2, match_5.index),
+                    speechItems,
+                    enableVoice_2,
+                    false,
+                    language_5,
+                );
+                const attrText_2 = match_5[1] || match_5[3] || '';
+                const attrs_5 = parseOfflineTagAttributes(attrText_2);
+                const innerText_2 = String(match_5[2] || '')
                             .replace(/<[^>]+>/g, '')
-                            .trim(),
-                        original_3 = String(
-                            attrs_5.original || attrs_5.text || innerText_2 || '',
-                        ).trim(),
-                        translation_3 = String(
-                            attrs_5.translation || attrs_5.zh || attrs_5.cn || '',
-                        ).trim(),
-                        offlineSpeechDisplayText = getOfflineSpeechDisplayText(
-                            original_3,
-                            translation_3,
-                        );
-                    if (offlineSpeechDisplayText) {
-                        const length_519 = speechItems.length;
-                        speechItems.push({
-                            original: original_3,
-                            translation: translation_3,
-                        });
-                        const value_520 = enableVoice_2 ? ' is-playable' : '',
-                            value_521 = enableVoice_2
-                                ? ' data-offline-speech-index="' +
-                                  length_519 +
-                                  '" role="button" tabindex="0" title="播放语音" aria-label="播放这段对话" aria-busy="false"'
-                                : '';
-                        html_3 +=
-                            '<span class="offline-chat-speech offline-chat-dialogue' +
-                            value_520 +
-                            '"' +
-                            value_521 +
-                            '>' +
-                            escapeSheetHtml(offlineSpeechDisplayText) +
-                            '</span>';
-                    }
-                    lastIndex_2 = match_5.index + match_5[0].length;
-                }
-                return (
-                    (html_3 += renderOfflinePlainTextWithFallbackSpeech(
-                        text_7.slice(lastIndex_2),
-                        speechItems,
-                        enableVoice_2,
-                        !hasExplicitSpeech,
-                        language_5,
-                    )),
-                    html_3
+                            .trim();
+                const original_3 = parseOfflineBilingualDialogue(
+                    attrs_5.original || attrs_5.text || innerText_2,
+                    language_5,
                 );
-            },
-            isTtsEnabledForFriend = (friend_5) =>
-                !!window.u2Tts?.resolveFriendTtsSettings?.(friend_5)?.enabled,
-            value_193 = (value_208, options_2 = {}) => {
-                const messageId_2 = options_2.messageId ? String(options_2.messageId) : '',
-                    enableVoice_3 = options_2.enableVoice !== false,
-                    enableBarrage_2 = !!options_2.enableBarrage,
-                    enableChoices_2 = !!options_2.enableChoices,
-                    enableRecap_2 = !!options_2.enableRecap,
-                    language_6 = options_2.language || 'zh',
-                    trim_225 = String(value_208 == null ? '' : value_208)
+                const _value5 = original_3.original;
+                const translation_3 = String(
+                    attrs_5.translation || attrs_5.zh || attrs_5.cn || original_3.translation || '',
+                ).trim();
+                const offlineSpeechDisplayText = getOfflineSpeechDisplayText(
+                    _value5,
+                    translation_3,
+                );
+                if (offlineSpeechDisplayText) {
+                    const length_519 = speechItems.length;
+                    speechItems.push({
+                        original: _value5,
+                        translation: translation_3,
+                    });
+                    const value_520 = enableVoice_2 ? ' is-playable' : '';
+                    const value_521 = enableVoice_2
+                        ? ' data-offline-speech-index="' +
+                          length_519 +
+                          '" role="button" tabindex="0" title="打开语音" aria-label="打开这段对话的语音弹窗"'
+                        : '';
+                    html_3 +=
+                        '<span class="offline-chat-speech offline-chat-dialogue' +
+                        value_520 +
+                        '"' +
+                        value_521 +
+                        '>' +
+                        escapeSheetHtml(offlineSpeechDisplayText) +
+                        '</span>';
+                }
+                lastIndex_2 = match_5.index + match_5[0].length;
+            }
+            html_3 += renderOfflinePlainTextWithFallbackSpeech(
+                text_7.slice(lastIndex_2),
+                speechItems,
+                enableVoice_2,
+                !hasExplicitSpeech,
+                language_5,
+            );
+            return html_3;
+        };
+        const isTtsEnabledForFriend = (friend_5) =>
+            getOfflineGroupMembers(friend_5)
+                .map(
+                    (_value6) =>
+                        window.imApp?.getFriendById?.(_value6.id) ||
+                        (window.imData?.friends || []).find(
+                            (_value7) => String(_value7.id) === String(_value6.id),
+                        ) ||
+                        _value6,
+                )
+                .filter((_value8) => window.u2Tts?.canSpeakForFriend?.(_value8));
+        const _value = (friend_5) =>
+            friend_5?.type === 'group' ||
+            !!window.u2Tts?.resolveFriendTtsSettings?.(friend_5)?.enabled;
+        const value_193 = (value_208, options_2 = {}) => {
+            const messageId_2 = options_2.messageId ? String(options_2.messageId) : '';
+            const enableVoice_3 = options_2.enableVoice !== false;
+            const enableBarrage_2 = !!options_2.enableBarrage;
+            const enableChoices_2 = !!options_2.enableChoices;
+            const enableRecap_2 = !!options_2.enableRecap;
+            const language_6 = options_2.language || 'zh';
+            const trim_225 = String(value_208 == null ? '' : value_208)
                         .replace(
                             /\r\n/g,
                             `
 `,
                         )
                         .trim();
-                if (!trim_225)
-                    return (
-                        messageId_2 &&
-                            (value_179['delete'](messageId_2),
-                            offlineBarrageRuntimeStore['delete'](messageId_2),
-                            value_181['delete'](messageId_2)),
-                        ''
-                    );
-                const speechItems_2 = [],
-                    recapExtraction_2 = enableRecap_2
+            if (!trim_225) {
+                messageId_2 &&
+                    !options_2.speechItems &&
+                    (value_179['delete'](messageId_2),
+                    offlineBarrageRuntimeStore['delete'](messageId_2),
+                    value_181['delete'](messageId_2));
+                return '';
+            }
+            const speechItems_2 = Array.isArray(options_2.speechItems) ? options_2.speechItems : [];
+            const recapExtraction_2 = enableRecap_2
                         ? extractOfflineRecapBlock(trim_225)
                         : {
                               cleanText: trim_225,
                               recap: '',
-                          },
-                    {
-                        cleanText: cleanText_3,
-                        barragesByParagraph: barragesByParagraph_2,
-                        plainBarrageSections: plainBarrageSections_3,
-                    } = parseOfflineBarrageBlocks(recapExtraction_2.cleanText),
-                    choiceParseResult = parseOfflineChoiceBlocks(cleanText_3),
-                    choices_3 = choiceParseResult.choices,
-                    normalizedText = choiceParseResult.cleanText
+                          };
+            const {
+                cleanText: cleanText_3,
+                barragesByParagraph: barragesByParagraph_2,
+                plainBarrageSections: plainBarrageSections_3,
+            } = parseOfflineBarrageBlocks(recapExtraction_2.cleanText);
+            const choiceParseResult = parseOfflineChoiceBlocks(cleanText_3);
+            const choices_3 = choiceParseResult.choices;
+            const normalizedText = choiceParseResult.cleanText
                         .replace(/<paragraph\b[^>]*>/gi, '')
                         .replace(
                             /<\/paragraph>/gi,
@@ -1839,12 +1848,12 @@ The prompt must describe the same current moment with characters, action, settin
 
 `,
                         )
-                        .trim(),
-                    paragraphs = normalizedText
+                        .trim();
+            const paragraphs = normalizedText
                         .split(/\n{2,}/)
                         .map((part) => part.trim())
-                        .filter(Boolean),
-                    allBarrageItems = []
+                        .filter(Boolean);
+            const allBarrageItems = []
                         .concat(
                             ...barragesByParagraph_2.map((items_4) =>
                                 Array.isArray(items_4) ? items_4 : [],
@@ -1856,10 +1865,10 @@ The prompt must describe the same current moment with characters, action, settin
                             ),
                         )
                         .filter((item_3) => item_3 && item_3.text);
-                messageId_2 &&
-                    (offlineBarrageRuntimeStore.set(messageId_2, [allBarrageItems]),
-                    value_181.set(messageId_2, choices_3));
-                const paragraphHtml_2 = paragraphs
+            messageId_2 &&
+                (offlineBarrageRuntimeStore.set(messageId_2, [allBarrageItems]),
+                value_181.set(messageId_2, choices_3));
+            const paragraphHtml_2 = paragraphs
                         .map((part_2, value_552) => {
                             const paragraphHtml = renderOfflineParagraphText(
                                 part_2,
@@ -1873,14 +1882,14 @@ The prompt must describe the same current moment with characters, action, settin
                                 '</p></div>'
                             );
                         })
-                        .join(''),
-                    barrageButtonHtml =
+                        .join('');
+            const barrageButtonHtml =
                         enableBarrage_2 && allBarrageItems.length > 0
                             ? '<button type="button" class="offline-chat-barrage-btn offline-chat-barrage-final-btn" data-offline-barrage-index="0" title="查看弹幕" aria-label="查看弹幕"><i class="fas fa-comment-dots"></i><span>' +
                               allBarrageItems.length +
                               '</span></button>'
-                            : '',
-                    choiceHtml =
+                            : '';
+            const choiceHtml =
                         enableChoices_2 && choices_3.length > 0
                             ? '<div class="offline-chat-choice-list">' +
                               choices_3
@@ -1896,44 +1905,70 @@ The prompt must describe the same current moment with characters, action, settin
                                   )
                                   .join('') +
                               '</div>'
-                            : '',
-                    recapHtml = recapExtraction_2.recap
+                            : '';
+            const recapHtml = recapExtraction_2.recap
                         ? '<section class="offline-chat-recap"><div class="offline-chat-recap-title">【回顾】</div><div class="offline-chat-recap-content">' +
                           escapeSheetHtml(
                               recapExtraction_2.recap.replace(/^【回顾】\s*/, ''),
                           ).replace(/\n/g, '<br>') +
                           '</div></section>'
-                        : '',
-                    html_4 = paragraphHtml_2 + barrageButtonHtml + choiceHtml + recapHtml;
-                return (messageId_2 && value_179.set(messageId_2, speechItems_2), html_4);
-            },
-            OFFLINE_ACTIVE_NOTICE_KIND = 'offline_meeting_active',
-            OFFLINE_MEETING_RECORD_TYPE = 'offline_meeting_record',
-            value_194 = (value_556) =>
-                (Array.isArray(value_556) ? value_556 : [])
-                    .map((value_557) => ({
-                        speechIndex: Math.max(0, Math.floor(Number(value_557?.speechIndex) || 0)),
-                        text: String(value_557?.text || '').trim(),
-                        assetId: String(value_557?.assetId || '').trim(),
-                    }))
-                    .filter((value_558) => value_558.text && value_558.assetId)
-                    .filter(
-                        (value_559, value_560, value_561) =>
-                            value_561.findIndex(
-                                (value_562) => value_562.speechIndex === value_559.speechIndex,
-                            ) === value_560,
+                        : '';
+            const html_4 = paragraphHtml_2 + barrageButtonHtml + choiceHtml + recapHtml;
+            messageId_2 && !options_2.speechItems && value_179.set(messageId_2, speechItems_2);
+            return html_4;
+        };
+        const OFFLINE_ACTIVE_NOTICE_KIND = 'offline_meeting_active';
+        const OFFLINE_MEETING_RECORD_TYPE = 'offline_meeting_record';
+        const value_194 = (value_556) =>
+            (Array.isArray(value_556) ? value_556 : [])
+                .map((value_557) => ({
+                    speechIndex: Math.max(0, Math.floor(Number(value_557?.speechIndex) || 0)),
+                    text: String(value_557?.text || '').trim(),
+                    speakerId: String(value_557?.speakerId || '').trim(),
+                    assetId: String(value_557?.assetId || '').trim(),
+                }))
+                .filter((value_558) => value_558.text && value_558.assetId)
+                .filter(
+                    (value_559, value_560, value_561) =>
+                        value_561.findIndex(
+                            (value_562) =>
+                                value_562.speechIndex === value_559.speechIndex &&
+                                value_562.speakerId === value_559.speakerId,
+                        ) === value_560,
+                );
+        const _value2 = (value_563, value_564, value_565, _value9 = '') =>
+            value_194(value_563?.ttsAudioAssets).find(
+                (value_566) =>
+                    value_566.speechIndex === value_564 &&
+                    value_566.text === value_565 &&
+                    value_566.speakerId === _value9,
+            ) || null;
+        const value_196 = (value_567, _value0, value_568, value_569) =>
+            [
+                'im_offline_tts',
+                value_567,
+                _value0,
+                value_568,
+                value_569 || 'single',
+                window.crypto?.randomUUID?.() ||
+                    Date.now() + '-' + Math.random().toString(36).slice(2),
+            ]
+                .map((value_570) => String(value_570 || '').replace(/[^a-z0-9_-]+/gi, '-'))
+                .join('_')
+                .slice(0, 220);
+        const _value3 = async (_value1) => {
+            const _value10 = Array.from(
+                new Set(value_194(_value1).map((_value11) => _value11.assetId)),
+            );
+            await Promise.all(
+                _value10.map((_value12) =>
+                    Promise.resolve(window.appStorage?.deleteAsset?.(_value12))['catch'](
+                        () => undefined,
                     ),
-            value_195 = (value_563, value_564, value_565) =>
-                value_194(value_563?.ttsAudioAssets).find(
-                    (value_566) =>
-                        value_566.speechIndex === value_564 && value_566.text === value_565,
-                ) || null,
-            value_196 = (value_567, value_568, value_569) =>
-                ['im_offline_tts', value_567, value_568, value_569]
-                    .map((value_570) => String(value_570 || '').replace(/[^a-z0-9_-]+/gi, '-'))
-                    .join('_')
-                    .slice(0, 220),
-            value_197 = async (value_571) => {
+                ),
+            );
+        };
+        const value_197 = async (value_571) => {
                 const trim_572 = String(value_571 || '').trim();
                 if (!trim_572) throw new Error('TTS 未返回可保存的音频');
                 if (trim_572.startsWith('data:')) {
@@ -1945,23 +1980,33 @@ The prompt must describe the same current moment with characters, action, settin
                 const value_574 = await value_573.blob();
                 if (!value_574.size) throw new Error('TTS 音频为空');
                 return value_574;
-            },
-            value_198 = async (value_576, value_577, speechIndex_3, text_13, value_580) => {
-                if (!window.appStorage?.saveAssetFromBlob) throw new Error('音频存储服务不可用');
-                const assetId_3 = value_196(value_576?.id, value_577?.id, speechIndex_3),
-                    value_582 = await value_197(value_580);
-                await window.appStorage.saveAssetFromBlob(assetId_3, value_582, {
-                    ownerType: 'imessage_offline_tts',
-                    ownerId: String(value_577?.id || ''),
-                    friendId: String(value_576?.id || ''),
-                    speechIndex: speechIndex_3,
-                });
-                const options_583 = {
-                    speechIndex: speechIndex_3,
-                    text: text_13,
-                    assetId: assetId_3,
-                };
-                let enabled_584 = false;
+            };
+        const value_198 = async (
+            value_576,
+            value_577,
+            speechIndex_3,
+            text_13,
+            value_580,
+            value_582,
+        ) => {
+            if (!window.appStorage?.saveAssetFromBlob) throw new Error('音频存储服务不可用');
+            const assetId_3 = value_196(value_576?.id, value_577?.id, speechIndex_3, value_580);
+            await window.appStorage.saveAssetFromBlob(assetId_3, value_582, {
+                ownerType: 'imessage_offline_tts',
+                ownerId: String(value_577?.id || ''),
+                friendId: String(value_576?.id || ''),
+                speechIndex: speechIndex_3,
+                speakerId: value_580,
+            });
+            const options_583 = {
+                speechIndex: speechIndex_3,
+                text: text_13,
+                speakerId: value_580,
+                assetId: assetId_3,
+            };
+            let enabled_584 = false;
+            const _value13 = new Set();
+            try {
                 const value_585 = await commitSheetFriendChange(
                     value_576?.id,
                     (value_586) => {
@@ -1971,16 +2016,30 @@ The prompt must describe the same current moment with characters, action, settin
                                 String(value_588.id || '') !== String(value_577?.id || '')
                             )
                                 return false;
-                            const filter_589 = value_194(value_588.ttsAudioAssets).filter(
-                                (value_590) => value_590.speechIndex !== speechIndex_3,
-                            );
-                            return (
-                                (value_588.ttsAudioAssets = filter_589
-                                    .concat(options_583)
-                                    .sort((a, b) => a.speechIndex - b.speechIndex)),
-                                (enabled_584 = true),
-                                true
-                            );
+                            if (String(value_588.content || '') !== String(value_577.content || ''))
+                                return false;
+                            const filter_589 = value_194(value_588.ttsAudioAssets);
+                            filter_589
+                                .filter(
+                                    (_value14) =>
+                                        _value14.speechIndex === speechIndex_3 &&
+                                        _value14.speakerId === value_580,
+                                )
+                                .forEach((_value15) => _value13.add(_value15.assetId));
+                            value_588.ttsAudioAssets = filter_589
+                                .filter(
+                                    (value_590) =>
+                                        value_590.speechIndex !== speechIndex_3 ||
+                                        value_590.speakerId !== value_580,
+                                )
+                                .concat(options_583)
+                                .sort(
+                                    (a, b) =>
+                                        a.speechIndex - b.speechIndex ||
+                                        a.speakerId.localeCompare(b.speakerId),
+                                );
+                            enabled_584 = true;
+                            return true;
                         };
                         (Array.isArray(value_586.offlineMessages)
                             ? value_586.offlineMessages
@@ -2001,181 +2060,507 @@ The prompt must describe the same current moment with characters, action, settin
                         metaOnly: true,
                     },
                 );
-                if (!value_585 || !enabled_584) {
-                    await window.appStorage.deleteAsset?.(assetId_3);
-                    throw new Error('线下语音记录保存失败');
-                }
-                return (
-                    (value_577.ttsAudioAssets = value_194(value_577.ttsAudioAssets)
-                        .filter((value_592) => value_592.speechIndex !== speechIndex_3)
-                        .concat(options_583)
-                        .sort((a_593, b_594) => a_593.speechIndex - b_594.speechIndex)),
-                    assetId_3
+                if (!value_585 || !enabled_584)
+                    throw new Error('线下语音记录保存失败，句子可能已变化');
+            } catch (_value16) {
+                await Promise.resolve(window.appStorage.deleteAsset?.(assetId_3))['catch'](
+                    () => undefined,
                 );
-            },
-            bindOfflineChatTextControls = (bubbleDiv_2, value_596, friend_6, floor_2) => {
-                if (!bubbleDiv_2 || !value_596?.id) return;
-                const messageId_3 = String(value_596.id);
-                bubbleDiv_2
-                    .querySelectorAll('.offline-chat-speech.is-playable')
-                    .forEach((speechEl) => {
-                        if (speechEl.dataset.bound === 'true') return;
-                        speechEl.dataset.bound = 'true';
-                        const playSpeech = async (event_601) => {
-                            event_601.preventDefault();
-                            event_601.stopPropagation();
-                            if (speechEl.getAttribute('aria-busy') === 'true') return;
-                            const speechIndex_2 = Number(
+                throw _value16;
+            }
+            value_577.ttsAudioAssets = value_194(value_577.ttsAudioAssets)
+                .filter(
+                    (value_592) =>
+                        value_592.speechIndex !== speechIndex_3 ||
+                        value_592.speakerId !== value_580,
+                )
+                .concat(options_583)
+                .sort(
+                    (a_593, b_594) =>
+                        a_593.speechIndex - b_594.speechIndex ||
+                        a_593.speakerId.localeCompare(b_594.speakerId),
+                );
+            await _value3(
+                Array.from(_value13)
+                    .filter((_value17) => _value17 !== assetId_3)
+                    .map((_value18) => ({
+                        speechIndex: speechIndex_3,
+                        text: text_13,
+                        speakerId: value_580,
+                        assetId: _value18,
+                    })),
+            );
+            return assetId_3;
+        };
+        const closeSheet = (() => {
+            let _value19 = null;
+            let _value20 = false;
+            const _value21 = () => ({
+                overlay: document.getElementById('offline-speech-overlay'),
+                close: document.getElementById('offline-speech-close'),
+                text: document.getElementById('offline-speech-text'),
+                wave: document.getElementById('offline-speech-wave'),
+                speakerRow: document.getElementById('offline-speech-speaker-row'),
+                speaker: document.getElementById('offline-speech-speaker'),
+                play: document.getElementById('offline-speech-play'),
+                regenerate: document.getElementById('offline-speech-regenerate'),
+                download: document.getElementById('offline-speech-download'),
+                status: document.getElementById('offline-speech-status'),
+            });
+            const _value22 = (_value34) => {
+                if (!_value34) return null;
+                if (_value34.friend.type !== 'group') return _value34.friend;
+                const _value35 = _value34.speakers.find(
+                    (_value36) => String(_value36.id) === _value34.speakerId,
+                );
+                if (!_value35) return null;
+                return window.imApp?.getFriendById?.(_value35.id) || _value35;
+            };
+            const _value23 = () => {
+                const _value37 = _value21();
+                const _value38 = _value22(_value19);
+                const _value39 =
+                    !!_value38 && !!window.u2Tts?.canSpeakForFriend?.(_value38) && !_value19?.busy;
+                [_value37.play, _value37.regenerate, _value37.download].forEach((_value41) => {
+                    if (_value41) _value41.disabled = !_value39;
+                });
+                if (_value37.speaker) _value37.speaker.disabled = !!_value19?.busy;
+                const _value40 =
+                    !!_value19?.audio && !_value19.audio.paused && !_value19.audio.ended;
+                _value37.wave?.classList.toggle('is-playing', _value40);
+                _value37.play &&
+                    ((_value37.play.title = _value40 ? '暂停语音' : '播放语音'),
+                    _value37.play.setAttribute('aria-label', _value37.play.title),
+                    (_value37.play.innerHTML = _value40
+                        ? '<i class="fas fa-pause" aria-hidden="true"></i>'
+                        : '<i class="fas fa-play" aria-hidden="true"></i>'));
+            };
+            const _value24 = (_value42, _value43 = false) => {
+                const _value44 = _value21().status;
+                if (!_value44) return;
+                _value44.textContent = _value42;
+                _value44.style.color = _value43 ? '#c33439' : '';
+            };
+            const _value25 = () => {
+                if (_value19?.audio) _value19.audio.pause();
+                window.u2Tts?.stopPlayback?.();
+                if (_value19) _value19.audio = null;
+                _value23();
+            };
+            const _value26 = () => {
+                if (!_value19) return;
+                const _value45 = _value19.origin;
+                _value19.request += 1;
+                _value25();
+                _value21().overlay.hidden = true;
+                _value19 = null;
+                if (_value45?.isConnected) _value45.focus();
+            };
+            const _value27 = (_value46) => {
+                const _value47 =
+                    window.imApp?.getFriendById?.(_value46.friend.id) || _value46.friend;
+                const _value48 = (
+                    Array.isArray(_value47.offlineMessages) ? _value47.offlineMessages : []
+                ).concat(
+                    ...(Array.isArray(_value47.offlineMeetingSessions)
+                        ? _value47.offlineMeetingSessions
+                        : []
+                    ).map((_value50) =>
+                        Array.isArray(_value50?.messages) ? _value50.messages : [],
+                    ),
+                );
+                const _value49 = _value48.find(
+                    (_value51) => String(_value51?.id || '') === String(_value46.message.id),
+                );
+                if (
+                    !_value49 ||
+                    String(_value49.content || '') !== String(_value46.message.content || '')
+                )
+                    throw new Error('这句对话已变化，请重新打开语音弹窗');
+                _value46.message.ttsAudioAssets = value_194(_value49.ttsAudioAssets);
+            };
+            const _value28 = async (_value52, _value53 = false) => {
+                const _value54 = _value22(_value52);
+                if (!_value54 || !window.u2Tts?.canSpeakForFriend?.(_value54))
+                    throw new Error('请先为该角色开启 TTS 并设置音色 ID');
+                _value27(_value52);
+                if (!_value53) {
+                    const _value58 = _value2(
+                        _value52.message,
+                        _value52.speechIndex,
+                        _value52.text,
+                        _value52.speakerId,
+                    );
+                    if (_value58) {
+                        const _value59 = await window.appStorage?.getAssetBlob?.(_value58.assetId);
+                        if (_value59?.size)
+                            return {
+                                assetId: _value58.assetId,
+                                blob: _value59,
+                            };
+                    }
+                }
+                if (!window.u2Tts?.prepareSpeech) throw new Error('TTS 不可用');
+                const _value55 = await window.u2Tts.prepareSpeech(_value52.text, _value54);
+                let _value56;
+                try {
+                    _value56 = await value_197(_value55);
+                } finally {
+                    if (String(_value55 || '').startsWith('blob:')) URL.revokeObjectURL(_value55);
+                }
+                const _value57 = await value_198(
+                    _value52.friend,
+                    _value52.message,
+                    _value52.speechIndex,
+                    _value52.text,
+                    _value52.speakerId,
+                    _value56,
+                );
+                return {
+                    assetId: _value57,
+                    blob: _value56,
+                };
+            };
+            const _value29 = (_value60) =>
+                ({
+                    'audio/mpeg': 'mp3',
+                    'audio/mp3': 'mp3',
+                    'audio/wav': 'wav',
+                    'audio/x-wav': 'wav',
+                    'audio/ogg': 'ogg',
+                    'audio/mp4': 'm4a',
+                    'audio/webm': 'webm',
+                    'audio/flac': 'flac',
+                })[String(_value60 || '').toLowerCase()] || 'mp3';
+            const _value30 = async (_value61) => {
+                const _value62 = _value19;
+                if (!_value62 || _value62.busy || !_value22(_value62)) return;
+                if (_value61 === 'play' && _value62.audio && !_value62.audio.ended) {
+                    try {
+                        if (_value62.audio.paused) await _value62.audio.play();
+                        else _value62.audio.pause();
+                        _value24(_value62.audio.paused ? '已暂停' : '正在播放');
+                        _value23();
+                    } catch (_value64) {
+                        _value24(_value64?.message || '语音播放失败', true);
+                    }
+                    return;
+                }
+                _value25();
+                _value62.busy = true;
+                const _value63 = ++_value62.request;
+                _value24(
+                    _value61 === 'regenerate'
+                        ? '正在重新生成语音…'
+                        : _value61 === 'download'
+                          ? '正在准备下载…'
+                          : '正在准备语音…',
+                );
+                _value23();
+                try {
+                    const { assetId: _value65, blob: _value66 } = await _value28(
+                        _value62,
+                        _value61 === 'regenerate',
+                    );
+                    if (_value19 !== _value62 || _value62.request !== _value63) return;
+                    if (_value61 === 'download') {
+                        if (typeof window.u2ExportFile !== 'function')
+                            throw new Error('文件下载功能尚未加载');
+                        const _value69 = await window.u2ExportFile({
+                            blob: _value66,
+                            fileName:
+                                'imessage-offline-' +
+                                String(_value62.message.id).replace(/[^a-z0-9_-]/gi, '-') +
+                                '-' +
+                                _value62.speechIndex +
+                                '.' +
+                                _value29(_value66.type),
+                            title: 'iMessage 线下语音',
+                        });
+                        if (_value69 === 'failed') throw new Error('语音下载失败，请重试');
+                        if (_value19 === _value62 && _value62.request === _value63)
+                            _value24(_value69 === 'shared' ? '已打开系统保存' : '语音已下载');
+                        return;
+                    }
+                    const _value67 = await window.appStorage?.getAssetUrl?.(_value65);
+                    if (!_value67) throw new Error('已保存的语音无法读取，请重试');
+                    const _value68 = await window.u2Tts.playAudioUrl(_value67);
+                    if (_value19 !== _value62 || _value62.request !== _value63) {
+                        _value68.pause();
+                        return;
+                    }
+                    _value62.audio = _value68;
+                    ['play', 'pause', 'ended'].forEach((_value70) =>
+                        _value68.addEventListener(_value70, () => {
+                            if (_value19 === _value62 && _value62.audio === _value68) {
+                                if (_value70 === 'ended') _value24('播放完成');
+                                _value23();
+                            }
+                        }),
+                    );
+                    _value24('正在播放');
+                } catch (_value71) {
+                    console.error('Offline speech action failed', _value71);
+                    const _value72 =
+                        window.u2Api?.isRequestError?.(_value71) &&
+                        window.u2Api.reportError?.(_value71, {
+                            operation: '语音生成',
+                        });
+                    _value19 === _value62 &&
+                        _value62.request === _value63 &&
+                        _value24(
+                            _value72
+                                ? '语音生成失败'
+                                : window.u2Tts?.getUserErrorMessage?.(_value71) ||
+                                      _value71?.message ||
+                                      '语音操作失败',
+                            true,
+                        );
+                } finally {
+                    _value19 === _value62 &&
+                        _value62.request === _value63 &&
+                        ((_value62.busy = false), _value23());
+                }
+            };
+            const _value31 = async (_value73) => {
+                if (!_value73.speakerId && _value73.friend.type === 'group') return;
+                const _value74 = _value73.request;
+                try {
+                    _value27(_value73);
+                    const _value75 = _value2(
+                        _value73.message,
+                        _value73.speechIndex,
+                        _value73.text,
+                        _value73.speakerId,
+                    );
+                    const _value76 = _value75
+                        ? await window.appStorage?.getAssetBlob?.(_value75.assetId)
+                        : null;
+                    if (_value19 === _value73 && _value73.request === _value74 && !_value73.busy) {
+                        const _value77 = _value22(_value73);
+                        _value24(
+                            !window.u2Tts?.canSpeakForFriend?.(_value77)
+                                ? '请先为该角色开启 TTS 并设置音色 ID'
+                                : _value76?.size
+                                  ? '已保存语音，点击播放'
+                                  : '点击播放生成语音',
+                        );
+                    }
+                } catch (_value78) {
+                    if (_value19 === _value73 && _value73.request === _value74)
+                        _value24(_value78?.message || '语音不可用', true);
+                }
+            };
+            const _value32 = () => {
+                if (_value20) return;
+                const _value79 = _value21();
+                if (!_value79.overlay) return;
+                _value20 = true;
+                _value79.wave.innerHTML = [
+                    12, 20, 34, 22, 48, 62, 33, 55, 38, 68, 46, 28, 59, 43, 64, 36, 51, 25, 39, 19,
+                    12,
+                ]
+                    .map(
+                        (_value80, _value81) =>
+                            '<span style="--wave-height:' +
+                            _value80 +
+                            'px;--wave-delay:' +
+                            _value81 * -0.055 +
+                            's"></span>',
+                    )
+                    .join('');
+                _value79.close.addEventListener('click', _value26);
+                _value79.overlay.addEventListener('click', (_value82) => {
+                    if (_value82.target === _value79.overlay) _value26();
+                });
+                _value79.overlay.addEventListener('keydown', (_value83) => {
+                    _value83.key === 'Escape' && (_value83.preventDefault(), _value26());
+                    if (_value83.key === 'Tab') {
+                        const _value84 = Array.from(
+                            _value79.overlay.querySelectorAll(
+                                'button:not(:disabled), select:not(:disabled)',
+                            ),
+                        ).filter((_value87) => _value87.offsetParent !== null);
+                        const _value85 = _value84[0];
+                        const _value86 = _value84[_value84.length - 1];
+                        if (_value83.shiftKey && document.activeElement === _value85) {
+                            _value83.preventDefault();
+                            _value86?.focus();
+                        } else
+                            !_value83.shiftKey &&
+                                document.activeElement === _value86 &&
+                                (_value83.preventDefault(), _value85?.focus());
+                    }
+                });
+                _value79.speaker.addEventListener('change', () => {
+                    if (!_value19) return;
+                    _value25();
+                    _value19.speakerId = _value79.speaker.value;
+                    _value19.request += 1;
+                    _value24(_value19.speakerId ? '点击播放生成语音' : '请先选择角色');
+                    _value23();
+                    if (_value19.speakerId) void _value31(_value19);
+                });
+                _value79.play.addEventListener('click', () => _value30('play'));
+                _value79.regenerate.addEventListener('click', () => _value30('regenerate'));
+                _value79.download.addEventListener('click', () => _value30('download'));
+            };
+            const _value33 = ({
+                friend: _value88,
+                message: _value89,
+                speechIndex: _value90,
+                text: _value91,
+                origin: _value92,
+            }) => {
+                _value32();
+                const _value93 = _value21();
+                if (!_value93.overlay) return;
+                if (_value19) _value26();
+                const _value94 = _value88?.type === 'group';
+                const _value95 = _value94 ? isTtsEnabledForFriend(_value88) : [];
+                _value19 = {
+                    friend: _value88,
+                    message: _value89,
+                    speechIndex: _value90,
+                    text: _value91,
+                    origin: _value92,
+                    speakers: _value95,
+                    speakerId: '',
+                    audio: null,
+                    busy: false,
+                    request: 0,
+                };
+                _value93.text.textContent = _value91;
+                _value93.speakerRow.hidden = !_value94;
+                _value93.speaker.innerHTML = '<option value="">选择角色</option>';
+                _value95.forEach((_value96) => {
+                    const _value97 = document.createElement('option');
+                    _value97.value = String(_value96.id);
+                    _value97.textContent = _value96.nickname || _value96.realName || '群成员';
+                    _value93.speaker.appendChild(_value97);
+                });
+                _value93.speaker.value = '';
+                _value93.overlay.hidden = false;
+                _value24(
+                    _value94
+                        ? _value95.length
+                            ? '请先选择角色'
+                            : '群成员尚未配置可用的 TTS 音色'
+                        : window.u2Tts?.canSpeakForFriend?.(_value88)
+                          ? '点击播放生成语音'
+                          : '请先为该角色开启 TTS 并设置音色 ID',
+                );
+                _value23();
+                if (!_value94) void _value31(_value19);
+                _value93.close.focus();
+            };
+            return {
+                open: _value33,
+                close: _value26,
+            };
+        })();
+        const bindOfflineChatTextControls = (bubbleDiv_2, value_596, friend_6, floor_2) => {
+            if (!bubbleDiv_2 || !value_596?.id) return;
+            const messageId_3 = String(value_596.id);
+            bubbleDiv_2.querySelectorAll('.offline-chat-speech.is-playable').forEach((speechEl) => {
+                if (speechEl.dataset.bound === 'true') return;
+                speechEl.dataset.bound = 'true';
+                const playSpeech = (event_601) => {
+                    event_601.preventDefault();
+                    event_601.stopPropagation();
+                    const speechIndex_2 = Number(
                                     speechEl.getAttribute('data-offline-speech-index'),
-                                ),
-                                value_603 = value_179.get(messageId_3) || [],
-                                speech = value_603[speechIndex_2],
-                                originalText = String(speech?.original || '').trim();
-                            if (!originalText) return;
-                            if (
-                                !window.u2Tts ||
-                                typeof window.u2Tts.speakTextCached !== 'function'
-                            ) {
-                                if (window.showToast) window.showToast('TTS 不可用');
-                                return;
-                            }
-                            speechEl.classList.add('is-loading');
-                            speechEl.setAttribute('aria-busy', 'true');
-                            try {
-                                const value_195_606 = value_195(
-                                    value_596,
-                                    speechIndex_2,
-                                    originalText,
                                 );
-                                if (value_195_606?.assetId && window.appStorage?.getAssetUrl) {
-                                    const value_608 = await window.appStorage.getAssetUrl(
-                                        value_195_606.assetId,
-                                    );
-                                    if (value_608) {
-                                        await window.u2Tts.playAudioUrl(value_608);
-                                        return;
-                                    }
-                                }
-                                const value_607 = await window.u2Tts.speakTextCached(
-                                    originalText,
-                                    friend_6,
-                                    speech,
-                                );
-                                if (value_607)
-                                    try {
-                                        await value_198(
-                                            friend_6,
-                                            value_596,
-                                            speechIndex_2,
-                                            originalText,
-                                            value_607,
-                                        );
-                                    } catch (value_609) {
-                                        console.error(
-                                            'Offline speech persistence failed',
-                                            value_609,
-                                        );
-                                        if (window.showToast)
-                                            window.showToast('语音已播放，但永久保存失败');
-                                    }
-                            } catch (error_3) {
-                                console.error('Offline speech playback failed', error_3);
-                                if (
-                                    (!window.u2Api?.isRequestError?.(error_3) ||
-                                        !window.u2Api.reportError(error_3, {
-                                            operation: '语音生成',
-                                        })) &&
-                                    window.showToast
-                                )
-                                    window.showToast(
-                                        window.u2Tts?.getUserErrorMessage?.(error_3) ||
-                                            '语音播放失败',
-                                    );
-                            } finally {
-                                speechEl.classList.remove('is-loading');
-                                speechEl.setAttribute('aria-busy', 'false');
-                            }
-                        };
-                        speechEl.addEventListener('click', (event_2) => {
-                            const selection =
+                    const value_603 = value_179.get(messageId_3) || [];
+                    const speech = value_603[speechIndex_2];
+                    const originalText = String(speech?.original || '').trim();
+                    if (!originalText) return;
+                    closeSheet.open({
+                        friend: friend_6,
+                        message: value_596,
+                        speechIndex: speechIndex_2,
+                        text: originalText,
+                        origin: speechEl,
+                    });
+                };
+                speechEl.addEventListener('click', (event_2) => {
+                    const selection =
                                 typeof window.getSelection === 'function'
                                     ? window.getSelection()
                                     : null;
-                            if (selection && !selection.isCollapsed && selection.toString().trim())
-                                return;
-                            playSpeech(event_2);
-                        });
-                        speechEl.addEventListener('keydown', (event_3) => {
-                            if (event_3.key !== 'Enter' && event_3.key !== ' ') return;
-                            playSpeech(event_3);
-                        });
-                    });
-                bubbleDiv_2.querySelectorAll('.offline-chat-barrage-btn').forEach((button_2) => {
-                    if (button_2.dataset.bound === 'true') return;
-                    button_2.dataset.bound = 'true';
-                    button_2.addEventListener('click', (event_4) => {
-                        event_4.preventDefault();
-                        event_4.stopPropagation();
-                        const paragraphIndex_2 =
+                    if (selection && !selection.isCollapsed && selection.toString().trim()) return;
+                    playSpeech(event_2);
+                });
+                speechEl.addEventListener('keydown', (event_3) => {
+                    if (event_3.key !== 'Enter' && event_3.key !== ' ') return;
+                    playSpeech(event_3);
+                });
+            });
+            bubbleDiv_2.querySelectorAll('.offline-chat-barrage-btn').forEach((button_2) => {
+                if (button_2.dataset.bound === 'true') return;
+                button_2.dataset.bound = 'true';
+                button_2.addEventListener('click', (event_4) => {
+                    event_4.preventDefault();
+                    event_4.stopPropagation();
+                    const paragraphIndex_2 =
                             Number(button_2.getAttribute('data-offline-barrage-index')) || 0;
-                        openOfflineBarrageView({
-                            messageId: messageId_3,
-                            paragraphIndex: paragraphIndex_2,
-                            floor: floor_2,
-                            barrages:
-                                (offlineBarrageRuntimeStore.get(messageId_3) || [])[
-                                    paragraphIndex_2
-                                ] || [],
-                        });
+                    openOfflineBarrageView({
+                        messageId: messageId_3,
+                        paragraphIndex: paragraphIndex_2,
+                        floor: floor_2,
+                        barrages:
+                            (offlineBarrageRuntimeStore.get(messageId_3) || [])[paragraphIndex_2] ||
+                            [],
                     });
                 });
-                bubbleDiv_2.querySelectorAll('.offline-chat-choice-btn').forEach((button_3) => {
-                    if (button_3.dataset.bound === 'true') return;
-                    button_3.dataset.bound = 'true';
-                    button_3.addEventListener('click', (event_617) => {
-                        event_617.preventDefault();
-                        event_617.stopPropagation();
-                        const choiceIndex =
-                                Number(button_3.getAttribute('data-offline-choice-index')) || 0,
-                            choices_4 = value_181.get(messageId_3) || [],
-                            value_16_2 = String(choices_4[choiceIndex] || '').trim(),
-                            offlineChatInputElement = document.getElementById('offline-chat-input');
-                        if (!value_16_2 || !offlineChatInputElement) return;
-                        offlineChatInputElement.value = value_16_2;
-                        offlineChatInputElement.focus();
-                        offlineChatInputElement.dispatchEvent(
-                            new Event('input', {
-                                bubbles: true,
-                            }),
-                        );
-                        const view_2 = document.getElementById('offline-chat-view'),
-                            contentArea_3 = document.getElementById('offline-chat-content');
-                        if (view_2 && contentArea_3)
-                            contentArea_3.scrollTop = contentArea_3.scrollHeight;
-                    });
+            });
+            bubbleDiv_2.querySelectorAll('.offline-chat-choice-btn').forEach((button_3) => {
+                if (button_3.dataset.bound === 'true') return;
+                button_3.dataset.bound = 'true';
+                button_3.addEventListener('click', (event_617) => {
+                    event_617.preventDefault();
+                    event_617.stopPropagation();
+                    const choiceIndex =
+                                Number(button_3.getAttribute('data-offline-choice-index')) || 0;
+                    const choices_4 = value_181.get(messageId_3) || [];
+                    const value_16_2 = String(choices_4[choiceIndex] || '').trim();
+                    const offlineChatInputElement = document.getElementById('offline-chat-input');
+                    if (!value_16_2 || !offlineChatInputElement) return;
+                    offlineChatInputElement.value = value_16_2;
+                    offlineChatInputElement.focus();
+                    offlineChatInputElement.dispatchEvent(
+                        new Event('input', {
+                            bubbles: true,
+                        }),
+                    );
+                    const view_2 = document.getElementById('offline-chat-view');
+                    const contentArea_3 = document.getElementById('offline-chat-content');
+                    if (view_2 && contentArea_3)
+                        contentArea_3.scrollTop = contentArea_3.scrollHeight;
                 });
-            },
-            isOfflineBarragePromptEnabled = (friend_7) => {
+            });
+        };
+        const isOfflineBarragePromptEnabled = (friend_7) => {
                 const prompts_2 = ensureGlobalOfflinePrompts(friend_7);
                 return prompts_2.some(
                     (prompt_2) =>
                         prompt_2.id === 'barrage_comments' &&
                         (prompt_2.alwaysEnabled || prompt_2.enabled),
                 );
-            },
-            isOfflineChoicesPromptEnabled = (friend_8) => {
+            };
+        const isOfflineChoicesPromptEnabled = (friend_8) => {
                 const prompts_3 = ensureGlobalOfflinePrompts(friend_8);
                 return prompts_3.some(
                     (prompt_3) =>
                         prompt_3.id === 'player_choices' &&
                         (prompt_3.alwaysEnabled || prompt_3.enabled),
                 );
-            },
-            createOfflineChatId = (prefix = 'offline') => {
+            };
+        const createOfflineChatId = (prefix = 'offline') => {
                 if (window.imChat?.createMessageId) return window.imChat.createMessageId(prefix);
                 return prefix + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
-            },
-            estimateOfflineTextTokens = (value_17_2) => {
+            };
+        const estimateOfflineTextTokens = (value_17_2) => {
                 const text_8 = stripOfflineDecorativeMarkup(value_17_2).trim();
                 if (!text_8) return 0;
                 if (typeof window.calculateTokens === 'function')
@@ -2196,17 +2581,17 @@ The prompt must describe the same current moment with characters, action, settin
                         console.warn('Offline token estimate failed', error_4);
                     }
                 return Math.max(1, Math.ceil(text_8.length * 0.75));
-            },
-            countOfflineTextCharacters = (value_18_2) => {
+            };
+        const countOfflineTextCharacters = (value_18_2) => {
                 const text_9 = stripOfflineDecorativeMarkup(value_18_2).replace(/\s+/g, '');
                 return text_9.length;
-            },
-            formatOfflineBubbleTime = (value_634) => {
+            };
+        const formatOfflineBubbleTime = (value_634) => {
                 const value_635 = new Date(Number(value_634) || Date.now()),
                     value_636 = (value_637) => String(value_637).padStart(2, '0');
                 return value_636(value_635.getHours()) + ':' + value_636(value_635.getMinutes());
-            },
-            formatOfflineMeetingDate = (value_638) => {
+            };
+        const formatOfflineMeetingDate = (value_638) => {
                 const value_639 = new Date(Number(value_638) || Date.now()),
                     value_640 = (value_641) => String(value_641).padStart(2, '0');
                 return (
@@ -2220,10 +2605,10 @@ The prompt must describe the same current moment with characters, action, settin
                     ':' +
                     value_640(value_639.getMinutes())
                 );
-            },
-            isOfflineSummaryMessage = (value_247) => value_247?.type === type_3,
-            value_206 = new WeakMap(),
-            value_207 = (message_643) => {
+            };
+        const isOfflineSummaryMessage = (value_247) => value_247?.type === type_3;
+        const value_206 = new WeakMap();
+        const value_207 = (message_643) => {
                 const content_26 = message_643?.content || '',
                     reasoning_3 = message_643?.reasoning || '',
                     value_646 = message_643 && typeof message_643 === 'object',
@@ -2242,8 +2627,8 @@ The prompt must describe the same current moment with characters, action, settin
                         parsed: parsed_13,
                     });
                 return parsed_13;
-            },
-            cloneOfflineMeetingMessages = (value_648) =>
+            };
+        const cloneOfflineMeetingMessages = (value_648) =>
                 (Array.isArray(value_648) ? value_648 : []).map((message_4, value_650) => {
                     const isSummary = isOfflineSummaryMessage(message_4),
                         isAutoImage = isOfflineAutoImageMessage(message_4),
@@ -2361,8 +2746,8 @@ The prompt must describe the same current moment with characters, action, settin
                             }),
                         options_655
                     );
-                }),
-            getOfflineDialogueRows = (value_657) => {
+                });
+        const getOfflineDialogueRows = (value_657) => {
                 let floor_5 = 0;
                 return (Array.isArray(value_657) ? value_657 : []).reduce((rows, message_5) => {
                     if (
@@ -2380,22 +2765,22 @@ The prompt must describe the same current moment with characters, action, settin
                         rows
                     );
                 }, []);
-            },
-            getOfflineMessageFloor = (messages_2, messageId_4) =>
+            };
+        const getOfflineMessageFloor = (messages_2, messageId_4) =>
                 getOfflineDialogueRows(messages_2).find(
                     (row) => String(row.message?.id || '') === String(messageId_4 || ''),
-                )?.floor || 1,
-            getOfflineUnarchivedDialogueRows = (messages_3) =>
+                )?.floor || 1;
+        const getOfflineUnarchivedDialogueRows = (messages_3) =>
                 getOfflineDialogueRows(messages_3).filter(
                     (row_2) => !row_2.message?.archivedBySummaryId,
-                ),
-            getOfflineSummarySourceMessages = (messages_4, summaryMessage) => {
+                );
+        const getOfflineSummarySourceMessages = (messages_4, summaryMessage) => {
                 const sourceIds = new Set((summaryMessage?.sourceMessageIds || []).map(String));
                 return getOfflineDialogueRows(messages_4).filter((row_3) =>
                     sourceIds.has(String(row_3.message?.id || '')),
                 );
-            },
-            value_211 = (message_667) => ({
+            };
+        const value_211 = (message_667) => ({
                 id: message_667.id,
                 role: message_667.role,
                 type: message_667.type || '',
@@ -2423,109 +2808,116 @@ The prompt must describe the same current moment with characters, action, settin
                 sourceFloorStart: message_667.sourceFloorStart || 0,
                 sourceFloorEnd: message_667.sourceFloorEnd || 0,
                 ttsAudioAssets: message_667.ttsAudioAssets || [],
-            }),
-            value_212 = (value_668, value_669) => {
-                if (value_668.length !== value_669.length) return false;
-                return value_668.every((value_670, value_671) => {
-                    const value_211_672 = value_211(value_670),
-                        value_211_673 = value_211(value_669[value_671]);
-                    return Object.keys(value_211_673).every((value_674) => {
-                        if (value_674 === 'ttsAudioAssets') {
-                            const value_677 = value_211_672[value_674],
-                                value_678 = value_211_673[value_674];
-                            return (
-                                Array.isArray(value_677) &&
-                                value_677.length === value_678.length &&
-                                value_677.every(
-                                    (value_679, value_680) =>
-                                        value_679.speechIndex ===
-                                            value_678[value_680]?.speechIndex &&
-                                        value_679.text === value_678[value_680]?.text &&
-                                        value_679.assetId === value_678[value_680]?.assetId,
-                                )
-                            );
-                        }
-                        if (value_674 !== 'sourceMessageIds')
-                            return value_211_672[value_674] === value_211_673[value_674];
-                        const value_675 = value_211_672[value_674],
-                            value_676 = value_211_673[value_674];
+            });
+        const value_212 = (value_668, value_669) => {
+            if (value_668.length !== value_669.length) return false;
+            return value_668.every((value_670, value_671) => {
+                const value_211_672 = value_211(value_670);
+                const value_211_673 = value_211(value_669[value_671]);
+                return Object.keys(value_211_673).every((value_674) => {
+                    if (value_674 === 'ttsAudioAssets') {
+                        const value_677 = value_211_672[value_674];
+                        const value_678 = value_211_673[value_674];
                         return (
-                            Array.isArray(value_675) &&
-                            value_675.length === value_676.length &&
-                            value_675.every(
-                                (value_681, value_682) => value_681 === value_676[value_682],
+                            Array.isArray(value_677) &&
+                            value_677.length === value_678.length &&
+                            value_677.every(
+                                (value_679, value_680) =>
+                                    value_679.speechIndex === value_678[value_680]?.speechIndex &&
+                                    value_679.text === value_678[value_680]?.text &&
+                                    value_679.speakerId === value_678[value_680]?.speakerId &&
+                                    value_679.assetId === value_678[value_680]?.assetId,
                             )
                         );
-                    });
+                    }
+                    if (value_674 !== 'sourceMessageIds')
+                        return value_211_672[value_674] === value_211_673[value_674];
+                    const value_675 = value_211_672[value_674];
+                    const value_676 = value_211_673[value_674];
+                    return (
+                        Array.isArray(value_675) &&
+                        value_675.length === value_676.length &&
+                        value_675.every(
+                            (value_681, value_682) => value_681 === value_676[value_682],
+                        )
+                    );
                 });
-            },
-            value_213 = () =>
+            });
+        };
+        const value_213 = () =>
                 offlineRegexEngine
                     ? offlineRegexEngine.normalizeHtmlTemplateRules(
                           window.imData?.offlineHtmlTemplateRules,
                       )
-                    : [],
-            value_214 = () =>
+                    : [];
+        const value_214 = () =>
                 offlineRegexEngine
                     ? offlineRegexEngine.normalizeTextReplacementRules(
                           window.imData?.offlineTextReplacementRules,
                       )
-                    : [],
-            value_215 = (value_683_2, role_4, depth_6) =>
+                    : [];
+        const value_215 = (value_683_2, role_4, depth_6) =>
                 offlineRegexEngine
                     ? offlineRegexEngine.applyTextReplacementRules(value_683_2, {
                           rules: value_214(),
                           role: role_4,
                           depth: depth_6,
                       })
-                    : String(value_683_2 || ''),
-            value_216 = (value_686_2, role_5, depth_7) =>
+                    : String(value_683_2 || '');
+        const value_216 = (value_686_2, role_5, depth_7) =>
                 offlineRegexEngine
                     ? offlineRegexEngine.stripHtmlTemplateRules(value_686_2, {
                           rules: value_213(),
                           role: role_5,
                           depth: depth_7,
                       })
-                    : String(value_686_2 || ''),
-            value_217 = (value_689, value_690, value_691) =>
-                value_216(value_689, value_690, value_691),
-            value_218 = (value_692, value_693, value_694) =>
-                value_215(value_216(value_692, value_693, value_694), value_693, value_694),
-            value_219 = (data_3) => {
+                    : String(value_686_2 || '');
+        const value_217 = (value_689, value_690, value_691) =>
+                value_216(value_689, value_690, value_691);
+        const value_218 = (value_692, value_693, value_694) =>
+                value_215(value_216(value_692, value_693, value_694), value_693, value_694);
+        const value_219 = (data_3) => {
                 const getVisionResponseContent_2 = window.imApp?.sanitizeHtmlTemplate;
                 return typeof getVisionResponseContent_2 === 'function'
                     ? String(getVisionResponseContent_2(data_3) || '')
                     : '';
-            },
-            value_220 = (value_697, role_6, depth_8, value_700 = {}) => {
-                const items_701 = offlineRegexEngine
-                    ? offlineRegexEngine.applyHtmlTemplateRules(value_697, {
-                          rules: value_213(),
-                          role: role_6,
-                          depth: depth_8,
-                          transformText: (value_702) => value_215(value_702, role_6, depth_8),
-                      })
-                    : [
-                          {
-                              type: 'text',
-                              text: String(value_697 || ''),
-                          },
-                      ];
-                return items_701
-                    .map((value_703) => {
-                        if (value_703.type !== 'html') return value_193(value_703.text, value_700);
-                        const value_219_704 = value_219(value_703.html);
-                        if (value_219_704)
-                            return (
-                                '<section class="offline-chat-html-template">' +
-                                value_219_704 +
-                                '</section>'
-                            );
-                        return value_193(value_703.raw, value_700);
-                    })
-                    .join('');
-            },
-            value_221 = (activeFriend_5) => {
+            };
+        const value_220 = (value_697, role_6, depth_8, value_700 = {}) => {
+            const items_701 = [];
+            const _value98 = {
+                ...value_700,
+                speechItems: items_701,
+            };
+            const _value99 = offlineRegexEngine
+                ? offlineRegexEngine.applyHtmlTemplateRules(value_697, {
+                      rules: value_213(),
+                      role: role_6,
+                      depth: depth_8,
+                      transformText: (value_702) => value_215(value_702, role_6, depth_8),
+                  })
+                : [
+                      {
+                          type: 'text',
+                          text: String(value_697 || ''),
+                      },
+                  ];
+            const _value100 = _value99
+                .map((value_703) => {
+                    if (value_703.type !== 'html') return value_193(value_703.text, _value98);
+                    const value_219_704 = value_219(value_703.html);
+                    if (value_219_704)
+                        return (
+                            '<section class="offline-chat-html-template">' +
+                            value_219_704 +
+                            '</section>'
+                        );
+                    return value_193(value_703.raw, _value98);
+                })
+                .join('');
+            if (value_700.messageId) value_179.set(String(value_700.messageId), items_701);
+            return _value100;
+        };
+        const value_221 = (activeFriend_5) => {
                 if (!activeFriend_5) return [];
                 const value_706 = Array.isArray(activeFriend_5.offlineMessages)
                         ? activeFriend_5.offlineMessages
@@ -2555,8 +2947,8 @@ The prompt must describe the same current moment with characters, action, settin
                               )),
                     offlineMessages_2
                 );
-            },
-            normalizeOfflineMeetingSessions = (activeFriend_6) => {
+            };
+        const normalizeOfflineMeetingSessions = (activeFriend_6) => {
                 if (!activeFriend_6) return [];
                 const sessions = Array.isArray(activeFriend_6.offlineMeetingSessions)
                         ? activeFriend_6.offlineMeetingSessions
@@ -2621,13 +3013,13 @@ The prompt must describe the same current moment with characters, action, settin
                               )),
                     offlineMeetingSessions_2
                 );
-            },
-            getCurrentOnlineChatContainer = (value_723) => {
+            };
+        const getCurrentOnlineChatContainer = (value_723) => {
                 if (!value_723?.id) return null;
                 const page_2 = document.getElementById('chat-interface-' + value_723.id);
                 return page_2 ? page_2.querySelector('.ins-chat-messages') : null;
-            },
-            rerenderOnlineChatForFriend = (friend_9, options_3 = {}) => {
+            };
+        const rerenderOnlineChatForFriend = (friend_9, options_3 = {}) => {
                 const container_2 = getCurrentOnlineChatContainer(friend_9);
                 if (container_2 && window.imChat?.rerenderChatContainer) {
                     const latestFriend_3 =
@@ -2639,8 +3031,8 @@ The prompt must describe the same current moment with characters, action, settin
                     });
                 }
                 if (window.imChat?.renderChatsList) window.imChat.renderChatsList();
-            },
-            value_224_2 = async (activeFriend_7) => {
+            };
+        const value_224_2 = async (activeFriend_7) => {
                 if (!activeFriend_7?.id) return false;
                 window.imApp?.ensureFriendMessagesLoaded &&
                     (await window.imApp.ensureFriendMessagesLoaded(activeFriend_7));
@@ -2716,8 +3108,8 @@ The prompt must describe the same current moment with characters, action, settin
                         scroll: true,
                     });
                 return saved_2;
-            },
-            value_225 = async (activeFriend_8) => {
+            };
+        const value_225 = async (activeFriend_8) => {
                 if (!activeFriend_8?.id) return true;
                 if (window.imApp?.ensureFriendRecentMessagesLoaded)
                     await window.imApp.ensureFriendRecentMessagesLoaded(activeFriend_8, {
@@ -2764,8 +3156,8 @@ The prompt must describe the same current moment with characters, action, settin
                         scroll: false,
                     });
                 return saved_3;
-            },
-            isOfflineMeetingRecordForSession = (message_11, session_3) => {
+            };
+        const isOfflineMeetingRecordForSession = (message_11, session_3) => {
                 if (!message_11 || !session_3 || message_11.type !== OFFLINE_MEETING_RECORD_TYPE)
                     return false;
                 const sessionId_2 = String(session_3.id || '');
@@ -2782,8 +3174,8 @@ The prompt must describe the same current moment with characters, action, settin
                     messageTitle &&
                     messageTitle === sessionTitle
                 );
-            },
-            buildOfflineMeetingRecordContent = (session, summary_2) => {
+            };
+        const buildOfflineMeetingRecordContent = (session, summary_2) => {
                 return [
                     session?.dateText || formatOfflineMeetingDate(session?.endedAt),
                     session?.title || '见面记录',
@@ -2791,15 +3183,15 @@ The prompt must describe the same current moment with characters, action, settin
                 ].filter(Boolean).join(`
 
 `);
-            },
-            buildOfflineMeetingRawSummary = (value_274, value_275) => {
+            };
+        const buildOfflineMeetingRawSummary = (value_274, value_275) => {
                 return [
                     '标题：' + (value_274?.title || '见面记录'),
                     '见面内容：' + String(value_275 || ''),
                 ].join(`
 `);
-            },
-            updateOfflineMeetingSessionSummary = async (value_753, session_4, value_755) => {
+            };
+        const updateOfflineMeetingSessionSummary = async (value_753, session_4, value_755) => {
                 if (!value_753?.id || !session_4?.id) return false;
                 window.imApp?.ensureFriendMessagesLoaded &&
                     (await window.imApp.ensureFriendMessagesLoaded(value_753));
@@ -2877,13 +3269,13 @@ The prompt must describe the same current moment with characters, action, settin
                     }),
                     true
                 );
-            },
-            value_227 = async (activeFriend_9, session_5) => {
-                if (!activeFriend_9?.id || !session_5?.id) return false;
-                window.imApp?.ensureFriendMessagesLoaded &&
-                    (await window.imApp.ensureFriendMessagesLoaded(activeFriend_9));
-                const sessionId_4 = String(session_5.id),
-                    saved_4 = await commitSheetFriendChange(
+            };
+        const value_227 = async (activeFriend_9, session_5) => {
+            if (!activeFriend_9?.id || !session_5?.id) return false;
+            window.imApp?.ensureFriendMessagesLoaded &&
+                (await window.imApp.ensureFriendMessagesLoaded(activeFriend_9));
+            const sessionId_4 = String(session_5.id);
+            const saved_4 = await commitSheetFriendChange(
                         activeFriend_9,
                         (targetFriend_6) => {
                             if (!targetFriend_6) return;
@@ -2925,24 +3317,26 @@ The prompt must describe the same current moment with characters, action, settin
                             includeMessages: true,
                         },
                     );
-                if (!saved_4) return false;
-                const currentActiveFriend_5 =
+            if (!saved_4) return false;
+            await _value3(
+                (Array.isArray(session_5.messages) ? session_5.messages : []).flatMap(
+                    (_value101) => _value101?.ttsAudioAssets || [],
+                ),
+            );
+            const currentActiveFriend_5 =
                     (window.imData?.friends || []).find(
                         (value_774) => String(value_774.id) === String(activeFriend_9.id),
                     ) || activeFriend_9;
-                return (
-                    window.imData?.currentActiveFriend &&
-                        String(window.imData.currentActiveFriend.id) ===
-                            String(currentActiveFriend_5.id) &&
-                        (window.imData.currentActiveFriend = currentActiveFriend_5),
-                    handleAction_285(currentActiveFriend_5),
-                    rerenderOnlineChatForFriend(currentActiveFriend_5, {
-                        scroll: false,
-                    }),
-                    true
-                );
-            },
-            confirmDeleteOfflineMeetingSession = (
+            window.imData?.currentActiveFriend &&
+                String(window.imData.currentActiveFriend.id) === String(currentActiveFriend_5.id) &&
+                (window.imData.currentActiveFriend = currentActiveFriend_5);
+            handleAction_285(currentActiveFriend_5);
+            rerenderOnlineChatForFriend(currentActiveFriend_5, {
+                scroll: false,
+            });
+            return true;
+        };
+        const confirmDeleteOfflineMeetingSession = (
                 value_775,
                 value_776,
                 value_777 = null,
@@ -2983,17 +3377,17 @@ The prompt must describe the same current moment with characters, action, settin
             value_784 = null,
             value_785 = {},
         ) => {
-            const friendId_2 = friend_10?.id ?? window.imData?.currentActiveFriend?.id,
-                activeFriend_10 =
+            const friendId_2 = friend_10?.id ?? window.imData?.currentActiveFriend?.id;
+            const activeFriend_10 =
                     friendId_2 != null
                         ? window.imApp?.getFriendById?.(friendId_2) ||
                           (window.imData?.friends || []).find(
                               (item_7) => String(item_7?.id) === String(friendId_2),
                           ) ||
                           friend_10
-                        : null,
-                sessionId_5 = String(record?.offlineSessionId || ''),
-                session_6 =
+                        : null;
+            const sessionId_5 = String(record?.offlineSessionId || '');
+            const session_6 =
                     sessionId_5 && Array.isArray(activeFriend_10?.offlineMeetingSessions)
                         ? activeFriend_10.offlineMeetingSessions.find(
                               (item_8) => String(item_8?.id || '') === sessionId_5,
@@ -3003,15 +3397,8 @@ The prompt must describe the same current moment with characters, action, settin
                 if (window.showToast) window.showToast('见面记录已不存在');
                 return false;
             }
-            return (
-                confirmDeleteOfflineMeetingSession(
-                    activeFriend_10,
-                    session_6,
-                    value_784,
-                    value_785,
-                ),
-                true
-            );
+            confirmDeleteOfflineMeetingSession(activeFriend_10, session_6, value_784, value_785);
+            return true;
         };
         const getActiveLinkedAccountsFriend = () => {
                 const activeFriend_11 = window.imData.currentActiveFriend;
@@ -3022,8 +3409,8 @@ The prompt must describe the same current moment with characters, action, settin
                 )
                     return null;
                 return activeFriend_11;
-            },
-            formatLinkedAccountTime = (timestamp_2) => {
+            };
+        const formatLinkedAccountTime = (timestamp_2) => {
                 const time_2 = Number(timestamp_2) || 0;
                 if (!time_2) return '';
                 if (window.imApp?.formatTime) return window.imApp.formatTime(time_2);
@@ -3031,18 +3418,18 @@ The prompt must describe the same current moment with characters, action, settin
                     hour: '2-digit',
                     minute: '2-digit',
                 });
-            },
-            getLinkedAccountDisplayName = (chat) => {
+            };
+        const getLinkedAccountDisplayName = (chat) => {
                 if (!chat) return '关联好友';
                 return chat.remark || chat.name || chat.realName || '关联好友';
-            },
-            getLinkedAccountInitial = (chat_2) => {
+            };
+        const getLinkedAccountInitial = (chat_2) => {
                 return (
                     String(getLinkedAccountDisplayName(chat_2)).trim().charAt(0).toUpperCase() ||
                     'A'
                 );
-            },
-            value_231 = (chat_3, size_2 = 42) => {
+            };
+        const value_231 = (chat_3, size_2 = 42) => {
                 const seed = String(
                     chat_3?.avatarSeed ||
                         chat_3?.remark ||
@@ -3070,8 +3457,8 @@ The prompt must describe the same current moment with characters, action, settin
                     Math.max(14, Math.round(size_2 * 0.38)) +
                     'px; font-weight:800; flex-shrink:0;'
                 );
-            },
-            value_232 = (value_803) => {
+            };
+        const value_232 = (value_803) => {
                 const OFFLINE_CHAT_PROMPT_ORDER_2 = Number(value_803) || 0;
                 if (!OFFLINE_CHAT_PROMPT_ORDER_2) return '';
                 const date = new Date(OFFLINE_CHAT_PROMPT_ORDER_2);
@@ -3085,8 +3472,8 @@ The prompt must describe the same current moment with characters, action, settin
                     ':' +
                     date.getMinutes().toString().padStart(2, '0')
                 );
-            },
-            getLinkedAccountMessageTranslation = (message_14) => {
+            };
+        const getLinkedAccountMessageTranslation = (message_14) => {
                 if (!message_14 || typeof message_14 !== 'object') return '';
                 return typeof message_14.translation === 'string' && message_14.translation.trim()
                     ? message_14.translation.trim()
@@ -3096,8 +3483,8 @@ The prompt must describe the same current moment with characters, action, settin
                       : typeof message_14.trans === 'string' && message_14.trans.trim()
                         ? message_14.trans.trim()
                         : '';
-            },
-            value_109 = (message_15) => {
+            };
+        const value_109 = (message_15) => {
                 const text_10 = escapeSheetHtml(message_15?.text || ''),
                     value_233_809 = getLinkedAccountMessageTranslation(message_15);
                 if (!value_233_809)
@@ -3118,8 +3505,8 @@ The prompt must describe the same current moment with characters, action, settin
                 </button>
             `
                 );
-            },
-            toggleLinkedAccountBubbleTranslation = (bubble) => {
+            };
+        const toggleLinkedAccountBubbleTranslation = (bubble) => {
                 if (!bubble) return;
                 const translation_4 = bubble.querySelector(
                     '.group-private-chat-detail-translation',
@@ -3130,8 +3517,8 @@ The prompt must describe the same current moment with characters, action, settin
                 bubble.classList.toggle('is-expanded', willExpand);
                 bubble.setAttribute('aria-expanded', willExpand ? 'true' : 'false');
                 bubble.title = willExpand ? '点击收起翻译' : '点击展开翻译';
-            },
-            findLinkedAccountChat = (chatId) => {
+            };
+        const findLinkedAccountChat = (chatId) => {
                 const activeFriend_12 = getActiveLinkedAccountsFriend(),
                     chats = Array.isArray(activeFriend_12?.linkedAccountChats)
                         ? activeFriend_12.linkedAccountChats
@@ -3141,8 +3528,8 @@ The prompt must describe the same current moment with characters, action, settin
         let linkedAccountModalOverlay = null;
         const closeLinkedAccountModal = () => {
                 if (linkedAccountModalOverlay) linkedAccountModalOverlay.style.display = 'none';
-            },
-            value_237_2 = (innerHTML_2) => {
+            };
+        const value_237_2 = (innerHTML_2) => {
                 !linkedAccountModalOverlay &&
                     ((linkedAccountModalOverlay = document.createElement('div')),
                     (linkedAccountModalOverlay.className = 'linked-account-modal-overlay'),
@@ -3176,8 +3563,8 @@ The prompt must describe the same current moment with characters, action, settin
                     attachmentSheet_2.appendChild(linkedAccountModalOverlay));
                 linkedAccountModalOverlay.innerHTML = innerHTML_2;
                 linkedAccountModalOverlay.style.display = 'flex';
-            },
-            openLinkedAccountChatModal = (chat_5) => {
+            };
+        const openLinkedAccountChatModal = (chat_5) => {
                 const activeFriend_13 = getActiveLinkedAccountsFriend();
                 if (!chat_5 || !activeFriend_13) return;
                 const displayName = getLinkedAccountDisplayName(chat_5),
@@ -3266,8 +3653,8 @@ The prompt must describe the same current moment with characters, action, settin
                 </div>
             `,
                 );
-            },
-            deleteLinkedAccountChat = async (value_836) => {
+            };
+        const deleteLinkedAccountChat = async (value_836) => {
                 const activeFriend_14 = getActiveLinkedAccountsFriend();
                 if (!activeFriend_14 || !value_836) return false;
                 const safeChatId = String(value_836),
@@ -3305,8 +3692,8 @@ The prompt must describe the same current moment with characters, action, settin
                 renderLinkedAccountsPanel_2();
                 if (window.showToast) window.showToast('已删除好友会话');
                 return true;
-            },
-            markLinkedAccountChatRead = async (value_842) => {
+            };
+        const markLinkedAccountChatRead = async (value_842) => {
                 const activeFriend_15 = getActiveLinkedAccountsFriend();
                 if (!activeFriend_15 || !value_842) return false;
                 const safeChatId_2 = String(value_842);
@@ -3342,8 +3729,8 @@ The prompt must describe the same current moment with characters, action, settin
                 ).find((item_12) => String(item_12.id) === safeChatId_2);
                 if (localChat) localChat.readAt = nextReadAt;
                 return (renderLinkedAccountsPanel_2(), true);
-            },
-            openLinkedAccountProfileModal = (chat_6) => {
+            };
+        const openLinkedAccountProfileModal = (chat_6) => {
                 if (!chat_6) return;
                 const displayName_2 = getLinkedAccountDisplayName(chat_6),
                     realName_2 = chat_6.realName || chat_6.name || displayName_2,
@@ -3396,17 +3783,17 @@ The prompt must describe the same current moment with characters, action, settin
                 </div>
             `,
                 );
-            },
-            stopLinkedAccountTimer_2 = () => {
+            };
+        const stopLinkedAccountTimer_2 = () => {
                 value_161 && (clearInterval(value_161), (value_161 = null));
                 value_162 = null;
                 count_163 = 0;
-            },
-            getActiveAttachmentTab = () => {
+            };
+        const getActiveAttachmentTab = () => {
                 const activeTab = attachmentSheet_2.querySelector('.sheet-tab-item.active');
                 return activeTab ? activeTab.getAttribute('data-tab') : '';
-            },
-            syncLinkedAccountTimer = () => {
+            };
+        const syncLinkedAccountTimer = () => {
                 const activeFriend_16 = getActiveLinkedAccountsFriend(),
                     bot = window.imApp?.normalizeLinkedAccountBot
                         ? window.imApp.normalizeLinkedAccountBot(activeFriend_16?.linkedAccountBot)
@@ -3442,10 +3829,10 @@ The prompt must describe the same current moment with characters, action, settin
                 }, nextIntervalMs);
                 count_163 = nextIntervalMs;
             };
-        let text_242 = '',
-            value_243_2 = null,
-            value_244 = null,
-            enabled_245 = true;
+        let text_242 = '';
+        let value_243_2 = null;
+        let value_244 = null;
+        let enabled_245 = true;
         const renderLinkedAccountsPanel_2 = (value_862_2 = {}) => {
                 const activeFriend_17 = getActiveLinkedAccountsFriend();
                 if (!linkedAccountsEmpty || !linkedAccountsControls || !linkedAccountsList) return;
@@ -3585,8 +3972,8 @@ The prompt must describe the same current moment with characters, action, settin
                     })
                     .join('');
                 syncLinkedAccountTimer();
-            },
-            saveLinkedAccountBotSettings = async (patch = {}) => {
+            };
+        const saveLinkedAccountBotSettings = async (patch = {}) => {
                 const activeFriend_18 = getActiveLinkedAccountsFriend();
                 if (!activeFriend_18) return false;
                 const currentBot = window.imApp?.normalizeLinkedAccountBot
@@ -3625,30 +4012,30 @@ The prompt must describe the same current moment with characters, action, settin
                     true
                 );
             };
-        let enabled_247 = true,
-            value_248 = null,
-            count_249 = 0;
+        let enabled_247 = true;
+        let value_248 = null;
+        let count_249 = 0;
         const value_250 = async () => {
-                if (!stickersList || !stickerCategoryTabs) return;
-                const stickers_884 = window.imData?.stickers;
-                if (!enabled_247 && value_248 === stickers_884) return;
-                const value_885 = ++count_249;
-                enabled_247 &&
-                    ((stickersList.innerHTML =
-                        '<div style="text-align:center; color:#8e8e93; padding:28px 0; font-size:13px;">Loading stickers...</div>'),
-                    (stickerCategoryTabs.innerHTML = ''));
-                try {
-                    window.imApp?.ensureStickersReady && (await window.imApp.ensureStickersReady());
-                } catch (error_6) {
-                    console.error('Failed to load stickers for attachment sheet', error_6);
-                }
-                if (
-                    value_885 !== count_249 ||
-                    getActiveAttachmentTab() !== 'stickers' ||
-                    attachmentSheet_2.style.display !== 'flex'
-                )
-                    return;
-                const categories = (
+            if (!stickersList || !stickerCategoryTabs) return;
+            const stickers_884 = window.imData?.stickers;
+            if (!enabled_247 && value_248 === stickers_884) return;
+            const value_885 = ++count_249;
+            enabled_247 &&
+                ((stickersList.innerHTML =
+                    '<div style="text-align:center; color:#8e8e93; padding:28px 0; font-size:13px;">Loading stickers...</div>'),
+                (stickerCategoryTabs.innerHTML = ''));
+            try {
+                window.imApp?.ensureStickersReady && (await window.imApp.ensureStickersReady());
+            } catch (error_6) {
+                console.error('Failed to load stickers for attachment sheet', error_6);
+            }
+            if (
+                value_885 !== count_249 ||
+                getActiveAttachmentTab() !== 'stickers' ||
+                attachmentSheet_2.style.display !== 'flex'
+            )
+                return;
+            const categories = (
                     Array.isArray(window.imData?.stickers) ? window.imData.stickers : []
                 ).filter(
                     (category_2) =>
@@ -3656,80 +4043,80 @@ The prompt must describe the same current moment with characters, action, settin
                         Array.isArray(category_2.items) &&
                         category_2.items.length > 0,
                 );
-                value_248 = window.imData?.stickers;
-                enabled_247 = false;
-                if (categories.length === 0) {
+            value_248 = window.imData?.stickers;
+            enabled_247 = false;
+            if (categories.length === 0) {
+                stickersList.innerHTML =
+                    '<div style="text-align:center; color:#8e8e93; padding:32px 14px; font-size:13px; line-height:1.45;">No stickers yet. Add stickers from Home first.</div>';
+                return;
+            }
+            (!activeStickerCategoryName ||
+                !categories.some(
+                    (category_3) => category_3.categoryName === activeStickerCategoryName,
+                )) &&
+                (activeStickerCategoryName = categories[0].categoryName || '');
+            const renderActiveStickerGrid = (category_4) => {
+                stickersList.innerHTML = '';
+                const grid = document.createElement('div');
+                grid.className = 'sheet-sticker-grid';
+                const items_6 = Array.isArray(category_4?.items) ? category_4.items : [];
+                if (items_6.length === 0) {
                     stickersList.innerHTML =
-                        '<div style="text-align:center; color:#8e8e93; padding:32px 14px; font-size:13px; line-height:1.45;">No stickers yet. Add stickers from Home first.</div>';
+                        '<div style="text-align:center; color:#8e8e93; padding:32px 14px; font-size:13px;">This category is empty.</div>';
                     return;
                 }
-                (!activeStickerCategoryName ||
-                    !categories.some(
-                        (category_3) => category_3.categoryName === activeStickerCategoryName,
-                    )) &&
-                    (activeStickerCategoryName = categories[0].categoryName || '');
-                const renderActiveStickerGrid = (category_4) => {
-                    stickersList.innerHTML = '';
-                    const grid = document.createElement('div');
-                    grid.className = 'sheet-sticker-grid';
-                    const items_6 = Array.isArray(category_4?.items) ? category_4.items : [];
-                    if (items_6.length === 0) {
-                        stickersList.innerHTML =
-                            '<div style="text-align:center; color:#8e8e93; padding:32px 14px; font-size:13px;">This category is empty.</div>';
-                        return;
-                    }
-                    items_6.forEach((sticker) => {
-                        if (!sticker || !sticker.url) return;
-                        const button_4 = document.createElement('button');
-                        button_4.type = 'button';
-                        button_4.className = 'sheet-sticker-item';
-                        button_4.title = sticker.name || '';
-                        button_4.innerHTML =
-                            '<img src="' +
-                            escapeSheetHtml(sticker.url) +
-                            '" alt="' +
-                            escapeSheetHtml(sticker.name || 'Sticker') +
-                            '"><span class="sheet-sticker-name">' +
-                            escapeSheetHtml(sticker.name || 'Sticker') +
-                            '</span>';
-                        button_4.addEventListener('click', async () => {
-                            closeSheet();
-                            await window.imChat.sendStickerMessage({
-                                category: category_4.categoryName || '',
-                                name: sticker.name || 'Sticker',
-                                url: sticker.url,
-                            });
+                items_6.forEach((sticker) => {
+                    if (!sticker || !sticker.url) return;
+                    const button_4 = document.createElement('button');
+                    button_4.type = 'button';
+                    button_4.className = 'sheet-sticker-item';
+                    button_4.title = sticker.name || '';
+                    button_4.innerHTML =
+                        '<img src="' +
+                        escapeSheetHtml(sticker.url) +
+                        '" alt="' +
+                        escapeSheetHtml(sticker.name || 'Sticker') +
+                        '"><span class="sheet-sticker-name">' +
+                        escapeSheetHtml(sticker.name || 'Sticker') +
+                        '</span>';
+                    button_4.addEventListener('click', async () => {
+                        _value4();
+                        await window.imChat.sendStickerMessage({
+                            category: category_4.categoryName || '',
+                            name: sticker.name || 'Sticker',
+                            url: sticker.url,
                         });
-                        grid.appendChild(button_4);
                     });
-                    stickersList.appendChild(grid);
-                };
-                stickerCategoryTabs.innerHTML = '';
-                categories.forEach((category_5) => {
-                    const tab = document.createElement('button');
-                    tab.type = 'button';
-                    tab.className =
-                        'sheet-sticker-category-tab ' +
-                        (category_5.categoryName === activeStickerCategoryName ? 'active' : '');
-                    tab.textContent = category_5.categoryName || 'Stickers';
-                    tab.addEventListener('click', () => {
-                        activeStickerCategoryName = category_5.categoryName || '';
-                        stickerCategoryTabs
-                            .querySelectorAll('.sheet-sticker-category-tab')
-                            .forEach((item_13) => {
-                                item_13.classList.toggle('active', item_13 === tab);
-                            });
-                        renderActiveStickerGrid(category_5);
-                    });
-                    stickerCategoryTabs.appendChild(tab);
+                    grid.appendChild(button_4);
                 });
-                const activeCategory =
+                stickersList.appendChild(grid);
+            };
+            stickerCategoryTabs.innerHTML = '';
+            categories.forEach((category_5) => {
+                const tab = document.createElement('button');
+                tab.type = 'button';
+                tab.className =
+                    'sheet-sticker-category-tab ' +
+                    (category_5.categoryName === activeStickerCategoryName ? 'active' : '');
+                tab.textContent = category_5.categoryName || 'Stickers';
+                tab.addEventListener('click', () => {
+                    activeStickerCategoryName = category_5.categoryName || '';
+                    stickerCategoryTabs
+                        .querySelectorAll('.sheet-sticker-category-tab')
+                        .forEach((item_13) => {
+                            item_13.classList.toggle('active', item_13 === tab);
+                        });
+                    renderActiveStickerGrid(category_5);
+                });
+                stickerCategoryTabs.appendChild(tab);
+            });
+            const activeCategory =
                     categories.find(
                         (category_6) => category_6.categoryName === activeStickerCategoryName,
                     ) || categories[0];
-                renderActiveStickerGrid(activeCategory);
-            },
-            value_251 = () => {
+            renderActiveStickerGrid(activeCategory);
+        };
+        const value_251 = () => {
                 const activeFriend_19 = window.imData.currentActiveFriend,
                     isOffline_2 = !!activeFriend_19?.offlineMeetEnabled;
                 if (attachmentMoreOfflineLabelElement)
@@ -3738,8 +4125,8 @@ The prompt must describe the same current moment with characters, action, settin
                         : '线下';
                 if (attachmentMoreOfflineEntryElement)
                     attachmentMoreOfflineEntryElement.classList.toggle('active', isOffline_2);
-            },
-            value_252 = () => {
+            };
+        const value_252 = () => {
                 const activeFriend_20 = window.imData.currentActiveFriend,
                     isEnabled = !!activeFriend_20?.dynamicActionNarrationEnabled;
                 if (attachmentMoreDynamicActionLabelElement)
@@ -3748,8 +4135,8 @@ The prompt must describe the same current moment with characters, action, settin
                         : '动描';
                 if (attachmentMoreDynamicActionEntryElement)
                     attachmentMoreDynamicActionEntryElement.classList.toggle('active', isEnabled);
-            },
-            value_253_2 = async () => {
+            };
+        const value_253_2 = async () => {
                 const activeFriend_21 = window.imData.currentActiveFriend;
                 if (!activeFriend_21) {
                     if (window.showToast) window.showToast('当前聊天不存在');
@@ -3901,16 +4288,16 @@ The prompt must describe the same current moment with characters, action, settin
                                   '</span>')
                             : (payRecipientAvatar.innerHTML = '<i class="fas fa-user"></i>');
                 }
-            },
-            setRecipientDropdownOpen = (isOpen_2) => {
+            };
+        const setRecipientDropdownOpen = (isOpen_2) => {
                 if (payRecipientDropdown)
                     payRecipientDropdown.style.display = isOpen_2 ? 'block' : 'none';
                 payRecipientArrow &&
                     (payRecipientArrow.style.transform = isOpen_2
                         ? 'rotate(180deg)'
                         : 'rotate(0deg)');
-            },
-            value_254 = (activeFriend_23) => {
+            };
+        const value_254 = (activeFriend_23) => {
                 if (!payRecipientDropdown) return;
                 payRecipientDropdown.innerHTML = '';
                 selectedRecipientId = null;
@@ -3975,8 +4362,8 @@ The prompt must describe the same current moment with characters, action, settin
                     );
                     if (firstOption) firstOption.click();
                 }
-            },
-            syncPayModeUi = (value_922, nextMode = 'transfer') => {
+            };
+        const syncPayModeUi = (value_922, nextMode = 'transfer') => {
                 currentPayMode = nextMode === 'red_packet' ? 'red_packet' : 'transfer';
                 payModeTabs.forEach((tab_2) => {
                     const isActive = tab_2.getAttribute('data-pay-mode') === currentPayMode;
@@ -4001,8 +4388,8 @@ The prompt must describe the same current moment with characters, action, settin
                 payRecipientField &&
                     (payRecipientField.style.display =
                         isGroupChat_2 && currentPayMode === 'transfer' ? 'block' : 'none');
-            },
-            closePayTransferForm = () => {
+            };
+        const closePayTransferForm = () => {
                 if (!payFormOverlay) return;
                 payFormOverlay.style.display = 'none';
                 if (payAmountInput) payAmountInput.value = '';
@@ -4015,18 +4402,18 @@ The prompt must describe the same current moment with characters, action, settin
                 setRecipientTriggerDisplay(null);
                 setRecipientDropdownOpen(false);
                 currentPayMode = 'transfer';
-            },
-            closeVoiceMessageForm = () => {
+            };
+        const closeVoiceMessageForm = () => {
                 if (!voiceFormOverlay) return;
                 voiceFormOverlay.style.display = 'none';
                 if (voiceTranscriptInput) voiceTranscriptInput.value = '';
-            },
-            value_257 = () => {
+            };
+        const value_257 = () => {
                 if (!narrationFormOverlay) return;
                 narrationFormOverlay.style.display = 'none';
                 if (narrationInput) narrationInput.value = '';
-            },
-            setRegenerateBusyState = (busy_2) => {
+            };
+        const setRegenerateBusyState = (busy_2) => {
                 const controls = [regenerateEntry, regenerateReferenceBtn, regenerateDirectBtn];
                 controls.forEach((control) => {
                     if (!control) return;
@@ -4034,13 +4421,13 @@ The prompt must describe the same current moment with characters, action, settin
                     control.style.opacity = busy_2 ? '0.45' : '';
                     control.style.pointerEvents = busy_2 ? 'none' : '';
                 });
-            },
-            closeRegenerateForm = () => {
+            };
+        const closeRegenerateForm = () => {
                 if (!regenerateFormOverlay) return;
                 regenerateFormOverlay.style.display = 'none';
                 if (regenerateRequirementInput) regenerateRequirementInput.value = '';
-            },
-            value_260 = (requiredAmount, callback_2) => {
+            };
+        const value_260 = (requiredAmount, callback_2) => {
                 const sheet = document.getElementById('pay-method-selection-sheet'),
                     listEl_2 = document.getElementById('pay-method-selection-list');
                 if (!sheet || !listEl_2) return false;
@@ -4104,8 +4491,8 @@ The prompt must describe the same current moment with characters, action, settin
                 if (window.openView) window.openView(sheet);
                 else sheet.style.display = 'flex';
                 return true;
-            },
-            value_261_2 = () => {
+            };
+        const value_261_2 = () => {
                 if (!payFormOverlay) return;
                 const activeFriend_24 = window.imData.currentActiveFriend,
                     isGroupChat = activeFriend_24 && activeFriend_24.type === 'group';
@@ -4126,8 +4513,8 @@ The prompt must describe the same current moment with characters, action, settin
                 setTimeout(() => {
                     if (payAmountInput) payAmountInput.focus();
                 }, 30);
-            },
-            value_117 = () => {
+            };
+        const value_117 = () => {
                 if (!voiceFormOverlay) return;
                 if (content_4) content_4.style.transform = 'translateY(100%)';
                 if (sheetOverlayElement) sheetOverlayElement.style.opacity = '0';
@@ -4135,16 +4522,16 @@ The prompt must describe the same current moment with characters, action, settin
                 voiceTranscriptInput &&
                     ((voiceTranscriptInput.value = ''),
                     setTimeout(() => voiceTranscriptInput.focus(), 30));
-            },
-            value_118 = () => {
+            };
+        const value_118 = () => {
                 if (!narrationFormOverlay) return;
                 if (content_4) content_4.style.transform = 'translateY(100%)';
                 if (sheetOverlayElement) sheetOverlayElement.style.opacity = '0';
                 narrationFormOverlay.style.display = 'flex';
                 narrationInput &&
                     ((narrationInput.value = ''), setTimeout(() => narrationInput.focus(), 30));
-            },
-            openRegenerateForm = () => {
+            };
+        const openRegenerateForm = () => {
                 if (!regenerateFormOverlay) return;
                 if (regenerateEntry?.dataset?.busy === 'true') return;
                 const currentActiveFriend_935 = window.imData.currentActiveFriend;
@@ -4158,8 +4545,8 @@ The prompt must describe the same current moment with characters, action, settin
                 regenerateRequirementInput &&
                     ((regenerateRequirementInput.value = ''),
                     setTimeout(() => regenerateRequirementInput.focus(), 30));
-            },
-            buildOfflineThinkingHtml = (value_331, value_332 = false) => {
+            };
+        const buildOfflineThinkingHtml = (value_331, value_332 = false) => {
                 const trim_333 = String(value_331 || '').trim();
                 if (!trim_333) return '';
                 return (
@@ -4183,8 +4570,8 @@ The prompt must describe the same current moment with characters, action, settin
                 </section>
             `
                 );
-            },
-            setOfflineThinkingExpanded = (bubble_3, expanded_2) => {
+            };
+        const setOfflineThinkingExpanded = (bubble_3, expanded_2) => {
                 const panel_2 = bubble_3?.querySelector?.('[data-offline-thinking]');
                 if (!panel_2) return;
                 const toggle_2 = panel_2.querySelector('.offline-chat-thinking-toggle'),
@@ -4192,8 +4579,8 @@ The prompt must describe the same current moment with characters, action, settin
                 panel_2.classList.toggle('is-expanded', !!expanded_2);
                 if (toggle_2) toggle_2.setAttribute('aria-expanded', expanded_2 ? 'true' : 'false');
                 if (content_6) content_6.hidden = !expanded_2;
-            },
-            bindOfflineThinkingToggle = (bubble_4) => {
+            };
+        const bindOfflineThinkingToggle = (bubble_4) => {
                 const toggle_3 = bubble_4?.querySelector?.('.offline-chat-thinking-toggle');
                 if (!toggle_3 || toggle_3.dataset.bound === 'true') return;
                 toggle_3.dataset.bound = 'true';
@@ -4205,8 +4592,8 @@ The prompt must describe the same current moment with characters, action, settin
                         toggle_3.getAttribute('aria-expanded') !== 'true',
                     );
                 });
-            },
-            renderOfflineThinkingState = (bubble_5, value_945, options_5 = {}) => {
+            };
+        const renderOfflineThinkingState = (bubble_5, value_945, options_5 = {}) => {
                 const body_4 = bubble_5?.querySelector?.('.offline-chat-bubble-body');
                 if (!body_4) return null;
                 const textContent_2 = String(value_945 || '').trim();
@@ -4227,15 +4614,15 @@ The prompt must describe the same current moment with characters, action, settin
                     setOfflineThinkingExpanded(bubble_5, !!options_5.expanded),
                     panel_3
                 );
-            },
-            isOfflineChatNearBottom = (contentArea, threshold = 96) => {
+            };
+        const isOfflineChatNearBottom = (contentArea, threshold = 96) => {
                 if (!contentArea) return false;
                 return (
                     contentArea.scrollHeight - contentArea.scrollTop - contentArea.clientHeight <=
                     threshold
                 );
-            },
-            value_268_2 = (contentArea_4) => {
+            };
+        const value_268_2 = (contentArea_4) => {
                 if (!contentArea_4) return false;
                 return (
                     contentArea_4.scrollHeight -
@@ -4243,8 +4630,8 @@ The prompt must describe the same current moment with characters, action, settin
                         contentArea_4.clientHeight <=
                     threshold_2
                 );
-            },
-            value_269 = (value_951, value_952 = {}) => {
+            };
+        const value_269 = (value_951, value_952 = {}) => {
                 if (!value_951) return;
                 const offlineChatScrollLatestElement = document.getElementById(
                     'offline-chat-scroll-latest',
@@ -4284,8 +4671,8 @@ The prompt must describe the same current moment with characters, action, settin
                     (offlineChatScrollLatestElement.tabIndex = _offlineLatestVisible_2 ? 0 : -1),
                     (offlineChatScrollLatestElement._offlineLatestVisible =
                         _offlineLatestVisible_2));
-            },
-            value_270 = (() => {
+            };
+        const value_270 = (() => {
                 let value_958 = null,
                     following_2 = false,
                     enabled_960 = false,
@@ -4541,11 +4928,11 @@ The prompt must describe the same current moment with characters, action, settin
                             ? following_2 && !enabled_960
                             : isOfflineChatNearBottom(value_1005),
                 };
-            })(),
-            scrollOfflineChatToBottom = (value_1006) => {
+            })();
+        const scrollOfflineChatToBottom = (value_1006) => {
                 if (value_1006) value_270.follow(value_1006);
-            },
-            value_272_2 = (value_1007) => {
+            };
+        const value_272_2 = (value_1007) => {
                 const toggle_4 = document.getElementById('offline-chat-scroll-latest');
                 if (!toggle_4 || toggle_4.dataset.bound === 'true') return;
                 toggle_4.dataset.bound = 'true';
@@ -4556,8 +4943,8 @@ The prompt must describe the same current moment with characters, action, settin
                         value_1007 || document.getElementById('offline-chat-content'),
                     );
                 });
-            },
-            value_273_2 = (value_1010) => {
+            };
+        const value_273_2 = (value_1010) => {
                 if (!value_1010) return null;
                 const from_1011 = Array.from(
                         value_1010.querySelectorAll('[data-message-id], [data-summary-id]'),
@@ -4577,8 +4964,8 @@ The prompt must describe the same current moment with characters, action, settin
                     offset: value_1015 ? value_1015.offsetTop - scrollTop_3 : 0,
                     scrollTop: scrollTop_3,
                 };
-            },
-            value_274_2 = (value_1017, value_1018) => {
+            };
+        const value_274_2 = (value_1017, value_1018) => {
                 if (!value_1017 || !value_1018) return;
                 const render_5 = () => {
                     if (value_1018.nearBottom) {
@@ -4631,8 +5018,8 @@ The prompt must describe the same current moment with characters, action, settin
                           window.requestAnimationFrame(render_5);
                       })
                     : setTimeout(render_5, 0);
-            },
-            getOfflineGeneratedImageFileName = (timestamp_3, mimeType_2 = '') => {
+            };
+        const getOfflineGeneratedImageFileName = (timestamp_3, mimeType_2 = '') => {
                 const extensionByMimeType = {
                         'image/jpeg': 'jpg',
                         'image/jpg': 'jpg',
@@ -4691,8 +5078,8 @@ The prompt must describe the same current moment with characters, action, settin
                 </div>
             `
                 );
-            },
-            bindOfflineChatBubbleActions = (value_1039, message_19) => {
+            };
+        const bindOfflineChatBubbleActions = (value_1039, message_19) => {
                 if (!value_1039 || !message_19?.id) return;
                 value_1039.querySelectorAll('[data-offline-action]').forEach((button_5) => {
                     if (button_5.dataset.bound === 'true') return;
@@ -4743,8 +5130,8 @@ The prompt must describe the same current moment with characters, action, settin
                         }
                     });
                 });
-            },
-            enableOfflineChatBubbleActions = (bubbleDiv, message_20) => {
+            };
+        const enableOfflineChatBubbleActions = (bubbleDiv, message_20) => {
                 const footer = bubbleDiv?.querySelector?.('.offline-chat-bubble-footer');
                 if (!footer || !message_20?.id) return;
                 footer.querySelector('.offline-chat-bubble-actions')?.remove();
@@ -4753,74 +5140,73 @@ The prompt must describe the same current moment with characters, action, settin
                     getOfflineChatActionButtonsHtml(message_20.role === 'user', false, message_20),
                 );
                 bindOfflineChatBubbleActions(bubbleDiv, message_20);
-            },
-            renderOfflineChatBubble = (messageOrText, isUser = true, options_6 = {}) => {
-                const contentArea_5 = document.getElementById('offline-chat-content');
-                if (!contentArea_5) return null;
-                const friend_11 = window.imData.currentActiveFriend;
-                if (!options_6.skipTheme) applyOfflineChatTheme_2(friend_11);
-                const rawMessage =
+            };
+        const renderOfflineChatBubble = (messageOrText, isUser = true, options_6 = {}) => {
+            const contentArea_5 = document.getElementById('offline-chat-content');
+            if (!contentArea_5) return null;
+            const friend_11 = window.imData.currentActiveFriend;
+            if (!options_6.skipTheme) applyOfflineChatTheme_2(friend_11);
+            const rawMessage =
                         messageOrText && typeof messageOrText === 'object'
                             ? messageOrText
                             : {
                                   role: isUser ? 'user' : 'assistant',
                                   content: String(messageOrText || ''),
                                   timestamp: Date.now(),
-                              },
-                    message_21 = {
-                        id:
-                            rawMessage.id ||
-                            createOfflineChatId(
-                                rawMessage.role === 'assistant' ? 'offline-ai' : 'offline-user',
-                            ),
-                        role: rawMessage.role === 'assistant' ? 'assistant' : 'user',
-                        type: rawMessage.type || '',
-                        content: String(rawMessage.content || ''),
-                        reasoning:
-                            rawMessage.role === 'assistant'
-                                ? String(rawMessage.reasoning || '')
-                                : '',
-                        timestamp: Number(rawMessage.timestamp) || Date.now(),
-                        tokens: Number(rawMessage.tokens) || 0,
-                        imageUrl: String(rawMessage.imageUrl || '').trim(),
-                        sourceMessageId: String(rawMessage.sourceMessageId || '').trim(),
-                        imageProvider: String(rawMessage.imageProvider || '').trim(),
-                        imageModel: String(rawMessage.imageModel || '').trim(),
-                        imageSize: String(rawMessage.imageSize || '').trim(),
-                        faceReferenceUsed: rawMessage.faceReferenceUsed === true,
-                        charFaceReferenceUsed: rawMessage.charFaceReferenceUsed === true,
-                        userFaceReferenceUsed: rawMessage.userFaceReferenceUsed === true,
-                        imageGenerationPrompt: String(rawMessage.imageGenerationPrompt || ''),
-                        imageGenerationCompiledPrompt: String(
-                            rawMessage.imageGenerationCompiledPrompt || '',
-                        ),
-                        imageGenerationConfig: rawMessage.imageGenerationConfig || null,
-                        generationState: ['failed', 'truncated'].includes(
-                            String(rawMessage.generationState || ''),
-                        )
-                            ? String(rawMessage.generationState)
-                            : undefined,
-                        continuationState:
-                            rawMessage.continuationState === 'available' ? 'available' : undefined,
-                    };
-                isUser = message_21.role === 'user';
-                const isAutoImage_2 = isOfflineAutoImageMessage(message_21),
-                    offlineUserProfile = handleAction_27(friend_11),
-                    userName_3 = isUser
+                              };
+            const message_21 = {
+                id:
+                    rawMessage.id ||
+                    createOfflineChatId(
+                        rawMessage.role === 'assistant' ? 'offline-ai' : 'offline-user',
+                    ),
+                role: rawMessage.role === 'assistant' ? 'assistant' : 'user',
+                type: rawMessage.type || '',
+                content: String(rawMessage.content || ''),
+                reasoning:
+                    rawMessage.role === 'assistant' ? String(rawMessage.reasoning || '') : '',
+                timestamp: Number(rawMessage.timestamp) || Date.now(),
+                tokens: Number(rawMessage.tokens) || 0,
+                imageUrl: String(rawMessage.imageUrl || '').trim(),
+                sourceMessageId: String(rawMessage.sourceMessageId || '').trim(),
+                imageProvider: String(rawMessage.imageProvider || '').trim(),
+                imageModel: String(rawMessage.imageModel || '').trim(),
+                imageSize: String(rawMessage.imageSize || '').trim(),
+                faceReferenceUsed: rawMessage.faceReferenceUsed === true,
+                charFaceReferenceUsed: rawMessage.charFaceReferenceUsed === true,
+                userFaceReferenceUsed: rawMessage.userFaceReferenceUsed === true,
+                imageGenerationPrompt: String(rawMessage.imageGenerationPrompt || ''),
+                imageGenerationCompiledPrompt: String(
+                    rawMessage.imageGenerationCompiledPrompt || '',
+                ),
+                imageGenerationConfig: rawMessage.imageGenerationConfig || null,
+                generationState: ['failed', 'truncated'].includes(
+                    String(rawMessage.generationState || ''),
+                )
+                    ? String(rawMessage.generationState)
+                    : undefined,
+                continuationState:
+                    rawMessage.continuationState === 'available' ? 'available' : undefined,
+                ttsAudioAssets: value_194(rawMessage.ttsAudioAssets),
+            };
+            isUser = message_21.role === 'user';
+            const isAutoImage_2 = isOfflineAutoImageMessage(message_21);
+            const offlineUserProfile = handleAction_27(friend_11);
+            const userName_3 = isUser
                         ? offlineUserProfile.name
-                        : friend_11?.nickname || friend_11?.realName || 'TA',
-                    userSign = isUser ? offlineUserProfile.signature : friend_11?.signature || '',
-                    userAvatar = isUser ? offlineUserProfile.avatarUrl : friend_11?.avatarUrl || '',
-                    floor_3 = Number(options_6.floor) || 1,
-                    value_1063 = Number.isInteger(Number(options_6.depth))
+                        : friend_11?.nickname || friend_11?.realName || 'TA';
+            const userSign = isUser ? offlineUserProfile.signature : friend_11?.signature || '';
+            const userAvatar = isUser ? offlineUserProfile.avatarUrl : friend_11?.avatarUrl || '';
+            const floor_3 = Number(options_6.floor) || 1;
+            const value_1063 = Number.isInteger(Number(options_6.depth))
                         ? Number(options_6.depth)
-                        : 0,
-                    isReadOnly = !!options_6.readOnly,
-                    actionsDisabled_2 = isReadOnly || !!options_6.actionsDisabled,
-                    enableBarrage_3 = !isUser && isOfflineBarragePromptEnabled(friend_11),
-                    enableChoices_3 = !isUser && isOfflineChoicesPromptEnabled(friend_11),
-                    timeText = formatOfflineBubbleTime(message_21.timestamp),
-                    value_1069 = isAutoImage_2
+                        : 0;
+            const isReadOnly = !!options_6.readOnly;
+            const actionsDisabled_2 = isReadOnly || !!options_6.actionsDisabled;
+            const enableBarrage_3 = !isUser && isOfflineBarragePromptEnabled(friend_11);
+            const enableChoices_3 = !isUser && isOfflineChoicesPromptEnabled(friend_11);
+            const timeText = formatOfflineBubbleTime(message_21.timestamp);
+            const value_1069 = isAutoImage_2
                         ? '图片 · ' + timeText
                         : isUser
                           ? '#' +
@@ -4834,19 +5220,19 @@ The prompt must describe the same current moment with characters, action, settin
                             ' · ' +
                             (message_21.tokens || estimateOfflineTextTokens(message_21.content)) +
                             ' tokens · ' +
-                            timeText,
-                    bubbleDiv_3 = document.createElement('div');
-                bubbleDiv_3.className = 'offline-chat-bubble ' + (isUser ? 'user' : 'ai');
-                bubbleDiv_3.setAttribute('data-message-id', message_21.id);
-                bubbleDiv_3.setAttribute('data-floor', String(floor_3));
-                let text_1071 =
+                            timeText;
+            const bubbleDiv_3 = document.createElement('div');
+            bubbleDiv_3.className = 'offline-chat-bubble ' + (isUser ? 'user' : 'ai');
+            bubbleDiv_3.setAttribute('data-message-id', message_21.id);
+            bubbleDiv_3.setAttribute('data-floor', String(floor_3));
+            let text_1071 =
                     '<div class="offline-chat-avatar"><i class="fas fa-user"></i></div>';
-                userAvatar &&
-                    (text_1071 =
-                        '<div class="offline-chat-avatar"><img src="' +
-                        escapeSheetHtml(userAvatar) +
-                        '" alt="avatar"></div>');
-                const parsedMessage =
+            userAvatar &&
+                (text_1071 =
+                    '<div class="offline-chat-avatar"><img src="' +
+                    escapeSheetHtml(userAvatar) +
+                    '" alt="avatar"></div>');
+            const parsedMessage =
                         !isUser && !isAutoImage_2 && offlineReasoning
                             ? offlineReasoning.normalizeResponse(
                                   message_21.content,
@@ -4855,32 +5241,32 @@ The prompt must describe the same current moment with characters, action, settin
                             : {
                                   content: String(message_21.content || ''),
                                   reasoning: '',
-                              },
-                    rawThinking = parsedMessage.reasoning,
-                    content_8 = value_218(parsedMessage.content, message_21.role, value_1063),
-                    value_220_1075 = value_220(parsedMessage.content, message_21.role, value_1063, {
-                        messageId: message_21.id,
-                        enableVoice: !isUser && isTtsEnabledForFriend(friend_11),
-                        enableBarrage: enableBarrage_3,
-                        enableChoices: enableChoices_3,
-                        enableRecap: !isUser,
-                        language: friend_11?.language || 'zh',
-                    }),
-                    displayThinking = rawThinking
+                              };
+            const rawThinking = parsedMessage.reasoning;
+            const content_8 = value_218(parsedMessage.content, message_21.role, value_1063);
+            const value_220_1075 = value_220(parsedMessage.content, message_21.role, value_1063, {
+                messageId: message_21.id,
+                enableVoice: !isUser && _value(friend_11),
+                enableBarrage: enableBarrage_3,
+                enableChoices: enableChoices_3,
+                enableRecap: !isUser,
+                language: friend_11?.language || 'zh',
+            });
+            const displayThinking = rawThinking
                         ? buildOfflineThinkingHtml(rawThinking, false)
-                        : '',
-                    offlineChatActionButtonsHtml = getOfflineChatActionButtonsHtml(
+                        : '';
+            const offlineChatActionButtonsHtml = getOfflineChatActionButtonsHtml(
                         isUser,
                         actionsDisabled_2,
                         message_21,
-                    ),
-                    match_1077 = String(message_21.imageSize || '').match(
+                    );
+            const match_1077 = String(message_21.imageSize || '').match(
                         /(\d{2,5})\s*[x×]\s*(\d{2,5})/i,
-                    ),
-                    value_1078 = match_1077
+                    );
+            const value_1078 = match_1077
                         ? Number(match_1077[1]) + ' / ' + Number(match_1077[2])
-                        : '1 / 1',
-                    value_1079 = isAutoImage_2
+                        : '1 / 1';
+            const value_1079 = isAutoImage_2
                         ? '<figure class="offline-chat-generated-image"><img src="' +
                           escapeSheetHtml(message_21.imageUrl) +
                           '" alt="' +
@@ -4891,67 +5277,58 @@ The prompt must describe the same current moment with characters, action, settin
                           escapeSheetHtml(message_21.content || '线下剧情图片') +
                           '</figcaption></figure>'
                         : '';
-                bubbleDiv_3.innerHTML =
-                    `
+            bubbleDiv_3.innerHTML =
+                `
                 <div class="offline-chat-bubble-header">
                     ` +
-                    text_1071 +
-                    `
+                text_1071 +
+                `
                     <div class="offline-chat-name-container">
                         <span class="offline-chat-name">` +
-                    escapeSheetHtml(userName_3) +
-                    `</span>
+                escapeSheetHtml(userName_3) +
+                `</span>
                     </div>
                     ` +
-                    (userSign
-                        ? '<div class="offline-chat-sign">' + escapeSheetHtml(userSign) + '</div>'
-                        : '') +
-                    `
+                (userSign
+                    ? '<div class="offline-chat-sign">' + escapeSheetHtml(userSign) + '</div>'
+                    : '') +
+                `
                 </div>
                 <div class="offline-chat-bubble-body">
                     ` +
-                    (isAutoImage_2 ? value_1079 : displayThinking) +
-                    `
+                (isAutoImage_2 ? value_1079 : displayThinking) +
+                `
                     ` +
-                    (isAutoImage_2
-                        ? ''
-                        : '<div class="offline-chat-bubble-text" ' +
-                          (value_220_1075 ? '' : 'style="display:none;"') +
-                          '>' +
-                          value_220_1075 +
-                          '</div>') +
-                    `
+                (isAutoImage_2
+                    ? ''
+                    : '<div class="offline-chat-bubble-text" ' +
+                      (value_220_1075 ? '' : 'style="display:none;"') +
+                      '>' +
+                      value_220_1075 +
+                      '</div>') +
+                `
                     <div class="offline-chat-bubble-footer">
                         <div class="offline-chat-bubble-meta">` +
-                    escapeSheetHtml(value_1069) +
-                    `</div>
+                escapeSheetHtml(value_1069) +
+                `</div>
                         ` +
-                    offlineChatActionButtonsHtml +
-                    `
+                offlineChatActionButtonsHtml +
+                `
                     </div>
                 </div>
             `;
-                if (!isAutoImage_2) bindOfflineThinkingToggle(bubbleDiv_3);
-                bindOfflineChatBubbleActions(bubbleDiv_3, message_21);
-                if (!isAutoImage_2)
-                    bindOfflineChatTextControls(
-                        bubbleDiv_3,
-                        {
-                            ...message_21,
-                            content: content_8,
-                            reasoning: rawThinking || undefined,
-                        },
-                        friend_11,
-                        floor_3,
-                    );
-                const container_3 = options_6.container || contentArea_5;
-                container_3.appendChild(bubbleDiv_3);
-                if (options_6.scroll !== false && container_3 === contentArea_5)
-                    scrollOfflineChatToBottom(contentArea_5);
-                return bubbleDiv_3;
-            },
-            createStreamingBubble = (content_9 = '', isUser_2 = false, options_7 = {}) => {
-                const message_22 = {
+            if (!isAutoImage_2) bindOfflineThinkingToggle(bubbleDiv_3);
+            bindOfflineChatBubbleActions(bubbleDiv_3, message_21);
+            if (!isAutoImage_2)
+                bindOfflineChatTextControls(bubbleDiv_3, message_21, friend_11, floor_3);
+            const container_3 = options_6.container || contentArea_5;
+            container_3.appendChild(bubbleDiv_3);
+            if (options_6.scroll !== false && container_3 === contentArea_5)
+                scrollOfflineChatToBottom(contentArea_5);
+            return bubbleDiv_3;
+        };
+        const createStreamingBubble = (content_9 = '', isUser_2 = false, options_7 = {}) => {
+            const message_22 = {
                         id:
                             options_7.id ||
                             createOfflineChatId(isUser_2 ? 'offline-user' : 'offline-ai'),
@@ -4960,30 +5337,30 @@ The prompt must describe the same current moment with characters, action, settin
                         reasoning: options_7.reasoning || '',
                         timestamp: options_7.timestamp || Date.now(),
                         tokens: options_7.tokens || 0,
-                    },
-                    bubbleDiv_4 = renderOfflineChatBubble(message_22, isUser_2, {
+                    };
+            const bubbleDiv_4 = renderOfflineChatBubble(message_22, isUser_2, {
                         floor: options_7.floor,
                         depth: options_7.depth,
                         actionsDisabled: true,
                     });
-                if (!bubbleDiv_4) return null;
-                let currentContent = content_9,
-                    currentNativeReasoning = String(options_7.reasoning || ''),
-                    lastVisibleReasoning = String(options_7.reasoning || '').trim(),
-                    generationFinished = false,
-                    renderFrameId = null,
-                    renderTimerId = null,
-                    lastRenderAt = 0;
-                const cancelPendingRender = () => {
+            if (!bubbleDiv_4) return null;
+            let currentContent = content_9;
+            let currentNativeReasoning = String(options_7.reasoning || '');
+            let lastVisibleReasoning = String(options_7.reasoning || '').trim();
+            let generationFinished = false;
+            let renderFrameId = null;
+            let renderTimerId = null;
+            let lastRenderAt = 0;
+            const cancelPendingRender = () => {
                         renderFrameId !== null &&
                             typeof window.cancelAnimationFrame === 'function' &&
                             window.cancelAnimationFrame(renderFrameId);
                         if (renderTimerId !== null) clearTimeout(renderTimerId);
                         renderFrameId = null;
                         renderTimerId = null;
-                    },
-                    renderStreamingState = () => {
-                        const currentParsed = offlineReasoning
+                    };
+            const renderStreamingState = () => {
+                const currentParsed = offlineReasoning
                             ? offlineReasoning.normalizeResponse(
                                   currentContent,
                                   currentNativeReasoning,
@@ -4996,76 +5373,65 @@ The prompt must describe the same current moment with characters, action, settin
                                   reasoning: currentNativeReasoning,
                                   incomplete: false,
                               };
-                        String(currentParsed.reasoning || '').trim() &&
-                            (lastVisibleReasoning = String(currentParsed.reasoning).trim());
-                        const parsed_5 =
+                String(currentParsed.reasoning || '').trim() &&
+                    (lastVisibleReasoning = String(currentParsed.reasoning).trim());
+                const parsed_5 =
                                 lastVisibleReasoning &&
                                 !String(currentParsed.reasoning || '').trim()
                                     ? {
                                           ...currentParsed,
                                           reasoning: lastVisibleReasoning,
                                       }
-                                    : currentParsed,
-                            currentActiveFriend_1089 = window.imData.currentActiveFriend,
-                            value_1090 = Number.isInteger(Number(options_7.depth))
+                                    : currentParsed;
+                const currentActiveFriend_1089 = window.imData.currentActiveFriend;
+                const value_1090 = Number.isInteger(Number(options_7.depth))
                                 ? Number(options_7.depth)
-                                : 0,
-                            finalDisplayContent = splitOfflineAutoImageMarker(
+                                : 0;
+                const finalDisplayContent = splitOfflineAutoImageMarker(
                                 parsed_5.content,
-                            ).content,
-                            textContent_8 = generationFinished
+                            ).content;
+                const textContent_8 = generationFinished
                                 ? value_218(finalDisplayContent, message_22.role, value_1090)
                                 : value_215(finalDisplayContent, message_22.role, value_1090);
-                        renderOfflineThinkingState(bubbleDiv_4, parsed_5.reasoning, {
-                            expanded: !generationFinished,
-                        });
-                        const textEl_2 = bubbleDiv_4.querySelector('.offline-chat-bubble-text');
-                        textEl_2 &&
-                            (textContent_8
-                                ? ((textEl_2.style.display = ''),
-                                  textEl_2.classList.toggle('is-streaming', !generationFinished),
-                                  generationFinished
-                                      ? ((textEl_2.innerHTML = value_220(
-                                            finalDisplayContent,
-                                            message_22.role,
-                                            value_1090,
-                                            {
-                                                messageId: message_22.id,
-                                                enableVoice:
-                                                    !isUser_2 &&
-                                                    isTtsEnabledForFriend(currentActiveFriend_1089),
-                                                enableBarrage:
-                                                    !isUser_2 &&
-                                                    isOfflineBarragePromptEnabled(
-                                                        currentActiveFriend_1089,
-                                                    ),
-                                                enableChoices:
-                                                    !isUser_2 &&
-                                                    isOfflineChoicesPromptEnabled(
-                                                        currentActiveFriend_1089,
-                                                    ),
-                                                enableRecap: !isUser_2,
-                                                language:
-                                                    currentActiveFriend_1089?.language || 'zh',
-                                            },
-                                        )),
-                                        bindOfflineChatTextControls(
-                                            bubbleDiv_4,
-                                            {
-                                                ...message_22,
-                                                content: textContent_8,
-                                                reasoning: parsed_5.reasoning,
-                                            },
-                                            currentActiveFriend_1089,
-                                            Number(options_7.floor) || 1,
-                                        ))
-                                      : (textEl_2.textContent = textContent_8))
-                                : ((textEl_2.innerHTML = ''), (textEl_2.style.display = 'none')));
-                        if (generationFinished) value_270.settle();
-                        else value_270.refresh();
-                        return parsed_5;
-                    },
-                    value_1086 = () => {
+                renderOfflineThinkingState(bubbleDiv_4, parsed_5.reasoning, {
+                    expanded: !generationFinished,
+                });
+                const textEl_2 = bubbleDiv_4.querySelector('.offline-chat-bubble-text');
+                textEl_2 &&
+                    (textContent_8
+                        ? ((textEl_2.style.display = ''),
+                          textEl_2.classList.toggle('is-streaming', !generationFinished),
+                          generationFinished
+                              ? ((textEl_2.innerHTML = value_220(
+                                    finalDisplayContent,
+                                    message_22.role,
+                                    value_1090,
+                                    {
+                                        messageId: message_22.id,
+                                        enableVoice: !isUser_2 && _value(currentActiveFriend_1089),
+                                        enableBarrage:
+                                            !isUser_2 &&
+                                            isOfflineBarragePromptEnabled(currentActiveFriend_1089),
+                                        enableChoices:
+                                            !isUser_2 &&
+                                            isOfflineChoicesPromptEnabled(currentActiveFriend_1089),
+                                        enableRecap: !isUser_2,
+                                        language: currentActiveFriend_1089?.language || 'zh',
+                                    },
+                                )),
+                                bindOfflineChatTextControls(
+                                    bubbleDiv_4,
+                                    message_22,
+                                    currentActiveFriend_1089,
+                                    Number(options_7.floor) || 1,
+                                ))
+                              : (textEl_2.textContent = textContent_8))
+                        : ((textEl_2.innerHTML = ''), (textEl_2.style.display = 'none')));
+                if (generationFinished) value_270.settle();
+                else value_270.refresh();
+                return parsed_5;
+            };
+            const value_1086 = () => {
                         if (renderFrameId !== null || renderTimerId !== null) return;
                         const queueFrame = () => {
                                 renderTimerId = null;
@@ -5086,46 +5452,46 @@ The prompt must describe the same current moment with characters, action, settin
                         if (delay > 0) renderTimerId = setTimeout(queueFrame, delay);
                         else queueFrame();
                     };
-                return {
-                    appendContentChunk: (value_1096) => {
-                        currentContent += String(value_1096 || '');
-                        value_1086();
-                    },
-                    appendReasoningChunk: (value_1097) => {
-                        currentNativeReasoning += String(value_1097 || '');
-                        value_1086();
-                    },
-                    appendChunk: (value_1098) => {
-                        currentContent += String(value_1098 || '');
-                        value_1086();
-                    },
-                    finish: () => {
-                        generationFinished = true;
-                        cancelPendingRender();
-                        const parsed_6 = renderStreamingState();
-                        return lastVisibleReasoning && !String(parsed_6.reasoning || '').trim()
-                            ? {
-                                  ...parsed_6,
-                                  reasoning: lastVisibleReasoning,
-                              }
-                            : parsed_6;
-                    },
-                    setTokens: (value_1100) => {
-                        const max_1101 = Math.max(0, Number(value_1100) || 0),
-                            metaEl = bubbleDiv_4.querySelector('.offline-chat-bubble-meta');
-                        metaEl &&
-                            (metaEl.textContent =
-                                '#' +
-                                (Number(options_7.floor) || 1) +
-                                ' · ' +
-                                (max_1101 || estimateOfflineTextTokens(currentContent)) +
-                                ' tokens · ' +
-                                formatOfflineBubbleTime(message_22.timestamp));
-                    },
-                    enableActions: (finalMessage) =>
-                        enableOfflineChatBubbleActions(bubbleDiv_4, finalMessage || message_22),
-                    getResult: () => {
-                        const parsed_7 = offlineReasoning
+            return {
+                appendContentChunk: (value_1096) => {
+                    currentContent += String(value_1096 || '');
+                    value_1086();
+                },
+                appendReasoningChunk: (value_1097) => {
+                    currentNativeReasoning += String(value_1097 || '');
+                    value_1086();
+                },
+                appendChunk: (value_1098) => {
+                    currentContent += String(value_1098 || '');
+                    value_1086();
+                },
+                finish: () => {
+                    generationFinished = true;
+                    cancelPendingRender();
+                    const parsed_6 = renderStreamingState();
+                    return lastVisibleReasoning && !String(parsed_6.reasoning || '').trim()
+                        ? {
+                              ...parsed_6,
+                              reasoning: lastVisibleReasoning,
+                          }
+                        : parsed_6;
+                },
+                setTokens: (value_1100) => {
+                    const max_1101 = Math.max(0, Number(value_1100) || 0);
+                    const metaEl = bubbleDiv_4.querySelector('.offline-chat-bubble-meta');
+                    metaEl &&
+                        (metaEl.textContent =
+                            '#' +
+                            (Number(options_7.floor) || 1) +
+                            ' · ' +
+                            (max_1101 || estimateOfflineTextTokens(currentContent)) +
+                            ' tokens · ' +
+                            formatOfflineBubbleTime(message_22.timestamp));
+                },
+                enableActions: (finalMessage) =>
+                    enableOfflineChatBubbleActions(bubbleDiv_4, finalMessage || message_22),
+                getResult: () => {
+                    const parsed_7 = offlineReasoning
                             ? offlineReasoning.normalizeResponse(
                                   currentContent,
                                   currentNativeReasoning,
@@ -5134,25 +5500,25 @@ The prompt must describe the same current moment with characters, action, settin
                                   content: currentContent,
                                   reasoning: currentNativeReasoning,
                               };
-                        return lastVisibleReasoning && !String(parsed_7.reasoning || '').trim()
-                            ? {
-                                  ...parsed_7,
-                                  reasoning: lastVisibleReasoning,
-                              }
-                            : parsed_7;
-                    },
-                    getFullText: () => currentContent,
-                    reset: () => {
-                        currentContent = '';
-                        currentNativeReasoning = '';
-                        lastVisibleReasoning = '';
-                        generationFinished = false;
-                        cancelPendingRender();
-                        renderStreamingState();
-                    },
-                };
-            },
-            persistOfflineMessages = async (activeFriend_25, value_1104, value_1105 = {}) => {
+                    return lastVisibleReasoning && !String(parsed_7.reasoning || '').trim()
+                        ? {
+                              ...parsed_7,
+                              reasoning: lastVisibleReasoning,
+                          }
+                        : parsed_7;
+                },
+                getFullText: () => currentContent,
+                reset: () => {
+                    currentContent = '';
+                    currentNativeReasoning = '';
+                    lastVisibleReasoning = '';
+                    generationFinished = false;
+                    cancelPendingRender();
+                    renderStreamingState();
+                },
+            };
+        };
+        const persistOfflineMessages = async (activeFriend_25, value_1104, value_1105 = {}) => {
                 if (!activeFriend_25) return [];
                 const offlineMessages_3 = cloneOfflineMeetingMessages(value_1104),
                     saved_10 = window.imApp?.commitFriendMetaPatch
@@ -5326,8 +5692,8 @@ The prompt must describe the same current moment with characters, action, settin
                 const latestFriend_5 =
                     window.imApp?.getFriendById?.(activeFriend_27.id) || activeFriend_27;
                 return latestFriend_5.offlineCurrentSessionId;
-            },
-            value_280_2 = (element_1134, value_1135) => {
+            };
+        const value_280_2 = (element_1134, value_1135) => {
                 const sessions_2 = normalizeOfflineMeetingSessions(value_1135);
                 if (sessions_2.length === 0) return;
                 const button_6 = document.createElement('button');
@@ -5336,14 +5702,14 @@ The prompt must describe the same current moment with characters, action, settin
                 button_6.innerHTML = '<i class="fas fa-history"></i><span>查看历史见面</span>';
                 button_6.addEventListener('click', () => handleAction_285(value_1135));
                 element_1134.appendChild(button_6);
-            },
-            value_281 = (value_1138, value_1139) => {
+            };
+        const value_281 = (value_1138, value_1139) => {
                 const length_1140 = value_1138.length,
                     max_1141 = Math.max(0, length_1140 - count_8);
                 if (!Number.isFinite(value_1139)) return max_1141;
                 return Math.max(0, Math.min(Math.floor(value_1139), max_1141));
-            },
-            renderOfflineParagraphText_2 = (
+            };
+        const renderOfflineParagraphText_2 = (
                 summaryMessage_2,
                 value_1143,
                 value_1144,
@@ -5365,8 +5731,8 @@ The prompt must describe the same current moment with characters, action, settin
                     };
                 if (value_1143) value_1143._offlineHistoryState = _offlineHistoryState_2;
                 return _offlineHistoryState_2;
-            },
-            value_283_2 = (element_1150, value_1151, value_1152) => {
+            };
+        const value_283_2 = (element_1150, value_1151, value_1152) => {
                 if (!element_1150 || !value_1151 || value_1152.visibleStartFloor <= 0) return;
                 const element_1153 = document.createElement('div');
                 element_1153.className = 'offline-chat-floor-loader';
@@ -5409,8 +5775,8 @@ The prompt must describe the same current moment with characters, action, settin
                         );
                 });
                 element_1150.appendChild(element_1153);
-            },
-            getOfflineSummaryShortTermMemory = (activeFriend_28, summaryId_2) => {
+            };
+        const getOfflineSummaryShortTermMemory = (activeFriend_28, summaryId_2) => {
                 const sourceId_2 = String(summaryId_2 || '');
                 if (!sourceId_2) return null;
                 const entries_2 = Array.isArray(activeFriend_28?.memory?.shortTermEntries)
@@ -5423,8 +5789,8 @@ The prompt must describe the same current moment with characters, action, settin
                             String(entry_3?.sourceId || '') === sourceId_2,
                     ) || null
                 );
-            },
-            addOfflineSummaryToShortTermMemory = async (activeFriend_29, summaryMessage_3) => {
+            };
+        const addOfflineSummaryToShortTermMemory = async (activeFriend_29, summaryMessage_3) => {
                 const sourceId_3 = String(summaryMessage_3?.id || ''),
                     trim_1172 = String(summaryMessage_3?.content || '').trim();
                 if (!activeFriend_29?.id || !sourceId_3 || !trim_1172)
@@ -5483,8 +5849,8 @@ The prompt must describe the same current moment with characters, action, settin
                     ),
                     savedMemory
                 );
-            },
-            renderOfflineSummaryCard = (
+            };
+        const renderOfflineSummaryCard = (
                 container_4,
                 activeFriend_30,
                 summaryMessage_4,
@@ -5958,8 +6324,8 @@ The prompt must describe the same current moment with characters, action, settin
         async function openOfflineMessageEditor(messageId_5) {
             const currentActiveFriend_1251 = window.imData.currentActiveFriend;
             if (!currentActiveFriend_1251) return;
-            const messages_11 = value_221(currentActiveFriend_1251),
-                index_4 = messages_11.findIndex(
+            const messages_11 = value_221(currentActiveFriend_1251);
+            const index_4 = messages_11.findIndex(
                     (value_422) => String(value_422.id) === String(messageId_5),
                 );
             if (index_4 < 0) return;
@@ -5967,18 +6333,18 @@ The prompt must describe the same current moment with characters, action, settin
                     (value_424) =>
                         String(value_424.getAttribute('data-message-id') || '') ===
                         String(messageId_5),
-                ),
-                textEl_3 = bubble_6 ? bubble_6.querySelector('.offline-chat-bubble-text') : null,
-                actionsEl_2 = bubble_6
+                );
+            const textEl_3 = bubble_6 ? bubble_6.querySelector('.offline-chat-bubble-text') : null;
+            const actionsEl_2 = bubble_6
                     ? bubble_6.querySelector('.offline-chat-bubble-actions')
                     : null;
             if (!bubble_6 || !textEl_3 || textEl_3.dataset.editing === 'true') return;
-            const originalText_2 = messages_11[index_4].content || '',
-                innerHTML_8 = textEl_3.innerHTML,
-                display_3 = textEl_3.style.display,
-                minHeight_2 = textEl_3.style.minHeight,
-                innerHTML_10 = actionsEl_2 ? actionsEl_2.innerHTML : '',
-                measuredHeight = Math.ceil(textEl_3.getBoundingClientRect().height || 0);
+            const originalText_2 = messages_11[index_4].content || '';
+            const innerHTML_8 = textEl_3.innerHTML;
+            const display_3 = textEl_3.style.display;
+            const minHeight_2 = textEl_3.style.minHeight;
+            const innerHTML_10 = actionsEl_2 ? actionsEl_2.innerHTML : '';
+            const measuredHeight = Math.ceil(textEl_3.getBoundingClientRect().height || 0);
             textEl_3.dataset.editing = 'true';
             textEl_3.style.display = '';
             if (measuredHeight > 0) textEl_3.style.minHeight = measuredHeight + 'px';
@@ -5991,8 +6357,8 @@ The prompt must describe the same current moment with characters, action, settin
                     <button type="button" class="offline-chat-action-btn" data-inline-edit-action="save" title="保存" aria-label="保存"><i class="fas fa-check"></i></button>
                     <button type="button" class="offline-chat-action-btn" data-inline-edit-action="cancel" title="取消" aria-label="取消"><i class="fas fa-times"></i></button>
                 `);
-            const textarea_3 = textEl_3.querySelector('.offline-chat-inline-editor'),
-                restore_2 = () => {
+            const textarea_3 = textEl_3.querySelector('.offline-chat-inline-editor');
+            const restore_2 = () => {
                     textEl_3.dataset.editing = 'false';
                     textEl_3.innerHTML = innerHTML_8;
                     textEl_3.style.display = display_3;
@@ -6039,32 +6405,37 @@ The prompt must describe the same current moment with characters, action, settin
                                         );
                                 });
                             }));
-                },
-                save = async () => {
-                    const content_10 = textarea_3 ? textarea_3.value : originalText_2,
-                        slice_1271 = messages_11.slice();
-                    slice_1271[index_4] = {
-                        ...slice_1271[index_4],
-                        content: content_10,
-                        tokens:
-                            slice_1271[index_4].role === 'assistant'
-                                ? estimateOfflineTextTokens(content_10)
-                                : undefined,
-                        updatedAt: new Date().toISOString(),
-                    };
-                    const filter_1272 = slice_1271.filter(
+                };
+            const save = async () => {
+                const content_10 = textarea_3 ? textarea_3.value : originalText_2;
+                const slice_1271 = messages_11.slice();
+                const _value102 =
+                    content_10 !== originalText_2 ? slice_1271[index_4].ttsAudioAssets : [];
+                slice_1271[index_4] = {
+                    ...slice_1271[index_4],
+                    content: content_10,
+                    ttsAudioAssets:
+                        content_10 !== originalText_2 ? [] : slice_1271[index_4].ttsAudioAssets,
+                    tokens:
+                        slice_1271[index_4].role === 'assistant'
+                            ? estimateOfflineTextTokens(content_10)
+                            : undefined,
+                    updatedAt: new Date().toISOString(),
+                };
+                const filter_1272 = slice_1271.filter(
                         (value_1273, value_1274) =>
                             value_1274 === index_4 ||
                             String(value_1273.sourceMessageId || '') !== String(messageId_5),
                     );
-                    await persistOfflineMessages(currentActiveFriend_1251, filter_1272, {
-                        resetMessageIds: [messageId_5],
-                    });
-                    renderOfflineCurrentMessages(currentActiveFriend_1251);
-                };
+                await persistOfflineMessages(currentActiveFriend_1251, filter_1272, {
+                    resetMessageIds: [messageId_5],
+                });
+                await _value3(_value102);
+                renderOfflineCurrentMessages(currentActiveFriend_1251);
+            };
             if (actionsEl_2) {
-                const saveBtn_2 = actionsEl_2.querySelector('[data-inline-edit-action="save"]'),
-                    cancelBtn_2 = actionsEl_2.querySelector('[data-inline-edit-action="cancel"]');
+                const saveBtn_2 = actionsEl_2.querySelector('[data-inline-edit-action="save"]');
+                const cancelBtn_2 = actionsEl_2.querySelector('[data-inline-edit-action="cancel"]');
                 if (saveBtn_2)
                     saveBtn_2.addEventListener('click', async (event_11) => {
                         event_11.preventDefault();
@@ -6094,13 +6465,19 @@ The prompt must describe the same current moment with characters, action, settin
             const currentActiveFriend_1279 = window.imData.currentActiveFriend;
             if (!currentActiveFriend_1279) return;
             if (!window.confirm('删除这一楼？')) return;
-            const messages_12 = value_221(currentActiveFriend_1279),
-                nextMessages_2 = messages_12.filter(
-                    (message_25) =>
-                        String(message_25.id) !== String(messageId_6) &&
-                        String(message_25.sourceMessageId || '') !== String(messageId_6),
-                );
-            await persistOfflineMessages(currentActiveFriend_1279, nextMessages_2);
+            const messages_12 = value_221(currentActiveFriend_1279);
+            const nextMessages_2 = messages_12.filter(
+                (message_25) =>
+                    String(message_25.id) === String(messageId_6) ||
+                    String(message_25.sourceMessageId || '') === String(messageId_6),
+            );
+            const _value103 = messages_12.filter(
+                (message_25) =>
+                    String(message_25.id) !== String(messageId_6) &&
+                    String(message_25.sourceMessageId || '') !== String(messageId_6),
+            );
+            await persistOfflineMessages(currentActiveFriend_1279, _value103);
+            await _value3(nextMessages_2.flatMap((_value104) => _value104.ttsAudioAssets || []));
             renderOfflineCurrentMessages(currentActiveFriend_1279);
         }
         const getOfflineGroupMembers = (activeFriend_34) => {
@@ -6125,8 +6502,8 @@ The prompt must describe the same current moment with characters, action, settin
                     nickname: value_1287.nickname || '',
                     persona: '',
                 }));
-            },
-            getOfflineIdentityContext = (activeFriend_35, currentUserState_3 = null) => {
+            };
+        const getOfflineIdentityContext = (activeFriend_35, currentUserState_3 = null) => {
                 const userState_3 =
                         currentUserState_3 ||
                         (window.getUserState ? window.getUserState() : window.userState || {}),
@@ -6162,12 +6539,12 @@ The prompt must describe the same current moment with characters, action, settin
                     isGroup: isGroup_2,
                     groupMembers: groupMembers_2,
                 };
-            },
-            replaceOfflinePromptVariables = (content_11, identityContext_2) =>
+            };
+        const replaceOfflinePromptVariables = (content_11, identityContext_2) =>
                 String(content_11 || '')
                     .replace(/\{\{user\}\}/g, () => identityContext_2.userName)
-                    .replace(/\{\{char\}\}/g, () => identityContext_2.charName),
-            value_129 = (activeFriend_36, items_1301) => {
+                    .replace(/\{\{char\}\}/g, () => identityContext_2.charName);
+        const value_129 = (activeFriend_36, items_1301) => {
                 const currentUserState_4 = window.getUserState
                         ? window.getUserState()
                         : window.userState || {},
@@ -6268,15 +6645,15 @@ The prompt must describe the same current moment with characters, action, settin
                 return mounted
                     .map(({ isOffline: isOffline_3, ...message_29 }) => message_29)
                     .filter((message_30) => message_30.content);
-            },
-            value_295 = async () => {
+            };
+        const value_295 = async () => {
                 if (window.scheduler?.['yield']) {
                     await window.scheduler['yield']();
                     return;
                 }
                 await new Promise((value_1325) => setTimeout(value_1325, 0));
-            },
-            value_296 = async (activeFriend_59, value_443) => {
+            };
+        const value_296 = async (activeFriend_59, value_443) => {
                 const currentUserState_5 = window.getUserState
                         ? window.getUserState()
                         : window.userState || {},
@@ -6440,8 +6817,8 @@ The prompt must describe the same current moment with characters, action, settin
                         },
                     }
                 );
-            },
-            value_297 = async (messages_13, streamingBubble = null, options_8 = {}) => {
+            };
+        const value_297 = async (messages_13, streamingBubble = null, options_8 = {}) => {
                 const currentApiConfig_3 = window.getApiConfig
                     ? window.getApiConfig()
                     : window.apiConfig || {};
@@ -6761,8 +7138,8 @@ The prompt must describe the same current moment with characters, action, settin
                     true,
                     false,
                 );
-            },
-            requestOfflineAssistantReplyWithCotValidation = async (
+            };
+        const requestOfflineAssistantReplyWithCotValidation = async (
                 requestContext,
                 streamingBubble_2 = null,
                 value_1415 = {},
@@ -6788,8 +7165,8 @@ The prompt must describe the same current moment with characters, action, settin
                 if (firstValidation.valid) return firstResult;
                 if (window.showToast) window.showToast('模型未完全按 COT 预设输出，已保留首轮回复');
                 return firstResult;
-            },
-            value_130 = (value_524, value_525) => {
+            };
+        const value_130 = (value_524, value_525) => {
                 const { userName: userName_9, charName: charName_8 } =
                         getOfflineIdentityContext(value_524),
                     normalizedMessages = cloneOfflineMeetingMessages(value_525);
@@ -6842,8 +7219,8 @@ The prompt must describe the same current moment with characters, action, settin
                     .filter(Boolean).join(`
 
 `);
-            },
-            value_300 = (value_1436) => {
+            };
+        const value_300 = (value_1436) => {
                 const date_3 = new Date(Number(value_1436) || Date.now());
                 if (Number.isNaN(date_3.getTime())) return '';
                 const value_1438 = (value_1439) => String(value_1439).padStart(2, '0');
@@ -6858,8 +7235,8 @@ The prompt must describe the same current moment with characters, action, settin
                     ':' +
                     value_1438(date_3.getMinutes())
                 );
-            },
-            formatOfflineTxtSession = (value_538, session_10, options_9 = {}) => {
+            };
+        const formatOfflineTxtSession = (value_538, session_10, options_9 = {}) => {
                 const { userName: userName_11, charName: charName_9 } =
                         getOfflineIdentityContext(value_538),
                     cloneOfflineMeetingMessages_543 = cloneOfflineMeetingMessages(
@@ -6918,8 +7295,8 @@ The prompt must describe the same current moment with characters, action, settin
 （暂无文字聊天记录）`);
                 return lines_2.join(`
 `);
-            },
-            value_302 = (activeFriend_37) => {
+            };
+        const value_302 = (activeFriend_37) => {
                 const sessions_4 = normalizeOfflineMeetingSessions(activeFriend_37)
                         .slice()
                         .sort((a_6, b_6) => Number(a_6.startedAt) - Number(b_6.startedAt)),
@@ -6963,8 +7340,8 @@ The prompt must describe the same current moment with characters, action, settin
                 ].join(`
 
 `);
-            },
-            getOfflineChatTxtFileName = (activeFriend_38) => {
+            };
+        const getOfflineChatTxtFileName = (activeFriend_38) => {
                 const rawName = String(
                         activeFriend_38?.nickname || activeFriend_38?.realName || '线下聊天记录',
                     ).trim(),
@@ -6993,15 +7370,15 @@ The prompt must describe the same current moment with characters, action, settin
                 prompt: String(source?.prompt || '')
                     .trim()
                     .slice(0, 12000),
-            }),
-            getOfflineSummarySettings = (friend_12) =>
-                normalizeOfflineSummarySettings(friend_12?.offlineSummarySettings),
-            getOfflineSummaryApiPresets = () => {
+            });
+        const getOfflineSummarySettings = (friend_12) =>
+                normalizeOfflineSummarySettings(friend_12?.offlineSummarySettings);
+        const getOfflineSummaryApiPresets = () => {
                 const presets_2 =
                     typeof window.getApiPresets === 'function' ? window.getApiPresets() : [];
                 return Array.isArray(presets_2) ? presets_2 : [];
-            },
-            resolveOfflineSummaryApiConfig = (settings_2 = {}) => {
+            };
+        const resolveOfflineSummaryApiConfig = (settings_2 = {}) => {
                 const selectedId = String(settings_2?.apiPresetId || '').trim(),
                     selectedPreset = selectedId
                         ? getOfflineSummaryApiPresets().find(
@@ -7025,8 +7402,8 @@ The prompt must describe the same current moment with characters, action, settin
                     ...current,
                     presetId: '',
                 };
-            },
-            value_308 = (value_1478, value_1479, value_1480 = {}) => {
+            };
+        const value_308 = (value_1478, value_1479, value_1480 = {}) => {
                 if (imOfflineSummaryErrors_6?.createError)
                     return imOfflineSummaryErrors_6.createError(value_1478, value_1479, value_1480);
                 return Object.assign(
@@ -7037,8 +7414,8 @@ The prompt must describe the same current moment with characters, action, settin
                         ...value_1480,
                     },
                 );
-            },
-            value_309 = (value_1481) => {
+            };
+        const value_309 = (value_1481) => {
                 if (imOfflineSummaryErrors_6?.formatFailure)
                     return imOfflineSummaryErrors_6.formatFailure(value_1481);
                 const value_1482 = Number(value_1481?.status) || 0,
@@ -7048,8 +7425,8 @@ The prompt must describe the same current moment with characters, action, settin
                     (value_1482 ? 'HTTP ' + value_1482 : '线下总结发生错误') +
                     (trim_1483 ? '：' + trim_1483 : '')
                 );
-            },
-            value_310 = (value_1484, value_1485) => {
+            };
+        const value_310 = (value_1484, value_1485) => {
                 const value_309_1486 = value_309(value_1485),
                     value_1487 =
                         Number(value_1485?.status) > 0 ||
@@ -7064,8 +7441,8 @@ The prompt must describe the same current moment with characters, action, settin
                         window.showToast?.(value_1484 + '：' + value_309_1486),
                     value_309_1486
                 );
-            },
-            value_311 = (value_1488) => {
+            };
+        const value_311 = (value_1488) => {
                 const items_1489 =
                     value_1488?.choices?.[0]?.message?.content ??
                     value_1488?.choices?.[0]?.text ??
@@ -7083,8 +7460,8 @@ The prompt must describe the same current moment with characters, action, settin
                         )
                         .trim();
                 return typeof items_1489 === 'string' ? items_1489.trim() : '';
-            },
-            value_312_2 = async (apiConfig_3, messages_17) => {
+            };
+        const value_312_2 = async (apiConfig_3, messages_17) => {
                 const missingFields_2 = [];
                 if (!String(apiConfig_3?.endpoint || '').trim()) missingFields_2.push('接口地址');
                 if (!String(apiConfig_3?.apiKey || '').trim()) missingFields_2.push('API Key');
@@ -7178,8 +7555,8 @@ The prompt must describe the same current moment with characters, action, settin
                         },
                     );
                 return value_311_1503;
-            },
-            persistOfflineSummarySettings = async (activeFriend_40, value_1509) => {
+            };
+        const persistOfflineSummarySettings = async (activeFriend_40, value_1509) => {
                 const offlineSummarySettings_1510 = normalizeOfflineSummarySettings(value_1509),
                     saved_13 = await commitSheetFriendChange(
                         activeFriend_40?.id || activeFriend_40,
@@ -7197,8 +7574,8 @@ The prompt must describe the same current moment with characters, action, settin
                         'Failed to persist offline summary settings',
                     );
                 return offlineSummarySettings_1510;
-            },
-            value_134 = (value_589) => {
+            };
+        const value_134 = (value_589) => {
                 const entries_3 = Array.isArray(value_589?.memory?.shortTermEntries)
                     ? value_589.memory.shortTermEntries
                     : [];
@@ -7216,8 +7593,8 @@ The prompt must describe the same current moment with characters, action, settin
                 ).join(`
 
 `);
-            },
-            requestOfflineMeetingSummary = async (value_593, value_594, value_595 = {}) => {
+            };
+        const requestOfflineMeetingSummary = async (value_593, value_594, value_595 = {}) => {
                 const value_1519 =
                         value_595.apiConfig ||
                         resolveOfflineSummaryApiConfig(
@@ -7309,8 +7686,8 @@ Char：` +
                         content: content_16,
                     },
                 ]);
-            },
-            requestOfflineSegmentSummary = async (value_610, sourceRows_2, value_612 = {}) => {
+            };
+        const requestOfflineSegmentSummary = async (value_610, sourceRows_2, value_612 = {}) => {
                 const value_1531 =
                         value_612.apiConfig ||
                         resolveOfflineSummaryApiConfig(
@@ -7404,8 +7781,8 @@ Char: ` +
                         },
                     );
                 return summary_5;
-            },
-            value_316 = (value_1548, startFloor_3, endFloor_3) => {
+            };
+        const value_316 = (value_1548, startFloor_3, endFloor_3) => {
                 const start = Math.max(1, Math.round(Number(startFloor_3) || 0)),
                     end = Math.max(start, Math.round(Number(endFloor_3) || 0)),
                     rows_4 = getOfflineDialogueRows(value_1548),
@@ -7421,8 +7798,8 @@ Char: ` +
                 if (selectedRows.some((row_5) => row_5.message.archivedBySummaryId))
                     throw new Error('Selected floors are already summarized');
                 return selectedRows;
-            },
-            value_317 = async (activeFriend_41, value_1555, value_1556, value_1557 = {}) => {
+            };
+        const value_317 = async (activeFriend_41, value_1555, value_1556, value_1557 = {}) => {
                 const value_221_1558 = value_221(activeFriend_41),
                     selectedRows_2 = value_316(value_221_1558, value_1555, value_1556),
                     settings_3 = await persistOfflineSummarySettings(activeFriend_41, value_1557),
@@ -7445,8 +7822,8 @@ Char: ` +
                     sourceFloorEnd: selectedRows_2[selectedRows_2.length - 1].floor,
                     createdAt: Date.now(),
                 };
-            },
-            getOfflineSpeechDisplayText_2 = async (value_1564, value_1565, value_1566 = null) => {
+            };
+        const getOfflineSpeechDisplayText_2 = async (value_1564, value_1565, value_1566 = null) => {
                 if (!value_1564 || !value_1565 || value_1565.kind !== 'segment')
                     throw new Error('Invalid offline summary draft');
                 const messages_14 = value_221(value_1564),
@@ -7500,8 +7877,8 @@ Char: ` +
                     }),
                     summaryMessage_5
                 );
-            },
-            value_319_2 = async (original_4, value_1579, value_1580, value_1581 = {}) => {
+            };
+        const value_319_2 = async (original_4, value_1579, value_1580, value_1581 = {}) => {
                 const translation_5 = await value_317(
                     original_4,
                     value_1579,
@@ -7509,8 +7886,8 @@ Char: ` +
                     value_1581,
                 );
                 return getOfflineSpeechDisplayText_2(original_4, translation_5);
-            },
-            persistOfflineSummarySettings_2 = async (activeFriend_42, value_1584 = {}) => {
+            };
+        const persistOfflineSummarySettings_2 = async (activeFriend_42, value_1584 = {}) => {
                 const messages_15 = value_221(activeFriend_42);
                 if (messages_15.length === 0) throw new Error('No offline meeting content');
                 const endedAt_5 = Date.now(),
@@ -7551,8 +7928,8 @@ Char: ` +
                     },
                     parsed: parsed_8,
                 };
-            },
-            value_321 = async (value_1594, parsed_9, element_622 = null) => {
+            };
+        const value_321 = async (value_1594, parsed_9, element_622 = null) => {
                 if (!value_1594 || !parsed_9 || parsed_9.kind !== 'end')
                     throw new Error('Invalid offline meeting draft');
                 if (parsed_9.friendId && String(parsed_9.friendId) !== String(value_1594.id))
@@ -7856,8 +8233,8 @@ Char: ` +
         window.imChat.isGeneratedResultPreviewCurrent =
             window.imChat.isGeneratedResultPreviewCurrent ||
             ((value_1646) => value_323_2.isCurrent(value_1646));
-        const value_324 = value_25_2,
-            value_325 = (value_1647, value_1648) => {
+        const value_324 = value_25_2;
+        const value_325 = (value_1647, value_1648) => {
                 const string_1649 = String(value_1647 || ''),
                     string_1650 = String(value_1648 || '');
                 if (!string_1649) return string_1650;
@@ -7873,11 +8250,11 @@ Char: ` +
             const currentActiveFriend_1655 = window.imData.currentActiveFriend;
             if (!currentActiveFriend_1655) return;
             if (isOfflineAutoImageMessage_2(currentActiveFriend_1655)) return;
-            const rows_5 = value_221(currentActiveFriend_1655),
-                index_6 = rows_5.findIndex(
+            const rows_5 = value_221(currentActiveFriend_1655);
+            const index_6 = rows_5.findIndex(
                     (value_1671) => String(value_1671.id) === String(messageId_7),
-                ),
-                value_1658 = rows_5[index_6];
+                );
+            const value_1658 = rows_5[index_6];
             if (
                 index_6 < 0 ||
                 value_1658?.role !== 'assistant' ||
@@ -7888,24 +8265,24 @@ Char: ` +
                     (value_1672) =>
                         String(value_1672.getAttribute('data-message-id') || '') ===
                         String(messageId_7),
-                ),
-                offlineChatBubbleTextElement_1660 = bubble_7?.querySelector(
+                );
+            const offlineChatBubbleTextElement_1660 = bubble_7?.querySelector(
                     '.offline-chat-bubble-text',
-                ),
-                metaEl_2 = bubble_7?.querySelector('.offline-chat-bubble-meta'),
-                actionsEl_3 = bubble_7?.querySelector('.offline-chat-bubble-actions'),
-                innerHTML_7 = offlineChatBubbleTextElement_1660?.innerHTML || '',
-                textContent_4 = metaEl_2?.textContent || '',
-                actionButtons = actionsEl_3
+                );
+            const metaEl_2 = bubble_7?.querySelector('.offline-chat-bubble-meta');
+            const actionsEl_3 = bubble_7?.querySelector('.offline-chat-bubble-actions');
+            const innerHTML_7 = offlineChatBubbleTextElement_1660?.innerHTML || '';
+            const textContent_4 = metaEl_2?.textContent || '';
+            const actionButtons = actionsEl_3
                     ? Array.from(actionsEl_3.querySelectorAll('button'))
-                    : [],
-                string_1665 = String(value_1658.content || '');
-            let content_17 = string_1665,
-                reasoning_2 = String(value_1658.reasoning || ''),
-                value_1668 = Number(value_1658.tokens) || 0;
+                    : [];
+            const string_1665 = String(value_1658.content || '');
+            let content_17 = string_1665;
+            let reasoning_2 = String(value_1658.reasoning || '');
+            let value_1668 = Number(value_1658.tokens) || 0;
             const value_1669 = (streaming_2 = true) => {
-                    if (!offlineChatBubbleTextElement_1660) return;
-                    const parsed_11 = offlineReasoning
+                if (!offlineChatBubbleTextElement_1660) return;
+                const parsed_11 = offlineReasoning
                         ? offlineReasoning.normalizeResponse(content_17, reasoning_2, {
                               streaming: streaming_2,
                           })
@@ -7913,37 +8290,35 @@ Char: ` +
                               content: content_17,
                               reasoning: reasoning_2,
                           };
-                    renderOfflineThinkingState(bubble_7, parsed_11.reasoning, {
-                        expanded: streaming_2 && !!parsed_11.reasoning,
-                    });
-                    const depth_4 = rows_5.length - 1 - index_6,
-                        value_215_1676 = value_215(parsed_11.content, 'assistant', depth_4),
-                        innerHTML_6 = streaming_2
-                            ? ''
-                            : value_220(parsed_11.content, 'assistant', depth_4, {
-                                  messageId: messageId_7,
-                                  enableVoice: isTtsEnabledForFriend(currentActiveFriend_1655),
-                                  enableBarrage:
-                                      isOfflineBarragePromptEnabled(currentActiveFriend_1655),
-                                  enableChoices:
-                                      isOfflineChoicesPromptEnabled(currentActiveFriend_1655),
-                                  enableRecap: true,
-                                  language: currentActiveFriend_1655?.language || 'zh',
-                              });
-                    offlineChatBubbleTextElement_1660.style.display = streaming_2
-                        ? value_215_1676
-                            ? ''
-                            : 'none'
-                        : innerHTML_6
-                          ? ''
-                          : 'none';
-                    offlineChatBubbleTextElement_1660.classList.toggle('is-streaming', streaming_2);
-                    if (streaming_2)
-                        offlineChatBubbleTextElement_1660.textContent =
-                            value_215_1676 || '正在继续生成...';
-                    else offlineChatBubbleTextElement_1660.innerHTML = innerHTML_6;
-                },
-                streamingBubble_3 = {
+                renderOfflineThinkingState(bubble_7, parsed_11.reasoning, {
+                    expanded: streaming_2 && !!parsed_11.reasoning,
+                });
+                const depth_4 = rows_5.length - 1 - index_6;
+                const value_215_1676 = value_215(parsed_11.content, 'assistant', depth_4);
+                const innerHTML_6 = streaming_2
+                    ? ''
+                    : value_220(parsed_11.content, 'assistant', depth_4, {
+                          messageId: messageId_7,
+                          enableVoice: _value(currentActiveFriend_1655),
+                          enableBarrage: isOfflineBarragePromptEnabled(currentActiveFriend_1655),
+                          enableChoices: isOfflineChoicesPromptEnabled(currentActiveFriend_1655),
+                          enableRecap: true,
+                          language: currentActiveFriend_1655?.language || 'zh',
+                      });
+                offlineChatBubbleTextElement_1660.style.display = streaming_2
+                    ? value_215_1676
+                        ? ''
+                        : 'none'
+                    : innerHTML_6
+                      ? ''
+                      : 'none';
+                offlineChatBubbleTextElement_1660.classList.toggle('is-streaming', streaming_2);
+                if (streaming_2)
+                    offlineChatBubbleTextElement_1660.textContent =
+                        value_215_1676 || '正在继续生成...';
+                else offlineChatBubbleTextElement_1660.innerHTML = innerHTML_6;
+            };
+            const streamingBubble_3 = {
                     appendContentChunk: (value_1678) => {
                         content_17 += String(value_1678 || '');
                         value_1669(true);
@@ -7992,11 +8367,11 @@ Char: ` +
                 const requestContext_2 = await value_296(
                         currentActiveFriend_1655,
                         rows_5.slice(0, index_6),
-                    ),
-                    items_1683 = Array.isArray(requestContext_2)
+                    );
+                const items_1683 = Array.isArray(requestContext_2)
                         ? requestContext_2
-                        : requestContext_2.messages,
-                    max_1684 = Math.max(0, rows_5.length - 1 - index_6);
+                        : requestContext_2.messages;
+                const max_1684 = Math.max(0, rows_5.length - 1 - index_6);
                 items_1683.push({
                     role: 'assistant',
                     content: stripOfflineDecorativeMarkup(
@@ -8014,12 +8389,13 @@ Char: ` +
                         {
                             requestReasoning: true,
                         },
-                    ),
-                    content_18 = value_325(value_1658.content, message_1685.content),
-                    slice_1687 = rows_5.slice();
+                    );
+                const content_18 = value_325(value_1658.content, message_1685.content);
+                const slice_1687 = rows_5.slice();
                 slice_1687[index_6] = {
                     ...value_1658,
                     content: splitOfflineAutoImageMarker(content_18).content,
+                    ttsAudioAssets: [],
                     reasoning: message_1685.reasoning || value_1658.reasoning || undefined,
                     tokens: message_1685.tokens || value_1668,
                     generationState: message_1685.truncated ? 'truncated' : undefined,
@@ -8027,14 +8403,15 @@ Char: ` +
                     generationError: message_1685.truncated ? 'stream_truncated' : undefined,
                     updatedAt: new Date().toISOString(),
                 };
-                const nextScene = splitOfflineAutoImageMarker(content_18).scene,
-                    value_1689 = await persistOfflineMessages(
+                const nextScene = splitOfflineAutoImageMarker(content_18).scene;
+                const value_1689 = await persistOfflineMessages(
                         currentActiveFriend_1655,
                         slice_1687,
                         {
                             resetMessageIds: [messageId_7],
                         },
                     );
+                await _value3(value_1658.ttsAudioAssets);
                 if (nextScene)
                     await generateOfflineAutoImage(
                         currentActiveFriend_1655,
@@ -8094,29 +8471,29 @@ Char: ` +
                 )
                     return;
             }
-            const messages_16 = value_221(activeFriend_44),
-                targetIndex = messages_16.findIndex(
+            const messages_16 = value_221(activeFriend_44);
+            const targetIndex = messages_16.findIndex(
                     (value_687) => String(value_687.id) === String(messageId_8),
                 );
             if (targetIndex < 0 || messages_16[targetIndex].role !== 'assistant') return;
-            const originalMessage = messages_16[targetIndex],
-                bubble_8 = Array.from(document.querySelectorAll('.offline-chat-bubble')).find(
+            const originalMessage = messages_16[targetIndex];
+            const bubble_8 = Array.from(document.querySelectorAll('.offline-chat-bubble')).find(
                     (value_688) =>
                         String(value_688.getAttribute('data-message-id') || '') ===
                         String(messageId_8),
-                ),
-                textEl_4 = bubble_8 ? bubble_8.querySelector('.offline-chat-bubble-text') : null,
-                metaEl_3 = bubble_8 ? bubble_8.querySelector('.offline-chat-bubble-meta') : null,
-                value_667 = bubble_8
+                );
+            const textEl_4 = bubble_8 ? bubble_8.querySelector('.offline-chat-bubble-text') : null;
+            const metaEl_3 = bubble_8 ? bubble_8.querySelector('.offline-chat-bubble-meta') : null;
+            const value_667 = bubble_8
                     ? bubble_8.querySelector('.offline-chat-bubble-actions')
-                    : null,
-                innerHTML_11 = textEl_4 ? textEl_4.innerHTML : '',
-                display_4 = textEl_4 ? textEl_4.style.display : '',
-                textContent_5 = metaEl_3 ? metaEl_3.textContent : '',
-                items_684 = value_667 ? Array.from(value_667.querySelectorAll('button')) : [],
-                timestamp_6 = Date.now();
-            let streamContent = '',
-                streamReasoning = '';
+                    : null;
+            const innerHTML_11 = textEl_4 ? textEl_4.innerHTML : '';
+            const display_4 = textEl_4 ? textEl_4.style.display : '';
+            const textContent_5 = metaEl_3 ? metaEl_3.textContent : '';
+            const items_684 = value_667 ? Array.from(value_667.querySelectorAll('button')) : [];
+            const timestamp_6 = Date.now();
+            let streamContent = '';
+            let streamReasoning = '';
             const getStreamResult = (streaming_3 = true) =>
                     offlineReasoning
                         ? offlineReasoning.normalizeResponse(streamContent, streamReasoning, {
@@ -8125,44 +8502,44 @@ Char: ` +
                         : {
                               content: streamContent,
                               reasoning: streamReasoning,
-                          },
-                renderStreamState = (streaming_4 = true) => {
-                    if (!textEl_4 || !bubble_8) return;
-                    const parsed_12 = getStreamResult(streaming_4),
-                        depth_5 = messages_16.length - 1 - targetIndex,
-                        content_19 = streaming_4
+                          };
+            const renderStreamState = (streaming_4 = true) => {
+                if (!textEl_4 || !bubble_8) return;
+                const parsed_12 = getStreamResult(streaming_4);
+                const depth_5 = messages_16.length - 1 - targetIndex;
+                const content_19 = streaming_4
                             ? value_215(parsed_12.content, 'assistant', depth_5)
-                            : value_218(parsed_12.content, 'assistant', depth_5).trim(),
-                        value_1717 = streaming_4
-                            ? ''
-                            : value_220(parsed_12.content, 'assistant', depth_5, {
-                                  messageId: messageId_8,
-                                  enableVoice: isTtsEnabledForFriend(activeFriend_44),
-                                  enableBarrage: isOfflineBarragePromptEnabled(activeFriend_44),
-                                  enableChoices: isOfflineChoicesPromptEnabled(activeFriend_44),
-                                  language: activeFriend_44?.language || 'zh',
-                              });
-                    renderOfflineThinkingState(bubble_8, parsed_12.reasoning, {
-                        expanded: streaming_4 && !!parsed_12.reasoning,
-                    });
-                    textEl_4.style.display = '';
-                    streaming_4
-                        ? (textEl_4.textContent = content_19 || '正在重新思考...')
-                        : ((textEl_4.innerHTML =
-                              value_1717 ||
-                              '<div class="offline-chat-reroll-placeholder">正在重新思考...</div>'),
-                          bindOfflineChatTextControls(
-                              bubble_8,
-                              {
-                                  ...originalMessage,
-                                  content: content_19,
-                                  timestamp: timestamp_6,
-                              },
-                              activeFriend_44,
-                              targetIndex + 1,
-                          ));
-                },
-                streamingBubble_4 = textEl_4
+                            : value_218(parsed_12.content, 'assistant', depth_5).trim();
+                const value_1717 = streaming_4
+                    ? ''
+                    : value_220(parsed_12.content, 'assistant', depth_5, {
+                          messageId: messageId_8,
+                          enableVoice: _value(activeFriend_44),
+                          enableBarrage: isOfflineBarragePromptEnabled(activeFriend_44),
+                          enableChoices: isOfflineChoicesPromptEnabled(activeFriend_44),
+                          language: activeFriend_44?.language || 'zh',
+                      });
+                renderOfflineThinkingState(bubble_8, parsed_12.reasoning, {
+                    expanded: streaming_4 && !!parsed_12.reasoning,
+                });
+                textEl_4.style.display = '';
+                streaming_4
+                    ? (textEl_4.textContent = content_19 || '正在重新思考...')
+                    : ((textEl_4.innerHTML =
+                          value_1717 ||
+                          '<div class="offline-chat-reroll-placeholder">正在重新思考...</div>'),
+                      bindOfflineChatTextControls(
+                          bubble_8,
+                          {
+                              ...originalMessage,
+                              content: content_19,
+                              timestamp: timestamp_6,
+                          },
+                          activeFriend_44,
+                          targetIndex + 1,
+                      ));
+            };
+            const streamingBubble_4 = textEl_4
                     ? {
                           appendContentChunk: (value_695) => {
                               streamContent += String(value_695 || '');
@@ -8221,42 +8598,44 @@ Char: ` +
                 (textEl_4.innerHTML =
                     '<div class="offline-chat-reroll-placeholder">正在重新思考...</div>'));
             try {
-                const contextMessages = messages_16.slice(0, targetIndex),
-                    requestContext_3 = await value_296(activeFriend_44, contextMessages),
+                const contextMessages = messages_16.slice(0, targetIndex);
+                const requestContext_3 = await value_296(activeFriend_44, contextMessages);
+                const {
+                    content: content_27,
+                    reasoning: reasoning_4,
+                    tokens: tokens_2,
+                    truncated: truncated_3,
+                } = await requestOfflineAssistantReplyWithCotValidation(
+                    requestContext_3,
+                    streamingBubble_4,
                     {
-                        content: content_27,
-                        reasoning: reasoning_4,
-                        tokens: tokens_2,
-                        truncated: truncated_3,
-                    } = await requestOfflineAssistantReplyWithCotValidation(
-                        requestContext_3,
-                        streamingBubble_4,
-                        {
-                            requestReasoning: true,
-                        },
-                    ),
-                    slice_1731 = messages_16.slice(),
-                    options_1732 = {
-                        ...slice_1731[targetIndex],
-                        content: splitOfflineAutoImageMarker(content_27).content,
-                        reasoning: reasoning_4 || undefined,
-                        tokens: tokens_2,
-                        timestamp: timestamp_6,
-                        updatedAt: new Date().toISOString(),
-                        generationState: truncated_3 ? 'truncated' : undefined,
-                        continuationState: truncated_3 ? 'available' : undefined,
-                        generationError: truncated_3 ? 'stream_truncated' : undefined,
-                    };
+                        requestReasoning: true,
+                    },
+                );
+                const slice_1731 = messages_16.slice();
+                const options_1732 = {
+                    ...slice_1731[targetIndex],
+                    content: splitOfflineAutoImageMarker(content_27).content,
+                    ttsAudioAssets: [],
+                    reasoning: reasoning_4 || undefined,
+                    tokens: tokens_2,
+                    timestamp: timestamp_6,
+                    updatedAt: new Date().toISOString(),
+                    generationState: truncated_3 ? 'truncated' : undefined,
+                    continuationState: truncated_3 ? 'available' : undefined,
+                    generationError: truncated_3 ? 'stream_truncated' : undefined,
+                };
                 slice_1731[targetIndex] = options_1732;
-                const scene_712 = splitOfflineAutoImageMarker(content_27).scene,
-                    filter_713 = slice_1731.filter(
+                const scene_712 = splitOfflineAutoImageMarker(content_27).scene;
+                const filter_713 = slice_1731.filter(
                         (value_715, value_716) =>
                             value_716 === targetIndex ||
                             String(value_715.sourceMessageId || '') !== String(messageId_8),
-                    ),
-                    value_714 = await persistOfflineMessages(activeFriend_44, filter_713, {
+                    );
+                const value_714 = await persistOfflineMessages(activeFriend_44, filter_713, {
                         resetMessageIds: [messageId_8],
                     });
+                await _value3(originalMessage.ttsAudioAssets);
                 if (scene_712)
                     await generateOfflineAutoImage(
                         activeFriend_44,
@@ -8314,7 +8693,8 @@ Char: ` +
             }
         }
         const value_328 = async () => {
-            closeSheet();
+            closeSheet.close();
+            _value4();
             const chatView = document.getElementById('offline-chat-view');
             if (chatView) {
                 const offlineChatInputAreaElement = chatView.querySelector(
@@ -8355,14 +8735,14 @@ Char: ` +
                     value_733.type === 'offline_invite',
             );
             if (!result_726 || result_726.inviteStatus !== 'pending') return false;
-            const now_727 = Date.now(),
-                needsNewSession_2 =
+            const now_727 = Date.now();
+            const needsNewSession_2 =
                     activeFriend_27_2.offlineMeetingActive !== true ||
-                    !activeFriend_27_2.offlineCurrentSessionId,
-                offlineCurrentSessionId_3 = needsNewSession_2
+                    !activeFriend_27_2.offlineCurrentSessionId;
+            const offlineCurrentSessionId_3 = needsNewSession_2
                     ? createOfflineChatId('offline-session')
-                    : activeFriend_27_2.offlineCurrentSessionId,
-                value_730 = await commitSheetFriendChange(
+                    : activeFriend_27_2.offlineCurrentSessionId;
+            const value_730 = await commitSheetFriendChange(
                     value_724,
                     (targetFriend_12_2) => {
                         const result_735 = (
@@ -8396,21 +8776,17 @@ Char: ` +
                     },
                 );
             if (!value_730) return false;
-            const friendById_731 = window.imApp?.getFriendById?.(value_724),
-                result_732 = friendById_731?.messages?.find(
+            const friendById_731 = window.imApp?.getFriendById?.(value_724);
+            const result_732 = friendById_731?.messages?.find(
                     (value_737) => String(value_737.id) === String(value_725),
                 );
             if (result_732?.inviteStatus !== 'accepted') return false;
             try {
-                return (await value_328(), true);
+                await value_328();
+                return true;
             } catch (value_738) {
-                return (
-                    console.error(
-                        '[iMessage] failed to open accepted offline invitation',
-                        value_738,
-                    ),
-                    false
-                );
+                console.error('[iMessage] failed to open accepted offline invitation', value_738);
+                return false;
             }
         };
         const OFFLINE_LEGACY_PROMPT_ID_BY_NAME = {
@@ -8444,8 +8820,8 @@ Char: ` +
                 'cot-语言检查': 'cot_language_check',
                 'cot-输出审查': 'cot_output_audit',
                 COT后: 'cot_after',
-            },
-            createOfflineDefaultPrompts = () => [
+            };
+        const createOfflineDefaultPrompts = () => [
                 {
                     id: 'role_identity',
                     name: '身份定义',
@@ -8847,8 +9223,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                     editable: true,
                     deletable: false,
                 },
-            ],
-            cloneOfflinePrompt = (defaultPrompt) => ({
+            ];
+        const cloneOfflinePrompt = (defaultPrompt) => ({
                 id: defaultPrompt.id,
                 name: defaultPrompt.name,
                 enabled: defaultPrompt.alwaysEnabled ? true : defaultPrompt.enabled !== false,
@@ -8862,15 +9238,15 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                 deletable: !!defaultPrompt.deletable,
                 alwaysEnabled: !!defaultPrompt.alwaysEnabled,
                 presetVersion: Math.max(0, Number(defaultPrompt.presetVersion) || 0),
-            }),
-            slugOfflinePromptName = (name_3) =>
+            });
+        const slugOfflinePromptName = (name_3) =>
                 String(name_3 || 'custom')
                     .trim()
                     .toLowerCase()
                     .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
                     .replace(/^-+|-+$/g, '')
-                    .slice(0, 32) || 'custom',
-            orderOfflinePromptsForHistoryAnchor = (value_1745) => {
+                    .slice(0, 32) || 'custom';
+        const orderOfflinePromptsForHistoryAnchor = (value_1745) => {
                 const source_4 = Array.isArray(value_1745) ? value_1745 : [],
                     canonicalIds = new Set(OFFLINE_CHAT_PROMPT_ORDER),
                     builtInById = new Map(),
@@ -8899,8 +9275,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                     }),
                     ordered
                 );
-            },
-            moveOfflineRecapBeforeFormatRules = (prompts_4) => {
+            };
+        const moveOfflineRecapBeforeFormatRules = (prompts_4) => {
                 const ordered_2 = Array.isArray(prompts_4) ? prompts_4.slice() : [],
                     recapIndex = ordered_2.findIndex(
                         (prompt_7) => prompt_7?.id === 'offline_recap_haru',
@@ -8915,8 +9291,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                         (value_1760) => value_1760?.id === 'format_rules',
                     );
                 return (ordered_2.splice(nextFormatIndex, 0, recapPrompt), ordered_2);
-            },
-            normalizeOfflinePrompts = (value_1761) => {
+            };
+        const normalizeOfflinePrompts = (value_1761) => {
                 const defaults = createOfflineDefaultPrompts(),
                     defaultById = new Map(defaults.map((prompt_8) => [prompt_8.id, prompt_8])),
                     source_5 = Array.isArray(value_1761) ? value_1761 : [];
@@ -9113,22 +9489,22 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                 return recapOrderVersion >= 2
                     ? orderedPrompts
                     : moveOfflineRecapBeforeFormatRules(orderedPrompts);
-            },
-            serializeOfflinePrompts = (prompts_5) =>
-                JSON.stringify((prompts_5 || []).map((prompt_15) => cloneOfflinePrompt(prompt_15))),
-            value_335 = (value_1801) =>
+            };
+        const serializeOfflinePrompts = (prompts_5) =>
+                JSON.stringify((prompts_5 || []).map((prompt_15) => cloneOfflinePrompt(prompt_15)));
+        const value_335 = (value_1801) =>
                 offlineRegexEngine
                     ? offlineRegexEngine.normalizeTextReplacementRules(value_1801)
-                    : [],
-            value_336 = (value_1802) =>
-                offlineRegexEngine ? offlineRegexEngine.normalizeHtmlTemplateRules(value_1802) : [],
-            value_337_2 = (value_1803) => JSON.stringify(value_336(value_1803));
-        let value_338 = null,
-            value_339 = null,
-            value_340 = null;
+                    : [];
+        const value_336 = (value_1802) =>
+                offlineRegexEngine ? offlineRegexEngine.normalizeHtmlTemplateRules(value_1802) : [];
+        const value_337_2 = (value_1803) => JSON.stringify(value_336(value_1803));
+        let value_338 = null;
+        let value_339 = null;
+        let value_340 = null;
         const createOfflinePromptPresetId = () =>
-                'offline-prompts-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
-            normalizeOfflinePromptPresets_2 = (value_1804) => {
+                'offline-prompts-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+        const normalizeOfflinePromptPresets_2 = (value_1804) => {
                 const items_1805 = [],
                     value_1806 = new Set(),
                     usedNames = new Set();
@@ -9160,8 +9536,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                     }),
                     items_1805
                 );
-            },
-            value_343_2 = (value_1811) =>
+            };
+        const value_343_2 = (value_1811) =>
                 JSON.stringify(
                     normalizeOfflinePromptPresets_2(value_1811).map((value_1812) => ({
                         id: value_1812.id,
@@ -9170,16 +9546,16 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                         textReplacementRules: value_335(value_1812.textReplacementRules),
                         htmlTemplateRules: value_336(value_1812.htmlTemplateRules),
                     })),
-                ),
-            value_344 = (value_1813, value_1814 = 0) =>
+                );
+        const value_344 = (value_1813, value_1814 = 0) =>
                 String(
                     value_1813?.nickname ||
                         value_1813?.realName ||
                         value_1813?.name ||
                         value_1813?.groupName ||
                         '角色 ' + (value_1814 + 1),
-                ).trim() || '角色 ' + (value_1814 + 1),
-            value_345 = (baseName, value_1816) => {
+                ).trim() || '角色 ' + (value_1814 + 1);
+        const value_345 = (baseName, value_1816) => {
                 const cleanBase =
                     String(baseName || '迁移提示词')
                         .trim()
@@ -9190,8 +9566,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                     value_1818 = (cleanBase + ' ' + count_1819++).slice(0, 40);
                 return (value_1816.add(value_1818.toLocaleLowerCase()), value_1818);
             };
-        let legacyOfflinePromptCleanupPromise = null,
-            offlinePromptMigrationSavePromise = null;
+        let legacyOfflinePromptCleanupPromise = null;
+        let offlinePromptMigrationSavePromise = null;
         const scheduleLegacyOfflinePromptCleanup = () => {
                 if (offlinePromptMigrationSavePromise) return;
                 const legacyFriends = (
@@ -9218,8 +9594,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                 )['finally'](() => {
                     legacyOfflinePromptCleanupPromise = null;
                 });
-            },
-            persistGlobalOfflinePromptState = async ({
+            };
+        const persistGlobalOfflinePromptState = async ({
                 prompts: prompts_6,
                 presets: presets_3,
                 activePresetId: activePresetId_2,
@@ -9254,8 +9630,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                 window.imData.offlineHtmlTemplateRules = offlineHtmlTemplateRules_2;
                 if (window.imApp?.saveImessageUiState) await window.imApp.saveImessageUiState();
                 return (scheduleLegacyOfflinePromptCleanup(), offlinePrompts_2);
-            },
-            ensureGlobalOfflinePrompts = (preferredFriend = null) => {
+            };
+        const ensureGlobalOfflinePrompts = (preferredFriend = null) => {
                 if (!window.imData.offlinePromptsInitialized) {
                     const legacyFriends_2 = (
                             Array.isArray(window.imData.friends) ? window.imData.friends : []
@@ -9338,8 +9714,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                     ) && (window.imData.offlinePromptActivePresetId = '');
                 }
                 return (scheduleLegacyOfflinePromptCleanup(), window.imData.offlinePrompts);
-            },
-            persistOfflinePrompts = async (prompts_9, value_1853 = {}) =>
+            };
+        const persistOfflinePrompts = async (prompts_9, value_1853 = {}) =>
                 persistGlobalOfflinePromptState({
                     prompts: prompts_9,
                     presets: value_1853.presets ?? window.imData.offlinePromptPresets,
@@ -9349,8 +9725,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                         window.imData.offlineTextReplacementRules,
                     htmlTemplateRules:
                         value_1853.htmlTemplateRules ?? window.imData.offlineHtmlTemplateRules,
-                }),
-            scheduleOfflinePromptsPersist = (value_1854) => {
+                });
+        const scheduleOfflinePromptsPersist = (value_1854) => {
                 const offlinePrompts_3 = normalizeOfflinePrompts(value_1854);
                 window.imData.offlinePrompts = offlinePrompts_3;
                 window.imData.offlinePromptActivePresetId = '';
@@ -9377,8 +9753,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                         window.imApp.saveImessageUiState?.()),
                     window.imApp.applyOfflineChatTheme()
                 );
-            },
-            createCustomOfflinePrompt = () => ({
+            };
+        const createCustomOfflinePrompt = () => ({
                 id: 'custom-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
                 name: '自定义条目',
                 enabled: true,
@@ -9390,8 +9766,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                 editable: true,
                 deletable: true,
                 alwaysEnabled: false,
-            }),
-            value_348 = (value_1858) => {
+            });
+        const value_348 = (value_1858) => {
                 const value_24_2 = Number(value_1858);
                 if (!Number.isFinite(value_24_2) || value_24_2 <= 0) return '';
                 const canonicalIds_2 = new Date(value_24_2),
@@ -9407,8 +9783,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                     ':' +
                     value_1861(canonicalIds_2.getMinutes())
                 );
-            },
-            formatOfflineHistoryForPrompt = (value_742, value_1864, value_1865) => {
+            };
+        const formatOfflineHistoryForPrompt = (value_742, value_1864, value_1865) => {
                 const items_1866 = Array.isArray(value_742) ? value_742 : [];
                 return items_1866
                     .slice(-60)
@@ -9422,8 +9798,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                     })
                     .filter((value_1870) => value_1870.trim()).join(`
 `);
-            },
-            getOfflineWorldBookFriend = (friend_17) => {
+            };
+        const getOfflineWorldBookFriend = (friend_17) => {
                 const boundIds = [
                     ...(Array.isArray(friend_17?.boundBooks) ? friend_17.boundBooks : []),
                     ...(Array.isArray(friend_17?.worldbooks) ? friend_17.worldbooks : []),
@@ -9432,8 +9808,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                     ...(friend_17 || {}),
                     boundBooks: Array.from(new Set(boundIds)),
                 };
-            },
-            value_351_2 = async (value_1873, value_1874) => {
+            };
+        const value_351_2 = async (value_1873, value_1874) => {
                 const value_350_1875 = getOfflineWorldBookFriend(value_1873),
                     getter =
                         window.imApp?.getWorldBookContextForFriendByPosition ||
@@ -9461,8 +9837,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                     beforeRole: beforeRole_2,
                     afterRole: afterRole_2,
                 };
-            },
-            value_352_2 = async (value_1883, value_1884, userName_10) => {
+            };
+        const value_352_2 = async (value_1883, value_1884, userName_10) => {
                 if (
                     !value_1883 ||
                     value_1883.type !== 'group' ||
@@ -9600,8 +9976,8 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                           `
 </cross_group_memories>`
                     : '';
-            },
-            value_353_2 = ({
+            };
+        const value_353_2 = ({
                 activeFriend: contact_757,
                 currentUserState: currentUserState_6,
                 userName: userName_8,
@@ -9713,8 +10089,8 @@ Persona: ` +
 </recent_context>
 </data_zone>`
                 );
-            },
-            isOfflineMemoryEntryTriggered = (entry_5, value_1932) => {
+            };
+        const isOfflineMemoryEntryTriggered = (entry_5, value_1932) => {
                 if (!entry_5) return false;
                 const text_11 = String(value_1932 || ''),
                     values_2 = [
@@ -9729,8 +10105,8 @@ Persona: ` +
                 return values_2.some(
                     (value_27_2) => value_27_2.length >= 2 && text_11.includes(value_27_2),
                 );
-            },
-            pickOfflineMemoryEntries = (entries_4, recentText, limit_2) => {
+            };
+        const pickOfflineMemoryEntries = (entries_4, recentText, limit_2) => {
                 const cleanEntries = Array.isArray(entries_4)
                     ? entries_4.filter(
                           (entry_6) =>
@@ -9747,8 +10123,8 @@ Persona: ` +
                     isOfflineMemoryEntryTriggered(entry_7, recentText),
                 );
                 return (triggered.length > 0 ? triggered : cleanEntries).slice(-limit_2);
-            },
-            value_355_2 = (friend_18, recentText_2) => {
+            };
+        const value_355_2 = (friend_18, recentText_2) => {
                 const normalizedFriend = window.imApp?.normalizeFriendData
                         ? window.imApp.normalizeFriendData(friend_18 || {})
                         : friend_18 || {},
@@ -9896,8 +10272,8 @@ Persona: ` +
                         `
 </character_memory_system>`
                 );
-            },
-            value_356 = async (value_1954, value_1955 = {}) => {
+            };
+        const value_356 = async (value_1954, value_1955 = {}) => {
                 if (!offlineRegexEngine) return [];
                 value_339 && (clearTimeout(value_339), (value_339 = null));
                 const textReplacementRules_3 = value_335(value_1954);
@@ -9920,8 +10296,8 @@ Persona: ` +
                         renderOfflineCurrentMessages(currentActiveFriend_1957);
                 }
                 return textReplacementRules_3;
-            },
-            value_357_2 = (value_1959) => {
+            };
+        const value_357_2 = (value_1959) => {
                 if (!offlineRegexEngine) return;
                 const offlineTextReplacementRules_3 = value_335(value_1959);
                 window.imData.offlineTextReplacementRules = offlineTextReplacementRules_3;
@@ -9933,16 +10309,16 @@ Persona: ` +
                         window.showToast?.('线下文字替换保存失败');
                     });
                 }, 350);
-            },
-            getOfflineRegexValidationError = (value_1962) => {
+            };
+        const getOfflineRegexValidationError = (value_1962) => {
                 if (!offlineRegexEngine) return '正则引擎未加载';
                 const validateTextReplacementRule_1963 =
                     offlineRegexEngine.validateTextReplacementRule(value_1962);
                 return validateTextReplacementRule_1963.valid
                     ? ''
                     : validateTextReplacementRule_1963.error;
-            },
-            value_359 = (element_1964) => {
+            };
+        const value_359 = (element_1964) => {
                 const scripts = value_214(),
                     element_1966 = document.createElement('section');
                 element_1966.className =
@@ -10202,8 +10578,8 @@ Persona: ` +
                 });
                 element_1966.appendChild(element_1968);
                 element_1964.appendChild(element_1966);
-            },
-            value_360 = async (value_1997, value_1998 = {}) => {
+            };
+        const value_360 = async (value_1997, value_1998 = {}) => {
                 if (!offlineRegexEngine) return [];
                 value_340 && (clearTimeout(value_340), (value_340 = null));
                 const htmlTemplateRules_3 = value_336(value_1997);
@@ -10225,8 +10601,8 @@ Persona: ` +
                         renderOfflineCurrentMessages(currentActiveFriend_2000);
                 }
                 return htmlTemplateRules_3;
-            },
-            value_361_2 = (value_2002) => {
+            };
+        const value_361_2 = (value_2002) => {
                 if (!offlineRegexEngine) return;
                 const offlineHtmlTemplateRules_3 = value_336(value_2002);
                 window.imData.offlineHtmlTemplateRules = offlineHtmlTemplateRules_3;
@@ -10238,8 +10614,8 @@ Persona: ` +
                         window.showToast?.('线下 HTML 模板保存失败');
                     });
                 }, 350);
-            },
-            getOfflineRegexValidationError_2 = (value_2005) => {
+            };
+        const getOfflineRegexValidationError_2 = (value_2005) => {
                 if (!offlineRegexEngine) return '正则引擎未加载';
                 const validateHtmlTemplateRule_2006 =
                     offlineRegexEngine.validateHtmlTemplateRule(value_2005);
@@ -10248,8 +10624,8 @@ Persona: ` +
                 if (!value_219(validateHtmlTemplateRule_2006.rule.html).trim())
                     return 'HTML 模板不包含可用内容';
                 return '';
-            },
-            value_363 = (element_2007) => {
+            };
+        const value_363 = (element_2007) => {
                 const scripts_2 = value_213(),
                     element_2009 = document.createElement('section');
                 element_2009.className = 'offline-html-template-section';
@@ -10489,8 +10865,8 @@ Persona: ` +
                 });
                 element_2009.appendChild(element_2011);
                 element_2007.appendChild(element_2009);
-            },
-            value_364 = (listEl_4) => {
+            };
+        const value_364 = (listEl_4) => {
                 if (!listEl_4) return;
                 listEl_4.innerHTML = '';
                 if (!offlineRegexEngine) {
@@ -10499,58 +10875,57 @@ Persona: ` +
                 }
                 value_359(listEl_4);
                 value_363(listEl_4);
-            },
-            renderOfflineChatSettingsEditor = (listEl, activeFriend_46) => {
-                listEl.innerHTML = '';
-                const streamRow = document.createElement('div');
-                streamRow.className = 'offline-settings-streaming';
-                streamRow.innerHTML = `
+            };
+        const renderOfflineChatSettingsEditor = (listEl, activeFriend_46) => {
+            listEl.innerHTML = '';
+            const streamRow = document.createElement('div');
+            streamRow.className = 'offline-settings-streaming';
+            streamRow.innerHTML = `
                 <div class="offline-settings-worldbook-main">
                     <i class="fas fa-bolt"></i>
                     <span><strong>流式传输</strong><small>STREAM RESPONSE</small></span>
                 </div>
             `;
-                const streamToggle = document.createElement('label');
-                streamToggle.className = 'toggle-switch';
-                streamToggle.setAttribute('aria-label', '线下流式传输');
-                const streamCheckbox = document.createElement('input');
-                streamCheckbox.type = 'checkbox';
-                streamCheckbox.checked = activeFriend_46.offlineStreamEnabled !== false;
-                streamCheckbox.addEventListener('change', async () => {
-                    await commitSheetFriendChange(
-                        activeFriend_46.id,
-                        (targetFriend_16) => {
-                            targetFriend_16.offlineStreamEnabled = streamCheckbox.checked;
-                        },
-                        {
-                            silent: true,
-                            metaOnly: true,
-                        },
-                    );
-                });
-                const element_818 = document.createElement('span');
-                element_818.className = 'slider';
-                streamToggle.append(streamCheckbox, element_818);
-                streamRow.appendChild(streamToggle);
-                listEl.appendChild(streamRow);
-                if (activeFriend_46.type === 'char') {
-                    const autoImageRow = document.createElement('div');
-                    autoImageRow.className =
-                        'offline-settings-streaming offline-settings-auto-image';
-                    autoImageRow.innerHTML = `
+            const streamToggle = document.createElement('label');
+            streamToggle.className = 'toggle-switch';
+            streamToggle.setAttribute('aria-label', '线下流式传输');
+            const streamCheckbox = document.createElement('input');
+            streamCheckbox.type = 'checkbox';
+            streamCheckbox.checked = activeFriend_46.offlineStreamEnabled !== false;
+            streamCheckbox.addEventListener('change', async () => {
+                await commitSheetFriendChange(
+                    activeFriend_46.id,
+                    (targetFriend_16) => {
+                        targetFriend_16.offlineStreamEnabled = streamCheckbox.checked;
+                    },
+                    {
+                        silent: true,
+                        metaOnly: true,
+                    },
+                );
+            });
+            const element_818 = document.createElement('span');
+            element_818.className = 'slider';
+            streamToggle.append(streamCheckbox, element_818);
+            streamRow.appendChild(streamToggle);
+            listEl.appendChild(streamRow);
+            if (activeFriend_46.type === 'char') {
+                const autoImageRow = document.createElement('div');
+                autoImageRow.className = 'offline-settings-streaming offline-settings-auto-image';
+                autoImageRow.innerHTML = `
                     <div class="offline-settings-worldbook-main">
                         <i class="fas fa-wand-magic-sparkles"></i>
                         <span><strong>线下自动生图</strong><small>按剧情决定是否生成；复用线上生图提示词配置</small></span>
                     </div>
                 `;
-                    const autoImageToggle = document.createElement('label');
-                    autoImageToggle.className = 'toggle-switch';
-                    autoImageToggle.setAttribute('aria-label', '线下自动生图');
-                    const autoImageCheckbox = document.createElement('input');
-                    autoImageCheckbox.type = 'checkbox';
-                    autoImageCheckbox.checked = activeFriend_46.offlineAutoImageGeneration === true;
-                    autoImageCheckbox.addEventListener('change', async () => {
-                        const saved_14 = await commitSheetFriendChange(
+                const autoImageToggle = document.createElement('label');
+                autoImageToggle.className = 'toggle-switch';
+                autoImageToggle.setAttribute('aria-label', '线下自动生图');
+                const autoImageCheckbox = document.createElement('input');
+                autoImageCheckbox.type = 'checkbox';
+                autoImageCheckbox.checked = activeFriend_46.offlineAutoImageGeneration === true;
+                autoImageCheckbox.addEventListener('change', async () => {
+                    const saved_14 = await commitSheetFriendChange(
                             activeFriend_46.id,
                             (targetFriend_17) => {
                                 targetFriend_17.offlineAutoImageGeneration =
@@ -10561,60 +10936,56 @@ Persona: ` +
                                 metaOnly: true,
                             },
                         );
-                        !saved_14 &&
-                            ((autoImageCheckbox.checked = !autoImageCheckbox.checked),
-                            window.showToast?.('线下自动生图设置保存失败'));
-                    });
-                    const element_829 = document.createElement('span');
-                    element_829.className = 'slider';
-                    autoImageToggle.append(autoImageCheckbox, element_829);
-                    autoImageRow.appendChild(autoImageToggle);
-                    listEl.appendChild(autoImageRow);
-                }
-                const wbBtnDiv = document.createElement('div');
-                wbBtnDiv.className = 'offline-settings-worldbook';
-                wbBtnDiv.innerHTML =
-                    `
-                <div class="offline-settings-worldbook-main">
-                    <i class="fas fa-book"></i>
-                    <span><strong>挂载世界书</strong><small>WORLD BOOK</small></span>
-                </div>
-                <div class="offline-settings-worldbook-meta">
-                    <span id="offline-chat-wb-count">` +
-                    (activeFriend_46.worldbooks || activeFriend_46.boundBooks || []).length +
-                    ` 项</span>
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            `;
-                wbBtnDiv.addEventListener('click', () => {
-                    const currentIds =
-                            activeFriend_46.worldbooks || activeFriend_46.boundBooks || [],
-                        handleSelection = (worldbooks_2) => {
-                            commitSheetFriendChange(
-                                activeFriend_46.id,
-                                (targetFriend_18) => {
-                                    targetFriend_18.worldbooks = worldbooks_2;
-                                },
-                                {
-                                    silent: true,
-                                    metaOnly: true,
-                                },
-                            );
-                            const countSpan = document.getElementById('offline-chat-wb-count');
-                            if (countSpan) countSpan.textContent = worldbooks_2.length + ' 项';
-                        };
-                    if (window.renderWorldBookSelector)
-                        window.renderWorldBookSelector(currentIds, handleSelection);
-                    else
-                        window.renderLegacyWorldBookSelector &&
-                            window.renderLegacyWorldBookSelector(currentIds, handleSelection);
+                    !saved_14 &&
+                        ((autoImageCheckbox.checked = !autoImageCheckbox.checked),
+                        window.showToast?.('线下自动生图设置保存失败'));
                 });
-                listEl.appendChild(wbBtnDiv);
-                let prompts_8 = ensureGlobalOfflinePrompts(activeFriend_46),
-                    presets_5 = normalizeOfflinePromptPresets_2(window.imData.offlinePromptPresets),
-                    promptPresetSelect = null,
-                    deletePromptPresetBtn = null;
-                const refreshPromptPresetSelect = () => {
+                const element_829 = document.createElement('span');
+                element_829.className = 'slider';
+                autoImageToggle.append(autoImageCheckbox, element_829);
+                autoImageRow.appendChild(autoImageToggle);
+                listEl.appendChild(autoImageRow);
+            }
+            const wbBtnDiv = document.createElement('div');
+            wbBtnDiv.className = 'offline-settings-worldbook';
+            wbBtnDiv.innerHTML =
+                '\n                <div class="offline-settings-worldbook-main">\n                    <i class="fas fa-book"></i>\n                    <span><strong>挂载世界书</strong><small>WORLD BOOK</small></span>\n                </div>\n                <div class="offline-settings-worldbook-meta">\n                    <span id="offline-chat-wb-count">' +
+                (window.getVisibleWorldBookMountIds?.(
+                    activeFriend_46.worldbooks || activeFriend_46.boundBooks || [],
+                ).length || 0) +
+                ' 项</span>\n                    <i class="fas fa-chevron-right"></i>\n                </div>\n            ';
+            wbBtnDiv.addEventListener('click', () => {
+                const currentIds =
+                            activeFriend_46.worldbooks || activeFriend_46.boundBooks || [];
+                const handleSelection = (worldbooks_2) => {
+                    commitSheetFriendChange(
+                        activeFriend_46.id,
+                        (targetFriend_18) => {
+                            targetFriend_18.worldbooks = worldbooks_2;
+                        },
+                        {
+                            silent: true,
+                            metaOnly: true,
+                        },
+                    );
+                    const countSpan = document.getElementById('offline-chat-wb-count');
+                    if (countSpan)
+                        countSpan.textContent =
+                            (window.getVisibleWorldBookMountIds?.(worldbooks_2).length || 0) +
+                            ' 项';
+                };
+                if (window.renderWorldBookSelector)
+                    window.renderWorldBookSelector(currentIds, handleSelection);
+                else
+                    window.renderLegacyWorldBookSelector &&
+                        window.renderLegacyWorldBookSelector(currentIds, handleSelection);
+            });
+            listEl.appendChild(wbBtnDiv);
+            let prompts_8 = ensureGlobalOfflinePrompts(activeFriend_46);
+            let presets_5 = normalizeOfflinePromptPresets_2(window.imData.offlinePromptPresets);
+            let promptPresetSelect = null;
+            let deletePromptPresetBtn = null;
+            const refreshPromptPresetSelect = () => {
                         if (!promptPresetSelect) return;
                         promptPresetSelect.innerHTML =
                             '<option value="">自定义提示词</option>' +
@@ -10635,53 +11006,53 @@ Persona: ` +
                             : '';
                         if (deletePromptPresetBtn)
                             deletePromptPresetBtn.disabled = !promptPresetSelect.value;
-                    },
-                    markPromptWorkCopyCustom = () => {
+                    };
+            const markPromptWorkCopyCustom = () => {
                         window.imData.offlinePromptActivePresetId = '';
                         if (promptPresetSelect) promptPresetSelect.value = '';
                         if (deletePromptPresetBtn) deletePromptPresetBtn.disabled = true;
-                    },
-                    promptPresetCard = document.createElement('section');
-                promptPresetCard.className = 'offline-theme-card offline-prompt-preset-card';
-                const promptPresetHeading = document.createElement('div');
-                promptPresetHeading.className = 'offline-theme-heading';
-                promptPresetHeading.innerHTML =
-                    '<div><strong>提示词预设</strong><span>PROMPT PRESETS</span></div><p>所有角色和群聊共用当前线下提示词。</p>';
-                promptPresetCard.appendChild(promptPresetHeading);
-                const element_2056 = document.createElement('div');
-                element_2056.className = 'offline-theme-preset-controls';
-                promptPresetSelect = document.createElement('select');
-                promptPresetSelect.className = 'offline-theme-preset-select';
-                promptPresetSelect.setAttribute('aria-label', '选择全局线下提示词预设');
-                deletePromptPresetBtn = document.createElement('button');
-                deletePromptPresetBtn.type = 'button';
-                deletePromptPresetBtn.className = 'offline-theme-preset-delete';
-                deletePromptPresetBtn.textContent = '删除';
-                promptPresetSelect.addEventListener('change', async () => {
-                    const preset_6 = presets_5.find(
+                    };
+            const promptPresetCard = document.createElement('section');
+            promptPresetCard.className = 'offline-theme-card offline-prompt-preset-card';
+            const promptPresetHeading = document.createElement('div');
+            promptPresetHeading.className = 'offline-theme-heading';
+            promptPresetHeading.innerHTML =
+                '<div><strong>提示词预设</strong><span>PROMPT PRESETS</span></div><p>所有角色和群聊共用当前线下提示词。</p>';
+            promptPresetCard.appendChild(promptPresetHeading);
+            const element_2056 = document.createElement('div');
+            element_2056.className = 'offline-theme-preset-controls';
+            promptPresetSelect = document.createElement('select');
+            promptPresetSelect.className = 'offline-theme-preset-select';
+            promptPresetSelect.setAttribute('aria-label', '选择全局线下提示词预设');
+            deletePromptPresetBtn = document.createElement('button');
+            deletePromptPresetBtn.type = 'button';
+            deletePromptPresetBtn.className = 'offline-theme-preset-delete';
+            deletePromptPresetBtn.textContent = '删除';
+            promptPresetSelect.addEventListener('change', async () => {
+                const preset_6 = presets_5.find(
                         (value_2079) => value_2079.id === promptPresetSelect.value,
                     );
-                    if (!preset_6) {
-                        await persistGlobalOfflinePromptState({
-                            prompts: prompts_8,
-                            presets: presets_5,
-                            activePresetId: '',
-                        });
-                        refreshPromptPresetSelect();
-                        return;
-                    }
-                    prompts_8 = preset_6.prompts.map(cloneOfflinePrompt);
+                if (!preset_6) {
                     await persistGlobalOfflinePromptState({
                         prompts: prompts_8,
                         presets: presets_5,
-                        activePresetId: preset_6.id,
-                        textReplacementRules: preset_6.textReplacementRules,
-                        htmlTemplateRules: preset_6.htmlTemplateRules,
+                        activePresetId: '',
                     });
-                    renderOfflineChatSettingsEditor(listEl, activeFriend_46);
-                    if (window.showToast) window.showToast('已应用提示词预设：' + preset_6.name);
+                    refreshPromptPresetSelect();
+                    return;
+                }
+                prompts_8 = preset_6.prompts.map(cloneOfflinePrompt);
+                await persistGlobalOfflinePromptState({
+                    prompts: prompts_8,
+                    presets: presets_5,
+                    activePresetId: preset_6.id,
+                    textReplacementRules: preset_6.textReplacementRules,
+                    htmlTemplateRules: preset_6.htmlTemplateRules,
                 });
-                const onConfirm_3 = async () => {
+                renderOfflineChatSettingsEditor(listEl, activeFriend_46);
+                if (window.showToast) window.showToast('已应用提示词预设：' + preset_6.name);
+            });
+            const onConfirm_3 = async () => {
                     const selectedId_2 = promptPresetSelect.value;
                     if (!selectedId_2) return;
                     presets_5 = normalizeOfflinePromptPresets_2(
@@ -10695,89 +11066,87 @@ Persona: ` +
                     renderOfflineChatSettingsEditor(listEl, activeFriend_46);
                     if (window.showToast) window.showToast('提示词预设已删除，当前提示词保持不变');
                 };
-                deletePromptPresetBtn.addEventListener('click', () => {
-                    const result_2082 = presets_5.find(
+            deletePromptPresetBtn.addEventListener('click', () => {
+                const result_2082 = presets_5.find(
                         (value_2083) => value_2083.id === promptPresetSelect.value,
                     );
-                    if (!result_2082) return;
-                    window.showCustomModal
-                        ? window.showCustomModal({
-                              title: '删除提示词预设',
-                              message:
-                                  '确定删除“' +
-                                  result_2082.name +
-                                  '”吗？当前已应用的提示词不会被清空。',
-                              confirmText: '删除',
-                              cancelText: '取消',
-                              isDestructive: true,
-                              onConfirm: onConfirm_3,
-                          })
-                        : onConfirm_3();
-                });
-                element_2056.append(promptPresetSelect, deletePromptPresetBtn);
-                promptPresetCard.appendChild(element_2056);
-                const element_2058 = document.createElement('div');
-                element_2058.className = 'offline-theme-save-row';
-                const promptPresetNameInput = document.createElement('input');
-                promptPresetNameInput.type = 'text';
-                promptPresetNameInput.maxLength = 40;
-                promptPresetNameInput.placeholder = '输入提示词预设名称';
-                const savePromptPresetBtn = document.createElement('button');
-                savePromptPresetBtn.type = 'button';
-                savePromptPresetBtn.textContent = '保存预设';
-                savePromptPresetBtn.addEventListener('click', async () => {
-                    const name_5 = promptPresetNameInput.value.trim().slice(0, 40);
-                    if (!name_5) {
-                        if (window.showToast) window.showToast('请先输入提示词预设名称');
-                        promptPresetNameInput.focus();
-                        return;
-                    }
-                    const existing = presets_5.find(
+                if (!result_2082) return;
+                window.showCustomModal
+                    ? window.showCustomModal({
+                          title: '删除提示词预设',
+                          message:
+                              '确定删除“' +
+                              result_2082.name +
+                              '”吗？当前已应用的提示词不会被清空。',
+                          confirmText: '删除',
+                          cancelText: '取消',
+                          isDestructive: true,
+                          onConfirm: onConfirm_3,
+                      })
+                    : onConfirm_3();
+            });
+            element_2056.append(promptPresetSelect, deletePromptPresetBtn);
+            promptPresetCard.appendChild(element_2056);
+            const element_2058 = document.createElement('div');
+            element_2058.className = 'offline-theme-save-row';
+            const promptPresetNameInput = document.createElement('input');
+            promptPresetNameInput.type = 'text';
+            promptPresetNameInput.maxLength = 40;
+            promptPresetNameInput.placeholder = '输入提示词预设名称';
+            const savePromptPresetBtn = document.createElement('button');
+            savePromptPresetBtn.type = 'button';
+            savePromptPresetBtn.textContent = '保存预设';
+            savePromptPresetBtn.addEventListener('click', async () => {
+                const name_5 = promptPresetNameInput.value.trim().slice(0, 40);
+                if (!name_5) {
+                    if (window.showToast) window.showToast('请先输入提示词预设名称');
+                    promptPresetNameInput.focus();
+                    return;
+                }
+                const existing = presets_5.find(
                             (value_2088) =>
                                 value_2088.name.toLocaleLowerCase() === name_5.toLocaleLowerCase(),
-                        ),
-                        id_8 = existing?.id || createOfflinePromptPresetId(),
-                        nextPreset = {
+                        );
+                const id_8 = existing?.id || createOfflinePromptPresetId();
+                const nextPreset = {
                             id: id_8,
                             name: name_5,
                             prompts: normalizeOfflinePrompts(prompts_8),
                             textReplacementRules: value_214(),
                             htmlTemplateRules: value_213(),
                         };
-                    presets_5 = normalizeOfflinePromptPresets_2(
-                        existing
-                            ? presets_5.map((preset_8) =>
-                                  preset_8.id === id_8 ? nextPreset : preset_8,
-                              )
-                            : presets_5.concat(nextPreset),
-                    );
-                    await persistGlobalOfflinePromptState({
-                        prompts: prompts_8,
-                        presets: presets_5,
-                        activePresetId: id_8,
-                    });
-                    promptPresetNameInput.value = '';
-                    refreshPromptPresetSelect();
-                    if (window.showToast)
-                        window.showToast(
-                            existing
-                                ? '已覆盖提示词预设：' + name_5
-                                : '已保存提示词预设：' + name_5,
-                        );
+                presets_5 = normalizeOfflinePromptPresets_2(
+                    existing
+                        ? presets_5.map((preset_8) =>
+                              preset_8.id === id_8 ? nextPreset : preset_8,
+                          )
+                        : presets_5.concat(nextPreset),
+                );
+                await persistGlobalOfflinePromptState({
+                    prompts: prompts_8,
+                    presets: presets_5,
+                    activePresetId: id_8,
                 });
-                element_2058.append(promptPresetNameInput, savePromptPresetBtn);
-                promptPresetCard.appendChild(element_2058);
-                listEl.appendChild(promptPresetCard);
+                promptPresetNameInput.value = '';
                 refreshPromptPresetSelect();
-                const variableHint = document.createElement('div');
-                variableHint.className = 'offline-settings-variable-hint';
-                variableHint.innerHTML =
-                    '<div class="offline-settings-section-kicker"><strong>可用变量</strong><span>VARIABLES</span></div><div><code>{{user}}</code> 当前 User 名字</div><div><code>{{char}}</code> 单聊为 Char 真名；群聊为全部群成员真名</div>';
-                listEl.appendChild(variableHint);
-                const promptsContainer = document.createElement('div');
-                promptsContainer.className = 'offline-settings-prompts';
-                listEl.appendChild(promptsContainer);
-                const makeIconButton = (value_2090, title_3, disabled_3 = false) => {
+                if (window.showToast)
+                    window.showToast(
+                        existing ? '已覆盖提示词预设：' + name_5 : '已保存提示词预设：' + name_5,
+                    );
+            });
+            element_2058.append(promptPresetNameInput, savePromptPresetBtn);
+            promptPresetCard.appendChild(element_2058);
+            listEl.appendChild(promptPresetCard);
+            refreshPromptPresetSelect();
+            const variableHint = document.createElement('div');
+            variableHint.className = 'offline-settings-variable-hint';
+            variableHint.innerHTML =
+                '<div class="offline-settings-section-kicker"><strong>可用变量</strong><span>VARIABLES</span></div><div><code>{{user}}</code> 当前 User 名字</div><div><code>{{char}}</code> 单聊为 Char 真名；群聊为全部群成员真名</div>';
+            listEl.appendChild(variableHint);
+            const promptsContainer = document.createElement('div');
+            promptsContainer.className = 'offline-settings-prompts';
+            listEl.appendChild(promptsContainer);
+            const makeIconButton = (value_2090, title_3, disabled_3 = false) => {
                     const button_8 = document.createElement('button');
                     return (
                         (button_8.type = 'button'),
@@ -10789,211 +11158,209 @@ Persona: ` +
                         button_8
                     );
                 };
-                prompts_8.forEach((prompt_16, index_9) => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'offline-settings-prompt-item';
-                    const isHistoryAnchor = prompt_16.id === OFFLINE_CHAT_HISTORY_PROMPT_ID;
-                    if (isHistoryAnchor) itemDiv.classList.add('offline-settings-history-anchor');
-                    const topRow = document.createElement('div');
-                    topRow.className = 'offline-settings-prompt-row';
-                    const moveGroup = document.createElement('div');
-                    moveGroup.className = 'offline-settings-move-actions';
-                    const upBtn = makeIconButton('fas fa-arrow-up', '上移', index_9 === 0),
-                        downBtn = makeIconButton(
+            prompts_8.forEach((prompt_16, index_9) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'offline-settings-prompt-item';
+                const isHistoryAnchor = prompt_16.id === OFFLINE_CHAT_HISTORY_PROMPT_ID;
+                if (isHistoryAnchor) itemDiv.classList.add('offline-settings-history-anchor');
+                const topRow = document.createElement('div');
+                topRow.className = 'offline-settings-prompt-row';
+                const moveGroup = document.createElement('div');
+                moveGroup.className = 'offline-settings-move-actions';
+                const upBtn = makeIconButton('fas fa-arrow-up', '上移', index_9 === 0);
+                const downBtn = makeIconButton(
                             'fas fa-arrow-down',
                             '下移',
                             index_9 === prompts_8.length - 1,
                         );
-                    upBtn.addEventListener('click', async (event_13) => {
-                        event_13.stopPropagation();
-                        if (index_9 === 0) return;
-                        const nextPrompts = prompts_8.slice();
-                        [nextPrompts[index_9 - 1], nextPrompts[index_9]] = [
-                            nextPrompts[index_9],
-                            nextPrompts[index_9 - 1],
-                        ];
-                        await persistOfflinePrompts(nextPrompts);
-                        renderOfflineChatSettingsEditor(listEl, activeFriend_46);
-                    });
-                    downBtn.addEventListener('click', async (event_14) => {
-                        event_14.stopPropagation();
-                        if (index_9 >= prompts_8.length - 1) return;
-                        const nextPrompts_2 = prompts_8.slice();
-                        [nextPrompts_2[index_9], nextPrompts_2[index_9 + 1]] = [
-                            nextPrompts_2[index_9 + 1],
-                            nextPrompts_2[index_9],
-                        ];
-                        await persistOfflinePrompts(nextPrompts_2);
-                        renderOfflineChatSettingsEditor(listEl, activeFriend_46);
-                    });
-                    moveGroup.appendChild(upBtn);
-                    moveGroup.appendChild(downBtn);
-                    topRow.appendChild(moveGroup);
-                    const nameWrap = document.createElement('div');
-                    nameWrap.className = 'offline-settings-prompt-name';
-                    if (prompt_16.editable !== false) {
-                        const nameInput = document.createElement('input');
-                        nameInput.type = 'text';
-                        nameInput.value = prompt_16.name || '未命名提示词';
-                        nameInput.className = 'offline-settings-name-input';
-                        nameInput.addEventListener('click', (event_15) =>
-                            event_15.stopPropagation(),
-                        );
-                        nameInput.addEventListener('input', () => {
-                            prompt_16.name = nameInput.value || '未命名提示词';
-                            markPromptWorkCopyCustom();
-                            scheduleOfflinePromptsPersist(prompts_8);
-                        });
-                        nameWrap.appendChild(nameInput);
-                    } else {
-                        const nameLabel = document.createElement('div');
-                        nameLabel.className = 'offline-settings-name-label';
-                        nameLabel.textContent = prompt_16.name || '系统条目';
-                        nameWrap.appendChild(nameLabel);
-                    }
-                    if (prompt_16.systemManaged) {
-                        const managedLabel = document.createElement('div');
-                        managedLabel.className = 'offline-settings-state-label';
-                        managedLabel.textContent = isHistoryAnchor
-                            ? '历史插入位置'
-                            : '系统挂载 · 始终开启';
-                        nameWrap.appendChild(managedLabel);
-                    } else {
-                        if (prompt_16.alwaysEnabled) {
-                            const alwaysLabel = document.createElement('div');
-                            alwaysLabel.className = 'offline-settings-state-label';
-                            alwaysLabel.textContent = '已永久开启';
-                            nameWrap.appendChild(alwaysLabel);
-                        }
-                    }
-                    topRow.appendChild(nameWrap);
-                    const itemDiv_2 = document.createElement('div');
-                    itemDiv_2.className = 'offline-settings-prompt-actions';
-                    let element_2104 = null,
-                        contentDiv_3 = null,
-                        contentDiv_2 = null;
-                    prompt_16.deletable &&
-                        ((element_2104 = makeIconButton('fas fa-trash', '删除')),
-                        element_2104.classList.add('danger'),
-                        element_2104.addEventListener('click', async (event_16) => {
-                            event_16.stopPropagation();
-                            const nextPrompts_3 = prompts_8.filter(
-                                (__3, promptIndex) => promptIndex !== index_9,
-                            );
-                            await persistOfflinePrompts(nextPrompts_3);
-                            renderOfflineChatSettingsEditor(listEl, activeFriend_46);
-                        }));
-                    if (!prompt_16.alwaysEnabled) {
-                        contentDiv_2 = document.createElement('label');
-                        contentDiv_2.className = 'toggle-switch';
-                        contentDiv_2.style.cssText = 'margin:0;';
-                        contentDiv_2.addEventListener('click', (event_2119) =>
-                            event_2119.stopPropagation(),
-                        );
-                        const checkbox = document.createElement('input');
-                        checkbox.type = 'checkbox';
-                        checkbox.checked = !!prompt_16.enabled;
-                        checkbox.addEventListener('change', () => {
-                            prompt_16.enabled = checkbox.checked;
-                            markPromptWorkCopyCustom();
-                            scheduleOfflinePromptsPersist(prompts_8);
-                        });
-                        const element_2118 = document.createElement('span');
-                        element_2118.className = 'slider';
-                        contentDiv_2.appendChild(checkbox);
-                        contentDiv_2.appendChild(element_2118);
-                    }
-                    if (prompt_16.deletable) {
-                        contentDiv_3 = document.createElement('label');
-                        contentDiv_3.className = 'offline-settings-cot-mode-toggle';
-                        contentDiv_3.title = '纳入本轮可见 COT 思考清单';
-                        contentDiv_3.addEventListener('click', (event_2122) =>
-                            event_2122.stopPropagation(),
-                        );
-                        const element_2120 = document.createElement('input');
-                        element_2120.type = 'checkbox';
-                        element_2120.checked = value_15(prompt_16);
-                        element_2120.setAttribute('aria-label', '纳入 COT 思考');
-                        element_2120.addEventListener('change', () => {
-                            prompt_16.cotEnabled = element_2120.checked;
-                            markPromptWorkCopyCustom();
-                            scheduleOfflinePromptsPersist(prompts_8);
-                        });
-                        const element_2121 = document.createElement('span');
-                        element_2121.textContent = 'COT';
-                        contentDiv_3.append(element_2120, element_2121);
-                    }
-                    let contentDiv = null,
-                        setExpanded = null,
-                        expandBtn = null;
-                    if (!isHistoryAnchor) {
-                        contentDiv = document.createElement('div');
-                        contentDiv.className = 'offline-settings-prompt-content';
-                        if (prompt_16.editable !== false) {
-                            const textarea_4 = document.createElement('textarea');
-                            textarea_4.value = prompt_16.content || '';
-                            textarea_4.placeholder = '输入提示词内容...';
-                            textarea_4.className = 'offline-settings-prompt-textarea';
-                            textarea_4.addEventListener('click', (event_17) =>
-                                event_17.stopPropagation(),
-                            );
-                            textarea_4.addEventListener('input', () => {
-                                prompt_16.content = textarea_4.value;
-                                markPromptWorkCopyCustom();
-                                scheduleOfflinePromptsPersist(prompts_8);
-                            });
-                            contentDiv.appendChild(textarea_4);
-                        } else {
-                            const preview = document.createElement('div');
-                            preview.className = 'offline-settings-prompt-preview';
-                            preview.textContent = prompt_16.content || '';
-                            contentDiv.appendChild(preview);
-                        }
-                        expandBtn = makeIconButton('fas fa-chevron-down', '展开提示词');
-                        expandBtn.classList.add('offline-settings-expand-btn');
-                        expandBtn.setAttribute('aria-expanded', 'false');
-                        setExpanded = (expanded_3) => {
-                            contentDiv.style.display = expanded_3 ? 'block' : 'none';
-                            expandBtn.setAttribute('aria-expanded', String(expanded_3));
-                            expandBtn.setAttribute(
-                                'aria-label',
-                                expanded_3 ? '收起提示词' : '展开提示词',
-                            );
-                            expandBtn.title = expanded_3 ? '收起提示词' : '展开提示词';
-                        };
-                        expandBtn.addEventListener('click', (event_18) => {
-                            event_18.stopPropagation();
-                            setExpanded(expandBtn.getAttribute('aria-expanded') !== 'true');
-                        });
-                    }
-                    if (contentDiv_3) itemDiv_2.appendChild(contentDiv_3);
-                    if (element_2104) itemDiv_2.appendChild(element_2104);
-                    if (contentDiv_2) itemDiv_2.appendChild(contentDiv_2);
-                    if (expandBtn) itemDiv_2.appendChild(expandBtn);
-                    topRow.appendChild(itemDiv_2);
-                    topRow.addEventListener('click', (event_19) => {
-                        if (!setExpanded || !expandBtn) return;
-                        if (event_19.target.closest('button, input, textarea, label')) return;
-                        setExpanded(expandBtn.getAttribute('aria-expanded') !== 'true');
-                    });
-                    itemDiv.appendChild(topRow);
-                    if (contentDiv) itemDiv.appendChild(contentDiv);
-                    promptsContainer.appendChild(itemDiv);
-                });
-                promptsContainer.lastElementChild &&
-                    (promptsContainer.lastElementChild.style.borderBottom = 'none');
-                const addBtn = document.createElement('button');
-                addBtn.type = 'button';
-                addBtn.className = 'offline-settings-add-btn';
-                addBtn.innerHTML = '<i class="fas fa-plus"></i><span>增加条目</span>';
-                addBtn.addEventListener('click', async () => {
-                    const nextPrompts_4 = prompts_8.concat(createCustomOfflinePrompt());
-                    await persistOfflinePrompts(nextPrompts_4);
+                upBtn.addEventListener('click', async (event_13) => {
+                    event_13.stopPropagation();
+                    if (index_9 === 0) return;
+                    const nextPrompts = prompts_8.slice();
+                    [nextPrompts[index_9 - 1], nextPrompts[index_9]] = [
+                        nextPrompts[index_9],
+                        nextPrompts[index_9 - 1],
+                    ];
+                    await persistOfflinePrompts(nextPrompts);
                     renderOfflineChatSettingsEditor(listEl, activeFriend_46);
                 });
-                listEl.appendChild(addBtn);
-            },
-            renderOfflineChatSettings = () => {
+                downBtn.addEventListener('click', async (event_14) => {
+                    event_14.stopPropagation();
+                    if (index_9 >= prompts_8.length - 1) return;
+                    const nextPrompts_2 = prompts_8.slice();
+                    [nextPrompts_2[index_9], nextPrompts_2[index_9 + 1]] = [
+                        nextPrompts_2[index_9 + 1],
+                        nextPrompts_2[index_9],
+                    ];
+                    await persistOfflinePrompts(nextPrompts_2);
+                    renderOfflineChatSettingsEditor(listEl, activeFriend_46);
+                });
+                moveGroup.appendChild(upBtn);
+                moveGroup.appendChild(downBtn);
+                topRow.appendChild(moveGroup);
+                const nameWrap = document.createElement('div');
+                nameWrap.className = 'offline-settings-prompt-name';
+                if (prompt_16.editable !== false) {
+                    const nameInput = document.createElement('input');
+                    nameInput.type = 'text';
+                    nameInput.value = prompt_16.name || '未命名提示词';
+                    nameInput.className = 'offline-settings-name-input';
+                    nameInput.addEventListener('click', (event_15) => event_15.stopPropagation());
+                    nameInput.addEventListener('input', () => {
+                        prompt_16.name = nameInput.value || '未命名提示词';
+                        markPromptWorkCopyCustom();
+                        scheduleOfflinePromptsPersist(prompts_8);
+                    });
+                    nameWrap.appendChild(nameInput);
+                } else {
+                    const nameLabel = document.createElement('div');
+                    nameLabel.className = 'offline-settings-name-label';
+                    nameLabel.textContent = prompt_16.name || '系统条目';
+                    nameWrap.appendChild(nameLabel);
+                }
+                if (prompt_16.systemManaged) {
+                    const managedLabel = document.createElement('div');
+                    managedLabel.className = 'offline-settings-state-label';
+                    managedLabel.textContent = isHistoryAnchor
+                        ? '历史插入位置'
+                        : '系统挂载 · 始终开启';
+                    nameWrap.appendChild(managedLabel);
+                } else {
+                    if (prompt_16.alwaysEnabled) {
+                        const alwaysLabel = document.createElement('div');
+                        alwaysLabel.className = 'offline-settings-state-label';
+                        alwaysLabel.textContent = '已永久开启';
+                        nameWrap.appendChild(alwaysLabel);
+                    }
+                }
+                topRow.appendChild(nameWrap);
+                const itemDiv_2 = document.createElement('div');
+                itemDiv_2.className = 'offline-settings-prompt-actions';
+                let element_2104 = null;
+                let contentDiv_3 = null;
+                let contentDiv_2 = null;
+                prompt_16.deletable &&
+                    ((element_2104 = makeIconButton('fas fa-trash', '删除')),
+                    element_2104.classList.add('danger'),
+                    element_2104.addEventListener('click', async (event_16) => {
+                        event_16.stopPropagation();
+                        const nextPrompts_3 = prompts_8.filter(
+                                (__3, promptIndex) => promptIndex !== index_9,
+                            );
+                        await persistOfflinePrompts(nextPrompts_3);
+                        renderOfflineChatSettingsEditor(listEl, activeFriend_46);
+                    }));
+                if (!prompt_16.alwaysEnabled) {
+                    contentDiv_2 = document.createElement('label');
+                    contentDiv_2.className = 'toggle-switch';
+                    contentDiv_2.style.cssText = 'margin:0;';
+                    contentDiv_2.addEventListener('click', (event_2119) =>
+                        event_2119.stopPropagation(),
+                    );
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = !!prompt_16.enabled;
+                    checkbox.addEventListener('change', () => {
+                        prompt_16.enabled = checkbox.checked;
+                        markPromptWorkCopyCustom();
+                        scheduleOfflinePromptsPersist(prompts_8);
+                    });
+                    const element_2118 = document.createElement('span');
+                    element_2118.className = 'slider';
+                    contentDiv_2.appendChild(checkbox);
+                    contentDiv_2.appendChild(element_2118);
+                }
+                if (prompt_16.deletable) {
+                    contentDiv_3 = document.createElement('label');
+                    contentDiv_3.className = 'offline-settings-cot-mode-toggle';
+                    contentDiv_3.title = '纳入本轮可见 COT 思考清单';
+                    contentDiv_3.addEventListener('click', (event_2122) =>
+                        event_2122.stopPropagation(),
+                    );
+                    const element_2120 = document.createElement('input');
+                    element_2120.type = 'checkbox';
+                    element_2120.checked = value_15(prompt_16);
+                    element_2120.setAttribute('aria-label', '纳入 COT 思考');
+                    element_2120.addEventListener('change', () => {
+                        prompt_16.cotEnabled = element_2120.checked;
+                        markPromptWorkCopyCustom();
+                        scheduleOfflinePromptsPersist(prompts_8);
+                    });
+                    const element_2121 = document.createElement('span');
+                    element_2121.textContent = 'COT';
+                    contentDiv_3.append(element_2120, element_2121);
+                }
+                let contentDiv = null;
+                let setExpanded = null;
+                let expandBtn = null;
+                if (!isHistoryAnchor) {
+                    contentDiv = document.createElement('div');
+                    contentDiv.className = 'offline-settings-prompt-content';
+                    if (prompt_16.editable !== false) {
+                        const textarea_4 = document.createElement('textarea');
+                        textarea_4.value = prompt_16.content || '';
+                        textarea_4.placeholder = '输入提示词内容...';
+                        textarea_4.className = 'offline-settings-prompt-textarea';
+                        textarea_4.addEventListener('click', (event_17) =>
+                            event_17.stopPropagation(),
+                        );
+                        textarea_4.addEventListener('input', () => {
+                            prompt_16.content = textarea_4.value;
+                            markPromptWorkCopyCustom();
+                            scheduleOfflinePromptsPersist(prompts_8);
+                        });
+                        contentDiv.appendChild(textarea_4);
+                    } else {
+                        const preview = document.createElement('div');
+                        preview.className = 'offline-settings-prompt-preview';
+                        preview.textContent = prompt_16.content || '';
+                        contentDiv.appendChild(preview);
+                    }
+                    expandBtn = makeIconButton('fas fa-chevron-down', '展开提示词');
+                    expandBtn.classList.add('offline-settings-expand-btn');
+                    expandBtn.setAttribute('aria-expanded', 'false');
+                    setExpanded = (expanded_3) => {
+                        contentDiv.style.display = expanded_3 ? 'block' : 'none';
+                        expandBtn.setAttribute('aria-expanded', String(expanded_3));
+                        expandBtn.setAttribute(
+                            'aria-label',
+                            expanded_3 ? '收起提示词' : '展开提示词',
+                        );
+                        expandBtn.title = expanded_3 ? '收起提示词' : '展开提示词';
+                    };
+                    expandBtn.addEventListener('click', (event_18) => {
+                        event_18.stopPropagation();
+                        setExpanded(expandBtn.getAttribute('aria-expanded') !== 'true');
+                    });
+                }
+                if (contentDiv_3) itemDiv_2.appendChild(contentDiv_3);
+                if (element_2104) itemDiv_2.appendChild(element_2104);
+                if (contentDiv_2) itemDiv_2.appendChild(contentDiv_2);
+                if (expandBtn) itemDiv_2.appendChild(expandBtn);
+                topRow.appendChild(itemDiv_2);
+                topRow.addEventListener('click', (event_19) => {
+                    if (!setExpanded || !expandBtn) return;
+                    if (event_19.target.closest('button, input, textarea, label')) return;
+                    setExpanded(expandBtn.getAttribute('aria-expanded') !== 'true');
+                });
+                itemDiv.appendChild(topRow);
+                if (contentDiv) itemDiv.appendChild(contentDiv);
+                promptsContainer.appendChild(itemDiv);
+            });
+            promptsContainer.lastElementChild &&
+                (promptsContainer.lastElementChild.style.borderBottom = 'none');
+            const addBtn = document.createElement('button');
+            addBtn.type = 'button';
+            addBtn.className = 'offline-settings-add-btn';
+            addBtn.innerHTML = '<i class="fas fa-plus"></i><span>增加条目</span>';
+            addBtn.addEventListener('click', async () => {
+                const nextPrompts_4 = prompts_8.concat(createCustomOfflinePrompt());
+                await persistOfflinePrompts(nextPrompts_4);
+                renderOfflineChatSettingsEditor(listEl, activeFriend_46);
+            });
+            listEl.appendChild(addBtn);
+        };
+        const renderOfflineChatSettings = () => {
                 const listEl_5 = document.getElementById('offline-chat-settings-list'),
                     regexListEl = document.getElementById('offline-chat-regex-list');
                 if (!listEl_5 || !regexListEl) return;
@@ -11031,66 +11398,66 @@ Persona: ` +
                         activateTab(button_9.getAttribute('data-offline-settings-tab'));
                 });
                 activateTab('prompts');
-            },
-            value_365_2 = () => {
-                const sendBtn = document.getElementById('offline-chat-send-btn'),
-                    offlineChatInputElement_2134 = document.getElementById('offline-chat-input'),
-                    attachmentBtn = document.getElementById('offline-chat-attachment-btn'),
-                    actionSheet = document.getElementById('offline-chat-action-sheet'),
-                    actionCancel = document.getElementById('offline-chat-action-cancel'),
-                    offlineChatEpisodeToggleElement = document.getElementById(
+            };
+        const value_365_2 = () => {
+            const sendBtn = document.getElementById('offline-chat-send-btn');
+            const offlineChatInputElement_2134 = document.getElementById('offline-chat-input');
+            const attachmentBtn = document.getElementById('offline-chat-attachment-btn');
+            const actionSheet = document.getElementById('offline-chat-action-sheet');
+            const actionCancel = document.getElementById('offline-chat-action-cancel');
+            const offlineChatEpisodeToggleElement = document.getElementById(
                         'offline-chat-episode-toggle',
-                    ),
-                    clearBtn = document.getElementById('offline-chat-clear-btn'),
-                    endBtn = document.getElementById('offline-chat-end-btn'),
-                    exportTxtBtn = document.getElementById('offline-chat-export-txt-btn'),
-                    offlineChatViewElement_2135 = document.getElementById('offline-chat-view'),
-                    summarySheet_2 = document.getElementById('offline-chat-summary-sheet'),
-                    summaryApiSelect = document.getElementById('offline-summary-api-select'),
-                    summaryPromptInput = document.getElementById('offline-summary-prompt-input'),
-                    summaryStartInput = document.getElementById('offline-summary-start-floor'),
-                    summaryEndInput = document.getElementById('offline-summary-end-floor'),
-                    summaryOnlyBtn = document.getElementById('offline-summary-only-btn'),
-                    summaryEndBtn = document.getElementById('offline-summary-end-btn'),
-                    summaryCancelBtn = document.getElementById('offline-summary-cancel-btn'),
-                    offlineResultPreviewModalElement = document.getElementById(
+                    );
+            const clearBtn = document.getElementById('offline-chat-clear-btn');
+            const endBtn = document.getElementById('offline-chat-end-btn');
+            const exportTxtBtn = document.getElementById('offline-chat-export-txt-btn');
+            const offlineChatViewElement_2135 = document.getElementById('offline-chat-view');
+            const summarySheet_2 = document.getElementById('offline-chat-summary-sheet');
+            const summaryApiSelect = document.getElementById('offline-summary-api-select');
+            const summaryPromptInput = document.getElementById('offline-summary-prompt-input');
+            const summaryStartInput = document.getElementById('offline-summary-start-floor');
+            const summaryEndInput = document.getElementById('offline-summary-end-floor');
+            const summaryOnlyBtn = document.getElementById('offline-summary-only-btn');
+            const summaryEndBtn = document.getElementById('offline-summary-end-btn');
+            const summaryCancelBtn = document.getElementById('offline-summary-cancel-btn');
+            const offlineResultPreviewModalElement = document.getElementById(
                         'offline-result-preview-modal',
-                    ),
-                    offlineResultPreviewCancelElement = document.getElementById(
+                    );
+            const offlineResultPreviewCancelElement = document.getElementById(
                         'offline-result-preview-cancel',
-                    ),
-                    offlineResultPreviewRegenerateElement = document.getElementById(
+                    );
+            const offlineResultPreviewRegenerateElement = document.getElementById(
                         'offline-result-preview-regenerate',
-                    ),
-                    offlineResultPreviewConfirmElement = document.getElementById(
+                    );
+            const offlineResultPreviewConfirmElement = document.getElementById(
                         'offline-result-preview-confirm',
                     );
-                let enabled_2137 = false,
-                    value_2138 = null,
-                    value_2139 = null,
-                    value_2140 = null,
-                    value_2141 = null;
-                const closeOfflineSummarySheet_2 = () => {
+            let enabled_2137 = false;
+            let value_2138 = null;
+            let value_2139 = null;
+            let value_2140 = null;
+            let value_2141 = null;
+            const closeOfflineSummarySheet_2 = () => {
                         if (!summarySheet_2) return;
                         summarySheet_2.classList.remove('active');
                         setTimeout(() => {
                             summarySheet_2.style.display = 'none';
                         }, 180);
-                    },
-                    getOfflineSummarySettingsFromModal = () =>
+                    };
+            const getOfflineSummarySettingsFromModal = () =>
                         normalizeOfflineSummarySettings({
                             apiPresetId: summaryApiSelect?.value || '',
                             prompt: summaryPromptInput?.value || '',
-                        }),
-                    saveOfflineSummarySettingsFromModal = async () => {
+                        });
+            const saveOfflineSummarySettingsFromModal = async () => {
                         const activeFriend_47 = window.imData.currentActiveFriend;
                         if (!activeFriend_47) return;
                         await persistOfflineSummarySettings(
                             activeFriend_47,
                             getOfflineSummarySettingsFromModal(),
                         );
-                    },
-                    value_2144 = (value_2147) => {
+                    };
+            const value_2144 = (value_2147) => {
                         if (!summaryApiSelect) return;
                         const normalized_3 = normalizeOfflineSummarySettings(value_2147),
                             presets_6 = getOfflineSummaryApiPresets();
@@ -11110,8 +11477,8 @@ Persona: ` +
                         )
                             ? normalized_3.apiPresetId
                             : '';
-                    },
-                    value_2145 = (value_2154, value_2155) => {
+                    };
+            const value_2145 = (value_2154, value_2155) => {
                         const rawThinking_2 = window.imData.currentActiveFriend;
                         if (!rawThinking_2 || !value_2155) return;
                         const value_2157 = value_2154 === 'end',
@@ -11238,8 +11605,8 @@ Persona: ` +
                             },
                         });
                         closeOfflineSummarySheet_2();
-                    },
-                    openOfflineSummarySheet = () => {
+                    };
+            const openOfflineSummarySheet = () => {
                         const currentActiveFriend_2166 = window.imData.currentActiveFriend;
                         if (!currentActiveFriend_2166 || !summarySheet_2) return;
                         const value_221_2167 = value_221(currentActiveFriend_2166),
@@ -11276,128 +11643,125 @@ Persona: ` +
                         void summarySheet_2.offsetWidth;
                         summarySheet_2.classList.add('active');
                     };
-                summaryApiSelect &&
-                    summaryApiSelect.addEventListener('change', () => {
-                        saveOfflineSummarySettingsFromModal()['catch']((error_17) => {
-                            console.error('Offline summary API setting save failed', error_17);
-                            if (window.showToast) window.showToast('线下总结设置保存失败');
-                        });
+            summaryApiSelect &&
+                summaryApiSelect.addEventListener('change', () => {
+                    saveOfflineSummarySettingsFromModal()['catch']((error_17) => {
+                        console.error('Offline summary API setting save failed', error_17);
+                        if (window.showToast) window.showToast('线下总结设置保存失败');
                     });
-                summaryPromptInput &&
-                    summaryPromptInput.addEventListener('input', () => {
-                        if (value_2139) clearTimeout(value_2139);
-                        value_2139 = setTimeout(() => {
-                            saveOfflineSummarySettingsFromModal()['catch']((error_18) =>
-                                console.error('Offline summary prompt save failed', error_18),
-                            );
-                        }, 350);
-                    });
-                if (summaryCancelBtn)
-                    summaryCancelBtn.addEventListener('click', closeOfflineSummarySheet_2);
-                summarySheet_2 &&
-                    summarySheet_2.addEventListener('click', (event_20) => {
-                        if (event_20.target === summarySheet_2) closeOfflineSummarySheet_2();
-                    });
-                offlineResultPreviewCancelElement &&
-                    offlineResultPreviewCancelElement.dataset.generatedResultPreviewBound !==
-                        'true' &&
-                    offlineResultPreviewCancelElement.addEventListener('click', async () => {
-                        const state_2176 = value_324.getState();
-                        if (!state_2176 || state_2176.busy) return;
-                        value_324.close();
-                        await state_2176.onCancel?.();
-                    });
-                offlineResultPreviewRegenerateElement &&
-                    offlineResultPreviewRegenerateElement.dataset.generatedResultPreviewBound !==
-                        'true' &&
-                    offlineResultPreviewRegenerateElement.addEventListener('click', async () => {
-                        const state_2177 = value_324.getState();
-                        if (!state_2177 || state_2177.busy) return;
-                        await state_2177.onRegenerate?.();
-                    });
-                offlineResultPreviewConfirmElement &&
-                    offlineResultPreviewConfirmElement.dataset.generatedResultPreviewBound !==
-                        'true' &&
-                    offlineResultPreviewConfirmElement.addEventListener('click', async () => {
-                        const state_2178 = value_324.getState();
-                        if (!state_2178 || state_2178.busy) return;
-                        await state_2178.onConfirm?.();
-                    });
-                offlineResultPreviewModalElement &&
-                    offlineResultPreviewModalElement.dataset.generatedResultPreviewBound !==
-                        'true' &&
-                    offlineResultPreviewModalElement.addEventListener('click', (event_2179) => {
-                        if (event_2179.target !== offlineResultPreviewModalElement) return;
-                        const state_2180 = value_324.getState();
-                        if (!state_2180 || state_2180.busy) return;
-                        value_324.close();
-                        state_2180.onCancel?.();
-                    });
-                summaryOnlyBtn &&
-                    summaryOnlyBtn.addEventListener('click', async () => {
-                        const rawThinking_3 = window.imData.currentActiveFriend;
-                        if (!rawThinking_3 || summaryOnlyBtn.disabled) return;
-                        const offlineSummarySettingsFromModal_2182 =
-                                getOfflineSummarySettingsFromModal(),
-                            number_2183 = Number(summaryStartInput?.value),
-                            number_2184 = Number(summaryEndInput?.value);
-                        summaryOnlyBtn.disabled = true;
-                        if (summaryEndBtn) summaryEndBtn.disabled = true;
-                        let enabled_2185 = false;
-                        buildOfflineThinkingHtml_2(rawThinking_3, true);
-                        try {
-                            if (window.showToast) window.showToast('正在生成线下总结...');
-                            const value_2186 = await value_317(
+                });
+            summaryPromptInput &&
+                summaryPromptInput.addEventListener('input', () => {
+                    if (value_2139) clearTimeout(value_2139);
+                    value_2139 = setTimeout(() => {
+                        saveOfflineSummarySettingsFromModal()['catch']((error_18) =>
+                            console.error('Offline summary prompt save failed', error_18),
+                        );
+                    }, 350);
+                });
+            if (summaryCancelBtn)
+                summaryCancelBtn.addEventListener('click', closeOfflineSummarySheet_2);
+            summarySheet_2 &&
+                summarySheet_2.addEventListener('click', (event_20) => {
+                    if (event_20.target === summarySheet_2) closeOfflineSummarySheet_2();
+                });
+            offlineResultPreviewCancelElement &&
+                offlineResultPreviewCancelElement.dataset.generatedResultPreviewBound !== 'true' &&
+                offlineResultPreviewCancelElement.addEventListener('click', async () => {
+                    const state_2176 = value_324.getState();
+                    if (!state_2176 || state_2176.busy) return;
+                    value_324.close();
+                    await state_2176.onCancel?.();
+                });
+            offlineResultPreviewRegenerateElement &&
+                offlineResultPreviewRegenerateElement.dataset.generatedResultPreviewBound !==
+                    'true' &&
+                offlineResultPreviewRegenerateElement.addEventListener('click', async () => {
+                    const state_2177 = value_324.getState();
+                    if (!state_2177 || state_2177.busy) return;
+                    await state_2177.onRegenerate?.();
+                });
+            offlineResultPreviewConfirmElement &&
+                offlineResultPreviewConfirmElement.dataset.generatedResultPreviewBound !== 'true' &&
+                offlineResultPreviewConfirmElement.addEventListener('click', async () => {
+                    const state_2178 = value_324.getState();
+                    if (!state_2178 || state_2178.busy) return;
+                    await state_2178.onConfirm?.();
+                });
+            offlineResultPreviewModalElement &&
+                offlineResultPreviewModalElement.dataset.generatedResultPreviewBound !== 'true' &&
+                offlineResultPreviewModalElement.addEventListener('click', (event_2179) => {
+                    if (event_2179.target !== offlineResultPreviewModalElement) return;
+                    const state_2180 = value_324.getState();
+                    if (!state_2180 || state_2180.busy) return;
+                    value_324.close();
+                    state_2180.onCancel?.();
+                });
+            summaryOnlyBtn &&
+                summaryOnlyBtn.addEventListener('click', async () => {
+                    const rawThinking_3 = window.imData.currentActiveFriend;
+                    if (!rawThinking_3 || summaryOnlyBtn.disabled) return;
+                    const offlineSummarySettingsFromModal_2182 =
+                                getOfflineSummarySettingsFromModal();
+                    const number_2183 = Number(summaryStartInput?.value);
+                    const number_2184 = Number(summaryEndInput?.value);
+                    summaryOnlyBtn.disabled = true;
+                    if (summaryEndBtn) summaryEndBtn.disabled = true;
+                    let enabled_2185 = false;
+                    buildOfflineThinkingHtml_2(rawThinking_3, true);
+                    try {
+                        if (window.showToast) window.showToast('正在生成线下总结...');
+                        const value_2186 = await value_317(
                                 rawThinking_3,
                                 number_2183,
                                 number_2184,
                                 offlineSummarySettingsFromModal_2182,
                             );
-                            value_2145('segment', value_2186);
-                            enabled_2185 = true;
-                        } catch (error_19) {
-                            console.error('Offline segment summary failed', error_19);
-                            const value_2188 = /already summarized/i.test(
+                        value_2145('segment', value_2186);
+                        enabled_2185 = true;
+                    } catch (error_19) {
+                        console.error('Offline segment summary failed', error_19);
+                        const value_2188 = /already summarized/i.test(
                                 String(error_19?.message || ''),
                             )
                                 ? '所选楼层包含已归档内容，请选择连续的未归档楼层'
                                 : /range is invalid/i.test(String(error_19?.message || ''))
                                   ? '请输入有效且连续的未归档楼层范围'
                                   : '';
-                            if (value_2188) window.showToast?.(value_2188);
-                            else value_310('线下总结失败', error_19);
-                        } finally {
-                            if (!enabled_2185) buildOfflineThinkingHtml_2(rawThinking_3, false);
-                            summaryOnlyBtn.disabled = false;
-                            if (summaryEndBtn) summaryEndBtn.disabled = false;
-                        }
-                    });
-                summaryEndBtn &&
-                    summaryEndBtn.addEventListener('click', async () => {
-                        const rawThinking_4 = window.imData.currentActiveFriend;
-                        if (!rawThinking_4 || summaryEndBtn.disabled) return;
-                        const settings_6 = getOfflineSummarySettingsFromModal();
-                        summaryEndBtn.disabled = true;
-                        if (summaryOnlyBtn) summaryOnlyBtn.disabled = true;
-                        let enabled_2191 = false;
-                        buildOfflineThinkingHtml_2(rawThinking_4, true);
-                        try {
-                            const value_2192 = await handleAction_322(null, {
+                        if (value_2188) window.showToast?.(value_2188);
+                        else value_310('线下总结失败', error_19);
+                    } finally {
+                        if (!enabled_2185) buildOfflineThinkingHtml_2(rawThinking_3, false);
+                        summaryOnlyBtn.disabled = false;
+                        if (summaryEndBtn) summaryEndBtn.disabled = false;
+                    }
+                });
+            summaryEndBtn &&
+                summaryEndBtn.addEventListener('click', async () => {
+                    const rawThinking_4 = window.imData.currentActiveFriend;
+                    if (!rawThinking_4 || summaryEndBtn.disabled) return;
+                    const settings_6 = getOfflineSummarySettingsFromModal();
+                    summaryEndBtn.disabled = true;
+                    if (summaryOnlyBtn) summaryOnlyBtn.disabled = true;
+                    let enabled_2191 = false;
+                    buildOfflineThinkingHtml_2(rawThinking_4, true);
+                    try {
+                        const value_2192 = await handleAction_322(null, {
                                 settings: settings_6,
                                 previewOnly: true,
                             });
-                            value_2192 && (value_2145('end', value_2192), (enabled_2191 = true));
-                        } catch (value_2193) {
-                            console.error('Offline meeting preview failed', value_2193);
-                            value_310('结束见面总结失败', value_2193);
-                        } finally {
-                            if (!enabled_2191) buildOfflineThinkingHtml_2(rawThinking_4, false);
-                            summaryEndBtn.disabled = false;
-                            if (summaryOnlyBtn) summaryOnlyBtn.disabled = false;
-                        }
-                    });
-                if (attachmentBtn && actionSheet) {
-                    const value_2194 = () => {
+                        value_2192 && (value_2145('end', value_2192), (enabled_2191 = true));
+                    } catch (value_2193) {
+                        console.error('Offline meeting preview failed', value_2193);
+                        value_310('结束见面总结失败', value_2193);
+                    } finally {
+                        if (!enabled_2191) buildOfflineThinkingHtml_2(rawThinking_4, false);
+                        summaryEndBtn.disabled = false;
+                        if (summaryOnlyBtn) summaryOnlyBtn.disabled = false;
+                    }
+                });
+            if (attachmentBtn && actionSheet) {
+                const value_2194 = () => {
                         if (!offlineChatEpisodeToggleElement) return;
                         const value_2195 =
                             window.imData.currentActiveFriend?.offlineEpisodeMode === true;
@@ -11414,21 +11778,21 @@ Persona: ` +
                                 ? '已开启'
                                 : '已关闭';
                     };
-                    attachmentBtn.addEventListener('click', () => {
-                        value_2194();
-                        actionSheet.style.display = 'flex';
-                        void actionSheet.offsetWidth;
-                        actionSheet.classList.add('active');
-                    });
-                    offlineChatEpisodeToggleElement?.addEventListener('click', async () => {
-                        const currentActiveFriend_2196 = window.imData.currentActiveFriend;
-                        if (!currentActiveFriend_2196 || offlineChatEpisodeToggleElement.disabled)
-                            return;
-                        const offlineEpisodeMode_2 =
+                attachmentBtn.addEventListener('click', () => {
+                    value_2194();
+                    actionSheet.style.display = 'flex';
+                    void actionSheet.offsetWidth;
+                    actionSheet.classList.add('active');
+                });
+                offlineChatEpisodeToggleElement?.addEventListener('click', async () => {
+                    const currentActiveFriend_2196 = window.imData.currentActiveFriend;
+                    if (!currentActiveFriend_2196 || offlineChatEpisodeToggleElement.disabled)
+                        return;
+                    const offlineEpisodeMode_2 =
                             currentActiveFriend_2196.offlineEpisodeMode !== true;
-                        offlineChatEpisodeToggleElement.disabled = true;
-                        try {
-                            const value_2198 = await window.imApp?.commitFriendMetaPatch?.(
+                    offlineChatEpisodeToggleElement.disabled = true;
+                    try {
+                        const value_2198 = await window.imApp?.commitFriendMetaPatch?.(
                                 currentActiveFriend_2196.id,
                                 {
                                     offlineEpisodeMode: offlineEpisodeMode_2,
@@ -11437,115 +11801,117 @@ Persona: ` +
                                     silent: true,
                                 },
                             );
-                            if (!value_2198) throw new Error('Failed to save offline episode mode');
-                            window.showToast?.(
-                                offlineEpisodeMode_2 ? '番外模式已开启' : '番外模式已关闭',
-                            );
-                        } catch (value_2199) {
-                            console.error('Failed to save offline episode mode', value_2199);
-                            window.showToast?.('番外模式保存失败，请重试');
-                        } finally {
-                            offlineChatEpisodeToggleElement.disabled = false;
-                            value_2194();
-                        }
-                    });
-                    actionCancel &&
-                        actionCancel.addEventListener('click', () => {
-                            actionSheet.classList.remove('active');
-                            setTimeout(() => {
-                                actionSheet.style.display = 'none';
-                            }, 300);
-                        });
-                    actionSheet.addEventListener('click', (event_2200) => {
-                        event_2200.target === actionSheet &&
-                            (actionSheet.classList.remove('active'),
-                            setTimeout(() => {
-                                actionSheet.style.display = 'none';
-                            }, 300));
-                    });
-                }
-                clearBtn &&
-                    offlineChatViewElement_2135 &&
-                    clearBtn.addEventListener('click', async () => {
+                        if (!value_2198) throw new Error('Failed to save offline episode mode');
+                        window.showToast?.(
+                            offlineEpisodeMode_2 ? '番外模式已开启' : '番外模式已关闭',
+                        );
+                    } catch (value_2199) {
+                        console.error('Failed to save offline episode mode', value_2199);
+                        window.showToast?.('番外模式保存失败，请重试');
+                    } finally {
+                        offlineChatEpisodeToggleElement.disabled = false;
+                        value_2194();
+                    }
+                });
+                actionCancel &&
+                    actionCancel.addEventListener('click', () => {
                         actionSheet.classList.remove('active');
                         setTimeout(() => {
                             actionSheet.style.display = 'none';
                         }, 300);
-                        const clearOfflineHistory = async () => {
-                                const activeFriend_48 = window.imData.currentActiveFriend;
-                                if (!activeFriend_48) return;
-                                clearBtn.dataset.busy = 'true';
-                                clearBtn.style.pointerEvents = 'none';
-                                try {
-                                    await persistOfflineMessages(activeFriend_48, []);
-                                    renderOfflineCurrentMessages(activeFriend_48);
-                                    if (window.showToast) window.showToast('线下聊天记录已清空');
-                                } catch (error_20) {
-                                    console.error('Failed to clear offline chat history', error_20);
-                                    if (window.showToast)
-                                        window.showToast('清空线下聊天记录失败，请重试');
-                                } finally {
-                                    clearBtn.dataset.busy = 'false';
-                                    clearBtn.style.pointerEvents = '';
-                                }
-                            },
-                            onConfirm_4 = () => {
+                    });
+                actionSheet.addEventListener('click', (event_2200) => {
+                    event_2200.target === actionSheet &&
+                        (actionSheet.classList.remove('active'),
+                        setTimeout(() => {
+                            actionSheet.style.display = 'none';
+                        }, 300));
+                });
+            }
+            clearBtn &&
+                offlineChatViewElement_2135 &&
+                clearBtn.addEventListener('click', async () => {
+                    actionSheet.classList.remove('active');
+                    setTimeout(() => {
+                        actionSheet.style.display = 'none';
+                    }, 300);
+                    const clearOfflineHistory = async () => {
+                        const activeFriend_48 = window.imData.currentActiveFriend;
+                        if (!activeFriend_48) return;
+                        clearBtn.dataset.busy = 'true';
+                        clearBtn.style.pointerEvents = 'none';
+                        try {
+                            const _value105 = value_221(activeFriend_48).flatMap(
+                                (_value106) => _value106.ttsAudioAssets || [],
+                            );
+                            await persistOfflineMessages(activeFriend_48, []);
+                            await _value3(_value105);
+                            renderOfflineCurrentMessages(activeFriend_48);
+                            if (window.showToast) window.showToast('线下聊天记录已清空');
+                        } catch (error_20) {
+                            console.error('Failed to clear offline chat history', error_20);
+                            if (window.showToast) window.showToast('清空线下聊天记录失败，请重试');
+                        } finally {
+                            clearBtn.dataset.busy = 'false';
+                            clearBtn.style.pointerEvents = '';
+                        }
+                    };
+                    const onConfirm_4 = () => {
                                 void clearOfflineHistory();
                             };
-                        if (window.showCustomModal)
-                            window.showCustomModal({
-                                title: '清空线下聊天记录',
-                                message: '确定清空本次线下见面的全部聊天记录吗？此操作无法恢复。',
-                                confirmText: '清空',
-                                isDestructive: true,
-                                onConfirm: onConfirm_4,
-                            });
-                        else
-                            window.confirm(
-                                '确定清空本次线下见面的全部聊天记录吗？此操作无法恢复。',
-                            ) && onConfirm_4();
-                    });
-                endBtn &&
-                    actionSheet &&
-                    endBtn.addEventListener('click', async () => {
+                    if (window.showCustomModal)
+                        window.showCustomModal({
+                            title: '清空线下聊天记录',
+                            message: '确定清空本次线下见面的全部聊天记录吗？此操作无法恢复。',
+                            confirmText: '清空',
+                            isDestructive: true,
+                            onConfirm: onConfirm_4,
+                        });
+                    else
+                        window.confirm('确定清空本次线下见面的全部聊天记录吗？此操作无法恢复。') &&
+                            onConfirm_4();
+                });
+            endBtn &&
+                actionSheet &&
+                endBtn.addEventListener('click', async () => {
+                    actionSheet.classList.remove('active');
+                    setTimeout(() => {
+                        actionSheet.style.display = 'none';
+                    }, 300);
+                    openOfflineSummarySheet();
+                });
+            exportTxtBtn &&
+                actionSheet &&
+                exportTxtBtn.addEventListener('click', async () => {
+                    const currentActiveFriend_2204 = window.imData.currentActiveFriend;
+                    if (!currentActiveFriend_2204 || exportTxtBtn.disabled) return;
+                    exportTxtBtn.disabled = true;
+                    exportTxtBtn.style.pointerEvents = 'none';
+                    const metaEl_4 = exportTxtBtn.querySelector('.offline-chat-action-label');
+                    const textContent_7 = metaEl_4?.textContent || '';
+                    if (metaEl_4) metaEl_4.textContent = '正在导出…';
+                    try {
+                        const result_7 = await handleAction_304(currentActiveFriend_2204);
                         actionSheet.classList.remove('active');
                         setTimeout(() => {
                             actionSheet.style.display = 'none';
                         }, 300);
-                        openOfflineSummarySheet();
-                    });
-                exportTxtBtn &&
-                    actionSheet &&
-                    exportTxtBtn.addEventListener('click', async () => {
-                        const currentActiveFriend_2204 = window.imData.currentActiveFriend;
-                        if (!currentActiveFriend_2204 || exportTxtBtn.disabled) return;
-                        exportTxtBtn.disabled = true;
-                        exportTxtBtn.style.pointerEvents = 'none';
-                        const metaEl_4 = exportTxtBtn.querySelector('.offline-chat-action-label'),
-                            textContent_7 = metaEl_4?.textContent || '';
-                        if (metaEl_4) metaEl_4.textContent = '正在导出…';
-                        try {
-                            const result_7 = await handleAction_304(currentActiveFriend_2204);
-                            actionSheet.classList.remove('active');
-                            setTimeout(() => {
-                                actionSheet.style.display = 'none';
-                            }, 300);
-                            if (result_7 === 'downloaded')
-                                window.showToast?.('线下聊天记录已导出为 TXT');
-                            if (result_7 === 'shared')
-                                window.showToast?.('已打开系统保存，请选择“存储到文件”');
-                        } catch (value_2207) {
-                            window.showToast?.(
-                                value_2207?.message || '线下聊天记录导出失败，请稍后重试',
-                            );
-                        } finally {
-                            exportTxtBtn.disabled = false;
-                            exportTxtBtn.style.pointerEvents = '';
-                            if (metaEl_4) metaEl_4.textContent = textContent_7;
-                        }
-                    });
-                if (sendBtn && offlineChatInputElement_2134) {
-                    const handleClick_2 = async () => {
+                        if (result_7 === 'downloaded')
+                            window.showToast?.('线下聊天记录已导出为 TXT');
+                        if (result_7 === 'shared')
+                            window.showToast?.('已打开系统保存，请选择“存储到文件”');
+                    } catch (value_2207) {
+                        window.showToast?.(
+                            value_2207?.message || '线下聊天记录导出失败，请稍后重试',
+                        );
+                    } finally {
+                        exportTxtBtn.disabled = false;
+                        exportTxtBtn.style.pointerEvents = '';
+                        if (metaEl_4) metaEl_4.textContent = textContent_7;
+                    }
+                });
+            if (sendBtn && offlineChatInputElement_2134) {
+                const handleClick_2 = async () => {
                         if (enabled_2137) {
                             value_2138 &&
                                 !value_2138.signal.aborted &&
@@ -11833,103 +12199,102 @@ Persona: ` +
                         }
                         return;
                     };
-                    sendBtn.addEventListener('click', handleClick_2);
-                    offlineChatInputElement_2134.addEventListener('keydown', (event_2255) => {
-                        if (event_2255.isComposing || event_2255.keyCode === 229) return;
-                        (event_2255.ctrlKey || event_2255.metaKey) &&
-                            (event_2255.key === 'Enter' || event_2255.keyCode === 13) &&
-                            (event_2255.preventDefault(), handleClick_2());
-                    });
-                }
-            };
+                sendBtn.addEventListener('click', handleClick_2);
+                offlineChatInputElement_2134.addEventListener('keydown', (event_2255) => {
+                    if (event_2255.isComposing || event_2255.keyCode === 229) return;
+                    (event_2255.ctrlKey || event_2255.metaKey) &&
+                        (event_2255.key === 'Enter' || event_2255.keyCode === 13) &&
+                        (event_2255.preventDefault(), handleClick_2());
+                });
+            }
+        };
         value_365_2();
-        const closeSheet = () => {
-                const currentPage = attachmentSheet_2.parentElement || page,
-                    insChatInputContainerElement = currentPage.querySelector(
-                        '.ins-chat-input-container',
-                    );
-                value_171();
-                stopLinkedAccountTimer_2();
-                closeLinkedAccountModal();
-                closePayTransferForm();
-                closeVoiceMessageForm();
-                value_257();
-                closeRegenerateForm();
-                closeOfflineSummarySheet();
-                sheetOverlayElement.style.opacity = '0';
-                content_4.style.transform = 'translateY(100%)';
-                if (renderTimerId_2 !== null) clearTimeout(renderTimerId_2);
-                renderTimerId_2 = setTimeout(() => {
-                    attachmentSheet_2.style.display = 'none';
-                    renderTimerId_2 = null;
-                }, 300);
-            },
-            submitVoiceMessage = async () => {
-                const transcript_2 = String(
+        const _value4 = () => {
+            const currentPage = attachmentSheet_2.parentElement || page;
+            const insChatInputContainerElement = currentPage.querySelector(
+                '.ins-chat-input-container',
+            );
+            value_171();
+            stopLinkedAccountTimer_2();
+            closeLinkedAccountModal();
+            closePayTransferForm();
+            closeVoiceMessageForm();
+            value_257();
+            closeRegenerateForm();
+            closeOfflineSummarySheet();
+            sheetOverlayElement.style.opacity = '0';
+            content_4.style.transform = 'translateY(100%)';
+            if (renderTimerId_2 !== null) clearTimeout(renderTimerId_2);
+            renderTimerId_2 = setTimeout(() => {
+                attachmentSheet_2.style.display = 'none';
+                renderTimerId_2 = null;
+            }, 300);
+        };
+        const submitVoiceMessage = async () => {
+            const transcript_2 = String(
                     voiceTranscriptInput ? voiceTranscriptInput.value : '',
                 ).trim();
-                if (!transcript_2) {
-                    if (window.showToast) window.showToast('请输入语音内容');
-                    return;
-                }
-                closeVoiceMessageForm();
-                closeSheet();
-                await window.imChat.sendVoiceMessage(transcript_2);
-            },
-            value_367 = async () => {
-                const value_370_2258 = getAttachmentTargetFriend(),
-                    currentActiveFriend_2259 = window.imData.currentActiveFriend;
-                if (
-                    !value_370_2258 ||
-                    value_370_2258.type !== 'char' ||
-                    !currentActiveFriend_2259 ||
-                    String(currentActiveFriend_2259.id) !== String(value_370_2258.id)
-                ) {
-                    closeOfflineSummarySheet();
-                    window.showToast?.('当前聊天已切换，请重新选择名片');
-                    return;
-                }
-                const result_2260 = value_175(value_370_2258).find(
+            if (!transcript_2) {
+                if (window.showToast) window.showToast('请输入语音内容');
+                return;
+            }
+            closeVoiceMessageForm();
+            _value4();
+            await window.imChat.sendVoiceMessage(transcript_2);
+        };
+        const value_367 = async () => {
+            const value_370_2258 = getAttachmentTargetFriend();
+            const currentActiveFriend_2259 = window.imData.currentActiveFriend;
+            if (
+                !value_370_2258 ||
+                value_370_2258.type !== 'char' ||
+                !currentActiveFriend_2259 ||
+                String(currentActiveFriend_2259.id) !== String(value_370_2258.id)
+            ) {
+                closeOfflineSummarySheet();
+                window.showToast?.('当前聊天已切换，请重新选择名片');
+                return;
+            }
+            const result_2260 = value_175(value_370_2258).find(
                     (value_2262) => String(value_2262.id) === String(text_160),
                 );
-                if (!result_2260) {
-                    value_176(value_370_2258);
-                    window.showToast?.('该名片已失效，请重新选择');
-                    return;
-                }
-                if (contactCardPickerConfirmElement)
-                    contactCardPickerConfirmElement.disabled = true;
-                closeOfflineSummarySheet();
-                closeSheet();
-                const value_2261 = await window.imChat.sendContactCard?.(result_2260.id, {
+            if (!result_2260) {
+                value_176(value_370_2258);
+                window.showToast?.('该名片已失效，请重新选择');
+                return;
+            }
+            if (contactCardPickerConfirmElement) contactCardPickerConfirmElement.disabled = true;
+            closeOfflineSummarySheet();
+            _value4();
+            const value_2261 = await window.imChat.sendContactCard?.(result_2260.id, {
                     friendId: value_370_2258.id,
                     role: 'user',
                 });
-                if (!value_2261) window.showToast?.('名片发送失败');
-            },
-            value_368 = async () => {
-                const trim_2263 = String(narrationInput ? narrationInput.value : '').trim();
-                if (!trim_2263) {
-                    if (window.showToast) window.showToast('请输入旁白内容');
-                    return;
-                }
-                const activeFriend_50 = window.imData.currentActiveFriend;
-                if (!activeFriend_50) {
-                    if (window.showToast) window.showToast('当前聊天不存在');
-                    return;
-                }
-                if (activeFriend_50.type === 'group' && Number(activeFriend_50.leftGroupAt) > 0) {
-                    if (window.showToast) window.showToast('已退出该群，不能添加旁白');
-                    return;
-                }
-                const elementById_2265 = document.getElementById(
+            if (!value_2261) window.showToast?.('名片发送失败');
+        };
+        const value_368 = async () => {
+            const trim_2263 = String(narrationInput ? narrationInput.value : '').trim();
+            if (!trim_2263) {
+                if (window.showToast) window.showToast('请输入旁白内容');
+                return;
+            }
+            const activeFriend_50 = window.imData.currentActiveFriend;
+            if (!activeFriend_50) {
+                if (window.showToast) window.showToast('当前聊天不存在');
+                return;
+            }
+            if (activeFriend_50.type === 'group' && Number(activeFriend_50.leftGroupAt) > 0) {
+                if (window.showToast) window.showToast('已退出该群，不能添加旁白');
+                return;
+            }
+            const elementById_2265 = document.getElementById(
                         'chat-interface-' + activeFriend_50.id,
-                    ),
-                    value_2266 = elementById_2265
+                    );
+            const value_2266 = elementById_2265
                         ? elementById_2265.querySelector('.ins-chat-messages')
-                        : null,
-                    timestamp_9 = Date.now(),
-                    options_2268 = {
+                        : null;
+            const timestamp_9 = Date.now();
+            const options_2268 = {
                         id: window.imChat.createMessageId
                             ? window.imChat.createMessageId('notice')
                             : 'notice-' + timestamp_9,
@@ -11940,8 +12305,8 @@ Persona: ` +
                         content: trim_2263,
                         text: trim_2263,
                         timestamp: timestamp_9,
-                    },
-                    saved_15 = window.imApp.appendFriendMessage
+                    };
+            const saved_15 = window.imApp.appendFriendMessage
                         ? await window.imApp.appendFriendMessage(activeFriend_50.id, options_2268, {
                               silent: true,
                           })
@@ -11955,18 +12320,18 @@ Persona: ` +
                                   silent: true,
                               },
                           );
-                if (!saved_15) {
-                    if (window.showToast) window.showToast('旁白保存失败');
-                    return;
-                }
-                value_257();
-                closeSheet();
-                const latestFriend_6 =
+            if (!saved_15) {
+                if (window.showToast) window.showToast('旁白保存失败');
+                return;
+            }
+            value_257();
+            _value4();
+            const latestFriend_6 =
                     (window.imData.friends || []).find(
                         (item_28) => String(item_28.id) === String(activeFriend_50.id),
                     ) || activeFriend_50;
-                if (value_2266) {
-                    const value_2273 = window.imChat.appendMessageToContainer
+            if (value_2266) {
+                const value_2273 = window.imChat.appendMessageToContainer
                         ? window.imChat.appendMessageToContainer(
                               latestFriend_6,
                               value_2266,
@@ -11976,88 +12341,88 @@ Persona: ` +
                               },
                           )
                         : false;
-                    !value_2273 &&
-                        window.imChat.rerenderChatContainer &&
-                        window.imChat.rerenderChatContainer(latestFriend_6, value_2266, {
-                            scroll: true,
-                        });
-                }
-            },
-            submitRegenerateRequest = async (useRequirement) => {
-                if (regenerateEntry?.dataset?.busy === 'true') return;
-                const activeFriend_51 = window.imData.currentActiveFriend;
-                if (!activeFriend_51 || !window.imChat.regenerateLastAiReply) {
-                    if (window.showToast) window.showToast('暂无可重回的回复');
-                    return;
-                }
-                const userRequirement_2 = useRequirement
+                !value_2273 &&
+                    window.imChat.rerenderChatContainer &&
+                    window.imChat.rerenderChatContainer(latestFriend_6, value_2266, {
+                        scroll: true,
+                    });
+            }
+        };
+        const submitRegenerateRequest = async (useRequirement) => {
+            if (regenerateEntry?.dataset?.busy === 'true') return;
+            const activeFriend_51 = window.imData.currentActiveFriend;
+            if (!activeFriend_51 || !window.imChat.regenerateLastAiReply) {
+                if (window.showToast) window.showToast('暂无可重回的回复');
+                return;
+            }
+            const userRequirement_2 = useRequirement
                     ? String(
                           regenerateRequirementInput ? regenerateRequirementInput.value : '',
                       ).trim()
                     : '';
-                if (useRequirement && !userRequirement_2) {
-                    if (window.showToast) window.showToast('请先输入参考要求');
-                    if (regenerateRequirementInput) regenerateRequirementInput.focus();
-                    return;
-                }
-                setRegenerateBusyState(true);
-                closeRegenerateForm();
-                closeSheet();
-                try {
-                    await window.imChat.regenerateLastAiReply(activeFriend_51, regenerateEntry, {
-                        userRequirement: userRequirement_2,
-                    });
-                } finally {
-                    setRegenerateBusyState(false);
-                }
-            },
-            value_369 = async () => {
-                const activeFriend_52 = window.imData.currentActiveFriend;
-                if (!activeFriend_52) {
-                    if (window.showToast) window.showToast('当前聊天不存在');
-                    return;
-                }
-                const isGroupChat_3 = activeFriend_52.type === 'group',
-                    value_2279 = 'chat-interface-' + activeFriend_52.id,
-                    elementById_2280 = document.getElementById(value_2279),
-                    value_2281 = elementById_2280
+            if (useRequirement && !userRequirement_2) {
+                if (window.showToast) window.showToast('请先输入参考要求');
+                if (regenerateRequirementInput) regenerateRequirementInput.focus();
+                return;
+            }
+            setRegenerateBusyState(true);
+            closeRegenerateForm();
+            _value4();
+            try {
+                await window.imChat.regenerateLastAiReply(activeFriend_51, regenerateEntry, {
+                    userRequirement: userRequirement_2,
+                });
+            } finally {
+                setRegenerateBusyState(false);
+            }
+        };
+        const value_369 = async () => {
+            const activeFriend_52 = window.imData.currentActiveFriend;
+            if (!activeFriend_52) {
+                if (window.showToast) window.showToast('当前聊天不存在');
+                return;
+            }
+            const isGroupChat_3 = activeFriend_52.type === 'group';
+            const value_2279 = 'chat-interface-' + activeFriend_52.id;
+            const elementById_2280 = document.getElementById(value_2279);
+            const value_2281 = elementById_2280
                         ? elementById_2280.querySelector('.ins-chat-messages')
-                        : null,
-                    timestamp_10 = Date.now(),
-                    lastMsg =
+                        : null;
+            const timestamp_10 = Date.now();
+            const lastMsg =
                         activeFriend_52.messages && activeFriend_52.messages.length > 0
                             ? activeFriend_52.messages[activeFriend_52.messages.length - 1]
                             : null;
-                if (currentPayMode === 'red_packet' && isGroupChat_3) {
-                    const packetCount_2 = parseInt(
+            if (currentPayMode === 'red_packet' && isGroupChat_3) {
+                const packetCount_2 = parseInt(
                             payRedPacketCountInput ? payRedPacketCountInput.value : '',
                             10,
-                        ),
-                        totalAmount_2 = Number(
+                        );
+                const totalAmount_2 = Number(
                             payRedPacketAmountInput ? payRedPacketAmountInput.value : '',
-                        ),
-                        description_2 =
+                        );
+                const description_2 =
                             String(
                                 payRedPacketDescInput ? payRedPacketDescInput.value : '',
                             ).trim() || '恭喜发财';
-                    if (!Number.isInteger(packetCount_2) || packetCount_2 <= 0) {
-                        if (window.showToast) window.showToast('红包个数无效');
-                        return;
-                    }
-                    if (!Number.isFinite(totalAmount_2) || totalAmount_2 <= 0) {
-                        if (window.showToast) window.showToast('总金额无效');
-                        return;
-                    }
-                    const allocations_2 = window.imChat.createRedPacketAllocations(
+                if (!Number.isInteger(packetCount_2) || packetCount_2 <= 0) {
+                    if (window.showToast) window.showToast('红包个数无效');
+                    return;
+                }
+                if (!Number.isFinite(totalAmount_2) || totalAmount_2 <= 0) {
+                    if (window.showToast) window.showToast('总金额无效');
+                    return;
+                }
+                const allocations_2 = window.imChat.createRedPacketAllocations(
                         totalAmount_2,
                         packetCount_2,
                     );
-                    if (allocations_2.length !== packetCount_2) {
-                        if (window.showToast) window.showToast('红包金额需至少满足每包 0.01');
-                        return;
-                    }
-                    const value_260_2292 = value_260(totalAmount_2, async (value_2293) => {
-                        const success =
+                if (allocations_2.length !== packetCount_2) {
+                    if (window.showToast) window.showToast('红包金额需至少满足每包 0.01');
+                    return;
+                }
+                const value_260_2292 = value_260(totalAmount_2, async (value_2293) => {
+                    const success =
                             typeof window.addPayTransaction === 'function'
                                 ? window.addPayTransaction(
                                       totalAmount_2,
@@ -12066,11 +12431,11 @@ Persona: ` +
                                       value_2293,
                                   )
                                 : false;
-                        if (!success) {
-                            if (window.showToast) window.showToast('红包发送失败');
-                            return;
-                        }
-                        const groupRedPacketState = window.imChat.normalizeGroupRedPacketState(
+                    if (!success) {
+                        if (window.showToast) window.showToast('红包发送失败');
+                        return;
+                    }
+                    const groupRedPacketState = window.imChat.normalizeGroupRedPacketState(
                             {
                                 id: window.imChat.createMessageId('packet'),
                                 packetId: window.imChat.createMessageId('packet'),
@@ -12091,11 +12456,8 @@ Persona: ` +
                             },
                             activeFriend_52,
                         );
-                        window.imApp.captureGroupUserIdentity?.(
-                            activeFriend_52,
-                            groupRedPacketState,
-                        );
-                        const saved_16 = window.imApp.appendFriendMessage
+                    window.imApp.captureGroupUserIdentity?.(activeFriend_52, groupRedPacketState);
+                    const saved_16 = window.imApp.appendFriendMessage
                             ? await window.imApp.appendFriendMessage(
                                   activeFriend_52.id,
                                   groupRedPacketState,
@@ -12113,13 +12475,13 @@ Persona: ` +
                                       silent: true,
                                   },
                               );
-                        if (!saved_16) {
-                            if (window.showToast) window.showToast('红包记录保存失败');
-                            return;
-                        }
-                        closeSheet();
-                        if (value_2281) {
-                            const value_2297 = window.imChat.appendMessageToContainer
+                    if (!saved_16) {
+                        if (window.showToast) window.showToast('红包记录保存失败');
+                        return;
+                    }
+                    _value4();
+                    if (value_2281) {
+                        const value_2297 = window.imChat.appendMessageToContainer
                                 ? window.imChat.appendMessageToContainer(
                                       activeFriend_52,
                                       value_2281,
@@ -12129,47 +12491,47 @@ Persona: ` +
                                       },
                                   )
                                 : false;
-                            !value_2297 &&
-                                window.imChat.rerenderChatContainer &&
-                                window.imChat.rerenderChatContainer(activeFriend_52, value_2281, {
-                                    scroll: true,
-                                });
-                        }
-                    });
-                    if (!value_260_2292) {
-                        if (window.showToast) window.showToast('支付方式拉取失败');
+                        !value_2297 &&
+                            window.imChat.rerenderChatContainer &&
+                            window.imChat.rerenderChatContainer(activeFriend_52, value_2281, {
+                                scroll: true,
+                            });
                     }
-                    return;
+                });
+                if (!value_260_2292) {
+                    if (window.showToast) window.showToast('支付方式拉取失败');
                 }
-                const amount_2 = Number(payAmountInput ? payAmountInput.value : ''),
-                    description_3 = String(payDescInput ? payDescInput.value : '').trim() || '转账';
-                if (!Number.isFinite(amount_2) || amount_2 <= 0) {
-                    if (window.showToast) window.showToast('金额无效');
-                    return;
-                }
-                let targetName_2 =
+                return;
+            }
+            const amount_2 = Number(payAmountInput ? payAmountInput.value : '');
+            const description_3 = String(payDescInput ? payDescInput.value : '').trim() || '转账';
+            if (!Number.isFinite(amount_2) || amount_2 <= 0) {
+                if (window.showToast) window.showToast('金额无效');
+                return;
+            }
+            let targetName_2 =
                     activeFriend_52.type === 'group'
                         ? activeFriend_52.nickname || '群聊'
                         : activeFriend_52.nickname || activeFriend_52.realName || '对方';
-                const groupUserIdentity =
+            const groupUserIdentity =
                         isGroupChat_3 && window.imApp?.getGroupUserIdentity
                             ? window.imApp.getGroupUserIdentity(activeFriend_52)
-                            : null,
-                    senderName_2 =
+                            : null;
+            const senderName_2 =
                         groupUserIdentity?.name ||
                         handleAction_27(activeFriend_52, userState_2).name;
-                if (isGroupChat_3) {
-                    const selectedMember = window.imChat
+            if (isGroupChat_3) {
+                const selectedMember = window.imChat
                         .getAvailableGroupRecipients(activeFriend_52)
                         .find((member_5) => String(member_5.id) === String(selectedRecipientId));
-                    if (!selectedMember) {
-                        if (window.showToast) window.showToast('请选择群成员');
-                        return;
-                    }
-                    targetName_2 = selectedMember.nickname || selectedMember.realName || '群成员';
+                if (!selectedMember) {
+                    if (window.showToast) window.showToast('请选择群成员');
+                    return;
                 }
-                const value_260_2289 = value_260(amount_2, async (value_2300) => {
-                    const success_2 =
+                targetName_2 = selectedMember.nickname || selectedMember.realName || '群成员';
+            }
+            const value_260_2289 = value_260(amount_2, async (value_2300) => {
+                const success_2 =
                         typeof window.addPayTransaction === 'function'
                             ? window.addPayTransaction(
                                   amount_2,
@@ -12178,11 +12540,11 @@ Persona: ` +
                                   value_2300,
                               )
                             : false;
-                    if (!success_2) {
-                        if (window.showToast) window.showToast('转账失败');
-                        return;
-                    }
-                    const options_2302 = {
+                if (!success_2) {
+                    if (window.showToast) window.showToast('转账失败');
+                    return;
+                }
+                const options_2302 = {
                         id: window.imChat.createMessageId('pay'),
                         role: 'user',
                         type: 'pay_transfer',
@@ -12201,8 +12563,8 @@ Persona: ` +
                         content: '[用户转账] ' + description_3 + ' ¥' + amount_2.toFixed(2),
                         timestamp: timestamp_10,
                     };
-                    window.imApp.captureGroupUserIdentity?.(activeFriend_52, options_2302);
-                    const saved_17 = window.imApp.appendFriendMessage
+                window.imApp.captureGroupUserIdentity?.(activeFriend_52, options_2302);
+                const saved_17 = window.imApp.appendFriendMessage
                         ? await window.imApp.appendFriendMessage(activeFriend_52.id, options_2302, {
                               silent: true,
                           })
@@ -12216,13 +12578,13 @@ Persona: ` +
                                   silent: true,
                               },
                           );
-                    if (!saved_17) {
-                        if (window.showToast) window.showToast('转账记录保存失败');
-                        return;
-                    }
-                    closeSheet();
-                    if (value_2281) {
-                        const value_2305 = window.imChat.appendMessageToContainer
+                if (!saved_17) {
+                    if (window.showToast) window.showToast('转账记录保存失败');
+                    return;
+                }
+                _value4();
+                if (value_2281) {
+                    const value_2305 = window.imChat.appendMessageToContainer
                             ? window.imChat.appendMessageToContainer(
                                   activeFriend_52,
                                   value_2281,
@@ -12232,26 +12594,26 @@ Persona: ` +
                                   },
                               )
                             : false;
-                        !value_2305 &&
-                            window.imChat.rerenderChatContainer &&
-                            window.imChat.rerenderChatContainer(activeFriend_52, value_2281, {
-                                scroll: true,
-                            });
-                    }
-                });
-                if (!value_260_2289) {
-                    if (window.showToast) window.showToast('支付方式拉取失败');
+                    !value_2305 &&
+                        window.imChat.rerenderChatContainer &&
+                        window.imChat.rerenderChatContainer(activeFriend_52, value_2281, {
+                            scroll: true,
+                        });
                 }
-            };
-        sheetOverlayElement.addEventListener('click', closeSheet);
-        closeBtn.addEventListener('click', closeSheet);
+            });
+            if (!value_260_2289) {
+                if (window.showToast) window.showToast('支付方式拉取失败');
+            }
+        };
+        sheetOverlayElement.addEventListener('click', _value4);
+        closeBtn.addEventListener('click', _value4);
         payEntry &&
             payEntry.addEventListener('click', () => {
                 value_261_2();
             });
         linkEntry &&
             linkEntry.addEventListener('click', () => {
-                closeSheet();
+                _value4();
                 if (window.imChat.openFakeLinkComposer) window.imChat.openFakeLinkComposer();
                 else window.showToast && window.showToast('链接功能加载失败');
             });
@@ -12270,7 +12632,7 @@ Persona: ` +
             attachmentMoreListenEntryElement.addEventListener('click', () => {
                 const activeFriend_53 = window.imData.currentActiveFriend;
                 if (!activeFriend_53 || activeFriend_53.type !== 'char') return;
-                closeSheet();
+                _value4();
                 try {
                     window.libraryApp?.openTogetherListeningPicker?.(activeFriend_53);
                 } catch (value_843) {
@@ -12311,8 +12673,8 @@ Persona: ` +
         payModeTabs.length > 0 &&
             payModeTabs.forEach((tab_4) => {
                 tab_4.addEventListener('click', () => {
-                    const currentActiveFriend_2311 = window.imData.currentActiveFriend,
-                        nextMode_2 = tab_4.getAttribute('data-pay-mode') || 'transfer';
+                    const currentActiveFriend_2311 = window.imData.currentActiveFriend;
+                    const nextMode_2 = tab_4.getAttribute('data-pay-mode') || 'transfer';
                     setRecipientDropdownOpen(false);
                     syncPayModeUi(currentActiveFriend_2311, nextMode_2);
                     setTimeout(() => {
@@ -12335,19 +12697,19 @@ Persona: ` +
             });
         voiceFormOverlay &&
             voiceFormOverlay.addEventListener('click', (event_844) => {
-                event_844.target === voiceFormOverlay && closeSheet();
+                event_844.target === voiceFormOverlay && _value4();
             });
         narrationFormOverlay &&
             narrationFormOverlay.addEventListener('click', (event_845) => {
-                event_845.target === narrationFormOverlay && closeSheet();
+                event_845.target === narrationFormOverlay && _value4();
             });
         regenerateFormOverlay &&
             regenerateFormOverlay.addEventListener('click', (event_846) => {
-                event_846.target === regenerateFormOverlay && closeSheet();
+                event_846.target === regenerateFormOverlay && _value4();
             });
         voiceCancelBtn &&
             voiceCancelBtn.addEventListener('click', () => {
-                closeSheet();
+                _value4();
             });
         voiceSubmitBtn &&
             voiceSubmitBtn.addEventListener('click', async () => {
@@ -12355,7 +12717,7 @@ Persona: ` +
             });
         narrationCancelBtn &&
             narrationCancelBtn.addEventListener('click', () => {
-                closeSheet();
+                _value4();
             });
         narrationSubmitBtn &&
             narrationSubmitBtn.addEventListener('click', async () => {
@@ -12376,6 +12738,7 @@ Persona: ` +
         const chatCloseBtn = document.getElementById('offline-chat-close-btn');
         chatCloseBtn &&
             chatCloseBtn.addEventListener('click', () => {
+                closeSheet.close();
                 const offlineChatViewElement_2317 = document.getElementById('offline-chat-view');
                 offlineChatViewElement_2317 &&
                     (offlineChatViewElement_2317.classList.remove('active'),
@@ -12530,7 +12893,7 @@ Persona: ` +
         const albumImageEntry = attachmentSheet_2.querySelector('.album-image-entry');
         albumImageEntry?.addEventListener('click', () => {
             const targetFriend_19 = getAttachmentTargetFriend();
-            closeSheet();
+            _value4();
             if (!targetFriend_19) {
                 if (window.showToast) window.showToast('当前聊天状态已失效，请重新进入聊天');
                 return;
@@ -12549,8 +12912,8 @@ Persona: ` +
                         imageUrl: '',
                         fileName: '',
                         onUpload: async (value_850, value_851 = []) => {
-                            const from_852 = Array.from(value_850 || []),
-                                items_853 = Array.isArray(value_851) ? value_851 : [];
+                            const from_852 = Array.from(value_850 || []);
+                            const items_853 = Array.isArray(value_851) ? value_851 : [];
                             if (items_853.length + from_852.length > 9)
                                 throw new Error('一次最多发送 9 张图片');
                             if (
@@ -12605,8 +12968,8 @@ Persona: ` +
                                     ]
                                   : [];
                         if (!trim_860 && items_861.length) {
-                            let count_863 = 0,
-                                length_864 = items_861.filter(
+                            let count_863 = 0;
+                            let length_864 = items_861.filter(
                                     (value_868) => value_868.recognizedDescription,
                                 ).length;
                             value_859.setImageStatus?.(
@@ -12629,8 +12992,8 @@ Persona: ` +
                                             );
                                         }
                                     },
-                                ),
-                                value_866 = await Promise.allSettled(from_865);
+                                );
+                            const value_866 = await Promise.allSettled(from_865);
                             value_859.setImageStatus?.('');
                             const result_867 = value_866.find(
                                 (value_871) => value_871.status === 'rejected',
@@ -12649,8 +13012,10 @@ Persona: ` +
                                       ).join(`
 `);
                         }
-                        if (!trim_860)
-                            return (window.showToast?.('未上传照片时请填写图片内容'), false);
+                        if (!trim_860) {
+                            window.showToast?.('未上传照片时请填写图片内容');
+                            return false;
+                        }
                         const value_862 = items_861[0]?.imageUrl || getChatImagePlaceholderUrl();
                         return await window.imChat.sendImageMessage(value_862, trim_860, {
                             imageSource: items_861.length ? 'real' : 'virtual',
@@ -12665,51 +13030,50 @@ Persona: ` +
                 });
         });
         const generatedImageEntry = attachmentSheet_2.querySelector('.generated-image-entry');
-        return (
-            generatedImageEntry?.addEventListener('click', async () => {
-                const targetFriend_20 = getAttachmentTargetFriend();
-                closeSheet();
-                if (!targetFriend_20) {
-                    window.showToast?.('当前聊天状态已失效，请重新进入聊天');
-                    return;
-                }
-                if (targetFriend_20.type === 'group') {
-                    window.showToast?.('请进入对应 Char 的单聊生成图片');
-                    return;
-                }
-                const runKey_2 = String(targetFriend_20.id ?? '');
-                if (window.imChat.isChatImageGenerationRunning?.(runKey_2)) {
-                    window.showToast?.('这段聊天已有图片正在生成');
-                    return;
-                }
-                const showModal = window.imApp?.showCustomModal || window.showCustomModal;
-                if (!showModal) {
-                    window.showToast?.('无法打开生图提示词窗口');
-                    return;
-                }
-                const latestTargetFriend =
-                        window.imApp?.getFriendById?.(targetFriend_20.id) || targetFriend_20,
-                    faceAssetId = latestTargetFriend.imageFaceReferenceAssetId || '';
-                let imageUrl_5 = '';
-                if (latestTargetFriend.imageFaceReferenceUrl)
-                    imageUrl_5 = latestTargetFriend.imageFaceReferenceUrl;
-                else
-                    faceAssetId &&
-                        typeof window.appStorage?.getAssetUrl === 'function' &&
-                        (imageUrl_5 = await window.appStorage
-                            .getAssetUrl(faceAssetId)
-                            ['catch'](() => ''));
-                const apk110New_2755 = window.imChat.getUserFaceReferenceSettings(),
-                    apk110New_2756 =
+        generatedImageEntry?.addEventListener('click', async () => {
+            const targetFriend_20 = getAttachmentTargetFriend();
+            _value4();
+            if (!targetFriend_20) {
+                window.showToast?.('当前聊天状态已失效，请重新进入聊天');
+                return;
+            }
+            if (targetFriend_20.type === 'group') {
+                window.showToast?.('请进入对应 Char 的单聊生成图片');
+                return;
+            }
+            const runKey_2 = String(targetFriend_20.id ?? '');
+            if (window.imChat.isChatImageGenerationRunning?.(runKey_2)) {
+                window.showToast?.('这段聊天已有图片正在生成');
+                return;
+            }
+            const showModal = window.imApp?.showCustomModal || window.showCustomModal;
+            if (!showModal) {
+                window.showToast?.('无法打开生图提示词窗口');
+                return;
+            }
+            const latestTargetFriend =
+                        window.imApp?.getFriendById?.(targetFriend_20.id) || targetFriend_20;
+            const faceAssetId = latestTargetFriend.imageFaceReferenceAssetId || '';
+            let imageUrl_5 = '';
+            if (latestTargetFriend.imageFaceReferenceUrl)
+                imageUrl_5 = latestTargetFriend.imageFaceReferenceUrl;
+            else
+                faceAssetId &&
+                    typeof window.appStorage?.getAssetUrl === 'function' &&
+                    (imageUrl_5 = await window.appStorage
+                        .getAssetUrl(faceAssetId)
+                        ['catch'](() => ''));
+            const apk110New_2755 = window.imChat.getUserFaceReferenceSettings();
+            const apk110New_2756 =
                         apk110New_2755.assetId &&
                         typeof window.appStorage?.getAssetUrl === 'function'
                             ? await window.appStorage
                                   .getAssetUrl(apk110New_2755.assetId)
                                   ['catch'](() => '')
-                            : '',
-                    supportsCharacterReference = latestTargetFriend.type !== 'group',
-                    value_2351 = latestTargetFriend.imagePromptConfig || {},
-                    buildPromptConfig = (modalState_3 = {}, previous = value_2351) => {
+                            : '';
+            const supportsCharacterReference = latestTargetFriend.type !== 'group';
+            const value_2351 = latestTargetFriend.imagePromptConfig || {};
+            const buildPromptConfig = (modalState_3 = {}, previous = value_2351) => {
                         const apk110New_2762 = {
                             ...(previous && typeof previous === 'object' ? previous : {}),
                             charAppearance: String(modalState_3.charAppearance || '').trim(),
@@ -12728,71 +13092,67 @@ Persona: ` +
                         };
                         return (delete apk110New_2762.autoUseReferenceFace, apk110New_2762);
                     };
-                showModal({
-                    type: 'prompt',
-                    title: '生成图片',
-                    message: '将自动根据当前聊天上下文生成画面',
-                    textareaLabel: '正向提示词',
-                    placeholder: '基础正向提示词：持续应用的主体、场景或质量要求（选填）',
-                    defaultValue: value_2351.basePrompt || value_2351.lastPrompt || '',
-                    multiline: true,
-                    confirmText: '开始生成',
-                    confirmTone: 'dark',
-                    generationPrompt: {
-                        charAppearance: value_2351.charAppearance || '',
-                        userAppearance: value_2351.userAppearance || '',
-                        artistPrompt: value_2351.artistPrompt || '',
-                        negativePrompt: value_2351.negativePrompt || '',
-                        presets: Array.isArray(value_2351.presets) ? value_2351.presets : [],
-                        activePresetId: value_2351.activePresetId || '',
-                        autoGenerate: value_2351.autoGenerate === true,
-                    },
-                    referenceFaces: supportsCharacterReference
-                        ? {
-                              char: {
-                                  title:
-                                      latestTargetFriend.nickname ||
-                                      latestTargetFriend.realName ||
-                                      'Char',
-                                  imageUrl: imageUrl_5,
-                                  fileName: latestTargetFriend.imageFaceReferenceFileName || '',
-                                  onUpload: async (file) => {
-                                      if (!/^image\//i.test(file?.type || ''))
-                                          throw new Error('请选择图片文件');
-                                      if (
-                                          !window.imApp?.compressImageFile ||
-                                          !window.appStorage?.saveAssetFromDataUrl
-                                      )
-                                          throw new Error('图片存储服务不可用');
-                                      const dataUrl = await window.imApp.compressImageFile(file, {
+            showModal({
+                type: 'prompt',
+                title: '生成图片',
+                message: '将自动根据当前聊天上下文生成画面',
+                textareaLabel: '正向提示词',
+                placeholder: '基础正向提示词：持续应用的主体、场景或质量要求（选填）',
+                defaultValue: value_2351.basePrompt || value_2351.lastPrompt || '',
+                multiline: true,
+                confirmText: '开始生成',
+                confirmTone: 'dark',
+                generationPrompt: {
+                    charAppearance: value_2351.charAppearance || '',
+                    userAppearance: value_2351.userAppearance || '',
+                    artistPrompt: value_2351.artistPrompt || '',
+                    negativePrompt: value_2351.negativePrompt || '',
+                    presets: Array.isArray(value_2351.presets) ? value_2351.presets : [],
+                    activePresetId: value_2351.activePresetId || '',
+                    autoGenerate: value_2351.autoGenerate === true,
+                },
+                referenceFaces: supportsCharacterReference
+                    ? {
+                          char: {
+                              title:
+                                  latestTargetFriend.nickname ||
+                                  latestTargetFriend.realName ||
+                                  'Char',
+                              imageUrl: imageUrl_5,
+                              fileName: latestTargetFriend.imageFaceReferenceFileName || '',
+                              onUpload: async (file) => {
+                                  if (!/^image\//i.test(file?.type || ''))
+                                      throw new Error('请选择图片文件');
+                                  if (
+                                      !window.imApp?.compressImageFile ||
+                                      !window.appStorage?.saveAssetFromDataUrl
+                                  )
+                                      throw new Error('图片存储服务不可用');
+                                  const dataUrl = await window.imApp.compressImageFile(file, {
                                               maxWidth: 1536,
                                               maxHeight: 1536,
                                               quality: 0.9,
                                               mimeType: 'image/jpeg',
-                                          }),
-                                          assetId_2 =
+                                          });
+                                  const assetId_2 =
                                               'im-face-reference-' +
                                               targetFriend_20.id +
                                               '-' +
-                                              Date.now(),
-                                          value_2356 =
+                                              Date.now();
+                                  const value_2356 =
                                               (
                                                   window.imApp?.getFriendById?.(
                                                       targetFriend_20.id,
                                                   ) || targetFriend_20
                                               ).imageFaceReferenceAssetId || '';
-                                      await window.appStorage.saveAssetFromDataUrl(
-                                          assetId_2,
-                                          dataUrl,
-                                          {
-                                              ownerType: 'im_friend_face_reference',
-                                              ownerId: String(targetFriend_20.id),
-                                              fileName: file.name,
-                                          },
-                                      );
-                                      const imageUrl_6 =
-                                              await window.appStorage.getAssetUrl(assetId_2),
-                                          saved_18 = await commitSheetFriendChange(
+                                  await window.appStorage.saveAssetFromDataUrl(assetId_2, dataUrl, {
+                                      ownerType: 'im_friend_face_reference',
+                                      ownerId: String(targetFriend_20.id),
+                                      fileName: file.name,
+                                  });
+                                  const imageUrl_6 =
+                                              await window.appStorage.getAssetUrl(assetId_2);
+                                  const saved_18 = await commitSheetFriendChange(
                                               targetFriend_20,
                                               (friend_19) => {
                                                   friend_19.imageFaceReferenceAssetId = assetId_2;
@@ -12803,33 +13163,31 @@ Persona: ` +
                                                   metaOnly: true,
                                               },
                                           );
-                                      if (!saved_18) {
-                                          await window.appStorage
-                                              .deleteAsset(assetId_2)
-                                              ['catch'](() => undefined);
-                                          throw new Error('参考脸保存失败，请重试');
-                                      }
-                                      return (
-                                          value_2356 &&
-                                              value_2356 !== assetId_2 &&
-                                              (await window.appStorage
-                                                  .deleteAsset(value_2356)
-                                                  ['catch'](() => undefined)),
-                                          window.showToast?.('已保存当前角色的参考脸'),
-                                          {
-                                              imageUrl: imageUrl_6,
-                                              fileName: file.name,
-                                          }
-                                      );
-                                  },
-                                  onDelete: async () => {
-                                      const value_2360 =
+                                  if (!saved_18) {
+                                      await window.appStorage
+                                          .deleteAsset(assetId_2)
+                                          ['catch'](() => undefined);
+                                      throw new Error('参考脸保存失败，请重试');
+                                  }
+                                  value_2356 &&
+                                      value_2356 !== assetId_2 &&
+                                      (await window.appStorage
+                                          .deleteAsset(value_2356)
+                                          ['catch'](() => undefined));
+                                  window.showToast?.('已保存当前角色的参考脸');
+                                  return {
+                                      imageUrl: imageUrl_6,
+                                      fileName: file.name,
+                                  };
+                              },
+                              onDelete: async () => {
+                                  const value_2360 =
                                               (
                                                   window.imApp?.getFriendById?.(
                                                       targetFriend_20.id,
                                                   ) || targetFriend_20
-                                              ).imageFaceReferenceAssetId || '',
-                                          saved_19 = await commitSheetFriendChange(
+                                              ).imageFaceReferenceAssetId || '';
+                                  const saved_19 = await commitSheetFriendChange(
                                               targetFriend_20,
                                               (friend_20) => {
                                                   friend_20.imageFaceReferenceAssetId = null;
@@ -12840,27 +13198,27 @@ Persona: ` +
                                                   metaOnly: true,
                                               },
                                           );
-                                      if (!saved_19) throw new Error('参考脸删除失败，请重试');
-                                      value_2360 &&
-                                          (await window.appStorage
-                                              ?.deleteAsset?.(value_2360)
-                                              ['catch'](() => undefined));
-                                      window.showToast?.('已删除当前角色的参考脸');
-                                  },
+                                  if (!saved_19) throw new Error('参考脸删除失败，请重试');
+                                  value_2360 &&
+                                      (await window.appStorage
+                                          ?.deleteAsset?.(value_2360)
+                                          ['catch'](() => undefined));
+                                  window.showToast?.('已删除当前角色的参考脸');
                               },
-                              user: {
-                                  title: 'User',
-                                  imageUrl: apk110New_2756,
-                                  fileName: apk110New_2755.fileName,
-                                  onUpload: async (apk110New_2773) => {
-                                      if (!/^image\//i.test(apk110New_2773?.type || ''))
-                                          throw new Error('请选择图片文件');
-                                      if (
-                                          !window.imApp?.compressImageFile ||
-                                          !window.appStorage?.saveAssetFromDataUrl
-                                      )
-                                          throw new Error('图片存储服务不可用');
-                                      const apk110New_2774 = await window.imApp.compressImageFile(
+                          },
+                          user: {
+                              title: 'User',
+                              imageUrl: apk110New_2756,
+                              fileName: apk110New_2755.fileName,
+                              onUpload: async (apk110New_2773) => {
+                                  if (!/^image\//i.test(apk110New_2773?.type || ''))
+                                      throw new Error('请选择图片文件');
+                                  if (
+                                      !window.imApp?.compressImageFile ||
+                                      !window.appStorage?.saveAssetFromDataUrl
+                                  )
+                                      throw new Error('图片存储服务不可用');
+                                  const apk110New_2774 = await window.imApp.compressImageFile(
                                               apk110New_2773,
                                               {
                                                   maxWidth: 1536,
@@ -12868,104 +13226,99 @@ Persona: ` +
                                                   quality: 0.9,
                                                   mimeType: 'image/jpeg',
                                               },
-                                          ),
-                                          apk110New_2775 = 'im-user-face-reference-' + Date.now(),
-                                          apk110New_2776 =
-                                              window.imChat.getUserFaceReferenceSettings().assetId;
-                                      await window.appStorage.saveAssetFromDataUrl(
-                                          apk110New_2775,
-                                          apk110New_2774,
-                                          {
-                                              ownerType: 'im_user_face_reference',
-                                              ownerId: 'global',
-                                              fileName: apk110New_2773.name,
-                                          },
-                                      );
-                                      try {
-                                          await window.appStorage.commitDomain(
-                                              'settings',
-                                              (apk110New_2778) => {
-                                                  apk110New_2778.imessageUserFaceReference = {
-                                                      assetId: apk110New_2775,
-                                                      fileName: apk110New_2773.name,
-                                                  };
-                                              },
-                                              {
-                                                  critical: true,
-                                                  reason: 'im-user-face-reference',
-                                              },
                                           );
-                                      } catch (apk110New_2779) {
-                                          await window.appStorage
-                                              .deleteAsset(apk110New_2775)
-                                              ['catch'](() => undefined);
-                                          throw apk110New_2779;
-                                      }
-                                      const apk110New_2777 =
-                                          await window.appStorage.getAssetUrl(apk110New_2775);
-                                      return (
-                                          apk110New_2776 &&
-                                              apk110New_2776 !== apk110New_2775 &&
-                                              (await window.appStorage
-                                                  .deleteAsset(apk110New_2776)
-                                                  ['catch'](() => undefined)),
-                                          window.showToast?.(
-                                              '已保存 User 参考脸，可在所有单聊使用',
-                                          ),
-                                          {
-                                              imageUrl: apk110New_2777,
-                                              fileName: apk110New_2773.name,
-                                          }
-                                      );
-                                  },
-                                  onDelete: async () => {
-                                      const apk110New_2780 =
-                                          window.imChat.getUserFaceReferenceSettings().assetId;
+                                  const apk110New_2775 = 'im-user-face-reference-' + Date.now();
+                                  const apk110New_2776 =
+                                              window.imChat.getUserFaceReferenceSettings().assetId;
+                                  await window.appStorage.saveAssetFromDataUrl(
+                                      apk110New_2775,
+                                      apk110New_2774,
+                                      {
+                                          ownerType: 'im_user_face_reference',
+                                          ownerId: 'global',
+                                          fileName: apk110New_2773.name,
+                                      },
+                                  );
+                                  try {
                                       await window.appStorage.commitDomain(
                                           'settings',
-                                          (apk110New_2781) => {
-                                              apk110New_2781.imessageUserFaceReference = {
-                                                  assetId: '',
-                                                  fileName: '',
+                                          (apk110New_2778) => {
+                                              apk110New_2778.imessageUserFaceReference = {
+                                                  assetId: apk110New_2775,
+                                                  fileName: apk110New_2773.name,
                                               };
                                           },
                                           {
                                               critical: true,
-                                              reason: 'im-user-face-reference-delete',
+                                              reason: 'im-user-face-reference',
                                           },
                                       );
-                                      if (apk110New_2780)
-                                          await window.appStorage
-                                              .deleteAsset(apk110New_2780)
-                                              ['catch'](() => undefined);
-                                      window.showToast?.('已删除 User 参考脸');
-                                  },
+                                  } catch (apk110New_2779) {
+                                      await window.appStorage
+                                          .deleteAsset(apk110New_2775)
+                                          ['catch'](() => undefined);
+                                      throw apk110New_2779;
+                                  }
+                                  const apk110New_2777 =
+                                          await window.appStorage.getAssetUrl(apk110New_2775);
+                                  apk110New_2776 &&
+                                      apk110New_2776 !== apk110New_2775 &&
+                                      (await window.appStorage
+                                          .deleteAsset(apk110New_2776)
+                                          ['catch'](() => undefined));
+                                  window.showToast?.('已保存 User 参考脸，可在所有单聊使用');
+                                  return {
+                                      imageUrl: apk110New_2777,
+                                      fileName: apk110New_2773.name,
+                                  };
                               },
-                          }
-                        : null,
-                    onCancel: (modalState = {}) => {
-                        const imagePromptConfig_2 = buildPromptConfig(modalState);
-                        commitSheetFriendChange(
-                            targetFriend_20,
-                            (friend_21) => {
-                                friend_21.imagePromptConfig = imagePromptConfig_2;
-                            },
-                            {
-                                metaOnly: true,
-                                silent: true,
-                            },
-                        );
-                    },
-                    onConfirm: (value_2364, modalState_4 = {}) => {
-                        const promptValue_2 = String(value_2364 || '').trim(),
-                            imagePromptConfig_3 = buildPromptConfig({
+                              onDelete: async () => {
+                                  const apk110New_2780 =
+                                          window.imChat.getUserFaceReferenceSettings().assetId;
+                                  await window.appStorage.commitDomain(
+                                      'settings',
+                                      (apk110New_2781) => {
+                                          apk110New_2781.imessageUserFaceReference = {
+                                              assetId: '',
+                                              fileName: '',
+                                          };
+                                      },
+                                      {
+                                          critical: true,
+                                          reason: 'im-user-face-reference-delete',
+                                      },
+                                  );
+                                  if (apk110New_2780)
+                                      await window.appStorage
+                                          .deleteAsset(apk110New_2780)
+                                          ['catch'](() => undefined);
+                                  window.showToast?.('已删除 User 参考脸');
+                              },
+                          },
+                      }
+                    : null,
+                onCancel: (modalState = {}) => {
+                    const imagePromptConfig_2 = buildPromptConfig(modalState);
+                    commitSheetFriendChange(
+                        targetFriend_20,
+                        (friend_21) => {
+                            friend_21.imagePromptConfig = imagePromptConfig_2;
+                        },
+                        {
+                            metaOnly: true,
+                            silent: true,
+                        },
+                    );
+                },
+                onConfirm: (value_2364, modalState_4 = {}) => {
+                    const promptValue_2 = String(value_2364 || '').trim();
+                    const imagePromptConfig_3 = buildPromptConfig({
                                 ...modalState_4,
                                 promptValue: promptValue_2,
                             });
-                        return (
-                            (async () => {
-                                try {
-                                    const saved_20 = await commitSheetFriendChange(
+                    (async () => {
+                        try {
+                            const saved_20 = await commitSheetFriendChange(
                                         targetFriend_20,
                                         (friend_22) => {
                                             friend_22.imagePromptConfig = imagePromptConfig_3;
@@ -12974,37 +13327,34 @@ Persona: ` +
                                             metaOnly: true,
                                         },
                                     );
-                                    if (!saved_20) {
-                                        window.showToast?.('生图提示词保存失败，请重试');
-                                        return;
-                                    }
-                                    window.showToast?.('正在根据聊天上下文整理画面…');
-                                    const value_2369 = await handleAction_32(latestTargetFriend);
-                                    await handleAction_371(
-                                        value_2369.scenePrompt,
-                                        targetFriend_20,
-                                        imagePromptConfig_3,
-                                        value_2369,
-                                    );
-                                } catch (error_23) {
-                                    console.error(
-                                        'Failed to prepare contextual chat image prompt',
-                                        error_23,
-                                    );
-                                    window.showToast?.(
-                                        error_23?.message || '根据聊天上下文生成画面失败',
-                                    );
-                                }
-                            })(),
-                            true
-                        );
-                    },
-                    onSavePreset: async ({
-                        presets: presets_7,
-                        activePresetId: activePresetId_3,
-                        preset: preset_11,
-                    }) => {
-                        const imagePromptConfig_4 = {
+                            if (!saved_20) {
+                                window.showToast?.('生图提示词保存失败，请重试');
+                                return;
+                            }
+                            window.showToast?.('正在根据聊天上下文整理画面…');
+                            const value_2369 = await handleAction_32(latestTargetFriend);
+                            await handleAction_371(
+                                value_2369.scenePrompt,
+                                targetFriend_20,
+                                imagePromptConfig_3,
+                                value_2369,
+                            );
+                        } catch (error_23) {
+                            console.error(
+                                'Failed to prepare contextual chat image prompt',
+                                error_23,
+                            );
+                            window.showToast?.(error_23?.message || '根据聊天上下文生成画面失败');
+                        }
+                    })();
+                    return true;
+                },
+                onSavePreset: async ({
+                    presets: presets_7,
+                    activePresetId: activePresetId_3,
+                    preset: preset_11,
+                }) => {
+                    const imagePromptConfig_4 = {
                                 ...value_2351,
                                 charAppearance: preset_11.charAppearance,
                                 userAppearance: preset_11.userAppearance,
@@ -13014,8 +13364,8 @@ Persona: ` +
                                 lastPrompt: preset_11.basePrompt || preset_11.prompt,
                                 presets: presets_7,
                                 activePresetId: activePresetId_3,
-                            },
-                            saved_21 = await commitSheetFriendChange(
+                            };
+                    const saved_21 = await commitSheetFriendChange(
                                 targetFriend_20,
                                 (friend_23) => {
                                     friend_23.imagePromptConfig = imagePromptConfig_4;
@@ -13025,23 +13375,21 @@ Persona: ` +
                                     silent: true,
                                 },
                             );
-                        if (!saved_21) throw new Error('提示词预设保存失败，请重试');
-                    },
-                });
-            }),
-            attachmentSheet_2
-                .querySelector('.location-open-composer-btn')
-                ?.addEventListener('click', value_178_2),
-            (window.imChat.renderLinkedAccountsPanel = renderLinkedAccountsPanel_2),
-            (window.imChat.stopLinkedAccountTimer = stopLinkedAccountTimer_2),
-            (window.imChat.scheduleAttachmentSheetOpenAnimation =
-                scheduleAttachmentSheetOpenAnimation_2),
-            attachmentSheet_2
-        );
+                    if (!saved_21) throw new Error('提示词预设保存失败，请重试');
+                },
+            });
+        });
+        attachmentSheet_2
+            .querySelector('.location-open-composer-btn')
+            ?.addEventListener('click', value_178_2);
+        window.imChat.renderLinkedAccountsPanel = renderLinkedAccountsPanel_2;
+        window.imChat.stopLinkedAccountTimer = stopLinkedAccountTimer_2;
+        window.imChat.scheduleAttachmentSheetOpenAnimation = scheduleAttachmentSheetOpenAnimation_2;
+        return attachmentSheet_2;
     }
     async function sendContactCard_3(value_2378, options_12 = {}) {
-        const friendId_6 = options_12.friendId ?? window.imData.currentActiveFriend?.id,
-            activeFriend_56 =
+        const friendId_6 = options_12.friendId ?? window.imData.currentActiveFriend?.id;
+        const activeFriend_56 =
                 friendId_6 != null
                     ? window.imApp?.getFriendById?.(friendId_6) ||
                       (window.imData.friends || []).find(
@@ -13049,8 +13397,8 @@ Persona: ` +
                       )
                     : null;
         if (!activeFriend_56 || activeFriend_56.type !== 'char') return false;
-        const trim_2382 = String(value_2378 || '').trim(),
-            value_2383 = options_12.generatedProfile != null;
+        const trim_2382 = String(value_2378 || '').trim();
+        const value_2383 = options_12.generatedProfile != null;
         if (value_2383 && trim_2382) return false;
         const contact_2384 = value_2383
             ? window.imApp.normalizeGeneratedContactProfile?.(options_12.generatedProfile, {
@@ -13072,8 +13420,8 @@ Persona: ` +
         if (options_12.requireRelationship === true) {
             const value_2399 = Array.isArray(activeFriend_56.memory?.relationships)
                     ? activeFriend_56.memory.relationships
-                    : [],
-                value_2400 =
+                    : [];
+            const value_2400 =
                     contact_2385 &&
                     value_2399.some(
                         (value_2401) =>
@@ -13082,8 +13430,8 @@ Persona: ` +
                     );
             if (!value_2400) return false;
         }
-        const role_7 = options_12.role === 'assistant' ? 'assistant' : 'user',
-            contactId_3 = contact_2384
+        const role_7 = options_12.role === 'assistant' ? 'assistant' : 'user';
+        const contactId_3 = contact_2384
                 ? (() => {
                       let text_2402 = '';
                       do {
@@ -13101,17 +13449,17 @@ Persona: ` +
                       );
                       return text_2402;
                   })()
-                : String(contact_2385.id),
-            contactName_2 = String(
+                : String(contact_2385.id);
+        const contactName_2 = String(
                 contact_2384?.nickname ||
                     contact_2385?.nickname ||
                     contact_2385?.realName ||
                     '未命名人物',
             )
                 .trim()
-                .slice(0, 200),
-            contactType_2 = contact_2384 ? 'char' : contact_2385.type === 'npc' ? 'npc' : 'char',
-            value_2390 = !contact_2384
+                .slice(0, 200);
+        const contactType_2 = contact_2384 ? 'char' : contact_2385.type === 'npc' ? 'npc' : 'char';
+        const value_2390 = !contact_2384
                 ? (Array.isArray(activeFriend_56.memory?.relationships)
                       ? activeFriend_56.memory.relationships
                       : []
@@ -13120,14 +13468,14 @@ Persona: ` +
                           String(value_2406?.targetId ?? value_2406?.npcId ?? '') ===
                           String(contact_2385.id),
                   )
-                : null,
-            value_2391 =
+                : null;
+        const value_2391 =
                 '[名片] ' +
                 contactName_2 +
                 '（' +
                 (contactType_2 === 'npc' ? 'NPC' : 'Char') +
-                '）',
-            baseNotice_4 = {
+                '）';
+        const baseNotice_4 = {
                 id: window.imChat.createMessageId('contact-card'),
                 role: role_7,
                 type: 'contact_card',
@@ -13193,9 +13541,9 @@ Persona: ` +
                 (window.imData.friends || []).find(
                     (item_31) => String(item_31.id) === String(activeFriend_56.id),
                 ) ||
-                activeFriend_56,
-            elementById_2395 = document.getElementById('chat-interface-' + activeFriend_56.id),
-            value_2396 = elementById_2395?.querySelector('.ins-chat-messages') || null;
+                activeFriend_56;
+        const elementById_2395 = document.getElementById('chat-interface-' + activeFriend_56.id);
+        const value_2396 = elementById_2395?.querySelector('.ins-chat-messages') || null;
         if (value_2396) {
             const value_2409 = window.imChat.appendMessageToContainer
                 ? window.imChat.appendMessageToContainer(value_2394, value_2396, baseNotice_4, {
@@ -13208,11 +13556,12 @@ Persona: ` +
                     scroll: true,
                 });
         }
+        window.imChat.maybeAutoReplyAfterUserMessage?.(value_2394, value_2396, baseNotice_4);
         return true;
     }
     async function sendImageMessage_2(content_28, value_876, contact_877 = {}) {
-        const value_878 = contact_877.friendId ?? window.imData.currentActiveFriend?.id,
-            friend_24 =
+        const value_878 = contact_877.friendId ?? window.imData.currentActiveFriend?.id;
+        const friend_24 =
                 value_878 != null
                     ? window.imApp?.getFriendById?.(value_878) ||
                       (window.imData.friends || []).find(
@@ -13223,15 +13572,15 @@ Persona: ` +
             if (window.showToast) window.showToast('未找到当前聊天对象，图片发送失败');
             return false;
         }
-        const value_880 = 'chat-interface-' + friend_24.id,
-            page_3 = document.getElementById(value_880);
+        const value_880 = 'chat-interface-' + friend_24.id;
+        const page_3 = document.getElementById(value_880);
         if (!page_3) {
             if (window.showToast) window.showToast('聊天页面已关闭，图片发送失败');
             return false;
         }
-        const insChatMessagesElement = page_3.querySelector('.ins-chat-messages'),
-            timestamp_11 = Date.now(),
-            options_882 = {
+        const insChatMessagesElement = page_3.querySelector('.ins-chat-messages');
+        const timestamp_11 = Date.now();
+        const options_882 = {
                 id: window.imChat.createMessageId('img'),
                 role: contact_877.role === 'assistant' ? 'assistant' : 'user',
                 type: 'image',
@@ -13297,31 +13646,44 @@ Persona: ` +
                     scroll: true,
                 });
         }
+        window.imChat.maybeAutoReplyAfterUserMessage?.(
+            friend_24,
+            insChatMessagesElement,
+            options_882,
+        );
         return true;
     }
     async function sendLocationMessage_3(value_2423, value_2424 = '', options_14 = {}) {
-        const friendId_8 = options_14.friendId ?? window.imData.currentActiveFriend?.id,
-            friend_25 =
+        const friendId_8 = options_14.friendId ?? window.imData.currentActiveFriend?.id;
+        const friend_25 =
                 friendId_8 != null
                     ? window.imApp?.getFriendById?.(friendId_8) ||
                       (window.imData.friends || []).find(
                           (item_33) => String(item_33.id) === String(friendId_8),
                       )
                     : null;
-        if (!friend_25 || friend_25.type !== 'char')
-            return (window.showToast?.('定位仅支持 Char 单聊'), false);
+        if (!friend_25 || friend_25.type !== 'char') {
+            window.showToast?.('定位仅支持 Char 单聊');
+            return false;
+        }
         const locationName_2 = String(value_2423 || '')
                 .trim()
-                .slice(0, 80),
-            locationAddress_2 = String(value_2424 || '')
+                .slice(0, 80);
+        const locationAddress_2 = String(value_2424 || '')
                 .trim()
                 .slice(0, 160);
-        if (!locationName_2) return (window.showToast?.('请填写地点名'), false);
+        if (!locationName_2) {
+            window.showToast?.('请填写地点名');
+            return false;
+        }
         const elementById_2430 = document.getElementById('chat-interface-' + friend_25.id);
-        if (!elementById_2430) return (window.showToast?.('聊天页面已关闭，定位发送失败'), false);
+        if (!elementById_2430) {
+            window.showToast?.('聊天页面已关闭，定位发送失败');
+            return false;
+        }
         const value_2431 =
-                '[位置] ' + locationName_2 + (locationAddress_2 ? ' — ' + locationAddress_2 : ''),
-            options_2432 = {
+                '[位置] ' + locationName_2 + (locationAddress_2 ? ' — ' + locationAddress_2 : '');
+        const options_2432 = {
                 id: window.imChat.createMessageId('location'),
                 role: options_14.role === 'assistant' ? 'assistant' : 'user',
                 type: 'location',
@@ -13330,8 +13692,8 @@ Persona: ` +
                 content: value_2431,
                 text: value_2431,
                 timestamp: Date.now(),
-            },
-            value_2433 = window.imApp.appendFriendMessage
+            };
+        const value_2433 = window.imApp.appendFriendMessage
                 ? await window.imApp.appendFriendMessage(friend_25.id, options_2432, {
                       silent: true,
                   })
@@ -13345,7 +13707,10 @@ Persona: ` +
                           silent: true,
                       },
                   );
-        if (!value_2433) return (window.showToast?.('定位消息保存失败'), false);
+        if (!value_2433) {
+            window.showToast?.('定位消息保存失败');
+            return false;
+        }
         const insChatMessagesElement_2434 = elementById_2430.querySelector('.ins-chat-messages');
         if (insChatMessagesElement_2434) {
             const value_2437 = window.imChat.appendMessageToContainer
@@ -13363,6 +13728,11 @@ Persona: ` +
                     scroll: true,
                 });
         }
+        window.imChat.maybeAutoReplyAfterUserMessage?.(
+            friend_25,
+            insChatMessagesElement_2434,
+            options_2432,
+        );
         return true;
     }
     async function sendStickerMessage_2(value_889) {
@@ -13373,24 +13743,24 @@ Persona: ` +
             Number(currentActiveFriend_890.leftGroupAt) > 0
         )
             return false;
-        const value_891 = 'chat-interface-' + currentActiveFriend_890.id,
-            elementById_892 = document.getElementById(value_891);
+        const value_891 = 'chat-interface-' + currentActiveFriend_890.id;
+        const elementById_892 = document.getElementById(value_891);
         if (!elementById_892) return false;
-        const insChatMessagesElement_893 = elementById_892.querySelector('.ins-chat-messages'),
-            safeSticker = value_889 || {},
-            stickerUrl_2 = String(safeSticker.url || safeSticker.stickerUrl || '').trim(),
-            stickerName_2 =
+        const insChatMessagesElement_893 = elementById_892.querySelector('.ins-chat-messages');
+        const safeSticker = value_889 || {};
+        const stickerUrl_2 = String(safeSticker.url || safeSticker.stickerUrl || '').trim();
+        const stickerName_2 =
                 String(safeSticker.name || safeSticker.stickerName || 'Sticker').trim() ||
-                'Sticker',
-            stickerCategory_2 = String(
+                'Sticker';
+        const stickerCategory_2 = String(
                 safeSticker.category || safeSticker.stickerCategory || '',
             ).trim();
         if (!stickerUrl_2) return false;
-        const timestamp_7 = Date.now(),
-            text_12 = stickerCategory_2
+        const timestamp_7 = Date.now();
+        const text_12 = stickerCategory_2
                 ? '用户发了一个表情包：' + stickerCategory_2 + ' / ' + stickerName_2
-                : '用户发了一个表情包：' + stickerName_2,
-            msgObj_2 = {
+                : '用户发了一个表情包：' + stickerName_2;
+        const msgObj_2 = {
                 id: window.imChat.createMessageId('sticker'),
                 role: 'user',
                 type: 'sticker',
@@ -13441,20 +13811,25 @@ Persona: ` +
                     },
                 );
         }
+        window.imChat.maybeAutoReplyAfterUserMessage?.(
+            currentActiveFriend_890,
+            insChatMessagesElement_893,
+            msgObj_2,
+        );
         return true;
     }
     async function sendVoiceMessage_3(value_2453) {
         if (!window.imData.currentActiveFriend) return;
-        const currentActiveFriend_2454 = window.imData.currentActiveFriend,
-            value_2455 = 'chat-interface-' + currentActiveFriend_2454.id,
-            elementById_2456 = document.getElementById(value_2455);
+        const currentActiveFriend_2454 = window.imData.currentActiveFriend;
+        const value_2455 = 'chat-interface-' + currentActiveFriend_2454.id;
+        const elementById_2456 = document.getElementById(value_2455);
         if (!elementById_2456) return;
-        const insChatMessagesElement_2457 = elementById_2456.querySelector('.ins-chat-messages'),
-            safeTranscript = String(value_2453 || '').trim();
+        const insChatMessagesElement_2457 = elementById_2456.querySelector('.ins-chat-messages');
+        const safeTranscript = String(value_2453 || '').trim();
         if (!safeTranscript) return;
-        const timestamp_8 = Date.now(),
-            duration_2 = Math.min(18, Math.max(3, Math.ceil(safeTranscript.length / 3))),
-            msgObj_3 = {
+        const timestamp_8 = Date.now();
+        const duration_2 = Math.min(18, Math.max(3, Math.ceil(safeTranscript.length / 3)));
+        const msgObj_3 = {
                 id: window.imChat.createMessageId('voice'),
                 role: 'user',
                 type: 'voice_message',
@@ -13504,6 +13879,11 @@ Persona: ` +
                     },
                 );
         }
+        window.imChat.maybeAutoReplyAfterUserMessage?.(
+            currentActiveFriend_2454,
+            insChatMessagesElement_2457,
+            msgObj_3,
+        );
     }
     async function acceptOfflineInvitation_2(value_904, value_905) {
         const page_4_2 = document.getElementById('chat-interface-' + value_904);
@@ -13582,24 +13962,24 @@ Persona: ` +
         if (!sheet_3) return;
         const attachmentMoreOfflineEntryElement_2480 = sheet_3.querySelector(
                 '.attachment-more-offline-entry',
-            ),
-            attachmentMoreOfflineLabelElement_2481 = sheet_3.querySelector(
+            );
+        const attachmentMoreOfflineLabelElement_2481 = sheet_3.querySelector(
                 '.attachment-more-offline-label',
-            ),
-            attachmentMoreDynamicActionEntryElement_2482 = sheet_3.querySelector(
+            );
+        const attachmentMoreDynamicActionEntryElement_2482 = sheet_3.querySelector(
                 '.attachment-more-dynamic-action-entry',
-            ),
-            attachmentMoreDynamicActionLabelElement_2483 = sheet_3.querySelector(
+            );
+        const attachmentMoreDynamicActionLabelElement_2483 = sheet_3.querySelector(
                 '.attachment-more-dynamic-action-label',
-            ),
-            listenEntry_2 = sheet_3.querySelector('.attachment-more-listen-entry'),
-            listenLabel = sheet_3.querySelector('.attachment-more-listen-label'),
-            activeFriend_58 = window.imData.currentActiveFriend,
-            isOffline_4 = !!window.imData.currentActiveFriend?.offlineMeetEnabled,
-            isDynamicActionEnabled =
-                !!window.imData.currentActiveFriend?.dynamicActionNarrationEnabled,
-            canListenTogether = activeFriend_58?.type === 'char',
-            isListeningTogether =
+            );
+        const listenEntry_2 = sheet_3.querySelector('.attachment-more-listen-entry');
+        const listenLabel = sheet_3.querySelector('.attachment-more-listen-label');
+        const activeFriend_58 = window.imData.currentActiveFriend;
+        const isOffline_4 = !!window.imData.currentActiveFriend?.offlineMeetEnabled;
+        const isDynamicActionEnabled =
+                !!window.imData.currentActiveFriend?.dynamicActionNarrationEnabled;
+        const canListenTogether = activeFriend_58?.type === 'char';
+        const isListeningTogether =
                 canListenTogether &&
                 !!window.libraryApp?.getTogetherListeningSnapshot?.(activeFriend_58.id);
         if (attachmentMoreOfflineLabelElement_2481)

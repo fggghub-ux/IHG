@@ -882,6 +882,7 @@ User persona:
             handleClick();
             session_5.sending = false;
             sendButton.textContent = '发送';
+            imChat_3.maybeAutoReplyAfterUserMessage?.(friend_7, container, msgObj);
         }
         return (
             editableControls.forEach((node) => {

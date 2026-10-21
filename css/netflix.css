@@ -3102,3 +3102,5 @@
         transition: none !important;
     }
 }
+
+.netflix-catalog-empty p { margin:0; }

@@ -63,6 +63,93 @@
     window.getPayCards = function () {
         return (applyPaySnapshot(getPayStoreSnapshot()), cards_2);
     };
+    const familySpendNoticesInFlight = new Set();
+    async function deliverFamilySpendNotice(transaction) {
+        const id = String(transaction?.id || '');
+        transaction =
+            cards_2
+                .flatMap((card) => card.transactions || [])
+                .find((tx) => String(tx?.id) === id) || transaction;
+        const spend = transaction?.familyCardSpend;
+        if (!id || !spend || spend.noticeStatus !== 'pending' || familySpendNoticesInFlight.has(id))
+            return false;
+        familySpendNoticesInFlight.add(id);
+        try {
+            if (!window.imApp?.appendFriendMessage) return false;
+            await window.imApp.ensureDataReady?.();
+            const friend = window.imData?.friends?.find(
+                (friend) => friend?.type === 'char' && String(friend.id) === String(spend.friendId),
+            );
+            if (!friend) return false;
+            const messageId = 'family-spend-' + id;
+            let exists = (friend.messages || []).some(
+                (message) => String(message.id) === messageId,
+            );
+            const storage = window.appStorage,
+                store = storage?.STORES?.imMessages;
+            if (!exists && store && storage.withStore && storage.requestToPromise) {
+                const stored = await storage.withStore([store], 'readonly', (stores) =>
+                    storage.requestToPromise(stores[store].get(messageId)),
+                );
+                exists = stored?.friendId != null && String(stored.friendId) === String(friend.id);
+            }
+            const amount = Math.abs(Number(transaction.amount));
+            const message = {
+                id: messageId,
+                role: 'system',
+                type: 'system_notice',
+                noticeKind: 'family_card_spend',
+                text: `使用 ${friend.nickname || friend.realName || 'Char'} 的亲属卡消费 $${amount.toFixed(2)} · ${spend.title}`,
+                content: `亲属卡消费 $${amount.toFixed(2)} · ${spend.title}`,
+                familyCardSpend: {
+                    transactionId: id,
+                    friendId: String(spend.friendId),
+                    title: spend.title,
+                    amount,
+                    balance: Number(spend.balance),
+                },
+                timestamp: Number(transaction.time) || Date.now(),
+            };
+            if (
+                !exists &&
+                !(await window.imApp.appendFriendMessage(friend.id, message, {
+                    silent: true,
+                }))
+            )
+                return false;
+            const latest = cards_2
+                .flatMap((card) => card.transactions || [])
+                .find((tx) => String(tx.id) === id);
+            if (!latest?.familyCardSpend) return false;
+            latest.familyCardSpend.noticeStatus = 'sent';
+            savePayData();
+            if (!exists && String(window.imData?.currentActiveFriend?.id) === String(friend.id)) {
+                const container = document
+                    .getElementById('chat-interface-' + friend.id)
+                    ?.querySelector('.ins-chat-messages');
+                if (container)
+                    window.imChat?.renderMessageBubble?.(
+                        message,
+                        friend,
+                        container,
+                        message.timestamp,
+                    );
+            }
+            return true;
+        } catch (error) {
+            console.error('Failed to deliver family card spend notice:', error);
+            return false;
+        } finally {
+            familySpendNoticesInFlight.delete(id);
+        }
+    }
+    async function deliverPendingFamilySpendNotices() {
+        for (const tx of cards_2
+            .flatMap((card) => card.transactions || [])
+            .filter((tx) => tx?.familyCardSpend?.noticeStatus === 'pending')) {
+            await deliverFamilySpendNotice(tx);
+        }
+    }
     window.addPayTransaction = function (
         value_17,
         title_2,
@@ -70,24 +157,49 @@
         targetCardId_2 = null,
     ) {
         const balance_2 = Number(value_17);
-        if (!Number.isFinite(balance_2) || balance_2 <= 0) return false;
+        if (
+            !Number.isFinite(balance_2) ||
+            balance_2 <= 0 ||
+            !['income', 'expense'].includes(type_2)
+        )
+            return false;
+        applyPaySnapshot(getPayStoreSnapshot());
         const targetCard = targetCardId_2
-            ? cards_2.find((c_2) => c_2.id === targetCardId_2) || getCurrentCard()
+            ? cards_2.find((c_2) => String(c_2.id) === String(targetCardId_2))
             : getCurrentCard();
+        if (!targetCard || !Number.isFinite(Number(targetCard.balance))) return false;
+        if (type_2 === 'expense' && Number(targetCard.balance) < balance_2) return false;
+        targetCard.balance = Number(targetCard.balance);
         type_2 === 'income' ? (targetCard.balance += balance_2) : (targetCard.balance -= balance_2);
         const newTx = {
-            id: Date.now(),
+            id: 'pay-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10),
             title: title_2 || '未知交易',
             amount: type_2 === 'income' ? balance_2 : -balance_2,
             time: Date.now(),
             icon: type_2 === 'income' ? 'fa-arrow-down' : 'fa-shopping-bag',
             color: type_2 === 'income' ? '#333' : '#666',
         };
+        if (
+            type_2 === 'expense' &&
+            targetCard.type === 'family' &&
+            String(targetCard.id).startsWith('family_')
+        ) {
+            newTx.familyCardSpend = {
+                friendId: String(targetCard.id).slice('family_'.length),
+                title:
+                    String(title_2 || '消费')
+                        .trim()
+                        .slice(0, 160) || '消费',
+                balance: Number(targetCard.balance),
+                noticeStatus: 'pending',
+            };
+        }
         return (
             (targetCard.transactions = targetCard.transactions || []),
             targetCard.transactions.unshift(newTx),
             savePayData(),
             renderPayUI(),
+            newTx.familyCardSpend && void deliverFamilySpendNotice(newTx),
             window.showToast &&
                 window.showToast(
                     type_2 === 'income'
@@ -391,6 +503,11 @@
                   return (console.warn('Pay global data recovery failed:', error_2), false);
               }))
         : (window.payDataReadyPromise = Promise.resolve(true));
+    void window.payDataReadyPromise
+        .then(deliverPendingFamilySpendNotices)
+        .catch((error) =>
+            console.warn('Pending family card notices could not be delivered:', error),
+        );
     window.addOrUpdateFamilyCard = function (friendId_2, friendName_2, amount_2) {
         const cardId = 'family_' + friendId_2;
         let existingCard = cards_2.find((c_5) => c_5.id === cardId);

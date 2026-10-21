@@ -3,14 +3,14 @@
     ((callback) => document.addEventListener('DOMContentLoaded', callback))
 )(() => {
     const {
-            openView: openView_3,
-            closeView: closeView_2,
-            showToast: showToast_2,
-            showCustomModal: showCustomModal_2,
-            userState: userState_2,
-        } = window,
-        chatSettingsSheet = document.getElementById('chat-settings-sheet'),
-        npcChatSettingsSheet = document.getElementById('npc-chat-settings-sheet');
+        openView: openView_3,
+        closeView: closeView_2,
+        showToast: showToast_2,
+        showCustomModal: showCustomModal_2,
+        userState: userState_2,
+    } = window;
+    const chatSettingsSheet = document.getElementById('chat-settings-sheet');
+    const npcChatSettingsSheet = document.getElementById('npc-chat-settings-sheet');
     window.mobileInputCompat?.registerFocusScope?.({
         selector: '#chat-location-profile-modal',
         priority: 20,
@@ -19,63 +19,63 @@
         scrollBehavior: 'focus',
     });
     window.imData.currentSettingsFriend = null;
-    const bindWorldBookSheet = document.getElementById('bind-world-book-sheet'),
-        bindWorldBookList = document.getElementById('bind-world-book-list'),
-        confirmBindWorldBookBtn = document.getElementById('confirm-bind-world-book-btn'),
-        worldBookBtn = document.getElementById('world-book-btn'),
-        chatBindIdBtn = document.getElementById('chat-bind-id-btn'),
-        chatBindIdLabel = document.getElementById('chat-bind-id-label'),
-        bindAccountSheet = document.getElementById('bind-account-sheet'),
-        bindAccountList = document.getElementById('bind-account-list'),
-        bindAccountEmpty = document.getElementById('bind-account-empty'),
-        confirmBindAccountBtn = document.getElementById('confirm-bind-account-btn'),
-        bindAccountDetailSheet = document.getElementById('bind-account-detail-sheet'),
-        bindAccountDetailSelect = document.getElementById('bind-account-detail-select'),
-        bindAccountDetailEmpty = document.getElementById('bind-account-detail-empty'),
-        bindAccountDetailForm = document.getElementById('bind-account-detail-form'),
-        bindAccountDetailAvatarBtn = document.getElementById('bind-account-detail-avatar-btn'),
-        bindAccountDetailAvatarUpload = document.getElementById(
+    const bindWorldBookSheet = document.getElementById('bind-world-book-sheet');
+    const bindWorldBookList = document.getElementById('bind-world-book-list');
+    const confirmBindWorldBookBtn = document.getElementById('confirm-bind-world-book-btn');
+    const worldBookBtn = document.getElementById('world-book-btn');
+    const chatBindIdBtn = document.getElementById('chat-bind-id-btn');
+    const chatBindIdLabel = document.getElementById('chat-bind-id-label');
+    const bindAccountSheet = document.getElementById('bind-account-sheet');
+    const bindAccountList = document.getElementById('bind-account-list');
+    const bindAccountEmpty = document.getElementById('bind-account-empty');
+    const confirmBindAccountBtn = document.getElementById('confirm-bind-account-btn');
+    const bindAccountDetailSheet = document.getElementById('bind-account-detail-sheet');
+    const bindAccountDetailSelect = document.getElementById('bind-account-detail-select');
+    const bindAccountDetailEmpty = document.getElementById('bind-account-detail-empty');
+    const bindAccountDetailForm = document.getElementById('bind-account-detail-form');
+    const bindAccountDetailAvatarBtn = document.getElementById('bind-account-detail-avatar-btn');
+    const bindAccountDetailAvatarUpload = document.getElementById(
             'bind-account-detail-avatar-upload',
-        ),
-        bindAccountDetailAvatarImg = document.getElementById('bind-account-detail-avatar-img'),
-        bindAccountDetailAvatarIcon = document.getElementById('bind-account-detail-avatar-icon'),
-        bindAccountDetailNameInput = document.getElementById('bind-account-detail-name-input'),
-        bindAccountDetailPhoneInput = document.getElementById('bind-account-detail-phone-input'),
-        bindAccountDetailSignatureInput = document.getElementById(
+        );
+    const bindAccountDetailAvatarImg = document.getElementById('bind-account-detail-avatar-img');
+    const bindAccountDetailAvatarIcon = document.getElementById('bind-account-detail-avatar-icon');
+    const bindAccountDetailNameInput = document.getElementById('bind-account-detail-name-input');
+    const bindAccountDetailPhoneInput = document.getElementById('bind-account-detail-phone-input');
+    const bindAccountDetailSignatureInput = document.getElementById(
             'bind-account-detail-signature-input',
-        ),
-        bindAccountDetailPersonaInput = document.getElementById(
+        );
+    const bindAccountDetailPersonaInput = document.getElementById(
             'bind-account-detail-persona-input',
-        ),
-        bindAccountDetailSaveBtn = document.getElementById('bind-account-detail-save-btn');
-    let tempSelectedBookIds = [],
-        tempSelectedAccountId = null,
-        bindAccountDetailAvatarUrl = null;
-    const editCharPersonaSheetElement = document.getElementById('edit-char-persona-sheet'),
-        relationshipSheet = document.getElementById('relationship-sheet'),
-        relationshipBtn = document.getElementById('relationship-btn'),
-        relationshipList = document.getElementById('relationship-list'),
-        relationshipEmptyState = document.getElementById('relationship-empty-state'),
-        relationshipPicker = document.getElementById('relationship-picker'),
-        relationshipPickerList = document.getElementById('relationship-picker-list'),
-        relationshipPickerFilters = document.getElementById('relationship-picker-filters'),
-        relationshipSelectedCount = document.getElementById('relationship-selected-count'),
-        relationshipTotalBadge = document.getElementById('relationship-total-badge'),
-        confirmRelationshipBtn = document.getElementById('confirm-relationship-btn'),
-        relationshipAddNpcBtn = document.getElementById('relationship-add-npc-btn'),
-        chatCotSettingsSheet = document.getElementById('chat-cot-settings-sheet'),
-        chatCotSettingsBtn = document.getElementById('chat-cot-settings-btn'),
-        chatCotSettingsLabel = document.getElementById('chat-cot-settings-label'),
-        chatCotEnabledToggle = document.getElementById('chat-cot-enabled-toggle'),
-        chatCotPromptInput = document.getElementById('chat-cot-prompt-input'),
-        resetChatCotPromptBtn = document.getElementById('reset-chat-cot-prompt-btn'),
-        saveChatCotSettingsBtn = document.getElementById('save-chat-cot-settings-btn'),
-        DEFAULT_SINGLE_CHAT_COT_PROMPT_2 = window.imApp.DEFAULT_SINGLE_CHAT_COT_PROMPT || '';
-    let tempRelationshipDrafts = [],
-        isRelationshipPickerVisible = false,
-        relationshipPickerType = 'all',
-        relationshipPreviewFrame = null,
-        pendingRelationshipPreviewFriend = null;
+        );
+    const bindAccountDetailSaveBtn = document.getElementById('bind-account-detail-save-btn');
+    let tempSelectedBookIds = [];
+    let tempSelectedAccountId = null;
+    let bindAccountDetailAvatarUrl = null;
+    const editCharPersonaSheetElement = document.getElementById('edit-char-persona-sheet');
+    const relationshipSheet = document.getElementById('relationship-sheet');
+    const relationshipBtn = document.getElementById('relationship-btn');
+    const relationshipList = document.getElementById('relationship-list');
+    const relationshipEmptyState = document.getElementById('relationship-empty-state');
+    const relationshipPicker = document.getElementById('relationship-picker');
+    const relationshipPickerList = document.getElementById('relationship-picker-list');
+    const relationshipPickerFilters = document.getElementById('relationship-picker-filters');
+    const relationshipSelectedCount = document.getElementById('relationship-selected-count');
+    const relationshipTotalBadge = document.getElementById('relationship-total-badge');
+    const confirmRelationshipBtn = document.getElementById('confirm-relationship-btn');
+    const relationshipAddNpcBtn = document.getElementById('relationship-add-npc-btn');
+    const chatCotSettingsSheet = document.getElementById('chat-cot-settings-sheet');
+    const chatCotSettingsBtn = document.getElementById('chat-cot-settings-btn');
+    const chatCotSettingsLabel = document.getElementById('chat-cot-settings-label');
+    const chatCotEnabledToggle = document.getElementById('chat-cot-enabled-toggle');
+    const chatCotPromptInput = document.getElementById('chat-cot-prompt-input');
+    const resetChatCotPromptBtn = document.getElementById('reset-chat-cot-prompt-btn');
+    const saveChatCotSettingsBtn = document.getElementById('save-chat-cot-settings-btn');
+    const DEFAULT_SINGLE_CHAT_COT_PROMPT_2 = window.imApp.DEFAULT_SINGLE_CHAT_COT_PROMPT || '';
+    let tempRelationshipDrafts = [];
+    let isRelationshipPickerVisible = false;
+    let relationshipPickerType = 'all';
+    let relationshipPreviewFrame = null;
+    let pendingRelationshipPreviewFriend = null;
     async function commitSettingsFriendChange(mutator, options_2 = {}) {
         const currentFriend = window.imData.currentSettingsFriend;
         if (!currentFriend) return false;
@@ -948,10 +948,10 @@
             refreshChatPageForFriend(friend_23);
         });
     }
-    let count_21 = 0,
-        count_22 = 0,
-        count_23 = 0,
-        text_24 = '';
+    let count_21 = 0;
+    let count_22 = 0;
+    let count_23 = 0;
+    let text_24 = '';
     const value_25 = new Set();
     function handleAction_26() {
         if (count_22) cancelAnimationFrame(count_22);
@@ -2097,8 +2097,8 @@
                             item_10.npcId &&
                             item_10.relation &&
                             !!getRelationshipTarget(item_10.npcId),
-                    ),
-                saved_6 = await commitSettingsFriendChange(
+                    );
+            const saved_6 = await commitSettingsFriendChange(
                     (targetFriend_5) => {
                         targetFriend_5.memory =
                             targetFriend_5.memory || window.imApp.createDefaultMemory();
@@ -2135,9 +2135,9 @@
                     (item_11) =>
                         (item_11.type === 'char' || item_11.type === 'npc') &&
                         String(item_11.id) !== String(window.imData.currentSettingsFriend.id),
-                ),
-                value_440 = new Set(tempRelationshipDrafts.map(getRelationshipTargetId)),
-                availablePeople_2 = allPeople_2.filter(
+                );
+            const value_440 = new Set(tempRelationshipDrafts.map(getRelationshipTargetId));
+            const availablePeople_2 = allPeople_2.filter(
                     (value_443) => !value_440.has(String(value_443.id)),
                 );
             if (allPeople_2.length === 0) {
@@ -2466,8 +2466,8 @@
         saveChatCotSettingsBtn.addEventListener('click', async () => {
             const currentSettingsFriend_492 = window.imData.currentSettingsFriend;
             if (!currentSettingsFriend_492 || currentSettingsFriend_492.type === 'group') return;
-            const nextEnabled = chatCotEnabledToggle?.checked !== false,
-                nextPrompt = String(chatCotPromptInput?.value || '')
+            const nextEnabled = chatCotEnabledToggle?.checked !== false;
+            const nextPrompt = String(chatCotPromptInput?.value || '')
                     .trim()
                     .slice(0, 4000);
             saveChatCotSettingsBtn.disabled = true;
@@ -2503,9 +2503,9 @@
         });
     bindAccountDetailSelect &&
         bindAccountDetailSelect.addEventListener('change', async (e_3) => {
-            const previousValue_2 = window.imData.currentSettingsFriend?.boundAccountId || 'none',
-                nextValue_2 = e_3.target.value || 'none',
-                saved_10 = await handleAction_20(nextValue_2);
+            const previousValue_2 = window.imData.currentSettingsFriend?.boundAccountId || 'none';
+            const nextValue_2 = e_3.target.value || 'none';
+            const saved_10 = await handleAction_20(nextValue_2);
             if (!saved_10) {
                 e_3.target.value = previousValue_2 || 'none';
                 renderBindAccountDetailForm(window.imData.currentSettingsFriend);
@@ -2632,8 +2632,8 @@
         confirmBindAccountBtn.addEventListener('click', async () => {
             const currentSettingsFriend_508 = window.imData.currentSettingsFriend;
             if (!currentSettingsFriend_508) return;
-            const boundAccountId_3 = tempSelectedAccountId || null,
-                saved_14 = await commitSettingsFriendChange(
+            const boundAccountId_3 = tempSelectedAccountId || null;
+            const saved_14 = await commitSettingsFriendChange(
                     (value_511) => {
                         value_511.boundAccountId = boundAccountId_3;
                     },
@@ -2739,21 +2739,21 @@
             bindWorldBookList.appendChild(item_12);
         });
     }
-    const deleteFriendBtn = document.getElementById('delete-friend-btn'),
-        clearHistoryBtn_2 = document.getElementById('clear-history-btn'),
-        resetCssBtn = document.getElementById('reset-css-btn'),
-        chatBgUpload = document.getElementById('chat-bg-upload'),
-        chatBgUploadIcon = document.getElementById('chat-bg-upload-icon'),
-        chatBgSaveIcon = document.getElementById('chat-bg-save-icon'),
-        chatBgResetIcon = document.getElementById('chat-bg-reset-icon');
+    const deleteFriendBtn = document.getElementById('delete-friend-btn');
+    const clearHistoryBtn_2 = document.getElementById('clear-history-btn');
+    const resetCssBtn = document.getElementById('reset-css-btn');
+    const chatBgUpload = document.getElementById('chat-bg-upload');
+    const chatBgUploadIcon = document.getElementById('chat-bg-upload-icon');
+    const chatBgSaveIcon = document.getElementById('chat-bg-save-icon');
+    const chatBgResetIcon = document.getElementById('chat-bg-reset-icon');
     chatBgUploadIcon &&
         chatBgUpload &&
         (chatBgUploadIcon.addEventListener('click', () => {
             chatBgUpload.click();
         }),
         chatBgUpload.addEventListener('change', async (event_520) => {
-            const value_521 = event_520.target.files[0],
-                currentSettingsFriend_522 = window.imData.currentSettingsFriend;
+            const value_521 = event_520.target.files[0];
+            const currentSettingsFriend_522 = window.imData.currentSettingsFriend;
             if (value_521 && currentSettingsFriend_522)
                 try {
                     const value_523 = await handleAction_8(value_521, currentSettingsFriend_522);
@@ -2810,8 +2810,8 @@
                     isDestructive: true,
                     confirmText: '清空',
                     onConfirm: async () => {
-                        const friendId_3 = window.imData.currentSettingsFriend.id,
-                            value_531 = window.imApp.resetFriendMessages
+                        const friendId_3 = window.imData.currentSettingsFriend.id;
+                        const value_531 = window.imApp.resetFriendMessages
                                 ? await window.imApp.resetFriendMessages(friendId_3, {
                                       silent: true,
                                   })
@@ -2855,8 +2855,8 @@
                         );
                         if (elementById_532) {
                             const insChatMessagesElement_536 =
-                                    elementById_532.querySelector('.ins-chat-messages'),
-                                value_537 = window.imApp.getFriendById
+                                    elementById_532.querySelector('.ins-chat-messages');
+                            const value_537 = window.imApp.getFriendById
                                     ? window.imApp.getFriendById(friendId_3)
                                     : window.imData.currentSettingsFriend;
                             if (
@@ -2893,9 +2893,9 @@
                     isDestructive: true,
                     confirmText: '删除',
                     onConfirm: async () => {
-                        const deletingFriend_3 = window.imData.currentSettingsFriend,
-                            deletingFriendId_3 = deletingFriend_3.id,
-                            saved_15 = window.imApp.commitFriendsChange
+                        const deletingFriend_3 = window.imData.currentSettingsFriend;
+                        const deletingFriendId_3 = deletingFriend_3.id;
+                        const saved_15 = window.imApp.commitFriendsChange
                                 ? await window.imApp.commitFriendsChange(
                                       () => {
                                           window.imData.friends = (
@@ -2939,12 +2939,12 @@
                     },
                 });
         });
-    const chatSettingsMomentsBtn = document.getElementById('chat-settings-moments-btn'),
-        chatReversePhoneBtnElement = document.getElementById('chat-reverse-phone-btn');
+    const chatSettingsMomentsBtn = document.getElementById('chat-settings-moments-btn');
+    const chatReversePhoneBtnElement = document.getElementById('chat-reverse-phone-btn');
     chatReversePhoneBtnElement &&
         chatReversePhoneBtnElement.addEventListener('click', () => {
-            const friendId_4 = window.imData.currentSettingsFriend?.id,
-                result_544 = (window.imData.friends || []).find(
+            const friendId_4 = window.imData.currentSettingsFriend?.id;
+            const result_544 = (window.imData.friends || []).find(
                     (item_13) => String(item_13.id) === String(friendId_4),
                 );
             if (result_544?.type !== 'char') return;
@@ -2963,17 +2963,17 @@
     chatSettingsProfileTriggerElement &&
         chatSettingsProfileTriggerElement.addEventListener('click', () => {
             if (!window.imData.currentSettingsFriend) return;
-            const friend_37 = window.imData.currentSettingsFriend,
-                editCharPersonaSheetElement_547 =
+            const friend_37 = window.imData.currentSettingsFriend;
+            const editCharPersonaSheetElement_547 =
                     document.getElementById('edit-char-persona-sheet');
             if (!editCharPersonaSheetElement_547) return;
-            const realNameInput = document.getElementById('char-realname-input'),
-                nicknameInput = document.getElementById('char-nickname-input'),
-                signatureInput = document.getElementById('char-signature-input'),
-                relationshipInput = document.getElementById('char-relationship-input'),
-                personaInput = document.getElementById('char-persona-input'),
-                charEditAvatarImgElement = document.getElementById('char-edit-avatar-img'),
-                iconPreview = document.getElementById('char-edit-avatar-preview');
+            const realNameInput = document.getElementById('char-realname-input');
+            const nicknameInput = document.getElementById('char-nickname-input');
+            const signatureInput = document.getElementById('char-signature-input');
+            const relationshipInput = document.getElementById('char-relationship-input');
+            const personaInput = document.getElementById('char-persona-input');
+            const charEditAvatarImgElement = document.getElementById('char-edit-avatar-img');
+            const iconPreview = document.getElementById('char-edit-avatar-preview');
             let element_548 = null;
             if (iconPreview) element_548 = iconPreview.querySelector('i');
             let tempAvatarUrl = friend_37.avatarUrl;
@@ -2994,8 +2994,8 @@
                     (charEditAvatarImgElement.src = ''));
                 if (element_548) element_548.style.display = 'block';
             }
-            const avatarWrapper = document.getElementById('char-edit-avatar-wrapper'),
-                avatarUpload = document.getElementById('char-edit-avatar-upload');
+            const avatarWrapper = document.getElementById('char-edit-avatar-wrapper');
+            const avatarUpload = document.getElementById('char-edit-avatar-upload');
             if (avatarWrapper && avatarUpload) {
                 const newAvatarWrapper = avatarWrapper.cloneNode(true);
                 avatarWrapper.parentNode.replaceChild(newAvatarWrapper, avatarWrapper);
@@ -3017,8 +3017,8 @@
                                   })
                                 : await window.imApp.readFileAsDataUrl(file_4);
                             const charEditAvatarImgElement_553 =
-                                    document.getElementById('char-edit-avatar-img'),
-                                iconPreview_2 = document.getElementById('char-edit-avatar-preview');
+                                    document.getElementById('char-edit-avatar-img');
+                            const iconPreview_2 = document.getElementById('char-edit-avatar-preview');
                             let element_555 = null;
                             if (iconPreview_2) element_555 = iconPreview_2.querySelector('i');
                             charEditAvatarImgElement_553 &&
@@ -3042,9 +3042,9 @@
                             nickname: friend_37.nickname || '',
                             realName: friend_37.realName || '',
                             avatarUrl: friend_37.avatarUrl || '',
-                        },
-                        fallbackName = friend_37.type === 'npc' ? 'New NPC' : 'New Friend',
-                        saved_16 = await commitNamedFriendChange(
+                        };
+                    const fallbackName = friend_37.type === 'npc' ? 'New NPC' : 'New Friend';
+                    const saved_16 = await commitNamedFriendChange(
                             friend_37,
                             (targetFriend_11) => {
                                 targetFriend_11.realName = realNameInput ? realNameInput.value : '';
@@ -3086,8 +3086,8 @@
                         ));
                     const page_2 = document.getElementById('chat-interface-' + latestFriend_6.id);
                     if (page_2) {
-                        const nameEl = page_2.querySelector('.ins-chat-name'),
-                            avatarContainer = page_2.querySelector('.ins-chat-avatar');
+                        const nameEl = page_2.querySelector('.ins-chat-name');
+                        const avatarContainer = page_2.querySelector('.ins-chat-avatar');
                         if (nameEl) nameEl.textContent = latestFriend_6.nickname;
                         avatarContainer &&
                             (latestFriend_6.avatarUrl
@@ -3099,11 +3099,11 @@
                     }
                     const chatSettingsAvatarImgElement = document.getElementById(
                             'chat-settings-avatar-img',
-                        ),
-                        chatSettingsAvatarIconElement = document.getElementById(
+                        );
+                    const chatSettingsAvatarIconElement = document.getElementById(
                             'chat-settings-avatar-icon',
-                        ),
-                        chatSettingsNameElement = document.getElementById('chat-settings-name');
+                        );
+                    const chatSettingsNameElement = document.getElementById('chat-settings-name');
                     if (latestFriend_6.avatarUrl) {
                         chatSettingsAvatarImgElement &&
                             ((chatSettingsAvatarImgElement.src = latestFriend_6.avatarUrl),
@@ -3458,41 +3458,41 @@
             el_3.dataset.chatMemoryBound = 'true';
         });
     }
-    const manualSummaryBtn = document.getElementById('chat-memory-manual-summary-btn'),
-        manualSummaryModal = document.getElementById('chat-memory-summary-modal'),
-        manualSummaryClose = document.getElementById('chat-memory-summary-close'),
-        manualSummaryConfirm = document.getElementById('chat-memory-summary-confirm'),
-        manualSummaryCountInput = document.getElementById('chat-memory-summary-count-input'),
-        manualSummaryUnsummarizedCount = document.getElementById('chat-memory-unsummarized-count'),
-        manualSummaryBatchCount = document.getElementById('chat-memory-summary-batch-count'),
-        autoSummaryToggle = document.getElementById('chat-memory-auto-summary-toggle'),
-        summaryRoundInput = document.getElementById('chat-memory-summary-round-input'),
-        summaryHint = document.getElementById('chat-memory-summary-hint'),
-        summaryApiSelect = document.getElementById('chat-memory-summary-api-select'),
-        summaryPromptInput = document.getElementById('chat-memory-summary-prompt-input'),
-        summaryPromptClear = document.getElementById('chat-memory-summary-prompt-clear'),
-        autonomousBtn = document.getElementById('chat-memory-autonomous-btn'),
-        autonomousSheet = document.getElementById('chat-memory-autonomous-sheet'),
-        autonomousClose = document.getElementById('chat-memory-autonomous-close-btn'),
-        autonomousSaveBtn = document.getElementById('chat-memory-autonomous-save-btn'),
-        autonomousToggle = document.getElementById('chat-memory-autonomous-enabled-toggle'),
-        autonomousStatus = document.getElementById('chat-memory-autonomous-status'),
-        autonomousNextLabel = document.getElementById('chat-memory-autonomous-next-label'),
-        autonomousReplyMinInput = document.getElementById('chat-memory-autonomous-reply-min-input'),
-        autonomousReplyMaxInput = document.getElementById('chat-memory-autonomous-reply-max-input'),
-        autonomousMomentToggle = document.getElementById('chat-memory-autonomous-moment-toggle'),
-        autonomousMomentMinInput = document.getElementById(
+    const manualSummaryBtn = document.getElementById('chat-memory-manual-summary-btn');
+    const manualSummaryModal = document.getElementById('chat-memory-summary-modal');
+    const manualSummaryClose = document.getElementById('chat-memory-summary-close');
+    const manualSummaryConfirm = document.getElementById('chat-memory-summary-confirm');
+    const manualSummaryCountInput = document.getElementById('chat-memory-summary-count-input');
+    const manualSummaryUnsummarizedCount = document.getElementById('chat-memory-unsummarized-count');
+    const manualSummaryBatchCount = document.getElementById('chat-memory-summary-batch-count');
+    const autoSummaryToggle = document.getElementById('chat-memory-auto-summary-toggle');
+    const summaryRoundInput = document.getElementById('chat-memory-summary-round-input');
+    const summaryHint = document.getElementById('chat-memory-summary-hint');
+    const summaryApiSelect = document.getElementById('chat-memory-summary-api-select');
+    const summaryPromptInput = document.getElementById('chat-memory-summary-prompt-input');
+    const summaryPromptClear = document.getElementById('chat-memory-summary-prompt-clear');
+    const autonomousBtn = document.getElementById('chat-memory-autonomous-btn');
+    const autonomousSheet = document.getElementById('chat-memory-autonomous-sheet');
+    const autonomousClose = document.getElementById('chat-memory-autonomous-close-btn');
+    const autonomousSaveBtn = document.getElementById('chat-memory-autonomous-save-btn');
+    const autonomousToggle = document.getElementById('chat-memory-autonomous-enabled-toggle');
+    const autonomousStatus = document.getElementById('chat-memory-autonomous-status');
+    const autonomousNextLabel = document.getElementById('chat-memory-autonomous-next-label');
+    const autonomousReplyMinInput = document.getElementById('chat-memory-autonomous-reply-min-input');
+    const autonomousReplyMaxInput = document.getElementById('chat-memory-autonomous-reply-max-input');
+    const autonomousMomentToggle = document.getElementById('chat-memory-autonomous-moment-toggle');
+    const autonomousMomentMinInput = document.getElementById(
             'chat-memory-autonomous-moment-min-input',
-        ),
-        autonomousMomentMaxInput = document.getElementById(
+        );
+    const autonomousMomentMaxInput = document.getElementById(
             'chat-memory-autonomous-moment-max-input',
-        ),
-        autonomousMomentNextLabel = document.getElementById(
+        );
+    const autonomousMomentNextLabel = document.getElementById(
             'chat-memory-autonomous-moment-next-label',
-        ),
-        summaryInFlight = new Set(),
-        chatBackgroundOperationTokens_2 = new Map(),
-        value_52 = new Map();
+        );
+    const summaryInFlight = new Set();
+    const chatBackgroundOperationTokens_2 = new Map();
+    const value_52 = new Map();
     function setAutonomousCardExpanded(toggleEl, expanded) {
         const card = toggleEl?.closest?.('.chat-memory-autonomous-card');
         if (card) card.classList.toggle('is-enabled', !!expanded);
@@ -4123,17 +4123,17 @@
         };
     }
     window.imApp.generateShortTermMemoryPromotionDraft = async function (value_136, sourceEntries) {
-        const entry_8 = window.imApp.getFriendById?.(value_136) || value_136,
-            entries_7 = (Array.isArray(sourceEntries) ? sourceEntries : [])
+        const entry_8 = window.imApp.getFriendById?.(value_136) || value_136;
+        const entries_7 = (Array.isArray(sourceEntries) ? sourceEntries : [])
                 .filter((entry_6) => entry_6 && entry_6.id != null)
                 .map((entry_7) => ({
                     ...entry_7,
                 }));
         if (!entry_8 || entries_7.length === 0) throw new Error('请选择至少一条短期记忆');
-        const anchorDate_2 = parseSummaryDate_2(getSummaryEntryTime_2(entry_8)),
-            value_140 = entry_8.nickname || entry_8.realname || entry_8.realName || 'Char',
-            value_141 = entry_8.type === 'group',
-            join_142 = entries_7.map((message_152, value_156) =>
+        const anchorDate_2 = parseSummaryDate_2(getSummaryEntryTime_2(entry_8));
+        const value_140 = entry_8.nickname || entry_8.realname || entry_8.realName || 'Char';
+        const value_141 = entry_8.type === 'group';
+        const join_142 = entries_7.map((message_152, value_156) =>
                 [
                     'Entry ' + (value_156 + 1) + ' (ID: ' + message_152.id + ')',
                     'Title: ' + (message_152.title || 'Conversation summary'),
@@ -4149,13 +4149,13 @@
 `),
             ).join(`
 
-`),
-            string_143 = String(
+`);
+        const string_143 = String(
                 entries_7[entries_7.length - 1]?.time ||
                     entries_7[entries_7.length - 1]?.createdAt ||
                     '',
-            ),
-            value_145 = value_141
+            );
+        const value_145 = value_141
                 ? `
 Group privacy constraints, highest priority:
 - Input should come only from public summaries of this group. Preserve public facts only.
@@ -4166,8 +4166,8 @@ Private-chat constraints:
 - Merge only facts explicitly present in the input entries. Do not add, guess, or invent details.
 - Express them concisely in terms of ` +
                   value_140 +
-                  "'s lasting relationship with User and stable preferences.",
-            content_5 =
+                  "'s lasting relationship with User and stable preferences.";
+        const content_5 =
                 'You organize memories. Merge these ' +
                 entries_7.length +
                 ' short-term memories into one memory suitable for long-term storage. Keep stable facts, promises, preferences, relationship changes, and unfinished matters; remove repetition and fleeting details.' +
@@ -4183,8 +4183,8 @@ Output parseable JSON only, with no Markdown or explanation. Use exactly this st
 
 Short-term memories:
 ` +
-                join_142,
-            value_753 = await fetch(normalizeSummaryApiEndpoint(anchorDate_2), {
+                join_142;
+        const value_753 = await fetch(normalizeSummaryApiEndpoint(anchorDate_2), {
                 method: 'POST',
                 headers: window.u2Api?.buildApiHeaders
                     ? window.u2Api.buildApiHeaders(anchorDate_2, {
@@ -5175,8 +5175,8 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
     window.imChat = window.imChat || {};
     window.imChat.maybeAutoSummarize = async function value_896(friendOrId_2) {
         const friendId_8 =
-                friendOrId_2 && typeof friendOrId_2 === 'object' ? friendOrId_2.id : friendOrId_2,
-            friend_56 =
+                friendOrId_2 && typeof friendOrId_2 === 'object' ? friendOrId_2.id : friendOrId_2;
+        const friend_56 =
                 (window.imData.friends || []).find(
                     (item_18) => String(item_18.id) === String(friendId_8),
                 ) || (friendOrId_2 && typeof friendOrId_2 === 'object' ? friendOrId_2 : null);
@@ -5236,6 +5236,8 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         if (!friend_57) return null;
         friend_57 = window.imApp.getFriendById?.(friend_57) || friend_57;
         window.imData.currentSettingsFriend = friend_57;
+        const _value7 = document.getElementById('chat-contact-type-select');
+        if (_value7) _value7.value = friend_57.type === 'npc' ? 'npc' : 'char';
         setActiveChatSettingsTab('info');
         if (chatReversePhoneBtnElement)
             chatReversePhoneBtnElement.hidden = friend_57.type !== 'char';
@@ -5245,31 +5247,33 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         handleAction_37();
         handleAction_84(friend_57);
         updateChatBindIdLabel_2(friend_57);
-        const timestampToggleElement_911 = document.getElementById('timestamp-toggle'),
-            timestampPositionBodyElement_912 = document.getElementById('timestamp-position-body'),
-            timestampPositionSelectElement_913 = document.getElementById(
+        const timestampToggleElement_911 = document.getElementById('timestamp-toggle');
+        const timestampPositionBodyElement_912 = document.getElementById('timestamp-position-body');
+        const timestampPositionSelectElement_913 = document.getElementById(
                 'timestamp-position-select',
-            ),
-            chatAvatarToggleElement_914 = document.getElementById('chat-avatar-toggle'),
-            apk110New_1226 = document.getElementById('chat-every-message-avatar-toggle'),
-            apk110New_1227 = document.getElementById('chat-continuous-bubbles-toggle'),
-            apk110New_1228 = document.getElementById('chat-reply-style-select'),
-            chatLanguageSelect = document.getElementById('chat-language-select'),
-            chatCustomLanguageRow_2 = document.getElementById('chat-custom-language-row'),
-            chatCustomLanguageInput_2 = document.getElementById('chat-custom-language-input'),
-            chatMessageCountMinInput = document.getElementById('chat-message-count-min-input'),
-            chatMessageCountMaxInput = document.getElementById('chat-message-count-max-input'),
-            chatTimeAwareToggle = document.getElementById('chat-time-aware-toggle'),
-            chatRoleRecallToggle = document.getElementById('chat-role-recall-toggle'),
-            chatCharBlockToggleElement_921 = document.getElementById('chat-char-block-toggle'),
-            chatBlockFriendBtnElement_922 = document.getElementById('chat-block-friend-btn'),
-            chatAutoExpandTranslationToggle = document.getElementById(
+            );
+        const chatAvatarToggleElement_914 = document.getElementById('chat-avatar-toggle');
+        const apk110New_1226 = document.getElementById('chat-every-message-avatar-toggle');
+        const apk110New_1227 = document.getElementById('chat-continuous-bubbles-toggle');
+        const apk110New_1228 = document.getElementById('chat-reply-style-select');
+        const chatLanguageSelect = document.getElementById('chat-language-select');
+        const chatCustomLanguageRow_2 = document.getElementById('chat-custom-language-row');
+        const chatCustomLanguageInput_2 = document.getElementById('chat-custom-language-input');
+        const chatMessageCountMinInput = document.getElementById('chat-message-count-min-input');
+        const chatMessageCountMaxInput = document.getElementById('chat-message-count-max-input');
+        const chatTimeAwareToggle = document.getElementById('chat-time-aware-toggle');
+        const _value8 = document.getElementById('chat-auto-reply-toggle');
+        const _value9 = document.getElementById('chat-auto-reply-row');
+        const chatRoleRecallToggle = document.getElementById('chat-role-recall-toggle');
+        const chatCharBlockToggleElement_921 = document.getElementById('chat-char-block-toggle');
+        const chatBlockFriendBtnElement_922 = document.getElementById('chat-block-friend-btn');
+        const chatAutoExpandTranslationToggle = document.getElementById(
                 'chat-auto-expand-translation-toggle',
-            ),
-            chatTtsEnabledToggleElement_924 = document.getElementById('chat-tts-enabled-toggle'),
-            chatTtsBody = document.getElementById('chat-tts-settings-body'),
-            chatTtsVoiceInput = document.getElementById('chat-tts-voice-id-input'),
-            chatTtsSpeedInput = document.getElementById('chat-tts-speed-input');
+            );
+        const chatTtsEnabledToggleElement_924 = document.getElementById('chat-tts-enabled-toggle');
+        const chatTtsBody = document.getElementById('chat-tts-settings-body');
+        const chatTtsVoiceInput = document.getElementById('chat-tts-voice-id-input');
+        const chatTtsSpeedInput = document.getElementById('chat-tts-speed-input');
         chatAvatarToggleElement_914 &&
             (chatAvatarToggleElement_914.checked = !!friend_57.showAvatar);
         if (apk110New_1226) apk110New_1226.checked = friend_57.showEveryMessageAvatar === true;
@@ -5277,9 +5281,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         if (apk110New_1228)
             apk110New_1228.value = friend_57.replyStyle === 'outside' ? 'outside' : 'inside';
         if (chatLanguageSelect) {
-            const language_2 = String(friend_57.language || 'zh').trim() || 'zh',
-                standardLanguages = new Set(['zh', 'ko', 'ja', 'en', 'fr', 'yue', 'ru']),
-                isCustomLanguage_2 = !standardLanguages.has(language_2);
+            const language_2 = String(friend_57.language || 'zh').trim() || 'zh';
+            const standardLanguages = new Set(['zh', 'ko', 'ja', 'en', 'fr', 'yue', 'ru']);
+            const isCustomLanguage_2 = !standardLanguages.has(language_2);
             chatLanguageSelect.value = isCustomLanguage_2 ? '__custom__' : language_2;
             if (chatCustomLanguageRow_2)
                 chatCustomLanguageRow_2.style.display = isCustomLanguage_2 ? 'flex' : 'none';
@@ -5300,6 +5304,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         if (chatMessageCountMinInput) chatMessageCountMinInput.value = String(messageRange.min);
         if (chatMessageCountMaxInput) chatMessageCountMaxInput.value = String(messageRange.max);
         chatTimeAwareToggle && (chatTimeAwareToggle.checked = friend_57.timeAware !== false);
+        if (_value9) _value9.hidden = friend_57.type !== 'char';
+        if (_value8)
+            _value8.checked = friend_57.type === 'char' && friend_57.autoReplyEnabled === true;
         handleAction_39(friend_57);
         chatRoleRecallToggle &&
             (chatRoleRecallToggle.checked = friend_57.allowRoleRecall !== false);
@@ -5320,22 +5327,20 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                 : friend_57.minimaxVoice && typeof friend_57.minimaxVoice === 'object'
                   ? friend_57.minimaxVoice
                   : {};
-        return (
-            chatTtsEnabledToggleElement_924 &&
-                (chatTtsEnabledToggleElement_924.checked = !!ttsVoice_2.enabled),
-            chatTtsBody && (chatTtsBody.style.display = ttsVoice_2.enabled ? 'block' : 'none'),
-            chatTtsVoiceInput && (chatTtsVoiceInput.value = ttsVoice_2.voiceId || ''),
-            chatTtsSpeedInput && (chatTtsSpeedInput.value = ttsVoice_2.speed || 1),
-            timestampToggleElement_911 &&
-                ((timestampToggleElement_911.checked = !!friend_57.showTimestamp),
-                timestampPositionBodyElement_912 &&
-                    (timestampPositionBodyElement_912.style.display = 'flex'),
-                timestampPositionSelectElement_913 &&
-                    (timestampPositionSelectElement_913.value =
-                        friend_57.timestampPosition || 'inside')),
-            updateStatusBarBtnCount_2(friend_57),
-            friend_57
-        );
+        chatTtsEnabledToggleElement_924 &&
+            (chatTtsEnabledToggleElement_924.checked = !!ttsVoice_2.enabled);
+        chatTtsBody && (chatTtsBody.style.display = ttsVoice_2.enabled ? 'block' : 'none');
+        chatTtsVoiceInput && (chatTtsVoiceInput.value = ttsVoice_2.voiceId || '');
+        chatTtsSpeedInput && (chatTtsSpeedInput.value = ttsVoice_2.speed || 1);
+        timestampToggleElement_911 &&
+            ((timestampToggleElement_911.checked = !!friend_57.showTimestamp),
+            timestampPositionBodyElement_912 &&
+                (timestampPositionBodyElement_912.style.display = 'flex'),
+            timestampPositionSelectElement_913 &&
+                (timestampPositionSelectElement_913.value =
+                    friend_57.timestampPosition || 'inside'));
+        updateStatusBarBtnCount_2(friend_57);
+        return friend_57;
     }
     function refreshNpcSettingsHeader(friend_58) {
         const avatarImg = document.getElementById('npc-chat-settings-avatar-img'),
@@ -5376,28 +5381,28 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
     function handleAction_89(currentSettingsFriend_9) {
         if (!currentSettingsFriend_9) return null;
         window.imData.currentSettingsFriend = currentSettingsFriend_9;
+        const _value0 = document.getElementById('npc-chat-contact-type-select');
+        if (_value0) _value0.value = currentSettingsFriend_9.type === 'char' ? 'char' : 'npc';
         refreshNpcSettingsHeader(currentSettingsFriend_9);
-        const npcTimestampToggleElement_937 = document.getElementById('npc-timestamp-toggle'),
-            npcTimestampPositionBodyElement_938 = document.getElementById(
+        const npcTimestampToggleElement_937 = document.getElementById('npc-timestamp-toggle');
+        const npcTimestampPositionBodyElement_938 = document.getElementById(
                 'npc-timestamp-position-body',
-            ),
-            npcTimestampPositionSelectElement_939 = document.getElementById(
+            );
+        const npcTimestampPositionSelectElement_939 = document.getElementById(
                 'npc-timestamp-position-select',
-            ),
-            npcChatAvatarToggleElement_940 = document.getElementById('npc-chat-avatar-toggle');
-        return (
-            npcChatAvatarToggleElement_940 &&
-                (npcChatAvatarToggleElement_940.checked = !!currentSettingsFriend_9.showAvatar),
-            npcTimestampToggleElement_937 &&
-                ((npcTimestampToggleElement_937.checked = !!currentSettingsFriend_9.showTimestamp),
-                npcTimestampPositionBodyElement_938 &&
-                    (npcTimestampPositionBodyElement_938.style.display = 'flex'),
-                npcTimestampPositionSelectElement_939 &&
-                    (npcTimestampPositionSelectElement_939.value =
-                        currentSettingsFriend_9.timestampPosition || 'inside')),
-            handleAction_42(),
-            currentSettingsFriend_9
-        );
+            );
+        const npcChatAvatarToggleElement_940 = document.getElementById('npc-chat-avatar-toggle');
+        npcChatAvatarToggleElement_940 &&
+            (npcChatAvatarToggleElement_940.checked = !!currentSettingsFriend_9.showAvatar);
+        npcTimestampToggleElement_937 &&
+            ((npcTimestampToggleElement_937.checked = !!currentSettingsFriend_9.showTimestamp),
+            npcTimestampPositionBodyElement_938 &&
+                (npcTimestampPositionBodyElement_938.style.display = 'flex'),
+            npcTimestampPositionSelectElement_939 &&
+                (npcTimestampPositionSelectElement_939.value =
+                    currentSettingsFriend_9.timestampPosition || 'inside'));
+        handleAction_42();
+        return currentSettingsFriend_9;
     }
     function openNpcChatSettingsForFriend(value_941) {
         const handleAction_89_942 = handleAction_89(value_941);
@@ -5435,17 +5440,98 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                 : void persistProfileStatusMigration(handleAction_86_945);
         }, 400);
     }
-    const timestampToggleElement = document.getElementById('timestamp-toggle'),
-        timestampPositionBodyElement = document.getElementById('timestamp-position-body'),
-        timestampPositionSelectElement = document.getElementById('timestamp-position-select');
+    let _value = false;
+    const _value2 = [
+        document.getElementById('chat-contact-type-select'),
+        document.getElementById('npc-chat-contact-type-select'),
+    ].filter(Boolean);
+    async function _value3(_value1) {
+        const _value10 = window.imData.currentSettingsFriend;
+        const _value11 = _value10?.id == null ? '' : String(_value10.id);
+        const _value12 = _value10?.type;
+        if (!_value11 || !['char', 'npc'].includes(_value12) || !['char', 'npc'].includes(_value1))
+            return false;
+        if (_value1 === _value12) return true;
+        if (_value) return false;
+        _value = true;
+        _value2.forEach((_value16) => {
+            _value16.disabled = true;
+        });
+        let _value13 = false;
+        try {
+            _value13 = await window.imApp.changeFriendType(_value11, _value1);
+        } catch (_value17) {
+            console.warn('[iMessage] Failed to switch contact type', _value17);
+        }
+        _value = false;
+        _value2.forEach((_value18) => {
+            _value18.disabled = false;
+        });
+        const _value14 = window.imApp.getFriendById(_value11);
+        if (!_value13 || !_value14 || _value14.type !== _value1) {
+            _value14 &&
+                ((window.imData.currentSettingsFriend = _value14),
+                String(window.imData.currentActiveFriend?.id ?? '') === _value11 &&
+                    (window.imData.currentActiveFriend = _value14));
+            _value2.forEach((_value19) => {
+                _value19.value = _value14?.type || _value12;
+            });
+            showToast_2('身份类型保存失败');
+            return false;
+        }
+        window.imData.currentSettingsFriend = _value14;
+        String(window.imData.currentActiveFriend?.id ?? '') === _value11 &&
+            (window.imData.currentActiveFriend = _value14);
+        window.imChat?.invalidateFriendConversation?.(_value11);
+        closeView_2(chatSettingsSheet);
+        closeView_2(npcChatSettingsSheet);
+        const _value15 = document.getElementById('chat-interface-' + _value11);
+        _value15 &&
+            (window.imChat?.disposeOnlineChatBottomFollower?.(
+                _value15.querySelector('.ins-chat-messages'),
+            ),
+            _value15.remove());
+        window.imApp.renderFriendsList?.({
+            force: true,
+        });
+        window.imApp.renderGroupsList?.({
+            force: true,
+        });
+        window.imApp.requestChatsListRefresh?.();
+        window.dispatchEvent(
+            new CustomEvent('u2:friend-type-changed', {
+                detail: {
+                    friendId: _value11,
+                    previousType: _value12,
+                    type: _value1,
+                },
+            }),
+        );
+        try {
+            await window.imChat?.openChatTab?.(_value14);
+        } catch (_value20) {
+            console.warn('[iMessage] Failed to rebuild chat after identity change', _value20);
+        }
+        openChatSettingsForFriend_2(_value14);
+        showToast_2('已切换为 ' + (_value1 === 'char' ? 'Char' : 'NPC'));
+        return true;
+    }
+    _value2.forEach((_value21) => {
+        _value21.addEventListener('change', (_value22) => {
+            void _value3(_value22.target.value);
+        });
+    });
+    const timestampToggleElement = document.getElementById('timestamp-toggle');
+    const timestampPositionBodyElement = document.getElementById('timestamp-position-body');
+    const timestampPositionSelectElement = document.getElementById('timestamp-position-select');
     timestampToggleElement &&
         timestampToggleElement.dataset.bound !== 'true' &&
         ((timestampToggleElement.dataset.bound = 'true'),
         timestampToggleElement.addEventListener('change', async (event_197) => {
             if (window.imData.currentSettingsFriend) {
-                const checked_12 = !!window.imData.currentSettingsFriend.showTimestamp,
-                    showTimestamp_3 = event_197.target.checked,
-                    value_200 = await commitSettingsFriendChange(
+                const checked_12 = !!window.imData.currentSettingsFriend.showTimestamp;
+                const showTimestamp_3 = event_197.target.checked;
+                const value_200 = await commitSettingsFriendChange(
                         (value_201) => {
                             value_201.showTimestamp = showTimestamp_3;
                         },
@@ -5466,9 +5552,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         ((timestampPositionSelectElement.dataset.bound = 'true'),
         timestampPositionSelectElement.addEventListener('change', async (event_202) => {
             if (window.imData.currentSettingsFriend) {
-                const value_16 = window.imData.currentSettingsFriend.timestampPosition || 'inside',
-                    timestampPosition_2 = event_202.target.value,
-                    value_205 = await commitSettingsFriendChange(
+                const value_16 = window.imData.currentSettingsFriend.timestampPosition || 'inside';
+                const timestampPosition_2 = event_202.target.value;
+                const value_205 = await commitSettingsFriendChange(
                         (value_206) => {
                             value_206.timestampPosition = timestampPosition_2;
                         },
@@ -5484,9 +5570,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                 handleAction_88(window.imData.currentSettingsFriend);
             }
         }));
-    const npcTimestampToggleElement = document.getElementById('npc-timestamp-toggle'),
-        npcTimestampPositionBodyElement = document.getElementById('npc-timestamp-position-body'),
-        npcTimestampPositionSelectElement = document.getElementById(
+    const npcTimestampToggleElement = document.getElementById('npc-timestamp-toggle');
+    const npcTimestampPositionBodyElement = document.getElementById('npc-timestamp-position-body');
+    const npcTimestampPositionSelectElement = document.getElementById(
             'npc-timestamp-position-select',
         );
     npcTimestampToggleElement &&
@@ -5494,9 +5580,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         ((npcTimestampToggleElement.dataset.bound = 'true'),
         npcTimestampToggleElement.addEventListener('change', async (event_207) => {
             if (window.imData.currentSettingsFriend) {
-                const checked_13 = !!window.imData.currentSettingsFriend.showTimestamp,
-                    showTimestamp_4 = event_207.target.checked,
-                    value_210 = await commitSettingsFriendChange(
+                const checked_13 = !!window.imData.currentSettingsFriend.showTimestamp;
+                const showTimestamp_4 = event_207.target.checked;
+                const value_210 = await commitSettingsFriendChange(
                         (value_211) => {
                             value_211.showTimestamp = showTimestamp_4;
                         },
@@ -5517,9 +5603,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         ((npcTimestampPositionSelectElement.dataset.bound = 'true'),
         npcTimestampPositionSelectElement.addEventListener('change', async (event_212) => {
             if (window.imData.currentSettingsFriend) {
-                const value_19 = window.imData.currentSettingsFriend.timestampPosition || 'inside',
-                    timestampPosition_3 = event_212.target.value,
-                    value_215 = await commitSettingsFriendChange(
+                const value_19 = window.imData.currentSettingsFriend.timestampPosition || 'inside';
+                const timestampPosition_3 = event_212.target.value;
+                const value_215 = await commitSettingsFriendChange(
                         (value_217) => {
                             value_217.timestampPosition = timestampPosition_3;
                         },
@@ -5535,15 +5621,15 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                 handleAction_88(window.imData.currentSettingsFriend);
             }
         }));
-    const chatLanguageSelect_2 = document.getElementById('chat-language-select'),
-        chatCustomLanguageRowElement = document.getElementById('chat-custom-language-row'),
-        chatCustomLanguageInput = document.getElementById('chat-custom-language-input'),
-        value_92 = new Set(['zh', 'ko', 'ja', 'en', 'fr', 'yue', 'ru']);
+    const chatLanguageSelect_2 = document.getElementById('chat-language-select');
+    const chatCustomLanguageRowElement = document.getElementById('chat-custom-language-row');
+    const chatCustomLanguageInput = document.getElementById('chat-custom-language-input');
+    const value_92 = new Set(['zh', 'ko', 'ja', 'en', 'fr', 'yue', 'ru']);
     chatLanguageSelect_2 &&
         chatLanguageSelect_2.addEventListener('change', async (event_966) => {
             if (window.imData.currentSettingsFriend) {
-                const value_8_2 = window.imData.currentSettingsFriend.language || 'zh',
-                    language_4 = event_966.target.value;
+                const value_8_2 = window.imData.currentSettingsFriend.language || 'zh';
+                const language_4 = event_966.target.value;
                 if (language_4 === '__custom__') {
                     if (chatCustomLanguageRowElement)
                         chatCustomLanguageRowElement.style.display = 'flex';
@@ -5572,7 +5658,8 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
             (item_19) => String(item_19.id) === String(friendId_9),
         );
         if (result_972?.type !== 'char') return false;
-        return (window.userPhoneAccessUi?.open(result_972), true);
+        window.userPhoneAccessUi?.open(result_972);
+        return true;
     };
     async function handleAction_93() {
         const friend_61 = window.imData.currentSettingsFriend;
@@ -5603,9 +5690,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         event_219.preventDefault();
         chatCustomLanguageInput.blur();
     });
-    const chatMessageCountMinInputElement = document.getElementById('chat-message-count-min-input'),
-        chatMessageCountMaxInputElement = document.getElementById('chat-message-count-max-input'),
-        clampChatMessageCount = (value_9_2) =>
+    const chatMessageCountMinInputElement = document.getElementById('chat-message-count-min-input');
+    const chatMessageCountMaxInputElement = document.getElementById('chat-message-count-max-input');
+    const clampChatMessageCount = (value_9_2) =>
             Math.min(20, Math.max(1, Math.round(Number(value_9_2) || 1)));
     async function handleAction_95(changedSide) {
         const currentSettingsFriend_982 = window.imData.currentSettingsFriend;
@@ -5658,9 +5745,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         ((chatTimeAwareToggleElement.dataset.bound = 'true'),
         chatTimeAwareToggleElement.addEventListener('change', async (event_988) => {
             if (window.imData.currentSettingsFriend) {
-                const checked_7 = window.imData.currentSettingsFriend.timeAware !== false,
-                    timeAware_2 = event_988.target.checked,
-                    value_991 = await commitSettingsFriendChange(
+                const checked_7 = window.imData.currentSettingsFriend.timeAware !== false;
+                const timeAware_2 = event_988.target.checked;
+                const value_991 = await commitSettingsFriendChange(
                         (targetFriend_18) => {
                             targetFriend_18.timeAware = timeAware_2;
                             if (!timeAware_2) {
@@ -5679,15 +5766,35 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                 } else !timeAware_2 && handleAction_39(window.imData.currentSettingsFriend);
             }
         }));
+    const _value4 = document.getElementById('chat-auto-reply-toggle');
+    _value4 &&
+        _value4.dataset.bound !== 'true' &&
+        ((_value4.dataset.bound = 'true'),
+        _value4.addEventListener('change', async (_value23) => {
+            const _value24 = window.imData.currentSettingsFriend;
+            if (!_value24 || _value24.type !== 'char') return;
+            const _value25 = _value24.autoReplyEnabled === true;
+            const _value26 = _value23.target.checked === true;
+            const _value27 = await commitSettingsFriendChange(
+                (_value28) => {
+                    _value28.autoReplyEnabled = _value26;
+                },
+                {
+                    silent: true,
+                },
+            );
+            !_value27 &&
+                ((_value23.target.checked = _value25), showToast_2('自动回复设置保存失败'));
+        }));
     const chatRoleRecallToggleElement = document.getElementById('chat-role-recall-toggle');
     chatRoleRecallToggleElement &&
         chatRoleRecallToggleElement.dataset.bound !== 'true' &&
         ((chatRoleRecallToggleElement.dataset.bound = 'true'),
         chatRoleRecallToggleElement.addEventListener('change', async (event_994) => {
             if (window.imData.currentSettingsFriend) {
-                const checked_8 = window.imData.currentSettingsFriend.allowRoleRecall !== false,
-                    checked_996 = event_994.target.checked,
-                    saved_21 = await commitSettingsFriendChange(
+                const checked_8 = window.imData.currentSettingsFriend.allowRoleRecall !== false;
+                const checked_996 = event_994.target.checked;
+                const saved_21 = await commitSettingsFriendChange(
                         (targetFriend_19) => {
                             targetFriend_19.allowRoleRecall = checked_996;
                         },
@@ -5706,9 +5813,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         chatCharBlockToggleElement.addEventListener('change', async (event_999) => {
             const currentSettingsFriend_1000 = window.imData.currentSettingsFriend;
             if (!currentSettingsFriend_1000 || currentSettingsFriend_1000.type === 'group') return;
-            const checked_14 = currentSettingsFriend_1000.allowCharBlock === true,
-                allowCharBlock_2 = event_999.target.checked === true,
-                value_1003 = await commitSettingsFriendChange(
+            const checked_14 = currentSettingsFriend_1000.allowCharBlock === true;
+            const allowCharBlock_2 = event_999.target.checked === true;
+            const value_1003 = await commitSettingsFriendChange(
                     (value_1004) => {
                         value_1004.allowCharBlock = allowCharBlock_2;
                     },
@@ -5726,8 +5833,8 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         autonomousSaveBtn_2.addEventListener('click', () => {
             const friend_62 = window.imData.currentSettingsFriend;
             if (!friend_62 || friend_62.type === 'group') return;
-            const value_1006 = friend_62.blockState?.userBlocksChar === true,
-                value_1007 = async () => {
+            const value_1006 = friend_62.blockState?.userBlocksChar === true;
+            const value_1007 = async () => {
                     autonomousSaveBtn_2.style.pointerEvents = 'none';
                     const value_1008 = await window.imApp.commitChatBlockState(
                         friend_62,
@@ -5772,9 +5879,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         chatAutoExpandTranslationToggleElement.addEventListener('change', async (event_1010) => {
             if (window.imData.currentSettingsFriend) {
                 const checked_9 =
-                        window.imData.currentSettingsFriend.autoExpandTranslation === true,
-                    checked_1012 = event_1010.target.checked,
-                    saved_22 = await commitSettingsFriendChange(
+                        window.imData.currentSettingsFriend.autoExpandTranslation === true;
+                const checked_1012 = event_1010.target.checked;
+                const saved_22 = await commitSettingsFriendChange(
                         (targetFriend_20) => {
                             targetFriend_20.autoExpandTranslation = checked_1012;
                         },
@@ -5795,9 +5902,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
             const currentSettingsFriend_1016 = window.imData.currentSettingsFriend;
             if (!currentSettingsFriend_1016?.id) return;
             const checked_15 =
-                    window.imMcpConfig?.isEnabled?.(currentSettingsFriend_1016.id) === true,
-                value_1018 = event_1015.target.checked === true,
-                value_1019 = value_1018
+                    window.imMcpConfig?.isEnabled?.(currentSettingsFriend_1016.id) === true;
+            const value_1018 = event_1015.target.checked === true;
+            const value_1019 = value_1018
                     ? window.imMcpConfig?.enable?.(currentSettingsFriend_1016.id)
                     : window.imMcpConfig?.disable?.(currentSettingsFriend_1016.id);
             if (value_1019 !== true) {
@@ -5817,9 +5924,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
             if (!currentSettingsFriend_1021?.id) return;
             const checked_16 =
                     window.imMcpConfig?.shouldShowToolCalls?.(currentSettingsFriend_1021.id) !==
-                    false,
-                value_1023 = event_1020.target.checked === true,
-                setShowToolCalls_1024 = window.imMcpConfig?.setShowToolCalls?.(
+                    false;
+            const value_1023 = event_1020.target.checked === true;
+            const setShowToolCalls_1024 = window.imMcpConfig?.setShowToolCalls?.(
                     currentSettingsFriend_1021.id,
                     value_1023,
                 );
@@ -5871,8 +5978,8 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
             if (!window.imData.currentSettingsFriend) return;
             const previousSettings = {
                     ...getCurrentTtsVoiceSettings(window.imData.currentSettingsFriend),
-                },
-                nextValue = e_5.target.checked;
+                };
+            const nextValue = e_5.target.checked;
             syncChatTtsBodyVisibility(nextValue);
             const saved_23 = await commitSettingsFriendChange(
                 (targetFriend_21) => {
@@ -5925,8 +6032,8 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         ((chatTtsSpeedInputElement.dataset.bound = 'true'),
         chatTtsSpeedInputElement.addEventListener('change', async (e_7) => {
             const previousValue_5 =
-                    getCurrentTtsVoiceSettings(window.imData.currentSettingsFriend).speed || 1,
-                value_12_2 = Math.max(0.5, Math.min(2, parseFloat(e_7.target.value) || 1));
+                    getCurrentTtsVoiceSettings(window.imData.currentSettingsFriend).speed || 1;
+            const value_12_2 = Math.max(0.5, Math.min(2, parseFloat(e_7.target.value) || 1));
             e_7.target.value = value_12_2;
             await saveChatTtsField('speed', value_12_2, e_7.target, previousValue_5);
         }));
@@ -5934,9 +6041,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
     chatAvatarToggleElement &&
         chatAvatarToggleElement.addEventListener('change', async (event_1042) => {
             if (window.imData.currentSettingsFriend) {
-                const checked_10 = !!window.imData.currentSettingsFriend.showAvatar,
-                    showAvatar_3 = event_1042.target.checked,
-                    value_1045 = await commitSettingsFriendChange(
+                const checked_10 = !!window.imData.currentSettingsFriend.showAvatar;
+                const showAvatar_3 = event_1042.target.checked;
+                const value_1045 = await commitSettingsFriendChange(
                         (value_1046) => {
                             value_1046.showAvatar = showAvatar_3;
                         },
@@ -5950,8 +6057,8 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                     return;
                 }
                 if (window.imChat && window.imChat.rerenderChatContainer) {
-                    const currentSettingsFriend_1047 = window.imData.currentSettingsFriend,
-                        elementById_1048 = document.getElementById(
+                    const currentSettingsFriend_1047 = window.imData.currentSettingsFriend;
+                    const elementById_1048 = document.getElementById(
                             'chat-interface-' + currentSettingsFriend_1047.id,
                         );
                     if (elementById_1048) {
@@ -5973,9 +6080,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
     pinToggle_2 &&
         pinToggle_2.addEventListener('change', async (event_1050) => {
             if (window.imData.currentSettingsFriend) {
-                const checked_11 = !!window.imData.currentSettingsFriend.isPinned,
-                    isPinned_3 = event_1050.target.checked,
-                    value_1053 = await commitSettingsFriendChange(
+                const checked_11 = !!window.imData.currentSettingsFriend.isPinned;
+                const isPinned_3 = event_1050.target.checked;
+                const value_1053 = await commitSettingsFriendChange(
                         (value_1055) => {
                             value_1055.isPinned = isPinned_3;
                         },
@@ -6038,13 +6145,13 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                           ? apk110New_1390[apk110New_1382] === 'outside'
                               ? 'outside'
                               : 'inside'
-                          : apk110New_1390[apk110New_1382] === true,
-                apk110New_1392 = apk110New_1383(
+                          : apk110New_1390[apk110New_1382] === true;
+            const apk110New_1392 = apk110New_1383(
                     apk110New_1389.type === 'checkbox'
                         ? apk110New_1389.checked
                         : apk110New_1389.value,
-                ),
-                apk110New_1393 = await commitSettingsFriendChange(
+                );
+            const apk110New_1393 = await commitSettingsFriendChange(
                     (apk110New_1395) => {
                         apk110New_1395[apk110New_1382] = apk110New_1392;
                     },
@@ -6063,8 +6170,8 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
             if (apk110New_1385) {
                 const apk110New_1396 = document.getElementById(
                         'chat-interface-' + apk110New_1394.id,
-                    ),
-                    apk110New_1397 = apk110New_1396?.querySelector('.ins-chat-messages');
+                    );
+                const apk110New_1397 = apk110New_1396?.querySelector('.ins-chat-messages');
                 if (apk110New_1397)
                     window.imChat?.rerenderChatContainer?.(apk110New_1394, apk110New_1397, {
                         scroll: false,
@@ -6158,9 +6265,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
             true
         );
     }
-    let enabled_101 = false,
-        enabled_102 = false,
-        enabled_103 = false;
+    let enabled_101 = false;
+    let enabled_102 = false;
+    let enabled_103 = false;
     function restoreSavedCss() {
         enabled_103 = true;
         if (enabled_101 || enabled_102) return;
@@ -6186,10 +6293,10 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
     document.addEventListener('imessage-data-ready', restoreSavedCss);
     document.addEventListener('u2-theme-state-ready', restoreSavedCss);
     restoreSavedCss();
-    const saveCssPresetBtn = document.getElementById('save-css-preset-btn'),
-        loadCssPresetBtn = document.getElementById('load-css-preset-btn'),
-        cssPresetListSheet = document.getElementById('css-preset-list-sheet'),
-        cssPresetList = document.getElementById('css-preset-list');
+    const saveCssPresetBtn = document.getElementById('save-css-preset-btn');
+    const loadCssPresetBtn = document.getElementById('load-css-preset-btn');
+    const cssPresetListSheet = document.getElementById('css-preset-list-sheet');
+    const cssPresetList = document.getElementById('css-preset-list');
     cssPresetListSheet &&
         cssPresetListSheet.addEventListener('click', (event_232) => {
             event_232.target === cssPresetListSheet && closeView_2(cssPresetListSheet);

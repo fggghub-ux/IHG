@@ -1,9 +1,3 @@
-// ==========================================
-// APP STORAGE LAYER
-// Unified IndexedDB repository for the whole project
-// Mobile-first, no legacy migration retention
-// ==========================================
-
 (function () {
     const DB_NAME = 'iiso_app_storage';
     const OPTIMIZATION_SHADOW_DB_NAME = 'iiso_app_storage_optimization_shadow_v10';
@@ -195,9 +189,6 @@
             });
         }
     }
-
-    // Browser localStorage is intentionally never read at runtime. These helpers
-    // only parse rows embedded in a user-selected legacy backup file.
     function getLegacyBackupValue(snapshot = [], key) {
         const row = Array.isArray(snapshot)
             ? snapshot.find((item) => item && item.key === key)
@@ -1501,9 +1492,10 @@
             fields.forEach((field) => {
                 const source = images[field];
                 if (isDataUrl(source)) {
-                    const assetId = String(
-                        imageAssetIds[field] || getDesktopWidgetAssetId(widgetId, field),
-                    );
+                    const previousId = String(imageAssetIds[field] || '');
+                    const assetId = previousId.startsWith('desktop_theme_')
+                        ? getDesktopWidgetAssetId(widgetId, field)
+                        : previousId || getDesktopWidgetAssetId(widgetId, field);
                     putAssetInTransaction(assetStore, assetId, source, {
                         ownerType: 'desktop_widget',
                         ownerId: String(widgetId),
@@ -1513,15 +1505,10 @@
                     images[field] = null;
                     return;
                 }
-
-                // Blob URLs are runtime-only. Keep their durable asset reference and
-                // let startup hydration recreate the URL after a refresh.
                 if (isBlobUrl(source)) {
                     images[field] = null;
                     return;
                 }
-
-                // An explicit built-in or remote URL supersedes a previous upload.
                 if (typeof source === 'string' && source.trim()) delete imageAssetIds[field];
             });
             widget.images = images;
@@ -2824,6 +2811,31 @@
         }
         return Number.isFinite(Number(fallbackIndex)) ? Number(fallbackIndex) : 0;
     }
+    function normalizeShopGiftMetadata(gift) {
+        if (!gift || typeof gift !== 'object') return null;
+        const price = Number(gift.price);
+        return {
+            orderId: String(gift.orderId || '').slice(0, 160),
+            itemName: String(gift.itemName || '').slice(0, 80),
+            price: Number.isFinite(price) && price > 0 ? price : 0,
+            paymentMethod: String(gift.paymentMethod || '').slice(0, 80),
+            senderRole: gift.senderRole === 'assistant' ? 'assistant' : 'user',
+            senderName: String(gift.senderName || '').slice(0, 80),
+            note: String(gift.note || '').slice(0, 180),
+        };
+    }
+    function normalizeFamilyCardSpendMetadata(spend) {
+        if (!spend || typeof spend !== 'object') return null;
+        const amount = Number(spend.amount);
+        const balance = Number(spend.balance);
+        return {
+            transactionId: String(spend.transactionId || '').slice(0, 160),
+            friendId: String(spend.friendId || '').slice(0, 160),
+            title: String(spend.title || '').slice(0, 160),
+            amount: Number.isFinite(amount) && amount > 0 ? amount : 0,
+            balance: Number.isFinite(balance) ? balance : null,
+        };
+    }
     function normalizeMessageRecord(friendId, msg, index) {
         const safe = msg || {};
         const resolvedOrder = resolveMessageOrder(safe, index);
@@ -2896,6 +2908,10 @@
                 : '',
             decidedAt: Math.max(0, Number(safe.decidedAt) || 0),
             noticeKind: typeof safe.noticeKind === 'string' ? safe.noticeKind : '',
+            familyCardSpend:
+                safe.type === 'system_notice' && safe.noticeKind === 'family_card_spend'
+                    ? normalizeFamilyCardSpendMetadata(safe.familyCardSpend)
+                    : null,
             actorRole:
                 safe.actorRole === 'user' || safe.actorRole === 'assistant' ? safe.actorRole : '',
             actorName: typeof safe.actorName === 'string' ? safe.actorName : '',
@@ -2909,6 +2925,21 @@
                   }))
                 : [],
             text: typeof safe.text === 'string' ? safe.text : '',
+            giftName: String(safe.giftName || ''),
+            giftValue: Number(safe.giftValue) || 0,
+            giftDescription: String(safe.giftDescription || ''),
+            giftStatus: safe.giftStatus === 'received' ? 'received' : 'pending',
+            giftPaymentMethod: String(safe.giftPaymentMethod || ''),
+            remarkChange:
+                safe.noticeKind === 'user_remark_changed' && safe.remarkChange
+                    ? {
+                          oldRemark: String(safe.remarkChange.oldRemark || ''),
+                          newRemark: String(safe.remarkChange.newRemark || ''),
+                      }
+                    : null,
+            shopGift: ['html', 'gift'].includes(safe.type)
+                ? normalizeShopGiftMetadata(safe.shopGift)
+                : null,
             transcript: typeof safe.transcript === 'string' ? safe.transcript : '',
             ttsAudioAssetId: typeof safe.ttsAudioAssetId === 'string' ? safe.ttsAudioAssetId : '',
             ttsAudioText: typeof safe.ttsAudioText === 'string' ? safe.ttsAudioText : '',
@@ -3231,6 +3262,10 @@
             decision: ['accept', 'reject', 'unblocked'].includes(row.decision) ? row.decision : '',
             decidedAt: Math.max(0, Number(row.decidedAt) || 0),
             noticeKind: row.noticeKind || '',
+            familyCardSpend:
+                row.type === 'system_notice' && row.noticeKind === 'family_card_spend'
+                    ? normalizeFamilyCardSpendMetadata(row.familyCardSpend)
+                    : null,
             actorRole:
                 row.actorRole === 'user' || row.actorRole === 'assistant'
                     ? row.actorRole
@@ -3246,6 +3281,21 @@
                   }))
                 : [],
             text: row.text,
+            giftName: String(row.giftName || ''),
+            giftValue: Number(row.giftValue) || 0,
+            giftDescription: String(row.giftDescription || ''),
+            giftStatus: row.giftStatus === 'received' ? 'received' : 'pending',
+            giftPaymentMethod: String(row.giftPaymentMethod || ''),
+            remarkChange:
+                row.noticeKind === 'user_remark_changed' && row.remarkChange
+                    ? {
+                          oldRemark: String(row.remarkChange.oldRemark || ''),
+                          newRemark: String(row.remarkChange.newRemark || ''),
+                      }
+                    : null,
+            shopGift: ['html', 'gift'].includes(row.type)
+                ? normalizeShopGiftMetadata(row.shopGift)
+                : null,
             transcript: row.transcript,
             ttsAudioAssetId: row.ttsAudioAssetId || '',
             ttsAudioText: row.ttsAudioText || '',
@@ -5884,6 +5934,14 @@
             'description',
             'statusText',
             'noticeKind',
+            'familyCardSpend',
+            'shopGift',
+            'giftName',
+            'giftValue',
+            'giftDescription',
+            'giftStatus',
+            'giftPaymentMethod',
+            'remarkChange',
             'offlineMode',
             'offlineScene',
             'offlineAction',

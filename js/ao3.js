@@ -3148,7 +3148,7 @@ Keep sentences clean and concrete. Let the reader infer what the characters feel
                     (value_716) => String(value_716.id) === String(value_715),
                 ),
             )
-            .filter(Boolean);
+            .filter((book) => book && !book.isGlobal);
         handleAction_131_709.textContent =
             filter_712.length + ' selected / 已选 ' + filter_712.length + ' 项';
         handleAction_131_710.innerHTML = filter_712.length
@@ -3470,6 +3470,28 @@ Keep sentences clean and concrete. Let the reader infer what the characters feel
                 )
                 .trim()
         );
+    }
+    function getAo3WorldBookPromptContext(ids, context = '') {
+        const books = handleAction_145(),
+            globalIds = new Set(
+                books.filter((book) => book?.isGlobal).map((book) => String(book.id)),
+            );
+        const mounted = handleAction_159(
+            (Array.isArray(ids) ? ids : []).filter((id) => !globalIds.has(String(id))),
+            context,
+        );
+        const global =
+            typeof window.getGlobalWorldBookContextByPosition === 'function'
+                ? ['system_depth', 'before_role', 'after_role']
+                      .map((position) =>
+                          window.getGlobalWorldBookContextByPosition(position, context, {
+                              includeBuiltin: false,
+                          }),
+                      )
+                      .filter(Boolean)
+                      .join('\n\n')
+                : handleAction_159([...globalIds], context);
+        return [mounted, global].filter(Boolean).join('\n\n');
     }
     function handleAction_160(value_783, value_784 = '', value_785 = '') {
         value_783 = {
@@ -3839,7 +3861,10 @@ Keep sentences clean and concrete. Let the reader infer what the characters feel
                 value_836,
             ].join(`
 `),
-            handleAction_159_838 = handleAction_159(handleAction_137_834.worldBookIds, join_837),
+            handleAction_159_838 = getAo3WorldBookPromptContext(
+                handleAction_137_834.worldBookIds,
+                join_837,
+            ),
             handleAction_160_839 = handleAction_160(
                 handleAction_137_834,
                 handleAction_159_838,

@@ -972,9 +972,7 @@
     }
     function handleAction_17(group_12) {
         const normalized_2 = group_12 ? window.imApp.normalizeFriendData(group_12) : null,
-            value_121 = Array.isArray(normalized_2?.boundBooks)
-                ? normalized_2.boundBooks.length
-                : 0;
+            value_121 = window.getVisibleWorldBookMountIds?.(normalized_2?.boundBooks)?.length || 0;
         if (groupWorldBookCountElement)
             groupWorldBookCountElement.textContent = value_121 > 0 ? value_121 + '本' : '';
     }

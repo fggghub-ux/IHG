@@ -2844,7 +2844,7 @@ X is a global app. Non-User authors may write in the language that naturally fit
         }
         function renderWorldBookSummary(value_586 = getXState()) {
             const countEl = document.getElementById('x-worldbook-count'),
-                value_587 = value_586.boundWorldBookIds || [];
+                value_587 = window.getVisibleWorldBookMountIds?.(value_586.boundWorldBookIds) || [];
             if (countEl) countEl.textContent = value_587.length + ' selected';
         }
         function handleAction_45() {

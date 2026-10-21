@@ -1,30 +1,32 @@
 (function () {
     'use strict';
 
-    const NETEASE_REDIRECT_API = 'https://music.znnu.com/api/redirect',
-        NETEASE_METING_API = 'https://api.injahow.cn/meting/',
-        value_4 = NETEASE_METING_API,
-        NETEASE_PLAYLIST_MAX_ATTEMPTS = 3,
-        NETEASE_PLAYLIST_RETRY_DELAYS = [400, 1200],
-        NETEASE_PLAYLIST_REQUEST_TIMEOUT = 12000,
-        text_7 = 'u2_netease_session_v1',
-        text_8 = 'libraryNeteaseAccount',
-        source_6 = 'netease_account',
-        count_10 = 18000,
-        BOOK_WORKER_URL = 'js/library_book_worker.js?v=20260715-reader-worker-v1',
-        READER_CHUNK_TARGET_CHARS = 16000,
-        count_13 = 3,
-        TABS = ['books', 'music', 'overview'],
-        DEFAULT_PREFERENCES = {
-            activeTab: 'books',
-            readerFontSize: 18,
-            readerLineHeight: 1.85,
-            readerTheme: 'light',
-            rankingRange: 'week',
-            togetherFloatSide: 'right',
-            togetherFloatY: 1,
-        },
-        BOOK_PALETTES = [
+    const NETEASE_REDIRECT_API = 'https://music.znnu.com/api/redirect';
+    const NETEASE_METING_API = 'https://api.injahow.cn/meting/';
+    const value_4 = NETEASE_METING_API;
+    const NETEASE_PLAYLIST_MAX_ATTEMPTS = 3;
+    const NETEASE_PLAYLIST_RETRY_DELAYS = [400, 1200];
+    const NETEASE_PLAYLIST_REQUEST_TIMEOUT = 12000;
+    const text_7 = 'u2_netease_session_v1';
+    const text_8 = 'libraryNeteaseAccount';
+    const source_6 = 'netease_account';
+    const count_10 = 18000;
+    const BOOK_WORKER_URL = 'js/library_book_worker.js?v=20260715-reader-worker-v1';
+    const READER_CHUNK_TARGET_CHARS = 16000;
+    const count_13 = 3;
+    const TABS = ['books', 'music', 'overview'];
+    const PLAYBACK_MODES = ['list_loop', 'single_loop', 'shuffle'];
+    const DEFAULT_PREFERENCES = {
+        activeTab: 'books',
+        playbackMode: 'list_loop',
+        readerFontSize: 18,
+        readerLineHeight: 1.85,
+        readerTheme: 'light',
+        rankingRange: 'week',
+        togetherFloatSide: 'right',
+        togetherFloatY: 1,
+    };
+    const BOOK_PALETTES = [
             ['linear-gradient(145deg, #b9c1ad, #929d87)', '#273029'],
             ['linear-gradient(145deg, #c6b5aa, #a69287)', '#352b27'],
             ['linear-gradient(145deg, #aebdca, #8f9eac)', '#27323d'],
@@ -33,82 +35,86 @@
             ['linear-gradient(145deg, #adbbb5, #8d9d97)', '#293532'],
             ['linear-gradient(145deg, #b8b0c3, #9c93ad)', '#302c39'],
             ['linear-gradient(145deg, #c4bbb0, #a79d91)', '#342f2a'],
-        ],
-        state = {
-            ready: false,
-            books: [],
-            playlists: [],
-            tracks: [],
-            stats: [],
-            preferences: {
-                ...DEFAULT_PREFERENCES,
-            },
-            activeTab: 'books',
-            currentBook: null,
-            detailBook: null,
-            currentPlaylist: null,
-            currentTrack: null,
-            queue: [],
-            queueIndex: -1,
-            chapters: [],
-            lyrics: [],
-            lyricIndex: -1,
-            lyricsStatus: 'idle',
-            lyricsTrackId: null,
-            lyricsRequestId: 0,
-            playerShowsLyrics: false,
-            together: null,
-            togetherListening: null,
-            togetherPicker: null,
-            playerReturnToChatFriendId: null,
-            readerPage: 0,
-            readerPageCount: 1,
-            readerMetrics: null,
-            readerContent: null,
-            readerChunkIndex: 0,
-            readerChunkStart: 0,
-            readerChunkEnd: 0,
-            readerOpenRequestId: 0,
-            readerPointerStart: null,
-            readerLastPointerEventAt: 0,
-            readerLastActivityAt: 0,
-            readerProgressSaveTimer: null,
-            readerProgressSaveBook: null,
-            readerSelection: null,
-            readerCommentLoading: false,
-            togetherFloatDrag: null,
-            pendingReadingSeconds: 0,
-            pendingListeningSeconds: 0,
-            lastMediaTime: 0,
-            playbackAttemptId: 0,
-            playbackStartingAttemptId: 0,
-            neteasePlaybackRetryCount: 0,
-            neteaseSessionToken: '',
-            neteaseAccount: null,
-            neteaseSyncing: false,
-            neteaseQrPollTimer: null,
-            neteaseQrKey: '',
-            neteaseQrImage: '',
-            neteaseQrExpiresAt: 0,
-            neteaseQrPollPending: false,
-            pendingPlayStatTrackId: null,
-            isSeeking: false,
-            navDragging: false,
-            navMouseDragging: false,
-            navPointerId: null,
+        ];
+    const state = {
+        ready: false,
+        books: [],
+        playlists: [],
+        tracks: [],
+        stats: [],
+        preferences: {
+            ...DEFAULT_PREFERENCES,
         },
-        dom = {},
-        audio = new Audio();
+        activeTab: 'books',
+        currentBook: null,
+        detailBook: null,
+        currentPlaylist: null,
+        currentTrack: null,
+        queue: [],
+        queueIndex: -1,
+        shuffleOrder: [],
+        shuffleOrderIndex: -1,
+        shuffleHistory: [],
+        shuffleHistoryIndex: -1,
+        chapters: [],
+        lyrics: [],
+        lyricIndex: -1,
+        lyricsStatus: 'idle',
+        lyricsTrackId: null,
+        lyricsRequestId: 0,
+        playerShowsLyrics: false,
+        together: null,
+        togetherListening: null,
+        togetherPicker: null,
+        playerReturnToChatFriendId: null,
+        readerPage: 0,
+        readerPageCount: 1,
+        readerMetrics: null,
+        readerContent: null,
+        readerChunkIndex: 0,
+        readerChunkStart: 0,
+        readerChunkEnd: 0,
+        readerOpenRequestId: 0,
+        readerPointerStart: null,
+        readerLastPointerEventAt: 0,
+        readerLastActivityAt: 0,
+        readerProgressSaveTimer: null,
+        readerProgressSaveBook: null,
+        readerSelection: null,
+        readerCommentLoading: false,
+        togetherFloatDrag: null,
+        pendingReadingSeconds: 0,
+        pendingListeningSeconds: 0,
+        lastMediaTime: 0,
+        playbackAttemptId: 0,
+        playbackStartingAttemptId: 0,
+        neteasePlaybackRetryCount: 0,
+        neteaseSessionToken: '',
+        neteaseAccount: null,
+        neteaseSyncing: false,
+        neteaseQrPollTimer: null,
+        neteaseQrKey: '',
+        neteaseQrImage: '',
+        neteaseQrExpiresAt: 0,
+        neteaseQrPollPending: false,
+        pendingPlayStatTrackId: null,
+        isSeeking: false,
+        navDragging: false,
+        navMouseDragging: false,
+        navPointerId: null,
+    };
+    const dom = {};
+    const audio = new Audio();
     audio.preload = 'metadata';
     audio.playsInline = true;
-    let togetherListeningEventTimer = null,
-        lastTogetherListeningEventAt = 0,
-        value_17 = null;
-    const readerChunkHtmlCache = new Map(),
-        readerChunkHtmlCache_2 = new Map(),
-        readerChunkHtmlCache_3 = new Map();
-    let bookWorker = null,
-        count_21 = 0;
+    let togetherListeningEventTimer = null;
+    let lastTogetherListeningEventAt = 0;
+    let value_17 = null;
+    const readerChunkHtmlCache = new Map();
+    const readerChunkHtmlCache_2 = new Map();
+    const readerChunkHtmlCache_3 = new Map();
+    let bookWorker = null;
+    let count_21 = 0;
     const bookWorkerRequests = new Map();
     function $(id_2) {
         return document.getElementById(id_2);
@@ -147,6 +153,7 @@
             'library-mini-art',
             'library-mini-title',
             'library-mini-artist',
+            'library-mini-mode',
             'library-mini-play',
             'library-mini-next',
             'library-mini-progress',
@@ -190,6 +197,7 @@
             'library-player-prev',
             'library-player-play',
             'library-player-next',
+            'library-player-mode',
             'library-lyrics',
             'library-import-modal',
             'library-netease-login-modal',
@@ -558,17 +566,17 @@
         return state.playlists.find((playlist_2) => playlist_2.id === playlistId_2) || null;
     }
     async function handleAction_38() {
-        const repo = storage(),
-            [value_270, playlists_2, tracks_2, stats_2, preferences_2, value_275, value_276] =
-                await Promise.all([
-                    repo.loadLibraryBooks(),
-                    repo.loadLibraryPlaylists(),
-                    repo.loadLibraryTracks(),
-                    repo.loadLibraryDailyStats(),
-                    repo.getSetting('libraryPreferences', DEFAULT_PREFERENCES),
-                    repo.getSetting(text_8, null),
-                    repo.getPrivateSession(text_7),
-                ]);
+        const repo = storage();
+        const [value_270, playlists_2, tracks_2, stats_2, preferences_2, value_275, value_276] =
+            await Promise.all([
+                repo.loadLibraryBooks(),
+                repo.loadLibraryPlaylists(),
+                repo.loadLibraryTracks(),
+                repo.loadLibraryDailyStats(),
+                repo.getSetting('libraryPreferences', DEFAULT_PREFERENCES),
+                repo.getSetting(text_8, null),
+                repo.getPrivateSession(text_7),
+            ]);
         state.books = (Array.isArray(value_270) ? value_270 : []).map((book_2) => ({
             ...book_2,
             author: String(book_2?.author || '').trim() || '未知作者',
@@ -598,6 +606,8 @@
             ...DEFAULT_PREFERENCES,
             ...(preferences_2 || {}),
         };
+        if (!PLAYBACK_MODES.includes(state.preferences.playbackMode))
+            state.preferences.playbackMode = DEFAULT_PREFERENCES.playbackMode;
         state.neteaseAccount = value_275 && typeof value_275 === 'object' ? value_275 : null;
         state.neteaseSessionToken = String(value_276 || '');
         state.activeTab = TABS.includes(state.preferences.activeTab)
@@ -4701,7 +4711,130 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
                 state.playbackStartingAttemptId = 0;
         }
     }
-    async function playTrack(track_27, queue_3) {
+    function getPlaybackMode() {
+        return PLAYBACK_MODES.includes(state.preferences.playbackMode)
+            ? state.preferences.playbackMode
+            : DEFAULT_PREFERENCES.playbackMode;
+    }
+    function renderPlaybackMode() {
+        const _value0 = {
+            list_loop: '列表循环',
+            single_loop: '单曲循环',
+            shuffle: '随机播放',
+        };
+        const _value1 = getPlaybackMode();
+        const _value10 =
+            _value1 === 'shuffle'
+                ? '<i class="fas fa-shuffle" aria-hidden="true"></i>'
+                : '<i class="fas fa-repeat" aria-hidden="true"></i>' +
+                  (_value1 === 'single_loop'
+                      ? '<span class="library-player-mode-one" aria-hidden="true">1</span>'
+                      : '');
+        [dom.player_mode, dom.mini_mode].forEach((_value11) => {
+            if (!_value11) return;
+            _value11.innerHTML = _value10;
+            _value11.setAttribute('aria-label', '播放方式：' + _value0[_value1] + '，点击切换');
+            _value11.title = _value0[_value1];
+        });
+    }
+    function cyclePlaybackMode() {
+        const _value12 = PLAYBACK_MODES.indexOf(getPlaybackMode());
+        state.preferences.playbackMode = PLAYBACK_MODES[(_value12 + 1) % PLAYBACK_MODES.length];
+        if (getPlaybackMode() === 'shuffle') resetShuffleHistory(state.currentTrack?.id);
+        renderPlaybackMode();
+        savePreferences()['catch'](console.error);
+        toast(
+            {
+                list_loop: '列表循环',
+                single_loop: '单曲循环',
+                shuffle: '随机播放',
+            }[getPlaybackMode()],
+        );
+    }
+    function getPlayableQueue() {
+        return [...new Set(state.queue)].filter((_value13) => isPlayableTrack(getTrack(_value13)));
+    }
+    function shuffleTrackIds(_value14) {
+        const _value15 = [..._value14];
+        for (let _value16 = _value15.length - 1; _value16 > 0; _value16 -= 1) {
+            const _value17 = Math.floor(Math.random() * (_value16 + 1));
+            [_value15[_value16], _value15[_value17]] = [_value15[_value17], _value15[_value16]];
+        }
+        return _value15;
+    }
+    function resetShuffleHistory(_value18) {
+        const _value19 = getPlayableQueue();
+        const _value20 = _value19.includes(_value18);
+        state.shuffleOrder = _value20
+            ? [_value18, ...shuffleTrackIds(_value19.filter((_value21) => _value21 !== _value18))]
+            : shuffleTrackIds(_value19);
+        state.shuffleOrderIndex = _value20 ? 0 : -1;
+        state.shuffleHistory = _value20 ? [_value18] : [];
+        state.shuffleHistoryIndex = _value20 ? 0 : -1;
+    }
+    function playShuffleDirection(_value22) {
+        const _value23 = getPlayableQueue();
+        if (!_value23.length) return toast('歌单中没有可播放的歌曲');
+        (!state.shuffleOrder.length ||
+            state.shuffleHistory[state.shuffleHistoryIndex] !== state.currentTrack?.id) &&
+            resetShuffleHistory(state.currentTrack?.id);
+        const _value24 = new Set(_value23);
+        if (_value22 < 0) {
+            for (let _value26 = state.shuffleHistoryIndex - 1; _value26 >= 0; _value26 -= 1) {
+                const _value27 = state.shuffleHistory[_value26];
+                if (!_value24.has(_value27)) continue;
+                state.shuffleHistoryIndex = _value26;
+                playTrack(getTrack(_value27), state.queue, {
+                    preserveShuffle: true,
+                });
+                return;
+            }
+            return;
+        }
+        for (
+            let _value28 = state.shuffleHistoryIndex + 1;
+            _value28 < state.shuffleHistory.length;
+            _value28 += 1
+        ) {
+            const _value29 = state.shuffleHistory[_value28];
+            if (!_value24.has(_value29)) continue;
+            state.shuffleHistoryIndex = _value28;
+            playTrack(getTrack(_value29), state.queue, {
+                preserveShuffle: true,
+            });
+            return;
+        }
+        let _value25 = null;
+        for (
+            let _value30 = state.shuffleOrderIndex + 1;
+            _value30 < state.shuffleOrder.length;
+            _value30 += 1
+        ) {
+            if (!_value24.has(state.shuffleOrder[_value30])) continue;
+            state.shuffleOrderIndex = _value30;
+            _value25 = state.shuffleOrder[_value30];
+            break;
+        }
+        if (!_value25) {
+            state.shuffleOrder = shuffleTrackIds(_value23);
+            if (state.shuffleOrder.length > 1 && state.shuffleOrder[0] === state.currentTrack?.id) {
+                const _value31 = 1 + Math.floor(Math.random() * (state.shuffleOrder.length - 1));
+                [state.shuffleOrder[0], state.shuffleOrder[_value31]] = [
+                    state.shuffleOrder[_value31],
+                    state.shuffleOrder[0],
+                ];
+            }
+            state.shuffleOrderIndex = 0;
+            _value25 = state.shuffleOrder[0];
+        }
+        state.shuffleHistory = state.shuffleHistory.slice(0, state.shuffleHistoryIndex + 1);
+        state.shuffleHistory.push(_value25);
+        state.shuffleHistoryIndex = state.shuffleHistory.length - 1;
+        playTrack(getTrack(_value25), state.queue, {
+            preserveShuffle: true,
+        });
+    }
+    async function playTrack(track_27, queue_3, _value32 = {}) {
         if (!isPlayableTrack(track_27)) {
             if (handleAction_27(track_27) && !handleAction_25()) {
                 toast('请先扫码登录网易云音乐');
@@ -4715,6 +4848,8 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
         if (!state.queue.includes(track_27.id)) state.queue = [track_27.id];
         state.queueIndex = state.queue.indexOf(track_27.id);
         state.currentTrack = track_27;
+        if (getPlaybackMode() === 'shuffle' && !_value32.preserveShuffle)
+            resetShuffleHistory(track_27.id);
         state.lastMediaTime = 0;
         state.neteasePlaybackRetryCount = 0;
         state.pendingPlayStatTrackId = track_27.id;
@@ -4725,10 +4860,11 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
     }
     function playQueueDirection(direction) {
         if (!state.queue.length) return;
+        if (getPlaybackMode() === 'shuffle') return playShuffleDirection(direction);
         const total_2 = state.queue.length;
         for (let step = 1; step <= total_2; step += 1) {
-            const queueIndex_2 = (state.queueIndex + direction * step + total_2) % total_2,
-                track_28 = getTrack(state.queue[queueIndex_2]);
+            const queueIndex_2 = (state.queueIndex + direction * step + total_2) % total_2;
+            const track_28 = getTrack(state.queue[queueIndex_2]);
             if (isPlayableTrack(track_28)) {
                 state.queueIndex = queueIndex_2;
                 playTrack(track_28, state.queue);
@@ -4736,6 +4872,14 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             }
         }
         toast('歌单中没有可播放的歌曲');
+    }
+    function handleTrackEnded() {
+        handleAction_170()['catch'](console.error);
+        if (getPlaybackMode() === 'single_loop' && isPlayableTrack(state.currentTrack)) {
+            playTrack(state.currentTrack, state.queue);
+            return;
+        }
+        playQueueDirection(1);
     }
     function togglePlayback() {
         if (!state.currentTrack) {
@@ -4781,10 +4925,11 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
         );
     }
     function updatePlayerUi() {
-        const track_29 = state.currentTrack,
-            hasTrack = !!track_29;
+        const track_29 = state.currentTrack;
+        const hasTrack = !!track_29;
         dom.mini_player.hidden = !hasTrack;
         dom.view.classList.toggle('has-mini-player', hasTrack);
+        renderPlaybackMode();
         if (!hasTrack) return;
         dom.mini_title.textContent = track_29.name || '未知歌曲';
         dom.mini_artist.textContent = track_29.artist || '未知歌手';
@@ -4982,8 +5127,8 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             importBook(dom.book_file_input.files?.[0]),
         );
         dom.book_grid.addEventListener('click', (event_12) => {
-            const card = event_12.target.closest('[data-book-id]'),
-                action_4 = event_12.target.closest('[data-book-action]')?.dataset.bookAction;
+            const card = event_12.target.closest('[data-book-id]');
+            const action_4 = event_12.target.closest('[data-book-action]')?.dataset.bookAction;
             if (!card || !action_4) return;
             const book_14 = state.books.find((item_13) => item_13.id === card.dataset.bookId);
             if (action_4 === 'details') openBookDetail(book_14);
@@ -5076,8 +5221,8 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
         dom.reader_toc_list.addEventListener('click', (event_15) => {
             const button_7 = event_15.target.closest('[data-chapter-offset]');
             if (!button_7) return;
-            const textLength_2 = Math.max(1, state.readerContent?.text?.length || 1),
-                offset_5 = clampReaderValue(
+            const textLength_2 = Math.max(1, state.readerContent?.text?.length || 1);
+            const offset_5 = clampReaderValue(
                     Number(button_7.dataset.chapterOffset) || 0,
                     0,
                     textLength_2,
@@ -5088,10 +5233,10 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             markReaderActivity();
         });
         dom.reader_panel.addEventListener('click', (event_16) => {
-            const font = event_16.target.closest('[data-reader-font]'),
-                line_8 = event_16.target.closest('[data-reader-line]'),
-                theme_2 = event_16.target.closest('[data-reader-theme]'),
-                progress_7 = state.currentBook ? Number(state.currentBook.progress) || 0 : 0;
+            const font = event_16.target.closest('[data-reader-font]');
+            const line_8 = event_16.target.closest('[data-reader-line]');
+            const theme_2 = event_16.target.closest('[data-reader-theme]');
+            const progress_7 = state.currentBook ? Number(state.currentBook.progress) || 0 : 0;
             if (font)
                 state.preferences.readerFontSize =
                     (Number(state.preferences.readerFontSize) || 18) +
@@ -5187,12 +5332,14 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             );
         });
         dom.mini_open.addEventListener('click', openPlayer);
+        dom.mini_mode.addEventListener('click', cyclePlaybackMode);
         dom.mini_play.addEventListener('click', togglePlayback);
         dom.mini_next.addEventListener('click', () => playQueueDirection(1));
         dom.player_close.addEventListener('click', handlePlayer_closeClick);
         dom.player_art.addEventListener('click', () => setPlayerLyricsMode(true));
         dom.lyrics.addEventListener('click', () => setPlayerLyricsMode(false));
         dom.player_play.addEventListener('click', togglePlayback);
+        dom.player_mode.addEventListener('click', cyclePlaybackMode);
         dom.player_prev.addEventListener('click', () => playQueueDirection(-1));
         dom.player_next.addEventListener('click', () => playQueueDirection(1));
         dom.player_progress.addEventListener('pointerdown', () => {
@@ -5255,8 +5402,8 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             emitTogetherListeningChange(true);
         });
         audio.addEventListener('timeupdate', () => {
-            const lastMediaTime_2 = Number(audio.currentTime) || 0,
-                pendingListeningSeconds_2 = lastMediaTime_2 - state.lastMediaTime;
+            const lastMediaTime_2 = Number(audio.currentTime) || 0;
+            const pendingListeningSeconds_2 = lastMediaTime_2 - state.lastMediaTime;
             if (
                 !state.isSeeking &&
                 !audio.paused &&
@@ -5271,10 +5418,7 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             updateLyrics(lastMediaTime_2);
             emitTogetherListeningChange(false);
         });
-        audio.addEventListener('ended', () => {
-            handleAction_170()['catch'](console.error);
-            playQueueDirection(1);
-        });
+        audio.addEventListener('ended', handleTrackEnded);
         audio.addEventListener('error', () => {
             if (!state.currentTrack || !audio.src) return;
             if (state.playbackStartingAttemptId === state.playbackAttemptId) return;
