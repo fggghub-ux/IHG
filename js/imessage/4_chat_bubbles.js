@@ -5145,7 +5145,6 @@
             <div class="voice-message-bubble-main">
                 ${value_823 ? '<button type="button" class="voice-message-play" aria-label="生成或播放语音" title="生成或播放语音"><i class="fas fa-play" aria-hidden="true"></i></button>' : ''}
                 <button type="button" class="voice-message-bubble-inner" aria-expanded="false" aria-label="展开语音转文字">
-                    <span class="voice-message-mic"><i class="fas fa-microphone-alt"></i></span>
                     <span class="voice-message-wave" aria-hidden="true">
                         <span></span><span></span><span></span><span></span><span></span>
                     </span>

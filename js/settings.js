@@ -3598,7 +3598,6 @@
 /* 语音卡片 */
 .voice-message-bubble { min-width: 0; max-width: min(70%, 240px) !important; padding: 10px 14px; overflow: visible; }
 .voice-message-bubble-inner { width: auto; min-height: 0; display: flex; align-items: center; gap: 8px; padding: 0; border: 0; border-radius: 0; background: transparent; color: inherit; cursor: pointer; font: inherit; text-align: left; }
-.voice-message-mic { display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: inherit; font-size: 14px; }
 .voice-message-wave { display: flex; align-items: center; gap: 3px; min-width: 0; }
 .voice-message-wave span { display: block; width: 3px; border-radius: 999px; background: currentColor; opacity: 0.82; }
 .voice-message-duration { font-size: 12px; font-weight: 700; line-height: 1; white-space: nowrap; opacity: 0.76; }

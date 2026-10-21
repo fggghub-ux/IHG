@@ -145,6 +145,33 @@ const path = require('node:path');
                 document.getElementById('delete-world-book-btn').textContent.trim() === '删除世界书'
             );
         });
+        await check('identity and reply selectors have no blue focus frame', () => {
+            const friend = window.imApp.getFriendById('apk113-char');
+            window.imApp.openChatSettingsForFriend(friend);
+            const identity = document.getElementById('chat-contact-type-select');
+            identity.focus();
+            const identityFocus = {
+                outline: getComputedStyle(identity).outlineStyle,
+                shadow: getComputedStyle(identity).boxShadow,
+            };
+            document.querySelector('#chat-settings-segment [data-tab="theme"]').click();
+            const reply = document.getElementById('chat-reply-style-select');
+            reply.focus();
+            const replyStyle = getComputedStyle(reply);
+            const replyFocus = {
+                outline: replyStyle.outlineStyle,
+                shadow: replyStyle.boxShadow,
+                border: replyStyle.borderColor,
+            };
+            window.closeView(document.getElementById('chat-settings-sheet'));
+            return (
+                identityFocus.outline === 'none' &&
+                identityFocus.shadow === 'none' &&
+                replyFocus.outline === 'none' &&
+                replyFocus.shadow === 'none' &&
+                replyFocus.border === 'rgb(229, 229, 234)'
+            );
+        });
         await check('manual Food and Mall: English fields, validation and storage', async () => {
             const shop = window.shoppingApp;
             for (const tab of ['food', 'mall']) {
@@ -270,11 +297,28 @@ const path = require('node:path');
                 shop.orders[0].method !== 'pay for me (Long Payer Name)'
             )
                 return card.innerHTML;
+            const giftButton = card.querySelector('.shopping-order-gifted-icon');
+            const reviewButton = card.querySelector('.shopping-order-comment-btn');
+            const giftStyle = getComputedStyle(giftButton);
+            const reviewStyle = getComputedStyle(reviewButton);
+            if (
+                giftButton.getBoundingClientRect().width !==
+                    reviewButton.getBoundingClientRect().width ||
+                giftButton.getBoundingClientRect().height !==
+                    reviewButton.getBoundingClientRect().height ||
+                giftStyle.backgroundImage !== reviewStyle.backgroundImage ||
+                giftStyle.backgroundColor !== reviewStyle.backgroundColor
+            )
+                return {
+                    gift: giftButton.getBoundingClientRect().toJSON(),
+                    review: reviewButton.getBoundingClientRect().toJSON(),
+                    giftBackground: [giftStyle.backgroundImage, giftStyle.backgroundColor],
+                    reviewBackground: [reviewStyle.backgroundImage, reviewStyle.backgroundColor],
+                };
             card.querySelector('.shopping-order-comment-btn').click();
             const result =
                 !!shop.ratingSheet.querySelector('.shopping-centered-card') &&
-                document.getElementById('shopping-rating-title').textContent ===
-                    'PRODUCT REVIEWS' &&
+                document.getElementById('shopping-rating-title').textContent === 'REVIEWS' &&
                 shop.ratingText.placeholder ===
                     'If you want to create something of value, be prepared to be judged.' &&
                 shop.ratingSubmit.textContent === 'submit review';
@@ -636,6 +680,7 @@ const path = require('node:path');
                     window.imChat.rerenderChatContainer(friend, container, { scroll: false });
                     const row = container.querySelector('[data-message-id="voice113"]'),
                         text = row.querySelector('.voice-message-transcript');
+                    if (row.querySelector('.voice-message-mic')) return 'old microphone remains';
                     row.querySelector('.voice-message-bubble-inner').click();
                     await new Promise((r) => setTimeout(r, 20));
                     if (text.hidden || generated || played)

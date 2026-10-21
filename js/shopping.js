@@ -1890,7 +1890,7 @@
             const sheetHtml = `
             <div class="bottom-sheet-overlay detail-sheet-overlay shopping-centered-overlay" id="shopping-rating-sheet" style="z-index:1200;">
               <section class="shopping-centered-card" role="dialog" aria-modal="true" aria-labelledby="shopping-rating-title">
-                <div class="shopping-modal-header"><h2 id="shopping-rating-title">PRODUCT REVIEWS</h2><button type="button" class="shopping-modal-close" id="shopping-rating-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+                <div class="shopping-modal-header"><h2 id="shopping-rating-title">REVIEWS</h2><button type="button" class="shopping-modal-close" id="shopping-rating-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button></div>
                 <div class="shopping-modal-scroll" style="padding:20px;">
                   <div id="shopping-rating-stars" style="display:flex;justify-content:center;gap:15px;margin-bottom:24px;">${[1, 2, 3, 4, 5].map((value) => `<i class="fas fa-star" data-val="${value}" style="font-size:32px;color:#ff9500;cursor:pointer;"></i>`).join('')}</div>
                   <textarea id="shopping-rating-text" placeholder="If you want to create something of value, be prepared to be judged." style="width:100%;height:120px;border:none;background:#f7f7f5;border-radius:12px;padding:16px;font-size:15px;resize:none;outline:none;margin-bottom:20px;box-sizing:border-box;"></textarea>
