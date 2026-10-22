@@ -47,6 +47,9 @@
     const bindAccountDetailPersonaInput = document.getElementById(
             'bind-account-detail-persona-input',
         );
+    const bindAccountSeparateAvatarToggle = document.getElementById(
+        'bind-account-separate-avatar-toggle',
+        );
     const bindAccountDetailSaveBtn = document.getElementById('bind-account-detail-save-btn');
     let tempSelectedBookIds = [];
     let tempSelectedAccountId = null;
@@ -886,7 +889,9 @@
             bindAccountDetailSignatureInput.value = account.signature || '';
         if (bindAccountDetailPersonaInput)
             bindAccountDetailPersonaInput.value = account.persona || '';
-        setBindAccountDetailAvatar(account.avatarUrl || null);
+        if (bindAccountSeparateAvatarToggle)
+            bindAccountSeparateAvatarToggle.checked = friend_20?.separateUserAvatarEnabled === true;
+        setBindAccountDetailAvatar(window.imApp.getChatUserAvatarUrl(friend_20, account) || null);
     }
     function openBindAccountDetailSheet(friend_21) {
         if (!friend_21 || !bindAccountDetailSheet) return;
@@ -2524,6 +2529,8 @@
         bindAccountDetailAvatarUpload.addEventListener('change', async (e) => {
             const file = e.target.files && e.target.files[0];
             if (!file) return;
+            const avatarFriendId = String(window.imData.currentSettingsFriend?.id || '');
+            const avatarAccountId = bindAccountDetailSelect?.value;
             try {
                 if (typeof window.readImageAsCompressedDataUrl !== 'function') {
                     showToast_2('头像上传组件不可用');
@@ -2534,6 +2541,11 @@
                     maxHeight: 256,
                     quality: 0.72,
                 });
+                if (
+                    String(window.imData.currentSettingsFriend?.id || '') !== avatarFriendId ||
+                    bindAccountDetailSelect?.value !== avatarAccountId
+                )
+                    return;
                 setBindAccountDetailAvatar(url);
             } catch (error_3) {
                 console.error('Failed to process bound account avatar', error_3);
@@ -2542,8 +2554,33 @@
                 e.target.value = '';
             }
         }));
+    bindAccountSeparateAvatarToggle?.addEventListener('change', async (event) => {
+        const friend = window.imData.currentSettingsFriend;
+        if (!friend) return;
+        const previous = friend.separateUserAvatarEnabled === true;
+        const enabled = event.target.checked;
+        event.target.disabled = true;
+        const saved = await commitNamedFriendChange(
+            friend,
+            (target) => {
+                target.separateUserAvatarEnabled = enabled;
+            },
+            { silent: true },
+        );
+        event.target.disabled = false;
+        if (!saved) {
+            event.target.checked = previous;
+            showToast_2('头像设置保存失败');
+            return;
+        }
+        refreshChatPageForFriend(friend.id);
+        if (String(window.imData.currentSettingsFriend?.id) === String(friend.id))
+            renderBindAccountDetailForm(window.imData.currentSettingsFriend);
+    });
     bindAccountDetailSaveBtn &&
-        bindAccountDetailSaveBtn.addEventListener('click', () => {
+        bindAccountDetailSaveBtn.addEventListener('click', async () => {
+            const avatarFriend = window.imData.currentSettingsFriend;
+            if (!avatarFriend) return;
             const accountId_3 = bindAccountDetailSelect ? bindAccountDetailSelect.value : 'none';
             if (!accountId_3 || accountId_3 === 'none') {
                 showToast_2('请先选择要绑定的 ID');
@@ -2553,15 +2590,37 @@
                 showToast_2('账号保存组件不可用');
                 return;
             }
+            const separateAvatar = avatarFriend.separateUserAvatarEnabled === true;
+            const avatarUrl = bindAccountDetailAvatarUrl || null;
             const saved_11 = window.updateAccountById(accountId_3, {
                 name: (bindAccountDetailNameInput?.value || '').trim() || '未命名ID',
                 phone: (bindAccountDetailPhoneInput?.value || '').trim(),
                 signature: (bindAccountDetailSignatureInput?.value || '').trim(),
                 persona: (bindAccountDetailPersonaInput?.value || '').trim(),
-                avatarUrl: bindAccountDetailAvatarUrl || null,
+                ...(!separateAvatar ? { avatarUrl } : {}),
             });
             if (!saved_11) {
                 showToast_2('ID资料保存失败');
+                return;
+            }
+            if (separateAvatar) {
+                const saved = await commitNamedFriendChange(
+                    avatarFriend,
+                    (target) => {
+                        target.userAvatarsByAccount = {
+                            ...(target.userAvatarsByAccount || {}),
+                            [accountId_3]: avatarUrl,
+                        };
+                    },
+                    { silent: true },
+                );
+                if (!saved) {
+                    showToast_2('当前聊天头像保存失败');
+                    return;
+                }
+            }
+            if (String(window.imData.currentSettingsFriend?.id) !== String(avatarFriend.id)) {
+                refreshChatPagesBoundToAccount(accountId_3);
                 return;
             }
             updateChatBindIdLabel_2(window.imData.currentSettingsFriend);
@@ -2573,7 +2632,7 @@
             if (window.imApp.renderChatsList) window.imApp.renderChatsList();
             if (window.imApp.updateChatsView) window.imApp.updateChatsView();
             refreshChatPagesBoundToAccount(accountId_3);
-            showToast_2('ID资料已同步');
+            showToast_2(separateAvatar ? 'ID资料已保存，头像仅用于当前聊天' : 'ID资料已同步');
         });
     worldBookBtn &&
         worldBookBtn.addEventListener('click', () => {
@@ -5307,6 +5366,7 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         if (_value9) _value9.hidden = friend_57.type !== 'char';
         if (_value8)
             _value8.checked = friend_57.type === 'char' && friend_57.autoReplyEnabled === true;
+        syncAutoReplyDelaySettings(friend_57);
         handleAction_39(friend_57);
         chatRoleRecallToggle &&
             (chatRoleRecallToggle.checked = friend_57.allowRoleRecall !== false);
@@ -5766,6 +5826,57 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                 } else !timeAware_2 && handleAction_39(window.imData.currentSettingsFriend);
             }
         }));
+    function syncAutoReplyDelaySettings(friend) {
+        const enabled = friend?.type === 'char' && friend.autoReplyEnabled === true;
+        document.getElementById('chat-auto-reply-delay-row').hidden = !enabled;
+        document.getElementById('chat-auto-reply-delay-seconds-row').hidden =
+            !enabled || friend.autoReplyDelayEnabled !== true;
+        document.getElementById('chat-auto-reply-delay-toggle').checked =
+            friend?.autoReplyDelayEnabled === true;
+        document.getElementById('chat-auto-reply-delay-seconds').value = String(
+            friend?.autoReplyDelaySeconds || 3,
+        );
+    }
+    async function saveAutoReplyDelaySetting(input, key, value) {
+        const friend = window.imData.currentSettingsFriend;
+        if (!friend || friend.type !== 'char') return;
+        input.disabled = true;
+        const saved = await commitNamedFriendChange(
+            friend,
+            (target) => {
+                target[key] = value;
+            },
+            { silent: true },
+        );
+        input.disabled = false;
+        if (saved) window.imChat.cancelPendingAutoReply?.(friend.id);
+        else showToast_2('延迟回复设置保存失败');
+        syncAutoReplyDelaySettings(window.imData.currentSettingsFriend);
+    }
+    document.getElementById('chat-auto-reply-delay-toggle')?.addEventListener('change', (event) => {
+        void saveAutoReplyDelaySetting(event.target, 'autoReplyDelayEnabled', event.target.checked);
+    });
+    const autoReplyDelaySecondsInput = document.getElementById('chat-auto-reply-delay-seconds');
+    autoReplyDelaySecondsInput?.addEventListener('change', (event) => {
+        const seconds = Number(event.target.value);
+        if (!Number.isInteger(seconds) || seconds < 1 || seconds > 3600) {
+            showToast_2('请输入 1–3600 的整数秒数');
+            syncAutoReplyDelaySettings(window.imData.currentSettingsFriend);
+            return;
+        }
+        void saveAutoReplyDelaySetting(event.target, 'autoReplyDelaySeconds', seconds);
+    });
+    autoReplyDelaySecondsInput?.addEventListener('keydown', (event) => {
+        if (
+            (event.key !== 'Enter' && event.keyCode !== 13) ||
+            event.isComposing ||
+            event.keyCode === 229
+        )
+            return;
+        event.preventDefault();
+        event.stopPropagation();
+        event.target.blur();
+    });
     const _value4 = document.getElementById('chat-auto-reply-toggle');
     _value4 &&
         _value4.dataset.bound !== 'true' &&
@@ -5775,6 +5886,7 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
             if (!_value24 || _value24.type !== 'char') return;
             const _value25 = _value24.autoReplyEnabled === true;
             const _value26 = _value23.target.checked === true;
+            _value23.target.disabled = true;
             const _value27 = await commitSettingsFriendChange(
                 (_value28) => {
                     _value28.autoReplyEnabled = _value26;
@@ -5785,6 +5897,9 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
             );
             !_value27 &&
                 ((_value23.target.checked = _value25), showToast_2('自动回复设置保存失败'));
+            _value23.target.disabled = false;
+            if (_value27 && !_value26) window.imChat.cancelPendingAutoReply?.(_value24.id);
+            syncAutoReplyDelaySettings(window.imData.currentSettingsFriend);
         }));
     const chatRoleRecallToggleElement = document.getElementById('chat-role-recall-toggle');
     chatRoleRecallToggleElement &&

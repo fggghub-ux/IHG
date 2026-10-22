@@ -1146,6 +1146,12 @@ Requirements for this turn:
                 (event_1456.preventDefault(), openMemoryRecallModal(displayRecall));
         });
         row_2.appendChild(notice_2);
+        if (
+            imChat_2.attachNoticeDeleteButton?.(row_2, friend_9, null, {
+                key: 'recall:' + value_1445,
+            }) === false
+        )
+            return;
         if (value_1444?.parentNode === messageContainer)
             messageContainer.insertBefore(row_2, value_1444);
         else messageContainer.appendChild(row_2);
@@ -1383,6 +1389,26 @@ Requirements for this turn:
         } else maybeAutoReplyAfterUserMessage(liveFriend_3, container_3, msgObj);
         return true;
     }
+    const pendingAutoReplies = new Map();
+    function cancelPendingAutoReply(friendId) {
+        const key = String(friendId),
+            entry = pendingAutoReplies.get(key);
+        if (entry) clearTimeout(entry.timer);
+        pendingAutoReplies.delete(key);
+    }
+    imChat_2.cancelPendingAutoReply = cancelPendingAutoReply;
+    function canAutoReply(friend) {
+        const key = String(friend?.id);
+        return (
+            friend?.type === 'char' &&
+            friend.autoReplyEnabled === true &&
+            friend.blockState?.charBlocksUser !== true &&
+            !aiReplyInFlight.has(key) &&
+            !autonomousActivityInFlight.has(key) &&
+            !value_8.has(key) &&
+            typeof window.imChat.handleAiReply === 'function'
+        );
+    }
     function maybeAutoReplyAfterUserMessage(friend, container, message) {
         const live = getLiveFriendById(friend?.id) || friend;
         if (
@@ -1395,6 +1421,31 @@ Requirements for this turn:
             typeof window.imChat.handleAiReply !== 'function'
         )
             return false;
+        const key = String(live.id);
+        if (!canAutoReply(live)) return false;
+        if (live.autoReplyDelayEnabled === true) {
+            if (pendingAutoReplies.has(key)) return true;
+            const rawSeconds = Number(live.autoReplyDelaySeconds);
+            const seconds =
+                Number.isInteger(rawSeconds) && rawSeconds >= 1 && rawSeconds <= 3600
+                    ? rawSeconds
+                    : 3;
+            const timer = setTimeout(() => {
+                pendingAutoReplies.delete(key);
+                const latest = getLiveFriendById(key);
+                if (!canAutoReply(latest) || latest.autoReplyDelayEnabled !== true) return;
+                const latestContainer =
+                    document
+                        .getElementById('chat-interface-' + key)
+                        ?.querySelector('.ins-chat-messages') || null;
+                void window.imChat
+                    .handleAiReply(latest, latestContainer, null, { source: 'auto_reply' })
+                    .catch((error) => console.error('[iMessage] delayed auto reply failed', error));
+            }, seconds * 1000);
+            pendingAutoReplies.set(key, { timer });
+            return true;
+        }
+        cancelPendingAutoReply(key);
         void window.imChat
             .handleAiReply(live, container, null, { source: 'auto_reply' })
             .catch((error) => console.error('[iMessage] auto reply failed', error));
@@ -5702,6 +5753,7 @@ Inside the tag, output only a JSON array shaped like [{"memberId":"exact member 
         return true;
     }
     async function handleAiReply_2(value_2412_2, value_2413, value_2414_2, value_2415 = {}) {
+        if (value_2415.source !== 'auto_reply') cancelPendingAutoReply(value_2412_2?.id);
         if (value_2415.userPhoneAuto !== true) await handleAction_48();
         return handleAction_159(value_2412_2, value_2413, value_2414_2, value_2415);
     }
@@ -7467,15 +7519,19 @@ Additional action narration: strict story-continuity rules.
                 (text_2842 +=
                     `
 ` + trim_2783);
+            const worldBookOptions = {
+                includeBuiltin: friend_31.builtinLivingVibeEnabled !== false,
+            };
             const systemDepthWorldBookContext_2 = window.imApp
                 ?.getWorldBookContextForFriendByPosition
                 ? window.imApp.getWorldBookContextForFriendByPosition(
                       'system_depth',
                       friend_31,
                       text_2842,
+                      worldBookOptions,
                   )
                 : window.getGlobalWorldBookContextByPosition
-                  ? window.getGlobalWorldBookContextByPosition('system_depth')
+                  ? window.getGlobalWorldBookContextByPosition('system_depth', '', worldBookOptions)
                   : '';
             await handleAction_47();
             if (!isConversationCurrent()) return;
@@ -7485,9 +7541,10 @@ Additional action narration: strict story-continuity rules.
                       'before_role',
                       friend_31,
                       text_2842,
+                      worldBookOptions,
                   )
                 : window.getGlobalWorldBookContextByPosition
-                  ? window.getGlobalWorldBookContextByPosition('before_role')
+                  ? window.getGlobalWorldBookContextByPosition('before_role', '', worldBookOptions)
                   : '';
             await handleAction_47();
             if (!isConversationCurrent()) return;
@@ -7496,9 +7553,10 @@ Additional action narration: strict story-continuity rules.
                       'after_role',
                       friend_31,
                       text_2842,
+                      worldBookOptions,
                   )
                 : window.getGlobalWorldBookContextByPosition
-                  ? window.getGlobalWorldBookContextByPosition('after_role')
+                  ? window.getGlobalWorldBookContextByPosition('after_role', '', worldBookOptions)
                   : '';
             await handleAction_47();
             if (!isConversationCurrent()) return;

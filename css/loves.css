@@ -3810,3 +3810,10 @@
         font-size: 23px;
     }
 }
+
+.lovers-together-date-card {
+    margin-bottom: 12px;
+}
+.lovers-anniversary-form > label[hidden] {
+    display: none;
+}

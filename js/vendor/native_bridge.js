@@ -695,6 +695,8 @@
   var le = m("StatusBar");
   var Y = A.getPlatform(),
     f = A.isNativePlatform() && Y === "android",
+    isNativeIos = A.isNativePlatform() && Y === "ios",
+    iosNavigationPlugin = m("U2IOSNavigation"),
     we = "u2_silent_messages",
     Oe = 1800,
     M = 256 * 1024,
@@ -784,7 +786,7 @@
     fileName: e,
     title: i = ""
   } = {}) {
-    if (!f) return "unavailable";
+    if (!f && !isNativeIos) return "unavailable";
     if (!(t instanceof Blob)) throw new TypeError("A Blob is required");
     let n = $e(e),
       r = String(t.type || "application/octet-stream"),
@@ -820,6 +822,33 @@
         token: o
       }).catch(() => {});
     }
+  }
+  async function importBackupFile(onProgress) {
+    if (!isNativeIos) return null;
+    let token = '';
+    try {
+      const result = await _.beginImport();
+      if (result?.status === 'cancelled') return null;
+      token = String(result?.token || '');
+      const size = Number(result?.size);
+      if (!token || !Number.isSafeInteger(size) || size <= 0) throw new Error('备份文件无效');
+      const chunks = [];
+      let offset = 0;
+      while (offset < size) {
+        const chunk = await _.readImportChunk({token, offset});
+        const bytes = je(chunk?.data), nextOffset = Number(chunk?.offset);
+        if (!bytes.byteLength || bytes.byteLength > M || nextOffset !== offset + bytes.byteLength || nextOffset > size)
+          throw new Error('备份读取不完整，请重试');
+        chunks.push(bytes); offset = nextOffset;
+        onProgress?.({message: '正在读取备份文件...', progress: Math.floor(offset / size * 25)});
+      }
+      return {blob: new Blob(chunks, {type: 'application/json'}), name: String(result.fileName || 'u2phone-backup.json'), size};
+    } finally {
+      if (token) await _.finishImport({token}).catch(() => {});
+    }
+  }
+  async function setBackGestureEnabled(enabled) {
+    if (isNativeIos) await iosNavigationPlugin.setEnabled({enabled: !!enabled});
   }
   function je(t) {
     let e = window.atob(String(t || "")),
@@ -995,6 +1024,8 @@
   }
   async function Xe() {
     document.documentElement.classList.toggle("u2-native-android", f);
+    document.documentElement.classList.toggle("u2-native-ios", isNativeIos);
+    if (isNativeIos) await iosNavigationPlugin.addListener('back', () => k('u2:ios-edge-back'));
     f && (await Promise.allSettled([me(), be("startup")]), await T.addListener("backButton", _e), await T.addListener("pause", () => k("u2:native-pause", {
       at: Date.now()
     })), await T.addListener("resume", () => {
@@ -1022,6 +1053,9 @@
   });
   window.u2NativeBridge = Object.freeze({
     isNativeAndroid: () => f,
+    isNativeIOS: () => isNativeIos,
+    importBackupFile,
+    setBackGestureEnabled,
     getPlatform: () => Y,
     ready: () => Ze,
     exportFile: Me,
@@ -1037,6 +1071,7 @@
   });
   k("u2:native-bridge-ready", {
     platform: Y,
-    isNativeAndroid: f
+    isNativeAndroid: f,
+    isNativeIOS: isNativeIos
   });
 })();

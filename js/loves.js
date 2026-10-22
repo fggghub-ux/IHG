@@ -776,10 +776,11 @@ window.lovesApp = {
         );
     },
     getLovesDaysCount: function (friend_4, now_3 = new Date()) {
-        const startTimestamp = Number(friend_4?.lovesSpaceStartTime);
-        if (!Number.isFinite(startTimestamp) || startTimestamp <= 0) return 1;
-        const startDay = this.getLocalDayOrdinal(new Date(startTimestamp)),
-            currentDay = this.getLocalDayOrdinal(now_3);
+        const startTimestamp = this.getAnniversaryDate(friend_4?.lovesData?.togetherDate);
+        const _value = Number(friend_4?.lovesSpaceStartTime);
+        if (!startTimestamp && (!Number.isFinite(_value) || _value <= 0)) return 1;
+        const startDay = this.getLocalDayOrdinal(startTimestamp || new Date(_value));
+        const currentDay = this.getLocalDayOrdinal(now_3);
         return Math.max(1, currentDay - startDay + 1);
     },
     syncDailySavingsForFriend: async function (friend_5, now_4 = new Date(), value_152 = {}) {
@@ -986,6 +987,7 @@ window.lovesApp = {
             document
                 .getElementById('lovers-anniversary-add')
                 ?.addEventListener('click', () => this.openAnniversaryEditor()),
+            document.getElementById('lovers-together-date-card')?.addEventListener('click', () => this.openAnniversaryEditor('together-date')),
             document
                 .getElementById('lovers-anniversary-cancel')
                 ?.addEventListener('click', () => this.closeAnniversaryEditor()),
@@ -1253,9 +1255,15 @@ window.lovesApp = {
         document.getElementById('lovers-shared-anniversary-btn')?.focus();
     },
     renderAnniversaries: function () {
-        const sharedSavingsBtn_2 = document.getElementById('lovers-anniversary-list'),
-            loversAnniversaryEmptyElement = document.getElementById('lovers-anniversary-empty');
-        if (!sharedSavingsBtn_2) return;
+        const sharedSavingsBtn_2 = this.currentFriend?.lovesData?.togetherDate;
+        const _value2 = document.getElementById('lovers-together-date-value');
+        if (_value2)
+            _value2.textContent = this.getAnniversaryDate(sharedSavingsBtn_2)
+                ? sharedSavingsBtn_2
+                : '未设置';
+        const _value3 = document.getElementById('lovers-anniversary-list');
+        const loversAnniversaryEmptyElement = document.getElementById('lovers-anniversary-empty');
+        if (!_value3) return;
         const sort_221 = this.getAnniversaries()
             .map((item_23) => ({
                 item: item_23,
@@ -1271,10 +1279,10 @@ window.lovesApp = {
                     String(value_224.item.name).localeCompare(String(value_225.item.name))
                 );
             });
-        sharedSavingsBtn_2.innerHTML = sort_221
+        _value3.innerHTML = sort_221
             .map(({ item: item_24, countdown: countdown_2 }) => {
-                const { next: next_3, days: days_2 } = countdown_2,
-                    value_232 =
+                const { next: next_3, days: days_2 } = countdown_2;
+                const value_232 =
                         days_2 === 0
                             ? '就是今天'
                             : days_2 > 0
@@ -1285,23 +1293,19 @@ window.lovesApp = {
                     this.escapeHTML(item_24.id) +
                     '" aria-label="编辑' +
                     this.escapeHTML(item_24.name) +
-                    `">
-                <span class="lovers-anniversary-date-box"><strong>` +
+                    '">\n                <span class="lovers-anniversary-date-box"><strong>' +
                     String(next_3.getDate()).padStart(2, '0') +
                     '</strong><small>' +
                     (next_3.getMonth() + 1) +
-                    `月</small></span>
-                <span class="lovers-anniversary-card-copy"><strong>` +
+                    '月</small></span>\n                <span class="lovers-anniversary-card-copy"><strong>' +
                     this.escapeHTML(item_24.name) +
                     '</strong><small>' +
                     this.escapeHTML(item_24.date) +
                     ' · ' +
                     (item_24.annual === false ? '只纪念这一次' : '每年重复') +
-                    `</small></span>
-                <span class="lovers-anniversary-count">` +
+                    '</small></span>\n                <span class="lovers-anniversary-count">' +
                     value_232 +
-                    `</span>
-            </button>`
+                    '</span>\n            </button>'
                 );
             })
             .join('');
@@ -1309,25 +1313,41 @@ window.lovesApp = {
             loversAnniversaryEmptyElement.hidden = sort_221.length > 0;
     },
     openAnniversaryEditor: function (value_233 = '') {
-        const loversAnniversaryEditorElement = document.getElementById('lovers-anniversary-editor'),
-            loversAnniversaryFormElement = document.getElementById('lovers-anniversary-form');
+        const loversAnniversaryEditorElement = document.getElementById('lovers-anniversary-editor');
+        const loversAnniversaryFormElement = document.getElementById('lovers-anniversary-form');
         if (!loversAnniversaryEditorElement || !loversAnniversaryFormElement) return;
         const result_234 = this.getAnniversaries().find(
             (value_235) => String(value_235.id) === String(value_233),
         );
-        loversAnniversaryFormElement.dataset.anniversaryId = result_234
-            ? String(result_234.id)
-            : '';
-        document.getElementById('lovers-anniversary-form-title').textContent = result_234
-            ? '编辑纪念日'
-            : '添加纪念日';
-        document.getElementById('lovers-anniversary-name').value = result_234?.name || '';
-        document.getElementById('lovers-anniversary-date').value =
-            result_234?.date || this.getLocalDateKey(new Date());
+        const _value4 = value_233 === 'together-date';
+        loversAnniversaryFormElement.dataset.anniversaryId = _value4
+            ? 'together-date'
+            : result_234
+              ? String(result_234.id)
+              : '';
+        document.getElementById('lovers-anniversary-form-title').textContent = _value4
+            ? '在一起的日期'
+            : result_234
+              ? '编辑纪念日'
+              : '添加纪念日';
+        const _value5 = document.getElementById('lovers-anniversary-name');
+        _value5.value = _value4 ? '在一起的日期' : result_234?.name || '';
+        _value5.readOnly = _value4;
+        const _value6 = document.getElementById('lovers-anniversary-date');
+        _value6.required = !_value4;
+        const _value7 = this.currentFriend?.lovesData?.togetherDate;
+        _value6.value = _value4
+            ? this.getAnniversaryDate(_value7)
+                ? _value7
+                : ''
+            : result_234?.date || this.getLocalDateKey(new Date());
         document.getElementById('lovers-anniversary-annual').checked = result_234?.annual !== false;
-        document.getElementById('lovers-anniversary-delete').hidden = !result_234;
+        document.getElementById('lovers-anniversary-annual').closest('label').hidden = _value4;
+        const _value8 = document.getElementById('lovers-anniversary-delete');
+        _value8.textContent = _value4 ? '清空' : '删除';
+        _value8.hidden = _value4 ? !_value7 : !result_234;
         loversAnniversaryEditorElement.hidden = false;
-        document.getElementById('lovers-anniversary-name')?.focus();
+        (_value4 ? _value6 : _value5).focus();
     },
     closeAnniversaryEditor: function () {
         const loversAnniversaryEditorElement_236 = document.getElementById(
@@ -1337,10 +1357,16 @@ window.lovesApp = {
     },
     saveAnniversary: async function () {
         if (this._anniversarySaving) return;
-        const currentFriend_3 = this.getCurrentChar(),
-            loversAnniversaryFormElement_238 = document.getElementById('lovers-anniversary-form'),
-            name_4 = document.getElementById('lovers-anniversary-name')?.value.trim().slice(0, 40),
-            date_8 = document.getElementById('lovers-anniversary-date')?.value;
+        const currentFriend_3 = this.getCurrentChar();
+        const loversAnniversaryFormElement_238 = document.getElementById('lovers-anniversary-form');
+        if (loversAnniversaryFormElement_238?.dataset.anniversaryId === 'together-date') {
+            await this.saveTogetherDate(
+                document.getElementById('lovers-anniversary-date')?.value || '',
+            );
+            return;
+        }
+        const name_4 = document.getElementById('lovers-anniversary-name')?.value.trim().slice(0, 40);
+        const date_8 = document.getElementById('lovers-anniversary-date')?.value;
         if (
             !currentFriend_3?.hasLovesSpace ||
             !loversAnniversaryFormElement_238 ||
@@ -1355,12 +1381,12 @@ window.lovesApp = {
             ...value_246,
         }));
         if (!currentFriend_3.lovesData) currentFriend_3.lovesData = {};
-        const items_242 = (currentFriend_3.lovesData.anniversaries = [...anniversaries_3]),
-            anniversaryId_243 = loversAnniversaryFormElement_238.dataset.anniversaryId,
-            result_244 = items_242.find(
+        const items_242 = (currentFriend_3.lovesData.anniversaries = [...anniversaries_3]);
+        const anniversaryId_243 = loversAnniversaryFormElement_238.dataset.anniversaryId;
+        const result_244 = items_242.find(
                 (value_247) => String(value_247.id) === String(anniversaryId_243),
-            ),
-            options_245 = {
+            );
+        const options_245 = {
                 id:
                     result_244?.id ||
                     'ann_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
@@ -1388,12 +1414,60 @@ window.lovesApp = {
             this._anniversarySaving = false;
         }
     },
+    saveTogetherDate: async function (_value0 = '') {
+        if (this._anniversarySaving) return;
+        const _value1 = this.getCurrentChar();
+        if (!_value1?.hasLovesSpace) return;
+        if (_value0 && !this.getAnniversaryDate(_value0)) {
+            window.showToast?.('请填写有效日期');
+            return;
+        }
+        this._anniversarySaving = true;
+        if (!_value1.lovesData) _value1.lovesData = {};
+        const _value10 = Object.prototype.hasOwnProperty.call(_value1.lovesData, 'togetherDate');
+        const _value11 = _value1.lovesData.togetherDate;
+        try {
+            if (
+                !(await this.persistFriendState(_value1, {
+                    metaOnly: true,
+                    mutate: (_value12) => {
+                        if (!_value12.lovesData) _value12.lovesData = {};
+                        _value12.lovesData.togetherDate = _value0;
+                    },
+                }))
+            )
+                throw new Error('save failed');
+            String(this.currentFriend?.id) === String(_value1.id) &&
+                (this.closeAnniversaryEditor(),
+                this.renderAnniversaries(),
+                this.updateDaysCount(this.currentFriend));
+            window.showToast?.(_value0 ? '在一起的日期已保存' : '已恢复空间开通日期计数');
+        } catch (_value13) {
+            const _value14 = window.imApp?.getFriendById?.(_value1.id) || _value1;
+            for (const _value15 of new Set([_value1, _value14, this.currentFriend])) {
+                if (!_value15 || String(_value15.id) !== String(_value1.id) || !_value15.lovesData)
+                    continue;
+                if (_value10) _value15.lovesData.togetherDate = _value11;
+                else delete _value15.lovesData.togetherDate;
+            }
+            window.showToast?.('保存失败，请重试');
+        } finally {
+            this._anniversarySaving = false;
+        }
+    },
     deleteAnniversary: async function () {
         if (this._anniversarySaving) return;
-        const currentChar_249 = this.getCurrentChar(),
-            entryId = document.getElementById('lovers-anniversary-form')?.dataset.anniversaryId,
-            anniversaries_2 = this.getAnniversaries(currentChar_249),
-            result_251 = anniversaries_2.find(
+        if (
+            document.getElementById('lovers-anniversary-form')?.dataset.anniversaryId ===
+            'together-date'
+        ) {
+            await this.saveTogetherDate('');
+            return;
+        }
+        const currentChar_249 = this.getCurrentChar();
+        const entryId = document.getElementById('lovers-anniversary-form')?.dataset.anniversaryId;
+        const anniversaries_2 = this.getAnniversaries(currentChar_249);
+        const result_251 = anniversaries_2.find(
                 (value_252) => String(value_252.id) === String(entryId),
             );
         if (

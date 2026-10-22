@@ -140,6 +140,12 @@
         element_37.className = 'memory-recall-narration-pill favorite-saved-narration-pill';
         element_37.textContent = '收藏了一些话';
         row_2.appendChild(element_37);
+        if (
+            imChat_2.attachNoticeDeleteButton?.(row_2, friend_3, null, {
+                key: 'favorite:' + sourceApiRunId_2,
+            }) === false
+        )
+            return false;
         messageContainer.appendChild(row_2);
         if (global.imChat?.scrollToBottom) global.imChat.scrollToBottom(messageContainer);
         return true;

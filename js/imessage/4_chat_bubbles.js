@@ -17,6 +17,45 @@
         enabled = true,
         renderMessageContextByFriend_3 = new WeakMap(),
         renderMessageContextByFriend_2 = new WeakMap();
+    imChat_3.attachNoticeDeleteButton = function (
+        row,
+        friend,
+        message,
+        { parent = row, key = '' } = {},
+    ) {
+        const live = window.imApp?.getFriendById?.(friend?.id) || friend;
+        if (key && window.imApp?.isChatNoticeDismissed?.(live, key)) return false;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'chat-notice-delete';
+        button.textContent = '×';
+        button.setAttribute('aria-label', '删除提示');
+        button.title = '删除提示';
+        button.addEventListener('click', async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (button.disabled) return;
+            button.disabled = true;
+            try {
+                const saved = key
+                    ? await window.imApp.dismissChatNotice(friend.id, key)
+                    : await window.imApp.removeFriendMessages(
+                          friend.id,
+                          { id: message?.id || null, timestamp: message?.timestamp || null },
+                          { silent: true },
+                      );
+                if (!saved) throw new Error('save failed');
+                row.remove();
+                window.imApp.requestChatsListRefresh?.();
+            } catch (error) {
+                button.disabled = false;
+                window.showToast?.('删除提示失败');
+            }
+        });
+        button.addEventListener('keydown', (event) => event.stopPropagation());
+        parent.appendChild(button);
+        return true;
+    };
     function escapeHtml(value_4) {
         return String(value_4 == null ? '' : value_4)
             .replace(/&/g, '&amp;')
@@ -53,7 +92,10 @@
             source_2 = boundAccount || window.userState || userState_2 || {};
         return {
             name: source_2.name || source_2.realName || source_2.nickname || 'User',
-            avatarUrl: source_2.avatarUrl || 'assets/moren-thumb.jpg',
+            avatarUrl:
+                window.imApp?.getChatUserAvatarUrl?.(friend_2, source_2) ||
+                source_2.avatarUrl ||
+                'assets/moren-thumb.jpg',
         };
     }
     function syncGroupUserAvatarState_3(friend_3, container_2) {
@@ -1402,6 +1444,12 @@
                     }
                     window.openView?.(modal);
                 });
+            imChat_3.attachNoticeDeleteButton(row_6, friend_11, msg_6, {
+                parent:
+                    row_6.querySelector(
+                        '.system-notice-card, .user-phone-access-notice-pill, .chat-block-status-pill, .message-recalled-notice',
+                    ) || row_6,
+            });
             container_3.appendChild(row_6);
             window.imChat.scrollToBottom(container_3);
             return row_6;
@@ -1462,6 +1510,12 @@
                         },
                     });
                 }),
+                imChat_3.attachNoticeDeleteButton(row_6, friend_11, msg_6, {
+                    parent:
+                        row_6.querySelector(
+                            '.system-notice-card, .user-phone-access-notice-pill, .chat-block-status-pill, .message-recalled-notice',
+                        ) || row_6,
+                }),
                 container_3.appendChild(row_6),
                 window.imChat.scrollToBottom(container_3),
                 row_6
@@ -1497,6 +1551,12 @@
                         event_5.stopPropagation();
                         openRecalledMessageDetail_2(recalledContent_2, recalledTranslation_2);
                     }),
+                imChat_3.attachNoticeDeleteButton(row_6, friend_11, msg_6, {
+                    parent:
+                        row_6.querySelector(
+                            '.system-notice-card, .user-phone-access-notice-pill, .chat-block-status-pill, .message-recalled-notice',
+                        ) || row_6,
+                }),
                 container_3.appendChild(row_6),
                 window.imChat.scrollToBottom(container_3),
                 row_6
@@ -1581,29 +1641,6 @@
                 </div>
             </div>
         `;
-        if (noticeKind_2 === 'family_card_spend') {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'family-card-spend-delete';
-            button.setAttribute('aria-label', '删除亲属卡消费通知');
-            button.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
-            row_6.querySelector('.system-notice-card')?.appendChild(button);
-            button.addEventListener('click', async (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                button.disabled = true;
-                const saved = await window.imApp.removeFriendMessages?.(
-                    friend_11.id,
-                    { id: msg_6.id || null, timestamp: msg_6.timestamp || null },
-                    { silent: true },
-                );
-                if (saved) row_6.remove();
-                else {
-                    button.disabled = false;
-                    window.showToast?.('删除通知失败');
-                }
-            });
-        }
         if (noticeKind_2 === 'narration') {
             const card_3 = row_6.querySelector('.system-notice-card');
             card_3 &&
@@ -1626,6 +1663,12 @@
                         );
                 });
         }
+        imChat_3.attachNoticeDeleteButton(row_6, friend_11, msg_6, {
+            parent:
+                row_6.querySelector(
+                    '.system-notice-card, .user-phone-access-notice-pill, .chat-block-status-pill, .message-recalled-notice',
+                ) || row_6,
+        });
         container_3.appendChild(row_6);
         window.imChat.scrollToBottom(container_3);
     }
@@ -1973,6 +2016,7 @@
         element_345.className = 'memory-recall-narration-pill memory-request-narration-pill';
         element_345.textContent = '想记住一些事\u3000' + (value_344 || '查看');
         element_343.appendChild(element_345);
+        imChat_3.attachNoticeDeleteButton(element_343, value_340, value_339);
         !value_344 && (element_345.setAttribute('role', 'button'), (element_345.tabIndex = 0));
         const handleClick_2 = (event_347) => {
             event_347.preventDefault();

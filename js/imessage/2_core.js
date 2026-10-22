@@ -158,6 +158,30 @@ window.imApp.getMessageUserIdentity = function (friend_2, message_3) {
         signature: String(user_3.signature || ''),
     };
 };
+window.imApp.getChatUserAvatarUrl = function (friend, account) {
+    const accounts = typeof window.getAccounts === 'function' ? window.getAccounts() : [];
+    const source =
+        account ||
+        accounts.find((a) => String(a?.id) === String(friend?.boundAccountId || '')) ||
+        (window.getUserState ? window.getUserState() : window.userState) ||
+        {};
+    const override =
+        friend?.separateUserAvatarEnabled === true && friend?.type !== 'group'
+            ? friend.userAvatarsByAccount?.[
+                  String(source.id || friend.boundAccountId || '__default__')
+              ]
+            : '';
+    return String(override || source.avatarUrl || source.avatar || '');
+};
+window.imApp.isChatNoticeDismissed = (friend, key) => friend?.dismissedChatNotices?.[key] === true;
+window.imApp.dismissChatNotice = async (friendId, key) =>
+    window.imApp.commitFriendChange(
+        friendId,
+        (friend) => {
+            friend.dismissedChatNotices = { ...(friend.dismissedChatNotices || {}), [key]: true };
+        },
+        { silent: true, metaOnly: true },
+    );
 window.imApp.getCharUserIdentity = function (value_16) {
     const user_4 = window.getUserState ? window.getUserState() : window.userState || {},
         accounts_2 = typeof window.getAccounts === 'function' ? window.getAccounts() : [],
@@ -2274,6 +2298,21 @@ window.imApp.normalizeFriendData = function (friend_8) {
     normalized_2.replyStyle = normalized_2.replyStyle === 'outside' ? 'outside' : 'inside';
     normalized_2.timeAware = normalized_2.timeAware !== false;
     normalized_2.autoReplyEnabled = normalized_2.autoReplyEnabled === true;
+    normalized_2.autoReplyDelayEnabled = normalized_2.autoReplyDelayEnabled === true;
+    const autoReplyDelaySeconds = Number(normalized_2.autoReplyDelaySeconds);
+    normalized_2.autoReplyDelaySeconds =
+        Number.isInteger(autoReplyDelaySeconds) &&
+        autoReplyDelaySeconds >= 1 &&
+        autoReplyDelaySeconds <= 3600
+            ? autoReplyDelaySeconds
+            : 3;
+    normalized_2.separateUserAvatarEnabled = normalized_2.separateUserAvatarEnabled === true;
+    normalized_2.userAvatarsByAccount =
+        normalized_2.userAvatarsByAccount &&
+        typeof normalized_2.userAvatarsByAccount === 'object' &&
+        !Array.isArray(normalized_2.userAvatarsByAccount)
+            ? normalized_2.userAvatarsByAccount
+            : {};
     normalized_2.locationProfile = window.imDataUtils?.normalizeLocationProfile
         ? window.imDataUtils.normalizeLocationProfile(normalized_2.locationProfile)
         : {
@@ -2484,6 +2523,7 @@ window.imApp.normalizeFriendData = function (friend_8) {
         typeof normalized_2.onlinePromptPresetId === 'string'
             ? normalized_2.onlinePromptPresetId.trim()
             : '';
+    normalized_2.builtinLivingVibeEnabled = normalized_2.builtinLivingVibeEnabled !== false;
     const cotDefaultVersion_2 = Number(normalized_2.cotDefaultVersion) || 0;
     normalized_2.cotEnabled = cotDefaultVersion_2 >= 2 && normalized_2.cotEnabled === true;
     normalized_2.cotDefaultVersion = 2;

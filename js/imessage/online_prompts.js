@@ -330,6 +330,37 @@
         );
         if (!value_115) throw new Error('应用失败，请重试');
     }
+    async function setBuiltinLivingVibeEnabled(value_117, _value2) {
+        const _value3 = value.imApp.getFriendById(value_117);
+        if (!_value3) throw new Error('聊天已不存在');
+        const _value4 = _value3.builtinLivingVibeEnabled;
+        try {
+            const _value5 = await value.imApp.commitScopedFriendChange(
+                value_117,
+                (_value6) => {
+                    _value6.builtinLivingVibeEnabled = _value2 !== false;
+                },
+                {
+                    silent: true,
+                    metaOnly: true,
+                    syncSettings: true,
+                },
+            );
+            if (!_value5) throw new Error('保存失败，请重试');
+        } catch (_value7) {
+            for (const _value8 of new Set([
+                _value3,
+                value.imApp.getFriendById(value_117),
+                value.imData.currentActiveFriend,
+                value.imData.currentSettingsFriend,
+            ])) {
+                if (!_value8 || String(_value8.id) !== String(value_117)) continue;
+                if (_value4 === undefined) delete _value8.builtinLivingVibeEnabled;
+                else _value8.builtinLivingVibeEnabled = _value4;
+            }
+            throw _value7;
+        }
+    }
     async function deletePreset_2(value_117) {
         const handleAction_13_118 = normalizePresets_2(value.imData.onlinePromptPresets),
             filter_119 = (value.imData.friends || []).filter(
@@ -380,6 +411,7 @@
         importPreset: importPreset_2,
         savePreset: savePreset_2,
         applyPreset: applyPreset_2,
+        setBuiltinLivingVibeEnabled,
         deletePreset: deletePreset_2,
     };
     value.imApp = value.imApp || {};

@@ -2912,3 +2912,23 @@ button.settings-item {
 .desktop-preset-dialog-card strong { font-size: 17px; }
 .desktop-preset-dialog-card p { margin: 0; color: #666; font-size: 13px; line-height: 1.55; }
 .desktop-preset-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+
+#ios-icloud-backup-group[hidden],
+#ios-icloud-import-preview[hidden] {
+    display: none;
+}
+#ios-icloud-import-preview p {
+    margin: 12px 0;
+    color: #777782;
+    font-size: 12px;
+    line-height: 1.5;
+}
+#ios-icloud-change-file {
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: #efeeff;
+    color: #5856d6;
+    font: inherit;
+    font-size: 13px;
+}

@@ -18,6 +18,12 @@
             chatOnlinePromptSheetElement.querySelector('.online-prompt-select'),
         onlinePromptDecisionElement =
             chatOnlinePromptSheetElement.querySelector('.online-prompt-decision'),
+        onlinePromptDecisionCardElement = chatOnlinePromptSheetElement.querySelector(
+            '.online-prompt-decision-card',
+        ),
+        livingVibeToggle = chatOnlinePromptSheetElement.querySelector(
+            '#online-prompt-living-vibe-toggle',
+        ),
         onlinePromptNoticeElement =
             chatOnlinePromptSheetElement.querySelector('.online-prompt-notice');
     if (
@@ -25,6 +31,7 @@
         !onlinePromptBodyElement ||
         !onlinePromptSelectElement ||
         !onlinePromptDecisionElement ||
+        !onlinePromptDecisionCardElement ||
         !onlinePromptNoticeElement
     )
         return;
@@ -479,9 +486,11 @@
         onlinePromptBodyElement.append(handleAction_14_120);
     }
     function handleAction_35(value_133, items) {
-        onlinePromptDecisionElement.replaceChildren(handleAction_14('p', '', value_133));
+        const message = handleAction_14('p', '', value_133);
+        message.id = 'online-prompt-decision-message';
+        onlinePromptDecisionCardElement.replaceChildren(message);
         const handleAction_14_134 = handleAction_14('div', 'online-prompt-decision-actions');
-        onlinePromptDecisionElement.append(handleAction_14_134);
+        onlinePromptDecisionCardElement.append(handleAction_14_134);
         onlinePromptDecisionElement.hidden = false;
         const activeElement_135 = document.activeElement;
         return (
@@ -497,11 +506,11 @@
                         });
                     value_136(value_137);
                 };
-                items.forEach(([value_138, value_139]) =>
-                    handleAction_14_134.append(
-                        handleAction_16(value_139, () => value_9?.(value_138)),
-                    ),
-                );
+                items.forEach(([value_138, value_139]) => {
+                    const button = handleAction_16(value_139, () => value_9?.(value_138));
+                    button.dataset.decision = value_138;
+                    handleAction_14_134.append(button);
+                });
                 handleAction_14_134.querySelector('button')?.focus({
                     preventScroll: true,
                 });
@@ -591,6 +600,8 @@
         if (window.imApp.ensureDataReady) await window.imApp.ensureDataReady();
         value_153 = window.imApp.getFriendById(value_153.id) || value_153;
         value_4 = value_153.id;
+        if (livingVibeToggle)
+            livingVibeToggle.checked = value_153.builtinLivingVibeEnabled !== false;
         value_10 = document.activeElement;
         if (value_10?.matches?.('input, textarea, select, [contenteditable="true"]'))
             value_10.blur();
@@ -602,6 +613,25 @@
         });
     }
     window.imApp.openOnlinePromptSettings = openOnlinePromptSettings_2;
+    onlinePromptDecisionElement.addEventListener('click', (event) => {
+        if (event.target === onlinePromptDecisionElement) value_9?.('cancel');
+    });
+    livingVibeToggle?.addEventListener('change', () => {
+        const previous = window.imApp.getFriendById(value_4)?.builtinLivingVibeEnabled !== false;
+        const enabled = livingVibeToggle.checked;
+        if (inert_2 || value_9) {
+            livingVibeToggle.checked = previous;
+            return;
+        }
+        void handleAction_38(async () => {
+            try {
+                await onlinePrompts_3.setBuiltinLivingVibeEnabled(value_4, enabled);
+            } catch (error) {
+                livingVibeToggle.checked = previous;
+                throw error;
+            }
+        });
+    });
     chatOnlinePromptSettingsBtnElement &&
         (chatOnlinePromptSettingsBtnElement.addEventListener('keydown', (event_154) => {
             (event_154.key === 'Enter' || event_154.key === ' ') &&

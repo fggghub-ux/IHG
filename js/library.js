@@ -88,6 +88,7 @@
         lastMediaTime: 0,
         playbackAttemptId: 0,
         playbackStartingAttemptId: 0,
+        playbackFailedAttemptId: 0,
         neteasePlaybackRetryCount: 0,
         neteaseSessionToken: '',
         neteaseAccount: null,
@@ -4658,7 +4659,16 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             );
         return safeHttpUrl(track_25?.mediaUrl);
     }
-    function finishPlaybackFailure(value_1101, error_18) {
+    function isCurrentPlaybackAttempt(track, attemptId) {
+        return attemptId === state.playbackAttemptId && state.currentTrack?.id === track?.id;
+    }
+    function finishPlaybackFailure(value_1101, error_18, attemptId = state.playbackAttemptId) {
+        if (
+            !isCurrentPlaybackAttempt(value_1101, attemptId) ||
+            state.playbackFailedAttemptId === attemptId
+        )
+            return;
+        state.playbackFailedAttemptId = attemptId;
         state.pendingPlayStatTrackId = null;
         console.warn('[Library] Playback failed:', error_18);
         toast(error_18?.message || '当前歌曲暂时无法播放');
@@ -4666,49 +4676,41 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
         emitTogetherListeningChange(true);
     }
     async function handleAction_166(track_26) {
-        const attemptId_2 = state.playbackAttemptId + 1;
-        state.playbackAttemptId = attemptId_2;
-        state.playbackStartingAttemptId = attemptId_2;
-        let src_2 = '';
+        const attemptId = ++state.playbackAttemptId;
+        state.playbackStartingAttemptId = attemptId;
+        let sourceAssigned = false;
         try {
-            src_2 = await handleAction_164(track_26, attemptId_2);
-        } catch (value_1106) {
-            return (finishPlaybackFailure(track_26, value_1106), false);
-        }
-        if (!src_2)
-            return (finishPlaybackFailure(track_26, new Error('歌曲没有有效的播放地址')), false);
-        audio.src = src_2;
-        audio.load();
-        try {
-            return (
-                await audio.play(),
-                attemptId_2 === state.playbackAttemptId && state.currentTrack?.id === track_26.id
-            );
-        } catch (value_1107) {
-            if (attemptId_2 !== state.playbackAttemptId || state.currentTrack?.id !== track_26.id)
-                return false;
-            const value_1108 =
+            const src = await handleAction_164(track_26, attemptId);
+            if (!isCurrentPlaybackAttempt(track_26, attemptId)) return false;
+            if (!src) throw new Error('歌曲没有有效的播放地址');
+            audio.src = src;
+            audio.load();
+            sourceAssigned = true;
+            await audio.play();
+            return isCurrentPlaybackAttempt(track_26, attemptId);
+        } catch (error) {
+            if (!isCurrentPlaybackAttempt(track_26, attemptId)) return false;
+            if (
+                sourceAssigned &&
                 (isNetEaseTrack(track_26) || handleAction_27(track_26)) &&
                 state.neteasePlaybackRetryCount < 1 &&
-                value_1107?.name !== 'NotAllowedError';
-            if (value_1108) {
+                error?.name !== 'NotAllowedError'
+            ) {
                 state.neteasePlaybackRetryCount += 1;
                 if (handleAction_27(track_26))
-                    readerChunkHtmlCache_3['delete'](String(track_26.neteaseId));
-                return (
-                    console.warn(
-                        '[Library] NetEase playback retry ' +
-                            state.neteasePlaybackRetryCount +
-                            '/1 for track ' +
-                            track_26.neteaseId,
-                    ),
-                    handleAction_166(track_26)
+                    readerChunkHtmlCache_3.delete(String(track_26.neteaseId));
+                console.warn(
+                    '[Library] NetEase playback retry ' +
+                        state.neteasePlaybackRetryCount +
+                        '/1 for track ' +
+                        track_26.neteaseId,
                 );
+                return handleAction_166(track_26);
             }
-            return (finishPlaybackFailure(track_26, value_1107), false);
+            finishPlaybackFailure(track_26, error, attemptId);
+            return false;
         } finally {
-            if (state.playbackStartingAttemptId === attemptId_2)
-                state.playbackStartingAttemptId = 0;
+            if (state.playbackStartingAttemptId === attemptId) state.playbackStartingAttemptId = 0;
         }
     }
     function getPlaybackMode() {
@@ -4888,15 +4890,18 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             else toast('还没有可播放的歌曲');
             return;
         }
-        if (audio.paused)
-            audio.play()['catch']((value_1118) => {
-                if (handleAction_27(state.currentTrack)) {
-                    readerChunkHtmlCache_3['delete'](String(state.currentTrack.neteaseId));
+        if (audio.paused) {
+            const track = state.currentTrack,
+                attemptId = state.playbackAttemptId;
+            audio.play().catch((error) => {
+                if (!isCurrentPlaybackAttempt(track, attemptId)) return;
+                if (handleAction_27(track)) {
+                    readerChunkHtmlCache_3.delete(String(track.neteaseId));
                     state.neteasePlaybackRetryCount = 0;
-                    handleAction_166(state.currentTrack);
-                } else toast(value_1118?.message || '当前歌曲暂时无法播放');
+                    handleAction_166(track);
+                } else toast(error?.message || '当前歌曲暂时无法播放');
             });
-        else audio.pause();
+        } else audio.pause();
     }
     function openPlayer() {
         if (!state.currentTrack) return;

@@ -133,7 +133,7 @@
             return (console.warn('[u2ExportFile] A Blob and fileName are required.'), 'failed');
         const trim_21 = String(fileName_3).trim(),
             u2NativeBridge_22 = window.u2NativeBridge;
-        if (u2NativeBridge_22?.isNativeAndroid?.())
+        if (u2NativeBridge_22?.isNativeAndroid?.() || u2NativeBridge_22?.isNativeIOS?.())
             try {
                 const value_25 = await u2NativeBridge_22.exportFile({
                     blob: blob_4,
@@ -142,10 +142,7 @@
                 });
                 if (value_25 !== 'unavailable') return value_25;
             } catch (value_26) {
-                return (
-                    console.warn('[u2ExportFile] Native Android export failed:', value_26),
-                    'failed'
-                );
+                return (console.warn('[u2ExportFile] Native export failed:', value_26), 'failed');
             }
         if (!isIosStandalone()) return downloadFile(blob_4, trim_21);
         const shareFileObject = makeShareFile(blob_4, trim_21);

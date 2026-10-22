@@ -147,6 +147,10 @@
     function getPayUserAvatar(apk110New_85, apk110New_86 = getPayUserName(apk110New_85)) {
         const currentUserState_2 = window.userState || userState_3 || {};
         return (
+            window.imApp?.getChatUserAvatarUrl?.(
+                apk110New_85,
+                apk110New_86 || currentUserState_2,
+            ) ||
             apk110New_86?.avatarUrl ||
             apk110New_86?.avatar ||
             currentUserState_2.avatarUrl ||

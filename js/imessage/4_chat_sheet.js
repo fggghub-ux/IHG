@@ -273,7 +273,7 @@
             name:
                 String(source_2.name || source_2.realName || source_2.nickname || 'User').trim() ||
                 'User',
-            avatarUrl: source_2.avatarUrl || source_2.avatar || '',
+            avatarUrl: window.imApp?.getChatUserAvatarUrl?.(value_103, source_2) || source_2.avatarUrl || source_2.avatar || '',
             signature: String(source_2.signature || '').trim(),
             persona: String(source_2.persona || '').trim(),
             boundAccountId: boundAccount?.id ?? null,

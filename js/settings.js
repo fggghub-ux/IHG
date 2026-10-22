@@ -9796,6 +9796,8 @@
                 !overlay &&
                     ((overlay = document.createElement('div')),
                     (overlay.className = 'data-operation-overlay'),
+                    overlay.setAttribute('data-ios-back-surface', ''),
+                    overlay.setAttribute('data-ios-back-block', ''),
                     (overlay.innerHTML = `
                         <div class="data-operation-card">
                             <i class="fas fa-spinner fa-spin data-operation-spinner"></i>
@@ -9823,6 +9825,12 @@
             function hideOperation() {
                 if (overlay) overlay.style.display = 'none';
             }
+            window.u2InitIosBackup?.({
+                showOperation,
+                updateOperation,
+                hideOperation,
+                refreshStorageHealth,
+            });
             function handleAction_1125(file_13, summary_4) {
                 if (!importPreview) return;
                 importPreview.style.display = 'block';

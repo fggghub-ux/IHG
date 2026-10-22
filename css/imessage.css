@@ -18875,25 +18875,72 @@ button.moment-private-chat-bubble.has-translation {
 #chat-reply-style-select:focus {
     border-color: #e5e5ea;
 }
-.family-card-spend-delete {
-    align-self: flex-start;
-    flex: 0 0 24px;
-    width: 24px;
-    height: 24px;
-    margin: -4px -8px -4px 2px;
+#chat-auto-reply-row[hidden] { display:none !important; }
+
+.bind-account-avatar-setting {
+    min-height: 52px;
+    margin: 0 16px 14px;
+    padding: 10px 16px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-radius: var(--radius-bubble, 20px);
+    background: #ffffff;
+}
+.bind-account-avatar-setting-label {
+    color: #111111;
+    font-size: 15px;
+    line-height: 1.4;
+}
+.bind-account-avatar-setting .toggle-switch {
+    margin: 0;
+    flex-shrink: 0;
+}
+#chat-auto-reply-delay-row[hidden],
+#chat-auto-reply-delay-seconds-row[hidden] {
+    display: none !important;
+}
+.chat-notice-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    margin: -5px -5px -5px 3px;
     border: 0;
     border-radius: 50%;
     background: transparent;
-    color: #666;
+    color: #c7c7cc;
+    font:
+        18px/1 Arial,
+        sans-serif;
     cursor: pointer;
+    vertical-align: middle;
+    touch-action: manipulation;
 }
-.family-card-spend-delete:focus-visible {
-    outline: 2px solid #007aff;
-    outline-offset: 2px;
+.chat-notice-delete:focus-visible {
+    outline: 2px solid #8e8e93;
+    outline-offset: 1px;
 }
-.family-card-spend-delete:disabled {
-    opacity: .45;
+.chat-notice-delete:disabled {
+    opacity: 0.45;
     cursor: default;
 }
 
-#chat-auto-reply-row[hidden] { display:none !important; }
+@keyframes offline-speech-wave-pulse {
+    from {
+        transform: scaleY(0.48);
+    }
+    to {
+        transform: scaleY(1.12);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .offline-speech-wave.is-playing span {
+        animation: none;
+    }
+}

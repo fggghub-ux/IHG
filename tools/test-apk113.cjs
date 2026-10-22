@@ -616,7 +616,7 @@ const path = require('node:path');
                     '#chat-interface-apk113-char .ins-chat-messages',
                 );
                 window.imChat.rerenderChatContainer(friend, container, { scroll: false });
-                const button = container.querySelector('.family-card-spend-delete');
+                const button = container.querySelector('.chat-notice-delete');
                 if (!button) return 'no delete button';
                 const remove = a.removeFriendMessages;
                 let deletion;
