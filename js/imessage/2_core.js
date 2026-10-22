@@ -220,6 +220,127 @@ window.imApp.getCharUserIdentity = function (value_16) {
         persona: String(source_3.persona || source_3.signature || user_5.persona || ''),
     };
 };
+window.imApp.setCustomChatTime = async function (_value23, _value24, _value25, _value26 = '') {
+    const _value27 = window.imApp.getFriendById(_value23);
+    const _value28 = window.imDataUtils;
+    if (!_value28?.isCustomChatTimeEnabled(_value27)) return false;
+    const _value29 = _value28.normalizeChatTimeAnchors([
+        {
+            sourceTimestamp: _value24,
+            sceneTimestamp: _value25,
+            messageId: _value26,
+        },
+    ]);
+    if (_value29.length !== 1) return false;
+    const _value30 = await window.imApp.commitScopedFriendChange(
+        _value23,
+        (_value31) => {
+            if (!_value28.isCustomChatTimeEnabled(_value31))
+                throw new Error('Custom chat time is disabled');
+            _value31.customTimeAnchors = _value28.normalizeChatTimeAnchors([
+                ...(_value31.customTimeAnchors || []),
+                _value29[0],
+            ]);
+        },
+        {
+            silent: true,
+            immediate: true,
+            metaOnly: true,
+            syncActive: true,
+            syncSettings: true,
+        },
+    );
+    if (!_value30) {
+        const _value32 = window.imApp.getFriendById(_value23);
+        _value32 &&
+            (window.imApp.syncActiveFriendReference?.(_value32),
+            window.imApp.syncSettingsFriendReference?.(_value32));
+    }
+    return _value30;
+};
+window.imApp.commitCharRelationship = async function (_value0, _value1, _value10) {
+    const _value11 = typeof _value1 === 'string' ? _value1 : '';
+    const _value12 = _value11.trim();
+    if (!_value10 || !_value12 || _value12.length > 120 || /[\u0000-\u001f\u007f]/.test(_value11))
+        return {
+            saved: true,
+            changed: false,
+        };
+    const _value13 =
+        window.imApp.getFriendById?.(_value0) ||
+        (window.imData?.friends || []).find((_value16) => String(_value16.id) === String(_value0));
+    if (_value13?.type !== 'char' || String(_value13.relationship || '').trim() === _value12)
+        return {
+            saved: true,
+            changed: false,
+        };
+    let _value14 = null;
+    const _value15 = await window.imApp.commitFriendChange(
+        _value0,
+        (_value17) => {
+            if (_value17.type !== 'char' || String(_value17.relationship || '').trim() === _value12)
+                return;
+            _value17.messages = Array.isArray(_value17.messages) ? _value17.messages : [];
+            if (
+                _value17.messages.some(
+                    (_value20) =>
+                        _value20?.noticeKind === 'relationship_changed' &&
+                        String(_value20.apiRunId || '') === String(_value10),
+                )
+            )
+                return;
+            const _value18 = String(_value17.relationship || '');
+            _value17.relationship = _value12;
+            const _value19 = _value17.nickname || _value17.realName || 'Char';
+            _value14 = {
+                id: _value10 + '-relationship',
+                role: 'system',
+                type: 'system_notice',
+                noticeKind: 'relationship_changed',
+                excludedFromContext: true,
+                content: _value19 + '现在认为你们的关系为' + _value12,
+                relationshipChange: {
+                    oldRelationship: _value18,
+                    newRelationship: _value12,
+                },
+                timestamp: Date.now(),
+                apiRunId: _value10,
+            };
+            _value17.messages.push(_value14);
+            window.imApp.syncFriendMessageSummary?.(_value17);
+        },
+        {
+            silent: true,
+            immediate: true,
+            includeMessages: true,
+            syncActive: true,
+            syncSettings: true,
+        },
+    );
+    if (!_value15) {
+        const _value21 = window.imApp.getFriendById?.(_value0);
+        _value21 &&
+            (window.imApp.syncActiveFriendReference?.(_value21),
+            window.imApp.syncSettingsFriendReference?.(_value21));
+    }
+    if (
+        _value15 &&
+        _value14 &&
+        String(window.imData.currentSettingsFriend?.id) === String(_value0)
+    ) {
+        window.imData.currentSettingsFriend.relationship = _value12;
+        const _value22 =
+            typeof document !== 'undefined'
+                ? document.getElementById('char-relationship-input')
+                : null;
+        if (_value22) _value22.value = _value12;
+    }
+    return {
+        saved: _value15,
+        changed: !!(_value15 && _value14),
+        notice: _value15 ? _value14 : null,
+    };
+};
 window.imApp.commitCharUserRemark = async function (memberId_2, value_30, value_31, apiRunId_2) {
     const value_33 = typeof value_31 === 'string' ? value_31 : '',
         trim_34 = value_33.trim();
@@ -315,11 +436,8 @@ window.imApp.commitCharUserRemark = async function (memberId_2, value_30, value_
 window.imApp.DEFAULT_STATUS_PROMPT =
     'Write exactly three genuine, unspoken thoughts the character has right now in Simplified Chinese. Each line should contain about 10 Chinese characters. Use exactly three lines, one thought per line, with no numbering, quotation marks, title, prefix, or explanation.';
 window.imApp.DEFAULT_STATUS_TEMPLATE_REGEX = '(?<thought>[\\s\\S]+)';
-window.imApp.DEFAULT_STATUS_TEMPLATE_HTML = `<div class="chat-profile-status-page" data-selected-index="{{index}}">
-    <div class="chat-profile-status-time">{{time}}</div>
-    <div class="gmp-inner-voice chat-profile-panel-thought">{{thought}}</div>
-    <div class="chat-profile-status-counter"><span>{{index}}</span> / {{total}}</div>
-</div>`;
+window.imApp.DEFAULT_STATUS_TEMPLATE_HTML =
+    '<div class="chat-profile-status-page" data-selected-index="{{index}}">\n    <div class="chat-profile-status-time">{{time}}</div>\n    <div class="gmp-inner-voice chat-profile-panel-thought">{{thought}}</div>\n    <div class="chat-profile-status-counter"><span>{{index}}</span> / {{total}}</div>\n</div>';
 window.imApp.createDefaultStatusTemplate = function (value_43 = {}) {
     return {
         enabled: value_43.enabled === true,
@@ -337,10 +455,8 @@ window.imApp.createDefaultStatusTemplate = function (value_43 = {}) {
                 : window.imApp.DEFAULT_STATUS_TEMPLATE_HTML,
     };
 };
-window.imApp.DEFAULT_SINGLE_CHAT_COT_PROMPT = `请按以下顺序完整分析：
-1. 当前具体日期、时间与时间段，以及这对本轮场景和聊天承接意味着什么。
-2. 结合自己的核心人设、性格、当前情绪和与 User 的关系，分析自己现在最真实的想法与适合的回应方式。
-3. 结合 User 人设、当前消息的内容与语气，分析 User 此刻的需求、感受和适合被怎样回应。`;
+window.imApp.DEFAULT_SINGLE_CHAT_COT_PROMPT =
+    '请按以下顺序完整分析：\n1. 当前具体日期、时间与时间段，以及这对本轮场景和聊天承接意味着什么。\n2. 结合自己的核心人设、性格、当前情绪和与 User 的关系，分析自己现在最真实的想法与适合的回应方式。\n3. 结合 User 人设、当前消息的内容与语气，分析 User 此刻的需求、感受和适合被怎样回应。';
 window.imApp.scopeUserCss = function (css_2, scope_2) {
     if (!css_2 || !scope_2) return '';
     function handleAction_46(value_50, value_51) {
@@ -1243,7 +1359,7 @@ window.imApp.normalizeBstagePopMount = function (mount_4) {
         memberId: source_13.memberId == null ? '' : String(source_13.memberId),
     };
 };
-window.imApp.isCharacterSleeping = function (value_223) {
+window.imApp.isCharacterSleeping = function (value_223, _value33) {
     if (
         !value_223 ||
         !value_223.memory ||
@@ -1251,20 +1367,24 @@ window.imApp.isCharacterSleeping = function (value_223) {
         !value_223.memory.schedule.enabled
     )
         return false;
-    const schedule_224 = value_223.memory.schedule,
-        value_225 = schedule_224.sleepTime || '23:00',
-        value_226 = schedule_224.wakeTime || '07:00';
+    const schedule_224 = value_223.memory.schedule;
+    const value_225 = schedule_224.sleepTime || '23:00';
+    const value_226 = schedule_224.wakeTime || '07:00';
     if (value_225 === value_226) return false;
-    const now_3 = new Date(),
-        currentHours = now_3.getHours(),
-        currentMinutes = now_3.getMinutes(),
-        currentTotalMinutes = currentHours * 60 + currentMinutes,
-        parseTime = (timeStr) => {
+    const now_3 = new Date(
+        _value33 == null
+            ? (window.imDataUtils?.getChatTimestamp?.(value_223, Date.now()) ?? Date.now())
+            : _value33,
+    );
+    const currentHours = now_3.getHours();
+    const currentMinutes = now_3.getMinutes();
+    const currentTotalMinutes = currentHours * 60 + currentMinutes;
+    const parseTime = (timeStr) => {
             const parts = timeStr.split(':');
             return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
-        },
-        value_229_230 = parseTime(value_225),
-        value_229_231 = parseTime(value_226);
+        };
+    const value_229_230 = parseTime(value_225);
+    const value_229_231 = parseTime(value_226);
     return value_229_230 < value_229_231
         ? currentTotalMinutes >= value_229_230 && currentTotalMinutes < value_229_231
         : currentTotalMinutes >= value_229_230 || currentTotalMinutes < value_229_231;
@@ -2156,8 +2276,8 @@ window.imApp.normalizeFriendData = function (friend_8) {
         delete normalized_2.lovesData.diaries);
     normalized_2.id = normalized_2.id != null ? normalized_2.id : Date.now();
     normalized_2.type = normalized_2.type || 'char';
-    const isGroupChat_2 = normalized_2.type === 'group',
-        value_425_2 = normalized_2.type === 'official';
+    const isGroupChat_2 = normalized_2.type === 'group';
+    const value_425_2 = normalized_2.type === 'official';
     normalized_2.officialConversationActive =
         value_425_2 && normalized_2.officialConversationActive === true;
     normalized_2.officialApiPresetId = value_425_2
@@ -2176,12 +2296,14 @@ window.imApp.normalizeFriendData = function (friend_8) {
     normalized_2.imageFaceReferenceAssetId = normalized_2.imageFaceReferenceAssetId || null;
     normalized_2.imageFaceReferenceFileName = normalized_2.imageFaceReferenceFileName || '';
     const imagePromptConfig_2 =
-            normalized_2.imagePromptConfig && typeof normalized_2.imagePromptConfig === 'object'
-                ? normalized_2.imagePromptConfig
-                : {},
-        promptPresetIds = new Set(),
-        presets_4 = (Array.isArray(imagePromptConfig_2.presets) ? imagePromptConfig_2.presets : [])
-            .map((preset_3, value_441) => {
+        normalized_2.imagePromptConfig && typeof normalized_2.imagePromptConfig === 'object'
+            ? normalized_2.imagePromptConfig
+            : {};
+    const promptPresetIds = new Set();
+    const presets_4 = (
+        Array.isArray(imagePromptConfig_2.presets) ? imagePromptConfig_2.presets : []
+    )
+        .map((preset_3, value_441) => {
                 if (!preset_3 || typeof preset_3 !== 'object') return null;
                 const name_4 = String(preset_3.name || '')
                         .trim()
@@ -2217,16 +2339,16 @@ window.imApp.normalizeFriendData = function (friend_8) {
                     updatedAt: Math.max(createdAt_6, Number(preset_3.updatedAt) || createdAt_6),
                 };
             })
-            .filter(Boolean)
-            .slice(0, 30),
-        activePresetId_2 = promptPresetIds.has(
-            String(imagePromptConfig_2.activePresetId || '').trim(),
-        )
-            ? String(imagePromptConfig_2.activePresetId).trim()
-            : '',
-        slice_49 = String(imagePromptConfig_2.basePrompt ?? imagePromptConfig_2.lastPrompt ?? '')
-            .trim()
-            .slice(0, 8000);
+        .filter(Boolean)
+        .slice(0, 30);
+    const activePresetId_2 = promptPresetIds.has(
+        String(imagePromptConfig_2.activePresetId || '').trim(),
+    )
+        ? String(imagePromptConfig_2.activePresetId).trim()
+        : '';
+    const slice_49 = String(imagePromptConfig_2.basePrompt ?? imagePromptConfig_2.lastPrompt ?? '')
+        .trim()
+        .slice(0, 8000);
     normalized_2.imagePromptConfig = {
         charAppearance: String(imagePromptConfig_2.charAppearance || '')
             .trim()
@@ -2250,7 +2372,6 @@ window.imApp.normalizeFriendData = function (friend_8) {
     normalized_2.userPhoneAccess = window.imApp.normalizeUserPhoneAccess(
         normalized_2.userPhoneAccess,
     );
-
     normalized_2.language = String(normalized_2.language || 'zh').trim() || 'zh';
     const chatMessageRange = window.imDataUtils?.normalizeChatMessageRange
         ? window.imDataUtils.normalizeChatMessageRange(
@@ -2297,6 +2418,10 @@ window.imApp.normalizeFriendData = function (friend_8) {
     normalized_2.continuousBubbles = normalized_2.continuousBubbles !== false;
     normalized_2.replyStyle = normalized_2.replyStyle === 'outside' ? 'outside' : 'inside';
     normalized_2.timeAware = normalized_2.timeAware !== false;
+    normalized_2.customTimeEnabled =
+        normalized_2.type === 'char' && normalized_2.customTimeEnabled === true;
+    normalized_2.customTimeAnchors =
+        window.imDataUtils?.normalizeChatTimeAnchors?.(normalized_2.customTimeAnchors) || [];
     normalized_2.autoReplyEnabled = normalized_2.autoReplyEnabled === true;
     normalized_2.autoReplyDelayEnabled = normalized_2.autoReplyDelayEnabled === true;
     const autoReplyDelaySeconds = Number(normalized_2.autoReplyDelaySeconds);
@@ -2400,9 +2525,9 @@ window.imApp.normalizeFriendData = function (friend_8) {
                         String(value_12_3 || '')
                             .replace(/\s+/g, ' ')
                             .trim()
-                            .slice(0, value_453),
-                    visits_2 = (Array.isArray(target_3.visits) ? target_3.visits : [])
-                        .map((value_454) => {
+                            .slice(0, value_453);
+                const visits_2 = (Array.isArray(target_3.visits) ? target_3.visits : [])
+                    .map((value_454) => {
                             if (!value_454 || typeof value_454 !== 'object') return null;
                             const charId_2 = value_450(value_454.charId, 160),
                                 remark_3 = value_450(value_454.remark, 160),
@@ -2421,8 +2546,8 @@ window.imApp.normalizeFriendData = function (friend_8) {
                                 innerOs: innerOs_2,
                             };
                         })
-                        .filter(Boolean)
-                        .slice(0, 100);
+                    .filter(Boolean)
+                    .slice(0, 100);
                 target_3.role = 'assistant';
                 target_3.content = '查手机记录';
                 target_3.excludedFromContext = true;
@@ -2437,7 +2562,9 @@ window.imApp.normalizeFriendData = function (friend_8) {
             }
             if (
                 target_3.type === 'system_notice' &&
-                ['user_phone_access', 'user_remark_changed'].includes(target_3.noticeKind)
+                ['user_phone_access', 'user_remark_changed', 'relationship_changed'].includes(
+                    target_3.noticeKind,
+                )
             ) {
                 target_3.role = 'system';
                 target_3.excludedFromContext = true;
@@ -2450,21 +2577,21 @@ window.imApp.normalizeFriendData = function (friend_8) {
                 const value_461_2 = (categoryName_8, value_465_2 = 1200) =>
                         String(categoryName_8 || '')
                             .trim()
-                            .slice(0, value_465_2),
-                    entry_3 =
-                        target_3.memoryPayload && typeof target_3.memoryPayload === 'object'
-                            ? target_3.memoryPayload
-                            : {},
-                    memoryRequestId_2 = value_461_2(
-                        target_3.memoryRequestId ||
-                            target_3.id ||
-                            'memory-request-' + (target_3.timestamp || 0),
-                        160,
-                    ),
-                    content_8 = value_461_2(
-                        entry_3.content || target_3.requestText || target_3.content,
-                        1800,
-                    );
+                            .slice(0, value_465_2);
+                const entry_3 =
+                    target_3.memoryPayload && typeof target_3.memoryPayload === 'object'
+                        ? target_3.memoryPayload
+                        : {};
+                const memoryRequestId_2 = value_461_2(
+                    target_3.memoryRequestId ||
+                        target_3.id ||
+                        'memory-request-' + (target_3.timestamp || 0),
+                    160,
+                );
+                const content_8 = value_461_2(
+                    entry_3.content || target_3.requestText || target_3.content,
+                    1800,
+                );
                 target_3.role = 'assistant';
                 target_3.excludedFromContext = true;
                 target_3.memoryRequestId = memoryRequestId_2;
@@ -2496,17 +2623,17 @@ window.imApp.normalizeFriendData = function (friend_8) {
             }
             if (target_3.type === 'system_notice' || (target_3.type && target_3.type !== 'text'))
                 return;
-            const value_447_2 = Number(target_3.timestamp) || 0,
-                value_448 =
-                    target_3.role === 'user' &&
-                    normalized_2.blockState.charBlocksUser === true &&
-                    normalized_2.blockState.charBlockedAt > 0 &&
-                    value_447_2 >= normalized_2.blockState.charBlockedAt,
-                value_449_2 =
-                    target_3.role === 'assistant' &&
-                    normalized_2.blockState.userBlocksChar === true &&
-                    normalized_2.blockState.userBlockedAt > 0 &&
-                    value_447_2 >= normalized_2.blockState.userBlockedAt;
+            const value_447_2 = Number(target_3.timestamp) || 0;
+            const value_448 =
+                target_3.role === 'user' &&
+                normalized_2.blockState.charBlocksUser === true &&
+                normalized_2.blockState.charBlockedAt > 0 &&
+                value_447_2 >= normalized_2.blockState.charBlockedAt;
+            const value_449_2 =
+                target_3.role === 'assistant' &&
+                normalized_2.blockState.userBlocksChar === true &&
+                normalized_2.blockState.userBlockedAt > 0 &&
+                value_447_2 >= normalized_2.blockState.userBlockedAt;
             target_3.deliveryStatus !== 'blocked' &&
                 (value_448 || value_449_2) &&
                 ((target_3.deliveryStatus = 'blocked'),
@@ -2650,99 +2777,96 @@ window.imApp.normalizeFriendData = function (friend_8) {
     normalized_2.profilePanel = window.imApp.createDefaultProfilePanel(normalized_2);
     normalized_2.latestThought = normalized_2.profilePanel.thought;
     normalized_2.status = normalized_2.profilePanel.status || normalized_2.status || 'online';
-    const defaultMemory = window.imApp.createDefaultMemory(),
-        memory_3 = normalized_2.memory || {},
-        recallPresentationSource =
-            memory_3.recallPresentation && typeof memory_3.recallPresentation === 'object'
-                ? memory_3.recallPresentation
-                : null,
-        normalizeRecallPresentationEntries = (entries_2) =>
+    const defaultMemory = window.imApp.createDefaultMemory();
+    const memory_3 = normalized_2.memory || {};
+    const recallPresentationSource =
+        memory_3.recallPresentation && typeof memory_3.recallPresentation === 'object'
+            ? memory_3.recallPresentation
+            : null;
+    const normalizeRecallPresentationEntries = (entries_2) =>
             (Array.isArray(entries_2) ? entries_2 : [])
                 .filter((entry_4) => entry_4 && typeof entry_4 === 'object')
                 .map((entry_5) => ({
                     ...entry_5,
-                })),
-        value_58 =
-            recallPresentationSource &&
-            recallPresentationSource.apiRunId &&
-            recallPresentationSource.recall &&
-            typeof recallPresentationSource.recall === 'object'
-                ? {
-                      apiRunId: String(recallPresentationSource.apiRunId),
-                      triggerUserMessageId: String(
-                          recallPresentationSource.triggerUserMessageId || '',
+                }));
+    const value_58 =
+        recallPresentationSource &&
+        recallPresentationSource.apiRunId &&
+        recallPresentationSource.recall &&
+        typeof recallPresentationSource.recall === 'object'
+            ? {
+                  apiRunId: String(recallPresentationSource.apiRunId),
+                  triggerUserMessageId: String(recallPresentationSource.triggerUserMessageId || ''),
+                  createdAt: Number(recallPresentationSource.createdAt) || 0,
+                  recall: {
+                      friendId: String(
+                          recallPresentationSource.recall.friendId || normalized_2.id || '',
                       ),
-                      createdAt: Number(recallPresentationSource.createdAt) || 0,
-                      recall: {
-                          friendId: String(
-                              recallPresentationSource.recall.friendId || normalized_2.id || '',
-                          ),
-                          isGroupChat: !!recallPresentationSource.recall.isGroupChat,
-                          shortTermEntries: normalizeRecallPresentationEntries(
-                              recallPresentationSource.recall.shortTermEntries,
-                          ),
-                          longTermEntries: normalizeRecallPresentationEntries(
-                              recallPresentationSource.recall.longTermEntries,
-                          ),
-                          cherishedEntries: normalizeRecallPresentationEntries(
-                              recallPresentationSource.recall.cherishedEntries,
-                          ),
-                      },
-                  }
-                : null,
-        value_59 = window.imDataUtils?.normalizeSchedule
-            ? window.imDataUtils.normalizeSchedule(memory_3.schedule)
-            : {
-                  enabled: !!memory_3.schedule?.enabled,
-                  sleepTime: memory_3.schedule?.sleepTime || defaultMemory.schedule.sleepTime,
-                  wakeTime: memory_3.schedule?.wakeTime || defaultMemory.schedule.wakeTime,
-                  events: Array.isArray(memory_3.schedule?.events) ? memory_3.schedule.events : [],
-              };
-    return (
-        (normalized_2.memory = {
-            overview: memory_3.overview || defaultMemory.overview,
-            anniversaries: memory_3.anniversaries || defaultMemory.anniversaries,
-            schedule: value_59,
-            context: {
-                enabled:
-                    typeof memory_3.context?.enabled === 'boolean'
-                        ? memory_3.context.enabled
-                        : defaultMemory.context.enabled,
-                limit:
-                    Number(memory_3.context?.limit) > 0
-                        ? Number(memory_3.context.limit)
-                        : isGroupChat_2
-                          ? 100
-                          : defaultMemory.context.limit,
-                notes: memory_3.context?.notes || defaultMemory.context.notes,
-            },
-            recallLimits: window.imApp.normalizeMemoryRecallLimits(memory_3.recallLimits),
-            summary: {
-                enabled:
-                    typeof memory_3.summary?.enabled === 'boolean'
-                        ? memory_3.summary.enabled
-                        : defaultMemory.summary.enabled,
-                limit:
-                    Number(memory_3.summary?.limit) > 0
-                        ? Number(memory_3.summary.limit)
-                        : defaultMemory.summary.limit,
-                roundLimit: window.imDataUtils?.normalizeRoundLimit
-                    ? window.imDataUtils.normalizeRoundLimit(
-                          memory_3.summary?.roundLimit,
-                          defaultMemory.summary.roundLimit,
-                      )
-                    : Number(memory_3.summary?.roundLimit) > 0
-                      ? Math.round(Number(memory_3.summary.roundLimit))
-                      : defaultMemory.summary.roundLimit,
-                prompt: memory_3.summary?.prompt || defaultMemory.summary.prompt,
-                apiPresetId: String(
-                    memory_3.summary?.apiPresetId || defaultMemory.summary.apiPresetId || '',
-                ),
-            },
-            autonomous: window.imApp.normalizeAutonomousActivity(memory_3.autonomous),
-            longTerm: memory_3.longTerm || defaultMemory.longTerm,
-            shortTermEntries: Array.isArray(memory_3.shortTermEntries)
-                ? memory_3.shortTermEntries.map((entry_6, value_475) => ({
+                      isGroupChat: !!recallPresentationSource.recall.isGroupChat,
+                      shortTermEntries: normalizeRecallPresentationEntries(
+                          recallPresentationSource.recall.shortTermEntries,
+                      ),
+                      longTermEntries: normalizeRecallPresentationEntries(
+                          recallPresentationSource.recall.longTermEntries,
+                      ),
+                      cherishedEntries: normalizeRecallPresentationEntries(
+                          recallPresentationSource.recall.cherishedEntries,
+                      ),
+                  },
+              }
+            : null;
+    const value_59 = window.imDataUtils?.normalizeSchedule
+        ? window.imDataUtils.normalizeSchedule(memory_3.schedule)
+        : {
+              enabled: !!memory_3.schedule?.enabled,
+              sleepTime: memory_3.schedule?.sleepTime || defaultMemory.schedule.sleepTime,
+              wakeTime: memory_3.schedule?.wakeTime || defaultMemory.schedule.wakeTime,
+              events: Array.isArray(memory_3.schedule?.events) ? memory_3.schedule.events : [],
+          };
+    normalized_2.memory = {
+        overview: memory_3.overview || defaultMemory.overview,
+        anniversaries: memory_3.anniversaries || defaultMemory.anniversaries,
+        schedule: value_59,
+        context: {
+            enabled:
+                typeof memory_3.context?.enabled === 'boolean'
+                    ? memory_3.context.enabled
+                    : defaultMemory.context.enabled,
+            limit:
+                Number(memory_3.context?.limit) > 0
+                    ? Number(memory_3.context.limit)
+                    : isGroupChat_2
+                      ? 100
+                      : defaultMemory.context.limit,
+            notes: memory_3.context?.notes || defaultMemory.context.notes,
+        },
+        recallLimits: window.imApp.normalizeMemoryRecallLimits(memory_3.recallLimits),
+        summary: {
+            enabled:
+                typeof memory_3.summary?.enabled === 'boolean'
+                    ? memory_3.summary.enabled
+                    : defaultMemory.summary.enabled,
+            limit:
+                Number(memory_3.summary?.limit) > 0
+                    ? Number(memory_3.summary.limit)
+                    : defaultMemory.summary.limit,
+            roundLimit: window.imDataUtils?.normalizeRoundLimit
+                ? window.imDataUtils.normalizeRoundLimit(
+                      memory_3.summary?.roundLimit,
+                      defaultMemory.summary.roundLimit,
+                  )
+                : Number(memory_3.summary?.roundLimit) > 0
+                  ? Math.round(Number(memory_3.summary.roundLimit))
+                  : defaultMemory.summary.roundLimit,
+            prompt: memory_3.summary?.prompt || defaultMemory.summary.prompt,
+            apiPresetId: String(
+                memory_3.summary?.apiPresetId || defaultMemory.summary.apiPresetId || '',
+            ),
+        },
+        autonomous: window.imApp.normalizeAutonomousActivity(memory_3.autonomous),
+        longTerm: memory_3.longTerm || defaultMemory.longTerm,
+        shortTermEntries: Array.isArray(memory_3.shortTermEntries)
+            ? memory_3.shortTermEntries.map((entry_6, value_475) => ({
                       id: entry_6?.id != null ? entry_6.id : 'shortterm-' + value_475,
                       title: entry_6?.title || '对话总结',
                       time: entry_6?.time || entry_6?.createdAt || '',
@@ -2801,12 +2925,12 @@ window.imApp.normalizeFriendData = function (friend_8) {
                           : [],
                       sourceRoundLimit: Math.max(0, Number(entry_6?.sourceRoundLimit) || 0),
                   }))
-                : defaultMemory.shortTermEntries,
-            groupChatContexts: window.imDataUtils?.normalizeGroupChatContexts
-                ? window.imDataUtils.normalizeGroupChatContexts(memory_3.groupChatContexts)
-                : defaultMemory.groupChatContexts,
-            longTermEntries: Array.isArray(memory_3.longTermEntries)
-                ? memory_3.longTermEntries.map((existing_2, value_481) => ({
+            : defaultMemory.shortTermEntries,
+        groupChatContexts: window.imDataUtils?.normalizeGroupChatContexts
+            ? window.imDataUtils.normalizeGroupChatContexts(memory_3.groupChatContexts)
+            : defaultMemory.groupChatContexts,
+        longTermEntries: Array.isArray(memory_3.longTermEntries)
+            ? memory_3.longTermEntries.map((existing_2, value_481) => ({
                       id: existing_2?.id != null ? existing_2.id : 'longterm-' + value_481,
                       title: existing_2?.title || '长期记忆',
                       content: existing_2?.content || '',
@@ -2822,12 +2946,12 @@ window.imApp.normalizeFriendData = function (friend_8) {
                             ? [String(existing_2.keyword).trim()]
                             : [],
                   }))
-                : defaultMemory.longTermEntries,
-            lastSummaryMessageCount:
-                typeof memory_3.lastSummaryMessageCount === 'number'
-                    ? memory_3.lastSummaryMessageCount
-                    : 0,
-            summaryCursor: (() => {
+            : defaultMemory.longTermEntries,
+        lastSummaryMessageCount:
+            typeof memory_3.lastSummaryMessageCount === 'number'
+                ? memory_3.lastSummaryMessageCount
+                : 0,
+        summaryCursor: (() => {
                 const max_483 = Math.max(0, Number(memory_3.lastSummaryMessageCount) || 0),
                     item_14 =
                         memory_3.summaryCursor && typeof memory_3.summaryCursor === 'object'
@@ -2842,9 +2966,9 @@ window.imApp.normalizeFriendData = function (friend_8) {
                     ),
                 };
             })(),
-            cherished: memory_3.cherished || defaultMemory.cherished,
-            cherishedEntries: Array.isArray(memory_3.cherishedEntries)
-                ? memory_3.cherishedEntries.map((message_485, value_486) => ({
+        cherished: memory_3.cherished || defaultMemory.cherished,
+        cherishedEntries: Array.isArray(memory_3.cherishedEntries)
+            ? memory_3.cherishedEntries.map((message_485, value_486) => ({
                       id: message_485?.id != null ? message_485.id : 'cherished-' + value_486,
                       title: message_485?.title || '长期记忆',
                       content: message_485?.content || '',
@@ -2861,30 +2985,30 @@ window.imApp.normalizeFriendData = function (friend_8) {
                             ? [String(message_485.keyword).trim()]
                             : [],
                   }))
-                : defaultMemory.cherishedEntries,
-            relationships: Array.isArray(memory_3.relationships)
-                ? memory_3.relationships
-                : defaultMemory.relationships,
-            xDirectMessageMount: window.imApp.normalizeXDirectMessageMount(
-                memory_3.xDirectMessageMount,
-            ),
-            bstagePopMount: window.imApp.normalizeBstagePopMount(memory_3.bstagePopMount),
-            recallPresentation: value_58,
-            userOverride: memory_3.userOverride || null,
-            mountSettings:
-                memory_3.mountSettings &&
-                typeof memory_3.mountSettings === 'object' &&
-                !Array.isArray(memory_3.mountSettings)
-                    ? {
-                          ...memory_3.mountSettings,
-                      }
-                    : defaultMemory.mountSettings,
-            mountLimits:
-                memory_3.mountLimits &&
-                typeof memory_3.mountLimits === 'object' &&
-                !Array.isArray(memory_3.mountLimits)
-                    ? Object.fromEntries(
-                          Object.entries(memory_3.mountLimits).map(([key_4, value_13_2]) => {
+            : defaultMemory.cherishedEntries,
+        relationships: Array.isArray(memory_3.relationships)
+            ? memory_3.relationships
+            : defaultMemory.relationships,
+        xDirectMessageMount: window.imApp.normalizeXDirectMessageMount(
+            memory_3.xDirectMessageMount,
+        ),
+        bstagePopMount: window.imApp.normalizeBstagePopMount(memory_3.bstagePopMount),
+        recallPresentation: value_58,
+        userOverride: memory_3.userOverride || null,
+        mountSettings:
+            memory_3.mountSettings &&
+            typeof memory_3.mountSettings === 'object' &&
+            !Array.isArray(memory_3.mountSettings)
+                ? {
+                      ...memory_3.mountSettings,
+                  }
+                : defaultMemory.mountSettings,
+        mountLimits:
+            memory_3.mountLimits &&
+            typeof memory_3.mountLimits === 'object' &&
+            !Array.isArray(memory_3.mountLimits)
+                ? Object.fromEntries(
+                      Object.entries(memory_3.mountLimits).map(([key_4, value_13_2]) => {
                               const limit_2 = Number(value_13_2);
                               return [
                                   key_4,
@@ -2893,21 +3017,20 @@ window.imApp.normalizeFriendData = function (friend_8) {
                                       : 20,
                               ];
                           }),
-                      )
-                    : defaultMemory.mountLimits,
-            crossGroupMemorySettings:
-                memory_3.crossGroupMemorySettings &&
-                typeof memory_3.crossGroupMemorySettings === 'object' &&
-                !Array.isArray(memory_3.crossGroupMemorySettings)
-                    ? Object.fromEntries(
-                          Object.entries(memory_3.crossGroupMemorySettings).map(
-                              ([value_491, value_492]) => [value_491, value_492 !== false],
-                          ),
-                      )
-                    : defaultMemory.crossGroupMemorySettings,
-        }),
-        normalized_2
-    );
+                  )
+                : defaultMemory.mountLimits,
+        crossGroupMemorySettings:
+            memory_3.crossGroupMemorySettings &&
+            typeof memory_3.crossGroupMemorySettings === 'object' &&
+            !Array.isArray(memory_3.crossGroupMemorySettings)
+                ? Object.fromEntries(
+                      Object.entries(memory_3.crossGroupMemorySettings).map(
+                          ([value_491, value_492]) => [value_491, value_492 !== false],
+                      ),
+                  )
+                : defaultMemory.crossGroupMemorySettings,
+    };
+    return normalized_2;
 };
 window.imApp.applyGeneratedShortTermMemory = function (friend_9, entry_7, options_3 = {}) {
     if (!friend_9 || !entry_7) return null;
@@ -3398,11 +3521,11 @@ window.imApp.formatFakeLinkMessageForApiContext = function (value_90, options_5 
 };
 window.imApp.formatMessageForApiContext = function (value_110, value_113, options_6 = {}) {
     const normalizedFriend_4 =
-            options_6.friendIsNormalized === true && value_113
-                ? value_113
-                : window.imApp.normalizeFriendData(value_113 || {}),
-        normalizedMessage_3 = value_110 || {},
-        value_117 = normalizedFriend_4.type === 'group';
+        options_6.friendIsNormalized === true && value_113
+            ? value_113
+            : window.imApp.normalizeFriendData(value_113 || {});
+    const normalizedMessage_3 = value_110 || {};
+    const value_117 = normalizedFriend_4.type === 'group';
     if (normalizedMessage_3.type === 'gift' && normalizedMessage_3.excludedFromContext !== true) {
         const gift = normalizedMessage_3.shopGift || {};
         const name = normalizedMessage_3.giftName || gift.itemName || 'Gift';
@@ -3418,13 +3541,15 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
         normalizedMessage_3.excludedFromContext === true ||
         normalizedMessage_3.type === 'user_phone_access_card' ||
         (normalizedMessage_3.type === 'system_notice' &&
-            ['user_phone_access', 'user_remark_changed'].includes(normalizedMessage_3.noticeKind))
+            ['user_phone_access', 'user_remark_changed', 'relationship_changed'].includes(
+                normalizedMessage_3.noticeKind,
+            ))
     )
         return null;
     if (normalizedMessage_3.type === 'memory_request') return null;
     if (normalizedMessage_3.type === 'unblock_request') {
-        const value_602 = normalizedMessage_3.requesterRole === 'assistant' ? 'Char' : 'User',
-            value_603 = normalizedMessage_3.requestStatus || 'pending';
+        const value_602 = normalizedMessage_3.requesterRole === 'assistant' ? 'Char' : 'User';
+        const value_603 = normalizedMessage_3.requestStatus || 'pending';
         return {
             role: normalizedMessage_3.requesterRole === 'assistant' ? 'assistant' : 'user',
             content:
@@ -3434,8 +3559,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                 value_602 +
                 '｜状态=' +
                 value_603 +
-                `]
-理由：` +
+                ']\n理由：' +
                 (normalizedMessage_3.requestText || normalizedMessage_3.content || ''),
         };
     }
@@ -3462,12 +3586,12 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
         };
     }
     if (normalizedMessage_3.type === 'together_listening_invite') {
-        const value_605 = String(normalizedMessage_3.title || '未知歌曲').trim() || '未知歌曲',
-            value_606 = String(normalizedMessage_3.artist || '未知歌手').trim() || '未知歌手',
-            value_607 =
-                normalizedMessage_3.inviteStatus === 'accepted'
-                    ? 'User 已同意，你们已进入一起听'
-                    : '等待 User 决定是否一起听';
+        const value_605 = String(normalizedMessage_3.title || '未知歌曲').trim() || '未知歌曲';
+        const value_606 = String(normalizedMessage_3.artist || '未知歌手').trim() || '未知歌手';
+        const value_607 =
+            normalizedMessage_3.inviteStatus === 'accepted'
+                ? 'User 已同意，你们已进入一起听'
+                : '等待 User 决定是否一起听';
         return {
             role: 'assistant',
             content:
@@ -3513,18 +3637,18 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
     else {
         if (normalizedMessage_3.type === 'group_poll') {
             const pollOptions_2 = Array.isArray(normalizedMessage_3.pollOptions)
-                    ? normalizedMessage_3.pollOptions
-                    : [],
-                pollVotes_2 = Array.isArray(normalizedMessage_3.pollVotes)
-                    ? normalizedMessage_3.pollVotes
-                    : [],
-                optionById = new Map(
-                    pollOptions_2.map((option) => [
+                ? normalizedMessage_3.pollOptions
+                : [];
+            const pollVotes_2 = Array.isArray(normalizedMessage_3.pollVotes)
+                ? normalizedMessage_3.pollVotes
+                : [];
+            const optionById = new Map(
+                pollOptions_2.map((option) => [
                         String(option?.id || ''),
                         String(option?.text || ''),
                     ]),
-                ),
-                map_611 = pollVotes_2.map((vote) => {
+            );
+            const map_611 = pollVotes_2.map((vote) => {
                     const voterName_2 = String(vote?.voterName || vote?.voterId || '未知成员'),
                         optionText = optionById.get(String(vote?.optionId || '')) || '未知选项';
                     return voterName_2 + ' → ' + optionText;
@@ -3540,8 +3664,9 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                         .join(' / ') || '无'),
                 '投票结果：' + (map_611.length > 0 ? map_611.join('；') : '暂时无人投票'),
                 normalizedMessage_3.pollStatus === 'pending' ? '角色投票仍在进行中。' : '',
-            ].filter(Boolean).join(`
-`);
+            ]
+                .filter(Boolean)
+                .join('\n');
         } else {
             if (normalizedMessage_3.type === 'fake_link')
                 value_601 = window.imApp.formatFakeLinkMessageForApiContext(
@@ -3559,49 +3684,41 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                 } else {
                     if (normalizedMessage_3.type === 'sticker') {
                         const stickerName_2 =
-                                normalizedMessage_3.stickerName ||
-                                normalizedMessage_3.text ||
-                                '表情包',
-                            stickerCategory_2 = normalizedMessage_3.stickerCategory || '',
-                            value_619 = stickerCategory_2
-                                ? stickerCategory_2 + ' / ' + stickerName_2
-                                : stickerName_2;
+                            normalizedMessage_3.stickerName || normalizedMessage_3.text || '表情包';
+                        const stickerCategory_2 = normalizedMessage_3.stickerCategory || '';
+                        const value_619 = stickerCategory_2
+                            ? stickerCategory_2 + ' / ' + stickerName_2
+                            : stickerName_2;
                         value_601 =
                             normalizedMessage_3.role === 'user'
                                 ? '[用户发了一个表情包：' + value_619 + ']'
                                 : '[你发了一个表情包：' + value_619 + ']';
                     } else {
                         if (normalizedMessage_3.type === 'offline_meeting_record') {
-                            const dateText_2 = normalizedMessage_3.dateText || '',
-                                title_4 = normalizedMessage_3.title || '见面记录',
-                                summary_2 =
-                                    normalizedMessage_3.summary ||
-                                    normalizedMessage_3.content ||
-                                    '',
-                                items_623 = [
-                                    options_6.includeTime !== false
-                                        ? '线下见面结束于：' + (dateText_2 || '未知')
-                                        : '线下见面已经结束',
-                                    '标题：' + title_4,
-                                    '总结：' + summary_2,
-                                ];
+                            const dateText_2 = normalizedMessage_3.dateText || '';
+                            const title_4 = normalizedMessage_3.title || '见面记录';
+                            const summary_2 =
+                                normalizedMessage_3.summary || normalizedMessage_3.content || '';
+                            const items_623 = [
+                                options_6.includeTime !== false
+                                    ? '线下见面结束于：' + (dateText_2 || '未知')
+                                    : '线下见面已经结束',
+                                '标题：' + title_4,
+                                '总结：' + summary_2,
+                            ];
                             return {
                                 role: 'system',
                                 content: window.imApp.formatSceneNarrationForApiContext(
-                                    items_623.join(`
-`),
+                                    items_623.join('\n'),
                                 ),
                             };
                         } else {
                             if (normalizedMessage_3.type === 'voice_call_record') {
-                                const duration_2 = normalizedMessage_3.duration || 0,
-                                    value_625 =
-                                        Math.floor(duration_2 / 60) +
-                                        '分' +
-                                        (duration_2 % 60) +
-                                        '秒',
-                                    callMessages_2 = normalizedMessage_3.callMessages || [],
-                                    statusText_2 = normalizedMessage_3.statusText || '通话记录';
+                                const duration_2 = normalizedMessage_3.duration || 0;
+                                const value_625 =
+                                    Math.floor(duration_2 / 60) + '分' + (duration_2 % 60) + '秒';
+                                const callMessages_2 = normalizedMessage_3.callMessages || [];
+                                const statusText_2 = normalizedMessage_3.statusText || '通话记录';
                                 if (statusText_2 === '已拒绝')
                                     value_601 =
                                         '[提示：' +
@@ -3620,12 +3737,12 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                     else {
                                         if (callMessages_2.length > 0) {
                                             const userName_2 =
-                                                    options_6.userName ||
-                                                    window.userState?.name ||
-                                                    'User',
-                                                charName = normalizedFriend_4.nickname || '对方',
-                                                join_149 = callMessages_2
-                                                    .map((m) => {
+                                                options_6.userName ||
+                                                window.userState?.name ||
+                                                'User';
+                                            const charName = normalizedFriend_4.nickname || '对方';
+                                            const join_149 = callMessages_2
+                                                .map((m) => {
                                                         const speaker_2 = m.isSelf
                                                                 ? userName_2
                                                                 : charName,
@@ -3654,18 +3771,16 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                                         return parts_2.join(`
   `);
                                                     })
-                                                    .filter(Boolean).join(`
-  `);
+                                                .filter(Boolean)
+                                                .join('\n  ');
                                             value_601 =
                                                 '[提示：你们刚刚完成了一通' +
                                                 (normalizedMessage_3.isVideo ? '视频' : '语音') +
                                                 '通话，时长 ' +
                                                 value_625 +
-                                                `。通话期间的交流内容如下：
-  ` +
+                                                '。通话期间的交流内容如下：\n  ' +
                                                 join_149 +
-                                                `
-（通话已结束，请直接用普通文字回复）]`;
+                                                '\n（通话已结束，请直接用普通文字回复）]';
                                         } else
                                             value_601 =
                                                 '[提示：你们刚刚完成了一通' +
@@ -3680,29 +3795,24 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                     normalizedMessage_3.type === 'html' &&
                                     normalizedMessage_3.shopGift
                                 ) {
-                                    const value_634 = normalizedMessage_3.shopGift || {},
-                                        value_635 =
-                                            String(value_634.itemName || '商品').trim() || '商品',
-                                        value_636 = Number(value_634.price) || 0,
-                                        trim_637 = String(value_634.paymentMethod || '').trim();
+                                    const value_634 = normalizedMessage_3.shopGift || {};
+                                    const value_635 =
+                                        String(value_634.itemName || '商品').trim() || '商品';
+                                    const value_636 = Number(value_634.price) || 0;
+                                    const trim_637 = String(value_634.paymentMethod || '').trim();
                                     value_601 =
-                                        `[User 赠送给你一份礼物]
-商品：` +
+                                        '[User 赠送给你一份礼物]\n商品：' +
                                         value_635 +
-                                        `
-价值：¥` +
+                                        '\n价值：¥' +
                                         value_636.toFixed(2) +
-                                        (trim_637
-                                            ? `
-付款方式：` + trim_637
-                                            : '');
+                                        (trim_637 ? '\n付款方式：' + trim_637 : '');
                                 } else {
                                     if (normalizedMessage_3.type === 'moment_forward')
                                         try {
                                             const momentData = JSON.parse(
-                                                    normalizedMessage_3.content,
-                                                ),
-                                                momentText_2 = momentData.text || '无配文';
+                                                normalizedMessage_3.content,
+                                            );
+                                            const momentText_2 = momentData.text || '无配文';
                                             value_601 =
                                                 '[转发了一条朋友圈, 内容: "' + momentText_2 + '"]';
                                             momentData.img &&
@@ -3716,15 +3826,15 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                     else {
                                         if (normalizedMessage_3.type === 'image') {
                                             const imageDescription =
-                                                    normalizedMessage_3.text ||
-                                                    normalizedMessage_3.description ||
-                                                    normalizedMessage_3.fileName ||
-                                                    '无描述',
-                                                value_169 =
-                                                    1 +
-                                                    (Array.isArray(normalizedMessage_3.albumImages)
-                                                        ? normalizedMessage_3.albumImages.length
-                                                        : 0);
+                                                normalizedMessage_3.text ||
+                                                normalizedMessage_3.description ||
+                                                normalizedMessage_3.fileName ||
+                                                '无描述';
+                                            const value_169 =
+                                                1 +
+                                                (Array.isArray(normalizedMessage_3.albumImages)
+                                                    ? normalizedMessage_3.albumImages.length
+                                                    : 0);
                                             value_601 =
                                                 '[发送了' +
                                                 (value_169 > 1 ? value_169 + '张' : '一张') +
@@ -3734,25 +3844,25 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                         } else {
                                             if (normalizedMessage_3.type === 'location') {
                                                 const trim_642 = String(
-                                                        normalizedMessage_3.locationName ||
-                                                            normalizedMessage_3.name ||
-                                                            '共享位置',
-                                                    ).trim(),
-                                                    trim_643 = String(
-                                                        normalizedMessage_3.locationAddress ||
-                                                            normalizedMessage_3.address ||
-                                                            '',
-                                                    ).trim(),
-                                                    trim_644 = String(
-                                                        normalizedMessage_3.locationNameTranslation ||
-                                                            normalizedMessage_3.nameTranslation ||
-                                                            '',
-                                                    ).trim(),
-                                                    trim_645 = String(
-                                                        normalizedMessage_3.locationAddressTranslation ||
-                                                            normalizedMessage_3.addressTranslation ||
-                                                            '',
-                                                    ).trim();
+                                                    normalizedMessage_3.locationName ||
+                                                        normalizedMessage_3.name ||
+                                                        '共享位置',
+                                                ).trim();
+                                                const trim_643 = String(
+                                                    normalizedMessage_3.locationAddress ||
+                                                        normalizedMessage_3.address ||
+                                                        '',
+                                                ).trim();
+                                                const trim_644 = String(
+                                                    normalizedMessage_3.locationNameTranslation ||
+                                                        normalizedMessage_3.nameTranslation ||
+                                                        '',
+                                                ).trim();
+                                                const trim_645 = String(
+                                                    normalizedMessage_3.locationAddressTranslation ||
+                                                        normalizedMessage_3.addressTranslation ||
+                                                        '',
+                                                ).trim();
                                                 value_601 =
                                                     '[发送了一个定位：' +
                                                     trim_642 +
@@ -3766,14 +3876,13 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                             } else {
                                                 if (normalizedMessage_3.type === 'pay_transfer') {
                                                     const payAmount =
-                                                            Number(normalizedMessage_3.amount) || 0,
-                                                        payDesc =
-                                                            normalizedMessage_3.description ||
-                                                            '转账',
-                                                        payTarget =
-                                                            normalizedMessage_3.targetName ||
-                                                            normalizedFriend_4.nickname ||
-                                                            '对方';
+                                                        Number(normalizedMessage_3.amount) || 0;
+                                                    const payDesc =
+                                                        normalizedMessage_3.description || '转账';
+                                                    const payTarget =
+                                                        normalizedMessage_3.targetName ||
+                                                        normalizedFriend_4.nickname ||
+                                                        '对方';
                                                     if (
                                                         normalizedMessage_3.payKind ===
                                                         'family_card_pending'
@@ -3949,52 +4058,32 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                     window.imApp.getGroupUserIdentity(normalizedFriend_4).name ||
                     'User',
             ).trim() || 'User';
-        if (normalizedMessage_3.role === 'user')
-            return (
-                normalizedMessage_3.replyTo &&
-                    (value_601 =
-                        '[引用了消息："' +
-                        normalizedMessage_3.replyTo +
-                        `"]
-` +
-                        value_601),
-                {
-                    role: 'user',
-                    content: 'User(' + userName_3 + '): ' + value_601,
-                }
-            );
+        if (normalizedMessage_3.role === 'user') {
+            normalizedMessage_3.replyTo &&
+                (value_601 = '[引用了消息："' + normalizedMessage_3.replyTo + '"]\n' + value_601);
+            return {
+                role: 'user',
+                content: 'User(' + userName_3 + '): ' + value_601,
+            };
+        }
         const assistantSpeaker =
             typeof normalizedMessage_3.speaker === 'string' && normalizedMessage_3.speaker.trim()
                 ? normalizedMessage_3.speaker.trim()
                 : '群成员';
-        return (
-            normalizedMessage_3.replyTo &&
-                (value_601 =
-                    '[引用了消息："' +
-                    normalizedMessage_3.replyTo +
-                    `"]
-` +
-                    value_601),
-            {
-                role: 'assistant',
-                content: assistantSpeaker + ': ' + value_601,
-            }
-        );
+        normalizedMessage_3.replyTo &&
+            (value_601 = '[引用了消息："' + normalizedMessage_3.replyTo + '"]\n' + value_601);
+        return {
+            role: 'assistant',
+            content: assistantSpeaker + ': ' + value_601,
+        };
     }
-    return (
-        normalizedMessage_3.role === 'user' &&
-            normalizedMessage_3.replyTo &&
-            (value_601 =
-                '[用户引用了消息："' +
-                normalizedMessage_3.replyTo +
-                `"]
-` +
-                value_601),
-        {
-            role: normalizedMessage_3.role,
-            content: value_601,
-        }
-    );
+    normalizedMessage_3.role === 'user' &&
+        normalizedMessage_3.replyTo &&
+        (value_601 = '[用户引用了消息："' + normalizedMessage_3.replyTo + '"]\n' + value_601);
+    return {
+        role: normalizedMessage_3.role,
+        content: value_601,
+    };
 };
 window.imApp.buildApiContextMessages = function (value_651, options_7 = {}) {
     const friendData_653 = window.imApp.normalizeFriendData(value_651 || {}),
@@ -4543,8 +4632,8 @@ window.imApp.getMomentMessages = function () {
 window.imApp.setMomentMessages = function (messages_4) {
     window.imData.momentMessages = Array.isArray(messages_4) ? messages_4 : [];
 };
-const recentFriendMessageWindows = new Map(),
-    recentFriendMessageLoadPromises = new Map();
+const recentFriendMessageWindows = new Map();
+const recentFriendMessageLoadPromises = new Map();
 window.imApp.getFriendMessageCount = function (value_807) {
     const value_808 =
         typeof value_807 === 'object' && value_807 !== null
@@ -5337,9 +5426,9 @@ window.imApp.persistMomentData = async function (momentId_2, value_952 = {}) {
     }
 };
 const IM_CHAT_LIST_RENDER_DEBOUNCE_MS = 180;
-let imChatListRenderTimer = null,
-    imChatListRenderBatchDepth = 0,
-    imChatListRenderDirty = false;
+let imChatListRenderTimer = null;
+let imChatListRenderBatchDepth = 0;
+let imChatListRenderDirty = false;
 function isImChatConversationOpen() {
     if (document.hidden) return false;
     const activeFriendId = window.imData?.currentActiveFriend?.id;
@@ -7972,68 +8061,76 @@ window.addEventListener('pagehide', () => {
     window.imApp = window.imApp || {};
     window.imApp.readFileAsDataUrl = readFileAsDataUrl_3;
     window.imApp.compressImageFile = compressImageFile_2;
-    const customModalOverlay = document.getElementById('custom-modal-overlay'),
-        modalTitle = document.getElementById('modal-title'),
-        modalConfirmContent = document.getElementById('modal-confirm-content'),
-        modalPromptContent = document.getElementById('modal-prompt-content'),
-        modalMessage = document.getElementById('modal-message'),
-        modalInput = document.getElementById('modal-input'),
-        modalInputGroup = document.getElementById('modal-input-group'),
-        modalTextareaGroup = document.getElementById('modal-textarea-group'),
-        modalTextarea = document.getElementById('modal-textarea'),
-        modalTextareaLabelElement = document.getElementById('modal-textarea-label'),
-        modalSecondaryTextareaGroupElement = document.getElementById(
-            'modal-secondary-textarea-group',
-        ),
-        modalSecondaryTextareaLabelElement = document.getElementById(
-            'modal-secondary-textarea-label',
-        ),
-        modalSecondaryTextareaElement = document.getElementById('modal-secondary-textarea'),
-        modalToggleGroup = document.getElementById('modal-toggle-group'),
-        modalToggleLabel = document.getElementById('modal-toggle-label'),
-        modalToggleInput = document.getElementById('modal-toggle-input'),
-        modalReferenceFaceGroup = document.getElementById('modal-reference-face-group'),
-        modalReferenceFacePreview = document.getElementById('modal-reference-face-preview'),
-        modalReferenceFaceTitle = document.getElementById('modal-reference-face-title'),
-        modalReferenceFaceStatus = document.getElementById('modal-reference-face-status'),
-        modalReferenceFaceUploadBtn = document.getElementById('modal-reference-face-upload-btn'),
-        modalReferenceFaceDeleteBtn = document.getElementById('modal-reference-face-delete-btn'),
-        modalReferenceFaceInput = document.getElementById('modal-reference-face-input'),
-        apk110New_1566 = document.getElementById('modal-user-reference-face-preview'),
-        apk110New_1567 = document.getElementById('modal-user-reference-face-title'),
-        apk110New_1568 = document.getElementById('modal-user-reference-face-status'),
-        apk110New_1569 = document.getElementById('modal-user-reference-face-upload-btn'),
-        apk110New_1570 = document.getElementById('modal-user-reference-face-delete-btn'),
-        apk110New_1571 = document.getElementById('modal-user-reference-face-input'),
-        apk110New_1572 = document.getElementById('modal-reference-face-warning'),
-        modalImageComposerGroup = document.getElementById('modal-image-composer-group'),
-        modalImageComposerPreview = document.getElementById('modal-image-composer-preview'),
-        modalImageComposerStatus = document.getElementById('modal-image-composer-status'),
-        modalImageComposerUploadBtn = document.getElementById('modal-image-composer-upload-btn'),
-        modalImageComposerRemoveBtn = document.getElementById('modal-image-composer-remove-btn'),
-        modalImageComposerInput = document.getElementById('modal-image-composer-input'),
-        modalImageComposerListElement = document.getElementById('modal-image-composer-list'),
-        modalGenerationPromptGroup = document.getElementById('modal-generation-prompt-group'),
-        apk110New_1581 = document.getElementById('modal-generation-preset-group'),
-        modalGenerationPresetSelect = document.getElementById('modal-generation-preset-select'),
-        modalGenerationSavePresetBtn = document.getElementById('modal-generation-save-preset-btn'),
-        modalAutoImageGenerationToggle = document.getElementById(
-            'modal-auto-image-generation-toggle',
-        ),
-        modalGenerationCharAppearance = document.getElementById('modal-generation-char-appearance'),
-        modalGenerationUserAppearance = document.getElementById('modal-generation-user-appearance'),
-        modalGenerationArtistPrompt = document.getElementById('modal-generation-artist-prompt'),
-        modalGenerationNegativePrompt = document.getElementById('modal-generation-negative-prompt'),
-        modalConfirmBtn = document.getElementById('modal-confirm-btn'),
-        modalCancelBtn = document.getElementById('modal-cancel-btn'),
-        modalPromptConfirmBtn = document.getElementById('modal-prompt-confirm-btn');
-    let currentModalCallback = null,
-        currentModalCancelCallback = null,
-        apk110New_1594 = null,
-        value_477 = null,
-        currentModalGenerationPrompt = null,
-        count_478 = 0,
-        disabled_3 = false;
+    const customModalOverlay = document.getElementById('custom-modal-overlay');
+    const modalTitle = document.getElementById('modal-title');
+    const modalConfirmContent = document.getElementById('modal-confirm-content');
+    const modalPromptContent = document.getElementById('modal-prompt-content');
+    const modalMessage = document.getElementById('modal-message');
+    const modalInput = document.getElementById('modal-input');
+    const modalInputGroup = document.getElementById('modal-input-group');
+    const modalTextareaGroup = document.getElementById('modal-textarea-group');
+    const modalTextarea = document.getElementById('modal-textarea');
+    const modalTextareaLabelElement = document.getElementById('modal-textarea-label');
+    const modalSecondaryTextareaGroupElement = document.getElementById(
+        'modal-secondary-textarea-group',
+    );
+    const modalSecondaryTextareaLabelElement = document.getElementById(
+        'modal-secondary-textarea-label',
+    );
+    const modalSecondaryTextareaElement = document.getElementById('modal-secondary-textarea');
+    const modalToggleGroup = document.getElementById('modal-toggle-group');
+    const modalToggleLabel = document.getElementById('modal-toggle-label');
+    const modalToggleInput = document.getElementById('modal-toggle-input');
+    const modalReferenceFaceGroup = document.getElementById('modal-reference-face-group');
+    const modalReferenceFacePreview = document.getElementById('modal-reference-face-preview');
+    const modalReferenceFaceTitle = document.getElementById('modal-reference-face-title');
+    const modalReferenceFaceStatus = document.getElementById('modal-reference-face-status');
+    const modalReferenceFaceUploadBtn = document.getElementById('modal-reference-face-upload-btn');
+    const modalReferenceFaceDeleteBtn = document.getElementById('modal-reference-face-delete-btn');
+    const modalReferenceFaceInput = document.getElementById('modal-reference-face-input');
+    const apk110New_1566 = document.getElementById('modal-user-reference-face-preview');
+    const apk110New_1567 = document.getElementById('modal-user-reference-face-title');
+    const apk110New_1568 = document.getElementById('modal-user-reference-face-status');
+    const apk110New_1569 = document.getElementById('modal-user-reference-face-upload-btn');
+    const apk110New_1570 = document.getElementById('modal-user-reference-face-delete-btn');
+    const apk110New_1571 = document.getElementById('modal-user-reference-face-input');
+    const apk110New_1572 = document.getElementById('modal-reference-face-warning');
+    const modalImageComposerGroup = document.getElementById('modal-image-composer-group');
+    const modalImageComposerPreview = document.getElementById('modal-image-composer-preview');
+    const modalImageComposerStatus = document.getElementById('modal-image-composer-status');
+    const modalImageComposerUploadBtn = document.getElementById('modal-image-composer-upload-btn');
+    const modalImageComposerRemoveBtn = document.getElementById('modal-image-composer-remove-btn');
+    const modalImageComposerInput = document.getElementById('modal-image-composer-input');
+    const modalImageComposerListElement = document.getElementById('modal-image-composer-list');
+    const modalGenerationPromptGroup = document.getElementById('modal-generation-prompt-group');
+    const apk110New_1581 = document.getElementById('modal-generation-preset-group');
+    const modalGenerationPresetSelect = document.getElementById('modal-generation-preset-select');
+    const modalGenerationSavePresetBtn = document.getElementById(
+        'modal-generation-save-preset-btn',
+    );
+    const modalAutoImageGenerationToggle = document.getElementById(
+        'modal-auto-image-generation-toggle',
+    );
+    const modalGenerationCharAppearance = document.getElementById(
+        'modal-generation-char-appearance',
+    );
+    const modalGenerationUserAppearance = document.getElementById(
+        'modal-generation-user-appearance',
+    );
+    const modalGenerationArtistPrompt = document.getElementById('modal-generation-artist-prompt');
+    const modalGenerationNegativePrompt = document.getElementById(
+        'modal-generation-negative-prompt',
+    );
+    const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalPromptConfirmBtn = document.getElementById('modal-prompt-confirm-btn');
+    let currentModalCallback = null;
+    let currentModalCancelCallback = null;
+    let apk110New_1594 = null;
+    let value_477 = null;
+    let currentModalGenerationPrompt = null;
+    let count_478 = 0;
+    let disabled_3 = false;
     function handleAction_480(disabled_2) {
         disabled_3 = disabled_2;
         modalPromptConfirmBtn &&
@@ -8139,7 +8236,13 @@ window.addEventListener('pagehide', () => {
         currentModalCancelCallback = options_35.onCancel;
         apk110New_1594 = null;
         value_477 = null;
-        currentModalGenerationPrompt = options_35.generationPrompt || null;
+        customModalOverlay.dataset.ownerId = options_35.ownerId || '';
+        currentModalGenerationPrompt = options_35.generationPrompt
+            ? {
+                  ...options_35.generationPrompt,
+                  onSavePreset: options_35.generationPrompt.onSavePreset || options_35.onSavePreset,
+              }
+            : null;
         customModalOverlay.classList.toggle('is-image-generation', !!options_35.generationPrompt);
         const isIPadComposer =
             !!options_35.generationPrompt &&
@@ -8149,11 +8252,11 @@ window.addEventListener('pagehide', () => {
                     navigator.maxTouchPoints > 1));
         customModalOverlay.classList.toggle('is-ipad-image-generation', isIPadComposer);
         if (options_35.type === 'prompt') {
-            const useTextarea = options_35.multiline === true,
-                value_1461 =
-                    options_35.secondaryTextarea && typeof options_35.secondaryTextarea === 'object'
-                        ? options_35.secondaryTextarea
-                        : null;
+            const useTextarea = options_35.multiline === true;
+            const value_1461 =
+                options_35.secondaryTextarea && typeof options_35.secondaryTextarea === 'object'
+                    ? options_35.secondaryTextarea
+                    : null;
             modalConfirmBtn.style.display = 'none';
             modalPromptConfirmBtn.style.display = 'block';
             modalConfirmContent.style.display = 'none';
@@ -8213,6 +8316,10 @@ window.addEventListener('pagehide', () => {
             modalAutoImageGenerationToggle &&
                 (modalAutoImageGenerationToggle.checked =
                     options_35.generationPrompt?.autoGenerate === true);
+            const autoImageGroup = document.getElementById('modal-auto-image-generation-group');
+            if (autoImageGroup)
+                autoImageGroup.style.display =
+                    options_35.generationPrompt?.showAutoGenerate === false ? 'none' : 'flex';
             if (modalGenerationCharAppearance)
                 modalGenerationCharAppearance.value =
                     options_35.generationPrompt?.charAppearance || '';
@@ -8268,9 +8375,8 @@ window.addEventListener('pagehide', () => {
             modalMessage.textContent = options_35.message || '';
             modalConfirmBtn.textContent = options_35.confirmText || '确认';
             const isDeleteAction =
-                    options_35.isDestructive &&
-                    String(options_35.confirmText || '').trim() === '删除',
-                isDarkAction = options_35.confirmTone === 'dark';
+                options_35.isDestructive && String(options_35.confirmText || '').trim() === '删除';
+            const isDarkAction = options_35.confirmTone === 'dark';
             modalConfirmBtn.style.color =
                 isDeleteAction || isDarkAction
                     ? '#fff'
@@ -8300,11 +8406,11 @@ window.addEventListener('pagehide', () => {
         }
     }
     function handleAction_483() {
-        const value_515 = count_478,
-            promptValue_2 =
-                modalTextareaGroup?.style.display === 'block'
-                    ? modalTextarea?.value || ''
-                    : modalInput?.value || '';
+        const value_515 = count_478;
+        const promptValue_2 =
+            modalTextareaGroup?.style.display === 'block'
+                ? modalTextarea?.value || ''
+                : modalInput?.value || '';
         return {
             promptValue: promptValue_2,
             secondaryValue:
@@ -8334,7 +8440,10 @@ window.addEventListener('pagehide', () => {
             artistPrompt: modalGenerationArtistPrompt?.value || '',
             negativePrompt: modalGenerationNegativePrompt?.value || '',
             activePresetId: modalGenerationPresetSelect?.value || '',
-            autoGenerate: modalAutoImageGenerationToggle?.checked === true,
+            autoGenerate:
+                currentModalGenerationPrompt?.showAutoGenerate === false
+                    ? currentModalGenerationPrompt.autoGenerate === true
+                    : modalAutoImageGenerationToggle?.checked === true,
             presets: Array.isArray(currentModalGenerationPrompt?.presets)
                 ? currentModalGenerationPrompt.presets
                 : [],
@@ -8342,6 +8451,8 @@ window.addEventListener('pagehide', () => {
     }
     function closeCustomModal_3(value_518 = true) {
         if (!customModalOverlay) return;
+        const onCancel = currentModalCancelCallback;
+        const cancelledValue = handleAction_483();
         count_478++;
         handleAction_480(false);
         if (customModalOverlay.contains(document.activeElement)) document.activeElement.blur();
@@ -8352,15 +8463,15 @@ window.addEventListener('pagehide', () => {
                 customModalOverlay.style.display = 'none';
             }
         }, 300);
-        value_518 &&
-            typeof currentModalCancelCallback === 'function' &&
-            currentModalCancelCallback(handleAction_483());
+
         currentModalCallback = null;
         currentModalCancelCallback = null;
         apk110New_1594 = null;
         customModalOverlay.classList.remove('is-image-generation', 'is-ipad-image-generation');
         value_477 = null;
         currentModalGenerationPrompt = null;
+        delete customModalOverlay.dataset.ownerId;
+        if (value_518 && typeof onCancel === 'function') onCancel(cancelledValue);
     }
     window.imApp.showCustomModal = showCustomModal_2;
     window.imApp.closeCustomModal = closeCustomModal_3;
@@ -8585,8 +8696,8 @@ window.addEventListener('pagehide', () => {
         customModalOverlay.addEventListener('click', (event_538) => {
             if (event_538.target === customModalOverlay && !disabled_3) closeCustomModal_3(true);
         });
-    const imessageView_3 = document.getElementById('imessage-view'),
-        dockIcon = document.getElementById('dock-icon-imessage');
+    const imessageView_3 = document.getElementById('imessage-view');
+    const dockIcon = document.getElementById('dock-icon-imessage');
     dockIcon &&
         dockIcon.addEventListener('click', (e_14) => {
             if (window.isJiggleMode || window.preventAppClick) {
@@ -8608,8 +8719,8 @@ window.addEventListener('pagehide', () => {
         });
     const imHeaderRight = document.querySelector('.line-header-right');
     if (imHeaderRight) {
-        const bookmarkBtn = imHeaderRight.querySelector('.fa-bookmark'),
-            settingsBtn = imHeaderRight.querySelector('.fa-cog');
+        const bookmarkBtn = imHeaderRight.querySelector('.fa-bookmark');
+        const settingsBtn = imHeaderRight.querySelector('.fa-cog');
         if (bookmarkBtn)
             bookmarkBtn.addEventListener('click', () => {
                 if (window.showToast) window.showToast('Bookmark clicked');
@@ -8650,32 +8761,32 @@ window.addEventListener('pagehide', () => {
             }
         });
     });
-    const stickersView = handleAction_1417(),
-        stickersBackBtn = document.getElementById('stickers-back-btn'),
-        stickersAddBtn = document.getElementById('stickers-add-btn'),
-        stickersEditBtn = document.getElementById('stickers-edit-btn'),
-        addStickerSheet = document.getElementById('add-sticker-sheet'),
-        stickersListContainer = document.getElementById('stickers-list-container'),
-        stickerCategoryNameInput = document.getElementById('sticker-category-name'),
-        stickerLocalUploadBtn = document.getElementById('sticker-local-upload-btn'),
-        stickerLocalUploadInput = document.getElementById('sticker-local-upload-input'),
-        stickerLocalPreview = document.getElementById('sticker-local-preview'),
-        stickerUrlInput = document.getElementById('sticker-url-input'),
-        confirmAddStickerBtn = document.getElementById('confirm-add-sticker-btn'),
-        stickerManifestUploadBtn = document.getElementById('sticker-manifest-upload-btn'),
-        stickerManifestUploadInput = document.getElementById('sticker-manifest-upload-input'),
-        stickerDetailSheet = document.getElementById('sticker-category-detail-sheet'),
-        stickerDetailTitle = document.getElementById('sticker-detail-title'),
-        stickerDetailCount = document.getElementById('sticker-detail-count'),
-        stickerDetailGrid = document.getElementById('sticker-detail-grid'),
-        stickerDetailBindBtn = document.getElementById('sticker-detail-bind-btn'),
-        stickerDetailDeleteCategoryBtn = document.getElementById(
-            'sticker-detail-delete-category-btn',
-        ),
-        stickerDetailBatchBar = document.getElementById('sticker-detail-batch-bar'),
-        stickerBatchDeleteBtn = document.getElementById('batch-delete-toggle');
-    let pendingLocalStickers = [],
-        activeStickerCategoryName = '';
+    const stickersView = handleAction_1417();
+    const stickersBackBtn = document.getElementById('stickers-back-btn');
+    const stickersAddBtn = document.getElementById('stickers-add-btn');
+    const stickersEditBtn = document.getElementById('stickers-edit-btn');
+    const addStickerSheet = document.getElementById('add-sticker-sheet');
+    const stickersListContainer = document.getElementById('stickers-list-container');
+    const stickerCategoryNameInput = document.getElementById('sticker-category-name');
+    const stickerLocalUploadBtn = document.getElementById('sticker-local-upload-btn');
+    const stickerLocalUploadInput = document.getElementById('sticker-local-upload-input');
+    const stickerLocalPreview = document.getElementById('sticker-local-preview');
+    const stickerUrlInput = document.getElementById('sticker-url-input');
+    const confirmAddStickerBtn = document.getElementById('confirm-add-sticker-btn');
+    const stickerManifestUploadBtn = document.getElementById('sticker-manifest-upload-btn');
+    const stickerManifestUploadInput = document.getElementById('sticker-manifest-upload-input');
+    const stickerDetailSheet = document.getElementById('sticker-category-detail-sheet');
+    const stickerDetailTitle = document.getElementById('sticker-detail-title');
+    const stickerDetailCount = document.getElementById('sticker-detail-count');
+    const stickerDetailGrid = document.getElementById('sticker-detail-grid');
+    const stickerDetailBindBtn = document.getElementById('sticker-detail-bind-btn');
+    const stickerDetailDeleteCategoryBtn = document.getElementById(
+        'sticker-detail-delete-category-btn',
+    );
+    const stickerDetailBatchBar = document.getElementById('sticker-detail-batch-bar');
+    const stickerBatchDeleteBtn = document.getElementById('batch-delete-toggle');
+    let pendingLocalStickers = [];
+    let activeStickerCategoryName = '';
     stickersBackBtn &&
         stickersView &&
         stickersBackBtn.addEventListener('click', () => {
@@ -8921,8 +9032,8 @@ window.addEventListener('pagehide', () => {
             if (showToast_2)
                 showToast_2('已添加 ' + items_2.length + ' 张表情到 "' + categoryName_15 + '"');
         });
-    let batchDeleteMode = false,
-        selectedStickers = new Set();
+    let batchDeleteMode = false;
+    let selectedStickers = new Set();
     stickersEditBtn &&
         stickersEditBtn.addEventListener('click', () => {
             batchDeleteMode = !batchDeleteMode;
@@ -9572,18 +9683,18 @@ window.addEventListener('pagehide', () => {
         npcsToggle.addEventListener('click', () => {
             npcsToggle.parentElement.classList.toggle('collapsed');
         });
-    const navHomeBtn = document.getElementById('nav-home-btn'),
-        navChatsBtn = document.getElementById('nav-chats-btn'),
-        navMomentsBtn = document.getElementById('nav-moments-btn'),
-        lineNavIndicator = document.getElementById('line-nav-indicator'),
-        imBottomNavContainer = document.querySelector('.line-bottom-nav-container'),
-        imContent = document.querySelector('.line-content'),
-        chatsContent = document.getElementById('chats-content'),
-        memoryLocationSheet = document.getElementById('memory-location-sheet'),
-        memoryLocationSheetContent = document.getElementById('memory-location-sheet-content'),
-        memorySocialCloseElement = document.getElementById('memory-social-close'),
-        apk110New_1662 = document.getElementById('memory-library-header-title'),
-        apk110New_1663 = document.getElementById('memory-library-header-subtitle');
+    const navHomeBtn = document.getElementById('nav-home-btn');
+    const navChatsBtn = document.getElementById('nav-chats-btn');
+    const navMomentsBtn = document.getElementById('nav-moments-btn');
+    const lineNavIndicator = document.getElementById('line-nav-indicator');
+    const imBottomNavContainer = document.querySelector('.line-bottom-nav-container');
+    const imContent = document.querySelector('.line-content');
+    const chatsContent = document.getElementById('chats-content');
+    const memoryLocationSheet = document.getElementById('memory-location-sheet');
+    const memoryLocationSheetContent = document.getElementById('memory-location-sheet-content');
+    const memorySocialCloseElement = document.getElementById('memory-social-close');
+    const apk110New_1662 = document.getElementById('memory-library-header-title');
+    const apk110New_1663 = document.getElementById('memory-library-header-subtitle');
     let value_1422 = null;
     const value_1423 = () => {
         if (!memoryLocationSheet?.classList.contains('active')) return;
@@ -9609,47 +9720,49 @@ window.addEventListener('pagehide', () => {
             return;
         value_1423();
     });
-    const memoryEntryDetailModal = document.getElementById('memory-entry-detail-modal'),
-        scheduleModal = document.getElementById('chat-memory-schedule-modal'),
-        scheduleClose = document.getElementById('chat-memory-schedule-close'),
-        scheduleAddModal = document.getElementById('chat-memory-schedule-add-modal'),
-        memoryEntryDetailTitle = document.getElementById('memory-entry-detail-title'),
-        memoryEntryDetailBody = document.getElementById('memory-entry-detail-body'),
-        memoryEntryDetailClose = document.getElementById('memory-entry-detail-close'),
-        memoryEntryEditorModal = document.getElementById('memory-entry-editor-modal'),
-        memoryEntryEditorTitle = document.getElementById('memory-entry-editor-title'),
-        memoryEntryEditorKind = document.getElementById('memory-entry-editor-kind'),
-        memoryEntryEditorId = document.getElementById('memory-entry-editor-id'),
-        memoryEntryEditorCollection = document.getElementById('memory-entry-editor-collection'),
-        memoryEntryEditorTitleInput = document.getElementById('memory-entry-editor-title-input'),
-        memoryEntryEditorTimeInput = document.getElementById('memory-entry-editor-time-input'),
-        memoryEntryEditorContentInput = document.getElementById(
-            'memory-entry-editor-content-input',
-        ),
-        memoryEntryEditorContentLabel = document.getElementById(
-            'memory-entry-editor-content-label',
-        ),
-        apk110New_1682 = document.getElementById('memory-entry-editor-tags-row'),
-        memoryEntryEditorTagsInput = document.getElementById('memory-entry-editor-tags-input'),
-        memoryEntryEditorDegreeRow = document.getElementById('memory-entry-editor-degree-row'),
-        memoryEntryEditorDegreeSelect = document.getElementById(
-            'memory-entry-editor-degree-select',
-        ),
-        memoryEntryEditorClose = document.getElementById('memory-entry-editor-close'),
-        memoryEntryEditorCancel = document.getElementById('memory-entry-editor-cancel'),
-        memoryEntryEditorSave = document.getElementById('memory-entry-editor-save'),
-        memoryPromotionPreviewModal = document.getElementById('memory-promotion-preview-modal'),
-        memoryPromotionPreviewClose = document.getElementById('memory-promotion-preview-close'),
-        memoryPromotionPreviewCancel = document.getElementById('memory-promotion-preview-cancel'),
-        memoryPromotionPreviewConfirm = document.getElementById('memory-promotion-preview-confirm'),
-        memoryPromotionTitleInput = document.getElementById('memory-promotion-title-input'),
-        memoryPromotionTimeInput = document.getElementById('memory-promotion-time-input'),
-        memoryPromotionContentInput = document.getElementById('memory-promotion-content-input'),
-        momentsContent = document.getElementById('moments-content');
-    let currentMemoryFriendId = null,
-        currentMemoryLocation = 'iphone',
-        scheduleEditorEventId = null,
-        pendingMemoryPromotion = null;
+    const memoryEntryDetailModal = document.getElementById('memory-entry-detail-modal');
+    const scheduleModal = document.getElementById('chat-memory-schedule-modal');
+    const scheduleClose = document.getElementById('chat-memory-schedule-close');
+    const scheduleAddModal = document.getElementById('chat-memory-schedule-add-modal');
+    const memoryEntryDetailTitle = document.getElementById('memory-entry-detail-title');
+    const memoryEntryDetailBody = document.getElementById('memory-entry-detail-body');
+    const memoryEntryDetailClose = document.getElementById('memory-entry-detail-close');
+    const memoryEntryEditorModal = document.getElementById('memory-entry-editor-modal');
+    const memoryEntryEditorTitle = document.getElementById('memory-entry-editor-title');
+    const memoryEntryEditorKind = document.getElementById('memory-entry-editor-kind');
+    const memoryEntryEditorId = document.getElementById('memory-entry-editor-id');
+    const memoryEntryEditorCollection = document.getElementById('memory-entry-editor-collection');
+    const memoryEntryEditorTitleInput = document.getElementById('memory-entry-editor-title-input');
+    const memoryEntryEditorTimeInput = document.getElementById('memory-entry-editor-time-input');
+    const memoryEntryEditorContentInput = document.getElementById(
+        'memory-entry-editor-content-input',
+    );
+    const memoryEntryEditorContentLabel = document.getElementById(
+        'memory-entry-editor-content-label',
+    );
+    const apk110New_1682 = document.getElementById('memory-entry-editor-tags-row');
+    const memoryEntryEditorTagsInput = document.getElementById('memory-entry-editor-tags-input');
+    const memoryEntryEditorDegreeRow = document.getElementById('memory-entry-editor-degree-row');
+    const memoryEntryEditorDegreeSelect = document.getElementById(
+        'memory-entry-editor-degree-select',
+    );
+    const memoryEntryEditorClose = document.getElementById('memory-entry-editor-close');
+    const memoryEntryEditorCancel = document.getElementById('memory-entry-editor-cancel');
+    const memoryEntryEditorSave = document.getElementById('memory-entry-editor-save');
+    const memoryPromotionPreviewModal = document.getElementById('memory-promotion-preview-modal');
+    const memoryPromotionPreviewClose = document.getElementById('memory-promotion-preview-close');
+    const memoryPromotionPreviewCancel = document.getElementById('memory-promotion-preview-cancel');
+    const memoryPromotionPreviewConfirm = document.getElementById(
+        'memory-promotion-preview-confirm',
+    );
+    const memoryPromotionTitleInput = document.getElementById('memory-promotion-title-input');
+    const memoryPromotionTimeInput = document.getElementById('memory-promotion-time-input');
+    const memoryPromotionContentInput = document.getElementById('memory-promotion-content-input');
+    const momentsContent = document.getElementById('moments-content');
+    let currentMemoryFriendId = null;
+    let currentMemoryLocation = 'iphone';
+    let scheduleEditorEventId = null;
+    let pendingMemoryPromotion = null;
     function updateLineNavIndicator(activeItem) {
         if (!activeItem || !lineNavIndicator) return;
         const containerRect = activeItem.parentElement.getBoundingClientRect(),

@@ -80,15 +80,15 @@ function createDefaultTkState() {
     };
 }
 function normalizeTkState(rawState = {}) {
-    const defaults = createDefaultTkState(),
-        safeState = rawState && typeof rawState === 'object' ? rawState : {},
-        imFriends =
-            typeof window.getImFriends === 'function'
-                ? window.getImFriends()
-                : Array.isArray(window.imData?.friends)
-                  ? window.imData.friends
-                  : [],
-        isLinkedImFriend = (char = {}) => {
+    const defaults = createDefaultTkState();
+    const safeState = rawState && typeof rawState === 'object' ? rawState : {};
+    const imFriends =
+        typeof window.getImFriends === 'function'
+            ? window.getImFriends()
+            : Array.isArray(window.imData?.friends)
+              ? window.imData.friends
+              : [];
+    const isLinkedImFriend = (char = {}) => {
             if (!Array.isArray(imFriends) || imFriends.length === 0) return false;
             return imFriends.some((friend) => {
                 if (!friend || friend.isOfficial || friend.type === 'official') return false;
@@ -98,16 +98,16 @@ function normalizeTkState(rawState = {}) {
                     String(friend.realName || '') === String(char.name || '')
                 );
             });
-        },
-        chars_2 = Array.isArray(safeState.chars)
-            ? safeState.chars.map((char_2) => ({
+        };
+    const chars_2 = Array.isArray(safeState.chars)
+        ? safeState.chars.map((char_2) => ({
                   ...char_2,
                   isFollowed: Boolean(char_2.isFollowed),
                   isFollower: Boolean(
                       char_2.isFollower || (char_2.isFollowed && isLinkedImFriend(char_2)),
                   ),
               }))
-            : defaults.chars;
+        : defaults.chars;
     return {
         ...defaults,
         ...safeState,
@@ -141,10 +141,7 @@ function normalizeTkState(rawState = {}) {
                 : [],
         },
         chars: chars_2,
-        videos:
-            Array.isArray(safeState.videos) && safeState.videos.length > 0
-                ? safeState.videos
-                : defaults.videos,
+        videos: Array.isArray(safeState.videos) ? safeState.videos : defaults.videos,
         dms: Array.isArray(safeState.dms) ? safeState.dms : defaults.dms,
     };
 }
@@ -163,13 +160,14 @@ function loadTkStateFromStore() {
 }
 const tkState = loadTkStateFromStore();
 window.tkState = tkState;
-function invalidateTkTabRenders() {
-    document
-        .querySelectorAll('.tk-tab-content')
-        .forEach((value_7) => delete value_7.dataset.tkRendered);
+function invalidateTkTabRenders(_value = ['tk-home-tab', 'tk-chat-tab', 'tk-profile-tab']) {
+    _value.forEach((value_7) => {
+        const _value2 = document.getElementById(value_7);
+        if (_value2) delete _value2.dataset.tkRendered;
+    });
 }
-function persistTkState() {
-    invalidateTkTabRenders();
+function persistTkState(_value3 = {}) {
+    invalidateTkTabRenders(_value3.dirtyTabs);
     const nextState = normalizeTkState(tkState);
     if (typeof window.setAppState === 'function') {
         window.setAppState('tiktok', nextState);
@@ -178,7 +176,30 @@ function persistTkState() {
     window.saveGlobalData && window.saveGlobalData();
 }
 window.tkGetChar = function (charId) {
-    return tkState.chars.find((c) => c.id === charId);
+    return tkState.chars.find((c) => String(c.id) === String(charId));
+};
+const tkVideoAssetUrls = new Map();
+window.tkCacheVideoAsset = (_value4, _value5) => tkVideoAssetUrls.set(_value4, _value5);
+window.tkGetVideoCover = function (_value6 = {}) {
+    return (
+        tkVideoAssetUrls.get(_value6.generatedCoverAssetId) ||
+        _value6.cover ||
+        _value6.bgImage ||
+        _value6.imageUrl ||
+        ''
+    );
+};
+window.tkHydrateVideoAssets = async function () {
+    const _value7 = [...tkState.videos, ...(tkState.profile.posts || [])];
+    const _value8 = [
+        ...new Set(_value7.map((_value9) => _value9.generatedCoverAssetId).filter(Boolean)),
+    ];
+    await Promise.all(
+        _value8.map(async (_value0) => {
+            const _value1 = await window.appStorage?.getAssetUrl?.(_value0);
+            if (_value1) tkVideoAssetUrls.set(_value0, _value1);
+        }),
+    );
 };
 window.tkSaveChar = function (charData) {
     const existing = tkState.chars.find((c_2) => c_2.id === charData.id);
@@ -201,11 +222,170 @@ function flushTkInteractiveSave() {
     if (tkInteractiveSaveTimer === null) return;
     clearTimeout(tkInteractiveSaveTimer);
     tkInteractiveSaveTimer = null;
-    persistTkState();
+    persistTkState({
+        dirtyTabs: [],
+    });
 }
-window.tkPersistStateAfterPaint = function () {
+window.tkPersistStateAfterPaint = function (_value10 = {}) {
+    invalidateTkTabRenders(_value10.dirtyTabs || ['tk-chat-tab', 'tk-profile-tab']);
     if (tkInteractiveSaveTimer !== null) clearTimeout(tkInteractiveSaveTimer);
-    tkInteractiveSaveTimer = setTimeout(flushTkInteractiveSave, 48);
+    tkInteractiveSaveTimer = setTimeout(flushTkInteractiveSave, 160);
+};
+const tkDataRevisions = {
+    videos: 0,
+    dms: 0,
+};
+const tkPendingRequests = new Set();
+const tkBlockedScopes = new Set();
+let tkCleanupInProgress = false;
+window.tkCaptureDataGuard = function (_value11) {
+    const _value12 = tkDataRevisions[_value11];
+    return () => !tkBlockedScopes.has(_value11) && _value12 === tkDataRevisions[_value11];
+};
+function tkCancelledRequest() {
+    return Object.assign(new Error('清理前的请求已取消'), {
+        name: 'AbortError',
+    });
+}
+window.tkFetch = async function (_value13, _value14, _value15 = {}) {
+    const _value16 = window.tkCaptureDataGuard(_value13);
+    if (!_value16()) throw tkCancelledRequest();
+    const _value17 = new AbortController();
+    const _value18 = {
+        scope: _value13,
+        controller: _value17,
+    };
+    tkPendingRequests.add(_value18);
+    try {
+        const _value19 = await fetch(_value14, {
+            ..._value15,
+            signal: _value17.signal,
+        });
+        if (!_value16()) throw tkCancelledRequest();
+        const _value20 = _value19.json.bind(_value19);
+        _value19.json = async () => {
+            try {
+                const _value21 = await _value20();
+                if (!_value16()) throw tkCancelledRequest();
+                return _value21;
+            } finally {
+                tkPendingRequests['delete'](_value18);
+            }
+        };
+        if (!_value19.ok) tkPendingRequests['delete'](_value18);
+        return _value19;
+    } catch (_value22) {
+        tkPendingRequests['delete'](_value18);
+        throw _value22;
+    }
+};
+window.tkClearData = async function (_value23) {
+    if (!['videos', 'dms', 'all'].includes(_value23)) throw new Error('未知的清理类型');
+    if (tkCleanupInProgress) return false;
+    tkCleanupInProgress = true;
+    const _value24 = _value23 === 'all' ? ['videos', 'dms'] : [_value23];
+    _value24.forEach((_value28) => {
+        tkDataRevisions[_value28]++;
+        tkBlockedScopes.add(_value28);
+    });
+    tkPendingRequests.forEach((_value29) => {
+        _value24.includes(_value29.scope) &&
+            (_value29.controller.abort(), tkPendingRequests['delete'](_value29));
+    });
+    if (tkInteractiveSaveTimer !== null) clearTimeout(tkInteractiveSaveTimer);
+    tkInteractiveSaveTimer = null;
+    const _value25 = {
+        ...tkState,
+    };
+    let _value26;
+    if (_value23 === 'all') {
+        _value26 = createDefaultTkState();
+        _value26.videos = [];
+        _value26.profile.name = window.userState?.name || _value26.profile.name;
+        _value26.profile.avatar = window.userState?.avatarUrl || null;
+    } else
+        _value23 === 'dms'
+            ? (_value26 = {
+                  ...tkState,
+                  dms: [],
+              })
+            : (_value26 = {
+                  ...tkState,
+                  videos: [],
+                  profile: {
+                      ...tkState.profile,
+                      posts: [],
+                  },
+                  chars: tkState.chars.map((_value30) => ({
+                      ..._value30,
+                      likedVideoIds: [],
+                  })),
+                  activity: {
+                      ...tkState.activity,
+                      likes: [],
+                      saves: [],
+                      comments: [],
+                      likesSaves: '互动消息',
+                      commentsMentions: '互动消息',
+                  },
+                  dms: tkState.dms.map((_value31) => ({
+                      ..._value31,
+                      messages: (_value31.messages || []).map((_value32) => {
+                          if (!_value32.sharedVideoId) return _value32;
+                          const { sharedVideoId: _value33, ..._value34 } = _value32;
+                          return {
+                              ..._value34,
+                              text: /^\[分享(?:了)?视频\]$/.test(_value32.text || '')
+                                  ? '[视频已清理]'
+                                  : _value32.text,
+                          };
+                      }),
+                  })),
+              });
+    const _value27 = (_value35) => {
+        Object.keys(tkState).forEach((_value36) => delete tkState[_value36]);
+        Object.assign(tkState, _value35);
+    };
+    try {
+        _value27(_value26);
+        persistTkState();
+        const _value37 = await window.saveGlobalData?.();
+        if (_value37 === false) throw new Error('清理保存失败，请重试');
+    } catch (_value38) {
+        _value27(_value25);
+        persistTkState();
+        tkCleanupInProgress = false;
+        _value24.forEach((_value39) => tkBlockedScopes['delete'](_value39));
+        throw _value38;
+    }
+    try {
+        if (_value23 !== 'dms') tkVideoAssetUrls.clear();
+        document.dispatchEvent(
+            new CustomEvent('tk:data-cleared', {
+                detail: {
+                    kind: _value23,
+                },
+            }),
+        );
+        window.tkRenderHome?.();
+        window.tkRenderChat?.();
+        window.tkRenderProfile?.();
+        const _value40 =
+            _value23 === 'all'
+                ? _value25
+                : _value23 === 'videos'
+                  ? [_value25.videos, _value25.profile.posts]
+                  : _value25.dms;
+        await window.appStorage
+            ?.releaseAssetsFromDeletedRecords?.(_value40)
+            ['catch']((_value41) => {
+                console.warn('TikTok unused resource cleanup failed:', _value41);
+            });
+        return true;
+    } finally {
+        tkCleanupInProgress = false;
+        _value24.forEach((_value42) => tkBlockedScopes['delete'](_value42));
+    }
 };
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') flushTkInteractiveSave();
@@ -227,22 +407,28 @@ function refreshTkUiAfterHydration() {
 }
 window.globalDataReadyPromise && typeof window.globalDataReadyPromise.then === 'function'
     ? (window.tkDataReadyPromise = window.globalDataReadyPromise
-          .then(() => {
-              return (window.tkLoadStateFromStore(), refreshTkUiAfterHydration(), true);
+          .then(async () => {
+              window.tkLoadStateFromStore();
+              await window.tkHydrateVideoAssets();
+              refreshTkUiAfterHydration();
+              return true;
           })
           ['catch']((error_2) => {
               return (console.warn('TikTok global data recovery failed:', error_2), false);
           }))
-    : (window.tkDataReadyPromise = Promise.resolve(true));
+    : (window.tkDataReadyPromise = window
+          .tkHydrateVideoAssets()
+          .then(() => true)
+          ['catch'](() => false));
 (
     window.u2OnStorageReady ||
     ((callback) => document.addEventListener('DOMContentLoaded', callback))
 )(() => {
-    const tkAppBtn = document.getElementById('app-tiktok-btn'),
-        tkView = document.getElementById('tiktok-view'),
-        homeBar = document.getElementById('home-bar'),
-        tkNavItems = document.querySelectorAll('.tk-bottom-nav .tk-nav-item[data-target]'),
-        tkTabContents = document.querySelectorAll('.tk-tab-content');
+    const tkAppBtn = document.getElementById('app-tiktok-btn');
+    const tkView = document.getElementById('tiktok-view');
+    const homeBar = document.getElementById('home-bar');
+    const tkNavItems = document.querySelectorAll('.tk-bottom-nav .tk-nav-item[data-target]');
+    const tkTabContents = document.querySelectorAll('.tk-tab-content');
     function initTikTok() {
         handleAction_15(count);
     }
@@ -259,21 +445,23 @@ window.globalDataReadyPromise && typeof window.globalDataReadyPromise.then === '
             tkView.classList.add('active');
         });
     const closeTkApp = () => {
-            window.closeView(tkView);
-            window.closeView(document.getElementById('tk-video-detail-sheet'));
-            window.closeView(document.getElementById('tk-edit-profile-sheet'));
-            window.closeView(document.getElementById('tk-edit-char-sheet'));
-            window.closeView(document.getElementById('tk-import-char-sheet'));
-            window.closeView(document.getElementById('tk-share-sheet'));
-            document.getElementById('tk-sub-profile-view').classList.remove('active');
-        },
-        homeBackBtn = document.getElementById('tk-home-back-btn');
+        window.closeView(document.getElementById('tk-search-generate-sheet'));
+        window.tkCloseImageGeneration?.();
+        window.closeView(tkView);
+        window.closeView(document.getElementById('tk-video-detail-sheet'));
+        window.closeView(document.getElementById('tk-edit-profile-sheet'));
+        window.closeView(document.getElementById('tk-edit-char-sheet'));
+        window.closeView(document.getElementById('tk-import-char-sheet'));
+        window.closeView(document.getElementById('tk-share-sheet'));
+        document.getElementById('tk-sub-profile-view').classList.remove('active');
+    };
+    const homeBackBtn = document.getElementById('tk-home-back-btn');
     if (homeBackBtn) homeBackBtn.addEventListener('click', closeTkApp);
-    const tkNavIndicator = document.querySelector('.tk-nav-indicator'),
-        mainContent = document.querySelector('.tk-main-content');
-    let count = 0,
-        enabled = false,
-        count_13 = 0;
+    const tkNavIndicator = document.querySelector('.tk-nav-indicator');
+    const mainContent = document.querySelector('.tk-main-content');
+    let count = 0;
+    let enabled = false;
+    let count_13 = 0;
     function handleAction_14(currentTabIndex) {
         const targetId = tkNavItems[currentTabIndex]?.getAttribute('data-target'),
             value_20 = targetId && document.getElementById(targetId);
@@ -331,9 +519,9 @@ window.globalDataReadyPromise && typeof window.globalDataReadyPromise.then === '
             switchTab(index_2);
         });
     });
-    let count_16 = 0,
-        count_17 = 0,
-        enabled_18 = false;
+    let count_16 = 0;
+    let count_17 = 0;
+    let enabled_18 = false;
     mainContent &&
         (mainContent.addEventListener(
             'touchstart',

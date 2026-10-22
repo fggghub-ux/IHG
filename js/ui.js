@@ -9,13 +9,18 @@ function openView(element) {
     element.classList.contains('bottom-sheet-overlay')
         ? (element.classList.add('active'), (document.body.style.overflow = 'hidden'))
         : element.classList.add('active');
+    element.dispatchEvent(new CustomEvent('u2:view-opened', { bubbles: true }));
 }
 function closeView(element_2) {
     if (!element_2) return;
+    element_2.dispatchEvent(new CustomEvent('u2:view-closing'));
     // A hidden sheet must not retain the focused input and its software keyboard.
     if (element_2.contains(document.activeElement)) document.activeElement.blur();
     element_2.classList.contains('bottom-sheet-overlay')
-        ? (element_2.classList.remove('active'), (document.body.style.overflow = ''))
+        ? (element_2.classList.remove('active'),
+          (document.body.style.overflow = document.querySelector('.bottom-sheet-overlay.active')
+              ? 'hidden'
+              : ''))
         : element_2.classList.remove('active');
 }
 function syncUIs() {}

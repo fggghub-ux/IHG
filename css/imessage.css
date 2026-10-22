@@ -18944,3 +18944,56 @@ button.moment-private-chat-bubble.has-translation {
         animation: none;
     }
 }
+#chat-custom-time-row[hidden],
+.im-custom-time-overlay[hidden] { display: none !important; }
+.chat-timestamp-editable > span { cursor: pointer; touch-action: manipulation; }
+.chat-timestamp-editable > span:focus-visible { outline: 2px solid #007aff; outline-offset: 4px; }
+.im-custom-time-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 30000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+    background: rgba(0, 0, 0, .35);
+    box-sizing: border-box;
+}
+.im-custom-time-dialog {
+    width: 100%;
+    max-width: 360px;
+    max-height: 85dvh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 22px;
+    border-radius: 20px;
+    background: var(--im-surface, #fff);
+    color: var(--im-text, #1c1c1e);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, .18);
+}
+.im-custom-time-dialog h3 { margin: 0 0 18px; font-size: 18px; }
+.im-custom-time-dialog label { display: block; margin-bottom: 8px; font-size: 14px; }
+.im-custom-time-dialog input {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    padding: 12px 10px;
+    border: 1px solid #d1d1d6;
+    border-radius: 10px;
+    font-size: 16px;
+    color: inherit;
+    background: transparent;
+}
+.im-custom-time-dialog p { font-size: 13px; line-height: 1.5; color: #8e8e93; }
+.im-custom-time-error { font-size: 13px; color: #ff3b30; }
+.im-custom-time-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
+.im-custom-time-actions button {
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 16px;
+    color: #007aff;
+    background: #f2f2f7;
+    cursor: pointer;
+}
+.im-custom-time-actions button[type="submit"] { color: #fff; background: #007aff; }

@@ -9,6 +9,64 @@
     function pad2(value_4) {
         return String(value_4).padStart(2, '0');
     }
+    function _value(_value5) {
+        return (
+            _value5?.type === 'char' &&
+            _value5.timeAware === false &&
+            _value5.customTimeEnabled === true
+        );
+    }
+    function _value2(_value6) {
+        const _value7 = new Map();
+        (Array.isArray(_value6) ? _value6 : []).forEach((_value8) => {
+            const _value9 = Number(_value8?.sourceTimestamp);
+            const _value0 = _value8?.sceneTimestamp;
+            if (
+                !Number.isFinite(_value9) ||
+                _value9 <= 0 ||
+                typeof _value0 !== 'number' ||
+                !Number.isFinite(_value0) ||
+                !Number.isFinite(new Date(_value0).getTime())
+            )
+                return;
+            _value7.set(_value9, {
+                messageId: String(_value8.messageId || ''),
+                sourceTimestamp: _value9,
+                sceneTimestamp: _value0,
+            });
+        });
+        return Array.from(_value7.values()).sort(
+            (_value1, _value10) => _value1.sourceTimestamp - _value10.sourceTimestamp,
+        );
+    }
+    function _value3(_value11, _value12 = Date.now()) {
+        const _value13 = Number(_value12);
+        if (!_value(_value11) || !Number.isFinite(_value13)) return _value13;
+        let _value14 = null;
+        for (const _value15 of _value11.customTimeAnchors || []) {
+            if (
+                _value15.sourceTimestamp <= _value13 &&
+                (!_value14 || _value15.sourceTimestamp >= _value14.sourceTimestamp)
+            )
+                _value14 = _value15;
+        }
+        return _value14 ? _value14.sceneTimestamp + _value13 - _value14.sourceTimestamp : _value13;
+    }
+    function _value4(_value16, _value17 = false) {
+        const _value18 = new Date(_value16);
+        if (!Number.isFinite(_value18.getTime())) return '';
+        return (
+            String(_value18.getFullYear()).padStart(4, '0') +
+            '-' +
+            pad2(_value18.getMonth() + 1) +
+            '-' +
+            pad2(_value18.getDate()) +
+            (_value17 ? 'T' : ' ') +
+            pad2(_value18.getHours()) +
+            ':' +
+            pad2(_value18.getMinutes())
+        );
+    }
     function normalizeRoundLimit_2(value_5, fallback = 30) {
         const numeric = Number(value_5);
         return Number.isFinite(numeric) && numeric > 0
@@ -33,139 +91,139 @@
         };
     }
     const items_8 = [
-            'Asia/Shanghai',
-            'Asia/Hong_Kong',
-            'Asia/Taipei',
-            'Asia/Tokyo',
-            'Asia/Seoul',
-            'Asia/Singapore',
-            'Asia/Bangkok',
-            'Asia/Kolkata',
-            'Asia/Dubai',
-            'Europe/London',
-            'Europe/Paris',
-            'Europe/Berlin',
-            'Europe/Moscow',
-            'America/New_York',
-            'America/Chicago',
-            'America/Denver',
-            'America/Los_Angeles',
-            'America/Toronto',
-            'America/Vancouver',
-            'America/Sao_Paulo',
-            'Australia/Sydney',
-            'Pacific/Auckland',
-            'UTC',
-        ],
-        options = {
-            上海: 'Asia/Shanghai',
-            shanghai: 'Asia/Shanghai',
-            北京: 'Asia/Shanghai',
-            beijing: 'Asia/Shanghai',
-            广州: 'Asia/Shanghai',
-            guangzhou: 'Asia/Shanghai',
-            深圳: 'Asia/Shanghai',
-            shenzhen: 'Asia/Shanghai',
-            成都: 'Asia/Shanghai',
-            chengdu: 'Asia/Shanghai',
-            重庆: 'Asia/Shanghai',
-            chongqing: 'Asia/Shanghai',
-            香港: 'Asia/Hong_Kong',
-            hongkong: 'Asia/Hong_Kong',
-            澳门: 'Asia/Macau',
-            macau: 'Asia/Macau',
-            台北: 'Asia/Taipei',
-            taipei: 'Asia/Taipei',
-            东京: 'Asia/Tokyo',
-            tokyo: 'Asia/Tokyo',
-            大阪: 'Asia/Tokyo',
-            osaka: 'Asia/Tokyo',
-            首尔: 'Asia/Seoul',
-            seoul: 'Asia/Seoul',
-            新加坡: 'Asia/Singapore',
-            singapore: 'Asia/Singapore',
-            曼谷: 'Asia/Bangkok',
-            bangkok: 'Asia/Bangkok',
-            孟买: 'Asia/Kolkata',
-            mumbai: 'Asia/Kolkata',
-            新德里: 'Asia/Kolkata',
-            delhi: 'Asia/Kolkata',
-            迪拜: 'Asia/Dubai',
-            dubai: 'Asia/Dubai',
-            伦敦: 'Europe/London',
-            london: 'Europe/London',
-            巴黎: 'Europe/Paris',
-            paris: 'Europe/Paris',
-            柏林: 'Europe/Berlin',
-            berlin: 'Europe/Berlin',
-            莫斯科: 'Europe/Moscow',
-            moscow: 'Europe/Moscow',
-            纽约: 'America/New_York',
-            newyork: 'America/New_York',
-            芝加哥: 'America/Chicago',
-            chicago: 'America/Chicago',
-            丹佛: 'America/Denver',
-            denver: 'America/Denver',
-            洛杉矶: 'America/Los_Angeles',
-            losangeles: 'America/Los_Angeles',
-            旧金山: 'America/Los_Angeles',
-            sanfrancisco: 'America/Los_Angeles',
-            多伦多: 'America/Toronto',
-            toronto: 'America/Toronto',
-            温哥华: 'America/Vancouver',
-            vancouver: 'America/Vancouver',
-            圣保罗: 'America/Sao_Paulo',
-            saopaulo: 'America/Sao_Paulo',
-            悉尼: 'Australia/Sydney',
-            sydney: 'Australia/Sydney',
-            墨尔本: 'Australia/Melbourne',
-            melbourne: 'Australia/Melbourne',
-            奥克兰: 'Pacific/Auckland',
-            auckland: 'Pacific/Auckland',
-        },
-        options_9 = {
-            中国: 'Asia/Shanghai',
-            china: 'Asia/Shanghai',
-            cn: 'Asia/Shanghai',
-            日本: 'Asia/Tokyo',
-            japan: 'Asia/Tokyo',
-            jp: 'Asia/Tokyo',
-            韩国: 'Asia/Seoul',
-            南韩: 'Asia/Seoul',
-            korea: 'Asia/Seoul',
-            kr: 'Asia/Seoul',
-            新加坡: 'Asia/Singapore',
-            singapore: 'Asia/Singapore',
-            sg: 'Asia/Singapore',
-            英国: 'Europe/London',
-            联合王国: 'Europe/London',
-            uk: 'Europe/London',
-            unitedkingdom: 'Europe/London',
-            法国: 'Europe/Paris',
-            france: 'Europe/Paris',
-            fr: 'Europe/Paris',
-            德国: 'Europe/Berlin',
-            germany: 'Europe/Berlin',
-            de: 'Europe/Berlin',
-            印度: 'Asia/Kolkata',
-            india: 'Asia/Kolkata',
-            阿联酋: 'Asia/Dubai',
-            uae: 'Asia/Dubai',
-            泰国: 'Asia/Bangkok',
-            thailand: 'Asia/Bangkok',
-            新西兰: 'Pacific/Auckland',
-            newzealand: 'Pacific/Auckland',
-        };
+        'Asia/Shanghai',
+        'Asia/Hong_Kong',
+        'Asia/Taipei',
+        'Asia/Tokyo',
+        'Asia/Seoul',
+        'Asia/Singapore',
+        'Asia/Bangkok',
+        'Asia/Kolkata',
+        'Asia/Dubai',
+        'Europe/London',
+        'Europe/Paris',
+        'Europe/Berlin',
+        'Europe/Moscow',
+        'America/New_York',
+        'America/Chicago',
+        'America/Denver',
+        'America/Los_Angeles',
+        'America/Toronto',
+        'America/Vancouver',
+        'America/Sao_Paulo',
+        'Australia/Sydney',
+        'Pacific/Auckland',
+        'UTC',
+    ];
+    const options = {
+        上海: 'Asia/Shanghai',
+        shanghai: 'Asia/Shanghai',
+        北京: 'Asia/Shanghai',
+        beijing: 'Asia/Shanghai',
+        广州: 'Asia/Shanghai',
+        guangzhou: 'Asia/Shanghai',
+        深圳: 'Asia/Shanghai',
+        shenzhen: 'Asia/Shanghai',
+        成都: 'Asia/Shanghai',
+        chengdu: 'Asia/Shanghai',
+        重庆: 'Asia/Shanghai',
+        chongqing: 'Asia/Shanghai',
+        香港: 'Asia/Hong_Kong',
+        hongkong: 'Asia/Hong_Kong',
+        澳门: 'Asia/Macau',
+        macau: 'Asia/Macau',
+        台北: 'Asia/Taipei',
+        taipei: 'Asia/Taipei',
+        东京: 'Asia/Tokyo',
+        tokyo: 'Asia/Tokyo',
+        大阪: 'Asia/Tokyo',
+        osaka: 'Asia/Tokyo',
+        首尔: 'Asia/Seoul',
+        seoul: 'Asia/Seoul',
+        新加坡: 'Asia/Singapore',
+        singapore: 'Asia/Singapore',
+        曼谷: 'Asia/Bangkok',
+        bangkok: 'Asia/Bangkok',
+        孟买: 'Asia/Kolkata',
+        mumbai: 'Asia/Kolkata',
+        新德里: 'Asia/Kolkata',
+        delhi: 'Asia/Kolkata',
+        迪拜: 'Asia/Dubai',
+        dubai: 'Asia/Dubai',
+        伦敦: 'Europe/London',
+        london: 'Europe/London',
+        巴黎: 'Europe/Paris',
+        paris: 'Europe/Paris',
+        柏林: 'Europe/Berlin',
+        berlin: 'Europe/Berlin',
+        莫斯科: 'Europe/Moscow',
+        moscow: 'Europe/Moscow',
+        纽约: 'America/New_York',
+        newyork: 'America/New_York',
+        芝加哥: 'America/Chicago',
+        chicago: 'America/Chicago',
+        丹佛: 'America/Denver',
+        denver: 'America/Denver',
+        洛杉矶: 'America/Los_Angeles',
+        losangeles: 'America/Los_Angeles',
+        旧金山: 'America/Los_Angeles',
+        sanfrancisco: 'America/Los_Angeles',
+        多伦多: 'America/Toronto',
+        toronto: 'America/Toronto',
+        温哥华: 'America/Vancouver',
+        vancouver: 'America/Vancouver',
+        圣保罗: 'America/Sao_Paulo',
+        saopaulo: 'America/Sao_Paulo',
+        悉尼: 'Australia/Sydney',
+        sydney: 'Australia/Sydney',
+        墨尔本: 'Australia/Melbourne',
+        melbourne: 'Australia/Melbourne',
+        奥克兰: 'Pacific/Auckland',
+        auckland: 'Pacific/Auckland',
+    };
+    const options_9 = {
+        中国: 'Asia/Shanghai',
+        china: 'Asia/Shanghai',
+        cn: 'Asia/Shanghai',
+        日本: 'Asia/Tokyo',
+        japan: 'Asia/Tokyo',
+        jp: 'Asia/Tokyo',
+        韩国: 'Asia/Seoul',
+        南韩: 'Asia/Seoul',
+        korea: 'Asia/Seoul',
+        kr: 'Asia/Seoul',
+        新加坡: 'Asia/Singapore',
+        singapore: 'Asia/Singapore',
+        sg: 'Asia/Singapore',
+        英国: 'Europe/London',
+        联合王国: 'Europe/London',
+        uk: 'Europe/London',
+        unitedkingdom: 'Europe/London',
+        法国: 'Europe/Paris',
+        france: 'Europe/Paris',
+        fr: 'Europe/Paris',
+        德国: 'Europe/Berlin',
+        germany: 'Europe/Berlin',
+        de: 'Europe/Berlin',
+        印度: 'Asia/Kolkata',
+        india: 'Asia/Kolkata',
+        阿联酋: 'Asia/Dubai',
+        uae: 'Asia/Dubai',
+        泰国: 'Asia/Bangkok',
+        thailand: 'Asia/Bangkok',
+        新西兰: 'Pacific/Auckland',
+        newzealand: 'Pacific/Auckland',
+    };
     function handleAction_10(value_65) {
         return String(value_65 || '')
             .trim()
             .toLocaleLowerCase()
             .replace(/[\s._,'’\-\/]+/g, '');
     }
-    const value_11 = new Map(),
-        value_12 = new Map();
-    let items_13 = null,
-        auxiliaryTypes = null;
+    const value_11 = new Map();
+    const value_12 = new Map();
+    let items_13 = null;
+    let auxiliaryTypes = null;
     function handleAction_15(value_66, value_67, value_68, value_69) {
         if (!value_66.has(value_67) && value_66.size >= value_69)
             value_66['delete'](value_66.keys().next().value);
@@ -1125,6 +1183,10 @@
         );
     }
     return {
+        isCustomChatTimeEnabled: _value,
+        normalizeChatTimeAnchors: _value2,
+        getChatTimestamp: _value3,
+        formatChatDateTime: _value4,
         normalizeRoundLimit: normalizeRoundLimit_2,
         normalizeMessageLimit: normalizeMessageLimit_2,
         normalizeChatMessageRange: normalizeChatMessageRange_3,

@@ -35,21 +35,21 @@
     const bindAccountDetailForm = document.getElementById('bind-account-detail-form');
     const bindAccountDetailAvatarBtn = document.getElementById('bind-account-detail-avatar-btn');
     const bindAccountDetailAvatarUpload = document.getElementById(
-            'bind-account-detail-avatar-upload',
-        );
+        'bind-account-detail-avatar-upload',
+    );
     const bindAccountDetailAvatarImg = document.getElementById('bind-account-detail-avatar-img');
     const bindAccountDetailAvatarIcon = document.getElementById('bind-account-detail-avatar-icon');
     const bindAccountDetailNameInput = document.getElementById('bind-account-detail-name-input');
     const bindAccountDetailPhoneInput = document.getElementById('bind-account-detail-phone-input');
     const bindAccountDetailSignatureInput = document.getElementById(
-            'bind-account-detail-signature-input',
-        );
+        'bind-account-detail-signature-input',
+    );
     const bindAccountDetailPersonaInput = document.getElementById(
-            'bind-account-detail-persona-input',
-        );
+        'bind-account-detail-persona-input',
+    );
     const bindAccountSeparateAvatarToggle = document.getElementById(
         'bind-account-separate-avatar-toggle',
-        );
+    );
     const bindAccountDetailSaveBtn = document.getElementById('bind-account-detail-save-btn');
     let tempSelectedBookIds = [];
     let tempSelectedAccountId = null;
@@ -1848,16 +1848,16 @@
     function handleAction_40(value_86) {
         if (!value_86 || value_86.type !== 'char') return;
         document.getElementById('chat-location-profile-modal')?.remove();
-        const handleAction_38_399 = handleAction_38(value_86),
-            items_400 = window.imDataUtils?.getSupportedTimeZones?.() || [],
-            value_401 = (value_406) =>
+        const handleAction_38_399 = handleAction_38(value_86);
+        const items_400 = window.imDataUtils?.getSupportedTimeZones?.() || [];
+        const value_401 = (value_406) =>
                 String(value_406 == null ? '' : value_406)
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;')
                     .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;'),
-            element_402 = document.createElement('div');
+                    .replace(/'/g, '&#039;');
+        const element_402 = document.createElement('div');
         element_402.id = 'chat-location-profile-modal';
         element_402.style.cssText =
             'position:absolute;inset:0;z-index:80;background:rgba(0,0,0,.38);display:flex;align-items:flex-end;justify-content:center;';
@@ -1875,8 +1875,8 @@
                                 '</option>',
                         ),
                     )
-                    .join(''),
-            value_404 = (value_90, value_91, value_93) =>
+                    .join('');
+        const value_404 = (value_90, value_91, value_93) =>
                 `
             <section style="padding:14px;border-radius:18px;background:#eeeeef;display:flex;flex-direction:column;gap:10px;">
                 <strong style="font-size:15px;color:#252525;">` +
@@ -1899,47 +1899,17 @@
                 `</select>
             </section>`;
         element_402.innerHTML =
-            `
-            <div style="width:100%;max-height:88%;overflow-y:auto;background:#f7f7f7;border-radius:24px 24px 0 0;padding:10px 16px calc(18px + env(safe-area-inset-bottom));box-sizing:border-box;">
-                <div style="width:38px;height:5px;border-radius:99px;background:#bdbdbd;margin:0 auto 12px;"></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                    <button type="button" data-location-action="cancel" style="border:0;background:transparent;color:#777;font-size:16px;padding:6px;">取消</button>
-                    <strong style="font-size:18px;">定位与时区</strong>
-                    <button type="button" data-location-action="save" style="border:0;background:transparent;color:#222;font-size:16px;font-weight:800;padding:6px;">保存</button>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:12px;">
-                    ` +
+            '\n            <div style="width:100%;max-height:88%;overflow-y:auto;background:#f7f7f7;border-radius:24px 24px 0 0;padding:10px 16px calc(18px + env(safe-area-inset-bottom));box-sizing:border-box;">\n                <div style="width:38px;height:5px;border-radius:99px;background:#bdbdbd;margin:0 auto 12px;"></div>\n                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">\n                    <button type="button" data-location-action="cancel" style="border:0;background:transparent;color:#777;font-size:16px;padding:6px;">取消</button>\n                    <strong style="font-size:18px;">定位与时区</strong>\n                    <button type="button" data-location-action="save" style="border:0;background:transparent;color:#222;font-size:16px;font-weight:800;padding:6px;">保存</button>\n                </div>\n                <div style="display:flex;flex-direction:column;gap:12px;">\n                    ' +
             value_404('char', 'Char 所在地', handleAction_38_399.char) +
-            `
-                    ` +
+            '\n                    ' +
             value_404('user', 'User 所在地', handleAction_38_399.user) +
-            `
-                    <div style="min-height:54px;padding:0 14px;border-radius:16px;background:#e7e7e8;display:flex;align-items:center;gap:12px;">
-                        <div style="flex:1;min-width:0;">
-                            <strong style="display:block;color:#252525;font-size:15px;">时差感知</strong>
-                            <span style="display:block;margin-top:2px;color:#777;font-size:12px;">开启后，AI 上下文按 Char 当地时间换算</span>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" class="location-profile-time-difference-toggle"` +
+            '\n                    <div style="min-height:54px;padding:0 14px;border-radius:16px;background:#e7e7e8;display:flex;align-items:center;gap:12px;">\n                        <div style="flex:1;min-width:0;">\n                            <strong style="display:block;color:#252525;font-size:15px;">时差感知</strong>\n                            <span style="display:block;margin-top:2px;color:#777;font-size:12px;">开启后，AI 上下文按 Char 当地时间换算</span>\n                        </div>\n                        <label class="toggle-switch">\n                            <input type="checkbox" class="location-profile-time-difference-toggle"' +
             (handleAction_38_399.timeDifferenceEnabled ? ' checked' : '') +
-            `>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div style="min-height:54px;padding:0 14px;border-radius:16px;background:#e7e7e8;display:flex;align-items:center;gap:12px;">
-                        <div style="flex:1;min-width:0;"><strong style="display:block;color:#252525;font-size:15px;">天气感知</strong><span style="display:block;margin-top:2px;color:#777;font-size:12px;">将双方城市实时天气提供给 Char</span></div>
-                        <label class="toggle-switch"><input type="checkbox" class="location-profile-weather-toggle"` +
+            '>\n                            <span class="slider"></span>\n                        </label>\n                    </div>\n                    <div style="min-height:54px;padding:0 14px;border-radius:16px;background:#e7e7e8;display:flex;align-items:center;gap:12px;">\n                        <div style="flex:1;min-width:0;"><strong style="display:block;color:#252525;font-size:15px;">天气感知</strong><span style="display:block;margin-top:2px;color:#777;font-size:12px;">将双方城市实时天气提供给 Char</span></div>\n                        <label class="toggle-switch"><input type="checkbox" class="location-profile-weather-toggle"' +
             (handleAction_38_399.weatherAwareEnabled ? ' checked' : '') +
-            `><span class="slider"></span></label>
-                    </div>
-                    <div style="min-height:54px;padding:0 14px;border-radius:16px;background:#e7e7e8;display:flex;align-items:center;gap:12px;">
-                        <div style="flex:1;min-width:0;"><strong style="display:block;color:#252525;font-size:15px;">异地模式</strong><span style="display:block;margin-top:2px;color:#777;font-size:12px;">明确告诉 Char 你们处于异地</span></div>
-                        <label class="toggle-switch"><input type="checkbox" class="location-profile-long-distance-toggle"` +
+            '><span class="slider"></span></label>\n                    </div>\n                    <div style="min-height:54px;padding:0 14px;border-radius:16px;background:#e7e7e8;display:flex;align-items:center;gap:12px;">\n                        <div style="flex:1;min-width:0;"><strong style="display:block;color:#252525;font-size:15px;">异地模式</strong><span style="display:block;margin-top:2px;color:#777;font-size:12px;">明确告诉 Char 你们处于异地</span></div>\n                        <label class="toggle-switch"><input type="checkbox" class="location-profile-long-distance-toggle"' +
             (handleAction_38_399.longDistanceEnabled ? ' checked' : '') +
-            `><span class="slider"></span></label>
-                    </div>
-                </div>
-            </div>`;
+            '><span class="slider"></span></label>\n                    </div>\n                </div>\n            </div>';
         chatSettingsSheet.appendChild(element_402);
         const value_405 = () => element_402.remove();
         element_402.addEventListener('click', (event_412) => {
@@ -1991,28 +1961,28 @@
                             element_402.querySelector(
                                 '[data-location-field="' + value_425 + '-timezone"]',
                             )?.value || '',
-                    }),
-                    locationProfile_2 = window.imDataUtils?.normalizeLocationProfile?.({
-                        char: value_420('char'),
-                        user: value_420('user'),
-                        timeDifferenceEnabled:
-                            element_402.querySelector('.location-profile-time-difference-toggle')
-                                ?.checked === true,
-                        weatherAwareEnabled:
-                            element_402.querySelector('.location-profile-weather-toggle')
-                                ?.checked === true,
-                        longDistanceEnabled:
-                            element_402.querySelector('.location-profile-long-distance-toggle')
-                                ?.checked === true,
-                    }),
-                    value_422 = !!(
-                        locationProfile_2?.char?.country &&
-                        locationProfile_2.char.city &&
-                        locationProfile_2.char.timeZone &&
-                        locationProfile_2?.user?.country &&
-                        locationProfile_2.user.city &&
-                        locationProfile_2.user.timeZone
-                    );
+                    });
+                const locationProfile_2 = window.imDataUtils?.normalizeLocationProfile?.({
+                    char: value_420('char'),
+                    user: value_420('user'),
+                    timeDifferenceEnabled:
+                        element_402.querySelector('.location-profile-time-difference-toggle')
+                            ?.checked === true,
+                    weatherAwareEnabled:
+                        element_402.querySelector('.location-profile-weather-toggle')?.checked ===
+                        true,
+                    longDistanceEnabled:
+                        element_402.querySelector('.location-profile-long-distance-toggle')
+                            ?.checked === true,
+                });
+                const value_422 = !!(
+                    locationProfile_2?.char?.country &&
+                    locationProfile_2.char.city &&
+                    locationProfile_2.char.timeZone &&
+                    locationProfile_2?.user?.country &&
+                    locationProfile_2.user.city &&
+                    locationProfile_2.user.timeZone
+                );
                 if (!value_422) {
                     showToast_2('请完整填写双方国家、城市并选择有效时区');
                     return;
@@ -2039,6 +2009,8 @@
                         chatTimeAwareToggleElement_427.checked = true;
                 }
                 handleAction_39(value_97);
+                syncCustomTimeSettings(value_97);
+                refreshChatPageForFriend(value_97);
                 value_405();
             });
     }
@@ -3522,7 +3494,9 @@
     const manualSummaryClose = document.getElementById('chat-memory-summary-close');
     const manualSummaryConfirm = document.getElementById('chat-memory-summary-confirm');
     const manualSummaryCountInput = document.getElementById('chat-memory-summary-count-input');
-    const manualSummaryUnsummarizedCount = document.getElementById('chat-memory-unsummarized-count');
+    const manualSummaryUnsummarizedCount = document.getElementById(
+        'chat-memory-unsummarized-count',
+    );
     const manualSummaryBatchCount = document.getElementById('chat-memory-summary-batch-count');
     const autoSummaryToggle = document.getElementById('chat-memory-auto-summary-toggle');
     const summaryRoundInput = document.getElementById('chat-memory-summary-round-input');
@@ -3537,18 +3511,22 @@
     const autonomousToggle = document.getElementById('chat-memory-autonomous-enabled-toggle');
     const autonomousStatus = document.getElementById('chat-memory-autonomous-status');
     const autonomousNextLabel = document.getElementById('chat-memory-autonomous-next-label');
-    const autonomousReplyMinInput = document.getElementById('chat-memory-autonomous-reply-min-input');
-    const autonomousReplyMaxInput = document.getElementById('chat-memory-autonomous-reply-max-input');
+    const autonomousReplyMinInput = document.getElementById(
+        'chat-memory-autonomous-reply-min-input',
+    );
+    const autonomousReplyMaxInput = document.getElementById(
+        'chat-memory-autonomous-reply-max-input',
+    );
     const autonomousMomentToggle = document.getElementById('chat-memory-autonomous-moment-toggle');
     const autonomousMomentMinInput = document.getElementById(
-            'chat-memory-autonomous-moment-min-input',
-        );
+        'chat-memory-autonomous-moment-min-input',
+    );
     const autonomousMomentMaxInput = document.getElementById(
-            'chat-memory-autonomous-moment-max-input',
-        );
+        'chat-memory-autonomous-moment-max-input',
+    );
     const autonomousMomentNextLabel = document.getElementById(
-            'chat-memory-autonomous-moment-next-label',
-        );
+        'chat-memory-autonomous-moment-next-label',
+    );
     const summaryInFlight = new Set();
     const chatBackgroundOperationTokens_2 = new Map();
     const value_52 = new Map();
@@ -5309,8 +5287,8 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         const timestampToggleElement_911 = document.getElementById('timestamp-toggle');
         const timestampPositionBodyElement_912 = document.getElementById('timestamp-position-body');
         const timestampPositionSelectElement_913 = document.getElementById(
-                'timestamp-position-select',
-            );
+            'timestamp-position-select',
+        );
         const chatAvatarToggleElement_914 = document.getElementById('chat-avatar-toggle');
         const apk110New_1226 = document.getElementById('chat-every-message-avatar-toggle');
         const apk110New_1227 = document.getElementById('chat-continuous-bubbles-toggle');
@@ -5327,8 +5305,8 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         const chatCharBlockToggleElement_921 = document.getElementById('chat-char-block-toggle');
         const chatBlockFriendBtnElement_922 = document.getElementById('chat-block-friend-btn');
         const chatAutoExpandTranslationToggle = document.getElementById(
-                'chat-auto-expand-translation-toggle',
-            );
+            'chat-auto-expand-translation-toggle',
+        );
         const chatTtsEnabledToggleElement_924 = document.getElementById('chat-tts-enabled-toggle');
         const chatTtsBody = document.getElementById('chat-tts-settings-body');
         const chatTtsVoiceInput = document.getElementById('chat-tts-voice-id-input');
@@ -5363,6 +5341,7 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         if (chatMessageCountMinInput) chatMessageCountMinInput.value = String(messageRange.min);
         if (chatMessageCountMaxInput) chatMessageCountMaxInput.value = String(messageRange.max);
         chatTimeAwareToggle && (chatTimeAwareToggle.checked = friend_57.timeAware !== false);
+        syncCustomTimeSettings(friend_57);
         if (_value9) _value9.hidden = friend_57.type !== 'char';
         if (_value8)
             _value8.checked = friend_57.type === 'char' && friend_57.autoReplyEnabled === true;
@@ -5633,8 +5612,8 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
     const npcTimestampToggleElement = document.getElementById('npc-timestamp-toggle');
     const npcTimestampPositionBodyElement = document.getElementById('npc-timestamp-position-body');
     const npcTimestampPositionSelectElement = document.getElementById(
-            'npc-timestamp-position-select',
-        );
+        'npc-timestamp-position-select',
+    );
     npcTimestampToggleElement &&
         npcTimestampToggleElement.dataset.bound !== 'true' &&
         ((npcTimestampToggleElement.dataset.bound = 'true'),
@@ -5808,7 +5787,7 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                 const checked_7 = window.imData.currentSettingsFriend.timeAware !== false;
                 const timeAware_2 = event_988.target.checked;
                 const value_991 = await commitSettingsFriendChange(
-                        (targetFriend_18) => {
+                    (targetFriend_18) => {
                             targetFriend_18.timeAware = timeAware_2;
                             if (!timeAware_2) {
                                 const locationProfile_3 = handleAction_38(targetFriend_18);
@@ -5816,16 +5795,65 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                                 targetFriend_18.locationProfile = locationProfile_3;
                             }
                         },
-                        {
-                            silent: true,
-                        },
-                    );
+                    {
+                        silent: true,
+                    },
+                );
                 if (!value_991) {
                     event_988.target.checked = checked_7;
                     showToast_2('时间感知设置保存失败');
-                } else !timeAware_2 && handleAction_39(window.imData.currentSettingsFriend);
+                } else {
+                    syncCustomTimeSettings(window.imData.currentSettingsFriend);
+                    refreshChatPageForFriend(window.imData.currentSettingsFriend);
+                    handleAction_39(window.imData.currentSettingsFriend);
+                }
             }
         }));
+    function syncCustomTimeSettings(_value26) {
+        const _value27 = document.getElementById('chat-custom-time-row');
+        const _value28 = document.getElementById('chat-custom-time-toggle');
+        if (_value27) _value27.hidden = _value26?.type !== 'char' || _value26.timeAware !== false;
+        if (_value28) _value28.checked = _value26?.customTimeEnabled === true;
+    }
+    const customTimeToggleElement = document.getElementById('chat-custom-time-toggle');
+    customTimeToggleElement &&
+        customTimeToggleElement.dataset.bound !== 'true' &&
+        ((customTimeToggleElement.dataset.bound = 'true'),
+        customTimeToggleElement.addEventListener('change', async (_value29) => {
+            const _value30 = _value29.currentTarget || _value29.target;
+            const timeAware_2 = window.imData.currentSettingsFriend;
+            if (!timeAware_2 || timeAware_2.type !== 'char' || timeAware_2.timeAware !== false)
+                return;
+            const _value31 = _value30.checked;
+            const _value32 = timeAware_2.customTimeEnabled === true;
+            _value30.disabled = true;
+            try {
+                const _value33 = await commitSettingsFriendChange(
+                    (_value34) => {
+                        _value34.customTimeEnabled = _value31;
+                    },
+                    {
+                        silent: true,
+                        immediate: true,
+                    },
+                );
+                if (!_value33) throw new Error('Custom time persistence failed');
+                String(window.imData.currentSettingsFriend?.id) === String(timeAware_2.id) &&
+                    syncCustomTimeSettings(window.imData.currentSettingsFriend);
+                refreshChatPageForFriend(timeAware_2.id);
+            } catch (_value35) {
+                const _value36 = window.imApp.getFriendById(timeAware_2.id);
+                _value36 &&
+                    (window.imApp.syncActiveFriendReference?.(_value36),
+                    window.imApp.syncSettingsFriendReference?.(_value36));
+                String(window.imData.currentSettingsFriend?.id) === String(timeAware_2.id) &&
+                    (_value30.checked = _value32);
+                showToast_2('自定义时间戳设置保存失败');
+            } finally {
+                _value30.disabled = false;
+            }
+        }));
+
     function syncAutoReplyDelaySettings(friend) {
         const enabled = friend?.type === 'char' && friend.autoReplyEnabled === true;
         document.getElementById('chat-auto-reply-delay-row').hidden = !enabled;

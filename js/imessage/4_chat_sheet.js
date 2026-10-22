@@ -17,14 +17,14 @@
     const count_12 = 2;
     const count_13 = 1200;
     const OFFLINE_COT_PROMPT_IDS = new Set([
-            'cot_before',
-            'cot_scene_planning',
-            'cot_literary_guidance',
-            'cot_language_check',
-            'cot_read_previous_recap_haru',
-            'cot_output_audit',
-            'cot_after',
-        ]);
+        'cot_before',
+        'cot_scene_planning',
+        'cot_literary_guidance',
+        'cot_language_check',
+        'cot_read_previous_recap_haru',
+        'cot_output_audit',
+        'cot_after',
+    ]);
     const value_15 = (value_46) => {
             if (offlineReasoning?.isCotEntry)
                 return offlineReasoning.isCotEntry(value_46, OFFLINE_COT_PROMPT_IDS);
@@ -67,32 +67,32 @@
         };
     const OFFLINE_AUTO_IMAGE_MARKER = '【线下生图】';
     const OFFLINE_CHAT_PROMPT_ORDER = [
-            'role_identity',
-            'data_zone',
-            'memory_system',
-            OFFLINE_CHAT_HISTORY_PROMPT_ID,
-            'task_instruction',
-            'length_words',
-            'nsfw',
-            'bilingual_dialogue',
-            'perspective_first',
-            'perspective_second',
-            'perspective_third',
-            'style_creative_guidance',
-            'style_baimiao',
-            'style_green_apple',
-            'barrage_comments',
-            'offline_recap_haru',
-            'format_rules',
-            'player_choices',
-            'cot_before',
-            'cot_scene_planning',
-            'cot_literary_guidance',
-            'cot_language_check',
-            'cot_read_previous_recap_haru',
-            'cot_output_audit',
-            'cot_after',
-        ];
+        'role_identity',
+        'data_zone',
+        'memory_system',
+        OFFLINE_CHAT_HISTORY_PROMPT_ID,
+        'task_instruction',
+        'length_words',
+        'nsfw',
+        'bilingual_dialogue',
+        'perspective_first',
+        'perspective_second',
+        'perspective_third',
+        'style_creative_guidance',
+        'style_baimiao',
+        'style_green_apple',
+        'barrage_comments',
+        'offline_recap_haru',
+        'format_rules',
+        'player_choices',
+        'cot_before',
+        'cot_scene_planning',
+        'cot_literary_guidance',
+        'cot_language_check',
+        'cot_read_previous_recap_haru',
+        'cot_output_audit',
+        'cot_after',
+    ];
     const value_25_2 = (() => {
             let value_56 = null,
                 count_57 = 0;
@@ -513,403 +513,8 @@ The prompt must describe the same current moment with characters, action, settin
         attachmentSheet_2.style.flexDirection = 'column';
         attachmentSheet_2.style.justifyContent = 'flex-end';
         attachmentSheet_2.style.overflow = 'hidden';
-        attachmentSheet_2.innerHTML = `
-            <div class="sheet-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); opacity: 0; transition: opacity 0.3s;"></div>
-            <div class="sheet-content" style="position: relative; height: 50%; width: 100%; background: #fff; border-radius: 24px 24px 0 0; display: flex; flex-direction: column; overflow: hidden; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); ">
-                <!-- Header -->
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: rgba(255,255,255,0.95);   z-index: 10;">
-                    <div class="close-sheet-btn" style="width: 32px; height: 32px; background: #f2f2f7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; color: #000;"><i class="fas fa-times"></i></div>
-                    <div style="font-weight: 600; font-size: 18px; color: #000;">Recents <i class="fas fa-chevron-down" style="font-size: 12px; color: #8e8e93; margin-left: 4px;"></i></div>
-                    <div style="width: 32px;"></div>
-                </div>
-                
-                <!-- Views Container -->
-                <div style="flex: 1; position: relative; overflow: hidden; background: #fff;">
-                    <!-- Gallery View -->
-                    <div class="sheet-view view-gallery" style="position: absolute; inset: 0; overflow-y: auto; padding: 14px 16px 120px; display: flex; flex-direction: column; gap: 10px; align-items: stretch; scrollbar-width: none;">
-                        <div class="grid-item album-image-entry" style="min-height: 68px; box-sizing: border-box; background: #f7f7fa; border-radius: 16px; border: 1px solid #ececf1; display: flex; align-items: center; gap: 13px; padding: 12px 14px; cursor: pointer;">
-                            <div style="width: 42px; height: 42px; border-radius: 13px; background: rgba(52,199,89,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fas fa-images" style="font-size: 20px; color: #34c759;"></i></div>
-                            <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;"><span style="font-size: 15px; color: #111; font-weight: 750;">相册图片</span><span style="font-size: 12px; color: #8e8e93;">上传图片或自定义图片内容</span></div>
-                            <i class="fas fa-chevron-right" style="font-size: 13px; color: #c7c7cc; flex-shrink: 0;"></i>
-                        </div>
-                        <div class="grid-item generated-image-entry" style="min-height: 68px; box-sizing: border-box; background: #f7f7fa; border-radius: 16px; border: 1px solid #ececf1; display: flex; align-items: center; gap: 13px; padding: 12px 14px; cursor: pointer;">
-                            <div style="width: 42px; height: 42px; border-radius: 13px; background: rgba(175,82,222,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fas fa-wand-magic-sparkles" style="font-size: 20px; color: #af52de;"></i></div>
-                            <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;"><span style="font-size: 15px; color: #111; font-weight: 750;">生成图片</span><span style="font-size: 12px; color: #8e8e93;">输入提示词生成</span></div>
-                            <i class="fas fa-chevron-right" style="font-size: 13px; color: #c7c7cc; flex-shrink: 0;"></i>
-                        </div>
-                    </div>
-
-                    <!-- Linked Friends View -->
-                    <div class="sheet-view view-file" style="position: absolute; inset: 0; display: none; background: #fff; padding: 14px 14px 112px; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch;">
-                        <div class="linked-accounts-panel" style="width: 100%; display: flex; flex-direction: column; gap: 12px;">
-                            <div class="linked-accounts-empty" style="display:none; text-align:center; color:#8e8e93; font-size:13px; line-height:1.45; padding:42px 18px;"></div>
-                            <div class="linked-accounts-controls" style="display:flex; flex-direction:column; gap:10px;">
-                                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-radius:18px; background:#f7f7fa;">
-                                    <div style="min-width:0;">
-                                        <div style="font-size:15px; font-weight:800; color:#111;">是否开启关联好友</div>
-                                        <div class="linked-accounts-status" style="font-size:12px; color:#8e8e93; margin-top:2px;">开启后会自动生成好友会话</div>
-                                    </div>
-                                    <label class="toggle-switch" style="flex-shrink:0;">
-                                        <input type="checkbox" class="linked-accounts-toggle">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-                                <div class="linked-accounts-interval-row" style="display:none; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-radius:18px; background:#f7f7fa;">
-                                    <div>
-                                        <div style="font-size:15px; font-weight:700; color:#111;">多少秒自动调用一次 API</div>
-                                        <div style="font-size:12px; color:#8e8e93; margin-top:2px;">开启后按此间隔自动生成消息</div>
-                                    </div>
-                                    <input type="number" class="linked-accounts-interval-input" min="5" step="1" value="60" style="width:82px; height:34px; border:1px solid #e5e5ea; border-radius:12px; background:#fff; color:#111; font-size:15px; text-align:center; outline:none;">
-                                </div>
-                            </div>
-                            <div class="linked-accounts-list" style="display:flex; flex-direction:column; gap:10px;"></div>
-                        </div>
-                    </div>
-
-                    <!-- Location opens a dedicated composer overlay. -->
-                    <div class="sheet-view view-location" style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: #fff; padding-bottom: 60px;">
-                        <i class="fas fa-map-marked-alt" style="font-size: 64px; color: #5d5d5d; margin-bottom: 16px;"></i>
-                        <div style="font-size: 16px; color: #242424; font-weight: 700;">发送虚拟定位</div>
-                        <div style="font-size: 13px; color: #7b7b7b; margin-top: 5px;">填写地点名和详细地址</div>
-                        <button type="button" class="location-open-composer-btn" style="height: 44px; min-width: 148px; margin-top: 20px; border: none; border-radius: 14px; background: #292929; color: #f7f7f7; font-size: 15px; font-weight: 800; cursor: pointer;">发送定位</button>
-                    </div>
-
-                    <!-- Stickers View -->
-                    <div class="sheet-view view-stickers" style="position: absolute; inset: 0; display: none; flex-direction: column; background: #fff; padding: 12px 0 112px; overflow: hidden;">
-                        <div class="sheet-sticker-category-tabs"></div>
-                        <div class="sheet-stickers-list"></div>
-                    </div>
-
-                    <!-- More View -->
-                    <div class="sheet-view view-more" style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: flex-start; justify-content: flex-start; overflow-y: auto; background: #fff; padding: 20px 18px 120px; gap: 14px;">
-                        <div class="attachment-more-icon-grid">
-                            <div class="attachment-more-regenerate-entry">
-                                <div class="attachment-more-regenerate-icon">
-                                    <i class="fas fa-rotate-left"></i>
-                                </div>
-                                <div class="attachment-more-regenerate-label">重回</div>
-                            </div>
-                            <div class="attachment-more-pay-entry">
-                                <div class="attachment-more-pay-icon">
-                                    <i class="fas fa-wallet"></i>
-                                </div>
-                                <div class="attachment-more-pay-label">Pay</div>
-                            </div>
-                            <div class="attachment-more-contact-entry" style="display:none;">
-                                <div class="attachment-more-contact-icon">
-                                    <i class="fas fa-address-card"></i>
-                                </div>
-                                <div class="attachment-more-contact-label">名片</div>
-                            </div>
-                            <div class="attachment-more-offline-entry" id="open-offline-chats-btn">
-                                <div class="attachment-more-offline-icon">
-                                    <i class="fas fa-people-arrows"></i>
-                                </div>
-                                <div class="attachment-more-offline-label">线下</div>
-                            </div>
-                            <div class="attachment-more-voice-entry">
-                                <div class="attachment-more-voice-icon">
-                                    <i class="fas fa-microphone-alt"></i>
-                                </div>
-                                <div class="attachment-more-voice-label">Voice</div>
-                            </div>
-                            <div class="attachment-more-listen-entry" style="display:none;">
-                                <div class="attachment-more-listen-icon">
-                                    <i class="fas fa-headphones"></i>
-                                </div>
-                                <div class="attachment-more-listen-label">一起听</div>
-                            </div>
-                            <div class="attachment-more-link-entry">
-                                <div class="attachment-more-link-icon">
-                                    <i class="fas fa-link"></i>
-                                </div>
-                                <div class="attachment-more-link-label">链接</div>
-                            </div>
-                            <div class="attachment-more-narration-entry">
-                                <div class="attachment-more-narration-icon">
-                                    <i class="fas fa-quote-left"></i>
-                                </div>
-                                <div class="attachment-more-narration-label">旁白</div>
-                            </div>
-                            <div class="attachment-more-dynamic-action-entry">
-                                <div class="attachment-more-dynamic-action-icon">
-                                    <i class="fas fa-running"></i>
-                                </div>
-                                <div class="attachment-more-dynamic-action-label">动描</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bottom Tabs (Floating Pill, Left Aligned, Tap to Select) -->
-                <div class="sheet-tabs-container" style="position: absolute; bottom: 16px; left: 20px; right: 20px; border-radius: 40px; display: flex; padding: 10px 16px; overflow-x: auto; background: rgba(250, 250, 250, 0.75);    scrollbar-width: none; gap: 24px; align-items: center; justify-content: flex-start;">
-                    <style>
-                        #chat-attachment-sheet ::-webkit-scrollbar { display: none; }
-
-                        .attachment-more-pay-entry,
-                        .attachment-more-link-entry,
-                        .attachment-more-contact-entry,
-                        .attachment-more-voice-entry,
-                        .attachment-more-listen-entry,
-                        .attachment-more-narration-entry,
-                        .attachment-more-dynamic-action-entry,
-                        .attachment-more-offline-entry {
-                            cursor: pointer;
-                            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
-                        }
-                        .attachment-more-regenerate-entry {
-                            cursor: pointer;
-                            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
-                        }
-                        .attachment-more-pay-entry:active,
-                        .attachment-more-link-entry:active,
-                        .attachment-more-contact-entry:active,
-                        .attachment-more-voice-entry:active,
-                        .attachment-more-listen-entry:active,
-                        .attachment-more-narration-entry:active,
-                        .attachment-more-dynamic-action-entry:active,
-                        .attachment-more-offline-entry:active {
-                            transform: scale(0.85);
-                            opacity: 0.7;
-                        }
-                        .attachment-more-regenerate-entry:active {
-                            transform: scale(0.85);
-                            opacity: 0.7;
-                        }
-
-                        .sheet-tab-item {
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                            gap: 3px;
-                            min-width: 44px;
-                            cursor: pointer;
-                            transition: transform 0.2s, opacity 0.2s;
-                            flex-shrink: 0;
-                        }
-                        .sheet-tab-icon {
-                            font-size: 24px;
-                            color: #8e8e93;
-                            transition: color 0.2s, transform 0.2s;
-                        }
-                        .sheet-tab-text {
-                            font-size: 10px;
-                            color: #8e8e93;
-                            font-weight: 500;
-                            transition: color 0.2s;
-                        }
-                        .sheet-tab-item.active .sheet-tab-icon {
-                            color: #007aff;
-                            transform: scale(1.1);
-                        }
-                        .sheet-tab-item.active .sheet-tab-text {
-                            color: #007aff;
-                            font-weight: 600;
-                        }
-                        .sheet-stickers-list {
-                            width: 100%;
-                            flex: 1;
-                            min-height: 0;
-                            overflow-y: auto;
-                            padding: 12px 14px 0;
-                            box-sizing: border-box;
-                        }
-                        .sheet-sticker-category-tabs {
-                            width: 100%;
-                            display: flex;
-                            gap: 8px;
-                            overflow-x: auto;
-                            padding: 0 14px 10px;
-                            box-sizing: border-box;
-                            border-bottom: 1px solid #f2f2f7;
-                            flex-shrink: 0;
-                        }
-                        .sheet-sticker-category-tab {
-                            height: 32px;
-                            border: none;
-                            border-radius: 999px;
-                            background: #f7f7fa;
-                            color: #636366;
-                            padding: 0 13px;
-                            font-size: 13px;
-                            font-weight: 700;
-                            white-space: nowrap;
-                            cursor: pointer;
-                            flex-shrink: 0;
-                        }
-                        .sheet-sticker-category-tab.active {
-                            background: #111;
-                            color: #fff;
-                        }
-                        .sheet-sticker-grid {
-                            display: grid;
-                            grid-template-columns: repeat(4, minmax(0, 1fr));
-                            gap: 10px;
-                        }
-                        .sheet-sticker-item {
-                            border: none;
-                            border-radius: 14px;
-                            background: #f7f7fa;
-                            padding: 7px;
-                            cursor: pointer;
-                            overflow: hidden;
-                            min-width: 0;
-                            display: flex;
-                            flex-direction: column;
-                            gap: 5px;
-                            align-items: stretch;
-                        }
-                        .sheet-sticker-item img {
-                            width: 100%;
-                            aspect-ratio: 1;
-                            object-fit: contain;
-                            display: block;
-                            min-height: 0;
-                        }
-                        .sheet-sticker-name {
-                            display: block;
-                            min-width: 0;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            white-space: nowrap;
-                            color: #3a3a3c;
-                            font-size: 11px;
-                            line-height: 1.2;
-                            text-align: center;
-                        }
-                    </style>
-                    
-                    <div class="sheet-tab-item active" data-tab="gallery">
-                        <i class="fas fa-image sheet-tab-icon"></i>
-                        <span class="sheet-tab-text">Gallery</span>
-                    </div>
-                    <div class="sheet-tab-item" data-tab="file">
-                        <i class="fas fa-user-friends sheet-tab-icon"></i>
-                        <span class="sheet-tab-text">Friends</span>
-                    </div>
-                    <div class="sheet-tab-item" data-tab="location">
-                        <i class="fas fa-map-marker-alt sheet-tab-icon"></i>
-                        <span class="sheet-tab-text">Location</span>
-                    </div>
-                    <div class="sheet-tab-item" data-tab="stickers">
-                        <i class="fas fa-smile sheet-tab-icon"></i>
-                        <span class="sheet-tab-text">Stickers</span>
-                    </div>
-                    <div class="sheet-tab-item" data-tab="more">
-                        <i class="fas fa-ellipsis-h sheet-tab-icon"></i>
-                        <span class="sheet-tab-text">More</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="contact-card-picker-overlay">
-                <div class="contact-card-picker-panel" role="dialog" aria-modal="true" aria-label="选择名片">
-                    <div class="contact-card-picker-header"><strong>选择名片</strong><span>选择一个 Char 或 NPC 发送给对方</span></div>
-                    <div class="contact-card-picker-list"></div>
-                    <div class="contact-card-picker-actions">
-                        <button type="button" class="contact-card-picker-cancel">取消</button>
-                        <button type="button" class="contact-card-picker-confirm" disabled>确定发送</button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Pay Transfer Overlay moved to attachmentSheet root so it floats centrally and isn't cropped -->
-            <div class="pay-transfer-form-overlay" style="position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.18); z-index: 20; padding: 20px;">
-                <div class="pay-transfer-form-card" style="width: 100%; max-width: 348px; border-radius: 30px; background: rgba(255,255,255,0.98);  padding: 18px 16px 16px; box-sizing: border-box;  ">
-                    <div class="pay-transfer-form-title" style="font-size: 18px; font-weight: 800; color: #111; text-align: center; margin-bottom: 10px;">Pay</div>
-                    <div class="pay-transfer-mode-tabs" style="display: flex; justify-content: center; gap: 22px; margin-bottom: 14px; border-bottom: 1px solid rgba(0,0,0,0.08);">
-                        <button type="button" class="pay-mode-tab active" data-pay-mode="transfer" style="position: relative; border: none; background: none; color: #000; font-size: 15px; font-weight: 600; padding: 0 2px 10px; cursor: pointer;">转账</button>
-                        <button type="button" class="pay-mode-tab" data-pay-mode="red_packet" style="position: relative; border: none; background: none; color: #8e8e93; font-size: 15px; font-weight: 600; padding: 0 2px 10px; cursor: pointer;">红包</button>
-                    </div>
-
-                    <div class="pay-mode-panel pay-mode-panel-transfer" style="display: block;">
-                        <div class="pay-form-field" style="margin-bottom: 10px;">
-                            <div style="font-size: 12px; color: #8e8e93; margin-bottom: 6px;">金额</div>
-                            <input type="number" class="pay-transfer-amount-input" placeholder="金额，例如 88.88" min="0" step="0.01" style="width: 100%; height: 42px; border: none; border-radius: 16px; background: #f7f7fa; padding: 0 14px; box-sizing: border-box; font-size: 14px; color: #111;">
-                        </div>
-                        <div class="pay-form-field" style="margin-bottom: 10px;">
-                            <div style="font-size: 12px; color: #8e8e93; margin-bottom: 6px;">描述</div>
-                            <input type="text" class="pay-transfer-desc-input" placeholder="描述，例如 奶茶钱 / 晚餐AA" style="width: 100%; height: 42px; border: none; border-radius: 16px; background: #f7f7fa; padding: 0 14px; box-sizing: border-box; font-size: 14px; color: #111;">
-                        </div>
-                        <div class="pay-form-field pay-group-recipient-field" style="display: none; margin-bottom: 6px; position: relative;">
-                            <div style="font-size: 12px; color: #8e8e93; margin-bottom: 8px;">转账给谁</div>
-                            <button type="button" class="pay-group-recipient-trigger" style="width: 100%; height: 48px; border: none; border-radius: 16px; background: #f7f7fa; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-                                <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                                    <div class="pay-group-recipient-avatar" style="width: 28px; height: 28px; border-radius: 50%; overflow: hidden; background: #e5e5ea; color: #8e8e93; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px;">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <div class="pay-group-recipient-label" style="font-size: 14px; color: #111; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">请选择群成员</div>
-                                </div>
-                                <i class="fas fa-chevron-down pay-group-recipient-arrow" style="font-size: 12px; color: #8e8e93;"></i>
-                            </button>
-                            <div class="pay-group-recipient-dropdown" style="display: none; margin-top: 8px; border-radius: 18px; background: #fff;  padding: 8px; max-height: 220px; overflow-y: auto;"></div>
-                        </div>
-                    </div>
-
-                    <div class="pay-mode-panel pay-mode-panel-red-packet" style="display: none;">
-                        <div class="pay-form-field" style="margin-bottom: 10px;">
-                            <div style="font-size: 12px; color: #8e8e93; margin-bottom: 6px;">红包个数</div>
-                            <input type="number" class="pay-red-packet-count-input" placeholder="例如 3" min="1" step="1" style="width: 100%; height: 42px; border: none; border-radius: 16px; background: #f7f7fa; padding: 0 14px; box-sizing: border-box; font-size: 14px; color: #111;">
-                        </div>
-                        <div class="pay-form-field" style="margin-bottom: 10px;">
-                            <div style="font-size: 12px; color: #8e8e93; margin-bottom: 6px;">总金额</div>
-                            <input type="number" class="pay-red-packet-amount-input" placeholder="总金额，例如 88.88" min="0" step="0.01" style="width: 100%; height: 42px; border: none; border-radius: 16px; background: #f7f7fa; padding: 0 14px; box-sizing: border-box; font-size: 14px; color: #111;">
-                        </div>
-                        <div class="pay-form-field" style="margin-bottom: 6px;">
-                            <div style="font-size: 12px; color: #8e8e93; margin-bottom: 6px;">描述</div>
-                            <input type="text" class="pay-red-packet-desc-input" placeholder="描述，例如 恭喜发财 / 今晚奶茶" style="width: 100%; height: 42px; border: none; border-radius: 16px; background: #f7f7fa; padding: 0 14px; box-sizing: border-box; font-size: 14px; color: #111;">
-                        </div>
-                    </div>
-
-                    <div class="pay-transfer-form-actions" style="display: flex; gap: 4px; margin-top: 16px;">
-                        <div class="pay-transfer-cancel-btn" style="flex: 1; height: 44px; border-radius: 16px; background: #f2f2f7; color: #666; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; cursor: pointer;">取消</div>
-                        <div class="pay-transfer-submit-btn" style="flex: 1; height: 44px; border-radius: 16px; background: #111; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; cursor: pointer;">发送</div>
-                    </div>
-                </div>
-            </div>
-            <div class="voice-message-form-overlay" style="position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.18); z-index: 21; padding: 20px;">
-                <div class="voice-message-form-card" style="width: 100%; max-width: 348px; border-radius: 30px; background: rgba(255,255,255,0.98);  padding: 18px 16px 16px; box-sizing: border-box;  ">
-                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; font-size:18px; font-weight:800; color:#111; text-align:center; margin-bottom:12px;">
-                        <i class="fas fa-microphone-alt" style="color:#111;"></i>
-                        <span>Voice</span>
-                    </div>
-                    <textarea class="voice-message-transcript-input" placeholder="输入语音内容..." style="width:100%; min-height:112px; max-height:180px; resize:none; border:none; outline:none; border-radius:20px; background:#f7f7fa; padding:13px 14px; box-sizing:border-box; font-size:15px; line-height:1.45; color:#111; font-family:inherit;"></textarea>
-                    <div style="font-size:12px; color:#8e8e93; line-height:1.45; margin:10px 2px 0;">将以语音气泡发送，并把这段文字作为转文字内容给 AI。</div>
-                    <div class="voice-message-form-actions" style="display:flex; gap:8px; margin-top:16px;">
-                        <div class="voice-message-cancel-btn" style="flex:1; height:44px; border-radius:16px; background:#f2f2f7; color:#666; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; cursor:pointer;">取消</div>
-                        <div class="voice-message-submit-btn" style="flex:1; height:44px; border-radius:16px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; cursor:pointer;">发送</div>
-                    </div>
-                </div>
-            </div>
-            <div class="narration-form-overlay" style="position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.18); z-index: 22; padding: 20px;">
-                <div class="narration-form-card" style="width: 100%; max-width: 348px; border-radius: 30px; background: rgba(255,255,255,0.98); padding: 18px 16px 16px; box-sizing: border-box;">
-                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; font-size:18px; font-weight:800; color:#111; text-align:center; margin-bottom:12px;">
-                        <i class="fas fa-quote-left" style="color:#5856d6;"></i>
-                        <span>旁白</span>
-                    </div>
-                    <textarea class="narration-message-input" placeholder="输入旁白，例如：窗外雨声慢慢停了" style="width:100%; min-height:120px; max-height:200px; resize:none; border:none; outline:none; border-radius:20px; background:#f7f7fa; padding:13px 14px; box-sizing:border-box; font-size:15px; line-height:1.45; color:#111; font-family:inherit;"></textarea>
-                    <div style="font-size:12px; color:#8e8e93; line-height:1.45; margin:10px 2px 0;">会作为居中事件进入聊天上下文，不会自动触发 AI。</div>
-                    <div class="narration-form-actions" style="display:flex; gap:8px; margin-top:16px;">
-                        <div class="narration-cancel-btn" style="flex:1; height:44px; border-radius:16px; background:#f2f2f7; color:#666; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; cursor:pointer;">取消</div>
-                        <div class="narration-submit-btn" style="flex:1; height:44px; border-radius:16px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; cursor:pointer;">发送</div>
-                    </div>
-                </div>
-            </div>
-            <div class="regenerate-form-overlay" style="position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.18); z-index: 23; padding: 20px;">
-                <div class="regenerate-form-card" style="width: 100%; max-width: 348px; border-radius: 30px; background: rgba(255,255,255,0.98); padding: 18px 16px 16px; box-sizing: border-box;">
-                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; font-size:18px; font-weight:800; color:#111; text-align:center; margin-bottom:12px;">
-                        <i class="fas fa-rotate-left" style="color:#8e8e93;"></i>
-                        <span>重回上一轮回复</span>
-                    </div>
-                    <textarea class="regenerate-requirement-input" placeholder="可以写为什么重回，或希望 TA 怎样回复。例如：角色ooc了，注意人设" style="width:100%; min-height:120px; max-height:200px; resize:none; border:none; outline:none; border-radius:20px; background:#f7f7fa; padding:13px 14px; box-sizing:border-box; font-size:15px; line-height:1.45; color:#111; font-family:inherit;"></textarea>
-                    <div style="font-size:12px; color:#8e8e93; line-height:1.45; margin:10px 2px 0;">参考：按上方要求重回生成；重回：不带要求直接重回。</div>
-                    <div class="regenerate-form-actions" style="display:flex; gap:8px; margin-top:16px;">
-                        <div class="regenerate-reference-btn" style="flex:1; height:44px; border-radius:16px; background:#8e8e93; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; cursor:pointer;">参考</div>
-                        <div class="regenerate-direct-btn" style="flex:1; height:44px; border-radius:16px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; cursor:pointer;">重回</div>
-                    </div>
-                </div>
-            </div>
-        `;
+        attachmentSheet_2.innerHTML =
+            '\n            <div class="sheet-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); opacity: 0; transition: opacity 0.3s;"></div>\n            <div class="sheet-content" style="position: relative; height: 50%; width: 100%; background: #fff; border-radius: 24px 24px 0 0; display: flex; flex-direction: column; overflow: hidden; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); ">\n                <!-- Header -->\n                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: rgba(255,255,255,0.95);   z-index: 10;">\n                    <div class="close-sheet-btn" style="width: 32px; height: 32px; background: #f2f2f7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; color: #000;"><i class="fas fa-times"></i></div>\n                    <div style="font-weight: 600; font-size: 18px; color: #000;">Recents <i class="fas fa-chevron-down" style="font-size: 12px; color: #8e8e93; margin-left: 4px;"></i></div>\n                    <div style="width: 32px;"></div>\n                </div>\n                \n                <!-- Views Container -->\n                <div style="flex: 1; position: relative; overflow: hidden; background: #fff;">\n                    <!-- Gallery View -->\n                    <div class="sheet-view view-gallery" style="position: absolute; inset: 0; overflow-y: auto; padding: 14px 16px 120px; display: flex; flex-direction: column; gap: 10px; align-items: stretch; scrollbar-width: none;">\n                        <div class="grid-item album-image-entry" style="min-height: 68px; box-sizing: border-box; background: #f7f7fa; border-radius: 16px; border: 1px solid #ececf1; display: flex; align-items: center; gap: 13px; padding: 12px 14px; cursor: pointer;">\n                            <div style="width: 42px; height: 42px; border-radius: 13px; background: rgba(52,199,89,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fas fa-images" style="font-size: 20px; color: #34c759;"></i></div>\n                            <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;"><span style="font-size: 15px; color: #111; font-weight: 750;">相册图片</span><span style="font-size: 12px; color: #8e8e93;">上传图片或自定义图片内容</span></div>\n                            <i class="fas fa-chevron-right" style="font-size: 13px; color: #c7c7cc; flex-shrink: 0;"></i>\n                        </div>\n                        <div class="grid-item generated-image-entry" style="min-height: 68px; box-sizing: border-box; background: #f7f7fa; border-radius: 16px; border: 1px solid #ececf1; display: flex; align-items: center; gap: 13px; padding: 12px 14px; cursor: pointer;">\n                            <div style="width: 42px; height: 42px; border-radius: 13px; background: rgba(175,82,222,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fas fa-wand-magic-sparkles" style="font-size: 20px; color: #af52de;"></i></div>\n                            <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;"><span style="font-size: 15px; color: #111; font-weight: 750;">生成图片</span><span style="font-size: 12px; color: #8e8e93;">输入提示词生成</span></div>\n                            <i class="fas fa-chevron-right" style="font-size: 13px; color: #c7c7cc; flex-shrink: 0;"></i>\n                        </div>\n                    </div>\n\n                    <!-- Linked Friends View -->\n                    <div class="sheet-view view-file" style="position: absolute; inset: 0; display: none; background: #fff; padding: 14px 14px 112px; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch;">\n                        <div class="linked-accounts-panel" style="width: 100%; display: flex; flex-direction: column; gap: 12px;">\n                            <div class="linked-accounts-empty" style="display:none; text-align:center; color:#8e8e93; font-size:13px; line-height:1.45; padding:42px 18px;"></div>\n                            <div class="linked-accounts-controls" style="display:flex; flex-direction:column; gap:10px;">\n                                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-radius:18px; background:#f7f7fa;">\n                                    <div style="min-width:0;">\n                                        <div style="font-size:15px; font-weight:800; color:#111;">是否开启关联好友</div>\n                                        <div class="linked-accounts-status" style="font-size:12px; color:#8e8e93; margin-top:2px;">开启后会自动生成好友会话</div>\n                                    </div>\n                                    <label class="toggle-switch" style="flex-shrink:0;">\n                                        <input type="checkbox" class="linked-accounts-toggle">\n                                        <span class="slider"></span>\n                                    </label>\n                                </div>\n                                <div class="linked-accounts-interval-row" style="display:none; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-radius:18px; background:#f7f7fa;">\n                                    <div>\n                                        <div style="font-size:15px; font-weight:700; color:#111;">多少秒自动调用一次 API</div>\n                                        <div style="font-size:12px; color:#8e8e93; margin-top:2px;">开启后按此间隔自动生成消息</div>\n                                    </div>\n                                    <input type="number" class="linked-accounts-interval-input" min="5" step="1" value="60" style="width:82px; height:34px; border:1px solid #e5e5ea; border-radius:12px; background:#fff; color:#111; font-size:15px; text-align:center; outline:none;">\n                                </div>\n                            </div>\n                            <div class="linked-accounts-list" style="display:flex; flex-direction:column; gap:10px;"></div>\n                        </div>\n                    </div>\n\n                    <!-- Location opens a dedicated composer overlay. -->\n                    <div class="sheet-view view-location" style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: #fff; padding-bottom: 60px;">\n                        <i class="fas fa-map-marked-alt" style="font-size: 64px; color: #5d5d5d; margin-bottom: 16px;"></i>\n                        <div style="font-size: 16px; color: #242424; font-weight: 700;">发送虚拟定位</div>\n                        <div style="font-size: 13px; color: #7b7b7b; margin-top: 5px;">填写地点名和详细地址</div>\n                        <button type="button" class="location-open-composer-btn" style="height: 44px; min-width: 148px; margin-top: 20px; border: none; border-radius: 14px; background: #292929; color: #f7f7f7; font-size: 15px; font-weight: 800; cursor: pointer;">发送定位</button>\n                    </div>\n\n                    <!-- Stickers View -->\n                    <div class="sheet-view view-stickers" style="position: absolute; inset: 0; display: none; flex-direction: column; background: #fff; padding: 12px 0 112px; overflow: hidden;">\n                        <div class="sheet-sticker-category-tabs"></div>\n                        <div class="sheet-stickers-list"></div>\n                    </div>\n\n                    <!-- More View -->\n                    <div class="sheet-view view-more" style="position: absolute; inset: 0; display: none; flex-direction: column; align-items: flex-start; justify-content: flex-start; overflow-y: auto; background: #fff; padding: 20px 18px 120px; gap: 14px;">\n                        <div class="attachment-more-icon-grid">\n                            <div class="attachment-more-regenerate-entry">\n                                <div class="attachment-more-regenerate-icon">\n                                    <i class="fas fa-rotate-left"></i>\n                                </div>\n                                <div class="attachment-more-regenerate-label">重回</div>\n                            </div>\n                            <div class="attachment-more-pay-entry">\n                                <div class="attachment-more-pay-icon">\n                                    <i class="fas fa-wallet"></i>\n                                </div>\n                                <div class="attachment-more-pay-label">Pay</div>\n                            </div>\n                            <div class="attachment-more-contact-entry" style="display:none;">\n                                <div class="attachment-more-contact-icon">\n                                    <i class="fas fa-address-card"></i>\n                                </div>\n                                <div class="attachment-more-contact-label">名片</div>\n                            </div>\n                            <div class="attachment-more-offline-entry" id="open-offline-chats-btn">\n                                <div class="attachment-more-offline-icon">\n                                    <i class="fas fa-people-arrows"></i>\n                                </div>\n                                <div class="attachment-more-offline-label">线下</div>\n                            </div>\n                            <div class="attachment-more-voice-entry">\n                                <div class="attachment-more-voice-icon">\n                                    <i class="fas fa-microphone-alt"></i>\n                                </div>\n                                <div class="attachment-more-voice-label">Voice</div>\n                            </div>\n                            <div class="attachment-more-listen-entry" style="display:none;">\n                                <div class="attachment-more-listen-icon">\n                                    <i class="fas fa-headphones"></i>\n                                </div>\n                                <div class="attachment-more-listen-label">一起听</div>\n                            </div>\n                            <div class="attachment-more-link-entry">\n                                <div class="attachment-more-link-icon">\n                                    <i class="fas fa-link"></i>\n                                </div>\n                                <div class="attachment-more-link-label">链接</div>\n                            </div>\n                            <div class="attachment-more-narration-entry">\n                                <div class="attachment-more-narration-icon">\n                                    <i class="fas fa-quote-left"></i>\n                                </div>\n                                <div class="attachment-more-narration-label">旁白</div>\n                            </div>\n                            <div class="attachment-more-dynamic-action-entry">\n                                <div class="attachment-more-dynamic-action-icon">\n                                    <i class="fas fa-running"></i>\n                                </div>\n                                <div class="attachment-more-dynamic-action-label">动描</div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n\n                <!-- Bottom Tabs (Floating Pill, Left Aligned, Tap to Select) -->\n                <div class="sheet-tabs-container" style="position: absolute; bottom: 16px; left: 20px; right: 20px; border-radius: 40px; display: flex; padding: 10px 16px; overflow-x: auto; background: rgba(250, 250, 250, 0.75);    scrollbar-width: none; gap: 24px; align-items: center; justify-content: flex-start;">\n                    <style>\n                        #chat-attachment-sheet ::-webkit-scrollbar { display: none; }\n\n                        .attachment-more-pay-entry,\n                        .attachment-more-link-entry,\n                        .attachment-more-contact-entry,\n                        .attachment-more-voice-entry,\n                        .attachment-more-listen-entry,\n                        .attachment-more-narration-entry,\n                        .attachment-more-dynamic-action-entry,\n                        .attachment-more-offline-entry {\n                            cursor: pointer;\n                            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;\n                        }\n                        .attachment-more-regenerate-entry {\n                            cursor: pointer;\n                            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;\n                        }\n                        .attachment-more-pay-entry:active,\n                        .attachment-more-link-entry:active,\n                        .attachment-more-contact-entry:active,\n                        .attachment-more-voice-entry:active,\n                        .attachment-more-listen-entry:active,\n                        .attachment-more-narration-entry:active,\n                        .attachment-more-dynamic-action-entry:active,\n                        .attachment-more-offline-entry:active {\n                            transform: scale(0.85);\n                            opacity: 0.7;\n                        }\n                        .attachment-more-regenerate-entry:active {\n                            transform: scale(0.85);\n                            opacity: 0.7;\n                        }\n\n                        .sheet-tab-item {\n                            display: flex;\n                            flex-direction: column;\n                            align-items: center;\n                            gap: 3px;\n                            min-width: 44px;\n                            cursor: pointer;\n                            transition: transform 0.2s, opacity 0.2s;\n                            flex-shrink: 0;\n                        }\n                        .sheet-tab-icon {\n                            font-size: 24px;\n                            color: #8e8e93;\n                            transition: color 0.2s, transform 0.2s;\n                        }\n                        .sheet-tab-text {\n                            font-size: 10px;\n                            color: #8e8e93;\n                            font-weight: 500;\n                            transition: color 0.2s;\n                        }\n                        .sheet-tab-item.active .sheet-tab-icon {\n                            color: #007aff;\n                            transform: scale(1.1);\n                        }\n                        .sheet-tab-item.active .sheet-tab-text {\n                            color: #007aff;\n                            font-weight: 600;\n                        }\n                        .sheet-stickers-list {\n                            width: 100%;\n                            flex: 1;\n                            min-height: 0;\n                            overflow-y: auto;\n                            padding: 12px 14px 0;\n                            box-sizing: border-box;\n                        }\n                        .sheet-sticker-category-tabs {\n                            width: 100%;\n                            display: flex;\n                            gap: 8px;\n                            overflow-x: auto;\n                            padding: 0 14px 10px;\n                            box-sizing: border-box;\n                            border-bottom: 1px solid #f2f2f7;\n                            flex-shrink: 0;\n                        }\n                        .sheet-sticker-category-tab {\n                            height: 32px;\n                            border: none;\n                            border-radius: 999px;\n                            background: #f7f7fa;\n                            color: #636366;\n                            padding: 0 13px;\n                            font-size: 13px;\n                            font-weight: 700;\n                            white-space: nowrap;\n                            cursor: pointer;\n                            flex-shrink: 0;\n                        }\n                        .sheet-sticker-category-tab.active {\n                            background: #111;\n                            color: #fff;\n                        }\n                        .sheet-sticker-grid {\n                            display: grid;\n                            grid-template-columns: repeat(4, minmax(0, 1fr));\n                            gap: 10px;\n                        }\n                        .sheet-sticker-item {\n                            border: none;\n                            border-radius: 14px;\n                            background: #f7f7fa;\n                            padding: 7px;\n                            cursor: pointer;\n                            overflow: hidden;\n                            min-width: 0;\n                            display: flex;\n                            flex-direction: column;\n                            gap: 5px;\n                            align-items: stretch;\n                        }\n                        .sheet-sticker-item img {\n                            width: 100%;\n                            aspect-ratio: 1;\n                            object-fit: contain;\n                            display: block;\n                            min-height: 0;\n                        }\n                        .sheet-sticker-name {\n                            display: block;\n                            min-width: 0;\n                            overflow: hidden;\n                            text-overflow: ellipsis;\n                            white-space: nowrap;\n                            color: #3a3a3c;\n                            font-size: 11px;\n                            line-height: 1.2;\n                            text-align: center;\n                        }\n                    </style>\n                    \n                    <div class="sheet-tab-item active" data-tab="gallery">\n                        <i class="fas fa-image sheet-tab-icon"></i>\n                        <span class="sheet-tab-text">Gallery</span>\n                    </div>\n                    <div class="sheet-tab-item" data-tab="file">\n                        <i class="fas fa-user-friends sheet-tab-icon"></i>\n                        <span class="sheet-tab-text">Friends</span>\n                    </div>\n                    <div class="sheet-tab-item" data-tab="location">\n                        <i class="fas fa-map-marker-alt sheet-tab-icon"></i>\n                        <span class="sheet-tab-text">Location</span>\n                    </div>\n                    <div class="sheet-tab-item" data-tab="stickers">\n                        <i class="fas fa-smile sheet-tab-icon"></i>\n                        <span class="sheet-tab-text">Stickers</span>\n                    </div>\n                    <div class="sheet-tab-item" data-tab="more">\n                        <i class="fas fa-ellipsis-h sheet-tab-icon"></i>\n                        <span class="sheet-tab-text">More</span>\n                    </div>\n                </div>\n            </div>\n\n            <div class="contact-card-picker-overlay">\n                <div class="contact-card-picker-panel" role="dialog" aria-modal="true" aria-label="选择名片">\n                    <div class="contact-card-picker-header"><strong>选择名片</strong><span>选择一个 Char 或 NPC 发送给对方</span></div>\n                    <div class="contact-card-picker-list"></div>\n                    <div class="contact-card-picker-actions">\n                        <button type="button" class="contact-card-picker-cancel">取消</button>\n                        <button type="button" class="contact-card-picker-confirm" disabled>确定发送</button>\n                    </div>\n                </div>\n            </div>\n            \n            <!-- Pay Transfer Overlay moved to attachmentSheet root so it floats centrally and isn\'t cropped -->\n            <div class="pay-transfer-form-overlay" style="position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.18); z-index: 20; padding: 20px;">\n                <div class="pay-transfer-form-card" style="width: 100%; max-width: 348px; border-radius: 30px; background: rgba(255,255,255,0.98);  padding: 18px 16px 16px; box-sizing: border-box;  ">\n                    <div class="pay-transfer-form-title" style="font-size: 18px; font-weight: 800; color: #111; text-align: center; margin-bottom: 10px;">Pay</div>\n                    <div class="pay-transfer-mode-tabs" style="display: flex; justify-content: center; gap: 22px; margin-bottom: 14px; border-bottom: 1px solid rgba(0,0,0,0.08);">\n                        <button type="button" class="pay-mode-tab active" data-pay-mode="transfer" style="position: relative; border: none; background: none; color: #000; font-size: 15px; font-weight: 600; padding: 0 2px 10px; cursor: pointer;">转账</button>\n                        <button type="button" class="pay-mode-tab" data-pay-mode="red_packet" style="position: relative; border: none; background: none; color: #8e8e93; font-size: 15px; font-weight: 600; padding: 0 2px 10px; cursor: pointer;">红包</button>\n                    </div>\n\n                    <div class="pay-mode-panel pay-mode-panel-transfer" style="display: block;">\n                        <div class="pay-form-field" style="margin-bottom: 10px;">\n                            <div style="font-size: 12px; color: #8e8e93; margin-bottom: 6px;">金额</div>\n                            <input type="number" class="pay-transfer-amount-input" placeholder="金额，例如 88.88" min="0" step="0.01" style="width: 100%; height: 42px; border: none; border-radius: 16px; background: #f7f7fa; padding: 0 14px; box-sizing: border-box; font-size: 14px; color: #111;">\n                        </div>\n                        <div class="pay-form-field" style="margin-bottom: 10px;">\n                            <div style="font-size: 12px; color: #8e8e93; margin-bottom: 6px;">描述</div>\n                            <input type="text" class="pay-transfer-desc-input" placeholder="描述，例如 奶茶钱 / 晚餐AA" style="width: 100%; height: 42px; border: none; border-radius: 16px; background: #f7f7fa; padding: 0 14px; box-sizing: border-box; font-size: 14px; color: #111;">\n                        </div>\n                        <div class="pay-form-field pay-group-recipient-field" style="display: none; margin-bottom: 6px; position: relative;">\n                            <div style="font-size: 12px; color: #8e8e93; margin-bottom: 8px;">转账给谁</div>\n                            <button type="button" class="pay-group-recipient-trigger" style="width: 100%; height: 48px; border: none; border-radius: 16px; background: #f7f7fa; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">\n                                <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">\n                                    <div class="pay-group-recipient-avatar" style="width: 28px; height: 28px; border-radius: 50%; overflow: hidden; background: #e5e5ea; color: #8e8e93; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px;">\n                                        <i class="fas fa-user"></i>\n                                    </div>\n                                    <div class="pay-group-recipient-label" style="font-size: 14px; color: #111; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">请选择群成员</div>\n                                </div>\n                                <i class="fas fa-chevron-down pay-group-recipient-arrow" style="font-size: 12px; color: #8e8e93;"></i>\n                            </button>\n                            <div class="pay-group-recipient-dropdown" style="display: none; margin-top: 8px; border-radius: 18px; background: #fff;  padding: 8px; max-height: 220px; overflow-y: auto;"></div>\n                        </div>\n                    </div>\n\n                    <div class="pay-mode-panel pay-mode-panel-red-packet" style="display: none;">\n                        <div class="pay-form-field" style="margin-bottom: 10px;">\n                            <div style="font-size: 12px; color: #8e8e93; margin-bottom: 6px;">红包个数</div>\n                            <input type="number" class="pay-red-packet-count-input" placeholder="例如 3" min="1" step="1" style="width: 100%; height: 42px; border: none; border-radius: 16px; background: #f7f7fa; padding: 0 14px; box-sizing: border-box; font-size: 14px; color: #111;">\n                        </div>\n                        <div class="pay-form-field" style="margin-bottom: 10px;">\n                            <div style="font-size: 12px; color: #8e8e93; margin-bottom: 6px;">总金额</div>\n                            <input type="number" class="pay-red-packet-amount-input" placeholder="总金额，例如 88.88" min="0" step="0.01" style="width: 100%; height: 42px; border: none; border-radius: 16px; background: #f7f7fa; padding: 0 14px; box-sizing: border-box; font-size: 14px; color: #111;">\n                        </div>\n                        <div class="pay-form-field" style="margin-bottom: 6px;">\n                            <div style="font-size: 12px; color: #8e8e93; margin-bottom: 6px;">描述</div>\n                            <input type="text" class="pay-red-packet-desc-input" placeholder="描述，例如 恭喜发财 / 今晚奶茶" style="width: 100%; height: 42px; border: none; border-radius: 16px; background: #f7f7fa; padding: 0 14px; box-sizing: border-box; font-size: 14px; color: #111;">\n                        </div>\n                    </div>\n\n                    <div class="pay-transfer-form-actions" style="display: flex; gap: 4px; margin-top: 16px;">\n                        <div class="pay-transfer-cancel-btn" style="flex: 1; height: 44px; border-radius: 16px; background: #f2f2f7; color: #666; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; cursor: pointer;">取消</div>\n                        <div class="pay-transfer-submit-btn" style="flex: 1; height: 44px; border-radius: 16px; background: #111; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; cursor: pointer;">发送</div>\n                    </div>\n                </div>\n            </div>\n            <div class="voice-message-form-overlay" style="position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.18); z-index: 21; padding: 20px;">\n                <div class="voice-message-form-card" style="width: 100%; max-width: 348px; border-radius: 30px; background: rgba(255,255,255,0.98);  padding: 18px 16px 16px; box-sizing: border-box;  ">\n                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; font-size:18px; font-weight:800; color:#111; text-align:center; margin-bottom:12px;">\n                        <i class="fas fa-microphone-alt" style="color:#111;"></i>\n                        <span>Voice</span>\n                    </div>\n                    <textarea class="voice-message-transcript-input" placeholder="输入语音内容..." style="width:100%; min-height:112px; max-height:180px; resize:none; border:none; outline:none; border-radius:20px; background:#f7f7fa; padding:13px 14px; box-sizing:border-box; font-size:15px; line-height:1.45; color:#111; font-family:inherit;"></textarea>\n                    <div style="font-size:12px; color:#8e8e93; line-height:1.45; margin:10px 2px 0;">将以语音气泡发送，并把这段文字作为转文字内容给 AI。</div>\n                    <div class="voice-message-form-actions" style="display:flex; gap:8px; margin-top:16px;">\n                        <div class="voice-message-cancel-btn" style="flex:1; height:44px; border-radius:16px; background:#f2f2f7; color:#666; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; cursor:pointer;">取消</div>\n                        <div class="voice-message-submit-btn" style="flex:1; height:44px; border-radius:16px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; cursor:pointer;">发送</div>\n                    </div>\n                </div>\n            </div>\n            <div class="narration-form-overlay" style="position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.18); z-index: 22; padding: 20px;">\n                <div class="narration-form-card" style="width: 100%; max-width: 348px; border-radius: 30px; background: rgba(255,255,255,0.98); padding: 18px 16px 16px; box-sizing: border-box;">\n                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; font-size:18px; font-weight:800; color:#111; text-align:center; margin-bottom:12px;">\n                        <i class="fas fa-quote-left" style="color:#5856d6;"></i>\n                        <span>旁白</span>\n                    </div>\n                    <textarea class="narration-message-input" placeholder="输入旁白，例如：窗外雨声慢慢停了" style="width:100%; min-height:120px; max-height:200px; resize:none; border:none; outline:none; border-radius:20px; background:#f7f7fa; padding:13px 14px; box-sizing:border-box; font-size:15px; line-height:1.45; color:#111; font-family:inherit;"></textarea>\n                    <div style="font-size:12px; color:#8e8e93; line-height:1.45; margin:10px 2px 0;">会作为居中事件进入聊天上下文，不会自动触发 AI。</div>\n                    <div class="narration-form-actions" style="display:flex; gap:8px; margin-top:16px;">\n                        <div class="narration-cancel-btn" style="flex:1; height:44px; border-radius:16px; background:#f2f2f7; color:#666; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; cursor:pointer;">取消</div>\n                        <div class="narration-submit-btn" style="flex:1; height:44px; border-radius:16px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; cursor:pointer;">发送</div>\n                    </div>\n                </div>\n            </div>\n            <div class="regenerate-form-overlay" style="position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.18); z-index: 23; padding: 20px;">\n                <div class="regenerate-form-card" style="width: 100%; max-width: 348px; border-radius: 30px; background: rgba(255,255,255,0.98); padding: 18px 16px 16px; box-sizing: border-box;">\n                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; font-size:18px; font-weight:800; color:#111; text-align:center; margin-bottom:12px;">\n                        <i class="fas fa-rotate-left" style="color:#8e8e93;"></i>\n                        <span>重回上一轮回复</span>\n                    </div>\n                    <textarea class="regenerate-requirement-input" placeholder="可以写为什么重回，或希望 TA 怎样回复。例如：角色ooc了，注意人设" style="width:100%; min-height:120px; max-height:200px; resize:none; border:none; outline:none; border-radius:20px; background:#f7f7fa; padding:13px 14px; box-sizing:border-box; font-size:15px; line-height:1.45; color:#111; font-family:inherit;"></textarea>\n                    <div style="font-size:12px; color:#8e8e93; line-height:1.45; margin:10px 2px 0;">参考：按上方要求重回生成；重回：不带要求直接重回。</div>\n                    <div class="regenerate-form-actions" style="display:flex; gap:8px; margin-top:16px;">\n                        <div class="regenerate-reference-btn" style="flex:1; height:44px; border-radius:16px; background:#8e8e93; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; cursor:pointer;">参考</div>\n                        <div class="regenerate-direct-btn" style="flex:1; height:44px; border-radius:16px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; cursor:pointer;">重回</div>\n                    </div>\n                </div>\n            </div>\n        ';
         page.appendChild(attachmentSheet_2);
         const sheetOverlayElement = attachmentSheet_2.querySelector('.sheet-overlay');
         const content_4 = attachmentSheet_2.querySelector('.sheet-content');
@@ -919,31 +524,33 @@ The prompt must describe the same current moment with characters, action, settin
         const payEntry = attachmentSheet_2.querySelector('.attachment-more-pay-entry');
         const linkEntry = attachmentSheet_2.querySelector('.attachment-more-link-entry');
         const attachmentMoreContactEntryElement = attachmentSheet_2.querySelector(
-                '.attachment-more-contact-entry',
-            );
-        const regenerateEntry = attachmentSheet_2.querySelector('.attachment-more-regenerate-entry');
+            '.attachment-more-contact-entry',
+        );
+        const regenerateEntry = attachmentSheet_2.querySelector(
+            '.attachment-more-regenerate-entry',
+        );
         const voiceEntry = attachmentSheet_2.querySelector('.attachment-more-voice-entry');
         const attachmentMoreListenEntryElement = attachmentSheet_2.querySelector(
-                '.attachment-more-listen-entry',
-            );
+            '.attachment-more-listen-entry',
+        );
         const narrationEntry = attachmentSheet_2.querySelector('.attachment-more-narration-entry');
         const attachmentMoreDynamicActionEntryElement = attachmentSheet_2.querySelector(
-                '.attachment-more-dynamic-action-entry',
-            );
+            '.attachment-more-dynamic-action-entry',
+        );
         const attachmentMoreDynamicActionLabelElement = attachmentSheet_2.querySelector(
-                '.attachment-more-dynamic-action-label',
-            );
+            '.attachment-more-dynamic-action-label',
+        );
         const attachmentMoreOfflineEntryElement = attachmentSheet_2.querySelector(
-                '.attachment-more-offline-entry',
-            );
+            '.attachment-more-offline-entry',
+        );
         const attachmentMoreOfflineLabelElement = attachmentSheet_2.querySelector(
-                '.attachment-more-offline-label',
-            );
+            '.attachment-more-offline-label',
+        );
         const payFormOverlay = attachmentSheet_2.querySelector('.pay-transfer-form-overlay');
         const voiceFormOverlay = attachmentSheet_2.querySelector('.voice-message-form-overlay');
         const voiceTranscriptInput = attachmentSheet_2.querySelector(
-                '.voice-message-transcript-input',
-            );
+            '.voice-message-transcript-input',
+        );
         const voiceCancelBtn = attachmentSheet_2.querySelector('.voice-message-cancel-btn');
         const voiceSubmitBtn = attachmentSheet_2.querySelector('.voice-message-submit-btn');
         const narrationFormOverlay = attachmentSheet_2.querySelector('.narration-form-overlay');
@@ -952,8 +559,8 @@ The prompt must describe the same current moment with characters, action, settin
         const narrationSubmitBtn = attachmentSheet_2.querySelector('.narration-submit-btn');
         const regenerateFormOverlay = attachmentSheet_2.querySelector('.regenerate-form-overlay');
         const regenerateRequirementInput = attachmentSheet_2.querySelector(
-                '.regenerate-requirement-input',
-            );
+            '.regenerate-requirement-input',
+        );
         const regenerateReferenceBtn = attachmentSheet_2.querySelector('.regenerate-reference-btn');
         const regenerateDirectBtn = attachmentSheet_2.querySelector('.regenerate-direct-btn');
         const stickersList = attachmentSheet_2.querySelector('.sheet-stickers-list');
@@ -970,33 +577,37 @@ The prompt must describe the same current moment with characters, action, settin
         const payRecipientAvatar = attachmentSheet_2.querySelector('.pay-group-recipient-avatar');
         const payRecipientLabel = attachmentSheet_2.querySelector('.pay-group-recipient-label');
         const payRecipientArrow = attachmentSheet_2.querySelector('.pay-group-recipient-arrow');
-        const payRecipientDropdown = attachmentSheet_2.querySelector('.pay-group-recipient-dropdown');
-        const payRedPacketCountInput = attachmentSheet_2.querySelector('.pay-red-packet-count-input');
+        const payRecipientDropdown = attachmentSheet_2.querySelector(
+            '.pay-group-recipient-dropdown',
+        );
+        const payRedPacketCountInput = attachmentSheet_2.querySelector(
+            '.pay-red-packet-count-input',
+        );
         const payRedPacketAmountInput = attachmentSheet_2.querySelector(
-                '.pay-red-packet-amount-input',
-            );
+            '.pay-red-packet-amount-input',
+        );
         const payRedPacketDescInput = attachmentSheet_2.querySelector('.pay-red-packet-desc-input');
         const linkedAccountsEmpty = attachmentSheet_2.querySelector('.linked-accounts-empty');
         const linkedAccountsControls = attachmentSheet_2.querySelector('.linked-accounts-controls');
         const linkedAccountsToggle = attachmentSheet_2.querySelector('.linked-accounts-toggle');
         const linkedAccountsIntervalRow = attachmentSheet_2.querySelector(
-                '.linked-accounts-interval-row',
-            );
+            '.linked-accounts-interval-row',
+        );
         const linkedAccountsIntervalInput = attachmentSheet_2.querySelector(
-                '.linked-accounts-interval-input',
-            );
+            '.linked-accounts-interval-input',
+        );
         const linkedAccountsStatus = attachmentSheet_2.querySelector('.linked-accounts-status');
         const linkedAccountsList = attachmentSheet_2.querySelector('.linked-accounts-list');
         const summarySheet = attachmentSheet_2.querySelector('.contact-card-picker-overlay');
         const contactCardPickerListElement = attachmentSheet_2.querySelector(
-                '.contact-card-picker-list',
-            );
+            '.contact-card-picker-list',
+        );
         const contactCardPickerCancelElement = attachmentSheet_2.querySelector(
-                '.contact-card-picker-cancel',
-            );
+            '.contact-card-picker-cancel',
+        );
         const contactCardPickerConfirmElement = attachmentSheet_2.querySelector(
-                '.contact-card-picker-confirm',
-            );
+            '.contact-card-picker-confirm',
+        );
         const sheetViews = attachmentSheet_2.querySelectorAll('.sheet-view');
         let currentPayMode = 'transfer';
         let selectedRecipientId = null;
@@ -5329,20 +4940,18 @@ The prompt must describe the same current moment with characters, action, settin
         };
         const createStreamingBubble = (content_9 = '', isUser_2 = false, options_7 = {}) => {
             const message_22 = {
-                        id:
-                            options_7.id ||
-                            createOfflineChatId(isUser_2 ? 'offline-user' : 'offline-ai'),
-                        role: isUser_2 ? 'user' : 'assistant',
-                        content: content_9,
-                        reasoning: options_7.reasoning || '',
-                        timestamp: options_7.timestamp || Date.now(),
-                        tokens: options_7.tokens || 0,
-                    };
+                id: options_7.id || createOfflineChatId(isUser_2 ? 'offline-user' : 'offline-ai'),
+                role: isUser_2 ? 'user' : 'assistant',
+                content: content_9,
+                reasoning: options_7.reasoning || '',
+                timestamp: options_7.timestamp || Date.now(),
+                tokens: options_7.tokens || 0,
+            };
             const bubbleDiv_4 = renderOfflineChatBubble(message_22, isUser_2, {
-                        floor: options_7.floor,
-                        depth: options_7.depth,
-                        actionsDisabled: true,
-                    });
+                floor: options_7.floor,
+                depth: options_7.depth,
+                actionsDisabled: true,
+            });
             if (!bubbleDiv_4) return null;
             let currentContent = content_9;
             let currentNativeReasoning = String(options_7.reasoning || '');
@@ -5361,38 +4970,34 @@ The prompt must describe the same current moment with characters, action, settin
                     };
             const renderStreamingState = () => {
                 const currentParsed = offlineReasoning
-                            ? offlineReasoning.normalizeResponse(
-                                  currentContent,
-                                  currentNativeReasoning,
-                                  {
-                                      streaming: !generationFinished,
-                                  },
-                              )
-                            : {
-                                  content: currentContent,
-                                  reasoning: currentNativeReasoning,
-                                  incomplete: false,
-                              };
+                    ? offlineReasoning.normalizeResponse(currentContent, currentNativeReasoning, {
+                          streaming: !generationFinished,
+                      })
+                    : {
+                          content: currentContent,
+                          reasoning: currentNativeReasoning,
+                          incomplete: false,
+                      };
                 String(currentParsed.reasoning || '').trim() &&
                     (lastVisibleReasoning = String(currentParsed.reasoning).trim());
                 const parsed_5 =
-                                lastVisibleReasoning &&
-                                !String(currentParsed.reasoning || '').trim()
-                                    ? {
-                                          ...currentParsed,
-                                          reasoning: lastVisibleReasoning,
-                                      }
-                                    : currentParsed;
+                    lastVisibleReasoning && !String(currentParsed.reasoning || '').trim()
+                        ? {
+                              ...currentParsed,
+                              reasoning: lastVisibleReasoning,
+                          }
+                        : currentParsed;
                 const currentActiveFriend_1089 = window.imData.currentActiveFriend;
                 const value_1090 = Number.isInteger(Number(options_7.depth))
-                                ? Number(options_7.depth)
-                                : 0;
-                const finalDisplayContent = splitOfflineAutoImageMarker(
-                                parsed_5.content,
-                            ).content;
+                    ? Number(options_7.depth)
+                    : 0;
+                const finalDisplayContent = splitOfflineAutoImageMarker(parsed_5.content).content;
+                generationFinished &&
+                    ((message_22.content = finalDisplayContent),
+                    (message_22.reasoning = parsed_5.reasoning || ''));
                 const textContent_8 = generationFinished
-                                ? value_218(finalDisplayContent, message_22.role, value_1090)
-                                : value_215(finalDisplayContent, message_22.role, value_1090);
+                    ? value_218(finalDisplayContent, message_22.role, value_1090)
+                    : value_215(finalDisplayContent, message_22.role, value_1090);
                 renderOfflineThinkingState(bubbleDiv_4, parsed_5.reasoning, {
                     expanded: !generationFinished,
                 });
@@ -5488,8 +5093,10 @@ The prompt must describe the same current moment with characters, action, settin
                             ' tokens · ' +
                             formatOfflineBubbleTime(message_22.timestamp));
                 },
-                enableActions: (finalMessage) =>
-                    enableOfflineChatBubbleActions(bubbleDiv_4, finalMessage || message_22),
+                enableActions: (finalMessage) => {
+                    if (finalMessage) Object.assign(message_22, finalMessage);
+                    enableOfflineChatBubbleActions(bubbleDiv_4, message_22);
+                },
                 getResult: () => {
                     const parsed_7 = offlineReasoning
                             ? offlineReasoning.normalizeResponse(
@@ -8790,37 +8397,37 @@ Char: ` +
             }
         };
         const OFFLINE_LEGACY_PROMPT_ID_BY_NAME = {
-                破限和身份定义: 'role_identity',
-                身份定义: 'role_identity',
-                资料区: 'data_zone',
-                语言和字数: 'length_words',
-                字数要求: 'length_words',
-                双语对话: 'bilingual_dialogue',
-                NSFW: 'nsfw',
-                文风基调: 'style_baimiao',
-                '文风-白描': 'style_baimiao',
-                '文风-创作指导': 'style_creative_guidance',
-                文学指导: 'style_creative_guidance',
-                创作指导: 'perspective_third',
-                '创作指导-第一人称视角': 'perspective_first',
-                '创作指导-第二人称视角': 'perspective_second',
-                '创作指导-第三人称视角': 'perspective_third',
-                弹幕评论: 'barrage_comments',
-                玩家选项: 'player_choices',
-                后续选项: 'player_choices',
-                任务要求: 'task_instruction',
-                记忆系统: 'memory_system',
-                记忆区: 'memory_system',
-                格式示例: 'format_rules',
-                COT: 'cot',
-                COT前: 'cot_before',
-                COT内容: 'cot_content',
-                'cot-情景规划': 'cot_scene_planning',
-                'cot-文学指导': 'cot_literary_guidance',
-                'cot-语言检查': 'cot_language_check',
-                'cot-输出审查': 'cot_output_audit',
-                COT后: 'cot_after',
-            };
+            破限和身份定义: 'role_identity',
+            身份定义: 'role_identity',
+            资料区: 'data_zone',
+            语言和字数: 'length_words',
+            字数要求: 'length_words',
+            双语对话: 'bilingual_dialogue',
+            NSFW: 'nsfw',
+            文风基调: 'style_baimiao',
+            '文风-白描': 'style_baimiao',
+            '文风-创作指导': 'style_creative_guidance',
+            文学指导: 'style_creative_guidance',
+            创作指导: 'perspective_third',
+            '创作指导-第一人称视角': 'perspective_first',
+            '创作指导-第二人称视角': 'perspective_second',
+            '创作指导-第三人称视角': 'perspective_third',
+            弹幕评论: 'barrage_comments',
+            玩家选项: 'player_choices',
+            后续选项: 'player_choices',
+            任务要求: 'task_instruction',
+            记忆系统: 'memory_system',
+            记忆区: 'memory_system',
+            格式示例: 'format_rules',
+            COT: 'cot',
+            COT前: 'cot_before',
+            COT内容: 'cot_content',
+            'cot-情景规划': 'cot_scene_planning',
+            'cot-文学指导': 'cot_literary_guidance',
+            'cot-语言检查': 'cot_language_check',
+            'cot-输出审查': 'cot_output_audit',
+            COT后: 'cot_after',
+        };
         const createOfflineDefaultPrompts = () => [
                 {
                     id: 'role_identity',
@@ -11406,8 +11013,8 @@ Persona: ` +
             const actionSheet = document.getElementById('offline-chat-action-sheet');
             const actionCancel = document.getElementById('offline-chat-action-cancel');
             const offlineChatEpisodeToggleElement = document.getElementById(
-                        'offline-chat-episode-toggle',
-                    );
+                'offline-chat-episode-toggle',
+            );
             const clearBtn = document.getElementById('offline-chat-clear-btn');
             const endBtn = document.getElementById('offline-chat-end-btn');
             const exportTxtBtn = document.getElementById('offline-chat-export-txt-btn');
@@ -11421,17 +11028,17 @@ Persona: ` +
             const summaryEndBtn = document.getElementById('offline-summary-end-btn');
             const summaryCancelBtn = document.getElementById('offline-summary-cancel-btn');
             const offlineResultPreviewModalElement = document.getElementById(
-                        'offline-result-preview-modal',
-                    );
+                'offline-result-preview-modal',
+            );
             const offlineResultPreviewCancelElement = document.getElementById(
-                        'offline-result-preview-cancel',
-                    );
+                'offline-result-preview-cancel',
+            );
             const offlineResultPreviewRegenerateElement = document.getElementById(
-                        'offline-result-preview-regenerate',
-                    );
+                'offline-result-preview-regenerate',
+            );
             const offlineResultPreviewConfirmElement = document.getElementById(
-                        'offline-result-preview-confirm',
-                    );
+                'offline-result-preview-confirm',
+            );
             let enabled_2137 = false;
             let value_2138 = null;
             let value_2139 = null;
@@ -11876,8 +11483,8 @@ Persona: ` +
                 endBtn.addEventListener('click', async () => {
                     actionSheet.classList.remove('active');
                     setTimeout(() => {
-                        actionSheet.style.display = 'none';
-                    }, 300);
+                            actionSheet.style.display = 'none';
+                        }, 300);
                     openOfflineSummarySheet();
                 });
             exportTxtBtn &&
@@ -11912,279 +11519,276 @@ Persona: ` +
                 });
             if (sendBtn && offlineChatInputElement_2134) {
                 const handleClick_2 = async () => {
-                        if (enabled_2137) {
-                            value_2138 &&
-                                !value_2138.signal.aborted &&
-                                (value_2138.abort(),
-                                sendBtn.classList.remove('is-generating'),
-                                sendBtn.classList.add('is-stopping'),
-                                (sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'),
-                                (sendBtn.title = '正在暂停'));
-                            return;
-                        }
-                        const content_21 = offlineChatInputElement_2134.value.trim(),
-                            activeFriend_49 = window.imData.currentActiveFriend;
-                        if (!activeFriend_49) return;
-                        if (isOfflineAutoImageMessage_2(activeFriend_49)) return;
-                        if (!content_21) {
-                            const value_221_2212 = value_221(activeFriend_49),
-                                lastCurrentMessage = value_221_2212[value_221_2212.length - 1];
-                            if (lastCurrentMessage?.role !== 'user') return;
-                        }
-                        const currentApiConfig_4 = window.getApiConfig
-                            ? window.getApiConfig()
-                            : window.apiConfig || {};
-                        if (!currentApiConfig_4.endpoint || !currentApiConfig_4.apiKey) {
-                            if (window.showToast) window.showToast('请先配置 API');
-                            return;
-                        }
-                        {
-                            offlineChatInputElement_2134.value = '';
-                            enabled_2137 = true;
-                            buildOfflineThinkingHtml_2(activeFriend_49, true);
-                            const generationController = new AbortController();
-                            value_2138 = generationController;
-                            const innerHTML_9 = sendBtn.innerHTML,
-                                title_4 = sendBtn.title || '';
-                            sendBtn.classList.add('is-generating');
-                            sendBtn.classList.remove('is-stopping');
-                            sendBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                            sendBtn.title = '暂停生成';
-                            let pendingAiMessage = null,
-                                streamingBubble_5 = null,
-                                userMsg = null,
-                                element_2220 = null,
-                                enabled_2221 = false;
-                            try {
-                                if (content_21) {
-                                    const value_2237 = Array.isArray(
-                                        activeFriend_49.offlineMessages,
-                                    )
-                                        ? activeFriend_49.offlineMessages
-                                        : [];
-                                    userMsg = {
-                                        id: createOfflineChatId('offline-user'),
-                                        role: 'user',
-                                        content: content_21,
-                                        timestamp: Date.now(),
-                                    };
-                                    element_2220 = renderOfflineChatBubble(userMsg, true, {
-                                        floor: getOfflineDialogueRows(value_2237).length + 1,
-                                        depth: 0,
-                                        actionsDisabled: true,
-                                    });
-                                    element_2220?.classList.add('is-persistence-pending');
-                                    element_2220?.setAttribute('aria-busy', 'true');
-                                    await new Promise((render_7) => {
+                    if (enabled_2137) {
+                        value_2138 &&
+                            !value_2138.signal.aborted &&
+                            (value_2138.abort(),
+                            sendBtn.classList.remove('is-generating'),
+                            sendBtn.classList.add('is-stopping'),
+                            (sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'),
+                            (sendBtn.title = '正在暂停'));
+                        return;
+                    }
+                    const content_21 = offlineChatInputElement_2134.value.trim();
+                    const activeFriend_49 = window.imData.currentActiveFriend;
+                    if (!activeFriend_49) return;
+                    if (isOfflineAutoImageMessage_2(activeFriend_49)) return;
+                    if (!content_21) {
+                        const value_221_2212 = value_221(activeFriend_49);
+                        const lastCurrentMessage = value_221_2212[value_221_2212.length - 1];
+                        if (lastCurrentMessage?.role !== 'user') return;
+                    }
+                    const currentApiConfig_4 = window.getApiConfig
+                        ? window.getApiConfig()
+                        : window.apiConfig || {};
+                    if (!currentApiConfig_4.endpoint || !currentApiConfig_4.apiKey) {
+                        if (window.showToast) window.showToast('请先配置 API');
+                        return;
+                    }
+                    {
+                        offlineChatInputElement_2134.value = '';
+                        enabled_2137 = true;
+                        buildOfflineThinkingHtml_2(activeFriend_49, true);
+                        const generationController = new AbortController();
+                        value_2138 = generationController;
+                        const innerHTML_9 = sendBtn.innerHTML;
+                        const title_4 = sendBtn.title || '';
+                        sendBtn.classList.add('is-generating');
+                        sendBtn.classList.remove('is-stopping');
+                        sendBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                        sendBtn.title = '暂停生成';
+                        let pendingAiMessage = null;
+                        let streamingBubble_5 = null;
+                        let userMsg = null;
+                        let element_2220 = null;
+                        let enabled_2221 = false;
+                        try {
+                            if (content_21) {
+                                const value_2237 = Array.isArray(activeFriend_49.offlineMessages)
+                                    ? activeFriend_49.offlineMessages
+                                    : [];
+                                userMsg = {
+                                    id: createOfflineChatId('offline-user'),
+                                    role: 'user',
+                                    content: content_21,
+                                    timestamp: Date.now(),
+                                };
+                                element_2220 = renderOfflineChatBubble(userMsg, true, {
+                                    floor: getOfflineDialogueRows(value_2237).length + 1,
+                                    depth: 0,
+                                    actionsDisabled: true,
+                                });
+                                element_2220?.classList.add('is-persistence-pending');
+                                element_2220?.setAttribute('aria-busy', 'true');
+                                await new Promise((render_7) => {
                                         typeof window.requestAnimationFrame === 'function'
                                             ? window.requestAnimationFrame(() =>
                                                   window.requestAnimationFrame(render_7),
                                               )
                                             : setTimeout(render_7, 0);
                                     });
-                                }
-                                await value_279(activeFriend_49);
-                                const previousMessages = value_221(activeFriend_49),
-                                    lastPreviousMessage =
-                                        previousMessages[previousMessages.length - 1],
-                                    resumeTrailingUser =
-                                        !content_21 && lastPreviousMessage?.role === 'user';
-                                if (!content_21 && !resumeTrailingUser) return;
-                                let messagesWithUser = previousMessages;
-                                if (content_21) {
-                                    messagesWithUser = await persistOfflineMessages(
-                                        activeFriend_49,
-                                        previousMessages.concat(userMsg),
-                                    );
-                                    enabled_2221 = true;
-                                    const persistedUserMsg =
-                                        messagesWithUser.find(
-                                            (message_37) =>
+                            }
+                            await value_279(activeFriend_49);
+                            const previousMessages = value_221(activeFriend_49);
+                            const lastPreviousMessage =
+                                previousMessages[previousMessages.length - 1];
+                            const resumeTrailingUser =
+                                !content_21 && lastPreviousMessage?.role === 'user';
+                            if (!content_21 && !resumeTrailingUser) return;
+                            let messagesWithUser = previousMessages;
+                            if (content_21) {
+                                messagesWithUser = await persistOfflineMessages(
+                                    activeFriend_49,
+                                    previousMessages.concat(userMsg),
+                                );
+                                enabled_2221 = true;
+                                const persistedUserMsg =
+                                    messagesWithUser.find(
+                                        (message_37) =>
                                                 String(message_37.id) === String(userMsg.id),
-                                        ) || userMsg;
-                                    element_2220?.classList.remove('is-persistence-pending');
-                                    element_2220?.removeAttribute('aria-busy');
-                                    enableOfflineChatBubbleActions(element_2220, persistedUserMsg);
-                                }
-                                const timestamp_5 = Date.now(),
-                                    id_9 = createOfflineChatId('offline-ai');
-                                pendingAiMessage = {
-                                    id: id_9,
-                                    role: 'assistant',
-                                    content: '',
-                                    timestamp: timestamp_5,
-                                    tokens: 0,
-                                };
-                                streamingBubble_5 = createStreamingBubble('', false, {
-                                    id: id_9,
-                                    floor: getOfflineDialogueRows(messagesWithUser).length + 1,
-                                    timestamp: timestamp_5,
-                                    depth: 0,
+                                    ) || userMsg;
+                                element_2220?.classList.remove('is-persistence-pending');
+                                element_2220?.removeAttribute('aria-busy');
+                                enableOfflineChatBubbleActions(element_2220, persistedUserMsg);
+                            }
+                            const timestamp_5 = Date.now();
+                            const id_9 = createOfflineChatId('offline-ai');
+                            pendingAiMessage = {
+                                id: id_9,
+                                role: 'assistant',
+                                content: '',
+                                timestamp: timestamp_5,
+                                tokens: 0,
+                            };
+                            streamingBubble_5 = createStreamingBubble('', false, {
+                                id: id_9,
+                                floor: getOfflineDialogueRows(messagesWithUser).length + 1,
+                                timestamp: timestamp_5,
+                                depth: 0,
+                            });
+                            if (!streamingBubble_5)
+                                throw new Error('Failed to create streaming bubble');
+                            const requestContext_4 = await value_296(
+                                activeFriend_49,
+                                messagesWithUser,
+                            );
+                            const {
+                                content: content_22,
+                                reasoning: reasoning_5,
+                                tokens: tokens_4,
+                                aborted: aborted_3,
+                                truncated: truncated_4,
+                            } = await requestOfflineAssistantReplyWithCotValidation(
+                                requestContext_4,
+                                streamingBubble_5,
+                                {
+                                    signal: generationController.signal,
+                                    requestReasoning: true,
+                                },
+                            );
+                            const latestMessages = value_221(activeFriend_49);
+                            const autoImageOutput = splitOfflineAutoImageMarker(content_22);
+                            const aiMsgObj = {
+                                ...pendingAiMessage,
+                                content: autoImageOutput.content,
+                                reasoning: reasoning_5 || undefined,
+                                tokens: Math.max(0, Number(tokens_4) || 0),
+                                generationState: truncated_4 ? 'truncated' : undefined,
+                                continuationState: truncated_4 ? 'available' : undefined,
+                                generationError: truncated_4 ? 'stream_truncated' : undefined,
+                            };
+                            if (!String(content_22 || '').trim())
+                                renderOfflineCurrentMessages(activeFriend_49, {
+                                    scroll: true,
+                                    preserveScroll: false,
                                 });
-                                if (!streamingBubble_5)
-                                    throw new Error('Failed to create streaming bubble');
-                                const requestContext_4 = await value_296(
-                                        activeFriend_49,
-                                        messagesWithUser,
-                                    ),
-                                    {
-                                        content: content_22,
-                                        reasoning: reasoning_5,
-                                        tokens: tokens_4,
-                                        aborted: aborted_3,
-                                        truncated: truncated_4,
-                                    } = await requestOfflineAssistantReplyWithCotValidation(
-                                        requestContext_4,
-                                        streamingBubble_5,
-                                        {
-                                            signal: generationController.signal,
-                                            requestReasoning: true,
-                                        },
-                                    ),
-                                    latestMessages = value_221(activeFriend_49),
-                                    autoImageOutput = splitOfflineAutoImageMarker(content_22),
-                                    aiMsgObj = {
-                                        ...pendingAiMessage,
-                                        content: autoImageOutput.content,
-                                        reasoning: reasoning_5 || undefined,
-                                        tokens: Math.max(0, Number(tokens_4) || 0),
-                                        generationState: truncated_4 ? 'truncated' : undefined,
-                                        continuationState: truncated_4 ? 'available' : undefined,
-                                        generationError: truncated_4
-                                            ? 'stream_truncated'
-                                            : undefined,
-                                    };
-                                if (!String(content_22 || '').trim())
+                            else {
+                                if (!String(autoImageOutput.content || '').trim())
                                     renderOfflineCurrentMessages(activeFriend_49, {
                                         scroll: true,
                                         preserveScroll: false,
                                     });
                                 else {
-                                    if (!String(autoImageOutput.content || '').trim())
-                                        renderOfflineCurrentMessages(activeFriend_49, {
-                                            scroll: true,
-                                            preserveScroll: false,
-                                        });
-                                    else {
-                                        const persistedMessages = await persistOfflineMessages(
+                                    const persistedMessages = await persistOfflineMessages(
+                                        activeFriend_49,
+                                        latestMessages.concat(aiMsgObj),
+                                    );
+                                    const _value5 =
+                                        persistedMessages.find(
+                                            (_value6) => String(_value6.id) === String(aiMsgObj.id),
+                                        ) || aiMsgObj;
+                                    streamingBubble_5.enableActions(_value5);
+                                    autoImageOutput.scene &&
+                                        (await generateOfflineAutoImage(
                                             activeFriend_49,
-                                            latestMessages.concat(aiMsgObj),
-                                        );
-                                        streamingBubble_5.enableActions(aiMsgObj);
-                                        autoImageOutput.scene &&
-                                            (await generateOfflineAutoImage(
-                                                activeFriend_49,
-                                                aiMsgObj.id,
-                                                autoImageOutput.scene,
-                                                persistedMessages,
-                                            ));
-                                    }
+                                            aiMsgObj.id,
+                                            autoImageOutput.scene,
+                                            persistedMessages,
+                                        ));
                                 }
-                                aborted_3 &&
-                                    window.showToast &&
-                                    window.showToast(
-                                        content_22 ? '已暂停生成' : '已暂停生成，可重回空白楼层',
-                                    );
-                            } catch (error_21) {
-                                console.error('Offline Chat API Error:', error_21);
-                                const isPersistenceFailure =
-                                    /Failed to persist offline meeting/.test(
-                                        String(error_21?.message || ''),
-                                    );
-                                if (userMsg && !enabled_2221) {
-                                    element_2220?.remove();
-                                    if (!offlineChatInputElement_2134.value)
-                                        offlineChatInputElement_2134.value = userMsg.content;
-                                }
-                                let failureFloorPersistenceFailed = false;
-                                if (!isPersistenceFailure && pendingAiMessage)
-                                    try {
-                                        const latestMessages_2 = value_221(activeFriend_49),
-                                            alreadyPersisted = latestMessages_2.some(
-                                                (message_38) =>
+                            }
+                            aborted_3 &&
+                                window.showToast &&
+                                window.showToast(
+                                    content_22 ? '已暂停生成' : '已暂停生成，可重回空白楼层',
+                                );
+                        } catch (error_21) {
+                            console.error('Offline Chat API Error:', error_21);
+                            const isPersistenceFailure = /Failed to persist offline meeting/.test(
+                                String(error_21?.message || ''),
+                            );
+                            if (userMsg && !enabled_2221) {
+                                element_2220?.remove();
+                                if (!offlineChatInputElement_2134.value)
+                                    offlineChatInputElement_2134.value = userMsg.content;
+                            }
+                            let failureFloorPersistenceFailed = false;
+                            if (!isPersistenceFailure && pendingAiMessage)
+                                try {
+                                    const latestMessages_2 = value_221(activeFriend_49);
+                                    const alreadyPersisted = latestMessages_2.some(
+                                        (message_38) =>
                                                     String(message_38.id) ===
                                                     String(pendingAiMessage.id),
-                                            );
-                                        if (!alreadyPersisted) {
-                                            const failedResult =
-                                                    streamingBubble_5?.getResult?.() || {},
-                                                content_23 = String(failedResult.content || '');
-                                            if (!content_23.trim())
-                                                renderOfflineCurrentMessages(activeFriend_49, {
-                                                    scroll: true,
-                                                    preserveScroll: false,
-                                                });
-                                            else {
-                                                const failedMessage = {
-                                                    ...pendingAiMessage,
-                                                    content: content_23,
-                                                    reasoning:
-                                                        String(
-                                                            failedResult.reasoning || '',
-                                                        ).trim() || undefined,
-                                                    generationState: 'failed',
-                                                    generationError:
-                                                        error_21?.code ===
-                                                        'reasoning_config_unsupported'
-                                                            ? 'reasoning_unsupported'
-                                                            : error_21?.code ===
-                                                                'reasoning_tokens_exhausted'
-                                                              ? 'reasoning_tokens_exhausted'
-                                                              : 'request_failed',
-                                                };
-                                                await persistOfflineMessages(
-                                                    activeFriend_49,
-                                                    latestMessages_2.concat(failedMessage),
-                                                );
-                                                renderOfflineCurrentMessages(activeFriend_49, {
-                                                    scroll: true,
-                                                    preserveScroll: false,
-                                                });
-                                            }
-                                        }
-                                    } catch (persistError) {
-                                        console.error(
-                                            'Failed to persist offline failure floor:',
-                                            persistError,
-                                        );
-                                        failureFloorPersistenceFailed = true;
-                                    }
-                                if (
-                                    !isPersistenceFailure &&
-                                    !failureFloorPersistenceFailed &&
-                                    window.u2Api?.isRequestError?.(error_21) &&
-                                    window.u2Api.reportError(error_21, {
-                                        operation: '线下聊天回复',
-                                        signal: generationController.signal,
-                                    })
-                                ) {
-                                } else
-                                    window.showToast &&
-                                        !generationController.signal.aborted &&
-                                        window.showToast(
-                                            isPersistenceFailure || failureFloorPersistenceFailed
-                                                ? '线下聊天记录保存失败'
-                                                : error_21?.code === 'reasoning_config_unsupported'
-                                                  ? '当前接口不支持自动推理配置'
-                                                  : error_21?.code === 'reasoning_tokens_exhausted'
-                                                    ? '思考已用完固定的 30000 回复 Token，请重试或更换模型'
-                                                    : error_21?.code === 'empty_response'
-                                                      ? '模型返回了空回复，请重试或更换模型'
-                                                      : '请求失败，请检查网络或 API 配置',
-                                        );
-                            } finally {
-                                buildOfflineThinkingHtml_2(activeFriend_49, false);
-                                enabled_2137 = false;
-                                value_2138 = null;
-                                sendBtn.classList.remove('is-generating', 'is-stopping');
-                                sendBtn.innerHTML = innerHTML_9;
-                                sendBtn.title = title_4;
-                                const offlineChatContentElement_2252 =
-                                        document.getElementById('offline-chat-content'),
-                                    isFollowing_2253 = value_270.isFollowing(
-                                        offlineChatContentElement_2252,
                                     );
-                                setTimeout(() => {
+                                    if (!alreadyPersisted) {
+                                        const failedResult = streamingBubble_5?.getResult?.() || {};
+                                        const content_23 = String(failedResult.content || '');
+                                        if (!content_23.trim())
+                                            renderOfflineCurrentMessages(activeFriend_49, {
+                                                scroll: true,
+                                                preserveScroll: false,
+                                            });
+                                        else {
+                                            const failedMessage = {
+                                                ...pendingAiMessage,
+                                                content: content_23,
+                                                reasoning:
+                                                    String(failedResult.reasoning || '').trim() ||
+                                                    undefined,
+                                                generationState: 'failed',
+                                                generationError:
+                                                    error_21?.code ===
+                                                    'reasoning_config_unsupported'
+                                                        ? 'reasoning_unsupported'
+                                                        : error_21?.code ===
+                                                            'reasoning_tokens_exhausted'
+                                                          ? 'reasoning_tokens_exhausted'
+                                                          : 'request_failed',
+                                            };
+                                            await persistOfflineMessages(
+                                                activeFriend_49,
+                                                latestMessages_2.concat(failedMessage),
+                                            );
+                                            renderOfflineCurrentMessages(activeFriend_49, {
+                                                scroll: true,
+                                                preserveScroll: false,
+                                            });
+                                        }
+                                    }
+                                } catch (persistError) {
+                                    console.error(
+                                        'Failed to persist offline failure floor:',
+                                        persistError,
+                                    );
+                                    failureFloorPersistenceFailed = true;
+                                }
+                            if (
+                                !isPersistenceFailure &&
+                                !failureFloorPersistenceFailed &&
+                                window.u2Api?.isRequestError?.(error_21) &&
+                                window.u2Api.reportError(error_21, {
+                                    operation: '线下聊天回复',
+                                    signal: generationController.signal,
+                                })
+                            ) {
+                            } else
+                                window.showToast &&
+                                    !generationController.signal.aborted &&
+                                    window.showToast(
+                                        isPersistenceFailure || failureFloorPersistenceFailed
+                                            ? '线下聊天记录保存失败'
+                                            : error_21?.code === 'reasoning_config_unsupported'
+                                              ? '当前接口不支持自动推理配置'
+                                              : error_21?.code === 'reasoning_tokens_exhausted'
+                                                ? '思考已用完固定的 30000 回复 Token，请重试或更换模型'
+                                                : error_21?.code === 'empty_response'
+                                                  ? '模型返回了空回复，请重试或更换模型'
+                                                  : '请求失败，请检查网络或 API 配置',
+                                    );
+                        } finally {
+                            buildOfflineThinkingHtml_2(activeFriend_49, false);
+                            enabled_2137 = false;
+                            value_2138 = null;
+                            sendBtn.classList.remove('is-generating', 'is-stopping');
+                            sendBtn.innerHTML = innerHTML_9;
+                            sendBtn.title = title_4;
+                            const offlineChatContentElement_2252 =
+                                document.getElementById('offline-chat-content');
+                            const isFollowing_2253 = value_270.isFollowing(
+                                offlineChatContentElement_2252,
+                            );
+                            setTimeout(() => {
                                     try {
                                         offlineChatInputElement_2134.focus({
                                             preventScroll: true,
@@ -12195,10 +11799,10 @@ Persona: ` +
                                     if (isFollowing_2253)
                                         scrollOfflineChatToBottom(offlineChatContentElement_2252);
                                 }, 50);
-                            }
                         }
-                        return;
-                    };
+                    }
+                    return;
+                };
                 sendBtn.addEventListener('click', handleClick_2);
                 offlineChatInputElement_2134.addEventListener('keydown', (event_2255) => {
                     if (event_2255.isComposing || event_2255.keyCode === 229) return;

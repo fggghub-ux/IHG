@@ -592,6 +592,14 @@ const path = require('node:path');
                 await app.commitFriendChange(f.id, (friend) => {
                     friend.memory = {
                         ...friend.memory,
+                        shortTermEntries: [
+                            {
+                                id: '117-short-memory',
+                                title: 'Context memory',
+                                event: 'Remember this context',
+                                triggerKeywords: ['context'],
+                            },
+                        ],
                         longTermEntries: [
                             {
                                 id: '117-memory',

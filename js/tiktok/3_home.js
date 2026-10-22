@@ -2,11 +2,128 @@
     window.u2OnStorageReady ||
     ((callback) => document.addEventListener('DOMContentLoaded', callback))
 )(() => {
-    const feedContainer = document.getElementById('tk-feed-container'),
-        apiGenBtn = document.getElementById('tk-api-generate-btn');
+    const feedContainer = document.getElementById('tk-feed-container');
+    const apiGenBtn = document.getElementById('tk-api-generate-btn');
     let currentEditingVideoId = null;
     const TK_COMMENT_RENDER_LIMIT = 50;
     let tkFeedWheelLocked = false;
+    const _value = new WeakMap();
+    const _value2 = new Set();
+    const _value3 = new Map();
+    let _value4 = null;
+    let _value5 = null;
+    function _value6(_value1) {
+        if (_value1 === _value4) return;
+        _value4?.classList.remove('tk-feed-playing');
+        _value4 = _value1;
+        _value1?.classList.add('tk-feed-playing');
+    }
+    function _value7() {
+        const _value10 = document.getElementById('tiktok-view');
+        const _value11 = document.getElementById('tk-home-tab');
+        const _value12 =
+            !!_value10?.querySelector(
+                '.bottom-sheet-overlay.active, .tk-sub-profile-view.active',
+            ) || document.getElementById('custom-modal-overlay')?.classList.contains('active');
+        const _value13 =
+            !!_value10?.classList.contains('active') &&
+            !!_value11?.classList.contains('active') &&
+            !document.hidden &&
+            !_value12;
+        _value13 !== _value5 &&
+            ((_value5 = _value13), _value11?.classList.toggle('tk-motion-enabled', _value13));
+    }
+    const _value8 =
+        typeof IntersectionObserver === 'function'
+            ? new IntersectionObserver(
+                  (_value14) => {
+                      _value14.forEach((_value17) => {
+                          if (_value17.isIntersecting)
+                              _value3.set(_value17.target, _value17.intersectionRatio);
+                          else _value3['delete'](_value17.target);
+                      });
+                      let _value15 = null;
+                      let _value16 = 0;
+                      _value3.forEach((_value18, _value19) => {
+                          _value19.isConnected &&
+                              _value18 > _value16 &&
+                              ((_value15 = _value19), (_value16 = _value18));
+                      });
+                      _value6(_value15);
+                  },
+                  {
+                      root: feedContainer,
+                      threshold: [0, 0.5, 0.75, 1],
+                  },
+              )
+            : null;
+    function isActiveTabFollowing(_value20) {
+        const _value21 = new Set(_value20);
+        _value2.forEach((_value22) => {
+            !_value21.has(_value22) &&
+                (_value8?.unobserve(_value22),
+                _value2['delete'](_value22),
+                _value3['delete'](_value22));
+        });
+        _value20.forEach((_value23) => {
+            !_value2.has(_value23) && (_value2.add(_value23), _value8?.observe(_value23));
+        });
+        if (!_value4?.isConnected) _value6(_value20[handleAction_20(_value20)] || null);
+        _value7();
+    }
+    if (typeof MutationObserver === 'function') {
+        const _value24 = new MutationObserver((_value27) => {
+            if (
+                _value27.some((_value28) =>
+                    _value28.target.matches(
+                        '#tiktok-view, .tk-tab-content, .bottom-sheet-overlay, .tk-sub-profile-view',
+                    ),
+                )
+            )
+                _value7();
+        });
+        const _value25 = document.getElementById('tiktok-view');
+        if (_value25)
+            _value24.observe(_value25, {
+                attributes: true,
+                attributeFilter: ['class'],
+                subtree: true,
+            });
+        const _value26 = document.getElementById('custom-modal-overlay');
+        if (_value26)
+            _value24.observe(_value26, {
+                attributes: true,
+                attributeFilter: ['class'],
+            });
+    }
+    document.addEventListener('visibilitychange', _value7);
+    const _value9 = document.getElementById('tiktok-view');
+    _value9?.addEventListener('u2:view-opened', _value7);
+    _value9?.addEventListener('u2:view-closing', () => requestAnimationFrame(_value7), true);
+    if (!_value8 && feedContainer) {
+        let _value29 = 0;
+        feedContainer.addEventListener(
+            'scroll',
+            () => {
+                if (_value29) return;
+                _value29 = requestAnimationFrame(() => {
+                    _value29 = 0;
+                    const _value30 = tkGetFeedCards();
+                    _value6(_value30[handleAction_20(_value30)] || null);
+                });
+            },
+            {
+                passive: true,
+            },
+        );
+    }
+    function _value0(_value31) {
+        if (!feedContainer) return;
+        const _value32 = feedContainer.style.scrollBehavior;
+        feedContainer.style.scrollBehavior = 'auto';
+        feedContainer.scrollTop = _value31;
+        feedContainer.style.scrollBehavior = _value32;
+    }
     function tkEscapeHtml(value_3) {
         return String(value_3 ?? '').replace(
             /[&<>"']/g,
@@ -125,7 +242,7 @@
         return window.tkGetRandomAvatarUrl(stableSeed);
     };
     function tkStableImageUrl(video_5 = {}) {
-        const existing = video_5.imageUrl || video_5.cover || video_5.bgImage;
+        const existing = window.tkGetVideoCover(video_5);
         if (existing) return existing;
         const seed = encodeURIComponent(
             video_5.imagePrompt ||
@@ -243,15 +360,13 @@
         const segments_3 = tkGetSceneSegments(video_8);
         if (!segments_3.length) return '';
         const bubbleBg =
-                options_2.background ||
-                (video_8.cover || video_8.bgImage ? 'rgba(17,17,17,0.82)' : '#111111'),
-            total_2 = Math.max(segments_3.length * 3.4, 6);
+            options_2.background ||
+            (window.tkGetVideoCover(video_8) ? 'rgba(17,17,17,0.82)' : '#111111');
+        const total_2 = Math.max(segments_3.length * 3.4, 6);
         return (
-            `
-            <div class="tk-bubble-flow" style="--tk-flow-total:` +
+            '\n            <div class="tk-bubble-flow" style="--tk-flow-total:' +
             total_2 +
-            `s;">
-                ` +
+            's;">\n                ' +
             segments_3
                 .map(
                     (value_17, index_3) =>
@@ -275,9 +390,7 @@
                 `,
                 )
                 .join('') +
-            `
-            </div>
-        `
+            '\n            </div>\n        '
         );
     }
     function tkNormalizeComments(comments_2 = []) {
@@ -834,10 +947,10 @@
         }
     }
     window.tkGenerateVideoInteractions = async function (value_38, options_5 = {}) {
-        const found = window.findVideoGlobal ? window.findVideoGlobal(value_38) : {},
-            video_10 = found.video,
-            author_2 = found.author || tkState.profile || {},
-            isAuto_2 = Boolean(options_5.isAuto);
+        const found = window.findVideoGlobal ? window.findVideoGlobal(value_38) : {};
+        const video_10 = found.video;
+        const author_2 = found.author || tkState.profile || {};
+        const isAuto_2 = Boolean(options_5.isAuto);
         if (!video_10) return;
         if (!window.apiConfig || !window.apiConfig.endpoint || !window.apiConfig.apiKey) {
             if (window.showToast) window.showToast('请先在系统设置中配置 API');
@@ -845,9 +958,10 @@
         }
         if (window.showToast)
             window.showToast(isAuto_2 ? 'AI 正在生成视频互动...' : 'AI 正在生成互动数据...');
-        const followedChars = (tkState.chars || []).filter((c_3) => c_3.isFollowed).slice(0, 6),
-            value_45 = followedChars.length
-                ? followedChars.map(
+        const followedChars = (tkState.chars || []).filter((c_3) => c_3.isFollowed).slice(0, 6);
+        const value_45 = followedChars.length
+            ? followedChars
+                  .map(
                       (contact_213) =>
                           '- CharID: ' +
                           contact_213.id +
@@ -855,171 +969,94 @@
                           (contact_213.name || contact_213.handle) +
                           ', 人设: ' +
                           (contact_213.persona || ''),
-                  ).join(`
-`)
-                : '没有已关注好友。',
-            isUserPost =
-                String(video_10.authorId || '') === 'profile' ||
-                String(author_2.id || '') === 'profile' ||
-                (tkState.profile?.handle &&
-                    String(author_2.handle || '') === String(tkState.profile.handle)),
-            userTikTokProfileContext = {
-                name: tkState.profile?.name || window.userState?.name || 'User',
-                handle: tkState.profile?.handle || 'user',
-                persona: tkState.profile?.persona || window.userState?.persona || '',
-                bio: tkState.profile?.bio || '',
-                basePersona: window.userState?.persona || '',
-            },
-            effectiveAuthorContext = isUserPost
-                ? userTikTokProfileContext
-                : {
-                      name: author_2.name || tkState.profile?.name || 'User',
-                      handle: author_2.handle || 'user',
-                      persona:
-                          author_2.persona ||
-                          tkState.profile?.persona ||
-                          window.userState?.persona ||
-                          '',
-                      bio: author_2.bio || tkState.profile?.bio || '',
-                      basePersona: window.userState?.persona || '',
-                  },
-            triggerText_3 = [
-                video_10.desc || '',
-                video_10.sceneText || '',
-                Array.isArray(video_10.sceneSegments)
-                    ? video_10.sceneSegments.join(`
-`)
-                    : '',
-                effectiveAuthorContext.persona || '',
-                effectiveAuthorContext.bio || '',
-                effectiveAuthorContext.name || '',
-                effectiveAuthorContext.handle || '',
-                window.userState?.persona || '',
-            ].filter(Boolean).join(`
-`),
-            value_50 = window.tkBuildWorldBookContext
-                ? window.tkBuildWorldBookContext(triggerText_3)
-                : '',
-            worldActorPrompt = window.tkBuildWorldActorPrompt
-                ? window.tkBuildWorldActorPrompt({
-                      includeUserIdentity: isUserPost,
-                      purpose: '视频发布后的评论、关注、点赞、收藏和主页访客互动',
-                      triggerText: triggerText_3,
-                  })
-                : '',
-            content_2 =
-                `
-Creator identity rule:
-` +
-                (isUserPost
-                    ? 'This video was posted by the current user. Treat the creator/blogger as the user TikTok account below, and use the TikTok profile persona as the authoritative persona for followers, likes, comments, and visitors.'
-                    : 'This video was posted by another TikTok creator. Use the creator context below, but still avoid impersonating the current user.') +
-                `
-The world book context was mounted with the video plus the user TikTok persona as trigger text.
-
-你是 TikTok 视频互动模拟器。请根据视频、博主人设、已关注好友和世界书，生成这条视频发布后的真实互动。
-
-` +
-                worldActorPrompt +
-                `
-
-硬性规则：
-1. 只返回严格 JSON 对象，不要 markdown，不要解释，不要尾逗号。
-2. 必须包含 newFollowers、newLikes、newSaves、newComments、visitors 五个字段。
-3. newFollowers 必须是 2-5 个新粉丝对象；每个对象含 authorId、authorName、authorAvatar、handle，可选 persona/status。
-4. newLikes 是点赞人数数字；newSaves 是收藏人数数字。
-5. newComments 必须是 2-5 条评论对象；每条含 authorId、authorName、authorAvatar、text、likes、replies。
-6. 评论可以自然 @ 好友或路人；如果 @ 引发对话，放进 replies 数组，replies 每条含 authorId、authorName、authorAvatar、text、likes。
-7. 禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。严禁扮演、冒充或使用 user/博主本人发评论、点赞、收藏、关注；所有互动者必须是路人、粉丝、已关注好友或新访客。
-8. 评论要有活人感、网感和上下文，不要像公告；如果用了已关注好友，authorId 必须填该好友 CharID。
-9. 评论里的 @ 必须使用对方名字，不要使用账号、handle 或 id。
-10. visitors 必须是 1-3 个主页访客对象；每个对象含 authorName、authorAvatar、handle、thought，thought 是 20-35 个中文字符的心声。
-11. 国际化翻译规则：评论或 replies 的 text 如果不是中文，必须同时填写 translationZh，内容是自然中文翻译；如果 text 是中文，translationZh 必须是空字符串。
-
-视频：
-` +
-                JSON.stringify(
-                    {
-                        id: video_10.id,
-                        desc: video_10.desc || '',
-                        mediaType: tkGetMediaType(video_10),
-                        sceneText: tkGetSceneText(video_10),
-                        sceneSegments: tkGetSceneSegments(video_10),
-                        currentLikes: video_10.likes || 0,
-                        currentSaves: video_10.saves || video_10.savedCount || 0,
-                        currentComments: tkCountVideoComments(video_10),
-                    },
-                    null,
-                    2,
-                ) +
-                `
-
-博主：
-` +
-                JSON.stringify(
-                    {
-                        ...effectiveAuthorContext,
-                        isCurrentUserTikTokAccount: isUserPost,
-                    },
-                    null,
-                    2,
-                ) +
-                `
-
-已关注好友：
-` +
-                value_45 +
-                `
-
-世界书：
-` +
-                (value_50 || '无') +
-                `
-
-返回格式：
-{
-  "newFollowers": [
-    {
-      "authorId": "follower_unique_id",
-      "authorName": "新粉丝名",
-      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=follower",
-      "handle": "follower_handle"
-    }
-  ],
-  "newLikes": 128,
-  "newSaves": 23,
-  "newComments": [
-    {
-      "authorId": "commenter_id",
-      "authorName": "评论者",
-      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=commenter",
-      "text": "评论内容",
-      "translationZh": "",
-      "likes": 12,
-      "replies": [
-        {
-          "authorId": "reply_id",
-          "authorName": "回复者",
-          "authorAvatar": "",
-          "text": "reply text",
-          "translationZh": "回复文字的中文翻译",
-          "likes": 5
-        }
-      ]
-    }
-  ],
-  "visitors": [
-    {
-      "authorName": "访客名",
-      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=visitor",
-      "handle": "visitor_handle",
-      "thought": "这条视频的细节让我想点进主页看看"
-    }
-  ]
-}
-`;
+                  )
+                  .join('\n')
+            : '没有已关注好友。';
+        const isUserPost =
+            String(video_10.authorId || '') === 'profile' ||
+            String(author_2.id || '') === 'profile' ||
+            (tkState.profile?.handle &&
+                String(author_2.handle || '') === String(tkState.profile.handle));
+        const userTikTokProfileContext = {
+            name: tkState.profile?.name || window.userState?.name || 'User',
+            handle: tkState.profile?.handle || 'user',
+            persona: tkState.profile?.persona || window.userState?.persona || '',
+            bio: tkState.profile?.bio || '',
+            basePersona: window.userState?.persona || '',
+        };
+        const effectiveAuthorContext = isUserPost
+            ? userTikTokProfileContext
+            : {
+                  name: author_2.name || tkState.profile?.name || 'User',
+                  handle: author_2.handle || 'user',
+                  persona:
+                      author_2.persona ||
+                      tkState.profile?.persona ||
+                      window.userState?.persona ||
+                      '',
+                  bio: author_2.bio || tkState.profile?.bio || '',
+                  basePersona: window.userState?.persona || '',
+              };
+        const triggerText_3 = [
+            video_10.desc || '',
+            video_10.sceneText || '',
+            Array.isArray(video_10.sceneSegments) ? video_10.sceneSegments.join('\n') : '',
+            effectiveAuthorContext.persona || '',
+            effectiveAuthorContext.bio || '',
+            effectiveAuthorContext.name || '',
+            effectiveAuthorContext.handle || '',
+            window.userState?.persona || '',
+        ]
+            .filter(Boolean)
+            .join('\n');
+        const value_50 = window.tkBuildWorldBookContext
+            ? window.tkBuildWorldBookContext(triggerText_3)
+            : '';
+        const worldActorPrompt = window.tkBuildWorldActorPrompt
+            ? window.tkBuildWorldActorPrompt({
+                  includeUserIdentity: isUserPost,
+                  purpose: '视频发布后的评论、关注、点赞、收藏和主页访客互动',
+                  triggerText: triggerText_3,
+              })
+            : '';
+        const content_2 =
+            '\nCreator identity rule:\n' +
+            (isUserPost
+                ? 'This video was posted by the current user. Treat the creator/blogger as the user TikTok account below, and use the TikTok profile persona as the authoritative persona for followers, likes, comments, and visitors.'
+                : 'This video was posted by another TikTok creator. Use the creator context below, but still avoid impersonating the current user.') +
+            '\nThe world book context was mounted with the video plus the user TikTok persona as trigger text.\n\n你是 TikTok 视频互动模拟器。请根据视频、博主人设、已关注好友和世界书，生成这条视频发布后的真实互动。\n\n' +
+            worldActorPrompt +
+            '\n\n硬性规则：\n1. 只返回严格 JSON 对象，不要 markdown，不要解释，不要尾逗号。\n2. 必须包含 newFollowers、newLikes、newSaves、newComments、visitors 五个字段。\n3. newFollowers 必须是 2-5 个新粉丝对象；每个对象含 authorId、authorName、authorAvatar、handle，可选 persona/status。\n4. newLikes 是点赞人数数字；newSaves 是收藏人数数字。\n5. newComments 必须是 2-5 条评论对象；每条含 authorId、authorName、authorAvatar、text、likes、replies。\n6. 评论可以自然 @ 好友或路人；如果 @ 引发对话，放进 replies 数组，replies 每条含 authorId、authorName、authorAvatar、text、likes。\n7. 禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。严禁扮演、冒充或使用 user/博主本人发评论、点赞、收藏、关注；所有互动者必须是路人、粉丝、已关注好友或新访客。\n8. 评论要有活人感、网感和上下文，不要像公告；如果用了已关注好友，authorId 必须填该好友 CharID。\n9. 评论里的 @ 必须使用对方名字，不要使用账号、handle 或 id。\n10. visitors 必须是 1-3 个主页访客对象；每个对象含 authorName、authorAvatar、handle、thought，thought 是 20-35 个中文字符的心声。\n11. 国际化翻译规则：评论或 replies 的 text 如果不是中文，必须同时填写 translationZh，内容是自然中文翻译；如果 text 是中文，translationZh 必须是空字符串。\n\n视频：\n' +
+            JSON.stringify(
+                {
+                    id: video_10.id,
+                    desc: video_10.desc || '',
+                    mediaType: tkGetMediaType(video_10),
+                    sceneText: tkGetSceneText(video_10),
+                    sceneSegments: tkGetSceneSegments(video_10),
+                    currentLikes: video_10.likes || 0,
+                    currentSaves: video_10.saves || video_10.savedCount || 0,
+                    currentComments: tkCountVideoComments(video_10),
+                },
+                null,
+                2,
+            ) +
+            '\n\n博主：\n' +
+            JSON.stringify(
+                {
+                    ...effectiveAuthorContext,
+                    isCurrentUserTikTokAccount: isUserPost,
+                },
+                null,
+                2,
+            ) +
+            '\n\n已关注好友：\n' +
+            value_45 +
+            '\n\n世界书：\n' +
+            (value_50 || '无') +
+            '\n\n返回格式：\n{\n  "newFollowers": [\n    {\n      "authorId": "follower_unique_id",\n      "authorName": "新粉丝名",\n      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=follower",\n      "handle": "follower_handle"\n    }\n  ],\n  "newLikes": 128,\n  "newSaves": 23,\n  "newComments": [\n    {\n      "authorId": "commenter_id",\n      "authorName": "评论者",\n      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=commenter",\n      "text": "评论内容",\n      "translationZh": "",\n      "likes": 12,\n      "replies": [\n        {\n          "authorId": "reply_id",\n          "authorName": "回复者",\n          "authorAvatar": "",\n          "text": "reply text",\n          "translationZh": "回复文字的中文翻译",\n          "likes": 5\n        }\n      ]\n    }\n  ],\n  "visitors": [\n    {\n      "authorName": "访客名",\n      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=visitor",\n      "handle": "visitor_handle",\n      "thought": "这条视频的细节让我想点进主页看看"\n    }\n  ]\n}\n';
         try {
-            const value_55 = await fetch(tkResolveApiEndpoint(), {
+            const value_55 = await window.tkFetch('videos', tkResolveApiEndpoint(), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1051,25 +1088,23 @@ The world book context was mounted with the video plus the user TikTok persona a
                         status: value_55.status,
                     })
                 );
-            const value_58 = await value_55.json(),
-                parsed = tkParseAiJson_3(value_58.choices?.[0]?.message?.content || ''),
-                followers_2 = Array.isArray(parsed.newFollowers)
-                    ? parsed.newFollowers
-                          .filter((entry_5) => !tkIsUserGeneratedActor(entry_5))
-                          .slice(0, 5)
-                    : [],
-                comments_4 = Array.isArray(parsed.newComments)
-                    ? parsed.newComments
-                          .filter((entry_6) => !tkIsUserGeneratedActor(entry_6))
-                          .slice(0, 5)
-                    : [],
-                visitors_2 = Array.isArray(parsed.visitors)
-                    ? parsed.visitors
-                          .filter((entry_7) => !tkIsUserGeneratedActor(entry_7))
-                          .slice(0, 3)
-                    : [],
-                max_63 = Math.max(0, Number(parsed.newLikes) || 0),
-                max_64 = Math.max(0, Number(parsed.newSaves) || 0);
+            const value_58 = await value_55.json();
+            const parsed = tkParseAiJson_3(value_58.choices?.[0]?.message?.content || '');
+            const followers_2 = Array.isArray(parsed.newFollowers)
+                ? parsed.newFollowers
+                      .filter((entry_5) => !tkIsUserGeneratedActor(entry_5))
+                      .slice(0, 5)
+                : [];
+            const comments_4 = Array.isArray(parsed.newComments)
+                ? parsed.newComments
+                      .filter((entry_6) => !tkIsUserGeneratedActor(entry_6))
+                      .slice(0, 5)
+                : [];
+            const visitors_2 = Array.isArray(parsed.visitors)
+                ? parsed.visitors.filter((entry_7) => !tkIsUserGeneratedActor(entry_7)).slice(0, 3)
+                : [];
+            const max_63 = Math.max(0, Number(parsed.newLikes) || 0);
+            const max_64 = Math.max(0, Number(parsed.newSaves) || 0);
             followers_2.forEach((follower_2, index_6) => tkEnsureFollowerChar(follower_2, index_6));
             video_10.likes = (Number(video_10.likes) || 0) + max_63;
             video_10.savedCount = (Number(video_10.savedCount || video_10.saves) || 0) + max_64;
@@ -1101,6 +1136,7 @@ The world book context was mounted with the video plus the user TikTok persona a
             if (value_25 === video_10.id) handleAction_27(video_10);
             if (window.showToast) window.showToast('互动数据生成完毕');
         } catch (error_2) {
+            if (error_2?.name === 'AbortError') return;
             console.error('Video Interaction Gen Error:', error_2);
             if (
                 !window.u2Api?.isRequestError?.(error_2) ||
@@ -1121,127 +1157,71 @@ The world book context was mounted with the video plus the user TikTok persona a
         if (!video_11 || !targetComment || !value_78) return;
         if (!window.apiConfig || !window.apiConfig.endpoint || !window.apiConfig.apiKey) return;
         const videoContext = {
-                desc: video_11.desc || '',
-                mediaType: tkGetMediaType(video_11),
-                sceneSegments: tkGetSceneSegments(video_11),
-                authorName: video_11.authorName || 'User',
-            },
-            join_80 = [
-                window.userState && window.userState.persona
-                    ? 'User persona: ' + window.userState.persona
-                    : '',
-                tkState.profile && tkState.profile.persona
-                    ? 'TikTok profile persona: ' + tkState.profile.persona
-                    : '',
-                tkState.profile && tkState.profile.bio
-                    ? 'TikTok profile bio: ' + tkState.profile.bio
-                    : '',
-                tkState.profile && tkState.profile.name
-                    ? 'TikTok profile name: ' + tkState.profile.name
-                    : '',
-            ].filter(Boolean).join(`
-`),
-            parentContext = parentComment
-                ? {
-                      authorName: parentComment.authorName || 'User',
-                      text: parentComment.text || '',
-                  }
-                : null,
-            value_83 = window.tkBuildWorldBookContext
-                ? window.tkBuildWorldBookContext(
-                      (video_11.desc || '') +
-                          `
-` +
-                          value_78 +
-                          `
-` +
-                          (parentContext ? parentContext.text : '') +
-                          `
-` +
-                          join_80,
-                  )
+            desc: video_11.desc || '',
+            mediaType: tkGetMediaType(video_11),
+            sceneSegments: tkGetSceneSegments(video_11),
+            authorName: video_11.authorName || 'User',
+        };
+        const join_80 = [
+            window.userState && window.userState.persona
+                ? 'User persona: ' + window.userState.persona
                 : '',
-            value_84 = window.tkBuildWorldActorPrompt
-                ? window.tkBuildWorldActorPrompt({
-                      includeUserIdentity: true,
-                      purpose: 'user 发出评论后的楼中楼回复和主页访客',
-                      triggerText:
-                          (video_11.desc || '') +
-                          `
-` +
-                          value_78,
-                  })
+            tkState.profile && tkState.profile.persona
+                ? 'TikTok profile persona: ' + tkState.profile.persona
                 : '',
-            content_3 =
-                `
-你是 TikTok 评论区和主页访客模拟器。请根据当前视频、用户刚发出的评论，以及可选楼主评论，生成真实、有网感、符合上下文的互动。
-
-` +
-                value_84 +
-                `
-
-硬性规则：
-1. 只能返回严格 JSON，不要 markdown，不要解释文字，不要尾逗号，不要单引号。
-2. JSON 顶层必须是对象，且只包含 "replies" 和 "visitors" 两个数组。
-3. "replies" 必须生成 2-5 条相关楼中楼评论；如果用户是在回复楼主，回复内容必须包含楼主评论语境。
-4. "visitors" 必须生成 2-5 条主页访客；每条访客必须有 authorName、authorAvatar、handle、thought。
-5. thought 必须是 20-30 个中文字符，写清楚这个人为什么看 user 主页，像真实心声，不要像系统文案。
-6. 所有 key 必须使用英文双引号；所有数组和对象最后一项后面不能有逗号。
-7. 国际化翻译规则：每条 replies 的 text 如果不是中文，必须同时填写 translationZh，内容是自然中文翻译；如果 text 是中文，translationZh 必须是空字符串。
-8. 禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。
-
-视频上下文：
-` +
-                JSON.stringify(videoContext, null, 2) +
-                `
-
-User context:
-` +
-                (join_80 || 'No explicit user persona. Infer a normal TikTok user.') +
-                `
-
-用户评论：
-` +
-                JSON.stringify(value_78) +
-                `
-
-` +
-                (parentContext
-                    ? `用户回复的【目标评论】上下文：
-` +
-                      JSON.stringify(parentContext, null, 2) +
-                      `
-（注意：如果目标评论是楼主，请作为楼中楼互动；如果目标评论也是楼中楼，请延续他们的话题）`
-                    : '用户发的是新的根评论，没有上下文。') +
-                `
-
-` +
-                value_83 +
-                `
-
-返回格式示例：
-{
-  "replies": [
-    {
-      "authorName": "路人A",
-      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=a",
-      "text": "这句也太像我刚想说的了，尤其是后半句很准。",
-      "translationZh": "",
-      "likes": 18
-    }
-  ],
-  "visitors": [
-    {
-      "authorName": "小梨",
-      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=li",
-      "handle": "xiaoli",
-      "thought": "她评论太会抓重点了想看看主页"
-    }
-  ]
-}
-`;
+            tkState.profile && tkState.profile.bio
+                ? 'TikTok profile bio: ' + tkState.profile.bio
+                : '',
+            tkState.profile && tkState.profile.name
+                ? 'TikTok profile name: ' + tkState.profile.name
+                : '',
+        ]
+            .filter(Boolean)
+            .join('\n');
+        const parentContext = parentComment
+            ? {
+                  authorName: parentComment.authorName || 'User',
+                  text: parentComment.text || '',
+              }
+            : null;
+        const value_83 = window.tkBuildWorldBookContext
+            ? window.tkBuildWorldBookContext(
+                  (video_11.desc || '') +
+                      '\n' +
+                      value_78 +
+                      '\n' +
+                      (parentContext ? parentContext.text : '') +
+                      '\n' +
+                      join_80,
+              )
+            : '';
+        const value_84 = window.tkBuildWorldActorPrompt
+            ? window.tkBuildWorldActorPrompt({
+                  includeUserIdentity: true,
+                  purpose: 'user 发出评论后的楼中楼回复和主页访客',
+                  triggerText: (video_11.desc || '') + '\n' + value_78,
+              })
+            : '';
+        const content_3 =
+            '\n你是 TikTok 评论区和主页访客模拟器。请根据当前视频、用户刚发出的评论，以及可选楼主评论，生成真实、有网感、符合上下文的互动。\n\n' +
+            value_84 +
+            '\n\n硬性规则：\n1. 只能返回严格 JSON，不要 markdown，不要解释文字，不要尾逗号，不要单引号。\n2. JSON 顶层必须是对象，且只包含 "replies" 和 "visitors" 两个数组。\n3. "replies" 必须生成 2-5 条相关楼中楼评论；如果用户是在回复楼主，回复内容必须包含楼主评论语境。\n4. "visitors" 必须生成 2-5 条主页访客；每条访客必须有 authorName、authorAvatar、handle、thought。\n5. thought 必须是 20-30 个中文字符，写清楚这个人为什么看 user 主页，像真实心声，不要像系统文案。\n6. 所有 key 必须使用英文双引号；所有数组和对象最后一项后面不能有逗号。\n7. 国际化翻译规则：每条 replies 的 text 如果不是中文，必须同时填写 translationZh，内容是自然中文翻译；如果 text 是中文，translationZh 必须是空字符串。\n8. 禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。\n\n视频上下文：\n' +
+            JSON.stringify(videoContext, null, 2) +
+            '\n\nUser context:\n' +
+            (join_80 || 'No explicit user persona. Infer a normal TikTok user.') +
+            '\n\n用户评论：\n' +
+            JSON.stringify(value_78) +
+            '\n\n' +
+            (parentContext
+                ? '用户回复的【目标评论】上下文：\n' +
+                  JSON.stringify(parentContext, null, 2) +
+                  '\n（注意：如果目标评论是楼主，请作为楼中楼互动；如果目标评论也是楼中楼，请延续他们的话题）'
+                : '用户发的是新的根评论，没有上下文。') +
+            '\n\n' +
+            value_83 +
+            '\n\n返回格式示例：\n{\n  "replies": [\n    {\n      "authorName": "路人A",\n      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=a",\n      "text": "这句也太像我刚想说的了，尤其是后半句很准。",\n      "translationZh": "",\n      "likes": 18\n    }\n  ],\n  "visitors": [\n    {\n      "authorName": "小梨",\n      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=li",\n      "handle": "xiaoli",\n      "thought": "她评论太会抓重点了想看看主页"\n    }\n  ]\n}\n';
         try {
-            const value_86 = await fetch(tkResolveApiEndpoint(), {
+            const value_86 = await window.tkFetch('videos', tkResolveApiEndpoint(), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1273,10 +1253,12 @@ User context:
                         status: value_86.status,
                     })
                 );
-            const value_87 = await value_86.json(),
-                parsed_2 = tkParseAiJson_3(value_87.choices?.[0]?.message?.content || ''),
-                replies_2 = Array.isArray(parsed_2.replies) ? parsed_2.replies.slice(0, 5) : [],
-                visitors_3 = Array.isArray(parsed_2.visitors) ? parsed_2.visitors.slice(0, 5) : [];
+            const value_87 = await value_86.json();
+            const parsed_2 = tkParseAiJson_3(value_87.choices?.[0]?.message?.content || '');
+            const replies_2 = Array.isArray(parsed_2.replies) ? parsed_2.replies.slice(0, 5) : [];
+            const visitors_3 = Array.isArray(parsed_2.visitors)
+                ? parsed_2.visitors.slice(0, 5)
+                : [];
             if (!Array.isArray(targetComment.replies)) targetComment.replies = [];
             replies_2
                 .map(tkNormalizeGeneratedReply)
@@ -1293,12 +1275,13 @@ User context:
             handleAction_22(video_11);
             if (visitors_3.length || replies_2.length) window.showToast('评论互动已更新');
         } catch (error_3) {
+            if (error_3?.name === 'AbortError') return;
             console.error('Comment Followup Gen Error:', error_3);
         }
     }
-    const bgBtn = document.getElementById('tk-edit-video-bg-btn'),
-        bgUpload = document.getElementById('tk-edit-video-bg-upload'),
-        bgImg = document.getElementById('tk-edit-video-bg-img');
+    const bgBtn = document.getElementById('tk-edit-video-bg-btn');
+    const bgUpload = document.getElementById('tk-edit-video-bg-upload');
+    const bgImg = document.getElementById('tk-edit-video-bg-img');
     bgBtn &&
         bgUpload &&
         (bgBtn.addEventListener('click', (e) => {
@@ -1334,11 +1317,20 @@ User context:
                     (value_250) => value_250.id === currentEditingVideoId,
                 );
             if (targetVideo) {
-                targetVideo.cover !== undefined && targetVideo.cover !== null
-                    ? (targetVideo.cover =
-                          bgImg && bgImg.style.display === 'block' ? bgImg.src : null)
-                    : (targetVideo.bgImage =
-                          bgImg && bgImg.style.display === 'block' ? bgImg.src : null);
+                const _value33 = bgImg && bgImg.style.display === 'block' ? bgImg.src : '';
+                const _value34 = targetVideo.generatedCoverAssetId;
+                const _value35 =
+                    targetVideo.generatedCoverAssetId &&
+                    _value33 === window.tkGetVideoCover(targetVideo);
+                !_value35 &&
+                    [...tkState.videos, ...(tkState.profile.posts || [])]
+                        .filter((_value36) => String(_value36.id) === String(targetVideo.id))
+                        .forEach((_value37) => {
+                            delete _value37.generatedCoverAssetId;
+                            _value37.cover = _value33 || null;
+                            _value37.bgImage = null;
+                            _value37.imageUrl = null;
+                        });
                 targetVideo.bgColor = null;
                 targetVideo.desc = document.getElementById('tk-edit-video-desc-input').value.trim();
                 targetVideo.sceneText = document
@@ -1349,6 +1341,16 @@ User context:
                 targetVideo.middle = targetVideo.sceneSegments[1] || '';
                 targetVideo.ending = targetVideo.sceneSegments[2] || '';
                 if (window.tkPersistState) window.tkPersistState();
+                _value34 &&
+                    !_value35 &&
+                    Promise.resolve(window.saveGlobalData?.())
+                        .then((_value38) => {
+                            if (_value38 !== false)
+                                return window.tkReleaseUnusedVideoAsset?.(_value34);
+                        })
+                        ['catch']((_value39) =>
+                            console.warn('TikTok old cover cleanup failed:', _value39),
+                        );
                 window.tkRenderHome();
                 if (window.tkRenderProfile) window.tkRenderProfile();
                 const tkFullscreenVideoViewElement = document.getElementById(
@@ -1400,7 +1402,7 @@ User context:
             (event_2) => {
                 if (Math.abs(event_2.deltaY) <= Math.abs(event_2.deltaX) || event_2.deltaY === 0)
                     return;
-                if (tkGetFeedCards().length < 2) return;
+                if (feedContainer.children.length < 2) return;
                 event_2.preventDefault();
                 if (tkFeedWheelLocked) return;
                 tkFeedWheelLocked = true;
@@ -1440,28 +1442,25 @@ User context:
         } else window.tkRenderHome && window.tkRenderHome();
         requestAnimationFrame(() => {
             const safeVideoId =
-                    videoId_2 && window.CSS && typeof CSS.escape === 'function'
-                        ? CSS.escape(String(videoId_2))
-                        : String(videoId_2 || '').replace(/"/g, '\\"'),
-                card_2 =
-                    videoId_2 && feedContainer
-                        ? feedContainer.querySelector(
-                              '.tk-video-card[data-video-id="' + safeVideoId + '"]',
-                          )
-                        : null;
-            if (card_2 && card_2.scrollIntoView)
-                card_2.scrollIntoView({
-                    block: 'start',
-                });
+                videoId_2 && window.CSS && typeof CSS.escape === 'function'
+                    ? CSS.escape(String(videoId_2))
+                    : String(videoId_2 || '').replace(/"/g, '\\"');
+            const card_2 =
+                videoId_2 && feedContainer
+                    ? feedContainer.querySelector(
+                          '.tk-video-card[data-video-id="' + safeVideoId + '"]',
+                      )
+                    : null;
+            if (card_2) _value0(card_2.offsetTop);
             else feedContainer && (feedContainer.scrollTop = 0);
         });
     };
     window.tkRenderHome = function (value_94 = {}) {
         if (!feedContainer) return;
-        const activeTabEl = document.querySelector('.tk-topbar-tab.active'),
-            isActiveTabFollowing = activeTabEl && activeTabEl.textContent === '关注';
+        const activeTabEl = document.querySelector('.tk-topbar-tab.active');
+        const _value40 = activeTabEl && activeTabEl.textContent === '关注';
         let displayVideos = [];
-        isActiveTabFollowing
+        _value40
             ? (displayVideos = tkState.videos.filter((v) => {
                   const char_5 = window.tkGetChar(v.authorId);
                   return char_5 && char_5.isFollowed;
@@ -1470,73 +1469,99 @@ User context:
                   const char_6 = window.tkGetChar(v_2.authorId);
                   return !char_6 || !char_6.isFollowed;
               }));
-        feedContainer.innerHTML = '';
+        const _value41 = tkGetFeedCards();
+        const _value42 = _value41[handleAction_20(_value41)];
+        const _value43 = _value42 ? feedContainer.scrollTop - _value42.offsetTop : 0;
+        const _value44 = new Map(_value41.map((_value46) => [_value46.dataset.videoId, _value46]));
         if (displayVideos.length === 0) {
-            isActiveTabFollowing
+            isActiveTabFollowing([]);
+            _value40
                 ? (feedContainer.innerHTML =
                       '<div class="tk-empty-feed"><p style="color: #999; font-size: 14px;">暂无关注的内容，快去探索吧</p></div>')
-                : (feedContainer.innerHTML = `
-                    <div class="tk-empty-feed">
-                        <div class="tk-magic-btn-large" id="tk-api-generate-btn-empty" onclick="window.tkTriggerApiGenerate(event)">
-                            <i class="fas fa-search"></i>
-                            <span>生成内容</span>
-                        </div>
-                        <p style="color: #999; font-size: 13px; margin-top: 10px;">点击搜索生成 TikTok 视频流</p>
-                    </div>
-                `);
+                : (feedContainer.innerHTML =
+                      '\n                    <div class="tk-empty-feed">\n                        <div class="tk-magic-btn-large" id="tk-api-generate-btn-empty" onclick="window.tkTriggerApiGenerate(event)">\n                            <i class="fas fa-search"></i>\n                            <span>生成内容</span>\n                        </div>\n                        <p style="color: #999; font-size: 13px; margin-top: 10px;">点击搜索生成 TikTok 视频流</p>\n                    </div>\n                ');
             document.getElementById('tk-home-tab').dataset.tkRendered = 'true';
             return;
         }
-        const items_101 = displayVideos,
-            documentFragment = document.createDocumentFragment();
+        const items_101 = displayVideos;
+        const documentFragment = [];
+        if (!_value41.length) feedContainer.replaceChildren();
         items_101.forEach((video_12, value_103) => {
-            const char_7 = window.tkGetChar(video_12.authorId),
-                isFollowed_2 = char_7 ? char_7.isFollowed : false,
-                authorName_2 = char_7 ? char_7.name || char_7.handle : video_12.authorName,
-                finalAvatar = window.tkResolveAvatar(
-                    video_12.authorId,
-                    authorName_2,
-                    video_12.authorAvatar,
-                ),
-                value_279 = finalAvatar
-                    ? '<img src="' + finalAvatar + '">'
-                    : '<i class="fas fa-user"></i>';
+            const char_7 = window.tkGetChar(video_12.authorId);
+            const isFollowed_2 = char_7 ? char_7.isFollowed : false;
+            const authorName_2 = char_7 ? char_7.name || char_7.handle : video_12.authorName;
+            const finalAvatar = window.tkResolveAvatar(
+                video_12.authorId,
+                authorName_2,
+                video_12.authorAvatar,
+            );
+            const value_279 = finalAvatar
+                ? '<img src="' + finalAvatar + '">'
+                : '<i class="fas fa-user"></i>';
             let formattedDesc = video_12.desc || '';
             formattedDesc = formattedDesc.replace(
                 /#([\w\u4e00-\u9fa5]+)/g,
                 '<span class="tk-hashtag" onclick="window.tkOpenHashtag(\'$1\', event)">#$1</span>',
             );
-            const card_3 = document.createElement('div');
-            card_3.className = 'tk-video-card';
-            card_3.dataset.videoId = video_12.id;
-            let bgStyleStr = 'background: #ffffff;',
-                cardContentHtml = '';
-            const mediaType_3 = tkGetMediaType(video_12),
-                visualImageUrl =
-                    mediaType_3 === 'image'
-                        ? tkStableImageUrl(video_12)
-                        : video_12.cover || video_12.bgImage;
+            const card_3 = window.tkGetVideoCover(video_12);
+            const _value47 = JSON.stringify([
+                video_12.desc,
+                video_12.mediaType,
+                video_12.contentType,
+                video_12.bgColor,
+                video_12.imagePrompt,
+                video_12.sceneText,
+                tkGetSceneSegments(video_12),
+                video_12.sceneSegmentTranslationsZh,
+                video_12.translationZh,
+                video_12.openingTranslationZh,
+                video_12.middleTranslationZh,
+                video_12.endingTranslationZh,
+                video_12.likes,
+                video_12.commentsCount,
+                video_12.shares,
+                video_12.isLiked,
+                authorName_2,
+                isFollowed_2,
+            ]);
+            const _value48 = _value44.get(String(video_12.id)) || document.createElement('div');
+            documentFragment.push(_value48);
+            const _value49 = _value.get(_value48);
+            if (
+                _value49?.key === _value47 &&
+                _value49.cover === card_3 &&
+                _value49.avatar === finalAvatar
+            )
+                return;
+            _value.set(_value48, {
+                key: _value47,
+                cover: card_3,
+                avatar: finalAvatar,
+            });
+            _value48.className = 'tk-video-card';
+            _value48.dataset.videoId = video_12.id;
+            let bgStyleStr = 'background: #ffffff;';
+            let cardContentHtml = '';
+            const mediaType_3 = tkGetMediaType(video_12);
+            const visualImageUrl =
+                mediaType_3 === 'image'
+                    ? tkStableImageUrl(video_12)
+                    : window.tkGetVideoCover(video_12);
             if (visualImageUrl)
                 cardContentHtml +=
-                    `
-                    <div class="tk-feed-visual ` +
+                    '\n                    <div class="tk-feed-visual ' +
                     (mediaType_3 === 'image' ? 'tk-feed-image-visual' : '') +
-                    `">
-                        <img src="` +
+                    '">\n                        <img src="' +
                     tkEscapeAttr(visualImageUrl) +
                     '" alt="" loading="' +
                     (value_103 < 2 ? 'eager' : 'lazy') +
-                    `" decoding="async">
-                    </div>
-                `;
+                    '" decoding="async">\n                    </div>\n                ';
             else
                 video_12.bgColor &&
                     (cardContentHtml +=
-                        `
-                    <div style="width: 100%; aspect-ratio: 3/4; background: ` +
+                        '\n                    <div style="width: 100%; aspect-ratio: 3/4; background: ' +
                         video_12.bgColor +
-                        `; position: absolute; top: 45%; transform: translateY(-50%);"></div>
-                `);
+                        '; position: absolute; top: 45%; transform: translateY(-50%);"></div>\n                ');
             const bubbleFlowHtml = tkCreateBubbleFlowHtml(video_12);
             if (bubbleFlowHtml) cardContentHtml += bubbleFlowHtml;
             else {
@@ -1545,103 +1570,65 @@ User context:
                     if (video_12.cover || video_12.bgImage) textContainerBg = 'rgba(17,17,17,0.8)';
                     else video_12.bgColor && (textContainerBg = '#111111');
                     cardContentHtml +=
-                        `
-                    <div style="background: ` +
+                        '\n                    <div style="background: ' +
                         textContainerBg +
-                        `; color: #ffffff; padding: 20px 24px; border-radius: 20px; max-width: 85%; margin: 0 auto; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 16px; line-height: 1.6; word-break: break-word; font-weight: 500; position: relative; z-index: 2; transform: translateY(-5vh);">
-                        ` +
+                        '; color: #ffffff; padding: 20px 24px; border-radius: 20px; max-width: 85%; margin: 0 auto; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 16px; line-height: 1.6; word-break: break-word; font-weight: 500; position: relative; z-index: 2; transform: translateY(-5vh);">\n                        ' +
                         video_12.sceneText +
-                        `
-                    </div>
-                `;
+                        '\n                    </div>\n                ';
                 } else
                     !video_12.cover &&
                         !video_12.bgImage &&
                         !video_12.bgColor &&
-                        (cardContentHtml += `
-                    <div style="background: #111111; color: #ffffff; padding: 20px 24px; border-radius: 20px; max-width: 85%; margin: 0 auto; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 16px; line-height: 1.6; word-break: break-word; font-weight: 500; position: relative; z-index: 2; transform: translateY(-5vh);">
-                        暂无内容
-                    </div>
-                `);
+                        (cardContentHtml +=
+                            '\n                    <div style="background: #111111; color: #ffffff; padding: 20px 24px; border-radius: 20px; max-width: 85%; margin: 0 auto; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 16px; line-height: 1.6; word-break: break-word; font-weight: 500; position: relative; z-index: 2; transform: translateY(-5vh);">\n                        暂无内容\n                    </div>\n                ');
             }
-            card_3.innerHTML =
-                `
-                <div class="tk-video-text-content" style="` +
+            _value48.innerHTML =
+                '\n                <div class="tk-video-text-content" style="' +
                 bgStyleStr +
-                ` display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; position: relative;">
-                    ` +
+                ' display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; position: relative;">\n                    ' +
                 cardContentHtml +
-                `
-                </div>
-
-                <div class="tk-right-actions">
-                    <div class="tk-avatar-action" onclick="window.tkHandleProfileClick('` +
+                '\n                </div>\n\n                <div class="tk-right-actions">\n                    <div class="tk-avatar-action" onclick="window.tkHandleProfileClick(\'' +
                 video_12.authorId +
-                `', event)">
-                        ` +
+                '\', event)">\n                        ' +
                 value_279 +
-                `
-                        <div class="tk-action-plus ` +
+                '\n                        <div class="tk-action-plus ' +
                 (isFollowed_2 ? 'followed' : '') +
                 '" onclick="window.tkHandleFollow(\'' +
                 video_12.authorId +
-                `', event)">
-                            <i class="fas fa-plus"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="tk-action-item ` +
+                '\', event)">\n                            <i class="fas fa-plus"></i>\n                        </div>\n                    </div>\n                    \n                    <div class="tk-action-item ' +
                 (video_12.isLiked ? 'liked' : '') +
                 '" data-tk-action="like" onclick="window.tkHandleLike(\'' +
                 video_12.id +
-                `', this, event)">
-                        <i class="fas fa-heart"></i>
-                        <span>` +
+                '\', this, event)">\n                        <i class="fas fa-heart"></i>\n                        <span>' +
                 window.tkFormatCount(video_12.likes || 0) +
-                `</span>
-                    </div>
-                    
-                    <div class="tk-action-item" data-tk-action="comments" onclick="window.tkOpenComments('` +
+                '</span>\n                    </div>\n                    \n                    <div class="tk-action-item" data-tk-action="comments" onclick="window.tkOpenComments(\'' +
                 video_12.id +
-                `', event)">
-                        <i class="fas fa-comment-dots"></i>
-                        <span>` +
+                '\', event)">\n                        <i class="fas fa-comment-dots"></i>\n                        <span>' +
                 window.tkFormatCount(video_12.commentsCount || 0) +
-                `</span>
-                    </div>
-                    
-            <div class="tk-action-item" onclick="window.tkOpenShare('` +
+                '</span>\n                    </div>\n                    \n            <div class="tk-action-item" onclick="window.tkOpenShare(\'' +
                 video_12.id +
-                `', event)">
-                <i class="fas fa-share" style="transform: scaleX(-1);"></i>
-                <span id="share-count-` +
+                '\', event)">\n                <i class="fas fa-share" style="transform: scaleX(-1);"></i>\n                <span id="share-count-' +
                 video_12.id +
                 '">' +
                 window.tkFormatCount(video_12.shares || 0) +
-                `</span>
-            </div>
-
-                    <div class="tk-music-disc" onclick="window.tkOpenMusic(event)">
-                        <i class="fas fa-music"></i>
-                    </div>
-                </div>
-
-                ` +
+                '</span>\n            </div>\n\n                    <div class="tk-music-disc" onclick="window.tkOpenMusic(event)">\n                        <i class="fas fa-music"></i>\n                    </div>\n                </div>\n\n                ' +
                 tkCreateFeedProgressHtml_2(video_12) +
-                `
-
-                <div class="tk-bottom-info">
-                    <div class="tk-video-author">@` +
+                '\n\n                <div class="tk-bottom-info">\n                    <div class="tk-video-author">@' +
                 authorName_2 +
-                `</div>
-                    <div class="tk-video-desc">` +
+                '</div>\n                    <div class="tk-video-desc">' +
                 formattedDesc +
-                `</div>
-                </div>
-            `;
-            documentFragment.appendChild(card_3);
+                '</div>\n                </div>\n            ';
         });
-        feedContainer.appendChild(documentFragment);
+        const _value45 = new Set(documentFragment);
+        _value41.forEach((_value50) => {
+            if (!_value45.has(_value50)) _value50.remove();
+        });
+        documentFragment.forEach((_value51, _value52) => {
+            if (feedContainer.children[_value52] !== _value51)
+                feedContainer.insertBefore(_value51, feedContainer.children[_value52] || null);
+        });
+        if (_value42 && _value45.has(_value42)) _value0(_value42.offsetTop + _value43);
+        isActiveTabFollowing(documentFragment);
         document.getElementById('tk-home-tab').dataset.tkRendered = 'true';
     };
     setTimeout(() => {
@@ -1652,9 +1639,9 @@ User context:
             newDisc.addEventListener('click', (e_3) => window.tkOpenMusic(e_3));
         }
     }, 500);
-    const fsView = document.getElementById('tk-fullscreen-video-view'),
-        backBtn = document.getElementById('tk-fs-video-back-btn'),
-        magicBtn = document.getElementById('tk-fs-video-magic-btn');
+    const fsView = document.getElementById('tk-fullscreen-video-view');
+    const backBtn = document.getElementById('tk-fs-video-back-btn');
+    const magicBtn = document.getElementById('tk-fs-video-magic-btn');
     backBtn &&
         fsView &&
         backBtn.addEventListener('click', () => {
@@ -1758,50 +1745,65 @@ User context:
         if (!video_16) return;
         if (value_306 === 'save') {
             video_16.isSaved = !video_16.isSaved;
-            if (window.tkPersistState) window.tkPersistState();
+            window.tkPersistStateAfterPaint?.({
+                dirtyTabs: ['tk-profile-tab'],
+            });
             window.showToast(video_16.isSaved ? '已收藏' : '已取消收藏');
         } else {
-            if (value_306 === 'edit') {
-                currentEditingVideoId = window.currentShareVideoId;
-                const avatarEl = document.getElementById('tk-edit-video-bg-img');
-                if (avatarEl) {
-                    const src_2 = video_16.bgImage || video_16.cover;
-                    src_2
-                        ? ((avatarEl.src = src_2), (avatarEl.style.display = 'block'))
-                        : ((avatarEl.src = ''), (avatarEl.style.display = 'none'));
-                }
-                const descInput = document.getElementById('tk-edit-video-desc-input');
-                if (descInput) descInput.value = video_16.desc || '';
-                const sceneInput = document.getElementById('tk-edit-video-scene-input');
-                if (sceneInput) sceneInput.value = video_16.sceneText || '';
-                window.openView(document.getElementById('tk-edit-single-video-sheet'));
-            } else {
-                if (value_306 === 'delete') {
-                    if (confirm('确定要彻底删除这个视频吗？')) {
-                        const vId = window.currentShareVideoId;
-                        tkState.videos = tkState.videos.filter((v_5) => v_5.id !== vId);
-                        tkState.profile &&
-                            tkState.profile.posts &&
-                            (tkState.profile.posts = tkState.profile.posts.filter(
-                                (v_6) => v_6.id !== vId,
-                            ));
-                        tkState.chars.forEach((c_4) => {
+            if (value_306 === 'generate-image') window.tkOpenVideoImageGenerator?.(video_16.id);
+            else {
+                if (value_306 === 'edit') {
+                    currentEditingVideoId = window.currentShareVideoId;
+                    const avatarEl = document.getElementById('tk-edit-video-bg-img');
+                    if (avatarEl) {
+                        const src_2 = window.tkGetVideoCover(video_16);
+                        src_2
+                            ? ((avatarEl.src = src_2), (avatarEl.style.display = 'block'))
+                            : ((avatarEl.src = ''), (avatarEl.style.display = 'none'));
+                    }
+                    const descInput = document.getElementById('tk-edit-video-desc-input');
+                    if (descInput) descInput.value = video_16.desc || '';
+                    const sceneInput = document.getElementById('tk-edit-video-scene-input');
+                    if (sceneInput) sceneInput.value = video_16.sceneText || '';
+                    window.openView(document.getElementById('tk-edit-single-video-sheet'));
+                } else {
+                    if (value_306 === 'delete') {
+                        if (confirm('确定要彻底删除这个视频吗？')) {
+                            const vId = window.currentShareVideoId;
+                            tkState.videos = tkState.videos.filter((v_5) => v_5.id !== vId);
+                            tkState.profile &&
+                                tkState.profile.posts &&
+                                (tkState.profile.posts = tkState.profile.posts.filter(
+                                    (v_6) => v_6.id !== vId,
+                                ));
+                            tkState.chars.forEach((c_4) => {
                             c_4.likedVideoIds &&
                                 (c_4.likedVideoIds = c_4.likedVideoIds.filter(
                                     (id_7) => id_7 !== vId,
                                 ));
                         });
-                        if (window.tkPersistState) window.tkPersistState();
-                        window.tkRenderHome();
-                        if (window.tkRenderProfile) window.tkRenderProfile();
-                        const tkFullscreenVideoViewElement_309 = document.getElementById(
-                            'tk-fullscreen-video-view',
-                        );
-                        tkFullscreenVideoViewElement_309 &&
-                            tkFullscreenVideoViewElement_309.classList.contains('active') &&
-                            tkFullscreenVideoViewElement_309.dataset.videoId === vId &&
-                            tkFullscreenVideoViewElement_309.classList.remove('active');
-                        window.showToast('已删除');
+                            if (window.tkPersistState) window.tkPersistState();
+                            Promise.resolve(window.saveGlobalData?.())
+                                .then((_value53) => {
+                                    if (_value53 !== false)
+                                        return window.tkReleaseUnusedVideoAsset?.(
+                                            video_16.generatedCoverAssetId,
+                                        );
+                                })
+                                ['catch']((_value54) =>
+                                    console.warn('TikTok deleted cover cleanup failed:', _value54),
+                                );
+                            window.tkRenderHome();
+                            if (window.tkRenderProfile) window.tkRenderProfile();
+                            const tkFullscreenVideoViewElement_309 = document.getElementById(
+                                'tk-fullscreen-video-view',
+                            );
+                            tkFullscreenVideoViewElement_309 &&
+                                tkFullscreenVideoViewElement_309.classList.contains('active') &&
+                                tkFullscreenVideoViewElement_309.dataset.videoId === vId &&
+                                tkFullscreenVideoViewElement_309.classList.remove('active');
+                            window.showToast('已删除');
+                        }
                     }
                 }
             }
@@ -1829,8 +1831,8 @@ User context:
             return;
         }
         try {
-            const coverEl_2 = document.getElementById('tk-fs-video-cover'),
-                fsVideoContainer = document.getElementById('tk-fs-video-container');
+            const coverEl_2 = document.getElementById('tk-fs-video-cover');
+            const fsVideoContainer = document.getElementById('tk-fs-video-container');
             if (fsVideoContainer) {
                 fsVideoContainer
                     .querySelectorAll('.tk-fs-video-progress')
@@ -1853,7 +1855,7 @@ User context:
                     fsVideoContainer.insertBefore(textBubble, fsVideoContainer.firstChild));
                 coverEl_2 &&
                     ((coverEl_2.style.objectFit = 'contain'), (coverEl_2.style.boxShadow = 'none'));
-                const src_3 = video_17.cover || video_17.bgImage || video_17.imageUrl || '';
+                const src_3 = window.tkGetVideoCover(video_17);
                 coverEl_2 &&
                     (src_3
                         ? ((coverEl_2.src = src_3), (coverEl_2.style.display = 'block'))
@@ -1875,20 +1877,20 @@ User context:
                       (textBubble.style.height = '100%'))
                     : ((textBubble.innerHTML = ''), (textBubble.style.display = 'none'));
             }
-            const textContent_2 = video_17.desc ? video_17.desc : tkGetSceneText(video_17),
-                descEl = document.getElementById('tk-fs-video-desc');
+            const textContent_2 = video_17.desc ? video_17.desc : tkGetSceneText(video_17);
+            const descEl = document.getElementById('tk-fs-video-desc');
             descEl && ((descEl.textContent = textContent_2), (descEl.style.color = '#111111'));
             const authorEl = document.getElementById('tk-fs-video-author');
             authorEl &&
                 ((authorEl.textContent = '@' + (author_4.handle || author_4.id || 'user')),
                 (authorEl.style.color = '#111111'));
-            const avatarEl_2 = document.getElementById('tk-fs-video-avatar'),
-                iconEl = document.getElementById('tk-fs-video-avatar-icon'),
-                src_4 = window.tkResolveAvatar(
-                    video_17.authorId,
-                    author_4.name || author_4.handle || video_17.authorName,
-                    author_4.avatar || video_17.authorAvatar,
-                );
+            const avatarEl_2 = document.getElementById('tk-fs-video-avatar');
+            const iconEl = document.getElementById('tk-fs-video-avatar-icon');
+            const src_4 = window.tkResolveAvatar(
+                video_17.authorId,
+                author_4.name || author_4.handle || video_17.authorName,
+                author_4.avatar || video_17.authorAvatar,
+            );
             if (src_4) {
                 avatarEl_2 && ((avatarEl_2.src = src_4), (avatarEl_2.style.display = 'block'));
                 if (iconEl) iconEl.style.display = 'none';
@@ -1932,12 +1934,12 @@ User context:
     };
     magicBtn &&
         magicBtn.addEventListener('click', async () => {
-            const videoId_5 = fsView.dataset.videoId,
-                {
-                    video: video_18,
-                    author: author_5,
-                    isUser: isUser_6,
-                } = window.findVideoGlobal(videoId_5);
+            const videoId_5 = fsView.dataset.videoId;
+            const {
+                video: video_18,
+                author: author_5,
+                isUser: isUser_6,
+            } = window.findVideoGlobal(videoId_5);
             if (!video_18) return;
             if (!window.apiConfig || !window.apiConfig.endpoint || !window.apiConfig.apiKey) {
                 window.showToast('请在系统设置中配置 API');
@@ -1949,100 +1951,66 @@ User context:
                 const friends = tkState.chars.filter((c_5) => c_5.isFollowed).slice(0, 3);
                 friends.length > 0 &&
                     (text_120 =
-                        `
-博主(User)有以下几个已关注的好友（你可以安排他们中的1-2个来评论）：
-` +
-                        friends.map(
-                            (contact_339) =>
+                        '\n博主(User)有以下几个已关注的好友（你可以安排他们中的1-2个来评论）：\n' +
+                        friends
+                            .map(
+                                (contact_339) =>
                                 '- CharID: ' +
                                 contact_339.id +
                                 ', 名字: ' +
                                 contact_339.name +
                                 ', 人设: ' +
                                 contact_339.persona,
-                        ).join(`
-`) +
-                        `
-如果使用了好友的评论，请把他们的 CharID 填在 authorId 字段中，名字填在 authorName 字段。`);
+                            )
+                            .join('\n') +
+                        '\n如果使用了好友的评论，请把他们的 CharID 填在 authorId 字段中，名字填在 authorName 字段。');
             }
             const value_121 = window.tkBuildWorldBookContext
-                    ? window.tkBuildWorldBookContext(
-                          (video_18.desc || '') +
-                              `
-` +
-                              (video_18.scene || '') +
-                              `
-` +
-                              (video_18.sceneText || '') +
-                              `
-` +
-                              (author_5.persona || ''),
-                      )
-                    : '',
-                value_122 =
-                    `
-你现在是一个 TikTok 互动模拟器。
-用户（也就是发视频的博主）的人设是：` +
-                    (author_5.persona || '普通人') +
-                    `
-刚发布的视频内容或背景描述是：` +
-                    (video_18.scene ||
-                        video_18.desc ||
-                        video_18.sceneText ||
-                        '一段有趣的日常视频') +
-                    `
-` +
-                    text_120 +
-                    `
-` +
-                    value_121 +
-                    `
-
-请为这个视频生成一些观众的互动数据。评论要具有活人感、网感，如果是朋友的评论要符合朋友的人设语气。
-重要：评论中可以带上艾特好友（@好友名字）或路人，增加互动真实感。艾特别人时，有几率触发被艾特的人在 \`replies\` 数组中进行楼中楼回复。
-国际化翻译规则：评论或 replies 的 text 如果不是中文，必须同时填写 translationZh，内容是自然中文翻译；如果 text 是中文，translationZh 必须是空字符串。
-要求返回严格的 JSON 格式（不要有多余文字或 markdown），格式如下：
-{
-  "newLikes": 850,
-  "newComments": [
-    { 
-      "authorId": "可能的话填入好友的CharID，否则留空", 
-      "authorName": "观众A或好友名字", 
-      "authorAvatar": "可以留空由系统自动生成", 
-      "text": "太有趣了吧！ @某某",
-      "translationZh": "",
-      "replies": [
-         { "authorName": "某某", "authorAvatar": "", "text": "哈哈哈确实！", "translationZh": "", "likes": 5 }
-      ]
-    }
-  ]
-}
-`;
+                ? window.tkBuildWorldBookContext(
+                      (video_18.desc || '') +
+                          '\n' +
+                          (video_18.scene || '') +
+                          '\n' +
+                          (video_18.sceneText || '') +
+                          '\n' +
+                          (author_5.persona || ''),
+                  )
+                : '';
+            const value_122 =
+                '\n你现在是一个 TikTok 互动模拟器。\n用户（也就是发视频的博主）的人设是：' +
+                (author_5.persona || '普通人') +
+                '\n刚发布的视频内容或背景描述是：' +
+                (video_18.scene || video_18.desc || video_18.sceneText || '一段有趣的日常视频') +
+                '\n' +
+                text_120 +
+                '\n' +
+                value_121 +
+                '\n\n请为这个视频生成一些观众的互动数据。评论要具有活人感、网感，如果是朋友的评论要符合朋友的人设语气。\n重要：评论中可以带上艾特好友（@好友名字）或路人，增加互动真实感。艾特别人时，有几率触发被艾特的人在 `replies` 数组中进行楼中楼回复。\n国际化翻译规则：评论或 replies 的 text 如果不是中文，必须同时填写 translationZh，内容是自然中文翻译；如果 text 是中文，translationZh 必须是空字符串。\n要求返回严格的 JSON 格式（不要有多余文字或 markdown），格式如下：\n{\n  "newLikes": 850,\n  "newComments": [\n    { \n      "authorId": "可能的话填入好友的CharID，否则留空", \n      "authorName": "观众A或好友名字", \n      "authorAvatar": "可以留空由系统自动生成", \n      "text": "太有趣了吧！ @某某",\n      "translationZh": "",\n      "replies": [\n         { "authorName": "某某", "authorAvatar": "", "text": "哈哈哈确实！", "translationZh": "", "likes": 5 }\n      ]\n    }\n  ]\n}\n';
             try {
                 const endpoint_2 = window.u2Api.resolveChatCompletionsEndpoint(
-                        window.apiConfig.endpoint,
-                    ),
-                    value_340 = await fetch(endpoint_2, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: 'Bearer ' + window.apiConfig.apiKey,
-                        },
-                        body: JSON.stringify({
-                            model: window.apiConfig.model || 'gpt-3.5-turbo',
-                            messages: [
-                                {
-                                    role: 'system',
-                                    content: 'You are a JSON generator.',
-                                },
-                                {
-                                    role: 'user',
-                                    content: value_122,
-                                },
-                            ],
-                            temperature: parseFloat(window.apiConfig.temperature) || 0.8,
-                        }),
-                    });
+                    window.apiConfig.endpoint,
+                );
+                const value_340 = await window.tkFetch('videos', endpoint_2, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + window.apiConfig.apiKey,
+                    },
+                    body: JSON.stringify({
+                        model: window.apiConfig.model || 'gpt-3.5-turbo',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'You are a JSON generator.',
+                            },
+                            {
+                                role: 'user',
+                                content: value_122,
+                            },
+                        ],
+                        temperature: parseFloat(window.apiConfig.temperature) || 0.8,
+                    }),
+                });
                 if (!value_340.ok)
                     throw (
                         window.u2Api?.createHttpError?.(
@@ -2078,6 +2046,7 @@ User context:
                 window.showToast('互动数据生成完毕！');
                 if (window.tkRenderProfile) window.tkRenderProfile();
             } catch (value_348) {
+                if (value_348?.name === 'AbortError') return;
                 console.error(value_348);
                 if (
                     !window.u2Api?.isRequestError?.(value_348) ||
@@ -2302,8 +2271,8 @@ User context:
                 : entry_8.authorAvatar || '',
         };
     }
-    let value_25 = null,
-        value_26 = null;
+    let value_25 = null;
+    let value_26 = null;
     function handleAction_27(video_23) {
         const list = document.getElementById('tk-comments-list'),
             title_3 = document.getElementById('tk-comments-title');
@@ -2709,8 +2678,8 @@ User context:
     window.tkOpenShare = function (currentShareVideoId_2, event_181) {
         if (event_181) event_181.stopPropagation();
         window.currentShareVideoId = currentShareVideoId_2;
-        const shareSheet = document.getElementById('tk-share-sheet'),
-            shareList = document.getElementById('tk-share-list');
+        const shareSheet = document.getElementById('tk-share-sheet');
+        const shareList = document.getElementById('tk-share-list');
         if (!shareSheet || !shareList) return;
         shareList.innerHTML = '';
         const followedChars_2 = tkState.chars.filter((c_8) => c_8.isFollowed);
@@ -2781,24 +2750,8 @@ User context:
               });
         const actionsRow = document.querySelector('.tk-share-actions-row');
         actionsRow &&
-            (actionsRow.innerHTML = `
-                <div class="tk-share-action-item" onclick="window.tkHandleShareAction('save')">
-                    <div class="tk-share-action-icon"><i class="fas fa-bookmark" id="tk-share-save-icon"></i></div>
-                    <span>收藏</span>
-                </div>
-                <div class="tk-share-action-item" onclick="window.tkHandleShareAction('edit')">
-                    <div class="tk-share-action-icon"><i class="fas fa-pen"></i></div>
-                    <span>编辑</span>
-                </div>
-                <div class="tk-share-action-item" onclick="window.tkHandleShareAction('delete')">
-                    <div class="tk-share-action-icon" style="color: #ff3b30;"><i class="fas fa-trash-alt"></i></div>
-                    <span style="color: #ff3b30;">删除</span>
-                </div>
-                <div class="tk-share-action-item" onclick="window.showToast('链接已复制'); window.closeView(document.getElementById('tk-share-sheet'));">
-                    <div class="tk-share-action-icon"><i class="fas fa-link"></i></div>
-                    <span>复制链接</span>
-                </div>
-            `);
+            (actionsRow.innerHTML =
+                '\n                <button type="button" class="tk-share-action-item" onclick="window.tkHandleShareAction(\'generate-image\')">\n                    <div class="tk-share-action-icon"><i class="fas fa-wand-magic-sparkles"></i></div>\n                    <span>生图</span>\n                </button>\n                <div class="tk-share-action-item" onclick="window.tkHandleShareAction(\'save\')">\n                    <div class="tk-share-action-icon"><i class="fas fa-bookmark" id="tk-share-save-icon"></i></div>\n                    <span>收藏</span>\n                </div>\n                <div class="tk-share-action-item" onclick="window.tkHandleShareAction(\'edit\')">\n                    <div class="tk-share-action-icon"><i class="fas fa-pen"></i></div>\n                    <span>编辑</span>\n                </div>\n                <div class="tk-share-action-item" onclick="window.tkHandleShareAction(\'delete\')">\n                    <div class="tk-share-action-icon" style="color: #ff3b30;"><i class="fas fa-trash-alt"></i></div>\n                    <span style="color: #ff3b30;">删除</span>\n                </div>\n                <div class="tk-share-action-item" onclick="window.showToast(\'链接已复制\'); window.closeView(document.getElementById(\'tk-share-sheet\'));">\n                    <div class="tk-share-action-icon"><i class="fas fa-link"></i></div>\n                    <span>复制链接</span>\n                </div>\n            ');
         if (shareSheet && !shareSheet.dataset.boundActions) {
             shareSheet.dataset.boundActions = 'true';
             shareSheet.addEventListener('click', (event_488) => {
@@ -2943,73 +2896,98 @@ User context:
         }
         if (window.tkOpenSubProfile) window.tkOpenSubProfile(value_507);
     };
+    let sheet_3 = null;
     function tkEnsureSearchGenerateSheet() {
-        let sheet_3 = document.getElementById('tk-search-generate-sheet');
-        if (sheet_3) return sheet_3;
-        return (
-            (sheet_3 = document.createElement('div')),
-            (sheet_3.className = 'bottom-sheet-overlay detail-sheet-overlay'),
-            (sheet_3.id = 'tk-search-generate-sheet'),
-            (sheet_3.innerHTML = `
-            <div class="bottom-sheet tk-search-generate-sheet">
-                <div class="sheet-handle"></div>
-                <div class="sheet-title">搜索生成视频</div>
-                <div class="detail-sheet-content tk-search-generate-content">
-                    <div class="tk-search-generate-box">
-                        <i class="fas fa-search"></i>
-                        <input id="tk-search-generate-input" type="text" enterkeyhint="done" placeholder="想看什么？留空随机生成">
-                    </div>
-                    <label class="tk-search-generate-count" for="tk-search-generate-count-input">
-                        <span>生成数量</span>
-                        <input id="tk-search-generate-count-input" type="number" min="1" max="10" step="1" value="3" inputmode="numeric" enterkeyhint="done" aria-label="生成视频数量">
-                    </label>
-                    <div class="sheet-action confirm-action" id="tk-search-generate-confirm">生成</div>
-                    <div class="sheet-action" id="tk-search-generate-cancel">取消</div>
-                </div>
-            </div>
-        `),
-            document.getElementById('tiktok-view')?.appendChild(sheet_3),
-            sheet_3.addEventListener('click', (event_202) => {
-                if (event_202.target === sheet_3) window.closeView(sheet_3);
-            }),
-            sheet_3
-                .querySelector('#tk-search-generate-cancel')
-                ?.addEventListener('click', () => window.closeView(sheet_3)),
-            sheet_3.querySelector('#tk-search-generate-confirm')?.addEventListener('click', () => {
-                const query =
-                        sheet_3.querySelector('#tk-search-generate-input')?.value.trim() || '',
-                    countInput = sheet_3.querySelector('#tk-search-generate-count-input'),
-                    count_3 = Math.min(
-                        10,
-                        Math.max(1, Number.parseInt(countInput?.value, 10) || 3),
-                    );
-                if (countInput) countInput.value = String(count_3);
-                window.closeView(sheet_3);
-                window.tkGenerateSearchVideos(query, count_3);
-            }),
-            sheet_3
-                .querySelectorAll('#tk-search-generate-input, #tk-search-generate-count-input')
-                .forEach((value_203) =>
-                    value_203.addEventListener('keydown', (event_204) => {
-                        event_204.key === 'Enter' &&
-                            !event_204.isComposing &&
-                            event_204.keyCode !== 229 &&
-                            (event_204.preventDefault(),
-                            sheet_3.querySelector('#tk-search-generate-confirm')?.click());
-                    }),
-                ),
-            sheet_3
-        );
+        let _value55 = document.getElementById('tk-search-generate-sheet');
+        if (_value55) return _value55;
+        _value55 = document.createElement('div');
+        _value55.className = 'bottom-sheet-overlay detail-sheet-overlay';
+        _value55.id = 'tk-search-generate-sheet';
+        _value55.innerHTML =
+            '\n            <div class="bottom-sheet tk-search-generate-sheet">\n                <div class="sheet-handle"></div>\n                <div class="sheet-title">搜索生成视频</div>\n                <div class="detail-sheet-content tk-search-generate-content">\n                    <div class="tk-search-generate-box">\n                        <i class="fas fa-search"></i>\n                        <input id="tk-search-generate-input" type="text" enterkeyhint="done" placeholder="想看什么？留空随机生成">\n                    </div>\n                    <label class="tk-search-generate-count" for="tk-search-generate-count-input">\n                        <span>生成数量</span>\n                        <input id="tk-search-generate-count-input" type="number" min="1" max="10" step="1" value="3" inputmode="numeric" enterkeyhint="done" aria-label="生成视频数量">\n                    </label>\n                    <button type="button" class="sheet-action confirm-action" id="tk-search-generate-confirm">生成</button>\n                    <button type="button" class="sheet-action" id="tk-search-generate-cancel">取消</button>\n                </div>\n            </div>\n        ';
+        document.getElementById('tiktok-view')?.appendChild(_value55);
+        let _value56 = [];
+        let _value57 = 0;
+        _value55.addEventListener('u2:view-closing', () => {
+            sheet_3 = null;
+            delete _value55.dataset.tkCharId;
+            if (!_value55.classList.contains('active')) return;
+            const _value58 = ++_value57;
+            const _value59 = () => {
+                if (_value58 !== _value57) return;
+                _value56.forEach(([_value60, _value61, _value62]) => {
+                    _value60.scrollTop = _value61;
+                    _value60.scrollLeft = _value62;
+                });
+            };
+            _value59();
+            requestAnimationFrame(_value59);
+        });
+        _value55.addEventListener('tk:search-opening', () => {
+            _value57++;
+            _value56 = [];
+            for (
+                let _value63 = _value55.parentElement;
+                _value63;
+                _value63 = _value63.parentElement
+            ) {
+                _value56.push([_value63, _value63.scrollTop, _value63.scrollLeft]);
+            }
+            _value55.querySelector('.detail-sheet-content').scrollTop = 0;
+        });
+        _value55.addEventListener('click', (event_202) => {
+            if (event_202.target === _value55) window.closeView(_value55);
+        });
+        _value55
+            .querySelector('#tk-search-generate-cancel')
+            ?.addEventListener('click', () => window.closeView(_value55));
+        _value55.querySelector('#tk-search-generate-confirm')?.addEventListener('click', () => {
+            const query = sheet_3;
+            if (!_value55.classList.contains('active') || !query) return;
+            if (query.isCurrent && !query.isCurrent()) {
+                window.closeView(_value55);
+                return;
+            }
+            const _value64 =
+                _value55.querySelector('#tk-search-generate-input')?.value.trim() || '';
+            const countInput = _value55.querySelector('#tk-search-generate-count-input');
+            const count_3 = Math.min(10, Math.max(1, Number.parseInt(countInput?.value, 10) || 3));
+            if (countInput) countInput.value = String(count_3);
+            window.closeView(_value55);
+            query.onGenerate(_value64, count_3);
+        });
+        _value55
+            .querySelectorAll('#tk-search-generate-input, #tk-search-generate-count-input')
+            .forEach((value_203) =>
+                value_203.addEventListener('keydown', (event_204) => {
+                    event_204.key === 'Enter' &&
+                        !event_204.isComposing &&
+                        event_204.keyCode !== 229 &&
+                        (event_204.preventDefault(),
+                        _value55.querySelector('#tk-search-generate-confirm')?.click());
+                }),
+            );
+        return _value55;
     }
-    window.tkOpenSearchGenerateSheet = function (event_15) {
+    window.tkOpenSearchGenerateSheet = function (event_15, _value65 = {}) {
         if (event_15) event_15.stopPropagation();
-        const sheet_4 = tkEnsureSearchGenerateSheet(),
-            input = sheet_4.querySelector('#tk-search-generate-input'),
-            countInput_2 = sheet_4.querySelector('#tk-search-generate-count-input');
+        const sheet_4 = tkEnsureSearchGenerateSheet();
+        const input = sheet_4.querySelector('#tk-search-generate-input');
+        const countInput_2 = sheet_4.querySelector('#tk-search-generate-count-input');
         if (input) input.value = '';
+        if (input) input.placeholder = _value65.placeholder || '想看什么？留空随机生成';
         if (countInput_2) countInput_2.value = '3';
+        sheet_4.querySelector('.sheet-title').textContent = _value65.title || '搜索生成视频';
+        sheet_3 = {
+            onGenerate:
+                _value65.onGenerate ||
+                ((_value66, _value67) => window.tkGenerateSearchVideos(_value66, _value67)),
+            isCurrent: _value65.isCurrent,
+        };
+        if (_value65.charId != null) sheet_4.dataset.tkCharId = String(_value65.charId);
+        else delete sheet_4.dataset.tkCharId;
+        sheet_4.dispatchEvent(new CustomEvent('tk:search-opening'));
         window.openView(sheet_4);
-        setTimeout(() => input?.focus(), 80);
     };
     window.tkTriggerApiGenerate = function (e_8) {
         window.tkOpenSearchGenerateSheet(e_8);
@@ -3020,100 +2998,34 @@ User context:
             window.showToast('请在系统设置中配置 API');
             return;
         }
-        const topic = String(value_205 || '').trim(),
-            targetCount = Math.min(10, Math.max(1, Number.parseInt(requestedCount, 10) || 3)),
-            contextText_2 = topic || '随机 TikTok 视频流',
-            value_210 = window.tkBuildWorldBookContext
-                ? window.tkBuildWorldBookContext(contextText_2)
-                : '',
-            userPersonaContext = window.tkBuildWorldActorPrompt
-                ? window.tkBuildWorldActorPrompt({
-                      includeUserIdentity: false,
-                      purpose: 'TikTok For You 主页内容流',
-                      triggerText: topic || contextText_2,
-                  })
-                : '',
-            value_212 =
-                `
-你是 TikTok For You 内容流 JSON 生成器。根据用户想看的主题、世界书和 user 人设关键词触发信息，一次生成恰好 ` +
-                targetCount +
-                ` 条完整 TikTok 内容，内容可以是短视频，也可以是图片帖。
-你可以是这个世界观里的任何非 user 创作者/路人/账号；只有主题确实需要时才提到 user，且永远不能扮演 user。
-
-用户主题：` +
-                (topic || '留空，随机生成但要具体、有生活感') +
-                `
-
-硬性要求：
-1. 返回严格 JSON 数组，数组长度必须恰好为 ` +
-                targetCount +
-                `，不要 markdown，不要解释文字。
-2. 每条内容必须有 mediaType，值只能是 "video" 或 "image"；video 像真实短视频，image 像真实图片帖/随手拍/截图梗图。
-3. 每条内容必须有 opening、middle、ending 三段；每段不少于 40 个字符，建议 40-80 字，分别呈现开头、中间、结尾，适合在画面中央逐条气泡显示。原文可以使用符合作者国籍、世界观和内容语境的任意语言。
-4. image 内容必须额外提供 imagePrompt，描述图片主体、构图、光线、质感；可选 bgImage、cover 或 imageUrl，如果没有真实 URL 就留空。
-5. 每条内容必须有不少于 10 条 comments。每条评论必须有 authorName、authorAvatar、text、likes、replies。
-6. replies 必须保留为数组；每条视频的 replies 楼中楼回复总数不少于 10 条，可以分布在多条评论下；每条回复带 authorName、authorAvatar、text、likes。
-7. desc 要像真实 TikTok 文案，可带 0-3 个 tag。内容要有网感、活人感、镜头感，不要像新闻稿。
-8. 作者和评论头像可使用 https://picsum.photos/150/150?random=数字 或 https://api.dicebear.com/7.x/avataaars/svg?seed=名字。
-9. 国际化翻译规则：opening/middle/ending 如果不是中文，必须分别填写 openingTranslationZh/middleTranslationZh/endingTranslationZh；评论或 replies 的 text 如果不是中文，必须填写 translationZh；如果原文是中文，对应翻译字段必须是空字符串。
-10. 禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。
-
-JSON 示例：
-[
-  {
-    "mediaType": "image",
-    "authorName": "用户昵称",
-    "handle": "user_id",
-    "authorAvatar": "https://picsum.photos/150/150?random=101",
-    "desc": "刚刚发生的瞬间 #日常 #随手拍",
-    "imagePrompt": "夜晚便利店门口的暖光随手拍，玻璃反光里有人低头笑，手机纪实感",
-    "opening": "开头不少于40字，写环境、第一眼看到的动作和氛围，要像画面中央的长气泡文字。",
-    "openingTranslationZh": "",
-    "middle": "中间不少于40字，写人物反应、冲突或一句很真实的话，保持第三人称和镜头感。",
-    "middleTranslationZh": "",
-    "ending": "结尾不少于40字，写收束、反转、余味或下一秒发生什么，不要短于40字。",
-    "endingTranslationZh": "",
-    "likes": 1234,
-    "shares": 12,
-    "comments": [
-      {
-        "authorName": "评论者A",
-        "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=a",
-        "text": "评论内容",
-        "translationZh": "",
-        "likes": 12,
-        "replies": [
-          {
-            "authorName": "回复者B",
-            "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=b",
-            "text": "楼中楼回复",
-            "translationZh": "",
-            "likes": 3
-          }
-        ]
-      }
-    ]
-  }
-]
-
-最终输出前请自检：
-- 顶层只能是 JSON 数组，或对象 { "content": [...] }。
-- 所有属性名必须是英文双引号。
-- 每条内容至少 10 条 comments，且 replies 总数至少 10 条。
-- opening、middle、ending 每个字段都不少于 40 个字符；如果不是中文，对应 TranslationZh 字段必须给出中文翻译。
-- 不允许尾逗号、注释、markdown 代码块、解释文字、中文引号作为 JSON 引号。
-- 如果不确定图片 URL，请把 imageUrl/bgImage/cover 留空，不要编造不可访问链接。
-
-` +
-                value_210 +
-                `
-` +
-                userPersonaContext +
-                `
-`;
+        const topic = String(value_205 || '').trim();
+        const targetCount = Math.min(10, Math.max(1, Number.parseInt(requestedCount, 10) || 3));
+        const contextText_2 = topic || '随机 TikTok 视频流';
+        const value_210 = window.tkBuildWorldBookContext
+            ? window.tkBuildWorldBookContext(contextText_2)
+            : '';
+        const userPersonaContext = window.tkBuildWorldActorPrompt
+            ? window.tkBuildWorldActorPrompt({
+                  includeUserIdentity: false,
+                  purpose: 'TikTok For You 主页内容流',
+                  triggerText: topic || contextText_2,
+              })
+            : '';
+        const value_212 =
+            '\n你是 TikTok For You 内容流 JSON 生成器。根据用户想看的主题、世界书和 user 人设关键词触发信息，一次生成恰好 ' +
+            targetCount +
+            ' 条完整 TikTok 内容，内容可以是短视频，也可以是图片帖。\n你可以是这个世界观里的任何非 user 创作者/路人/账号；只有主题确实需要时才提到 user，且永远不能扮演 user。\n\n用户主题：' +
+            (topic || '留空，随机生成但要具体、有生活感') +
+            '\n\n硬性要求：\n1. 返回严格 JSON 数组，数组长度必须恰好为 ' +
+            targetCount +
+            '，不要 markdown，不要解释文字。\n2. 每条内容必须有 mediaType，值只能是 "video" 或 "image"；video 像真实短视频，image 像真实图片帖/随手拍/截图梗图。\n3. 每条内容必须有 opening、middle、ending 三段；每段不少于 40 个字符，建议 40-80 字，分别呈现开头、中间、结尾，适合在画面中央逐条气泡显示。原文可以使用符合作者国籍、世界观和内容语境的任意语言。\n4. image 内容必须额外提供 imagePrompt，描述图片主体、构图、光线、质感；可选 bgImage、cover 或 imageUrl，如果没有真实 URL 就留空。\n5. 每条内容必须有不少于 10 条 comments。每条评论必须有 authorName、authorAvatar、text、likes、replies。\n6. replies 必须保留为数组；每条视频的 replies 楼中楼回复总数不少于 10 条，可以分布在多条评论下；每条回复带 authorName、authorAvatar、text、likes。\n7. desc 要像真实 TikTok 文案，可带 0-3 个 tag。内容要有网感、活人感、镜头感，不要像新闻稿。\n8. 作者和评论头像可使用 https://picsum.photos/150/150?random=数字 或 https://api.dicebear.com/7.x/avataaars/svg?seed=名字。\n9. 国际化翻译规则：opening/middle/ending 如果不是中文，必须分别填写 openingTranslationZh/middleTranslationZh/endingTranslationZh；评论或 replies 的 text 如果不是中文，必须填写 translationZh；如果原文是中文，对应翻译字段必须是空字符串。\n10. 禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。\n\nJSON 示例：\n[\n  {\n    "mediaType": "image",\n    "authorName": "用户昵称",\n    "handle": "user_id",\n    "authorAvatar": "https://picsum.photos/150/150?random=101",\n    "desc": "刚刚发生的瞬间 #日常 #随手拍",\n    "imagePrompt": "夜晚便利店门口的暖光随手拍，玻璃反光里有人低头笑，手机纪实感",\n    "opening": "开头不少于40字，写环境、第一眼看到的动作和氛围，要像画面中央的长气泡文字。",\n    "openingTranslationZh": "",\n    "middle": "中间不少于40字，写人物反应、冲突或一句很真实的话，保持第三人称和镜头感。",\n    "middleTranslationZh": "",\n    "ending": "结尾不少于40字，写收束、反转、余味或下一秒发生什么，不要短于40字。",\n    "endingTranslationZh": "",\n    "likes": 1234,\n    "shares": 12,\n    "comments": [\n      {\n        "authorName": "评论者A",\n        "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=a",\n        "text": "评论内容",\n        "translationZh": "",\n        "likes": 12,\n        "replies": [\n          {\n            "authorName": "回复者B",\n            "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=b",\n            "text": "楼中楼回复",\n            "translationZh": "",\n            "likes": 3\n          }\n        ]\n      }\n    ]\n  }\n]\n\n最终输出前请自检：\n- 顶层只能是 JSON 数组，或对象 { "content": [...] }。\n- 所有属性名必须是英文双引号。\n- 每条内容至少 10 条 comments，且 replies 总数至少 10 条。\n- opening、middle、ending 每个字段都不少于 40 个字符；如果不是中文，对应 TranslationZh 字段必须给出中文翻译。\n- 不允许尾逗号、注释、markdown 代码块、解释文字、中文引号作为 JSON 引号。\n- 如果不确定图片 URL，请把 imageUrl/bgImage/cover 留空，不要编造不可访问链接。\n\n' +
+            value_210 +
+            '\n' +
+            userPersonaContext +
+            '\n';
         try {
             window.showToast(topic ? '正在按搜索生成内容...' : '正在随机生成内容...');
-            const value_528 = await fetch(tkResolveApiEndpoint(), {
+            const value_528 = await window.tkFetch('videos', tkResolveApiEndpoint(), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -3147,12 +3059,12 @@ JSON 示例：
                 );
             const data_2 = await value_528.json();
             let aiReply_2 = data_2.choices?.[0]?.message?.content || '';
-            const parsed_4 = tkParseAiJson_3(aiReply_2),
-                parsedVideos = Array.isArray(parsed_4)
-                    ? parsed_4
-                    : Array.isArray(parsed_4.content)
-                      ? parsed_4.content
-                      : [];
+            const parsed_4 = tkParseAiJson_3(aiReply_2);
+            const parsedVideos = Array.isArray(parsed_4)
+                ? parsed_4
+                : Array.isArray(parsed_4.content)
+                  ? parsed_4.content
+                  : [];
             if (!Array.isArray(parsedVideos) || parsedVideos.length === 0)
                 throw new Error('JSON content is not an array');
             const normalizedVideos = parsedVideos
@@ -3178,6 +3090,7 @@ JSON 示例：
                   }));
             window.showToast('已生成内容');
         } catch (error_4) {
+            if (error_4?.name === 'AbortError') return;
             console.error('Search Gen Error:', error_4);
             if (
                 !window.u2Api?.isRequestError?.(error_4) ||
@@ -3205,4 +3118,26 @@ JSON 示例：
         });
     });
     handleAction_21();
+    document.addEventListener('tk:data-cleared', ({ detail: _value68 }) => {
+        if (_value68.kind === 'dms') return;
+        currentEditingVideoId = null;
+        value_25 = null;
+        value_26 = null;
+        window.currentShareVideoId = null;
+        window.currentReplyTargetId = null;
+        [
+            'tk-search-generate-sheet',
+            'tk-video-detail-sheet',
+            'tk-fullscreen-video-view',
+            'tk-share-sheet',
+            'tk-edit-single-video-sheet',
+            'tk-hashtag-view',
+            'tk-music-view',
+        ].forEach((_value70) => window.closeView(document.getElementById(_value70)));
+        document.getElementById('tk-comments-list')?.replaceChildren();
+        const _value69 = document.getElementById('tk-fullscreen-video-view');
+        if (_value69) delete _value69.dataset.videoId;
+        isActiveTabFollowing([]);
+        _value6(null);
+    });
 });

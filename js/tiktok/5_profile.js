@@ -2,49 +2,52 @@
     window.u2OnStorageReady ||
     ((callback) => document.addEventListener('DOMContentLoaded', callback))
 )(() => {
-    const avatarImg = document.getElementById('tk-profile-avatar-img'),
-        avatarIcon = document.getElementById('tk-profile-avatar-icon'),
-        statusBubble = document.getElementById('tk-profile-status-bubble'),
-        nameEl = document.getElementById('tk-profile-name'),
-        handleEl = document.getElementById('tk-profile-handle'),
-        bioEl = document.getElementById('tk-profile-bio'),
-        statFollowing = document.getElementById('tk-stat-following'),
-        statFollowers = document.getElementById('tk-stat-followers'),
-        statLikes = document.getElementById('tk-stat-likes'),
-        editBtn = document.getElementById('tk-profile-edit-btn'),
-        visitorsBtn = document.getElementById('tk-profile-visitors-btn'),
-        profileSettingsBtn = document.getElementById('tk-profile-settings-btn'),
-        profileBackBtn = document.getElementById('tk-profile-back-btn'),
-        tkEditProfileSheetElement = document.getElementById('tk-edit-profile-sheet'),
-        saveProfileBtn = document.getElementById('tk-save-profile-btn'),
-        tiktokViewElement = document.getElementById('tiktok-view'),
-        editCharSheet = document.getElementById('tk-edit-char-sheet'),
-        subProfileEditTrigger = document.getElementById('tk-sub-profile-edit-trigger'),
-        tkEditNameElement = document.getElementById('tk-edit-name'),
-        tkEditHandleElement = document.getElementById('tk-edit-handle'),
-        tkEditBioElement = document.getElementById('tk-edit-bio'),
-        tkEditPersonaElement = document.getElementById('tk-edit-persona'),
-        tkEditFollowingElement = document.getElementById('tk-edit-following'),
-        tkEditFollowersElement = document.getElementById('tk-edit-followers'),
-        tkEditLikesElement = document.getElementById('tk-edit-likes'),
-        avatarBtn = document.getElementById('tk-profile-avatar-btn'),
-        avatarUpload = document.getElementById('tk-profile-avatar-upload'),
-        subProfileView = document.getElementById('tk-sub-profile-view'),
-        subProfileBackBtn = document.getElementById('tk-sub-profile-back-btn'),
-        subProfileAvatarImg = document.getElementById('tk-sub-profile-avatar-img'),
-        subProfileAvatarIcon = document.getElementById('tk-sub-profile-avatar-icon'),
-        subProfileStatusBubble = document.getElementById('tk-sub-profile-status-bubble'),
-        subProfileName = document.getElementById('tk-sub-profile-name'),
-        subProfileHandle = document.getElementById('tk-sub-profile-handle'),
-        subStatFollowing = document.getElementById('tk-sub-stat-following'),
-        subStatFollowers = document.getElementById('tk-sub-stat-followers'),
-        subStatLikes = document.getElementById('tk-sub-stat-likes'),
-        subProfileBio = document.getElementById('tk-sub-profile-bio'),
-        subProfileFollowBtn = document.getElementById('tk-sub-profile-follow-btn'),
-        subProfileMsgBtn = document.getElementById('tk-sub-profile-msg-btn'),
-        subProfileApiBtn = document.getElementById('tk-sub-profile-api-btn'),
-        tkSubProfileGridElement = document.getElementById('tk-sub-profile-grid');
+    const avatarImg = document.getElementById('tk-profile-avatar-img');
+    const avatarIcon = document.getElementById('tk-profile-avatar-icon');
+    const statusBubble = document.getElementById('tk-profile-status-bubble');
+    const nameEl = document.getElementById('tk-profile-name');
+    const handleEl = document.getElementById('tk-profile-handle');
+    const bioEl = document.getElementById('tk-profile-bio');
+    const statFollowing = document.getElementById('tk-stat-following');
+    const statFollowers = document.getElementById('tk-stat-followers');
+    const statLikes = document.getElementById('tk-stat-likes');
+    const editBtn = document.getElementById('tk-profile-edit-btn');
+    const visitorsBtn = document.getElementById('tk-profile-visitors-btn');
+    const profileSettingsBtn = document.getElementById('tk-profile-settings-btn');
+    const profileBackBtn = document.getElementById('tk-profile-back-btn');
+    const tkEditProfileSheetElement = document.getElementById('tk-edit-profile-sheet');
+    const saveProfileBtn = document.getElementById('tk-save-profile-btn');
+    const tiktokViewElement = document.getElementById('tiktok-view');
+    const editCharSheet = document.getElementById('tk-edit-char-sheet');
+    const subProfileEditTrigger = document.getElementById('tk-sub-profile-edit-trigger');
+    const tkEditNameElement = document.getElementById('tk-edit-name');
+    const tkEditHandleElement = document.getElementById('tk-edit-handle');
+    const tkEditBioElement = document.getElementById('tk-edit-bio');
+    const tkEditPersonaElement = document.getElementById('tk-edit-persona');
+    const tkEditFollowingElement = document.getElementById('tk-edit-following');
+    const tkEditFollowersElement = document.getElementById('tk-edit-followers');
+    const tkEditLikesElement = document.getElementById('tk-edit-likes');
+    const avatarBtn = document.getElementById('tk-profile-avatar-btn');
+    const avatarUpload = document.getElementById('tk-profile-avatar-upload');
+    const subProfileView = document.getElementById('tk-sub-profile-view');
+    const subProfileBackBtn = document.getElementById('tk-sub-profile-back-btn');
+    const subProfileAvatarImg = document.getElementById('tk-sub-profile-avatar-img');
+    const subProfileAvatarIcon = document.getElementById('tk-sub-profile-avatar-icon');
+    const subProfileStatusBubble = document.getElementById('tk-sub-profile-status-bubble');
+    const subProfileName = document.getElementById('tk-sub-profile-name');
+    const subProfileHandle = document.getElementById('tk-sub-profile-handle');
+    const subStatFollowing = document.getElementById('tk-sub-stat-following');
+    const subStatFollowers = document.getElementById('tk-sub-stat-followers');
+    const subStatLikes = document.getElementById('tk-sub-stat-likes');
+    const subProfileBio = document.getElementById('tk-sub-profile-bio');
+    const subProfileFollowBtn = document.getElementById('tk-sub-profile-follow-btn');
+    const subProfileMsgBtn = document.getElementById('tk-sub-profile-msg-btn');
+    const subProfileApiBtn = document.getElementById('tk-sub-profile-api-btn');
+    const tkSubProfileGridElement = document.getElementById('tk-sub-profile-grid');
     let currentSubCharId = null;
+    const _value = new Map();
+    const _value2 = new WeakMap();
+    let _value3 = 0;
     function tkProfileFormatCount(value_2) {
         return window.tkFormatCount ? window.tkFormatCount(value_2) : String(value_2 || 0);
     }
@@ -97,12 +100,12 @@
                 String,
             ),
         );
-        if (!ids.size) return '未挂载';
-        const books = typeof window.getWorldBooks === 'function' ? window.getWorldBooks() : [],
-            names = (Array.isArray(books) ? books : [])
-                .filter((book) => book && ids.has(String(book.id)))
-                .map((book_2) => book_2.name || book_2.title || book_2.keyword || '世界书')
-                .filter(Boolean);
+        if (!ids.size) return 'Not mounted';
+        const books = typeof window.getWorldBooks === 'function' ? window.getWorldBooks() : [];
+        const names = (Array.isArray(books) ? books : [])
+            .filter((book) => book && ids.has(String(book.id)))
+            .map((book_2) => book_2.name || book_2.title || book_2.keyword || '世界书')
+            .filter(Boolean);
         if (!names.length) return ids.size + ' 本';
         if (names.length <= 2) return names.join('、');
         return names.slice(0, 2).join('、') + ' 等 ' + names.length + ' 本';
@@ -114,30 +117,76 @@
     function tkEnsureProfileSettingsSheet() {
         let sheet_2 = document.getElementById('tk-profile-settings-sheet');
         if (sheet_2) return sheet_2;
-        return (
-            (sheet_2 = document.createElement('div')),
-            (sheet_2.id = 'tk-profile-settings-sheet'),
-            (sheet_2.className = 'bottom-sheet-overlay detail-sheet-overlay'),
-            (sheet_2.innerHTML = `
-            <div class="bottom-sheet" style="background: #ffffff;">
-                <div class="sheet-handle"></div>
-                <div class="sheet-title">TikTok 设置</div>
-                <div class="detail-sheet-content" style="padding: 10px 16px 24px; background: #ffffff;">
-                    <div class="settings-group fully-rounded" style="margin:0;">
-                        <div class="settings-item" id="tk-bind-worldbook-btn" style="border-bottom:none; cursor:pointer;">
-                            <div class="settings-icon" style="background-color:#1c1c1e;"><i class="fas fa-book"></i></div>
-                            <div class="settings-text">挂载世界书</div>
-                            <div id="tk-bound-worldbook-label" style="margin-left:auto; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#8e8e93; font-size:12px; text-align:right;">未挂载</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `),
-            (document.getElementById('tiktok-view') || document.body).appendChild(sheet_2),
-            sheet_2.addEventListener('click', (event) => {
+        sheet_2 = document.createElement('div');
+        sheet_2.id = 'tk-profile-settings-sheet';
+        sheet_2.className = 'bottom-sheet-overlay detail-sheet-overlay';
+        sheet_2.innerHTML =
+            '<div class="bottom-sheet tk-settings-sheet tk-settings-shop-sheet" role="dialog" aria-modal="true" aria-labelledby="tk-settings-title">\n <div class="sheet-handle" aria-hidden="true"></div><div class="sheet-title" id="tk-settings-title">SETTINGS</div>\n <div class="detail-sheet-content" style="padding:16px"><div class="settings-group fully-rounded" style="margin:0"><button type="button" class="settings-item tk-settings-row" id="tk-bind-worldbook-btn">\n                                <span class="settings-icon" style="background-color:#1c1c1e" aria-hidden="true"><i class="fas fa-book"></i></span>\n                                <span class="tk-settings-copy"><span class="tk-settings-row-title">World books</span></span><span id="tk-bound-worldbook-label" class="tk-settings-book-status">Not mounted</span>\n                                <svg class="tk-settings-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>\n                            </button>\n<button type="button" class="settings-item tk-settings-row" data-tk-clear="videos">\n                                <span class="tk-settings-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="12" height="14" rx="3"/><path d="m15 10 6-4v12l-6-4Z"/></svg></span>\n                                <span class="tk-settings-copy"><span class="tk-settings-row-title">清理全部视频</span><span class="tk-settings-description">推荐、关注和自己发布的视频</span></span>\n                                <svg class="tk-settings-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>\n                            </button>\n<button type="button" class="settings-item tk-settings-row" data-tk-clear="dms">\n                                <span class="tk-settings-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8A8.5 8.5 0 0 1 12.5 20a8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/><path d="M8 11h.01M12 11h.01M16 11h.01"/></svg></span>\n                                <span class="tk-settings-copy"><span class="tk-settings-row-title">清理全部私信</span><span class="tk-settings-description">清空私信会话，保留角色联系人</span></span>\n                                <svg class="tk-settings-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>\n                            </button>\n<button type="button" class="settings-item tk-settings-row tk-settings-row-destructive" data-tk-clear="all">\n                                <span class="tk-settings-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 6h18M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M5 6l1 14a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1l1-14M10 10v7M14 10v7"/></svg></span>\n                                <span class="tk-settings-copy"><span class="tk-settings-row-title">清空 TikTok 所有数据</span><span class="tk-settings-description">重置 TikTok，不影响其他应用</span></span>\n                                <svg class="tk-settings-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>\n                            </button></div></div></div>';
+        (document.getElementById('tiktok-view') || document.body).appendChild(sheet_2);
+        sheet_2.addEventListener('click', (event) => {
                 if (event.target === sheet_2) window.closeView(sheet_2);
+            });
+        sheet_2
+            .querySelector('.tk-settings-close')
+            ?.addEventListener('click', () => window.closeView(sheet_2));
+        sheet_2.querySelectorAll('[data-tk-clear]').forEach((_value6) =>
+            _value6.addEventListener('click', () => {
+                const _value7 = _value6.dataset.tkClear;
+                const _value8 = {
+                    videos: [
+                        '清理全部视频',
+                        '将删除推荐、关注及自己发布的全部视频和相关视频互动记录，保留个人资料、角色与私信。此操作无法撤销。',
+                    ],
+                    dms: [
+                        '清理全部私信',
+                        '将删除 TikTok 的全部私信会话和聊天记录，保留角色联系人与视频。此操作无法撤销。',
+                    ],
+                    all: [
+                        '清空 TK 所有数据',
+                        '将重置 TikTok 的个人资料、角色、视频、私信、互动记录和设置，其他应用及 iMessage 角色数据不受影响。此操作无法撤销。',
+                    ],
+                };
+                const [_value9, _value0] = _value8[_value7];
+                const _value1 = async () => {
+                    const _value11 = sheet_2.querySelectorAll('[data-tk-clear]');
+                    _value11.forEach((_value12) => (_value12.disabled = true));
+                    window.showToast?.('正在清理…');
+                    try {
+                        const _value13 = await window.tkClearData(_value7);
+                        _value13 &&
+                            (tkProfileUpdateSettingsSheet(sheet_2),
+                            window.showToast?.(
+                                _value7 === 'videos'
+                                    ? '全部视频已清理'
+                                    : _value7 === 'dms'
+                                      ? '全部私信已清理'
+                                      : 'TikTok 数据已清空',
+                            ));
+                    } catch (_value14) {
+                        window.showToast?.(_value14.message || '清理失败，请重试');
+                    } finally {
+                        _value11.forEach((_value15) => (_value15.disabled = false));
+                    }
+                };
+                const _value10 = window.imApp?.showCustomModal || window.showCustomModal;
+                if (_value10)
+                    _value10({
+                        type: 'confirm',
+                        title: _value9,
+                        message: _value0,
+                        confirmText: '清理',
+                        isDestructive: true,
+                        ownerId: 'tiktok-data-cleanup',
+                        onConfirm: () => {
+                            void _value1();
+                        },
+                    });
+                else {
+                    if (confirm(_value9 + '？\n' + _value0)) void _value1();
+                }
             }),
-            sheet_2.querySelector('#tk-bind-worldbook-btn')?.addEventListener('click', () => {
+        );
+        sheet_2.querySelector('#tk-bind-worldbook-btn')?.addEventListener('click', () => {
                 if (typeof window.renderWorldBookSelector !== 'function') {
                     if (window.showToast) window.showToast('世界书选择器不可用');
                     return;
@@ -151,9 +200,8 @@
                     tkProfileUpdateSettingsSheet(sheet_2);
                     if (window.showToast) window.showToast('TikTok 世界书挂载已更新');
                 });
-            }),
-            sheet_2
-        );
+            });
+        return sheet_2;
     }
     function tkFormatVisitorTime(value_5) {
         const time = Number(value_5);
@@ -174,10 +222,11 @@
         try {
             return JSON.parse(raw);
         } catch (error_2) {
+            if (error_2?.name === 'AbortError') return;
             const start = Math.min(
-                    ...[raw.indexOf('{'), raw.indexOf('[')].filter((index) => index >= 0),
-                ),
-                end = Math.max(raw.lastIndexOf('}'), raw.lastIndexOf(']'));
+                ...[raw.indexOf('{'), raw.indexOf('[')].filter((index) => index >= 0),
+            );
+            const end = Math.max(raw.lastIndexOf('}'), raw.lastIndexOf(']'));
             if (!Number.isFinite(start) || start < 0 || end <= start) throw error_2;
             return JSON.parse(raw.slice(start, end + 1).replace(/,\s*([}\]])/g, '$1'));
         }
@@ -437,59 +486,17 @@
     subProfileBackBtn &&
         subProfileView &&
         subProfileBackBtn.addEventListener('click', () => {
-            subProfileView.classList.remove('active');
+            window.closeView(subProfileView);
             currentSubCharId = null;
+            window.currentTkSubProfileCharId = null;
         });
-    subProfileEditTrigger &&
-        subProfileEditTrigger.addEventListener('click', () => {
-            if (currentSubCharId) {
-                const tkCharSheetTitleElement = document.getElementById('tk-char-sheet-title');
-                if (tkCharSheetTitleElement) tkCharSheetTitleElement.textContent = '编辑角色';
-                const tkCharNameElement = document.getElementById('tk-char-name'),
-                    tkCharStatusElement = document.getElementById('tk-char-status'),
-                    tkCharPersonaElement = document.getElementById('tk-char-persona'),
-                    tkCharBioElement = document.getElementById('tk-char-bio'),
-                    tkCharFollowingElement = document.getElementById('tk-char-following'),
-                    tkCharFollowersElement = document.getElementById('tk-char-followers'),
-                    tkCharLikesElement = document.getElementById('tk-char-likes'),
-                    tkDeleteCharBtnElement = document.getElementById('tk-delete-char-btn'),
-                    tkCharAvatarImgElement = document.getElementById('tk-char-avatar-img'),
-                    tkCharAvatarPreviewIElement = document.querySelector(
-                        '#tk-char-avatar-preview i',
-                    ),
-                    tkGetChar_61 = window.tkGetChar(currentSubCharId);
-                if (tkGetChar_61) {
-                    if (tkCharNameElement) tkCharNameElement.value = tkGetChar_61.name || '';
-                    if (tkCharStatusElement) tkCharStatusElement.value = tkGetChar_61.status || '';
-                    if (tkCharPersonaElement)
-                        tkCharPersonaElement.value = tkGetChar_61.persona || '';
-                    if (tkCharBioElement) tkCharBioElement.value = tkGetChar_61.bio || '';
-                    if (tkCharFollowingElement)
-                        tkCharFollowingElement.value = tkGetChar_61.following || 0;
-                    if (tkCharFollowersElement)
-                        tkCharFollowersElement.value = tkGetChar_61.followers || 0;
-                    if (tkCharLikesElement) tkCharLikesElement.value = tkGetChar_61.likes || 0;
-                    if (tkDeleteCharBtnElement) tkDeleteCharBtnElement.style.display = 'block';
-                    const src_3 = tkProfileResolveAvatar(tkGetChar_61);
-                    if (src_3) {
-                        tkCharAvatarImgElement &&
-                            ((tkCharAvatarImgElement.src = src_3),
-                            (tkCharAvatarImgElement.style.display = 'block'));
-                        if (tkCharAvatarPreviewIElement)
-                            tkCharAvatarPreviewIElement.style.display = 'none';
-                    } else {
-                        tkCharAvatarImgElement &&
-                            ((tkCharAvatarImgElement.src = ''),
-                            (tkCharAvatarImgElement.style.display = 'none'));
-                        if (tkCharAvatarPreviewIElement)
-                            tkCharAvatarPreviewIElement.style.display = 'block';
-                    }
-                }
-                window.tkOpenEditChar
-                    ? window.tkOpenEditChar(currentSubCharId)
-                    : window.openView(editCharSheet);
-            }
-        });
+    subProfileView?.addEventListener('u2:view-closing', () => {
+        const _value16 = document.getElementById('tk-search-generate-sheet');
+        if (_value16?.dataset.tkCharId != null) window.closeView(_value16);
+    });
+    subProfileEditTrigger?.addEventListener('click', () => {
+        if (currentSubCharId) window.tkOpenEditChar?.(currentSubCharId);
+    });
     function handleAction_8(value_63) {
         if (!subProfileFollowBtn || !value_63) return;
         if (value_63.isFollowed && value_63.isFollower) {
@@ -507,11 +514,37 @@
                       (subProfileFollowBtn.className = 'tk-btn-primary'));
         }
     }
+    function _value4() {
+        const _value17 = window.tkGetChar(currentSubCharId);
+        const _value18 =
+            subProfileView.querySelector('.tk-ptab.active')?.dataset.target || 'videos';
+        const _value19 =
+            _value18 === 'liked' ? new Set((_value17?.likedVideoIds || []).map(String)) : null;
+        const _value20 = _value17
+            ? tkState.videos.filter((_value21) =>
+                  _value19
+                      ? _value19.has(String(_value21.id))
+                      : String(_value21.authorId) === String(_value17.id),
+              )
+            : [];
+        renderGrid(
+            _value18,
+            tkSubProfileGridElement,
+            _value18 === 'videos' ? _value20 : [],
+            _value18 === 'liked' ? _value20 : [],
+        );
+    }
     window.tkOpenSubProfile = function (currentTkSubProfileCharId_2) {
         const char_6 = window.tkGetChar(currentTkSubProfileCharId_2);
         if (!char_6 || !subProfileView) return;
+        if (String(currentSubCharId) !== String(currentTkSubProfileCharId_2)) {
+            const _value22 = document.getElementById('tk-search-generate-sheet');
+            if (_value22?.dataset.tkCharId != null) window.closeView(_value22);
+            subProfileView.querySelector('.tk-profile-scrollable').scrollTop = 0;
+        }
         currentSubCharId = currentTkSubProfileCharId_2;
         window.currentTkSubProfileCharId = currentTkSubProfileCharId_2;
+        _value5();
         subProfileName.textContent = char_6.name || 'User';
         subProfileHandle.textContent = '@' + (char_6.handle || currentTkSubProfileCharId_2);
         subProfileBio.textContent = char_6.bio || '暂无简介';
@@ -523,342 +556,163 @@
         subStatFollowers.textContent = tkProfileFormatCount(char_6.followers || 0);
         subStatLikes.textContent = tkProfileFormatCount(char_6.likes || 0);
         const src_4 = tkProfileResolveAvatar(char_6);
-        src_4
-            ? ((subProfileAvatarImg.src = src_4),
-              (subProfileAvatarImg.style.display = 'block'),
-              (subProfileAvatarIcon.style.display = 'none'))
-            : ((subProfileAvatarImg.src = ''),
-              (subProfileAvatarImg.style.display = 'none'),
-              (subProfileAvatarIcon.style.display = 'block'));
+        if (src_4) {
+            if (subProfileAvatarImg.getAttribute('src') !== src_4) subProfileAvatarImg.src = src_4;
+            subProfileAvatarImg.style.display = 'block';
+            subProfileAvatarIcon.style.display = 'none';
+        } else {
+            subProfileAvatarImg.src = '';
+            subProfileAvatarImg.style.display = 'none';
+            subProfileAvatarIcon.style.display = 'block';
+        }
         handleAction_8(char_6);
-        const activeTab = document.querySelector('#tk-sub-profile-view .tk-ptab.active'),
-            value_67 = activeTab ? activeTab.getAttribute('data-target') : 'videos';
-        let charVideos = tkState.videos.filter(
-                (v_2) => v_2.authorId === currentTkSubProfileCharId_2,
-            ),
-            items_69 = [];
-        char_6.likedVideoIds &&
-            (items_69 = tkState.videos.filter((value_71) =>
-                char_6.likedVideoIds.includes(value_71.id),
-            ));
-        tkSubProfileGridElement &&
-            renderGrid(value_67, tkSubProfileGridElement, charVideos, items_69);
+        _value4();
         subProfileView.classList.add('active');
     };
     subProfileFollowBtn &&
         subProfileFollowBtn.addEventListener('click', () => {
             if (!currentSubCharId) return;
-            const char_7 = window.tkGetChar(currentSubCharId);
-            if (char_7) {
-                char_7.isFollowed = !char_7.isFollowed;
+            const _value23 = window.tkGetChar(currentSubCharId);
+            if (_value23) {
+                _value23.isFollowed = !_value23.isFollowed;
                 if (window.tkPersistState) window.tkPersistState();
-                handleAction_8(char_7);
-                char_7.isFollowed ? window.showToast('已关注') : window.showToast('已取消关注');
+                handleAction_8(_value23);
+                _value23.isFollowed ? window.showToast('已关注') : window.showToast('已取消关注');
                 if (window.tkRenderHome) window.tkRenderHome();
                 if (window.tkRenderChat) window.tkRenderChat();
             }
         });
+    function _value5() {
+        if (!subProfileApiBtn) return;
+        const _value24 = _value.has(String(currentSubCharId));
+        subProfileApiBtn.disabled = _value24;
+        subProfileApiBtn.setAttribute('aria-busy', String(_value24));
+        subProfileApiBtn.title = _value24 ? '正在生成主页内容' : '生成主页内容';
+    }
     subProfileApiBtn &&
         ((subProfileApiBtn.innerHTML = '<i class="fas fa-search" style="color: #fff;"></i>'),
         (subProfileApiBtn.title = '生成主页内容'),
-        subProfileApiBtn.addEventListener('click', () => {
+        subProfileApiBtn.addEventListener('click', (_value25) => {
             if (!currentSubCharId) return;
-            window.tkGenerateCharVideos
-                ? window.tkGenerateCharVideos(currentSubCharId, () => {
-                      window.tkOpenSubProfile(currentSubCharId);
-                  })
-                : window.showToast('生成功能未绑定');
+            const _value26 = currentSubCharId;
+            const _value27 = window.tkGetChar(_value26);
+            if (!_value27 || _value.has(String(_value26))) return;
+            const _value28 =
+                subProfileView.querySelector('.tk-ptab.active')?.dataset.target || 'videos';
+            window.tkOpenSearchGenerateSheet(_value25, {
+                charId: _value26,
+                title: _value28 === 'liked' ? '生成角色喜欢的视频' : '生成角色作品',
+                placeholder: '想生成什么内容？留空按角色设定生成',
+                isCurrent: () =>
+                    window.tkGetChar(_value26) === _value27 &&
+                    String(currentSubCharId) === String(_value26) &&
+                    subProfileView.classList.contains('active'),
+                onGenerate: (_value29, _value30) =>
+                    window.tkGenerateCharVideos(_value26, {
+                        query: _value29,
+                        count: _value30,
+                        target: _value28,
+                    }),
+            });
         }));
-    window.tkGenerateCharVideos = async function (charId_2, value_74) {
-        if (!window.apiConfig || !window.apiConfig.endpoint || !window.apiConfig.apiKey) {
+    window.tkGenerateCharVideos = async function (_value31, _value32 = {}, _value33) {
+        typeof _value32 === 'function' && ((_value33 = _value32), (_value32 = {}));
+        const char_8 = window.tkGetChar(_value31);
+        if (!char_8) return false;
+        const _value34 = String(_value31);
+        if (_value.has(_value34)) return false;
+        if (!window.apiConfig?.endpoint || !window.apiConfig?.apiKey) {
             window.showToast('请在系统设置中配置 API');
-            return;
+            return false;
         }
-        const char_8 = window.tkGetChar(charId_2);
-        if (!char_8) return;
-        window.showToast('正在生成角色主页内容...');
-        let text_76 = '';
-        if (window.getWorldBooks) {
-            const allWb = window.getWorldBooks(),
-                globalWb = allWb.filter((b_2) => b_2.isGlobal);
-            globalWb.length > 0 &&
-                ((text_76 += `世界观背景设定:
-`),
-                globalWb.forEach((value_84) => {
-                    value_84.entries.forEach((message_85) => {
-                        text_76 +=
-                            '- ' +
-                            message_85.keyword +
-                            ': ' +
-                            message_85.content +
-                            `
-`;
-                    });
-                }),
-                (text_76 += `
-`));
-        }
-        if (window.getBuiltinWorldBooks) {
-            const builtinWb = window.getBuiltinWorldBooks().filter((b_3) => b_3.isGlobal);
-            builtinWb.length > 0 &&
-                ((text_76 += `内置设定:
-`),
-                builtinWb.forEach((value_88) => {
-                    value_88.entries.forEach((message_89) => {
-                        text_76 +=
-                            '- ' +
-                            message_89.keyword +
-                            ': ' +
-                            message_89.content +
-                            `
-`;
-                    });
-                }),
-                (text_76 += `
-`));
-        }
-        char_8.memories &&
-            char_8.memories.length > 0 &&
-            ((text_76 += `角色记忆:
-`),
-            char_8.memories.forEach((value_90) => {
-                text_76 +=
-                    '- ' +
-                    value_90.text +
-                    `
-`;
-            }),
-            (text_76 += `
-`));
-        const charContextText =
-                (char_8.name || '') +
-                ' ' +
-                (char_8.handle || '') +
-                ' ' +
-                (char_8.persona || '') +
-                ' ' +
-                (char_8.bio || ''),
-            modernWbContext = window.tkBuildWorldBookContext
-                ? window.tkBuildWorldBookContext(charContextText)
-                : '',
-            worldActorPrompt = window.tkBuildWorldActorPrompt
-                ? window.tkBuildWorldActorPrompt({
-                      includeUserIdentity: false,
-                      purpose: '角色 TikTok 主页视频与评论区生成',
-                      triggerText: charContextText,
-                  })
-                : '你是这个世界观中的任何非 user 角色/路人/创作者；只有必要时才提到 user，禁止扮演 user。';
-        modernWbContext &&
-            (text_76 =
-                modernWbContext +
-                (char_8.memories && char_8.memories.length > 0
-                    ? `
-
-角色记忆:
-` +
-                      char_8.memories.map((value_91) => '- ' + (value_91.text || value_91)).join(`
-`) +
-                      `
-`
-                    : ''));
-        const value_80 =
-            `
-你现在是一个 TikTok 视频内容生成器。请根据以下角色的设定和挂载的世界书/记忆，为该角色生成主页内容：至少 2 条发布的视频内容和至少 2 条点赞过的视频。
-角色名字：` +
-            char_8.name +
-            `
-角色设定：` +
-            char_8.persona +
-            `
-
-要求：
-1. 整体风格符合该角色的性格和人物设定，视频画面用文字描述，富有镜头感或气泡文字表现感，必须以第三人称视角描述简要的环境氛围、动作和语言描述，字数严格控制在 40-80 字之间。
-2. 符合世界观，仿真实tk网络视频，内容多样化，文案要具有“活人感”（例如碎碎念、吐槽、玩梗,也可以是一句摘抄的文学语录），切忌机器播报感。
-3. 务必为每个视频生成 3-5 条相关评论，且如果情景合适（比如@了朋友），请在评论中追加 \`replies\`（楼中楼回复）。
-4. 返回严格的 JSON 格式（不要有 markdown 代码块标记，不要多余文字），格式必须如下：
-{
-  "posts": [
-    {
-      "desc": "视频文案（简短，带tag）",
-      "sceneText": "画面内容文字描述（气泡内容或镜头描述）",
-      "likes": 1234,
-      "commentsCount": 5,
-      "shares": 12,
-      "comments": [
-        { 
-          "authorName": "评论者A", 
-          "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=c1", 
-          "text": "评论内容", 
-          "likes": 12,
-          "replies": [
-            {
-              "authorName": "回复者B",
-              "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=c2",
-              "text": "回复内容（如果情景合适）",
-              "likes": 3
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "likedVideos": [
-    {
-      "authorName": "随机创作者名",
-      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=v1",
-      "desc": "点赞视频文案",
-      "sceneText": "点赞视频的画面内容",
-      "likes": 5678,
-      "commentsCount": 30,
-      "shares": 20,
-      "comments": [
-        {
-          "authorName": "评论者A",
-          "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=c3",
-          "text": "好有趣的视频！",
-          "likes": 100,
-          "replies": []
-        }
-      ]
-    }
-  ]
-}
-
-` +
-            text_76 +
-            `
-`;
-        let content_2 =
-            value_80 +
-            `
-
-新版补充要求（必须覆盖旧格式）：
-角色名字：` +
-            (char_8.name || 'User') +
-            `
-角色 handle：` +
-            (char_8.handle || charId_2) +
-            `
-角色设定：` +
-            (char_8.persona || '普通 TikTok 用户') +
-            `
-1. posts 生成 2-5 条，likedVideos 生成 2-5 条；每条内容必须包含 mediaType，值为 "video" 或 "image"。
-2. image 内容必须额外包含 imagePrompt，描述图片主体、构图、光线、质感；可选 bgImage、cover 或 imageUrl，没有真实 URL 就留空。
-3. 每条内容必须包含 opening、middle、ending 三段，每段 30-50 个字符；sceneText 可省略；如果原文不是中文，必须提供对应中文翻译字段。
-4. posts 和 likedVideos 中每条内容都必须包含至少 10 条顶层 comments；每条评论必须包含 replies 数组，楼中楼按情境可为空或自然生成。
-5. comments 和 replies 的每一项都必须带 authorName、authorAvatar、text、likes。
-6. 返回 JSON 对象时，posts 和 likedVideos 中的内容都使用同一套字段：mediaType、desc、imagePrompt、opening、middle、ending、likes、shares、comments。
-`;
+        const _value35 = String(_value32.query || '').trim();
+        const _value36 = Math.min(10, Math.max(1, Number.parseInt(_value32.count, 10) || 3));
+        const _value37 = _value32.target === 'liked' ? 'likedVideos' : 'posts';
+        const _value38 = {};
+        const _value39 = window.tkCaptureDataGuard('videos');
+        const _value40 = () => _value39() && window.tkGetChar(_value31) === char_8;
+        _value.set(_value34, _value38);
+        _value5();
         try {
-            const endpoint_2 = window.u2Api.resolveChatCompletionsEndpoint(
-                window.apiConfig.endpoint,
-            );
-            content_2 =
-                `
-You are generating a TikTok character profile. Return strict valid JSON only.
-You may write as any non-user account/person inside this world view. Do not impersonate user.
-
-` +
-                worldActorPrompt +
-                `
-
-Character:
-` +
+            const _value41 = [char_8.name, char_8.handle, char_8.persona, char_8.bio, _value35]
+                .filter(Boolean)
+                .join(' ');
+            let text_76 = window.tkBuildWorldBookContext?.(_value41) || '';
+            if (!window.tkBuildWorldBookContext) {
+                const _value47 = [
+                    ...(window.getWorldBooks?.() || []),
+                    ...(window.getBuiltinWorldBooks?.() || []),
+                ];
+                text_76 = _value47
+                    .filter((value_71) => value_71?.isGlobal)
+                    .flatMap((_value48) =>
+                        (_value48.entries || [])
+                            .filter((_value49) => _value49.enabled !== false)
+                            .map(
+                                (value_91) =>
+                                    '- ' +
+                                    (value_91.keyword || '') +
+                                    ': ' +
+                                    (value_91.content || ''),
+                            ),
+                    )
+                    .join('\n');
+            }
+            const _value42 = (Array.isArray(char_8.memories) ? char_8.memories : [])
+                .map((_value50) => _value50?.text || _value50)
+                .filter(Boolean);
+            const _value43 =
+                window.tkBuildWorldActorPrompt?.({
+                    includeUserIdentity: false,
+                    purpose: '角色 TikTok 主页视频与评论区生成',
+                    triggerText: _value41,
+                }) || '你可以扮演世界观中的非 user 角色、路人和创作者，禁止扮演 user。';
+            const content_2 =
+                '\nYou are generating a TikTok character profile. Return strict valid JSON only.\nYou may write as any non-user account/person inside this world view. Do not impersonate user.\n\n' +
+                _value43 +
+                '\n\nCharacter:\n' +
                 JSON.stringify(
                     {
-                        id: charId_2,
+                        id: _value31,
                         name: char_8.name || 'User',
-                        handle: char_8.handle || charId_2,
+                        handle: char_8.handle || _value31,
                         persona: char_8.persona || '',
                         bio: char_8.bio || '',
                         status: char_8.status || '',
-                        memories: Array.isArray(char_8.memories)
-                            ? char_8.memories.map((m) => m.text || m).slice(0, 12)
-                            : [],
                     },
                     null,
                     2,
                 ) +
-                `
-
-World book and memory context:
-` +
+                '\n\nWorld book context:\n' +
                 (text_76 || 'No extra world book context.') +
-                `
-
-Hard requirements:
-1. Return one JSON object only. No markdown, no comments, no prose, no trailing commas.
-2. Include "profileStats" with numeric "following", "followers", and "likes".
-3. Include "posts": 2-5 items. Include "likedVideos": 1-3 items.
-4. Every post and likedVideo must include "mediaType" ("video" or "image"), "desc", "imagePrompt", "opening", "middle", "ending", "likes", "shares", and "comments".
-5. Even when mediaType is "video", provide imagePrompt as a realistic cover frame description. If no real image URL exists, leave "cover", "bgImage", and "imageUrl" empty.
-6. opening, middle, and ending are each 30-50 characters and should read like immersive bubble-flow text. They may use any language that fits the character and world.
-7. Every video in posts and likedVideos must contain at least 10 top-level comments. Each comment must include authorName, authorAvatar, text, likes, and replies. replies is always an array and may be empty or contain natural nested replies when appropriate.
-8. The content must match the character persona and world book. Avoid generic influencer wording. 禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。
-9. 如果评论或 replies 中出现本角色本人，请使用 Character.id 作为 authorId，并让 authorName 与 Character.name 一致，以便头像与主页视频头像同步。
-10. International translation rule: opening/middle/ending may use any language that fits the character and world. If a bubble field is not Chinese, fill openingTranslationZh/middleTranslationZh/endingTranslationZh with a natural Chinese translation. If it is Chinese, the matching translation field must be an empty string. If any comment or reply text is not Chinese, fill translationZh with a natural Chinese translation; if it is Chinese, translationZh must be an empty string.
-
-JSON shape:
-{
-  "profileStats": {
-    "following": 120,
-    "followers": 3400,
-    "likes": 28000
-  },
-  "posts": [
-    {
-      "mediaType": "video",
-      "desc": "short TikTok caption with tags",
-      "imagePrompt": "realistic cover frame description",
-      "opening": "30-50 chars in the fitting language",
-      "openingTranslationZh": "",
-      "middle": "30-50 chars in the fitting language",
-      "middleTranslationZh": "",
-      "ending": "30-50 chars in the fitting language",
-      "endingTranslationZh": "",
-      "likes": 1234,
-      "shares": 23,
-      "comments": [
-        {
-          "authorName": "commenter",
-          "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=commenter",
-          "text": "comment text",
-          "translationZh": "Chinese translation if comment text is not Chinese, otherwise empty string",
-          "likes": 12,
-          "replies": [
-            {
-              "authorName": "reply author",
-              "authorAvatar": "",
-              "text": "reply text",
-              "translationZh": "Chinese translation if reply text is not Chinese, otherwise empty string",
-              "likes": 3
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "likedVideos": [
-    {
-      "mediaType": "image",
-      "authorName": "another creator",
-      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=creator",
-      "desc": "liked content caption",
-      "imagePrompt": "realistic image or cover frame description",
-      "opening": "30-50 chars in the fitting language",
-      "openingTranslationZh": "",
-      "middle": "30-50 chars in the fitting language",
-      "middleTranslationZh": "",
-      "ending": "30-50 chars in the fitting language",
-      "endingTranslationZh": "",
-      "likes": 5678,
-      "shares": 44,
-      "comments": []
-    }
-  ]
-}
-`;
-            const value_92 = await fetch(endpoint_2, {
+                '\nCharacter memories:\n' +
+                (_value42.join('\n') || 'No extra memories.') +
+                '\n\n用户指定的生成内容：' +
+                (_value35 || '未指定，请根据角色设定随机生成具体、有生活感的内容。') +
+                '\n本次生成目标：' +
+                (_value37 === 'posts'
+                    ? '该角色自己发布的作品'
+                    : '该角色喜欢的、由其他创作者发布的视频') +
+                '。\n生成数量：恰好 ' +
+                _value36 +
+                ' 条。只生成本次目标，不额外生成其他页的内容。\n\nHard requirements:\n1. Return one JSON object only. No markdown, comments, prose, or trailing commas.\n2. Include "profileStats" with numeric "following", "followers", and "likes".\n3. "' +
+                _value37 +
+                '" must contain exactly ' +
+                _value36 +
+                ' complete items. "' +
+                (_value37 === 'posts' ? 'likedVideos' : 'posts') +
+                '" must be an empty array.\n4. Every post and likedVideo must include "mediaType" ("video" or "image"), "desc", "imagePrompt", "opening", "middle", "ending", "likes", "shares", and "comments".\n5. Even when mediaType is "video", provide imagePrompt as a realistic cover frame description. If no real image URL exists, leave "cover", "bgImage", and "imageUrl" empty.\n6. opening, middle, and ending are each 30-50 characters. Use immersive third-person descriptions of the environment, action, and dialogue, in a language fitting the character and world.\n7. Every video in posts and likedVideos must contain at least 10 top-level comments. Each comment must include authorName, authorAvatar, text, likes, and replies. replies is always an array and may be empty or contain natural nested replies when appropriate.\n8. Match the user\'s requested content, character persona, and world book. Captions should feel like real TikTok posts. 禁止扮演user的身份发抖音和评论。\n9. If this character appears in comments or replies, use Character.id as authorId and Character.name as authorName. For likedVideos, include the other creator\'s authorName, authorId (if known), and authorAvatar.\n10. If opening/middle/ending is not Chinese, fill the matching openingTranslationZh/middleTranslationZh/endingTranslationZh with a natural Chinese translation. If a comment or reply is not Chinese, fill translationZh. For Chinese originals, leave the matching translation fields empty.\n\nJSON shape (repeat complete video objects to meet the requested count):\n{"profileStats":{"following":120,"followers":3400,"likes":28000},"posts":[],"likedVideos":[]}\nEach video object uses:\n{"mediaType":"video","desc":"caption with tags","imagePrompt":"realistic cover frame","opening":"opening scene","openingTranslationZh":"","middle":"middle scene","middleTranslationZh":"","ending":"ending scene","endingTranslationZh":"","likes":1234,"shares":23,"comments":[{"authorId":"commenter-id","authorName":"commenter","authorAvatar":"","text":"comment text","translationZh":"","likes":12,"replies":[]}]}\n';
+            window.showToast(
+                '正在生成 ' +
+                    _value36 +
+                    ' 条角色' +
+                    (_value37 === 'posts' ? '作品' : '喜欢的视频') +
+                    '…',
+            );
+            const endpoint_2 = window.u2Api.resolveChatCompletionsEndpoint(
+                window.apiConfig.endpoint,
+            );
+            const value_92 = await window.tkFetch('videos', endpoint_2, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -870,7 +724,7 @@ JSON shape:
                         {
                             role: 'system',
                             content:
-                                'Return strict valid JSON only. Use double-quoted keys and strings. Do not use markdown, comments, prose, or trailing commas.',
+                                'Return strict valid JSON only. Use double-quoted keys and strings. No markdown, comments, prose, or trailing commas.',
                         },
                         {
                             role: 'user',
@@ -891,103 +745,79 @@ JSON shape:
                     })
                 );
             const data = await value_92.json();
-            let aiReply = data.choices[0].message.content;
-            const parsedData = handleAction_3(aiReply);
-            let enabled = false;
-            if (parsedData.profileStats && typeof parsedData.profileStats === 'object') {
-                const stats = parsedData.profileStats;
-                if (Number.isFinite(Number(stats.following)))
-                    char_8.following = Number(stats.following);
-                if (Number.isFinite(Number(stats.followers)))
-                    char_8.followers = Number(stats.followers);
-                if (Number.isFinite(Number(stats.likes))) char_8.likes = Number(stats.likes);
-            }
-            parsedData.posts &&
-                Array.isArray(parsedData.posts) &&
-                (parsedData.posts.slice(0, 5).forEach((v) => {
-                    const normalized = window.tkNormalizeVideoPayload
-                        ? window.tkNormalizeVideoPayload(v, {
-                              id: 'v_' + Date.now() + Math.floor(Math.random() * 1000),
-                              authorId: charId_2,
-                              authorName: char_8.name,
-                              authorAvatar: tkProfileResolveAvatar(char_8) || null,
-                              isLiked: false,
-                          })
-                        : {
-                              id: 'v_' + Date.now() + Math.floor(Math.random() * 1000),
-                              authorId: charId_2,
-                              authorName: char_8.name,
-                              authorAvatar: tkProfileResolveAvatar(char_8) || null,
-                              desc: v.desc || '',
-                              sceneText:
-                                  v.sceneText ||
-                                  [v.opening, v.middle, v.ending].filter(Boolean).join(' '),
-                              sceneSegments: [v.opening, v.middle, v.ending].filter(Boolean),
-                              likes: v.likes || Math.floor(Math.random() * 1000),
-                              commentsCount:
-                                  (v.comments && v.comments.length) || v.commentsCount || 0,
-                              shares: v.shares || Math.floor(Math.random() * 100),
-                              isLiked: false,
-                              comments: v.comments || [],
-                          };
-                    tkState.videos.unshift(normalized);
-                }),
-                (enabled = true));
-            if (parsedData.likedVideos && Array.isArray(parsedData.likedVideos)) {
-                if (!char_8.likedVideoIds) char_8.likedVideoIds = [];
-                parsedData.likedVideos.slice(0, 3).forEach((v_3) => {
-                    const id_8 = 'v_liked_' + Date.now() + Math.floor(Math.random() * 1000),
-                        normalized_2 = window.tkNormalizeVideoPayload
-                            ? window.tkNormalizeVideoPayload(v_3, {
-                                  id: id_8,
-                                  authorId: 'user_' + Date.now() + Math.floor(Math.random() * 100),
-                                  authorName: v_3.authorName || 'User',
-                                  authorAvatar: v_3.authorAvatar || null,
-                                  isLiked: false,
-                              })
-                            : {
-                                  id: id_8,
-                                  authorId: 'user_' + Date.now() + Math.floor(Math.random() * 100),
-                                  authorName: v_3.authorName || 'User',
-                                  authorAvatar: v_3.authorAvatar || null,
-                                  desc: v_3.desc || '',
-                                  sceneText:
-                                      v_3.sceneText ||
-                                      [v_3.opening, v_3.middle, v_3.ending]
-                                          .filter(Boolean)
-                                          .join(' '),
-                                  sceneSegments: [v_3.opening, v_3.middle, v_3.ending].filter(
-                                      Boolean,
-                                  ),
-                                  likes: v_3.likes || Math.floor(Math.random() * 10000),
-                                  commentsCount:
-                                      (v_3.comments && v_3.comments.length) ||
-                                      v_3.commentsCount ||
-                                      0,
-                                  shares: v_3.shares || Math.floor(Math.random() * 100),
-                                  isLiked: false,
-                                  comments: v_3.comments || [],
-                              };
-                    tkState.videos.unshift(normalized_2);
-                    char_8.likedVideoIds.push(id_8);
-                });
-                enabled = true;
-            }
-            if (enabled) {
-                if (window.tkPersistState) window.tkPersistState();
-                if (window.tkRenderHome) window.tkRenderHome();
-                window.showToast('生成成功');
-                if (value_74) value_74();
-            } else throw new Error('No posts or likedVideos array in JSON');
-        } catch (error_3) {
-            console.error('Gen Error:', error_3);
+            if (!_value40()) return false;
+            const parsedData = handleAction_3(data.choices?.[0]?.message?.content || '');
+            const _value44 = Array.isArray(parsedData?.[_value37])
+                ? parsedData[_value37].slice(0, _value36)
+                : [];
+            if (_value44.length !== _value36)
+                throw new Error('返回的视频数量不足，需要 ' + _value36 + ' 条，请重试');
             if (
-                !window.u2Api?.isRequestError?.(error_3) ||
-                !window.u2Api.reportError(error_3, {
-                    operation: '主页内容生成',
-                })
+                _value44.some(
+                    (_value51) =>
+                        !_value51 ||
+                        typeof _value51 !== 'object' ||
+                        !(_value51.desc || _value51.sceneText || _value51.opening),
+                )
             )
-                window.showToast('生成失败，请检查 API 配置');
+                throw new Error('返回的视频内容不完整，请重试');
+            const _value45 = tkProfileResolveAvatar(char_8) || null;
+            const _value46 = _value44.map((_value52) => {
+                const _value53 = 'v_char_' + Date.now() + '_' + ++_value3;
+                return window.tkNormalizeVideoPayload(
+                    _value52,
+                    _value37 === 'posts'
+                        ? {
+                              id: _value53,
+                              authorId: _value31,
+                              authorName: char_8.name,
+                              authorAvatar: _value45,
+                              isLiked: false,
+                          }
+                        : {
+                              id: _value53,
+                              authorId:
+                                  _value52.authorId || _value52.handle || 'creator_' + _value53,
+                              isLiked: false,
+                          },
+                );
+            });
+            tkState.videos.unshift(..._value46);
+            _value37 === 'likedVideos' &&
+                (char_8.likedVideoIds = [
+                    ...new Set([
+                        ...(char_8.likedVideoIds || []),
+                        ..._value46.map((_value54) => _value54.id),
+                    ]),
+                ]);
+            parsedData.profileStats &&
+                typeof parsedData.profileStats === 'object' &&
+                ['following', 'followers', 'likes'].forEach((_value55) => {
+                    const _value56 = Number(parsedData.profileStats[_value55]);
+                    if (Number.isFinite(_value56) && _value56 >= 0) char_8[_value55] = _value56;
+                });
+            window.tkPersistState?.({
+                dirtyTabs: ['tk-home-tab', 'tk-profile-tab'],
+            });
+            window.tkRenderHome?.();
+            String(currentSubCharId) === String(_value31) &&
+                subProfileView.classList.contains('active') &&
+                window.tkOpenSubProfile(_value31);
+            window.showToast('已生成 ' + _value46.length + ' 条视频');
+            _value33?.();
+            return true;
+        } catch (error_3) {
+            if (error_3?.name === 'AbortError' || !_value40()) return false;
+            console.error('Char Profile Gen Error:', error_3);
+            (!window.u2Api?.isRequestError?.(error_3) ||
+                !window.u2Api.reportError(error_3, {
+                    operation: '角色主页内容生成',
+                })) &&
+                window.showToast(error_3.message || '生成失败，请检查 API 配置');
+            return false;
+        } finally {
+            if (_value.get(_value34) === _value38) _value['delete'](_value34);
+            _value5();
         }
     };
     window.tkRenderProfile = function () {
@@ -1081,12 +911,7 @@ JSON shape:
     !window.tkProfileDelegationBound &&
         ((window.tkProfileDelegationBound = true),
         document.addEventListener('click', (e_2) => {
-            const sheets = [
-                'tk-edit-profile-sheet',
-                'tk-upload-video-sheet',
-                'tk-edit-char-sheet',
-                'tk-create-action-sheet',
-            ];
+            const sheets = ['tk-edit-profile-sheet', 'tk-upload-video-sheet', 'tk-edit-char-sheet'];
             sheets.forEach((id_9) => {
                 const sheet_6 = document.getElementById(id_9);
                 sheet_6 &&
@@ -1096,8 +921,8 @@ JSON shape:
             });
             if (e_2.target.closest('#tk-profile-edit-btn'))
                 try {
-                    const p_2 = tkState.profile,
-                        tkEditNameElement_116 = document.getElementById('tk-edit-name');
+                    const p_2 = tkState.profile;
+                    const tkEditNameElement_116 = document.getElementById('tk-edit-name');
                     if (tkEditNameElement_116) tkEditNameElement_116.value = p_2.name || '';
                     const elHandle = document.getElementById('tk-edit-handle');
                     if (elHandle) elHandle.value = p_2.handle || '';
@@ -1124,13 +949,13 @@ JSON shape:
                     if (window.showToast) window.showToast('打开编辑失败:' + err.message);
                 }
             if (e_2.target.closest('#tk-save-profile-btn')) {
-                const elName = document.getElementById('tk-edit-name'),
-                    elHandle_2 = document.getElementById('tk-edit-handle'),
-                    elBio = document.getElementById('tk-edit-bio'),
-                    elPersona = document.getElementById('tk-edit-persona'),
-                    elFollowing = document.getElementById('tk-edit-following'),
-                    elFollowers = document.getElementById('tk-edit-followers'),
-                    elLikes = document.getElementById('tk-edit-likes');
+                const elName = document.getElementById('tk-edit-name');
+                const elHandle_2 = document.getElementById('tk-edit-handle');
+                const elBio = document.getElementById('tk-edit-bio');
+                const elPersona = document.getElementById('tk-edit-persona');
+                const elFollowing = document.getElementById('tk-edit-following');
+                const elFollowers = document.getElementById('tk-edit-followers');
+                const elLikes = document.getElementById('tk-edit-likes');
                 tkState.profile.name = elName ? elName.value.trim() : 'User';
                 tkState.profile.handle = elHandle_2 ? elHandle_2.value.trim() : 'user123';
                 tkState.profile.bio = elBio ? elBio.value.trim() : '';
@@ -1146,16 +971,12 @@ JSON shape:
                 window.showToast('资料已保存');
             }
             if (e_2.target.closest('#tk-profile-tab .tk-btn-icon')) {
-                const sheet_7 = document.getElementById('tk-create-action-sheet');
-                if (sheet_7 && window.openView) window.openView(sheet_7);
-            }
-            if (e_2.target.closest('#tk-btn-open-upload-video')) {
-                const createActionSheet_2 = document.getElementById('tk-create-action-sheet');
-                if (createActionSheet_2) window.closeView(createActionSheet_2);
-                const tkUploadDescInputElement = document.getElementById('tk-upload-desc-input'),
-                    tkUploadSceneInputElement = document.getElementById('tk-upload-scene-input'),
-                    tkUploadCoverImgElement_134 = document.getElementById('tk-upload-cover-img'),
-                    coverBtn = document.getElementById('tk-upload-cover-btn');
+                const sheet_7 = document.getElementById('tk-upload-desc-input');
+                const tkUploadDescInputElement = document.getElementById('tk-upload-scene-input');
+                const tkUploadCoverImgElement_134 = document.getElementById('tk-upload-cover-img');
+                const coverBtn = document.getElementById('tk-upload-cover-btn');
+                const tkUploadSceneInputElement = document.getElementById('tk-upload-cover-input');
+                if (sheet_7) sheet_7.value = '';
                 if (tkUploadDescInputElement) tkUploadDescInputElement.value = '';
                 if (tkUploadSceneInputElement) tkUploadSceneInputElement.value = '';
                 tkUploadCoverImgElement_134 &&
@@ -1170,35 +991,35 @@ JSON shape:
             }
             if (e_2.target.closest('#tk-confirm-upload-btn')) {
                 const tkUploadDescInputElement_136 =
-                        document.getElementById('tk-upload-desc-input'),
-                    tkUploadSceneInputElement_137 =
-                        document.getElementById('tk-upload-scene-input'),
-                    coverImg = document.getElementById('tk-upload-cover-img'),
-                    desc_2 = tkUploadDescInputElement_136
-                        ? tkUploadDescInputElement_136.value.trim()
-                        : '',
-                    sceneText_2 = tkUploadSceneInputElement_137
-                        ? tkUploadSceneInputElement_137.value.trim()
-                        : '',
-                    cover_2 = coverImg ? coverImg.src : null;
+                    document.getElementById('tk-upload-desc-input');
+                const tkUploadSceneInputElement_137 =
+                    document.getElementById('tk-upload-scene-input');
+                const coverImg = document.getElementById('tk-upload-cover-img');
+                const desc_2 = tkUploadDescInputElement_136
+                    ? tkUploadDescInputElement_136.value.trim()
+                    : '';
+                const sceneText_2 = tkUploadSceneInputElement_137
+                    ? tkUploadSceneInputElement_137.value.trim()
+                    : '';
+                const cover_2 = coverImg ? coverImg.src : null;
                 if (!tkState.profile.posts) tkState.profile.posts = [];
                 const newPost = {
-                        id: 'post_' + Date.now(),
-                        authorId: 'profile',
-                        authorName: tkState.profile.name || 'User',
-                        authorAvatar: null,
-                        mediaType: 'video',
-                        desc: desc_2,
-                        sceneText: sceneText_2,
-                        cover: coverImg && coverImg.style.display === 'block' ? cover_2 : null,
-                        likes: 0,
-                        savedCount: 0,
-                        saves: 0,
-                        shares: 0,
-                        commentsCount: 0,
-                        comments: [],
-                    },
-                    handleAction_2_142 = handleAction_2(newPost);
+                    id: 'post_' + Date.now(),
+                    authorId: 'profile',
+                    authorName: tkState.profile.name || 'User',
+                    authorAvatar: null,
+                    mediaType: 'video',
+                    desc: desc_2,
+                    sceneText: sceneText_2,
+                    cover: coverImg && coverImg.style.display === 'block' ? cover_2 : null,
+                    likes: 0,
+                    savedCount: 0,
+                    saves: 0,
+                    shares: 0,
+                    commentsCount: 0,
+                    comments: [],
+                };
+                const handleAction_2_142 = handleAction_2(newPost);
                 tkState.profile.posts.unshift(newPost);
                 if (window.tkPersistState) window.tkPersistState();
                 window.tkRenderProfile();
@@ -1215,90 +1036,35 @@ JSON shape:
                         isAuto: true,
                     });
             }
-            if (e_2.target.closest('#tk-sub-profile-edit-trigger')) {
-                const charId_3 = window.currentTkSubProfileCharId;
-                if (charId_3) {
-                    const tkCharSheetTitleElement_145 =
-                        document.getElementById('tk-char-sheet-title');
-                    if (tkCharSheetTitleElement_145)
-                        tkCharSheetTitleElement_145.textContent = '编辑角色';
-                    const tkCharNameElement_146 = document.getElementById('tk-char-name'),
-                        tkCharStatusElement_147 = document.getElementById('tk-char-status'),
-                        tkCharPersonaElement_148 = document.getElementById('tk-char-persona'),
-                        tkCharBioElement_149 = document.getElementById('tk-char-bio'),
-                        tkCharFollowingElement_150 = document.getElementById('tk-char-following'),
-                        tkCharFollowersElement_151 = document.getElementById('tk-char-followers'),
-                        tkCharLikesElement_152 = document.getElementById('tk-char-likes'),
-                        tkDeleteCharBtnElement_153 = document.getElementById('tk-delete-char-btn'),
-                        tkCharAvatarImgElement_154 = document.getElementById('tk-char-avatar-img'),
-                        tkCharAvatarPreviewIElement_155 = document.querySelector(
-                            '#tk-char-avatar-preview i',
-                        ),
-                        tkGetChar_156 = window.tkGetChar(charId_3);
-                    if (tkGetChar_156) {
-                        if (tkCharNameElement_146)
-                            tkCharNameElement_146.value = tkGetChar_156.name || '';
-                        if (tkCharStatusElement_147)
-                            tkCharStatusElement_147.value = tkGetChar_156.status || '';
-                        if (tkCharPersonaElement_148)
-                            tkCharPersonaElement_148.value = tkGetChar_156.persona || '';
-                        if (tkCharBioElement_149)
-                            tkCharBioElement_149.value = tkGetChar_156.bio || '';
-                        if (tkCharFollowingElement_150)
-                            tkCharFollowingElement_150.value = tkGetChar_156.following || 0;
-                        if (tkCharFollowersElement_151)
-                            tkCharFollowersElement_151.value = tkGetChar_156.followers || 0;
-                        if (tkCharLikesElement_152)
-                            tkCharLikesElement_152.value = tkGetChar_156.likes || 0;
-                        if (tkDeleteCharBtnElement_153)
-                            tkDeleteCharBtnElement_153.style.display = 'block';
-                        const src_5 = tkProfileResolveAvatar(tkGetChar_156);
-                        if (src_5) {
-                            tkCharAvatarImgElement_154 &&
-                                ((tkCharAvatarImgElement_154.src = src_5),
-                                (tkCharAvatarImgElement_154.style.display = 'block'));
-                            if (tkCharAvatarPreviewIElement_155)
-                                tkCharAvatarPreviewIElement_155.style.display = 'none';
-                        } else {
-                            tkCharAvatarImgElement_154 &&
-                                ((tkCharAvatarImgElement_154.src = ''),
-                                (tkCharAvatarImgElement_154.style.display = 'none'));
-                            if (tkCharAvatarPreviewIElement_155)
-                                tkCharAvatarPreviewIElement_155.style.display = 'block';
-                        }
-                    }
-                    if (window.tkOpenEditChar) window.tkOpenEditChar(charId_3);
-                    else {
-                        const s = document.getElementById('tk-edit-char-sheet');
-                        if (s) window.openView(s);
-                    }
-                }
-            }
         }));
     visitorsBtn &&
         ((visitorsBtn.title = '主页访客'),
-        visitorsBtn.addEventListener('click', (event_4) => {
-            event_4.stopPropagation();
+        visitorsBtn.addEventListener('click', (_value57) => {
+            _value57.stopPropagation();
             if (window.tkOpenProfileVisitorsSheet) window.tkOpenProfileVisitorsSheet();
         }));
     profileSettingsBtn &&
         ((profileSettingsBtn.title = 'TikTok 设置'),
-        profileSettingsBtn.addEventListener('click', (event_5) => {
-            event_5.stopPropagation();
-            const sheet_9 = tkEnsureProfileSettingsSheet();
-            tkProfileUpdateSettingsSheet(sheet_9);
-            window.openView(sheet_9);
+        profileSettingsBtn.addEventListener('click', (_value58) => {
+            _value58.stopPropagation();
+            const _value59 = tkEnsureProfileSettingsSheet();
+            tkProfileUpdateSettingsSheet(_value59);
+            window.openView(_value59);
         }));
-    const mainProfileTabs = document.querySelectorAll('#tk-profile-tab .tk-ptab'),
-        mainIndicator = document.querySelector('#tk-profile-tab .tk-ptab-indicator'),
-        mainGridContainer = document.getElementById('tk-profile-grid');
+    const mainProfileTabs = document.querySelectorAll('#tk-profile-tab .tk-ptab');
+    const tkCharAvatarPreviewIElement_155 = document.querySelector(
+        '#tk-profile-tab .tk-ptab-indicator',
+    );
+    const mainGridContainer = document.getElementById('tk-profile-grid');
     mainProfileTabs.forEach((subProfileView_3, value_163) => {
         subProfileView_3.addEventListener('click', () => {
+            if (subProfileView_3.classList.contains('active')) return;
             mainProfileTabs.forEach((subProfileView_2) =>
                 subProfileView_2.classList.remove('active'),
             );
             subProfileView_3.classList.add('active');
-            mainIndicator.style.transform = 'translateX(' + value_163 * 100 + '%)';
+            tkCharAvatarPreviewIElement_155.style.transform =
+                'translateX(' + value_163 * 100 + '%)';
             const target_3 = subProfileView_3.getAttribute('data-target');
             renderGrid(
                 target_3,
@@ -1308,94 +1074,105 @@ JSON shape:
             );
         });
     });
-    const subProfileTabs = document.querySelectorAll('#tk-sub-profile-view .tk-ptab'),
-        subIndicator = document.querySelector('#tk-sub-profile-view .tk-ptab-indicator'),
-        tkSubProfileGridElement_9 = document.getElementById('tk-sub-profile-grid');
+    const subProfileTabs = document.querySelectorAll('#tk-sub-profile-view .tk-ptab');
+    const subIndicator = document.querySelector('#tk-sub-profile-view .tk-ptab-indicator');
     subProfileTabs.forEach((subProfileView_5, value_167) => {
         subProfileView_5.addEventListener('click', () => {
+            if (subProfileView_5.classList.contains('active')) return;
             subProfileTabs.forEach((subProfileView_4) =>
                 subProfileView_4.classList.remove('active'),
             );
             subProfileView_5.classList.add('active');
             subIndicator.style.transform = 'translateX(' + value_167 * 100 + '%)';
-            const attribute_168 = subProfileView_5.getAttribute('data-target');
-            let charVideos_2 = [],
-                items_170 = [];
-            if (currentSubCharId) {
-                const tkGetChar_172 = window.tkGetChar(currentSubCharId);
-                charVideos_2 = tkState.videos.filter((v_6) => v_6.authorId === currentSubCharId);
-                tkGetChar_172 &&
-                    tkGetChar_172.likedVideoIds &&
-                    (items_170 = tkState.videos.filter((value_174) =>
-                        tkGetChar_172.likedVideoIds.includes(value_174.id),
-                    ));
-            }
-            renderGrid(attribute_168, tkSubProfileGridElement_9, charVideos_2, items_170);
+            _value4();
         });
     });
-    function renderGrid(value_175 = 'videos', container, value_177 = [], value_178 = []) {
-        if (!container) return;
-        container.innerHTML = '';
-        let items_2 = [];
-        if (value_175 === 'videos') items_2 = value_177;
-        else value_175 === 'liked' && (items_2 = value_178);
-        if (items_2.length === 0) {
-            container.innerHTML =
-                '<div style="grid-column: span 3; padding: 40px 0; text-align: center; color: #999; font-size: 13px;">暂无内容</div>';
+    function renderGrid(_value60 = 'videos', _value61, charVideos_2 = [], items_170 = []) {
+        if (!_value61) return;
+        let _value62 = _value2.get(_value61);
+        !_value62 &&
+            ((_value62 = {
+                nodes: new Map(),
+                empty: document.createElement('div'),
+            }),
+            (_value62.empty.className = 'tk-grid-empty'),
+            (_value62.empty.textContent = '暂无内容'),
+            _value2.set(_value61, _value62),
+            _value61.replaceChildren(),
+            _value61.addEventListener('click', (v_6) => {
+                const _value64 = v_6.target.closest('.tk-grid-item[data-video-id]');
+                if (!_value64 || !_value61.contains(_value64)) return;
+                window.tkOpenFullscreenVideo?.(_value64.dataset.videoId);
+            }));
+        const _value63 =
+            _value60 === 'videos' ? charVideos_2 : _value60 === 'liked' ? items_170 : [];
+        const container = new Set(_value63.map((_value65) => String(_value65.id)));
+        for (const [_value66, _value67] of _value62.nodes) {
+            !container.has(_value66) &&
+                (_value67.element.remove(), _value62.nodes['delete'](_value66));
+        }
+        if (!_value63.length) {
+            if (_value62.empty.parentElement !== _value61) _value61.replaceChildren(_value62.empty);
             return;
         }
-        items_2.forEach((item_2) => {
-            const el = document.createElement('div');
-            el.className = 'tk-grid-item';
-            const mediaIcon = item_2.mediaType === 'image' ? 'fa-image' : 'fa-play';
-            if (item_2.cover || item_2.bgImage || item_2.imageUrl) {
-                let imgUrl = item_2.cover || item_2.bgImage || item_2.imageUrl;
-                el.innerHTML =
-                    `
-                    <img src="` +
-                    imgUrl +
-                    `" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: cover;">
-                    <div class="tk-grid-views" style="text-shadow: none;"><i class="fas ` +
-                    mediaIcon +
-                    '" style="text-shadow: none;"></i> ' +
-                    tkProfileFormatCount(item_2.likes || Math.floor(Math.random() * 1000)) +
-                    `</div>
-                `;
-            } else {
-                let bgStyleStr = item_2.bgColor ? item_2.bgColor : '#ffffff';
-                el.innerHTML =
-                    `
-                    <div class="tk-grid-text" style="position: relative; left: 0; top: 0; transform: none; background: ` +
-                    bgStyleStr +
-                    `; color:#111111; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: 8px; width: 100%; height: 100%; box-sizing: border-box; border: none;  text-shadow: none;">
-                        ` +
-                    (item_2.sceneText
-                        ? item_2.sceneText.substring(0, 15) + '...'
-                        : item_2.desc
-                          ? item_2.desc.substring(0, 15) + '...'
-                          : '视频') +
-                    `
-                    </div>
-                    <div class="tk-grid-views" style="color: #fff; text-shadow: none;"><i class="fas ` +
-                    mediaIcon +
-                    '" style="text-shadow: none;"></i> ' +
-                    tkProfileFormatCount(item_2.likes || Math.floor(Math.random() * 1000)) +
-                    `</div>
-                `;
+        _value62.empty.remove();
+        let el = _value61.firstElementChild;
+        _value63.forEach((item_2) => {
+            const _value68 = String(item_2.id);
+            let _value69 = _value62.nodes.get(_value68);
+            if (!_value69) {
+                const _value75 = document.createElement('button');
+                _value75.type = 'button';
+                _value75.className = 'tk-grid-item';
+                _value75.dataset.videoId = _value68;
+                _value75.innerHTML =
+                    '<img class="tk-grid-cover" alt="" loading="lazy" decoding="async"><span class="tk-grid-text"></span><span class="tk-grid-views"><i class="fas" aria-hidden="true"></i><span></span></span>';
+                _value69 = {
+                    element: _value75,
+                    signature: '',
+                };
+                _value62.nodes.set(_value68, _value69);
             }
-            el.addEventListener('click', () => {
-                if (window.tkOpenFullscreenVideo) window.tkOpenFullscreenVideo(item_2.id);
-                else {
-                    console.error('tkOpenFullscreenVideo 不存在');
-                    if (window.showToast) window.showToast('错误: 全屏视频组件未就绪');
-                }
-            });
-            container.appendChild(el);
+            const _value70 = window.tkGetVideoCover(item_2);
+            const _value71 = String(item_2.sceneText || item_2.desc || '视频');
+            const _value72 = tkProfileFormatCount(item_2.likes ?? 0);
+            const _value73 = JSON.stringify([
+                _value70,
+                _value71,
+                _value72,
+                item_2.bgColor,
+                item_2.mediaType,
+                item_2.desc,
+            ]);
+            const _value74 = _value69.element;
+            if (_value73 !== _value69.signature) {
+                const _value76 = _value74.querySelector('img');
+                const _value77 = _value74.querySelector('.tk-grid-text');
+                if (_value70 && _value76.getAttribute('src') !== _value70) _value76.src = _value70;
+                if (!_value70) _value76.removeAttribute('src');
+                _value76.hidden = !_value70;
+                _value74.classList.toggle('tk-grid-without-cover', !_value70);
+                _value77.hidden = Boolean(_value70);
+                const items_2 = Array.from(_value71);
+                _value77.textContent =
+                    items_2.slice(0, 15).join('') + (items_2.length > 15 ? '…' : '');
+                _value77.style.background = item_2.bgColor || '#fff';
+                _value74.querySelector('.tk-grid-views i').className =
+                    'fas ' + (item_2.mediaType === 'image' ? 'fa-image' : 'fa-play');
+                _value74.querySelector('.tk-grid-views span').textContent = _value72;
+                _value74.setAttribute(
+                    'aria-label',
+                    (item_2.desc || _value71) + '，' + _value72 + '赞',
+                );
+                _value69.signature = _value73;
+            }
+            if (_value74 === el) el = el.nextElementSibling;
+            else _value61.insertBefore(_value74, el);
         });
     }
-    const coverBtn_2 = document.getElementById('tk-upload-cover-btn'),
-        coverInput = document.getElementById('tk-upload-cover-input'),
-        coverImg_2 = document.getElementById('tk-upload-cover-img');
+    const coverBtn_2 = document.getElementById('tk-upload-cover-btn');
+    const coverInput = document.getElementById('tk-upload-cover-input');
+    const coverImg_2 = document.getElementById('tk-upload-cover-img');
     coverBtn_2 &&
         coverInput &&
         (coverBtn_2.addEventListener('click', (e) => {
@@ -1415,4 +1192,24 @@ JSON shape:
             }
             event_185.target.value = '';
         }));
+    document.addEventListener('tk:data-cleared', ({ detail: _value78 }) => {
+        if (_value78.kind === 'videos') {
+            _value4();
+            return;
+        }
+        if (_value78.kind !== 'all') return;
+        currentSubCharId = null;
+        window.currentTkSubProfileCharId = null;
+        [
+            'tk-sub-profile-view',
+            'tk-edit-profile-sheet',
+            'tk-edit-char-sheet',
+            'tk-import-char-sheet',
+            'tk-upload-video-sheet',
+            'tk-profile-visitors-sheet',
+            'tk-visitor-thought-sheet',
+        ].forEach((_value79) => window.closeView(document.getElementById(_value79)));
+        document.getElementById('tk-sub-profile-grid')?.replaceChildren();
+        tkProfileUpdateSettingsSheet(document.getElementById('tk-profile-settings-sheet'));
+    });
 });

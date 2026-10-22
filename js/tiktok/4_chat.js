@@ -2,33 +2,39 @@
     window.u2OnStorageReady ||
     ((callback) => document.addEventListener('DOMContentLoaded', callback))
 )(() => {
-    const followingBar = document.getElementById('tk-following-bar'),
-        addCharBtn = document.getElementById('tk-chat-add-btn'),
-        editCharSheet = document.getElementById('tk-edit-char-sheet'),
-        dmsContainer = document.getElementById('tk-chat-dms-container'),
-        chatView = document.getElementById('tk-dm-chat-view'),
-        chatBackBtn = document.getElementById('tk-dm-back-btn'),
-        chatTitle = document.getElementById('tk-dm-chat-title'),
-        messagesContainer = document.getElementById('tk-dm-messages-container'),
-        chatInput = document.getElementById('tk-dm-chat-input'),
-        chatSendBtn = document.getElementById('tk-dm-chat-send'),
-        chatMicBtn = document.getElementById('tk-dm-mic-btn'),
-        chatGenerateDmsBtn = document.getElementById('tk-chat-generate-dms-btn'),
-        charAvatarImg = document.getElementById('tk-char-avatar-img'),
-        tkSubProfileMsgBtn = document.getElementById('tk-sub-profile-msg-btn'),
-        charAvatarIcon = document.querySelector('#tk-char-avatar-preview i'),
-        charNameInput = document.getElementById('tk-char-name'),
-        charStatusInput = document.getElementById('tk-char-status'),
-        charPersonaInput = document.getElementById('tk-char-persona'),
-        charBioInput = document.getElementById('tk-char-bio'),
-        charFollowingInput = document.getElementById('tk-char-following'),
-        charFollowersInput = document.getElementById('tk-char-followers'),
-        charLikesInput = document.getElementById('tk-char-likes'),
-        saveCharBtn = document.getElementById('tk-save-char-btn'),
-        deleteCharBtn = document.getElementById('tk-delete-char-btn');
-    let editingCharId = null,
-        currentChatCharId = null,
-        enabled = false;
+    const followingBar = document.getElementById('tk-following-bar');
+    const addCharBtn = document.getElementById('tk-chat-add-btn');
+    const editCharSheet = document.getElementById('tk-edit-char-sheet');
+    const dmsContainer = document.getElementById('tk-chat-dms-container');
+    const chatView = document.getElementById('tk-dm-chat-view');
+    const chatBackBtn = document.getElementById('tk-dm-back-btn');
+    const chatTitle = document.getElementById('tk-dm-chat-title');
+    const messagesContainer = document.getElementById('tk-dm-messages-container');
+    const chatInput = document.getElementById('tk-dm-chat-input');
+    const chatSendBtn = document.getElementById('tk-dm-chat-send');
+    const chatMicBtn = document.getElementById('tk-dm-mic-btn');
+    const chatGenerateDmsBtn = document.getElementById('tk-chat-generate-dms-btn');
+    const charAvatarImg = document.getElementById('tk-char-avatar-img');
+    const tkSubProfileMsgBtn = document.getElementById('tk-sub-profile-msg-btn');
+    const charAvatarIcon = document.querySelector('#tk-char-avatar-preview i');
+    const charNameInput = document.getElementById('tk-char-name');
+    const charStatusInput = document.getElementById('tk-char-status');
+    const charPersonaInput = document.getElementById('tk-char-persona');
+    const charBioInput = document.getElementById('tk-char-bio');
+    const charFollowingInput = document.getElementById('tk-char-following');
+    const charFollowersInput = document.getElementById('tk-char-followers');
+    const charLikesInput = document.getElementById('tk-char-likes');
+    const saveCharBtn = document.getElementById('tk-save-char-btn');
+    const deleteCharBtn = document.getElementById('tk-delete-char-btn');
+    let editingCharId = null;
+    let currentChatCharId = null;
+    let enabled = false;
+    function _value(_value2, _value3) {
+        const _value4 = window.tkCaptureDataGuard('dms');
+        return setTimeout(() => {
+            if (_value4()) _value2();
+        }, _value3);
+    }
     function tkDmEscapeHtml(value_2) {
         return String(value_2 ?? '').replace(
             /[&<>"']/g,
@@ -153,75 +159,36 @@
         tkDmSetGenerateButtonLoading(true);
         if (window.showToast) window.showToast('正在生成 TikTok 私信...');
         const userPersonaParts = [
-                tkState.profile?.persona
-                    ? 'TikTok profile persona: ' + tkState.profile.persona
-                    : '',
-                tkState.profile?.bio ? 'TikTok profile bio: ' + tkState.profile.bio : '',
-                window.userState?.persona ? 'User base persona: ' + window.userState.persona : '',
-                tkState.profile?.name ? 'TikTok display name: ' + tkState.profile.name : '',
-                tkState.profile?.handle ? 'TikTok handle: @' + tkState.profile.handle : '',
-            ].filter(Boolean),
-            userPersonaContext =
-                userPersonaParts.join(`
-`) || 'No explicit TikTok persona. Infer a normal but specific TikTok creator/user.',
-            wbTriggerText = [
-                'TikTok incoming direct messages',
-                tkState.profile?.name || '',
-                tkState.profile?.handle || '',
-                tkState.profile?.persona || '',
-                tkState.profile?.bio || '',
-                window.userState?.persona || '',
-            ].filter(Boolean).join(`
-`),
-            value_25 = window.tkBuildWorldBookContext
-                ? window.tkBuildWorldBookContext(wbTriggerText)
-                : '',
-            content_2 =
-                `
-Generate incoming TikTok direct messages for the current user's TikTok account. This must perfectly simulate the highly realistic, chaotic, and unfiltered environment of real TikTok DMs.
-
-User TikTok persona:
-` +
-                userPersonaContext +
-                `
-
-Mounted and built-in world book context:
-` +
-                (value_25 || 'No extra world book context.') +
-                `
-
-Hard requirements:
-1. Return one strict JSON object only. No markdown, no prose, no comments, no trailing commas.
-2. The JSON shape must be {"users":[...]}.
-3. Generate 2-5 different senders. To reflect real TikTok DMs, mix normal users (strangers, peers, followers) with UNWANTED users (crypto/forex scammers, fake sugar daddies/mommies, fake agency collabs, bots, weird creeps, or harassment messages).
-4. Every sender must include "name", "handle", "avatarDesc", "persona", "status", and "messages". "persona" must explicitly describe their motive (e.g. "Crypto scammer trying to sell a course" or "Creepy stranger asking for feet pics").
-5. "messages" must contain 5-10 message objects from that sender to the user. Each object is one short chat bubble.
-6. The messages must feel EXTREMELY REAL to TikTok. Scammers should use their typical aggressive/scripted tactics, creeps should be inappropriately forward, bots should sound like spam, and normal users should be casual.
-7. Do not use emoji. Do not write as the user. Do not include offer cards or non-text message types. 禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。
-8. The app is international. The message text can be any language that fits the sender persona. If "text" is not Chinese, "translationZh" must contain a natural Chinese translation. If "text" is Chinese, "translationZh" must be an empty string.
-
-JSON example:
-{
-  "users": [
-    {
-      "name": "sender name",
-      "handle": "sender_handle",
-      "avatarDesc": "short avatar seed",
-      "persona": "why this sender would DM the user",
-      "status": "short TikTok status",
-      "messages": [
-        { "text": "message 1", "translationZh": "" },
-        { "text": "foreign-language message", "translationZh": "这条外语消息的中文翻译" },
-        { "text": "message 3", "translationZh": "" },
-        { "text": "message 4", "translationZh": "" },
-        { "text": "message 5", "translationZh": "" }
-      ]
-    }
-  ]
-}
-`;
+            tkState.profile?.persona ? 'TikTok profile persona: ' + tkState.profile.persona : '',
+            tkState.profile?.bio ? 'TikTok profile bio: ' + tkState.profile.bio : '',
+            window.userState?.persona ? 'User base persona: ' + window.userState.persona : '',
+            tkState.profile?.name ? 'TikTok display name: ' + tkState.profile.name : '',
+            tkState.profile?.handle ? 'TikTok handle: @' + tkState.profile.handle : '',
+        ].filter(Boolean);
+        const userPersonaContext =
+            userPersonaParts.join('\n') ||
+            'No explicit TikTok persona. Infer a normal but specific TikTok creator/user.';
+        const wbTriggerText = [
+            'TikTok incoming direct messages',
+            tkState.profile?.name || '',
+            tkState.profile?.handle || '',
+            tkState.profile?.persona || '',
+            tkState.profile?.bio || '',
+            window.userState?.persona || '',
+        ]
+            .filter(Boolean)
+            .join('\n');
+        const value_25 = window.tkBuildWorldBookContext
+            ? window.tkBuildWorldBookContext(wbTriggerText)
+            : '';
+        const content_2 =
+            "\nGenerate incoming TikTok direct messages for the current user's TikTok account. This must perfectly simulate the highly realistic, chaotic, and unfiltered environment of real TikTok DMs.\n\nUser TikTok persona:\n" +
+            userPersonaContext +
+            '\n\nMounted and built-in world book context:\n' +
+            (value_25 || 'No extra world book context.') +
+            '\n\nHard requirements:\n1. Return one strict JSON object only. No markdown, no prose, no comments, no trailing commas.\n2. The JSON shape must be {"users":[...]}.\n3. Generate 2-5 different senders. To reflect real TikTok DMs, mix normal users (strangers, peers, followers) with UNWANTED users (crypto/forex scammers, fake sugar daddies/mommies, fake agency collabs, bots, weird creeps, or harassment messages).\n4. Every sender must include "name", "handle", "avatarDesc", "persona", "status", and "messages". "persona" must explicitly describe their motive (e.g. "Crypto scammer trying to sell a course" or "Creepy stranger asking for feet pics").\n5. "messages" must contain 5-10 message objects from that sender to the user. Each object is one short chat bubble.\n6. The messages must feel EXTREMELY REAL to TikTok. Scammers should use their typical aggressive/scripted tactics, creeps should be inappropriately forward, bots should sound like spam, and normal users should be casual.\n7. Do not use emoji. Do not write as the user. Do not include offer cards or non-text message types. 禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。\n8. The app is international. The message text can be any language that fits the sender persona. If "text" is not Chinese, "translationZh" must contain a natural Chinese translation. If "text" is Chinese, "translationZh" must be an empty string.\n\nJSON example:\n{\n  "users": [\n    {\n      "name": "sender name",\n      "handle": "sender_handle",\n      "avatarDesc": "short avatar seed",\n      "persona": "why this sender would DM the user",\n      "status": "short TikTok status",\n      "messages": [\n        { "text": "message 1", "translationZh": "" },\n        { "text": "foreign-language message", "translationZh": "这条外语消息的中文翻译" },\n        { "text": "message 3", "translationZh": "" },\n        { "text": "message 4", "translationZh": "" },\n        { "text": "message 5", "translationZh": "" }\n      ]\n    }\n  ]\n}\n';
         try {
-            const value_27 = await fetch(tkDmResolveApiEndpoint(), {
+            const value_27 = await window.tkFetch('dms', tkDmResolveApiEndpoint(), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -253,12 +220,12 @@ JSON example:
                         status: value_27.status,
                     })
                 );
-            const data = await value_27.json(),
-                parsed = window.tkParseAiJson
-                    ? window.tkParseAiJson(data.choices?.[0]?.message?.content || '')
-                    : JSON.parse(data.choices?.[0]?.message?.content || '{}'),
-                generatedUsers = Array.isArray(parsed.users) ? parsed.users.slice(0, 5) : [],
-                created = [];
+            const data = await value_27.json();
+            const parsed = window.tkParseAiJson
+                ? window.tkParseAiJson(data.choices?.[0]?.message?.content || '')
+                : JSON.parse(data.choices?.[0]?.message?.content || '{}');
+            const generatedUsers = Array.isArray(parsed.users) ? parsed.users.slice(0, 5) : [];
+            const created = [];
             generatedUsers.forEach((user, value_32) => {
                 const messages_2 = tkDmNormalizeGeneratedMessages(user.messages);
                 if (messages_2.length < 5) return;
@@ -310,6 +277,7 @@ JSON example:
             if (window.tkRenderChat) window.tkRenderChat();
             if (window.showToast) window.showToast('收到 ' + created.length + ' 位新联系人私信');
         } catch (error_2) {
+            if (error_2?.name === 'AbortError') return;
             console.error('TikTok incoming DM generation failed:', error_2);
             if (
                 !window.u2Api?.isRequestError?.(error_2) ||
@@ -435,9 +403,9 @@ JSON example:
                     '<div style="padding: 20px; text-align: center; color: #999; font-size: 13px;">暂无消息记录</div>'));
         document.getElementById('tk-chat-tab').dataset.tkRendered = 'true';
     };
-    const importSheet = document.getElementById('tk-import-char-sheet'),
-        importList = document.getElementById('tk-import-list'),
-        closeImportBtn = document.getElementById('tk-close-import-btn');
+    const importSheet = document.getElementById('tk-import-char-sheet');
+    const importList = document.getElementById('tk-import-list');
+    const closeImportBtn = document.getElementById('tk-close-import-btn');
     addCharBtn &&
         addCharBtn.addEventListener('click', () => {
             window.tkOpenImportSheet();
@@ -585,8 +553,8 @@ JSON example:
     function openEditChar(charId_4) {
         window.tkOpenEditChar(charId_4);
     }
-    const avatarWrapper = document.getElementById('tk-char-avatar-wrapper'),
-        avatarUpload = document.getElementById('tk-char-avatar-upload');
+    const avatarWrapper = document.getElementById('tk-char-avatar-wrapper');
+    const avatarUpload = document.getElementById('tk-char-avatar-upload');
     avatarWrapper &&
         avatarUpload &&
         (avatarWrapper.addEventListener('click', (e) => {
@@ -670,14 +638,14 @@ JSON example:
             window.closeView(chatView);
             currentChatCharId = null;
         });
-    const chatSettingsBtn = document.getElementById('tk-dm-settings-btn'),
-        chatSettingsSheet = document.getElementById('tk-dm-chat-settings-sheet'),
-        btnClearHistory = document.getElementById('tk-dm-clear-chat-btn'),
-        btnBlock = document.getElementById('tk-dm-block-friend-btn'),
-        btnDelete = document.getElementById('tk-dm-delete-friend-btn'),
-        btnCancel = chatSettingsSheet
-            ? chatSettingsSheet.querySelector('.sheet-action[onclick*="tk-dm-chat-settings-sheet"]')
-            : null;
+    const chatSettingsBtn = document.getElementById('tk-dm-settings-btn');
+    const chatSettingsSheet = document.getElementById('tk-dm-chat-settings-sheet');
+    const btnClearHistory = document.getElementById('tk-dm-clear-chat-btn');
+    const btnBlock = document.getElementById('tk-dm-block-friend-btn');
+    const btnDelete = document.getElementById('tk-dm-delete-friend-btn');
+    const btnCancel = chatSettingsSheet
+        ? chatSettingsSheet.querySelector('.sheet-action[onclick*="tk-dm-chat-settings-sheet"]')
+        : null;
     chatSettingsBtn &&
         chatSettingsSheet &&
         (chatSettingsBtn.addEventListener('click', () => {
@@ -812,14 +780,14 @@ JSON example:
         if (nameEl) nameEl.textContent = char_11.name || char_11.handle || 'TA';
         window.openView(sheet_2);
     };
-    const wtUserAvatar = document.getElementById('wt-user-avatar'),
-        wtCharAvatar = document.getElementById('wt-char-avatar'),
-        wtCloseBtn = document.getElementById('wt-close-btn'),
-        wtChatContainer = document.getElementById('wt-chat-container'),
-        wtChatInput = document.getElementById('wt-chat-input'),
-        wtSendBtn = document.getElementById('wt-send-btn'),
-        wtLoadingOverlay = document.getElementById('wt-loading-overlay'),
-        wtLoadingText = document.getElementById('wt-loading-text');
+    const wtUserAvatar = document.getElementById('wt-user-avatar');
+    const wtCharAvatar = document.getElementById('wt-char-avatar');
+    const wtCloseBtn = document.getElementById('wt-close-btn');
+    const wtChatContainer = document.getElementById('wt-chat-container');
+    const wtChatInput = document.getElementById('wt-chat-input');
+    const wtSendBtn = document.getElementById('wt-send-btn');
+    const wtLoadingOverlay = document.getElementById('wt-loading-overlay');
+    const wtLoadingText = document.getElementById('wt-loading-text');
     let wtChatHistory = [];
     function onSend_2() {
         const text_3 = wtChatInput.value.trim();
@@ -873,10 +841,10 @@ JSON example:
         wtChatContainer.appendChild(row);
         wtChatContainer.scrollTop = wtChatContainer.scrollHeight;
     }
-    const wtHistoryBtn = document.getElementById('wt-history-btn'),
-        wtHistoryOverlay = document.getElementById('wt-history-overlay'),
-        wtHistoryClose = document.getElementById('wt-history-close'),
-        wtHistoryContent = document.getElementById('wt-history-content');
+    const wtHistoryBtn = document.getElementById('wt-history-btn');
+    const wtHistoryOverlay = document.getElementById('wt-history-overlay');
+    const wtHistoryClose = document.getElementById('wt-history-close');
+    const wtHistoryContent = document.getElementById('wt-history-content');
     wtHistoryBtn &&
         wtHistoryOverlay &&
         (wtHistoryBtn.addEventListener('click', () => {
@@ -886,8 +854,8 @@ JSON example:
                 (wtHistoryContent.style.flexDirection = 'column'),
                 (wtHistoryContent.style.gap = '10px'),
                 (wtHistoryContent.style.padding = '10px 5px'));
-            const charId_7 = wtBubble.dataset.charId,
-                tkGetChar_98 = window.tkGetChar(charId_7);
+            const charId_7 = wtBubble.dataset.charId;
+            const tkGetChar_98 = window.tkGetChar(charId_7);
             if (wtChatHistory.length === 0) {
                 if (wtHistoryContent)
                     wtHistoryContent.innerHTML =
@@ -916,7 +884,7 @@ JSON example:
                     row_2.appendChild(bubble);
                     if (wtHistoryContent) wtHistoryContent.appendChild(row_2);
                 });
-                setTimeout(() => {
+                _value(() => {
                     if (wtHistoryContent)
                         wtHistoryContent.scrollTop = wtHistoryContent.scrollHeight;
                 }, 50);
@@ -985,10 +953,10 @@ JSON example:
                 const feedContainer = document.getElementById('tk-feed-container');
                 if (feedContainer && feedContainer.children.length > 0) {
                     const cards = Array.from(feedContainer.querySelectorAll('.tk-video-card'));
-                    let closestCard = null,
-                        value_125 = Infinity;
-                    const boundingClientRect = feedContainer.getBoundingClientRect(),
-                        containerCenter = boundingClientRect.top + boundingClientRect.height / 2;
+                    let closestCard = null;
+                    let value_125 = Infinity;
+                    const boundingClientRect = feedContainer.getBoundingClientRect();
+                    const containerCenter = boundingClientRect.top + boundingClientRect.height / 2;
                     cards.forEach((feedContainer_2) => {
                         const boundingClientRect_128 = feedContainer_2.getBoundingClientRect(),
                             cardCenter =
@@ -1018,8 +986,7 @@ JSON example:
         currentVideo &&
             currentVideo.comments &&
             currentVideo.comments.length > 0 &&
-            ((text_108 = `该视频的评论区热评：
-`),
+            ((text_108 = '该视频的评论区热评：\n'),
             currentVideo.comments.slice(0, 5).forEach((value_134) => {
                 text_108 +=
                     '- ' +
@@ -1030,18 +997,16 @@ JSON example:
 `;
             }));
         let videoContext = currentVideo
-                ? '当前我们在看一个视频。视频作者是：' +
-                  (currentVideo.authorName || '未知') +
-                  '。视频文案是：' +
-                  (currentVideo.desc || '无') +
-                  '。视频画面描述是：' +
-                  (currentVideo.sceneText || '一段视频') +
-                  `。
-` +
-                  text_108
-                : '我们在浏览TikTok，但是当前没有特定的视频。',
-            chatHistoryStr = `聊天记录:
-`;
+            ? '当前我们在看一个视频。视频作者是：' +
+              (currentVideo.authorName || '未知') +
+              '。视频文案是：' +
+              (currentVideo.desc || '无') +
+              '。视频画面描述是：' +
+              (currentVideo.sceneText || '一段视频') +
+              '。\n' +
+              text_108
+            : '我们在浏览TikTok，但是当前没有特定的视频。';
+        let chatHistoryStr = '聊天记录:\n';
         wtChatHistory.slice(-10).forEach((value_135) => {
             chatHistoryStr +=
                 '[' +
@@ -1051,47 +1016,42 @@ JSON example:
                 `
 `;
         });
-        let worldBookContextText =
-            videoContext +
-            `
-` +
-            chatHistoryStr;
+        let worldBookContextText = videoContext + '\n' + chatHistoryStr;
         const value_112 = window.imApp?.getWorldBookContextForFriendByPosition
-                ? window.imApp.getWorldBookContextForFriendByPosition(
-                      'system_depth',
-                      char_12,
-                      worldBookContextText,
-                  )
-                : window.getGlobalWorldBookContextByPosition
-                  ? window.getGlobalWorldBookContextByPosition('system_depth')
-                  : '',
-            value_113 = window.imApp?.getWorldBookContextForFriendByPosition
-                ? window.imApp.getWorldBookContextForFriendByPosition(
-                      'before_role',
-                      char_12,
-                      worldBookContextText,
-                  )
-                : window.getGlobalWorldBookContextByPosition
-                  ? window.getGlobalWorldBookContextByPosition('before_role')
-                  : '',
-            value_114 = window.imApp?.getWorldBookContextForFriendByPosition
-                ? window.imApp.getWorldBookContextForFriendByPosition(
-                      'after_role',
-                      char_12,
-                      worldBookContextText,
-                  )
-                : window.getGlobalWorldBookContextByPosition
-                  ? window.getGlobalWorldBookContextByPosition('after_role')
-                  : '',
-            value_115 = window.tkBuildWorldBookContext
-                ? window.tkBuildWorldBookContext(worldBookContextText)
-                : '';
+            ? window.imApp.getWorldBookContextForFriendByPosition(
+                  'system_depth',
+                  char_12,
+                  worldBookContextText,
+              )
+            : window.getGlobalWorldBookContextByPosition
+              ? window.getGlobalWorldBookContextByPosition('system_depth')
+              : '';
+        const value_113 = window.imApp?.getWorldBookContextForFriendByPosition
+            ? window.imApp.getWorldBookContextForFriendByPosition(
+                  'before_role',
+                  char_12,
+                  worldBookContextText,
+              )
+            : window.getGlobalWorldBookContextByPosition
+              ? window.getGlobalWorldBookContextByPosition('before_role')
+              : '';
+        const value_114 = window.imApp?.getWorldBookContextForFriendByPosition
+            ? window.imApp.getWorldBookContextForFriendByPosition(
+                  'after_role',
+                  char_12,
+                  worldBookContextText,
+              )
+            : window.getGlobalWorldBookContextByPosition
+              ? window.getGlobalWorldBookContextByPosition('after_role')
+              : '';
+        const value_115 = window.tkBuildWorldBookContext
+            ? window.tkBuildWorldBookContext(worldBookContextText)
+            : '';
         let text_116 = '';
         char_12 &&
             char_12.memories &&
             char_12.memories.length > 0 &&
-            ((text_116 += `角色记忆:
-`),
+            ((text_116 += '角色记忆:\n'),
             char_12.memories.forEach((value_136) => {
                 text_116 +=
                     '- ' +
@@ -1099,19 +1059,14 @@ JSON example:
                     `
 `;
             }),
-            (text_116 += `
-`));
+            (text_116 += '\n'));
         let text_117 = '';
         window.userState &&
             window.userState.persona &&
-            (text_117 =
-                '我(User)的人设: ' +
-                window.userState.persona +
-                `
-`);
+            (text_117 = '我(User)的人设: ' + window.userState.persona + '\n');
         wtCharAvatar.style.opacity = '0.5';
-        const id_2 = 'wt-typing-' + Date.now(),
-            element_119 = document.createElement('div');
+        const id_2 = 'wt-typing-' + Date.now();
+        const element_119 = document.createElement('div');
         element_119.id = id_2;
         element_119.style.display = 'flex';
         element_119.style.width = '100%';
@@ -1128,104 +1083,52 @@ JSON example:
         wtChatContainer.appendChild(element_119);
         wtChatContainer.scrollTop = wtChatContainer.scrollHeight;
         const content_4 =
-            `
-` +
-            (value_112
-                ? `System Depth Rules (Highest Priority):
-` +
-                  value_112 +
-                  `
-
-`
-                : '') +
-            (value_113
-                ? `Before Role Rules:
-` +
-                  value_113 +
-                  `
-
-`
-                : '') +
-            (value_115
-                ? `TikTok Mounted World Book:
-` +
-                  value_115 +
-                  `
-
-`
-                : '') +
+            '\n' +
+            (value_112 ? 'System Depth Rules (Highest Priority):\n' + value_112 + '\n\n' : '') +
+            (value_113 ? 'Before Role Rules:\n' + value_113 + '\n\n' : '') +
+            (value_115 ? 'TikTok Mounted World Book:\n' + value_115 + '\n\n' : '') +
             '你现在的身份是：' +
             char_12.name +
-            `
-你的人设是：` +
+            '\n你的人设是：' +
             char_12.persona +
-            `
-现在我们正在"一起看视频"的连麦状态。
-
-` +
+            '\n现在我们正在"一起看视频"的连麦状态。\n\n' +
             text_116 +
-            `
-` +
+            '\n' +
             text_117 +
-            `
-
-` +
+            '\n\n' +
             videoContext +
-            `
-
-` +
+            '\n\n' +
             chatHistoryStr +
-            `
-` +
-            (value_114
-                ? `
-After Role Rules:
-` +
-                  value_114 +
-                  `
-`
-                : '') +
-            `
-要求：
-1. 请读取已挂载的世界书，深度扮演 ` +
+            '\n' +
+            (value_114 ? '\nAfter Role Rules:\n' + value_114 + '\n' : '') +
+            '\n要求：\n1. 请读取已挂载的世界书，深度扮演 ' +
             char_12.name +
-            ` 的身份人设与user开始沉浸式聊天。
-2. 读取视频内容、文案、评论区以及我刚才的话（如果有），作出合理回应。可以吐槽视频、回复我的话、玩梗，或者分享你的感受。
-3. 一句一发，将你想说的话拆分成 3 到 5 条简短的微信式气泡。
-4. 绝对不要发 emoji，也绝对不要使用句号结尾，要有十足的"活人感"和"网感"。语言自然连贯。禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。
-5. 国际化翻译规则：回复可以使用符合角色国籍、人设和上下文的任意语言；如果 text 不是中文，必须填写 translationZh 作为自然中文翻译；如果 text 是中文，translationZh 必须是空字符串。
-6. 必须返回严格的 JSON 数组格式（不要带有 markdown 代码块标记），格式如下：
-[
-  { "text": "气泡1", "translationZh": "" },
-  { "text": "foreign-language bubble", "translationZh": "这条外语气泡的中文翻译" },
-  { "text": "气泡3", "translationZh": "" }
-]
-`;
+            ' 的身份人设与user开始沉浸式聊天。\n2. 读取视频内容、文案、评论区以及我刚才的话（如果有），作出合理回应。可以吐槽视频、回复我的话、玩梗，或者分享你的感受。\n3. 一句一发，将你想说的话拆分成 3 到 5 条简短的微信式气泡。\n4. 绝对不要发 emoji，也绝对不要使用句号结尾，要有十足的"活人感"和"网感"。语言自然连贯。禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。\n5. 国际化翻译规则：回复可以使用符合角色国籍、人设和上下文的任意语言；如果 text 不是中文，必须填写 translationZh 作为自然中文翻译；如果 text 是中文，translationZh 必须是空字符串。\n6. 必须返回严格的 JSON 数组格式（不要带有 markdown 代码块标记），格式如下：\n[\n  { "text": "气泡1", "translationZh": "" },\n  { "text": "foreign-language bubble", "translationZh": "这条外语气泡的中文翻译" },\n  { "text": "气泡3", "translationZh": "" }\n]\n';
         try {
             const chatCompletionsEndpoint = window.u2Api.resolveChatCompletionsEndpoint(
-                    window.apiConfig.endpoint,
-                ),
-                value_137 = await fetch(chatCompletionsEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: 'Bearer ' + window.apiConfig.apiKey,
-                    },
-                    body: JSON.stringify({
-                        model: window.apiConfig.model || 'gpt-3.5-turbo',
-                        messages: [
-                            {
-                                role: 'system',
-                                content: 'You are a roleplay character JSON generator.',
-                            },
-                            {
-                                role: 'user',
-                                content: content_4,
-                            },
-                        ],
-                        temperature: parseFloat(window.apiConfig.temperature) || 0.8,
-                    }),
-                });
+                window.apiConfig.endpoint,
+            );
+            const value_137 = await window.tkFetch('dms', chatCompletionsEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + window.apiConfig.apiKey,
+                },
+                body: JSON.stringify({
+                    model: window.apiConfig.model || 'gpt-3.5-turbo',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'You are a roleplay character JSON generator.',
+                        },
+                        {
+                            role: 'user',
+                            content: content_4,
+                        },
+                    ],
+                    temperature: parseFloat(window.apiConfig.temperature) || 0.8,
+                }),
+            });
             if (!value_137.ok)
                 throw (
                     window.u2Api?.createHttpError?.(
@@ -1271,10 +1174,7 @@ After Role Rules:
                 console.warn('JSON Parse failed, falling back to split', parseErr);
                 parsedMsgs = tkDmNormalizeGeneratedMessages(
                     content_139
-                        .split(
-                            `
-`,
-                        )
+                        .split('\n')
                         .map((value_144) => value_144.replace(/^[-*•\d.\[\]"'\s]+/, '').trim())
                         .filter((value_145) => value_145.length > 0),
                 );
@@ -1290,7 +1190,7 @@ After Role Rules:
             if (elementById) elementById.remove();
             let delay = 0;
             parsedMsgs.forEach((message_4) => {
-                setTimeout(() => {
+                _value(() => {
                     wtChatHistory.push({
                         sender: 'char',
                         text: message_4.text,
@@ -1301,6 +1201,7 @@ After Role Rules:
                 delay += 1500 + Math.random() * 1000;
             });
         } catch (error_3) {
+            if (error_3?.name === 'AbortError') return;
             console.error('WT Gen Error:', error_3);
             if (
                 !window.u2Api?.isRequestError?.(error_3) ||
@@ -1325,10 +1226,10 @@ After Role Rules:
     wtMagicBtn &&
         (wtMagicBtn.addEventListener('click', window.tkTriggerWtApi),
         wtMagicBtn.addEventListener('touchend', window.tkTriggerWtApi));
-    const wtMainContent = document.getElementById('wt-main-content'),
-        wtExitMenu = document.getElementById('wt-exit-menu'),
-        wtExitSummaryBtn = document.getElementById('wt-exit-summary-btn'),
-        wtExitDirectBtn = document.getElementById('wt-exit-direct-btn');
+    const wtMainContent = document.getElementById('wt-main-content');
+    const wtExitMenu = document.getElementById('wt-exit-menu');
+    const wtExitSummaryBtn = document.getElementById('wt-exit-summary-btn');
+    const wtExitDirectBtn = document.getElementById('wt-exit-direct-btn');
     wtCloseBtn &&
         wtCloseBtn.addEventListener('click', () => {
             wtExitMenu.style.display === 'none'
@@ -1404,17 +1305,17 @@ After Role Rules:
             window.showToast('暂无互动内容，已退出');
             return;
         }
-        const now_2 = new Date(),
-            value_158 =
-                now_2.getFullYear() +
-                '年' +
-                (now_2.getMonth() + 1) +
-                '月' +
-                now_2.getDate() +
-                '日 ' +
-                now_2.getHours() +
-                ':' +
-                now_2.getMinutes().toString().padStart(2, '0');
+        const now_2 = new Date();
+        const value_158 =
+            now_2.getFullYear() +
+            '年' +
+            (now_2.getMonth() + 1) +
+            '月' +
+            now_2.getDate() +
+            '日 ' +
+            now_2.getHours() +
+            ':' +
+            now_2.getMinutes().toString().padStart(2, '0');
         let text_159 = '';
         wtChatHistory.forEach((value_162) => {
             text_159 +=
@@ -1426,61 +1327,41 @@ After Role Rules:
 `;
         });
         const value_160 = window.tkBuildWorldBookContext
-                ? window.tkBuildWorldBookContext(text_159)
-                : '',
-            content_3 =
-                `
-请总结这段"一起看视频"的连麦过程。
-记录时间：` +
-                value_158 +
-                `
-聊天记录：
-` +
-                text_159 +
-                `
-` +
-                (value_160
-                    ? `
-TikTok Mounted World Book:
-` +
-                      value_160 +
-                      `
-`
-                    : '') +
-                `
-
-要求：
-1. 提取真实的互动时间和内容。
-2. 用精练、自然的第三人称日记视角来写（例如："2024年X月X日 XX:XX，我和某某一起连麦刷了会儿视频，聊了聊关于..."）。
-3. 绝对不要胡编乱造没有发生过的事情，如果没有特定细节就一笔带过。真实的啥简化啥。
-4. 返回严格的 JSON 格式，包含一个 summary 字段，不要有 markdown。格式：
-{ "summary": "总结内容" }
-`;
+            ? window.tkBuildWorldBookContext(text_159)
+            : '';
+        const content_3 =
+            '\n请总结这段"一起看视频"的连麦过程。\n记录时间：' +
+            value_158 +
+            '\n聊天记录：\n' +
+            text_159 +
+            '\n' +
+            (value_160 ? '\nTikTok Mounted World Book:\n' + value_160 + '\n' : '') +
+            '\n\n要求：\n1. 提取真实的互动时间和内容。\n2. 用精练、自然的第三人称日记视角来写（例如："2024年X月X日 XX:XX，我和某某一起连麦刷了会儿视频，聊了聊关于..."）。\n3. 绝对不要胡编乱造没有发生过的事情，如果没有特定细节就一笔带过。真实的啥简化啥。\n4. 返回严格的 JSON 格式，包含一个 summary 字段，不要有 markdown。格式：\n{ "summary": "总结内容" }\n';
         try {
             const chatCompletionsEndpoint_163 = window.u2Api.resolveChatCompletionsEndpoint(
-                    window.apiConfig.endpoint,
-                ),
-                value_164 = await fetch(chatCompletionsEndpoint_163, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: 'Bearer ' + window.apiConfig.apiKey,
-                    },
-                    body: JSON.stringify({
-                        model: window.apiConfig.model || 'gpt-3.5-turbo',
-                        messages: [
-                            {
-                                role: 'system',
-                                content: 'You are an accurate summarizer.',
-                            },
-                            {
-                                role: 'user',
-                                content: content_3,
-                            },
-                        ],
-                        temperature: 0.3,
-                    }),
-                });
+                window.apiConfig.endpoint,
+            );
+            const value_164 = await window.tkFetch('dms', chatCompletionsEndpoint_163, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + window.apiConfig.apiKey,
+                },
+                body: JSON.stringify({
+                    model: window.apiConfig.model || 'gpt-3.5-turbo',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'You are an accurate summarizer.',
+                        },
+                        {
+                            role: 'user',
+                            content: content_3,
+                        },
+                    ],
+                    temperature: 0.3,
+                }),
+            });
             if (!value_164.ok)
                 throw (
                     window.u2Api?.createHttpError?.(
@@ -1506,6 +1387,7 @@ TikTok Mounted World Book:
                       )
                     : window.showToast('总结完成，但未保存'));
         } catch (err_2) {
+            if (err_2?.name === 'AbortError') return;
             console.error('Summary Error:', err_2);
             window.showToast('总结保存失败');
         }
@@ -1560,7 +1442,7 @@ TikTok Mounted World Book:
                     const charId_11 = currentChatCharId;
                     window.closeView(chatView);
                     currentChatCharId = null;
-                    setTimeout(() => {
+                    _value(() => {
                         if (window.tkOpenSubProfile) window.tkOpenSubProfile(charId_11);
                     }, 40);
                 });
@@ -1574,8 +1456,8 @@ TikTok Mounted World Book:
             return;
         }
         const tkDmResolveAvatar_178 = tkDmResolveAvatar(char_14);
-        let lastSender = null,
-            value_180 = null;
+        let lastSender = null;
+        let value_180 = null;
         dm_5.messages.forEach((msg, index_2) => {
             const isSelf_2 = msg.sender === 'user',
                 timeStr =
@@ -1743,7 +1625,7 @@ TikTok Mounted World Book:
                     if (window.tkPersistState) window.tkPersistState();
                 });
         });
-        setTimeout(() => {
+        _value(() => {
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }, 50);
     }
@@ -1819,9 +1701,8 @@ TikTok Mounted World Book:
                 tkState.dms.push(dm_7));
             window.showToast('对方正在输入...');
             const recentMsgs = dm_7.messages.slice(-15);
-            let text_213 = `历史聊天记录:
-`,
-                text_214 = '';
+            let text_213 = '历史聊天记录:\n';
+            let text_214 = '';
             recentMsgs.forEach((msg_3) => {
                 let text_225 = msg_3.text;
                 if (msg_3.sharedVideoId) {
@@ -1853,35 +1734,35 @@ TikTok Mounted World Book:
                     `
 `;
             });
-            let worldBookContextText_2 = text_213,
-                tkMountedWorldBookContext = '';
+            let worldBookContextText_2 = text_213;
+            let tkMountedWorldBookContext = '';
             const value_217 = window.imApp?.getWorldBookContextForFriendByPosition
-                    ? window.imApp.getWorldBookContextForFriendByPosition(
-                          'system_depth',
-                          tkGetChar_210,
-                          worldBookContextText_2,
-                      )
-                    : window.getGlobalWorldBookContextByPosition
-                      ? window.getGlobalWorldBookContextByPosition('system_depth')
-                      : '',
-                value_218 = window.imApp?.getWorldBookContextForFriendByPosition
-                    ? window.imApp.getWorldBookContextForFriendByPosition(
-                          'before_role',
-                          tkGetChar_210,
-                          worldBookContextText_2,
-                      )
-                    : window.getGlobalWorldBookContextByPosition
-                      ? window.getGlobalWorldBookContextByPosition('before_role')
-                      : '',
-                value_219 = window.imApp?.getWorldBookContextForFriendByPosition
-                    ? window.imApp.getWorldBookContextForFriendByPosition(
-                          'after_role',
-                          tkGetChar_210,
-                          worldBookContextText_2,
-                      )
-                    : window.getGlobalWorldBookContextByPosition
-                      ? window.getGlobalWorldBookContextByPosition('after_role')
-                      : '';
+                ? window.imApp.getWorldBookContextForFriendByPosition(
+                      'system_depth',
+                      tkGetChar_210,
+                      worldBookContextText_2,
+                  )
+                : window.getGlobalWorldBookContextByPosition
+                  ? window.getGlobalWorldBookContextByPosition('system_depth')
+                  : '';
+            const value_218 = window.imApp?.getWorldBookContextForFriendByPosition
+                ? window.imApp.getWorldBookContextForFriendByPosition(
+                      'before_role',
+                      tkGetChar_210,
+                      worldBookContextText_2,
+                  )
+                : window.getGlobalWorldBookContextByPosition
+                  ? window.getGlobalWorldBookContextByPosition('before_role')
+                  : '';
+            const value_219 = window.imApp?.getWorldBookContextForFriendByPosition
+                ? window.imApp.getWorldBookContextForFriendByPosition(
+                      'after_role',
+                      tkGetChar_210,
+                      worldBookContextText_2,
+                  )
+                : window.getGlobalWorldBookContextByPosition
+                  ? window.getGlobalWorldBookContextByPosition('after_role')
+                  : '';
             tkMountedWorldBookContext = window.tkBuildWorldBookContext
                 ? window.tkBuildWorldBookContext(worldBookContextText_2)
                 : '';
@@ -1889,8 +1770,7 @@ TikTok Mounted World Book:
             tkGetChar_210 &&
                 tkGetChar_210.memories &&
                 tkGetChar_210.memories.length > 0 &&
-                ((text_220 += `角色记忆:
-`),
+                ((text_220 += '角色记忆:\n'),
                 tkGetChar_210.memories.forEach((value_229) => {
                     text_220 +=
                         '- ' +
@@ -1898,108 +1778,58 @@ TikTok Mounted World Book:
                         `
 `;
                 }),
-                (text_220 += `
-`));
+                (text_220 += '\n'));
             let text_221 = '';
             window.userState &&
                 window.userState.persona &&
-                (text_221 =
-                    'User的人设: ' +
-                    window.userState.persona +
-                    `
-`);
+                (text_221 = 'User的人设: ' + window.userState.persona + '\n');
             const content_5 =
-                `
-` +
-                (value_217
-                    ? `System Depth Rules (Highest Priority):
-` +
-                      value_217 +
-                      `
-
-`
-                    : '') +
-                (value_218
-                    ? `Before Role Rules:
-` +
-                      value_218 +
-                      `
-
-`
-                    : '') +
+                '\n' +
+                (value_217 ? 'System Depth Rules (Highest Priority):\n' + value_217 + '\n\n' : '') +
+                (value_218 ? 'Before Role Rules:\n' + value_218 + '\n\n' : '') +
                 (tkMountedWorldBookContext
-                    ? `TikTok Mounted World Book:
-` +
-                      tkMountedWorldBookContext +
-                      `
-
-`
+                    ? 'TikTok Mounted World Book:\n' + tkMountedWorldBookContext + '\n\n'
                     : '') +
                 '你现在的身份是：' +
                 tkGetChar_210.name +
-                `
-你的人设是：` +
+                '\n你的人设是：' +
                 tkGetChar_210.persona +
-                `
-请扮演该角色，在 TikTok 的私信(DM)中与 User 开启沉浸式对话。` +
+                '\n请扮演该角色，在 TikTok 的私信(DM)中与 User 开启沉浸式对话。' +
                 text_214 +
-                `
-
-要求：
-1. 一句一发，不要一大串。调用一次必须生成 3 到 6 条气泡回复。
-2. 如果 User 分享了视频，请务必读取视频内容和文案进行针对性玩梗、感叹或讨论（视频的作者不一定是user，读取视频创作者名字）。
-3. 这是一场真实的 TikTok 私信互动。如果对方人设是正常人，要有十足的"活人感"和短视频网感；如果对方人设是诈骗犯、推销员、杀猪盘或骚扰者，请淋漓尽致地展现他们的话术、生硬机翻或死缠烂打的套路。
-4. 绝对不要发emoji，也绝对不要使用句号结尾，保持短平快的发送习惯。禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。
-5. 国际化翻译规则：回复可以使用符合角色国籍、人设和上下文的任意语言；如果 text 不是中文，必须填写 translationZh 作为自然中文翻译；如果 text 是中文，translationZh 必须是空字符串。
-6. 必须返回严格的 JSON 数组格式（不要带有 markdown 代码块标记），格式如下：
-[
-  { "text": "第一条回复内容", "translationZh": "" },
-  { "text": "foreign-language reply", "translationZh": "这条外语回复的中文翻译" },
-  { "text": "第三条回复内容", "translationZh": "" }
-]
-
-` +
+                '\n\n要求：\n1. 一句一发，不要一大串。调用一次必须生成 3 到 6 条气泡回复。\n2. 如果 User 分享了视频，请务必读取视频内容和文案进行针对性玩梗、感叹或讨论（视频的作者不一定是user，读取视频创作者名字）。\n3. 这是一场真实的 TikTok 私信互动。如果对方人设是正常人，要有十足的"活人感"和短视频网感；如果对方人设是诈骗犯、推销员、杀猪盘或骚扰者，请淋漓尽致地展现他们的话术、生硬机翻或死缠烂打的套路。\n4. 绝对不要发emoji，也绝对不要使用句号结尾，保持短平快的发送习惯。禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。\n5. 国际化翻译规则：回复可以使用符合角色国籍、人设和上下文的任意语言；如果 text 不是中文，必须填写 translationZh 作为自然中文翻译；如果 text 是中文，translationZh 必须是空字符串。\n6. 必须返回严格的 JSON 数组格式（不要带有 markdown 代码块标记），格式如下：\n[\n  { "text": "第一条回复内容", "translationZh": "" },\n  { "text": "foreign-language reply", "translationZh": "这条外语回复的中文翻译" },\n  { "text": "第三条回复内容", "translationZh": "" }\n]\n\n' +
                 text_220 +
-                `
-` +
+                '\n' +
                 text_221 +
-                `
-` +
+                '\n' +
                 text_213 +
-                `
-` +
-                (value_219
-                    ? `
-After Role Rules:
-` + value_219
-                    : '') +
-                `
-`;
+                '\n' +
+                (value_219 ? '\nAfter Role Rules:\n' + value_219 : '') +
+                '\n';
             try {
                 const chatCompletionsEndpoint_230 = window.u2Api.resolveChatCompletionsEndpoint(
-                        window.apiConfig.endpoint,
-                    ),
-                    value_231 = await fetch(chatCompletionsEndpoint_230, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: 'Bearer ' + window.apiConfig.apiKey,
-                        },
-                        body: JSON.stringify({
-                            model: window.apiConfig.model || 'gpt-3.5-turbo',
-                            messages: [
-                                {
-                                    role: 'system',
-                                    content: 'You are a roleplay character JSON generator.',
-                                },
-                                {
-                                    role: 'user',
-                                    content: content_5,
-                                },
-                            ],
-                            temperature: parseFloat(window.apiConfig.temperature) || 0.8,
-                        }),
-                    });
+                    window.apiConfig.endpoint,
+                );
+                const value_231 = await window.tkFetch('dms', chatCompletionsEndpoint_230, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + window.apiConfig.apiKey,
+                    },
+                    body: JSON.stringify({
+                        model: window.apiConfig.model || 'gpt-3.5-turbo',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'You are a roleplay character JSON generator.',
+                            },
+                            {
+                                role: 'user',
+                                content: content_5,
+                            },
+                        ],
+                        temperature: parseFloat(window.apiConfig.temperature) || 0.8,
+                    }),
+                });
                 if (!value_231.ok)
                     throw (
                         window.u2Api?.createHttpError?.(
@@ -2046,10 +1876,7 @@ After Role Rules:
                     console.warn('Chat JSON Parse failed, falling back to split', parseErr_2);
                     items_234 = tkDmNormalizeGeneratedMessages(
                         content_233
-                            .split(
-                                `
-`,
-                            )
+                            .split('\n')
                             .map((value_238) => value_238.replace(/^[-*•\d.\[\]"'\s]+/, '').trim())
                             .filter((value_239) => value_239.length > 0),
                     );
@@ -2063,7 +1890,7 @@ After Role Rules:
                     ]);
                 let count = 0;
                 items_234.forEach((message_5, value_241) => {
-                    setTimeout(() => {
+                    _value(() => {
                         dm_7.messages.push({
                             sender: 'char',
                             text: message_5.text,
@@ -2080,6 +1907,7 @@ After Role Rules:
                     count += 1500 + Math.random() * 1000;
                 });
             } catch (error_4) {
+                if (error_4?.name === 'AbortError') return;
                 console.error('Chat Gen Error:', error_4);
                 if (
                     !window.u2Api?.isRequestError?.(error_4) ||
@@ -2093,4 +1921,22 @@ After Role Rules:
                 isChatGenerating = false;
             }
         });
+    document.addEventListener('tk:data-cleared', ({ detail: _value5 }) => {
+        if (_value5.kind === 'videos') {
+            if (currentChatCharId) renderMessages();
+            return;
+        }
+        currentChatCharId = null;
+        if (_value5.kind === 'all') editingCharId = null;
+        window.currentWtCharId = null;
+        wtChatHistory = [];
+        wtBubble && ((wtBubble.style.display = 'none'), (wtBubble.dataset.charId = ''));
+        messagesContainer?.replaceChildren();
+        wtChatContainer?.replaceChildren();
+        if (chatInput) chatInput.value = '';
+        if (wtChatInput) wtChatInput.value = '';
+        ['tk-dm-chat-view', 'tk-dm-chat-settings-sheet', 'tk-watch-together-sheet'].forEach(
+            (_value6) => window.closeView(document.getElementById(_value6)),
+        );
+    });
 });

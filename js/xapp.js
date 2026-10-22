@@ -3,298 +3,430 @@
         window.u2OnStorageReady ||
         ((callback) => document.addEventListener('DOMContentLoaded', callback))
     )(() => {
-        const appButton = document.getElementById('app-x-btn'),
-            view = document.getElementById('x-view'),
-            mainContent = view ? view.querySelector('.x-main-content') : null,
-            navItems = view ? Array.from(view.querySelectorAll('.x-nav-item[data-target]')) : [],
-            tabs = view ? Array.from(view.querySelectorAll('.x-tab-content')) : [],
-            indicator = document.getElementById('x-nav-indicator'),
-            postDetailView = document.getElementById('x-post-detail-view'),
-            postDetailBack = document.getElementById('x-post-detail-back'),
-            topicDetailView = document.getElementById('x-topic-detail-view'),
-            topicDetailBack = document.getElementById('x-topic-detail-back'),
-            topicDetailGenerateBtn = document.getElementById('x-topic-detail-generate-btn'),
-            topicDetailHeadline = document.getElementById('x-topic-detail-headline'),
-            topicFeedPanel = document.getElementById('x-topic-feed-panel'),
-            createTopicSheet = document.getElementById('x-create-topic-sheet'),
-            createTopicCancelBtn = document.getElementById('x-create-topic-cancel-btn'),
-            createTopicSaveBtn = document.getElementById('x-create-topic-save-btn'),
-            createTopicBannerPreview = document.getElementById('x-create-topic-banner-preview'),
-            createTopicBannerInput = document.getElementById('x-create-topic-banner-input'),
-            createTopicAvatarPreview = document.getElementById('x-create-topic-avatar-preview'),
-            createTopicAvatarInput = document.getElementById('x-create-topic-avatar-input'),
-            createTopicNameInput = document.getElementById('x-create-topic-name-input'),
-            xCreateTopicDescriptionInputElement = document.getElementById(
-                'x-create-topic-description-input',
-            ),
-            createTopicFansInput = document.getElementById('x-create-topic-fans-input'),
-            createTopicImportBtn = document.getElementById('x-topic-import-imessage-btn'),
-            createTopicManualBtn = document.getElementById('x-topic-manual-char-btn'),
-            createTopicImessageContainer = document.getElementById(
-                'x-topic-imessage-list-container',
-            ),
-            createTopicManualContainer = document.getElementById('x-topic-manual-container'),
-            createTopicCharsList = document.getElementById('x-topic-chars-list'),
-            topicManualSaveBtn = document.getElementById('x-topic-manual-save-btn'),
-            superUpdateBtn = document.getElementById('x-super-update-btn');
-        let avatar_8 = '',
-            banner_2 = '',
-            createTopicSelectedChars = [],
-            editSuperTopicSheet = null,
-            currentEditingSuperTopicId = null,
-            editSuperTopicAvatarDraft = '',
-            editSuperTopicBannerDraft = '',
-            editSuperTopicSelectedChars = [];
-        const editSheet = document.getElementById('x-edit-profile-sheet'),
-            settingsSheet = document.getElementById('x-settings-sheet'),
-            composeSheet = document.getElementById('x-compose-sheet'),
-            xProfileSettingsBtnElement = document.getElementById('x-profile-settings-btn'),
-            editCancelButton = document.getElementById('x-edit-cancel-btn'),
-            editSaveButton = document.getElementById('x-edit-save-btn'),
-            settingsCloseButton = document.getElementById('x-settings-close-btn'),
-            settingsWorldBookButton = document.getElementById('x-settings-worldbook-btn'),
-            composeCancelButton = document.getElementById('x-compose-cancel-btn'),
-            composeSubmitButton = document.getElementById('x-compose-submit-btn'),
-            composeTextInput = document.getElementById('x-compose-text-input'),
-            composeTopicInput = document.getElementById('x-compose-topic-input'),
-            composeSuperChip = document.getElementById('x-compose-super-chip'),
-            composeSuperName = document.getElementById('x-compose-super-name'),
-            composeImageButton = document.getElementById('x-compose-image-placeholder'),
-            composeImageInput = document.getElementById('x-compose-image-input'),
-            composeImagePreview = document.getElementById('x-compose-image-preview'),
-            composeImageClearButton = document.getElementById('x-compose-image-clear-btn'),
-            composeImageUrlInput = document.getElementById('x-compose-image-url-input'),
-            composeImageUrlButton = document.getElementById('x-compose-image-url-btn'),
-            editAvatarPreview = document.getElementById('x-edit-avatar-preview'),
-            editAvatarInput = document.getElementById('x-edit-avatar-input'),
-            editBannerPreview = document.getElementById('x-edit-banner-preview'),
-            editBannerInput = document.getElementById('x-edit-banner-input'),
-            editNameInput = document.getElementById('x-edit-name-input'),
-            editHandleInput = document.getElementById('x-edit-handle-input'),
-            editBioInput = document.getElementById('x-edit-bio-input'),
-            editPersonaInput = document.getElementById('x-edit-persona-input'),
-            editFollowingInput = document.getElementById('x-edit-following-input'),
-            editFollowersInput = document.getElementById('x-edit-followers-input'),
-            closeButtons = [
-                document.getElementById('x-back-btn'),
-                document.getElementById('x-profile-close-btn'),
-            ].filter(Boolean);
+        const appButton = document.getElementById('app-x-btn');
+        const view = document.getElementById('x-view');
+        const mainContent = view ? view.querySelector('.x-main-content') : null;
+        const navItems = view ? Array.from(view.querySelectorAll('.x-nav-item[data-target]')) : [];
+        const tabs = view ? Array.from(view.querySelectorAll('.x-tab-content')) : [];
+        const indicator = document.getElementById('x-nav-indicator');
+        const postDetailView = document.getElementById('x-post-detail-view');
+        const postDetailBack = document.getElementById('x-post-detail-back');
+        const topicDetailView = document.getElementById('x-topic-detail-view');
+        const topicDetailBack = document.getElementById('x-topic-detail-back');
+        const topicDetailGenerateBtn = document.getElementById('x-topic-detail-generate-btn');
+        const topicDetailHeadline = document.getElementById('x-topic-detail-headline');
+        const topicFeedPanel = document.getElementById('x-topic-feed-panel');
+        const createTopicSheet = document.getElementById('x-create-topic-sheet');
+        const createTopicCancelBtn = document.getElementById('x-create-topic-cancel-btn');
+        const createTopicSaveBtn = document.getElementById('x-create-topic-save-btn');
+        const createTopicBannerPreview = document.getElementById('x-create-topic-banner-preview');
+        const createTopicBannerInput = document.getElementById('x-create-topic-banner-input');
+        const createTopicAvatarPreview = document.getElementById('x-create-topic-avatar-preview');
+        const createTopicAvatarInput = document.getElementById('x-create-topic-avatar-input');
+        const createTopicNameInput = document.getElementById('x-create-topic-name-input');
+        const xCreateTopicDescriptionInputElement = document.getElementById(
+            'x-create-topic-description-input',
+        );
+        const createTopicFansInput = document.getElementById('x-create-topic-fans-input');
+        const createTopicImportBtn = document.getElementById('x-topic-import-imessage-btn');
+        const createTopicManualBtn = document.getElementById('x-topic-manual-char-btn');
+        const createTopicImessageContainer = document.getElementById(
+            'x-topic-imessage-list-container',
+        );
+        const createTopicManualContainer = document.getElementById('x-topic-manual-container');
+        const createTopicCharsList = document.getElementById('x-topic-chars-list');
+        const topicManualSaveBtn = document.getElementById('x-topic-manual-save-btn');
+        const superUpdateBtn = document.getElementById('x-super-update-btn');
+        let avatar_8 = '';
+        let banner_2 = '';
+        let createTopicSelectedChars = [];
+        let editSuperTopicSheet = null;
+        let currentEditingSuperTopicId = null;
+        let editSuperTopicAvatarDraft = '';
+        let editSuperTopicBannerDraft = '';
+        let editSuperTopicSelectedChars = [];
+        const editSheet = document.getElementById('x-edit-profile-sheet');
+        const settingsSheet = document.getElementById('x-settings-sheet');
+        const composeSheet = document.getElementById('x-compose-sheet');
+        const xProfileSettingsBtnElement = document.getElementById('x-profile-settings-btn');
+        const editCancelButton = document.getElementById('x-edit-cancel-btn');
+        const editSaveButton = document.getElementById('x-edit-save-btn');
+        const settingsCloseButton = document.getElementById('x-settings-close-btn');
+        const settingsWorldBookButton = document.getElementById('x-settings-worldbook-btn');
+        const composeCancelButton = document.getElementById('x-compose-cancel-btn');
+        const composeSubmitButton = document.getElementById('x-compose-submit-btn');
+        const composeTextInput = document.getElementById('x-compose-text-input');
+        const composeTopicInput = document.getElementById('x-compose-topic-input');
+        const composeSuperChip = document.getElementById('x-compose-super-chip');
+        const composeSuperName = document.getElementById('x-compose-super-name');
+        const composeImageButton = document.getElementById('x-compose-image-placeholder');
+        const composeImageInput = document.getElementById('x-compose-add-placeholder-btn');
+        const _value = document.getElementById('x-compose-image-input');
+        const composeImagePreview = document.getElementById('x-compose-media-preview');
+        const composeImageUrlInput = document.getElementById('x-compose-image-url-input');
+        const composeImageUrlButton = document.getElementById('x-compose-image-url-btn');
+        const editAvatarPreview = document.getElementById('x-edit-avatar-preview');
+        const editAvatarInput = document.getElementById('x-edit-avatar-input');
+        const editBannerPreview = document.getElementById('x-edit-banner-preview');
+        const editBannerInput = document.getElementById('x-edit-banner-input');
+        const editNameInput = document.getElementById('x-edit-name-input');
+        const editHandleInput = document.getElementById('x-edit-handle-input');
+        const editBioInput = document.getElementById('x-edit-bio-input');
+        const editPersonaInput = document.getElementById('x-edit-persona-input');
+        const editFollowingInput = document.getElementById('x-edit-following-input');
+        const editFollowersInput = document.getElementById('x-edit-followers-input');
+        const closeButtons = [
+            document.getElementById('x-back-btn'),
+            document.getElementById('x-profile-close-btn'),
+        ].filter(Boolean);
         if (!view || !appButton || navItems.length === 0 || tabs.length === 0) return;
-        const nextDayBtn = document.getElementById('x-next-day-btn'),
-            trendList_2 = document.getElementById('x-trend-list'),
-            defaultProfile = {
-                name: 'User Name',
-                handle: '@username',
-                bio: '',
-                persona: '',
-                avatar: '',
-                banner: '',
-                following: 520,
-                followers: 13100,
-                profileStatsEdited: false,
+        const nextDayBtn = document.getElementById('x-next-day-btn');
+        const trendList_2 = document.getElementById('x-trend-list');
+        const defaultProfile = {
+            name: 'User Name',
+            handle: '@username',
+            bio: '',
+            persona: '',
+            avatar: '',
+            banner: '',
+            following: 520,
+            followers: 13100,
+            profileStatsEdited: false,
+        };
+        const defaultTrends = [
+            {
+                id: 'default-stage-style',
+                title: '#黑白舞台造型',
+                category: 'Entertainment · Trending',
+                heat: '52.8K',
+                movement: 'none',
             },
-            defaultTrends = [
-                {
-                    id: 'default-stage-style',
-                    title: '#黑白舞台造型',
-                    category: 'Entertainment · Trending',
-                    heat: '52.8K',
-                    movement: 'none',
-                },
-                {
-                    id: 'default-topic-host',
-                    title: '#超话主持人招募',
-                    category: 'Community · Trending',
-                    heat: '18.2K',
-                    movement: 'none',
-                },
-                {
-                    id: 'default-citywalk',
-                    title: '#周末Citywalk',
-                    category: 'City · Rising',
-                    heat: '9.6K',
-                    movement: 'none',
-                },
-            ],
-            defaultAdvancePreferences = {
-                strangersEnabled: true,
-                strangersCount: 5,
-                trendsEnabled: true,
-                trendsCount: 3,
-                postsEnabled: true,
-                postsCount: 3,
+            {
+                id: 'default-topic-host',
+                title: '#超话主持人招募',
+                category: 'Community · Trending',
+                heat: '18.2K',
+                movement: 'none',
             },
-            defaultImessageContextMount = Object.freeze({
-                enabled: true,
-                limit: 20,
-            }),
-            defaultXState = {
-                xData: {
-                    ...defaultProfile,
-                    edited: false,
-                },
-                xPlayerAccounts: [],
-                activeXPlayerAccountId: '',
-                xAccountSchemaVersion: 1,
-                xCharIdentityMigrationVersion: 0,
-                xCharProfileMediaMigrationVersion: 0,
-                xTopics: [],
-                boundWorldBookIds: [],
-                xVisitors: [],
-                xDirectMessages: [],
-                xPostThreads: {},
-                xGeneratedPosts: [],
-                xAccounts: [],
-                xTrends: defaultTrends.map((trend_2) => ({
+            {
+                id: 'default-citywalk',
+                title: '#周末Citywalk',
+                category: 'City · Rising',
+                heat: '9.6K',
+                movement: 'none',
+            },
+        ];
+        const defaultAdvancePreferences = {
+            strangersEnabled: true,
+            strangersCount: 5,
+            trendsEnabled: true,
+            trendsCount: 3,
+            postsEnabled: true,
+            postsCount: 3,
+        };
+        const defaultImessageContextMount = Object.freeze({
+            enabled: true,
+            limit: 20,
+        });
+        const defaultXState = {
+            xData: {
+                ...defaultProfile,
+                edited: false,
+            },
+            xPlayerAccounts: [],
+            activeXPlayerAccountId: '',
+            xAccountSchemaVersion: 1,
+            xCharIdentityMigrationVersion: 0,
+            xCharProfileMediaMigrationVersion: 0,
+            xTopics: [],
+            boundWorldBookIds: [],
+            xVisitors: [],
+            xDirectMessages: [],
+            xPostThreads: {},
+            xGeneratedPosts: [],
+            xAccounts: [],
+            xTrends: defaultTrends.map((trend_2) => ({
                     ...trend_2,
                 })),
-                xAdvancePreferences: {
-                    ...defaultAdvancePreferences,
-                },
-                xHomeBannerUrl: '',
-                xSearchBannerUrl: '',
+            xAdvancePreferences: {
+                ...defaultAdvancePreferences,
             },
-            xImageCompressionPresets = Object.freeze({
-                avatar: Object.freeze({
-                    maxWidth: 512,
-                    maxHeight: 512,
-                    quality: 0.82,
-                }),
-                cover: Object.freeze({
-                    maxWidth: 1600,
-                    maxHeight: 900,
-                    quality: 0.82,
-                }),
-                post: Object.freeze({
-                    maxWidth: 1600,
-                    maxHeight: 1600,
-                    quality: 0.82,
-                }),
+            xHomeBannerUrl: '',
+            xSearchBannerUrl: '',
+        };
+        const xImageCompressionPresets = Object.freeze({
+            avatar: Object.freeze({
+                maxWidth: 512,
+                maxHeight: 512,
+                quality: 0.82,
             }),
-            xAcceptedImageTypes = new Set(['image/jpeg', 'image/jpg', 'image/png']),
-            maxXTrends = 15,
-            xLandscapeAvatarImages = Object.freeze([
-                'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
-                'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
-                'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
-                'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
-                'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
-                'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
-                'https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
-                'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
-            ]),
-            postData = {
-                profile: {
-                    avatar: 'U',
-                    name: 'User Name',
-                    handle: '@username · pinned',
-                    text: '个人主页内容卡片先保持静态，重点是排版、层级和底栏切换体验。',
-                    reposts: '12',
-                    likes: '520',
-                    comments: '34',
-                    commentList: [
-                        {
-                            avatar: 'X',
-                            name: 'X App',
-                            handle: '@xapp · now',
-                            text: '这条来自个人页 Posts 分栏。',
-                        },
-                    ],
-                },
-            };
-        let currentIndex = 0,
-            items_10 = [],
-            touchStartX = 0,
-            touchStartY = 0,
-            isTouching = false,
-            currentProfile = {
-                ...defaultProfile,
+            cover: Object.freeze({
+                maxWidth: 1600,
+                maxHeight: 900,
+                quality: 0.82,
+            }),
+            post: Object.freeze({
+                maxWidth: 1600,
+                maxHeight: 1600,
+                quality: 0.82,
+            }),
+        });
+        const xAcceptedImageTypes = new Set(['image/jpeg', 'image/jpg', 'image/png']);
+        const maxXTrends = 15;
+        const xLandscapeAvatarImages = Object.freeze([
+            'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
+            'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
+            'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
+            'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
+            'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
+            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
+            'https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
+            'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=256&h=256&q=82&sat=-100',
+        ]);
+        const postData = {
+            profile: {
+                avatar: 'U',
+                name: 'User Name',
+                handle: '@username · pinned',
+                text: '个人主页内容卡片先保持静态，重点是排版、层级和底栏切换体验。',
+                reposts: '12',
+                likes: '520',
+                comments: '34',
+                commentList: [
+                    {
+                        avatar: 'X',
+                        name: 'X App',
+                        handle: '@xapp · now',
+                        text: '这条来自个人页 Posts 分栏。',
+                    },
+                ],
             },
-            profileEditorMode = 'edit',
-            accountSwitchSheet = null,
-            enabled_11 = false,
-            avatarDraft = currentProfile.avatar || '',
-            bannerDraft = currentProfile.banner || '',
-            count_12 = 0,
-            currentDetailPostId = null,
-            replyTarget = null,
-            visitorsSheet = null,
-            visitorsList = null,
-            addDmSheet = null,
-            element_7 = null,
-            imessageCharList = null,
-            dmList = null,
-            manualCharNameInput = null,
-            manualCharHandleInput = null,
-            manualCharBioInput = null,
-            manualCharPersonaInput = null,
-            element_18 = null,
-            element_19 = null,
-            dmChatInput = null,
-            dmSettingsSheet = null,
-            dmProfileView = null,
-            postDetailView_2 = null,
-            currentProfileIdentity = null,
-            charEditSheet = null,
-            currentEditingCharId = null,
-            charEditAvatarDraft = '',
-            coverSeed_3 = '',
-            charEditCoverImageDraft = '',
-            charProfileGenerateSheet = null,
-            currentGeneratingCharId = null,
-            charProfileGenerationInFlight = false,
-            charProfileReferenceDraft = '',
-            charProfileReferenceFileNameDraft = '',
-            charProfileReferenceChanged = false,
-            charProfilePresetDrafts = [],
-            postForwardSheet = null,
-            currentForwardPostId = null,
-            currentDmId = null,
-            searchGenerateSheet = null,
-            searchGenerateInput = null,
-            searchGenerateMode = 'home',
-            advanceSheet = null,
-            advancePlotInput = null,
-            imagePreviewOverlay = null,
-            value_13 = null,
-            enabled_14 = false,
-            currentTopicContext = null,
-            postSettingsSheet = null,
-            currentActionPostId = null,
-            currentComposeSuperId = null,
-            composeImageDraft = '';
-        const postVisionRuns = new Set(),
-            value_395_2 = new Set();
-        let enabled_16 = false,
-            enabled_17 = false;
-        const xHomeFeedInitialLimit = 20,
-            xHomeFeedPageSize = 20;
-        let xHomeFeedRenderLimit = xHomeFeedInitialLimit,
-            xHomeFeedTotalPosts = 0,
-            xHomeFeedRenderKey = '',
-            text_28 = '',
-            count_29 = 0;
+        };
+        let currentIndex = 0;
+        let items_10 = [];
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let isTouching = false;
+        let currentProfile = {
+            ...defaultProfile,
+        };
+        let profileEditorMode = 'edit';
+        let accountSwitchSheet = null;
+        let enabled_11 = false;
+        let avatarDraft = currentProfile.avatar || '';
+        let bannerDraft = currentProfile.banner || '';
+        let count_12 = 0;
+        let currentDetailPostId = null;
+        let replyTarget = null;
+        let visitorsSheet = null;
+        let visitorsList = null;
+        let addDmSheet = null;
+        let element_7 = null;
+        let imessageCharList = null;
+        let dmList = null;
+        let manualCharNameInput = null;
+        let manualCharHandleInput = null;
+        let manualCharBioInput = null;
+        let manualCharPersonaInput = null;
+        let element_18 = null;
+        let element_19 = null;
+        let dmChatInput = null;
+        let dmSettingsSheet = null;
+        let dmProfileView = null;
+        let postDetailView_2 = null;
+        let currentProfileIdentity = null;
+        let charEditSheet = null;
+        let currentEditingCharId = null;
+        let charEditAvatarDraft = '';
+        let coverSeed_3 = '';
+        let charEditCoverImageDraft = '';
+        let charProfileGenerateSheet = null;
+        let currentGeneratingCharId = null;
+        let charProfileGenerationInFlight = false;
+        let charProfileReferenceDraft = '';
+        let charProfileReferenceFileNameDraft = '';
+        let charProfileReferenceChanged = false;
+        let charProfilePresetDrafts = [];
+        let postForwardSheet = null;
+        let currentForwardPostId = null;
+        let currentDmId = null;
+        let searchGenerateSheet = null;
+        let searchGenerateInput = null;
+        let searchGenerateMode = 'home';
+        let advanceSheet = false;
+        let _value2 = null;
+        let advancePlotInput = null;
+        let imagePreviewOverlay = null;
+        let value_13 = null;
+        let enabled_14 = false;
+        let currentTopicContext = null;
+        let postSettingsSheet = null;
+        let currentActionPostId = null;
+        let currentComposeSuperId = null;
+        let composeImageDraft = [];
+        let value_38 = false;
+        let _value3 = 0;
+        let _value4 = false;
+        const _value5 = [];
+        let _value6 = false;
+        const _value7 = new Set();
+        const postVisionRuns = new Set();
+        const value_395_2 = new Set();
+        let enabled_16 = false;
+        let enabled_17 = false;
+        const xHomeFeedInitialLimit = 20;
+        const xHomeFeedPageSize = 20;
+        let xHomeFeedRenderLimit = xHomeFeedInitialLimit;
+        let xHomeFeedTotalPosts = 0;
+        let xHomeFeedRenderKey = '';
+        let text_28 = '';
+        let count_29 = 0;
         const count_30 = 20;
-        let value_31 = count_30,
-            count_32 = 0,
-            value_33 = null;
+        let value_31 = count_30;
+        let count_32 = 0;
+        let value_33 = null;
         const count_34 = 40;
-        let value_35 = count_34,
-            count_20 = 0,
-            items_37 = [],
-            value_38 = count_34,
-            value_39 = null;
-        const photosRendered_2 = 20,
-            value_41 = new WeakMap(),
-            value_42 = new Map();
-        let count_43 = 0,
-            count_44 = 0;
+        let value_35 = count_34;
+        let count_20 = 0;
+        let items_37 = [];
+        let _value8 = count_34;
+        let value_39 = null;
+        const photosRendered_2 = 20;
+        const value_41 = new WeakMap();
+        const value_42 = new Map();
+        let count_43 = 0;
+        let count_44 = 0;
         const value_45 = new Map();
-        let enabled_46 = false,
-            value_47 = null,
-            cachedNormalizedXRevision = -1,
-            fallbackXStateRevision = 0,
-            xOpenMaintenancePromise = null;
+        let enabled_46 = false;
+        let value_47 = null;
+        let cachedNormalizedXRevision = -1;
+        let fallbackXStateRevision = 0;
+        let xOpenMaintenancePromise = null;
+        function _value9(_value27) {
+            return {
+                post: postDetailView,
+                topic: topicDetailView,
+                profile: dmProfileView,
+                dm: element_18,
+            }[_value27];
+        }
+        function _value0(_value28) {
+            if (!_value28) return;
+            const _value29 = _value9(_value28.type);
+            const _value30 = _value29?.querySelector(
+                '.x-dm-profile-page-scroll, .x-detail-scroll, .x-dm-chat-messages, .x-scroll-area',
+            );
+            _value28.scrollTop = _value30?.scrollTop || 0;
+            _value28.tab =
+                _value29?.querySelector('.x-unified-profile-tabs button.active')?.dataset
+                    .xProfileTab || 'posts';
+            _value28.commentLimit = value_31;
+            _value28.chatLimit = _value8;
+            _value28.profileLimit = value_41.get(_value30)?.rendered || photosRendered_2;
+            _value28.photoLimit = value_41.get(_value30)?.photosRendered || photosRendered_2;
+            _value28.type === 'post' &&
+                ((_value28.replyTarget = replyTarget
+                    ? {
+                          ...replyTarget,
+                      }
+                    : null),
+                (_value28.draft = document.getElementById('x-reply-input')?.value || ''));
+            if (_value28.type === 'dm') _value28.draft = dmChatInput?.value || '';
+        }
+        function _value1(_value31, _value32, _value33 = null) {
+            if (_value6) return;
+            const _value34 = _value5.at(-1);
+            if (_value34?.type === _value31 && _value34.id === String(_value32)) {
+                if (_value33) _value34.payload = _value33;
+                return;
+            }
+            _value0(_value34);
+            releaseFocusBeforeHide(_value9(_value34?.type));
+            _value5.push({
+                type: _value31,
+                id: String(_value32),
+                payload: _value33,
+            });
+            ['post', 'topic', 'profile', 'dm'].forEach((_value35) => {
+                const _value36 = _value9(_value35);
+                _value36?.classList.remove('active');
+                _value36?.setAttribute('aria-hidden', 'true');
+            });
+        }
+        function _value10(_value37) {
+            if (_value6 || _value5.at(-1)?.type !== _value37) return false;
+            releaseFocusBeforeHide(_value9(_value37));
+            _value5.pop();
+            ['post', 'topic', 'profile', 'dm'].forEach((_value39) => {
+                const _value40 = _value9(_value39);
+                _value40?.classList.remove('active');
+                _value40?.setAttribute('aria-hidden', 'true');
+            });
+            currentDetailPostId = null;
+            currentProfileIdentity = null;
+            currentDmId = null;
+            currentTopicContext = null;
+            replyTarget = null;
+            count_44 += 1;
+            const _value38 = _value5.at(-1);
+            if (!_value38) return true;
+            _value6 = true;
+            try {
+                if (_value38.type === 'post') {
+                    openPostDetail(_value38.id);
+                    value_31 = _value38.commentLimit || count_30;
+                    replyTarget = _value38.replyTarget;
+                    const _value41 = document.getElementById('x-reply-input');
+                    if (_value41) _value41.value = _value38.draft || '';
+                    handleAction_151();
+                } else {
+                    if (_value38.type === 'profile') {
+                        openDmProfile(_value38.id, _value38.payload);
+                        const _value42 = _value9('profile');
+                        _value42
+                            ?.querySelector(
+                                '[data-x-profile-tab="' + (_value38.tab || 'posts') + '"]',
+                            )
+                            ?.click();
+                    } else {
+                        if (_value38.type === 'dm') {
+                            openDmChat(_value38.id);
+                            _value8 = _value38.chatLimit || count_34;
+                            if (dmChatInput) dmChatInput.value = _value38.draft || '';
+                        } else openTopicDetail(_value38.id);
+                    }
+                }
+            } finally {
+                _value6 = false;
+            }
+            handleAction_50(() => {
+                if (_value5.at(-1) !== _value38) return;
+                const _value43 = _value9(_value38.type);
+                const _value44 = _value43?.querySelector(
+                    '.x-dm-profile-page-scroll, .x-detail-scroll, .x-dm-chat-messages, .x-scroll-area',
+                );
+                if (_value38.type === 'profile' && _value44) {
+                    const _value45 = _value38.tab === 'photos' ? 'photosRendered' : 'rendered';
+                    const _value46 =
+                        _value38.tab === 'photos' ? _value38.photoLimit : _value38.profileLimit;
+                    while ((value_41.get(_value44)?.[_value45] || 0) < (_value46 || 0)) {
+                        const _value47 = value_41.get(_value44)?.[_value45];
+                        handleAction_99(_value44);
+                        if (_value47 === value_41.get(_value44)?.[_value45]) break;
+                    }
+                }
+                if (_value44) _value44.scrollTop = _value38.scrollTop || 0;
+            });
+            return true;
+        }
+        function _value11() {
+            _value5.length = 0;
+            ['post', 'topic', 'profile', 'dm'].forEach((_value48) => {
+                const _value49 = _value9(_value48);
+                _value49?.classList.remove('active');
+                _value49?.setAttribute('aria-hidden', 'true');
+            });
+        }
         function handleAction_50(value_242) {
             requestAnimationFrame(() => requestAnimationFrame(value_242));
         }
@@ -883,26 +1015,38 @@ X is a global app. Non-User authors may write in the language that naturally fit
             );
             if (!authorName_3) return null;
             const identity_4 = resolveXAuthorIdentity(
-                    raw_8.authorId || raw_8.accountId,
-                    raw_8.handle || raw_8.authorHandle,
-                    authorName_3,
-                    raw_8.authorAvatar || raw_8.avatar,
-                ),
-                id_3 = String(raw_8.id || makeLocalId('xgen')),
-                handleAction_53_136 = handleAction_53(id_3),
-                text_6 = safeText(raw_8.text || raw_8.desc || raw_8.content);
-            if (!text_6 && !raw_8.isMoment) return null;
+                raw_8.authorId || raw_8.accountId,
+                raw_8.handle || raw_8.authorHandle,
+                authorName_3,
+                raw_8.authorAvatar || raw_8.avatar,
+            );
+            const id_3 = String(raw_8.id || makeLocalId('xgen'));
+            const handleAction_53_136 = handleAction_53(id_3);
+            const text_6 = safeText(raw_8.text || raw_8.desc || raw_8.content);
+            if (
+                !text_6 &&
+                !raw_8.isMoment &&
+                !(
+                    Array.isArray(raw_8.images) &&
+                    raw_8.images.some(
+                        (_value50) =>
+                            safeText(_value50.url || _value50.src || _value50.assetId) ||
+                            _value50.imageSource === 'placeholder',
+                    )
+                )
+            )
+                return null;
             const text_7 = safeText(
-                    raw_8.imageText ||
-                        raw_8.imagePrompt ||
-                        raw_8.image ||
-                        raw_8.picture ||
-                        raw_8.mediaDescription,
-                ),
-                rawImages = Array.isArray(raw_8.images) ? raw_8.images : [],
-                images_2 =
-                    rawImages.length > 0
-                        ? rawImages.map((image_4, value_379) => ({
+                raw_8.imageText ||
+                    raw_8.imagePrompt ||
+                    raw_8.image ||
+                    raw_8.picture ||
+                    raw_8.mediaDescription,
+            );
+            const rawImages = Array.isArray(raw_8.images) ? raw_8.images : [];
+            const images_2 =
+                rawImages.length > 0
+                    ? rawImages.map((image_4, value_379) => ({
                               id: String(image_4.id || id_3 + '-image-' + value_379),
                               text: safeText(
                                   image_4.text ||
@@ -925,23 +1069,23 @@ X is a global app. Non-User authors may write in the language that naturally fit
                                         }
                                       : undefined,
                           }))
-                        : text_7 || raw_8.mediaType === 'image'
-                          ? [
-                                {
-                                    id: id_3 + '-image-0',
-                                    text: text_7,
-                                    url: '',
-                                },
-                            ]
-                          : [],
-                items_140 = Array.isArray(raw_8.comments)
-                    ? raw_8.comments
-                    : Array.isArray(raw_8.commentList)
-                      ? raw_8.commentList
-                      : [],
-                filter_141 = items_140
-                    .map((value_142, value_143) => normalizeGeneratedComment(value_142, value_143))
-                    .filter(Boolean);
+                    : text_7 || raw_8.mediaType === 'image'
+                      ? [
+                            {
+                                id: id_3 + '-image-0',
+                                text: text_7,
+                                url: '',
+                            },
+                        ]
+                      : [];
+            const items_140 = Array.isArray(raw_8.comments)
+                ? raw_8.comments
+                : Array.isArray(raw_8.commentList)
+                  ? raw_8.commentList
+                  : [];
+            const filter_141 = items_140
+                .map((value_142, value_143) => normalizeGeneratedComment(value_142, value_143))
+                .filter(Boolean);
             return {
                 id: id_3,
                 authorId: identity_4.id,
@@ -984,42 +1128,58 @@ X is a global app. Non-User authors may write in the language that naturally fit
             };
         }
         function getPostImages(post_6) {
-            return (Array.isArray(post_6?.images) ? post_6.images : []).filter((image_5) =>
-                safeText(image_5?.url),
+            return (Array.isArray(post_6?.images) ? post_6.images : []).filter(
+                (image_5) => safeText(image_5?.url) || image_5?.imageSource === 'placeholder',
+            );
+        }
+        function _value12(_value51 = '') {
+            return (
+                '<span class="x-image-placeholder-content"><i class="far fa-image" aria-hidden="true"></i><span>占位图</span><span class="x-image-placeholder-caption">' +
+                escapeHtml(_value51) +
+                '</span></span>'
+            );
+        }
+        function _value13(_value52, _value53 = '', _value54 = '') {
+            const _value55 = _value52.imageSource === 'placeholder';
+            return (
+                '\n                <button class="x-post-image-thumb ' +
+                (_value55 ? 'is-placeholder' : '') +
+                ' ' +
+                escapeHtml(_value54) +
+                '" type="button" data-image-text="' +
+                escapeHtml(_value52.text || (_value55 ? '占位图' : 'Image')) +
+                '" data-image-url="' +
+                escapeHtml(_value52.url || '') +
+                '" data-image-id="' +
+                escapeHtml(_value52.id || '') +
+                '" data-image-source="' +
+                escapeHtml(_value52.imageSource || '') +
+                '" data-post-id="' +
+                escapeHtml(_value53) +
+                '">\n                    ' +
+                (_value55
+                    ? _value12(_value52.text)
+                    : '<img src="' +
+                      escapeHtml(_value52.url) +
+                      '" alt="' +
+                      escapeHtml(_value52.text || '') +
+                      '" onerror="this.remove()">') +
+                '\n                    ' +
+                (_value52.text ? '<span class="x-image-alt-badge">ALT</span>' : '') +
+                '\n                </button>\n            '
             );
         }
         function handleAction_23(items_144 = [], value_145 = '') {
             if (!items_144.length) return '';
             return (
-                `
-                <div class="x-generated-media-grid">
-                    ` +
+                '\n                <div class="x-generated-media-grid" data-image-count="' +
+                Math.min(4, items_144.length) +
+                '">\n                    ' +
                 items_144
                     .slice(0, 4)
-                    .map(
-                        (value_146) =>
-                            `
-                        <button class="x-post-image-thumb" type="button" data-image-text="` +
-                            escapeHtml(value_146.text || 'Image') +
-                            '" data-image-url="' +
-                            escapeHtml(value_146.url || '') +
-                            '" data-image-id="' +
-                            escapeHtml(value_146.id || '') +
-                            '" data-image-source="' +
-                            escapeHtml(value_146.imageSource || '') +
-                            '" data-post-id="' +
-                            escapeHtml(value_145) +
-                            `">
-                            <img src="` +
-                            escapeHtml(value_146.url) +
-                            `" alt="" onerror="this.remove()">
-                        </button>
-                    `,
-                    )
+                    .map((value_146) => _value13(value_146, value_145))
                     .join('') +
-                `
-                </div>
-            `
+                '\n                </div>\n            '
             );
         }
         function makeHandle(name_5, value_387) {
@@ -1118,9 +1278,9 @@ X is a global app. Non-User authors may write in the language that naturally fit
             );
         }
         function normalizeXAccount(raw_10 = {}, value_416 = 0) {
-            const name_9 = safeText(raw_10.name || raw_10.authorName || raw_10.handle, 'X User'),
-                handle_4 = makeHandle(name_9, raw_10.handle || raw_10.authorHandle || name_9),
-                id_4 = String(raw_10.id || raw_10.authorId || makeAccountId(handle_4, name_9));
+            const name_9 = safeText(raw_10.name || raw_10.authorName || raw_10.handle, 'X User');
+            const handle_4 = makeHandle(name_9, raw_10.handle || raw_10.authorHandle || name_9);
+            const id_4 = String(raw_10.id || raw_10.authorId || makeAccountId(handle_4, name_9));
             return {
                 id: id_4,
                 name: name_9,
@@ -1132,6 +1292,34 @@ X is a global app. Non-User authors may write in the language that naturally fit
                 bio: safeText(raw_10.bio || raw_10.signature, '暂无简介'),
                 persona: safeText(raw_10.persona),
                 coverSeed: safeText(raw_10.coverSeed, id_4 + '-' + value_416 + '-cover'),
+                coverImage: safeText(raw_10.coverImage),
+                avatarAssetId: safeText(raw_10.avatarAssetId),
+                coverImageAssetId: safeText(raw_10.coverImageAssetId),
+                followingCount: normalizeProfileCount(
+                    raw_10.followingCount,
+                    getDefaultCharSocialCounts({
+                        id: id_4,
+                        name: name_9,
+                        handle: handle_4,
+                    }).followingCount,
+                ),
+                followersCount: normalizeProfileCount(
+                    raw_10.followersCount,
+                    getDefaultCharSocialCounts({
+                        id: id_4,
+                        name: name_9,
+                        handle: handle_4,
+                    }).followersCount,
+                ),
+                profileImagePromptConfig: normalizeCharProfileImagePromptConfig(
+                    raw_10.profileImagePromptConfig,
+                ),
+                profileImageFaceReferenceAssetId: safeText(raw_10.profileImageFaceReferenceAssetId),
+                profileImageFaceReferenceUrl: safeText(raw_10.profileImageFaceReferenceUrl),
+                profileImageFaceReferenceFileName: safeText(
+                    raw_10.profileImageFaceReferenceFileName,
+                ),
+                profileGeneratedAt: Number(raw_10.profileGeneratedAt) || 0,
                 isFollowing: raw_10.isFollowing !== false,
                 source: safeText(raw_10.source, 'generated'),
                 createdAt: Number(raw_10.createdAt) || Date.now(),
@@ -1414,16 +1602,16 @@ X is a global app. Non-User authors may write in the language that naturally fit
             });
         }
         function resolveXAuthorIdentity(value_479, handle_5, name_10, value_482 = '') {
-            const displayName_2 = safeText(name_10 || handle_5, 'X User'),
-                makeHandle_484 = makeHandle(
-                    displayName_2,
-                    safeText(handle_5).split('·')[0].trim() || displayName_2,
-                ),
-                safeText_485 = safeText(value_479),
-                canonicalAccountHandle_486 = canonicalAccountHandle(
-                    currentProfile?.handle,
-                    currentProfile?.name,
-                );
+            const displayName_2 = safeText(name_10 || handle_5, 'X User');
+            const makeHandle_484 = makeHandle(
+                displayName_2,
+                safeText(handle_5).split('·')[0].trim() || displayName_2,
+            );
+            const safeText_485 = safeText(value_479);
+            const canonicalAccountHandle_486 = canonicalAccountHandle(
+                currentProfile?.handle,
+                currentProfile?.name,
+            );
             if (
                 safeText_485 === 'me' ||
                 canonicalAccountHandle(makeHandle_484, displayName_2) === canonicalAccountHandle_486
@@ -1441,13 +1629,16 @@ X is a global app. Non-User authors may write in the language that naturally fit
                     ),
                     kind: 'me',
                 };
-            const state_6 = getXState(),
-                chars_2 = Array.isArray(state_6.xDirectMessages) ? state_6.xDirectMessages : [],
-                char_8 = chars_2.find(
+            const state_6 = getXState();
+            const chars_2 = Array.isArray(state_6.xDirectMessages) ? state_6.xDirectMessages : [];
+            const char_8 =
+                chars_2.find(
+                    (value_493) => safeText_485 && String(value_493.id) === safeText_485,
+                ) ||
+                chars_2.find(
                     (value_493) =>
-                        (safeText_485 && String(value_493.id) === safeText_485) ||
                         canonicalAccountHandle(value_493.handle, value_493.name) ===
-                            canonicalAccountHandle(makeHandle_484, displayName_2),
+                        canonicalAccountHandle(makeHandle_484, displayName_2),
                 );
             if (char_8)
                 return {
@@ -1469,13 +1660,27 @@ X is a global app. Non-User authors may write in the language that naturally fit
                 displayName_2,
                 state_6,
             );
-            if (handleAction_66_490) return handleAction_66_490;
-            const accounts = Array.isArray(state_6.xAccounts) ? state_6.xAccounts : [],
-                account_5 = accounts.find(
+            if (handleAction_66_490) {
+                const _value57 = (state_6.xAccounts || []).find(
+                    (value_494) => String(value_494.id) === String(handleAction_66_490.id),
+                );
+                return _value57
+                    ? {
+                          ...handleAction_66_490,
+                          ..._value57,
+                          kind: 'topic-char',
+                      }
+                    : handleAction_66_490;
+            }
+            const _value56 = Array.isArray(state_6.xAccounts) ? state_6.xAccounts : [];
+            const account_5 =
+                _value56.find(
+                    (value_494) => safeText_485 && String(value_494.id) === safeText_485,
+                ) ||
+                _value56.find(
                     (value_494) =>
-                        (safeText_485 && String(value_494.id) === safeText_485) ||
                         canonicalAccountHandle(value_494.handle, value_494.name) ===
-                            canonicalAccountHandle(makeHandle_484, displayName_2),
+                        canonicalAccountHandle(makeHandle_484, displayName_2),
                 );
             if (account_5)
                 return {
@@ -1987,52 +2192,8 @@ X is a global app. Non-User authors may write in the language that naturally fit
                 'bottom-sheet-overlay detail-sheet-overlay x-char-profile-generate-overlay';
             charProfileGenerateSheet.id = 'x-char-profile-generate-sheet';
             charProfileGenerateSheet.style.zIndex = '281';
-            charProfileGenerateSheet.innerHTML = `
-                <div class="bottom-sheet x-char-profile-generate-sheet" role="dialog" aria-modal="true" aria-labelledby="x-char-profile-generate-title">
-                    <div class="sheet-handle"></div>
-                    <div class="x-edit-sheet-header">
-                        <button class="x-edit-sheet-text-btn" id="x-char-profile-generate-close-btn" type="button">取消</button>
-                        <strong id="x-char-profile-generate-title">生成主页帖子</strong>
-                        <button class="x-edit-sheet-save" id="x-char-profile-generate-run-btn" type="button">生成</button>
-                    </div>
-                    <div class="x-char-profile-generate-body">
-                        <label class="x-char-profile-generate-row">
-                            <span><strong>帖子数量</strong><small>每条至少包含 10 条评论</small></span>
-                            <input id="x-char-profile-generate-count" type="number" min="1" max="10" step="1" inputmode="numeric" value="3">
-                        </label>
-                        <label class="x-char-profile-generate-row">
-                            <span><strong>开启生图</strong><small>整批最多为一条帖子生成真实图片</small></span>
-                            <input id="x-char-profile-image-toggle" type="checkbox">
-                        </label>
-                        <section class="x-char-profile-image-options" id="x-char-profile-image-options" hidden>
-                            <label class="x-edit-field">
-                                <span>提示词预设</span>
-                                <select id="x-char-profile-image-preset"><option value="">当前编辑内容</option></select>
-                            </label>
-                            <div class="x-char-profile-preset-actions">
-                                <input id="x-char-profile-preset-name" type="text" maxlength="40" placeholder="预设名称">
-                                <button id="x-char-profile-preset-save" type="button">保存预设</button>
-                                <button id="x-char-profile-preset-delete" type="button">删除</button>
-                            </div>
-                            <label class="x-edit-field"><span>正向提示词</span><textarea id="x-char-profile-image-prompt" maxlength="4000" placeholder="追加到帖子画面描述后的主体、场景或风格要求"></textarea></label>
-                            <label class="x-edit-field"><span>Char 外貌</span><textarea id="x-char-profile-char-appearance" maxlength="4000" placeholder="角色外貌约束"></textarea></label>
-                            <label class="x-edit-field"><span>User 外貌</span><textarea id="x-char-profile-user-appearance" maxlength="4000" placeholder="用户外貌约束"></textarea></label>
-                            <label class="x-edit-field"><span>画风提示词</span><textarea id="x-char-profile-artist-prompt" maxlength="4000" placeholder="画风、镜头、质感等"></textarea></label>
-                            <label class="x-edit-field"><span>负面提示词</span><textarea id="x-char-profile-negative-prompt" maxlength="4000" placeholder="不希望出现在图片中的内容"></textarea></label>
-                            <div class="x-char-profile-reference-card">
-                                <button class="x-char-profile-reference-preview" id="x-char-profile-reference-preview" type="button" aria-label="上传参考脸"><i class="fas fa-user"></i></button>
-                                <input id="x-char-profile-reference-input" type="file" accept="image/jpeg,image/png" hidden>
-                                <div><strong>Char 参考脸</strong><small id="x-char-profile-reference-status">尚未上传</small></div>
-                                <button id="x-char-profile-reference-delete" type="button">移除</button>
-                            </div>
-                            <label class="x-char-profile-generate-row compact">
-                                <span><strong>本次使用参考脸</strong><small>仅在已有参考脸时可用</small></span>
-                                <input id="x-char-profile-reference-toggle" type="checkbox">
-                            </label>
-                        </section>
-                        <p class="x-advance-note">生图失败时仍会保留本次生成的文字帖子，不会使用随机外部图片。</p>
-                    </div>
-                </div>`;
+            charProfileGenerateSheet.innerHTML =
+                '\n                <div class="bottom-sheet x-char-profile-generate-sheet" role="dialog" aria-modal="true" aria-labelledby="x-char-profile-generate-title">\n                    <div class="sheet-handle"></div>\n                    <div class="x-edit-sheet-header">\n                        <button class="x-edit-sheet-text-btn" id="x-char-profile-generate-close-btn" type="button">取消</button>\n                        <strong id="x-char-profile-generate-title">生成主页帖子</strong>\n                        <button class="x-edit-sheet-save" id="x-char-profile-generate-run-btn" type="button">生成</button>\n                    </div>\n                    <div class="x-char-profile-generate-body">\n                        <label class="x-char-profile-generate-row">\n                            <span><strong>帖子数量</strong><small>每条至少包含 10 条评论</small></span>\n                            <input id="x-char-profile-generate-count" type="number" min="1" max="10" step="1" inputmode="numeric" value="3">\n                        </label>\n                        <label class="x-edit-field x-profile-generation-direction">\n                            <span>想生成什么？（可选）</span>\n                            <textarea id="x-char-profile-generate-direction" maxlength="2000" rows="3" placeholder="例如：分享今天的旅行见闻，或围绕最近发生的事发帖"></textarea>\n                        </label>\n                        <label class="x-char-profile-generate-row">\n                            <span><strong>开启生图</strong><small>整批最多为一条帖子生成真实图片</small></span>\n                            <input id="x-char-profile-image-toggle" type="checkbox">\n                        </label>\n                        <section class="x-char-profile-image-options" id="x-char-profile-image-options" hidden>\n                            <label class="x-edit-field">\n                                <span>提示词预设</span>\n                                <select id="x-char-profile-image-preset"><option value="">当前编辑内容</option></select>\n                            </label>\n                            <div class="x-char-profile-preset-actions">\n                                <input id="x-char-profile-preset-name" type="text" maxlength="40" placeholder="预设名称">\n                                <button id="x-char-profile-preset-save" type="button">保存预设</button>\n                                <button id="x-char-profile-preset-delete" type="button">删除</button>\n                            </div>\n                            <label class="x-edit-field"><span>正向提示词</span><textarea id="x-char-profile-image-prompt" maxlength="4000" placeholder="追加到帖子画面描述后的主体、场景或风格要求"></textarea></label>\n                            <label class="x-edit-field"><span>Char 外貌</span><textarea id="x-char-profile-char-appearance" maxlength="4000" placeholder="角色外貌约束"></textarea></label>\n                            <label class="x-edit-field"><span>User 外貌</span><textarea id="x-char-profile-user-appearance" maxlength="4000" placeholder="用户外貌约束"></textarea></label>\n                            <label class="x-edit-field"><span>画风提示词</span><textarea id="x-char-profile-artist-prompt" maxlength="4000" placeholder="画风、镜头、质感等"></textarea></label>\n                            <label class="x-edit-field"><span>负面提示词</span><textarea id="x-char-profile-negative-prompt" maxlength="4000" placeholder="不希望出现在图片中的内容"></textarea></label>\n                            <div class="x-char-profile-reference-card">\n                                <button class="x-char-profile-reference-preview" id="x-char-profile-reference-preview" type="button" aria-label="上传参考脸"><i class="fas fa-user"></i></button>\n                                <input id="x-char-profile-reference-input" type="file" accept="image/jpeg,image/png" hidden>\n                                <div><strong>Char 参考脸</strong><small id="x-char-profile-reference-status">尚未上传</small></div>\n                                <button id="x-char-profile-reference-delete" type="button">移除</button>\n                            </div>\n                            <label class="x-char-profile-generate-row compact">\n                                <span><strong>本次使用参考脸</strong><small>仅在已有参考脸时可用</small></span>\n                                <input id="x-char-profile-reference-toggle" type="checkbox">\n                            </label>\n                        </section>\n                        <p class="x-advance-note">生图失败时仍会保留本次生成的文字帖子，不会使用随机外部图片。</p>\n                    </div>\n                </div>';
             view.appendChild(charProfileGenerateSheet);
         }
         function handleAction_36() {
@@ -2119,22 +2280,8 @@ X is a global app. Non-User authors may write in the language that naturally fit
                     'bottom-sheet-overlay detail-sheet-overlay x-search-generate-overlay'),
                 (searchGenerateSheet.id = 'x-search-generate-sheet'),
                 (searchGenerateSheet.style.zIndex = '273'),
-                (searchGenerateSheet.innerHTML = `
-                    <div class="bottom-sheet x-search-generate-sheet">
-                        <div class="sheet-handle"></div>
-                        <div class="x-edit-sheet-header">
-                            <button class="x-edit-sheet-text-btn" id="x-search-generate-close-btn" type="button">Close</button>
-                            <strong id="x-search-generate-title">搜索/生成帖子</strong>
-                            <button class="x-edit-sheet-save" id="x-search-generate-run-btn" type="button">Generate</button>
-                        </div>
-                        <div class="x-search-generate-body">
-                            <label class="x-add-dm-field">
-                                <span id="x-search-generate-label">生成方向</span>
-                                <textarea id="x-search-generate-input" maxlength="500" placeholder="可留空，或输入想生成的帖子主题"></textarea>
-                            </label>
-                        </div>
-                    </div>
-                `),
+                (searchGenerateSheet.innerHTML =
+                    '\n                    <div class="bottom-sheet x-search-generate-sheet">\n                        <div class="sheet-handle"></div>\n                        <div class="x-edit-sheet-header">\n                            <button class="x-edit-sheet-text-btn" id="x-search-generate-close-btn" type="button">Close</button>\n                            <strong id="x-search-generate-title">搜索/生成帖子</strong>\n                            <button class="x-edit-sheet-save" id="x-search-generate-run-btn" type="button">Generate</button>\n                        </div>\n                        <div class="x-search-generate-body">\n                            <label class="x-add-dm-field">\n                                <span id="x-search-generate-label">生成方向</span>\n                                <textarea id="x-search-generate-input" maxlength="500" placeholder="可留空，或输入想生成的帖子主题"></textarea>\n                            </label>\n                            <section class="x-home-generation-options" id="x-home-generation-options">\n                                <label class="x-home-generation-toggle">\n                                    <span><strong>挂载 Char 人设</strong><small>使用已添加的 iMessage Char 的人设</small></span>\n                                    <input id="x-home-mount-char-persona" type="checkbox">\n                                </label>\n                                <label class="x-home-generation-toggle">\n                                    <span><strong>挂载 User 人设</strong><small>使用当前 X 账号的 User 人设</small></span>\n                                    <input id="x-home-mount-user-persona" type="checkbox">\n                                </label>\n                                <label class="x-home-generation-toggle">\n                                    <span><strong>挂载单聊上下文</strong><small>每位 Char 仅引用自己的 iMessage 单聊</small></span>\n                                    <input id="x-home-mount-single-chat" type="checkbox">\n                                </label>\n                                <label class="x-home-generation-context-count">\n                                    <span>上下文条数</span>\n                                    <input id="x-home-single-chat-limit" type="number" min="1" max="50" step="1" inputmode="numeric" value="20" disabled>\n                                    <small>每位 Char 最近 1–50 条，默认 20 条</small>\n                                </label>\n                            </section>\n                        </div>\n                    </div>\n                '),
                 view.appendChild(searchGenerateSheet));
             searchGenerateInput = document.getElementById('x-search-generate-input');
             searchGenerateSheet
@@ -2142,58 +2289,15 @@ X is a global app. Non-User authors may write in the language that naturally fit
                 .forEach((value_160) => value_160.remove());
         }
         function handleAction_39() {
-            advanceSheet = document.getElementById('x-advance-sheet');
-            !advanceSheet &&
-                ((advanceSheet = document.createElement('div')),
-                (advanceSheet.className =
-                    'bottom-sheet-overlay detail-sheet-overlay x-advance-overlay'),
-                (advanceSheet.id = 'x-advance-sheet'),
-                (advanceSheet.style.zIndex = '276'),
-                (advanceSheet.innerHTML = `
-                    <div class="bottom-sheet x-advance-sheet">
-                        <div class="sheet-handle"></div>
-                        <div class="x-edit-sheet-header">
-                            <button class="x-edit-sheet-text-btn" id="x-advance-close-btn" type="button">关闭</button>
-                            <strong>推进到下一天</strong>
-                            <button class="x-edit-sheet-save" id="x-advance-run-btn" type="button">生成</button>
-                        </div>
-                        <div class="x-advance-body">
-                            <label class="x-advance-field">
-                                <span>想推进的剧情</span>
-                                <textarea id="x-advance-plot-input" maxlength="800" placeholder="可留空，留空时将随机延续当前剧情"></textarea>
-                            </label>
-                            <div class="x-advance-section-title">生成内容</div>
-                            <div class="x-advance-options">
-                                <label class="x-advance-option">
-                                    <input id="x-advance-strangers-toggle" type="checkbox">
-                                    <span class="x-advance-option-copy">
-                                        <strong>陌生人私信</strong>
-                                        <span>每人生成 2–5 条对方来信</span>
-                                    </span>
-                                    <input class="x-advance-count" id="x-advance-strangers-count" type="number" min="1" max="20" inputmode="numeric" aria-label="陌生人人数">
-                                </label>
-                                <label class="x-advance-option">
-                                    <input id="x-advance-trends-toggle" type="checkbox">
-                                    <span class="x-advance-option-copy">
-                                        <strong>推进热搜</strong>
-                                        <span>新热搜置顶，旧热搜依次下移</span>
-                                    </span>
-                                    <input class="x-advance-count" id="x-advance-trends-count" type="number" min="1" max="15" inputmode="numeric" aria-label="热搜数量">
-                                </label>
-                                <label class="x-advance-option">
-                                    <input id="x-advance-posts-toggle" type="checkbox">
-                                    <span class="x-advance-option-copy">
-                                        <strong>推进帖子</strong>
-                                        <span>每条新帖子至少生成 5 条评论</span>
-                                    </span>
-                                    <input class="x-advance-count" id="x-advance-posts-count" type="number" min="1" max="20" inputmode="numeric" aria-label="帖子数量">
-                                </label>
-                            </div>
-                            <p class="x-advance-note">将使用 X 已绑定的世界书和当前热搜、帖子作为剧情上下文。全部生成成功后才会保存。</p>
-                        </div>
-                    </div>
-                `),
-                view.appendChild(advanceSheet));
+            _value2 = document.getElementById('x-advance-sheet');
+            !_value2 &&
+                ((_value2 = document.createElement('div')),
+                (_value2.className = 'bottom-sheet-overlay detail-sheet-overlay x-advance-overlay'),
+                (_value2.id = 'x-advance-sheet'),
+                (_value2.style.zIndex = '276'),
+                (_value2.innerHTML =
+                    '\n                    <div class="bottom-sheet x-advance-sheet">\n                        <div class="sheet-handle"></div>\n                        <div class="x-edit-sheet-header">\n                            <button class="x-edit-sheet-text-btn" id="x-advance-close-btn" type="button">关闭</button>\n                            <strong>推进到下一天</strong>\n                            <button class="x-edit-sheet-save" id="x-advance-run-btn" type="button">生成</button>\n                        </div>\n                        <div class="x-advance-body">\n                            <label class="x-advance-field">\n                                <span>想推进的剧情</span>\n                                <textarea id="x-advance-plot-input" maxlength="800" placeholder="可留空，留空时将随机延续当前剧情"></textarea>\n                            </label>\n                            <div class="x-advance-section-title">生成内容</div>\n                            <div class="x-advance-options">\n                                <label class="x-advance-option">\n                                    <input id="x-advance-strangers-toggle" type="checkbox">\n                                    <span class="x-advance-option-copy">\n                                        <strong>陌生人私信</strong>\n                                        <span>每人生成 2–5 条对方来信</span>\n                                    </span>\n                                    <input class="x-advance-count" id="x-advance-strangers-count" type="number" min="1" max="20" inputmode="numeric" aria-label="陌生人人数">\n                                </label>\n                                <label class="x-advance-option">\n                                    <input id="x-advance-trends-toggle" type="checkbox">\n                                    <span class="x-advance-option-copy">\n                                        <strong>推进热搜</strong>\n                                        <span>新热搜置顶，旧热搜依次下移</span>\n                                    </span>\n                                    <input class="x-advance-count" id="x-advance-trends-count" type="number" min="1" max="15" inputmode="numeric" aria-label="热搜数量">\n                                </label>\n                                <label class="x-advance-option">\n                                    <input id="x-advance-posts-toggle" type="checkbox">\n                                    <span class="x-advance-option-copy">\n                                        <strong>推进帖子</strong>\n                                        <span>每条新帖子至少生成 5 条评论</span>\n                                    </span>\n                                    <input class="x-advance-count" id="x-advance-posts-count" type="number" min="1" max="20" inputmode="numeric" aria-label="帖子数量">\n                                </label>\n                            </div>\n                            <p class="x-advance-note">将使用 X 已绑定的世界书和当前热搜、帖子作为剧情上下文。全部生成成功后才会保存。</p>\n                        </div>\n                    </div>\n                '),
+                view.appendChild(_value2));
             advancePlotInput = document.getElementById('x-advance-plot-input');
         }
         function handleAction_40() {
@@ -2233,20 +2337,13 @@ X is a global app. Non-User authors may write in the language that naturally fit
                 (imagePreviewOverlay.className = 'x-image-preview-overlay'),
                 (imagePreviewOverlay.id = 'x-image-preview-overlay'),
                 imagePreviewOverlay.setAttribute('aria-hidden', 'true'),
-                (imagePreviewOverlay.innerHTML = `
-                    <button class="x-image-preview-close" id="x-image-preview-close" type="button" aria-label="Close image"><i class="fas fa-times"></i></button>
-                    <div class="x-image-preview-card" id="x-image-preview-card">
-                        <img id="x-image-preview-img" alt="">
-                    </div>
-                    <div class="x-image-preview-details">
-                        <p id="x-image-preview-text"></p>
-                        <div class="x-image-preview-actions" id="x-image-preview-actions" hidden>
-                            <button id="x-image-download-btn" type="button">下载</button>
-                            <button id="x-image-regenerate-btn" type="button">重新生成</button>
-                            <button id="x-image-delete-btn" type="button">删除</button>
-                        </div>
-                    </div>
-                `),
+                imagePreviewOverlay.setAttribute('role', 'dialog'),
+                imagePreviewOverlay.setAttribute('aria-modal', 'true'),
+                imagePreviewOverlay.setAttribute('aria-label', '图片详情'),
+                (imagePreviewOverlay.innerHTML =
+                    '\n                    <button class="x-image-preview-close" id="x-image-preview-close" type="button" aria-label="Close image"><i class="fas fa-times"></i></button>\n                    <div class="x-image-preview-card" id="x-image-preview-card">\n                        <img id="x-image-preview-img" alt="">\n                        <div class="x-image-preview-placeholder" id="x-image-preview-placeholder" hidden>' +
+                    _value12() +
+                    '</div>\n                    </div>\n                    <div class="x-image-preview-details">\n                        <p id="x-image-preview-text"></p>\n                        <label class="x-image-description-editor" id="x-image-description-editor" hidden>\n                            <span>图片描述（可选）<small id="x-image-description-count">0/1000</small></span>\n                            <textarea id="x-image-description-input" maxlength="1000" rows="3" inputmode="text" enterkeyhint="enter" autocomplete="off" placeholder="描述画面中的人物、场景或细节"></textarea>\n                        </label>\n                        <button class="x-image-description-done" id="x-image-description-done" type="button" hidden>完成</button>\n                        <div class="x-image-preview-actions" id="x-image-preview-actions" hidden>\n                            <button id="x-image-download-btn" type="button">下载</button>\n                            <button id="x-image-regenerate-btn" type="button">重新生成</button>\n                            <button id="x-image-delete-btn" type="button">删除</button>\n                        </div>\n                    </div>\n                '),
                 view.appendChild(imagePreviewOverlay));
         }
         function handleAction_94() {
@@ -2602,6 +2699,7 @@ X is a global app. Non-User authors may write in the language that naturally fit
             else accountSwitchSheet?.classList.remove('active');
         }
         function handleAction_105() {
+            _value11();
             const staticPostIds = new Set(['profile']);
             Object.keys(postData).forEach((postId_2) => {
                 if (!staticPostIds.has(postId_2)) delete postData[postId_2];
@@ -2619,7 +2717,7 @@ X is a global app. Non-User authors may write in the language that naturally fit
             count_29 = 0;
             value_35 = count_34;
             count_20 = 0;
-            value_38 = count_34;
+            _value8 = count_34;
             value_39 = null;
             value_42.clear();
             count_43 += 1;
@@ -2640,7 +2738,7 @@ X is a global app. Non-User authors may write in the language that naturally fit
             closeCharProfileGenerateSheet();
             closeEditSuperTopicSheet();
             closePostForwardSheet();
-            closeImagePreview();
+            _value20();
         }
         async function activateXPlayerAccount(accountId_2, initialState = null) {
             const targetId_2 = String(accountId_2 || ''),
@@ -2961,37 +3059,117 @@ X is a global app. Non-User authors may write in the language that naturally fit
             );
         }
         function renderComposeImageDraft() {
-            const iElement = composeImageButton?.querySelector('i'),
-                label_3 = composeImageButton?.querySelector('.x-compose-image-copy'),
-                hidden_2 = !!composeImageDraft;
-            composeImageButton?.classList.toggle('has-image', hidden_2);
-            if (iElement) iElement.hidden = hidden_2;
-            if (label_3) label_3.hidden = hidden_2;
-            composeImagePreview &&
-                ((composeImagePreview.hidden = !hidden_2),
-                (composeImagePreview.src = hidden_2 ? composeImageDraft : ''));
-            if (composeImageClearButton) composeImageClearButton.hidden = !hidden_2;
+            const iElement = composeImageDraft.length;
+            if (composeImageButton) composeImageButton.disabled = iElement >= 4 || value_38;
+            if (composeImageInput) composeImageInput.disabled = iElement >= 4 || value_38;
+            if (composeImageUrlButton) composeImageUrlButton.disabled = iElement >= 4 || value_38;
+            if (composeSubmitButton) composeSubmitButton.disabled = value_38 || _value4;
+            const _value58 = document.getElementById('x-compose-image-count');
+            if (_value58) _value58.textContent = value_38 ? '正在处理图片…' : iElement + '/4';
+            if (!composeImagePreview) return;
+            composeImagePreview.hidden = iElement === 0;
+            composeImagePreview.innerHTML =
+                '\n                <div class="x-generated-media-grid x-compose-preview-grid" data-image-count="' +
+                iElement +
+                '">\n                    ' +
+                composeImageDraft
+                    .map(
+                        (_value59, _value60) =>
+                            '\n                        <div class="x-compose-media-item">\n                            <button class="x-compose-preview-image" type="button" data-compose-preview-id="' +
+                            escapeHtml(_value59.id) +
+                            '" aria-label="查看第 ' +
+                            (_value60 + 1) +
+                            ' 张图片">\n                                ' +
+                            (_value59.imageSource === 'placeholder'
+                                ? _value12(_value59.text)
+                                : '<img src="' +
+                                  escapeHtml(_value59.url) +
+                                  '" alt="' +
+                                  escapeHtml(_value59.text) +
+                                  '">') +
+                            '\n                            </button>\n                            <button class="x-compose-image-remove" type="button" data-compose-remove-id="' +
+                            escapeHtml(_value59.id) +
+                            '" aria-label="移除第 ' +
+                            (_value60 + 1) +
+                            ' 张图片"><i class="fas fa-xmark"></i></button>\n                            <span class="x-compose-description-badge"' +
+                            (_value59.text ? '' : ' hidden') +
+                            '>ALT</span>\n                        </div>',
+                    )
+                    .join('') +
+                '\n                </div>\n            ';
+        }
+        function _value14(_value61, _value62 = 'uploaded') {
+            if (composeImageDraft.length >= 4) {
+                window.showToast?.('每条帖子最多添加 4 张图片');
+                return false;
+            }
+            composeImageDraft.push({
+                id: makeLocalId('compose-image'),
+                url: _value61,
+                text: '',
+                imageSource: _value62,
+            });
+            renderComposeImageDraft();
+            return true;
+        }
+        async function _value15() {
+            const _value63 = Array.from(_value?.files || []);
+            if (!_value63.length || value_38) return;
+            const _value64 = _value3;
+            const _value65 = 4 - composeImageDraft.length;
+            if (_value63.length > _value65) window.showToast?.('每条帖子最多添加 4 张图片');
+            value_38 = true;
+            renderComposeImageDraft();
+            try {
+                for (const _value66 of _value63.slice(0, _value65)) {
+                    try {
+                        const _value67 = await compressXImageFile(
+                            _value66,
+                            xImageCompressionPresets.post,
+                        );
+                        if (_value64 !== _value3) return;
+                        _value14(_value67);
+                    } catch (_value68) {
+                        if (_value64 !== _value3) return;
+                        window.showToast?.(_value68?.message || '图片处理失败，请重新选择');
+                    }
+                }
+            } finally {
+                if (_value64 === _value3) {
+                    value_38 = false;
+                    if (_value) _value.value = '';
+                    renderComposeImageDraft();
+                }
+            }
         }
         function addComposeImageUrl() {
+            if (value_38 || _value4) return;
             const url_3 = safeText(composeImageUrlInput?.value);
             if (!/^https?:\/\//i.test(url_3)) {
                 if (typeof window.showToast === 'function')
                     window.showToast('请输入有效的 http(s) 图片 URL');
                 return;
             }
-            composeImageDraft = url_3;
-            renderComposeImageDraft();
+            if (_value14(url_3) && composeImageUrlInput) composeImageUrlInput.value = '';
         }
         function openComposer(options_5 = {}) {
-            const requestedSuperId = safeText(options_5?.superTopicId),
-                topic_5 = requestedSuperId
-                    ? (getXState().xTopics || []).find(
-                          (item_9) => String(item_9.id || item_9.name) === requestedSuperId,
-                      )
-                    : null;
+            if (value_13?.composeImageId) _value20();
+            const requestedSuperId = safeText(options_5?.superTopicId);
+            const topic_5 = requestedSuperId
+                ? (getXState().xTopics || []).find(
+                      (item_9) => String(item_9.id || item_9.name) === requestedSuperId,
+                  )
+                : null;
             currentComposeSuperId = topic_5 ? String(topic_5.id || topic_5.name) : null;
-            composeImageDraft = '';
-            if (composeImageInput) composeImageInput.value = '';
+            _value3 += 1;
+            composeImageDraft = [];
+            value_38 = false;
+            const _value69 = document.getElementById('x-compose-image-url-row');
+            if (_value69) _value69.hidden = true;
+            document
+                .getElementById('x-compose-image-link-toggle')
+                ?.setAttribute('aria-expanded', 'false');
+            if (_value) _value.value = '';
             if (composeImageUrlInput) composeImageUrlInput.value = '';
             if (composeTextInput) composeTextInput.value = '';
             if (composeTopicInput) composeTopicInput.value = '';
@@ -3005,26 +3183,38 @@ X is a global app. Non-User authors may write in the language that naturally fit
             else composeSheet?.classList.add('active');
         }
         function closeComposer() {
+            if (value_13?.composeImageId) _value20();
             currentComposeSuperId = null;
-            composeImageDraft = '';
+            _value3 += 1;
+            composeImageDraft = [];
+            value_38 = false;
             renderComposeImageDraft();
             if (typeof window.closeView === 'function') window.closeView(composeSheet);
             else composeSheet?.classList.remove('active');
         }
         async function handleAction_115() {
-            const text_9 = safeText(composeTextInput?.value, '新帖子草稿');
-            count_12 += 1;
-            const id_5 = 'temp-' + Date.now() + '-' + count_12,
-                superTopic = currentComposeSuperId
+            if (value_38 || _value4) return;
+            const text_9 = safeText(composeTextInput?.value);
+            if (!text_9 && !composeImageDraft.length) {
+                window.showToast?.('请输入帖子内容或添加图片');
+                return;
+            }
+            const _value70 = getXState().activeXPlayerAccountId;
+            _value4 = true;
+            renderComposeImageDraft();
+            try {
+                count_12 += 1;
+                const id_5 = 'temp-' + Date.now() + '-' + count_12;
+                const superTopic = currentComposeSuperId
                     ? (getXState().xTopics || []).find(
                           (item_10) =>
                               String(item_10.id || item_10.name) === String(currentComposeSuperId),
                       )
-                    : null,
-                topicTag_3 =
+                    : null;
+                const topicTag_3 =
                     normalizeComposeTopicTag(composeTopicInput?.value) ||
-                    normalizeComposeTopicTag(superTopic?.name || superTopic?.title),
-                rawPost_3 = {
+                    normalizeComposeTopicTag(superTopic?.name || superTopic?.title);
+                const rawPost_3 = {
                     id: id_5,
                     authorId: 'me',
                     authorAvatar: handleAction_55(
@@ -3043,44 +3233,47 @@ X is a global app. Non-User authors may write in the language that naturally fit
                     likes: 0,
                     commentsCount: 0,
                     comments: [],
-                    mediaType: composeImageDraft ? 'image' : 'text',
-                    images: composeImageDraft
-                        ? [
-                              {
-                                  id: id_5 + '-image-0',
-                                  text: '用户上传图片',
-                                  url: composeImageDraft,
-                              },
-                          ]
-                        : [],
+                    mediaType: composeImageDraft.length ? 'image' : 'text',
+                    images: composeImageDraft.map((_value71, _value72) => ({
+                        id: id_5 + '-image-' + _value72,
+                        text: _value71.text,
+                        url: _value71.url,
+                        imageSource: _value71.imageSource || 'uploaded',
+                    })),
                     createdAt: Date.now(),
-                },
-                map_619 = rawPost_3.images.map((image_6) => ({
-                    id: String(image_6.id || ''),
-                    url: String(image_6.url || ''),
-                    mimeType: String(image_6.mimeType || ''),
-                })),
-                added = appendGeneratedPosts([rawPost_3]);
-            if (superTopic && added.length) updateSuperHomeCard(superTopic);
-            closeComposer();
-            if (added.length) {
-                const durable_2 = await flushXStateNow('x-post-publish');
-                if (!durable_2) {
-                    updateXState((draft_3) => {
+                };
+                const map_619 = rawPost_3.images.map((_value73) => ({
+                    id: String(_value73.id || ''),
+                    url: String(_value73.url || ''),
+                    mimeType: String(_value73.mimeType || ''),
+                    imageSource: String(_value73.imageSource || ''),
+                }));
+                const added = appendGeneratedPosts([rawPost_3]);
+                if (superTopic && added.length) updateSuperHomeCard(superTopic);
+                closeComposer();
+                if (added.length) {
+                    const durable_2 = await flushXStateNow('x-post-publish');
+                    if (_value70 !== getXState().activeXPlayerAccountId) return;
+                    if (!durable_2) {
+                        updateXState((draft_3) => {
                         draft_3.xGeneratedPosts = (draft_3.xGeneratedPosts || []).filter(
                             (post_8) => String(post_8.id) !== String(id_5),
                         );
                     });
-                    renderGeneratedPosts();
+                        renderGeneratedPosts();
+                        if (typeof window.showToast === 'function')
+                            window.showToast('帖子保存失败，已撤销发布');
+                        return;
+                    }
                     if (typeof window.showToast === 'function')
-                        window.showToast('帖子保存失败，已撤销发布');
-                    return;
+                        window.showToast('Post published; generating engagement');
+                    generatePostPublishInteractions(added[0].id, {
+                        imageSources: map_619,
+                    });
                 }
-                if (typeof window.showToast === 'function')
-                    window.showToast('Post published; generating engagement');
-                generatePostPublishInteractions(added[0].id, {
-                    imageSources: map_619,
-                });
+            } finally {
+                _value4 = false;
+                renderComposeImageDraft();
             }
         }
         function ensureCommentDepth(post_9) {
@@ -3298,6 +3491,7 @@ X is a global app. Non-User authors may write in the language that naturally fit
                 });
         }
         function openTopicDetail(topicText) {
+            _value1('topic', topicText);
             currentTopicContext = topicText;
             if (topicDetailHeadline) topicDetailHeadline.textContent = topicText;
             renderTopicFeed(topicText);
@@ -3305,6 +3499,7 @@ X is a global app. Non-User authors may write in the language that naturally fit
             topicDetailView?.setAttribute('aria-hidden', 'false');
         }
         function handleAction_122() {
+            if (_value10('topic')) return;
             topicDetailView?.contains(document.activeElement) && document.activeElement.blur();
             topicDetailView?.classList.remove('active');
             topicDetailView?.setAttribute('aria-hidden', 'true');
@@ -3673,22 +3868,22 @@ Worldbook context:
         }
         function handleAction_51(topic_11, state_13 = getXState()) {
             if (!topic_11) return;
-            const topicName_3 = topic_11.name || topic_11.title || '',
-                featuredPanel = view.querySelector('.x-super-feed[data-super-panel="featured"]'),
-                postsPanel = view.querySelector('.x-super-feed[data-super-panel="posts"]'),
-                photosPanel = view.querySelector('.x-super-feed[data-super-panel="photos"]'),
-                momentsPanel = view.querySelector('.x-super-feed[data-super-panel="moments"]'),
-                posts_5 = (state_13.xGeneratedPosts || [])
-                    .filter((post_22) => {
+            const topicName_3 = topic_11.name || topic_11.title || '';
+            const featuredPanel = view.querySelector('.x-super-feed[data-super-panel="featured"]');
+            const postsPanel = view.querySelector('.x-super-feed[data-super-panel="posts"]');
+            const photosPanel = view.querySelector('.x-super-feed[data-super-panel="photos"]');
+            const momentsPanel = view.querySelector('.x-super-feed[data-super-panel="moments"]');
+            const posts_5 = (state_13.xGeneratedPosts || [])
+                .filter((post_22) => {
                         const topicId_4 = String(topic_11.id || topic_11.name);
                         if (post_22.superTopicId) return String(post_22.superTopicId) === topicId_4;
                         if (post_22.superTopicName)
                             return safeText(post_22.superTopicName) === topicName_3;
                         return post_22.topicTag === topicName_3;
                     })
-                    .map((post_23, index_10) => normalizeGeneratedPost(post_23, index_10))
-                    .filter(Boolean)
-                    .map((post_24) => ensureCommentDepth(post_24));
+                .map((post_23, index_10) => normalizeGeneratedPost(post_23, index_10))
+                .filter(Boolean)
+                .map((post_24) => ensureCommentDepth(post_24));
             handleAction_117(posts_5);
             if (featuredPanel) featuredPanel.innerHTML = '';
             if (postsPanel) postsPanel.innerHTML = '';
@@ -3698,23 +3893,14 @@ Worldbook context:
             if (topic_11.onlineStatus) {
                 const onlineStatus_729 = topic_11.onlineStatus;
                 if (onlineStatus_729.isOnline)
-                    innerHTML_2 = `
-                        <div class="x-online-status-banner online">
-                            <div class="x-online-indicator online"></div>
-                            <span class="x-online-text online">明星当前在线</span>
-                        </div>
-                    `;
+                    innerHTML_2 =
+                        '\n                        <div class="x-online-status-banner online">\n                            <div class="x-online-indicator online"></div>\n                            <span class="x-online-text online">明星当前在线</span>\n                        </div>\n                    ';
                 else
                     onlineStatus_729.lastOnline &&
                         (innerHTML_2 =
-                            `
-                        <div class="x-online-status-banner offline">
-                            <div class="x-online-indicator offline"></div>
-                            <span class="x-online-text offline">离线 · 上次在线：` +
+                            '\n                        <div class="x-online-status-banner offline">\n                            <div class="x-online-indicator offline"></div>\n                            <span class="x-online-text offline">离线 · 上次在线：' +
                             escapeHtml(onlineStatus_729.lastOnline) +
-                            `</span>
-                        </div>
-                    `);
+                            '</span>\n                        </div>\n                    ');
             }
             if (posts_5.length === 0) {
                 if (featuredPanel)
@@ -3825,36 +4011,20 @@ Worldbook context:
                 allImages.length === 0
                     ? (photosPanel.innerHTML = '<div class="x-empty-state">暂无图片</div>')
                     : ((photosPanel.innerHTML =
-                          `<div class="x-super-post-grid">
-                        ` +
+                          '<div class="x-super-post-grid">\n                        ' +
                           allImages
-                              .map(
-                                  (value_239, value_240) =>
-                                      `
-                            <div class="x-post-image-thumb ` +
-                                      (value_240 >= 12 ? 'x-hidden-page-2' : '') +
-                                      '" style="' +
-                                      (value_240 >= 12 ? 'display:none;' : '') +
-                                      '" data-image-text="' +
-                                      escapeHtml(value_239.text || 'Image') +
-                                      '" data-image-url="' +
-                                      escapeHtml(value_239.url || '') +
-                                      '" data-image-id="' +
-                                      escapeHtml(value_239.id || '') +
-                                      '" data-image-source="' +
-                                      escapeHtml(value_239.imageSource || '') +
-                                      '" data-post-id="' +
-                                      escapeHtml(value_239.postId) +
-                                      `">
-                                <img src="` +
-                                      escapeHtml(value_239.url) +
-                                      `" alt="" onerror="this.remove()">
-                            </div>
-                        `,
+                              .map((value_239, value_240) =>
+                                  _value13(
+                                      value_239,
+                                      value_239.postId,
+                                      value_240 >= 12 ? 'x-hidden-page-2' : '',
+                                  ),
                               )
                               .join('') +
-                          `
-                    </div>`),
+                          '\n                    </div>'),
+                      photosPanel.querySelectorAll('.x-hidden-page-2').forEach((_value74) => {
+                          _value74.style.display = 'none';
+                      }),
                       photosPanel.querySelectorAll('.x-post-image-thumb').forEach((value_241) => {
                           value_241.addEventListener('click', (event) => {
                               event.preventDefault();
@@ -4882,31 +5052,43 @@ Worldbook context:
         }
         function handleAction_155() {
             if (!currentDetailPostId) return;
-            const input_2 = document.getElementById('x-reply-input'),
-                text_10 = safeText(input_2?.value);
+            const input_2 = document.getElementById('x-reply-input');
+            const text_10 = safeText(input_2?.value);
             if (!text_10) {
                 if (typeof window.showToast === 'function') window.showToast('请输入回复内容');
                 return;
             }
-            const author_3 = handleAction_57(),
-                thread_8 = getPostThread(currentDetailPostId);
-            let text_909 = '',
-                userReply = null,
-                enabled_911 = false;
+            const author_3 = handleAction_57();
+            const thread_8 = getPostThread(currentDetailPostId);
+            let text_909 = '';
+            let userReply = null;
+            let enabled_911 = false;
+            let _value75 = null;
             if (replyTarget?.commentId) {
                 const target_3 = findCommentById(thread_8, replyTarget.commentId);
-                target_3 &&
-                    ((target_3.replies = Array.isArray(target_3.replies) ? target_3.replies : []),
-                    (userReply = {
+                if (target_3) {
+                    const _value76 = replyTarget.replyId
+                        ? findReplyById(target_3, replyTarget.replyId)
+                        : target_3;
+                    if (_value76)
+                        _value75 = resolveXAuthorIdentity(
+                            _value76.authorId,
+                            _value76.handle,
+                            _value76.name,
+                            _value76.avatar,
+                        );
+                    target_3.replies = Array.isArray(target_3.replies) ? target_3.replies : [];
+                    userReply = {
                         id: makeLocalId('reply'),
                         ...author_3,
                         text: text_10,
                         replyToId: replyTarget.replyId || '',
                         replyToName: replyTarget.name || target_3.name || '',
-                    }),
-                    target_3.replies.push(userReply),
-                    (text_909 = target_3.id),
-                    (enabled_911 = true));
+                    };
+                    target_3.replies.push(userReply);
+                    text_909 = target_3.id;
+                    enabled_911 = true;
+                }
             }
             !enabled_911 &&
                 ((userReply = {
@@ -4925,14 +5107,21 @@ Worldbook context:
             openPostDetail(currentDetailPostId);
             text_909 &&
                 userReply &&
-                handleAction_157(currentDetailPostId, text_909, userReply, enabled_911);
+                handleAction_157(currentDetailPostId, text_909, userReply, enabled_911, _value75);
         }
         function normalizeEngagementReply(reply_4, value_914 = 0, value_915 = {}) {
-            const text_11 = safeText(reply_4?.text || reply_4?.content),
-                name_19 = safeText(reply_4?.authorName || reply_4?.name || reply_4?.handle);
+            const text_11 = safeText(reply_4?.text || reply_4?.content);
+            const name_19 = safeText(reply_4?.authorName || reply_4?.name || reply_4?.handle);
             if (!text_11 || !name_19) return null;
+            const _value77 = resolveXAuthorIdentity(
+                reply_4.authorId,
+                reply_4.handle,
+                name_19,
+                reply_4.authorAvatar || reply_4.avatar,
+            );
             return {
                 id: String(reply_4.id || makeLocalId('auto-reply')),
+                authorId: _value77.id,
                 avatar: handleAction_55(
                     reply_4.authorAvatar || reply_4.avatar,
                     'reply:' + (reply_4.authorId || reply_4.handle || name_19),
@@ -4962,108 +5151,126 @@ Worldbook context:
                 createdAt: Date.now(),
             };
         }
-        async function handleAction_157(postId_6, value_922, userReply_2, isNestedReply = false) {
-            const post_31 = postData[postId_6] || {},
-                postThread = getPostThread(postId_6),
-                rootComment = findCommentById(postThread, value_922);
+        async function handleAction_157(
+            postId_6,
+            value_922,
+            userReply_2,
+            isNestedReply = false,
+            _value78 = null,
+        ) {
+            const post_31 = postData[postId_6] || {};
+            const postThread = getPostThread(postId_6);
+            const rootComment = findCommentById(postThread, value_922);
             if (!rootComment || !userReply_2) return;
+            const _value79 = getXState().activeXPlayerAccountId;
+            const _value80 = _value79 + ':' + postId_6 + ':' + userReply_2.id;
+            if (_value7.has(_value80) || userReply_2.engagementGeneratedAt) return;
+            _value7.add(_value80);
+            const _value81 = isNestedReply && _value78?.kind !== 'me' ? _value78 : null;
+            const _value82 = _value81 ? _value16(_value81.id, _value81) : null;
             try {
                 const worldbook_2 = getSelectedWorldBookContext(
-                        [
-                            post_31.name,
-                            post_31.text,
-                            rootComment.name,
-                            rootComment.text,
-                            userReply_2.text,
-                            currentProfile.persona,
-                        ]
-                            .filter(Boolean)
-                            .join(' '),
-                    ),
-                    content_3 =
-                        `Return strict JSON only. A user just commented in an X/Twitter-style post detail page. Generate engagement around this user's exact comment.
-Output JSON shape:
-{
-  "replies": [{"authorName":"", "handle":"", "text":"", "translation":""}],
-  "visitors": [{"name":"", "handle":"", "bio":"", "translation":"", "avatar":"", "time":"now"}]
-}
-Rules:
-- replies must contain at least 5 items.
-- visitors must contain 2 to 5 items.
-- Every generated reply and visitor must be a non-User identity. Never write another comment or reply as the current User.
-- Replies must directly respond to the user's comment, not to the whole post in general.
-- Keep replies short, social, varied, and realistic. Mix agreement, disagreement, teasing, clarification, and curiosity.
-- Each account may use the language natural to its identity. For non-Chinese reply or bio text, translation must contain Simplified Chinese; for Chinese originals use "".
-- Visitors are people who visited the user's profile because of this comment; bio should briefly explain the vibe or reason.
-- Do not include markdown or extra text.
-
-Post author: ` +
-                        (post_31.name || '') +
-                        `
-Post text: ` +
-                        (post_31.text || '') +
-                        `
-Root comment author: ` +
-                        (rootComment.name || '') +
-                        `
-Root comment text: ` +
-                        (rootComment.text || '') +
-                        `
-User display name: ` +
-                        currentProfile.name +
-                        ' ' +
-                        currentProfile.handle +
-                        `
-User comment text: ` +
-                        userReply_2.text +
-                        `
-User comment type: ` +
-                        (isNestedReply ? 'reply inside a comment thread' : 'top-level comment') +
-                        `
-
-Worldbook:
-` +
-                        (worldbook_2 || 'None'),
-                    raw_15 = await requestXChatCompletion(
-                        [
-                            {
-                                role: 'system',
-                                content:
-                                    'You generate strict JSON for social-feed replies and profile visitors.',
-                            },
-                            {
-                                role: 'user',
-                                content: content_3,
-                            },
-                        ],
+                    [
+                        post_31.name,
+                        post_31.text,
+                        rootComment.name,
+                        rootComment.text,
+                        userReply_2.text,
+                        currentProfile.persona,
+                    ]
+                        .filter(Boolean)
+                        .join(' '),
+                );
+                const content_3 =
+                    'Return strict JSON only. A user just commented in an X/Twitter-style post detail page. Generate engagement around this user\'s exact comment.\nOutput JSON shape:\n{\n  "replies": [{"authorName":"", "handle":"", "text":"", "translation":""}],\n  "visitors": [{"name":"", "handle":"", "bio":"", "translation":"", "avatar":"", "time":"now"}],\n  "privateMessage": null\n}\nRules:\n- replies must contain at least 5 items.\n- visitors must contain 2 to 5 items.\n- Every generated reply and visitor must be a non-User identity. Never write another comment or reply as the current User.\n- Replies must directly respond to the user\'s comment, not to the whole post in general.\n- Keep replies short, social, varied, and realistic. Mix agreement, disagreement, teasing, clarification, and curiosity.\n- Each account may use the language natural to its identity. For non-Chinese reply or bio text, translation must contain Simplified Chinese; for Chinese originals use "".\n- Visitors are people who visited the user\'s profile because of this comment; bio should briefly explain the vibe or reason.\n- ' +
+                    (_value81
+                        ? 'Only the actual account the User replied to may optionally initiate a private message. Set privateMessage to {"messages":[{"text":"","translation":""}]} with 1 to 3 short incoming messages only when this exact exchange gives that account a concrete, natural reason to contact User privately; otherwise return null. Do not invent or select a different sender. Never write User messages.'
+                        : 'privateMessage MUST be null. This is a top-level comment or a reply to User themself.') +
+                    '\n- Do not include markdown or extra text.\n\nPost author: ' +
+                    (post_31.name || '') +
+                    '\nPost text: ' +
+                    (post_31.text || '') +
+                    '\nRoot comment author: ' +
+                    (rootComment.name || '') +
+                    '\nRoot comment text: ' +
+                    (rootComment.text || '') +
+                    '\nUser display name: ' +
+                    currentProfile.name +
+                    ' ' +
+                    currentProfile.handle +
+                    '\nUser comment text: ' +
+                    userReply_2.text +
+                    '\nUser comment type: ' +
+                    (isNestedReply ? 'reply inside a comment thread' : 'top-level comment') +
+                    '\nActual replied-to account: ' +
+                    (_value82
+                        ? JSON.stringify({
+                              id: _value82.id,
+                              name: _value82.name,
+                              handle: _value82.handle,
+                              bio: _value82.bio,
+                              persona: _value82.persona,
+                          })
+                        : 'None') +
+                    '\nRecent public thread replies: ' +
+                    JSON.stringify(
+                        (rootComment.replies || [])
+                            .slice(-12)
+                            .map(({ name: _value86, handle: _value87, text: _value88 }) => ({
+                                name: _value86,
+                                handle: _value87,
+                                text: _value88,
+                            })),
+                    ) +
+                    '\n\nWorldbook:\n' +
+                    (worldbook_2 || 'None');
+                const _value83 = await requestXChatCompletion(
+                    [
                         {
-                            temperature: 0.9,
+                            role: 'system',
+                            content:
+                                'You generate strict JSON for social-feed replies and profile visitors.',
                         },
-                    ),
-                    parsed_4 = parseJsonPayload(raw_15),
-                    rawReplies = sanitizeApiGeneratedAuthors(
-                        Array.isArray(parsed_4?.replies) ? parsed_4.replies : [],
-                    ),
-                    rawVisitors = sanitizeApiGeneratedAuthors(
-                        Array.isArray(parsed_4?.visitors) ? parsed_4.visitors : [],
-                    ),
-                    replyTo = isNestedReply
-                        ? {
-                              id: userReply_2.id,
-                              name: userReply_2.name,
-                          }
-                        : {},
-                    generatedReplies = rawReplies
-                        .map((reply_5, index_12) =>
+                        {
+                            role: 'user',
+                            content: content_3,
+                        },
+                    ],
+                    {
+                        temperature: 0.9,
+                    },
+                );
+                if (_value79 !== getXState().activeXPlayerAccountId) return;
+                const parsed_4 = parseJsonPayload(_value83);
+                const raw_15 = getPostThread(postId_6);
+                const _value84 = findCommentById(raw_15, value_922);
+                const _value85 = isNestedReply ? findReplyById(_value84, userReply_2.id) : _value84;
+                if (!_value85 || _value85.engagementGeneratedAt) return;
+                _value85.engagementGeneratedAt = Date.now();
+                savePostThread(postId_6, raw_15);
+                const rawReplies = sanitizeApiGeneratedAuthors(
+                    Array.isArray(parsed_4?.replies) ? parsed_4.replies : [],
+                );
+                const rawVisitors = sanitizeApiGeneratedAuthors(
+                    Array.isArray(parsed_4?.visitors) ? parsed_4.visitors : [],
+                );
+                const replyTo = isNestedReply
+                    ? {
+                          id: userReply_2.id,
+                          name: userReply_2.name,
+                      }
+                    : {};
+                const generatedReplies = rawReplies
+                    .map((reply_5, index_12) =>
                             normalizeEngagementReply(reply_5, index_12, replyTo),
-                        )
-                        .filter(Boolean),
-                    visitors_2 = rawVisitors
-                        .map((value_306, value_307) => handleAction_156(value_306, value_307))
-                        .filter(Boolean);
+                    )
+                    .filter(Boolean);
+                const visitors_2 = rawVisitors
+                    .map((value_306, value_307) => handleAction_156(value_306, value_307))
+                    .filter(Boolean);
                 if (generatedReplies.length) {
-                    const latestThread = getPostThread(postId_6),
-                        latestRoot = findCommentById(latestThread, value_922);
+                    const latestThread = getPostThread(postId_6);
+                    const latestRoot = findCommentById(latestThread, value_922);
                     if (latestRoot) {
                         latestRoot.replies = Array.isArray(latestRoot.replies)
                             ? latestRoot.replies
@@ -5102,9 +5309,29 @@ Worldbook:
                             });
                     }),
                     handleAction_172());
+                if (
+                    _value81 &&
+                    parsed_4?.privateMessage &&
+                    typeof parsed_4.privateMessage === 'object'
+                ) {
+                    const _value89 = (
+                        Array.isArray(parsed_4.privateMessage.messages)
+                            ? parsed_4.privateMessage.messages
+                            : []
+                    )
+                        .filter((_value90) => safeText(_value90?.text))
+                        .slice(0, 3);
+                    if (_value89.length) {
+                        const _value91 = _value17(_value81);
+                        if (_value91) appendDmMessageBatch(_value91.id, 'char', _value89);
+                    }
+                }
+                await flushXStateNow('x-comment-engagement');
             } catch (error_7) {
                 console.error('[X] Generate user reply engagement failed', error_7);
                 if (typeof window.showToast === 'function') window.showToast('回复生成失败');
+            } finally {
+                _value7['delete'](_value80);
             }
         }
         function toggleDetailAction(value_949) {
@@ -5457,21 +5684,21 @@ Recent iMessage messages:
         }
         function normalizeDmChar(source_10 = {}, origin_3 = 'manual') {
             const name_21 = safeText(
-                    source_10.nickname || source_10.name || source_10.realName,
-                    'Char',
-                ),
-                handleSource =
-                    source_10.handle || source_10.realName || source_10.signature || name_21,
-                id_9 = String(source_10.id || makeLocalId(origin_3)),
-                handle_7 = makeHandle(name_21, handleSource),
-                avatar_7 = handleAction_55(
-                    source_10.avatarUrl || source_10.avatar,
-                    'char:' + id_9 + ':' + handleSource,
-                ),
-                profilePosts_2 = (
-                    Array.isArray(source_10.profilePosts) ? source_10.profilePosts : []
-                )
-                    .map((post_32, index_13) =>
+                source_10.nickname || source_10.name || source_10.realName,
+                'Char',
+            );
+            const handleSource =
+                source_10.handle || source_10.realName || source_10.signature || name_21;
+            const id_9 = String(source_10.id || makeLocalId(origin_3));
+            const handle_7 = makeHandle(name_21, handleSource);
+            const avatar_7 = handleAction_55(
+                source_10.avatarUrl || source_10.avatar,
+                'char:' + id_9 + ':' + handleSource,
+            );
+            const profilePosts_2 = (
+                Array.isArray(source_10.profilePosts) ? source_10.profilePosts : []
+            )
+                .map((post_32, index_13) =>
                         normalizeGeneratedPost(
                             {
                                 ...post_32,
@@ -5480,14 +5707,14 @@ Recent iMessage messages:
                             },
                             index_13,
                         ),
-                    )
-                    .filter(Boolean),
-                socialCounts = getDefaultCharSocialCounts({
-                    ...source_10,
-                    id: id_9,
-                    name: name_21,
-                    handle: handle_7,
-                });
+                )
+                .filter(Boolean);
+            const socialCounts = getDefaultCharSocialCounts({
+                ...source_10,
+                id: id_9,
+                name: name_21,
+                handle: handle_7,
+            });
             return {
                 id: id_9,
                 origin: origin_3,
@@ -5501,6 +5728,7 @@ Recent iMessage messages:
                     source_10.persona || source_10.characterPersona || source_10.systemPrompt,
                 ),
                 avatar: avatar_7,
+                avatarAssetId: safeText(source_10.avatarAssetId),
                 boundBooks: getCharacterBoundWorldBookIds(source_10),
                 messages: normalizeDmMessages(source_10.messages),
                 botSubmissions: Array.isArray(source_10.botSubmissions)
@@ -5546,6 +5774,7 @@ Recent iMessage messages:
                 ),
                 coverSeed: safeText(source_10.coverSeed, id_9 + '-cover'),
                 coverImage: safeText(source_10.coverImage),
+                coverImageAssetId: safeText(source_10.coverImageAssetId),
                 profileImagePromptConfig: normalizeCharProfileImagePromptConfig(
                     source_10.profileImagePromptConfig,
                 ),
@@ -5920,6 +6149,127 @@ Recent iMessage messages:
             );
             return item_27 ? normalizeDmChar(item_27, item_27.origin || 'manual') : null;
         }
+        function _value16(container, fallbackSelector = null) {
+            const _value92 = getDirectMessageById(container);
+            if (_value92) return _value92;
+            const _value93 = getXState();
+            const _value94 =
+                (_value93.xAccounts || []).find(
+                    (_value95) => String(_value95.id) === String(container),
+                ) ||
+                handleAction_65(_value93).find(
+                    (_value96) => String(_value96.id) === String(container),
+                ) ||
+                (String(currentProfileIdentity?.id) === String(container)
+                    ? currentProfileIdentity
+                    : null) ||
+                fallbackSelector;
+            return _value94
+                ? normalizeDmChar(
+                      {
+                          ..._value94,
+                          id: container,
+                          profilePosts: (_value93.xGeneratedPosts || []).filter(
+                              (_value97) =>
+                                  String(_value97.authorId || '') === String(container) ||
+                                  canonicalAccountHandle(_value97.handle, _value97.name) ===
+                                      canonicalAccountHandle(_value94.handle, _value94.name),
+                          ),
+                      },
+                      'generated',
+                  )
+                : null;
+        }
+        function updateDirectMessage(_value98, _value99) {
+            if (getDirectMessageById(_value98)) {
+                const _value102 = _value19(_value98, _value99);
+                if (_value102)
+                    updateXState((_value103) => {
+                        _value103.xAccounts = _value103.xAccounts.map((_value104) =>
+                            String(_value104.id) === String(_value98)
+                                ? normalizeXAccount({
+                                      ..._value104,
+                                      ..._value102,
+                                  })
+                                : _value104,
+                        );
+                    });
+                return _value102;
+            }
+            const _value100 = _value16(_value98);
+            if (!_value100) return null;
+            const _value101 =
+                _value99({
+                    ..._value100,
+                }) || _value100;
+            updateXState((_value105) => {
+                const _value106 = normalizeXAccount(_value101);
+                const _value107 = _value105.xAccounts.findIndex(
+                    (_value108) => String(_value108.id) === String(_value98),
+                );
+                if (_value107 < 0) _value105.xAccounts.unshift(_value106);
+                else _value105.xAccounts[_value107] = _value106;
+                _value105.xTopics = (_value105.xTopics || []).map((_value109) => ({
+                    ..._value109,
+                    chars: (_value109.chars || []).map((_value110) =>
+                        String(_value110.id || _value110.sourceFriendId) === String(_value98)
+                            ? {
+                                  ..._value110,
+                                  name: _value101.name,
+                                  nickname: _value101.name,
+                                  handle: _value101.handle,
+                                  avatar: _value101.avatar,
+                                  avatarUrl: _value101.avatar,
+                                  bio: _value101.bio,
+                                  persona: _value101.persona,
+                                  coverImage: _value101.coverImage,
+                              }
+                            : _value110,
+                    ),
+                }));
+            });
+            return _value101;
+        }
+        function openDmProfile(_value111, _value112 = null) {
+            const _value113 = getDirectMessageById(_value111);
+            if (_value113) return _value18(_value113.id);
+            const _value114 = _value16(_value111, _value112);
+            if (_value114)
+                renderIdentityProfile(
+                    {
+                        ..._value114,
+                        kind: 'account',
+                    },
+                    _value114,
+                );
+        }
+        function _value17(_value115) {
+            if (!_value115 || _value115.id === 'me') return null;
+            const _value116 = getXState().xDirectMessages || [];
+            const _value117 =
+                _value116.find((_value120) => String(_value120.id) === String(_value115.id)) ||
+                _value116.find(
+                    (_value121) =>
+                        canonicalAccountHandle(_value121.handle, _value121.name) ===
+                        canonicalAccountHandle(_value115.handle, _value115.name),
+                );
+            if (_value117) return getDirectMessageById(_value117.id);
+            const _value118 = _value16(_value115.id, _value115);
+            if (!_value118) return null;
+            const _value119 = normalizeDmChar(
+                {
+                    ..._value118,
+                    messages: [],
+                    addedAt: Date.now(),
+                },
+                'generated',
+            );
+            updateXState((_value122) => {
+                _value122.xDirectMessages.unshift(_value119);
+            });
+            renderDirectMessages();
+            return _value119;
+        }
         function releaseFocusBeforeHide(container, fallbackSelector = '') {
             if (!container || !container.contains(document.activeElement)) return;
             const focused = document.activeElement;
@@ -6014,28 +6364,7 @@ Recent iMessage messages:
             );
         }
         function handleAction_181(items_354) {
-            return items_354
-                .map(
-                    (value_355) =>
-                        `
-                <button class="x-post-image-thumb" type="button" data-image-text="` +
-                        escapeHtml(value_355.text || 'Image') +
-                        '" data-image-url="' +
-                        escapeHtml(value_355.url || '') +
-                        '" data-image-id="' +
-                        escapeHtml(value_355.id || '') +
-                        '" data-image-source="' +
-                        escapeHtml(value_355.imageSource || '') +
-                        '" data-post-id="' +
-                        escapeHtml(value_355.postId) +
-                        `">
-                    <img src="` +
-                        escapeHtml(value_355.url) +
-                        `" alt="" onerror="this.remove()">
-                </button>
-            `,
-                )
-                .join('');
+            return items_354.map((value_355) => _value13(value_355, value_355.postId)).join('');
         }
         function handleAction_182(value_1093) {
             const handleAction_181_1094 = handleAction_181(
@@ -6050,116 +6379,143 @@ Recent iMessage messages:
         function renderIdentityProfile(identity_10, charItem_2 = null) {
             const body_2 = document.getElementById('x-dm-profile-body');
             if (!identity_10 || !body_2 || !dmProfileView) return;
-            const isChar = identity_10.kind === 'char' && !!charItem_2,
-                isTopicChar = identity_10.kind === 'topic-char',
-                posts_9 = handleAction_178(identity_10),
-                value_1100 =
-                    (identity_10.id || '') + ':' + (identity_10.handle || identity_10.name || ''),
-                fallbackSocialCounts = getDefaultCharSocialCounts({
-                    id: identity_10.id,
-                    handle: identity_10.handle,
-                    name: identity_10.name,
-                }),
-                followersCount_2 = isChar
-                    ? normalizeProfileCount(
-                          charItem_2.followersCount,
-                          fallbackSocialCounts.followersCount,
-                      )
-                    : 1200 + (hashPostMetricSeed('followers:' + value_1100) % 198800),
-                followingCount_2 = isChar
-                    ? normalizeProfileCount(
-                          charItem_2.followingCount,
-                          fallbackSocialCounts.followingCount,
-                      )
-                    : 80 + (hashPostMetricSeed('following:' + value_1100) % 1920),
-                coverSeed_2 = safeText(
-                    charItem_2?.coverSeed || identity_10.coverSeed,
-                    identity_10.id + '-cover',
-                ),
-                coverUrl =
-                    safeText(charItem_2?.coverImage || identity_10.coverImage) ||
-                    getStableExternalImage(coverSeed_2, 1200, 480),
-                fallbackCover = safeText(currentProfile.banner),
-                value_1107 = fallbackCover ? ",url('" + escapeHtml(fallbackCover) + "')" : '',
-                following_2 = isChar
-                    ? charItem_2.isFollowing !== false
-                    : identity_10.isFollowing !== false;
+            const _value123 = _value5.at(-1);
+            const _value124 =
+                !_value6 &&
+                _value123?.type === 'profile' &&
+                _value123.id === String(identity_10.id);
+            if (_value124) _value0(_value123);
+            const _value125 = _value124
+                ? {
+                      ..._value123,
+                  }
+                : null;
+            _value1('profile', identity_10.id, identity_10);
+            charItem_2 = _value16(identity_10.id, charItem_2 || identity_10);
+            identity_10 = {
+                ...identity_10,
+                ...charItem_2,
+                kind: getDirectMessageById(identity_10.id) ? 'char' : identity_10.kind,
+            };
+            const isChar = identity_10.kind === 'char';
+            const isTopicChar = identity_10.kind === 'topic-char';
+            const posts_9 = handleAction_178(identity_10);
+            const value_1100 =
+                (identity_10.id || '') + ':' + (identity_10.handle || identity_10.name || '');
+            const fallbackSocialCounts = getDefaultCharSocialCounts({
+                id: identity_10.id,
+                handle: identity_10.handle,
+                name: identity_10.name,
+            });
+            const followersCount_2 = charItem_2
+                ? normalizeProfileCount(
+                      charItem_2.followersCount,
+                      fallbackSocialCounts.followersCount,
+                  )
+                : 1200 + (hashPostMetricSeed('followers:' + value_1100) % 198800);
+            const followingCount_2 = charItem_2
+                ? normalizeProfileCount(
+                      charItem_2.followingCount,
+                      fallbackSocialCounts.followingCount,
+                  )
+                : 80 + (hashPostMetricSeed('following:' + value_1100) % 1920);
+            const coverSeed_2 = safeText(
+                charItem_2?.coverSeed || identity_10.coverSeed,
+                identity_10.id + '-cover',
+            );
+            const coverUrl =
+                safeText(charItem_2?.coverImage || identity_10.coverImage) ||
+                getStableExternalImage(coverSeed_2, 1200, 480);
+            const fallbackCover = safeText(currentProfile.banner);
+            const value_1107 = fallbackCover ? ",url('" + escapeHtml(fallbackCover) + "')" : '';
+            const following_2 = isChar
+                ? charItem_2.isFollowing !== false
+                : identity_10.isFollowing !== false;
             currentProfileIdentity = {
                 ...identity_10,
                 kind: isChar ? 'char' : isTopicChar ? 'topic-char' : 'account',
             };
-            const actionsHtml_2 = isTopicChar
-                    ? ''
-                    : `
-                <button class="x-profile-follow-btn ` +
-                      (following_2 ? 'active' : '') +
-                      '" type="button" data-profile-follow-id="' +
-                      escapeHtml(identity_10.id) +
-                      '">' +
-                      (following_2 ? '已关注' : '关注') +
-                      `</button>
-                ` +
-                      (isChar
-                          ? '<button class="x-profile-edit" type="button" data-profile-edit-id="' +
-                            escapeHtml(identity_10.id) +
-                            '">Edit</button>'
-                          : '') +
-                      `
-            `,
-                profileContentHtml = buildUnifiedProfileContentHtml({
-                    identity: identity_10,
-                    posts: posts_9,
-                    actionsHtml: actionsHtml_2,
-                    stats: [
-                        {
-                            value: posts_9.length,
-                            label: 'Posts',
-                        },
-                        {
-                            value: formatCompactCount(followersCount_2),
-                            label: 'Followers',
-                        },
-                        {
-                            value: formatCompactCount(followingCount_2),
-                            label: 'Following',
-                        },
-                    ],
-                });
+            const actionsHtml_2 =
+                '\n                <button class="x-profile-follow-btn ' +
+                (following_2 ? 'active' : '') +
+                '" type="button" data-profile-follow-id="' +
+                escapeHtml(identity_10.id) +
+                '">' +
+                (following_2 ? '已关注' : '关注') +
+                '</button>\n                <button class="x-profile-edit" type="button" data-profile-edit-id="' +
+                escapeHtml(identity_10.id) +
+                '">Edit</button>\n            ';
+            const profileContentHtml = buildUnifiedProfileContentHtml({
+                identity: identity_10,
+                posts: posts_9,
+                actionsHtml: actionsHtml_2,
+                stats: [
+                    {
+                        value: posts_9.length,
+                        label: 'Posts',
+                    },
+                    {
+                        value: formatCompactCount(followersCount_2),
+                        label: 'Followers',
+                    },
+                    {
+                        value: formatCompactCount(followingCount_2),
+                        label: 'Following',
+                    },
+                ],
+            });
             body_2.innerHTML =
-                `
-                <div class="x-dm-profile-page-scroll">
-                    <div class="x-profile-cover x-dm-profile-cover" style="background-image:linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.35))` +
+                '\n                <div class="x-dm-profile-page-scroll">\n                    <div class="x-profile-cover x-dm-profile-cover" style="background-image:linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.35))' +
                 value_1107 +
-                `">
-                        <img class="x-dm-profile-cover-image" src="` +
+                '">\n                        <img class="x-dm-profile-cover-image" src="' +
                 escapeHtml(coverUrl) +
-                `" alt="" onerror="this.remove()">
-                        <div class="x-profile-cover-actions">
-                            <button class="x-header-button" id="x-dm-profile-back" type="button" aria-label="返回"><i class="fas fa-chevron-left"></i></button>
-                            ` +
+                '" alt="" onerror="this.remove()">\n                        <div class="x-profile-cover-actions">\n                            <button class="x-header-button" id="x-dm-profile-back" type="button" aria-label="返回"><i class="fas fa-chevron-left"></i></button>\n                            <div class="x-profile-cover-right-actions">\n                                <button class="x-header-button" type="button" data-profile-message-id="' +
+                escapeHtml(identity_10.id) +
+                '" aria-label="私信 ' +
+                escapeHtml(identity_10.name) +
+                '" title="私信 ' +
+                escapeHtml(identity_10.name) +
+                '"><i class="far fa-envelope" aria-hidden="true"></i></button>\n                                ' +
                 (isChar && charItem_2?.kind === 'bot'
                     ? '<button class="x-header-button x-bot-inbox-trigger" id="x-bot-inbox-btn" type="button" data-bot-id="' +
                       escapeHtml(charItem_2.id) +
                       '" aria-label="打开投稿箱" title="投稿箱"><i class="fas fa-inbox"></i></button>'
-                    : isChar
-                      ? '<button class="x-header-button" id="x-char-profile-generate-btn" type="button" aria-label="生成 Char 主页内容"><i class="fas fa-search"></i></button>'
-                      : '<span></span>') +
-                `
-                        </div>
-                    </div>
-                    <div class="x-profile-scroll x-dm-profile-scroll">
-                        ` +
+                    : '<button class="x-header-button" id="x-char-profile-generate-btn" type="button" aria-label="生成主页帖子"><i class="fas fa-search"></i></button>') +
+                '\n                            </div>\n                        </div>\n                    </div>\n                    <div class="x-profile-scroll x-dm-profile-scroll">\n                        ' +
                 profileContentHtml +
-                `
-                    </div>
-                </div>
-            `;
+                '\n                    </div>\n                </div>\n            ';
             handleAction_98(body_2.querySelector('.x-dm-profile-page-scroll'), posts_9);
             body_2.querySelectorAll('.x-profile-feed-card').forEach(bindPostCard);
             dmProfileView.classList.add('active');
             dmProfileView.setAttribute('aria-hidden', 'false');
+            if (_value125)
+                handleAction_50(() => {
+                    if (
+                        _value5.at(-1)?.id !== String(identity_10.id) ||
+                        _value5.at(-1)?.type !== 'profile'
+                    )
+                        return;
+                    const _value126 = body_2.querySelector('.x-dm-profile-page-scroll');
+                    const _value127 = _value125.tab || 'posts';
+                    switchButtonTabs(
+                        Array.from(body_2.querySelectorAll('[data-x-profile-tab]')),
+                        Array.from(body_2.querySelectorAll('[data-x-profile-panel]')),
+                        'data-x-profile-tab',
+                        'data-x-profile-panel',
+                        _value127,
+                    );
+                    const _value128 = _value127 === 'photos' ? 'photosRendered' : 'rendered';
+                    const _value129 =
+                        _value127 === 'photos' ? _value125.photoLimit : _value125.profileLimit;
+                    while ((value_41.get(_value126)?.[_value128] || 0) < _value129) {
+                        const _value130 = value_41.get(_value126)?.[_value128];
+                        handleAction_99(_value126);
+                        if (_value130 === value_41.get(_value126)?.[_value128]) break;
+                    }
+                    if (_value126) _value126.scrollTop = _value125.scrollTop || 0;
+                });
         }
-        function openDmProfile(dmId_3 = currentDmId) {
+        function _value18(dmId_3 = currentDmId) {
             const item_30 = dmId_3 ? getDirectMessageById(dmId_3) : null;
             if (!item_30) return;
             renderIdentityProfile(
@@ -6268,7 +6624,7 @@ Recent iMessage messages:
                 return;
             }
             if (identity_11.kind === 'char') {
-                openDmProfile(identity_11.id);
+                _value18(identity_11.id);
                 return;
             }
             if (identity_11.kind === 'topic-char') {
@@ -6286,18 +6642,27 @@ Recent iMessage messages:
         }
         function closeDmProfile() {
             if (postDetailView_2?.classList.contains('active')) closePostDetail_2();
+            if (_value10('profile')) return;
             releaseFocusBeforeHide(dmProfileView);
             currentProfileIdentity = null;
             dmProfileView?.classList.remove('active');
             dmProfileView?.setAttribute('aria-hidden', 'true');
         }
         function toggleProfileFollow(value_1120) {
+            if (!getDirectMessageById(value_1120)) {
+                const _value131 = updateDirectMessage(value_1120, (_value132) => ({
+                    ..._value132,
+                    isFollowing: _value132.isFollowing === false,
+                }));
+                if (_value131) openDmProfile(value_1120);
+                return;
+            }
             const directMessageById_1121 = getDirectMessageById(value_1120);
             if (directMessageById_1121) {
-                const handleAction_202_1123 = updateDirectMessage(value_1120, (draft_13) => {
+                const handleAction_202_1123 = _value19(value_1120, (draft_13) => {
                     return ((draft_13.isFollowing = draft_13.isFollowing === false), draft_13);
                 });
-                if (handleAction_202_1123) openDmProfile(value_1120);
+                if (handleAction_202_1123) _value18(value_1120);
                 return;
             }
             let updatedAccount = null;
@@ -6320,18 +6685,18 @@ Recent iMessage messages:
                 });
         }
         function openCharEditSheet(value_385) {
-            const item_32 = getDirectMessageById(value_385);
+            const item_32 = _value16(value_385);
             if (!item_32 || !charEditSheet) return;
             currentEditingCharId = String(item_32.id);
             charEditAvatarDraft = item_32.avatar || '';
             coverSeed_3 = item_32.coverSeed || item_32.id + '-cover';
             charEditCoverImageDraft = item_32.coverImage || '';
-            const xCharEditNameElement = document.getElementById('x-char-edit-name'),
-                handleInput_3 = document.getElementById('x-char-edit-handle'),
-                xCharEditBioElement = document.getElementById('x-char-edit-bio'),
-                personaInput_3 = document.getElementById('x-char-edit-persona'),
-                followingInput = document.getElementById('x-char-edit-following'),
-                followersInput = document.getElementById('x-char-edit-followers');
+            const xCharEditNameElement = document.getElementById('x-char-edit-name');
+            const handleInput_3 = document.getElementById('x-char-edit-handle');
+            const xCharEditBioElement = document.getElementById('x-char-edit-bio');
+            const personaInput_3 = document.getElementById('x-char-edit-persona');
+            const followingInput = document.getElementById('x-char-edit-following');
+            const followersInput = document.getElementById('x-char-edit-followers');
             if (xCharEditNameElement) xCharEditNameElement.value = item_32.name;
             if (handleInput_3) handleInput_3.value = item_32.handle;
             if (xCharEditBioElement) xCharEditBioElement.value = item_32.bio;
@@ -6365,14 +6730,14 @@ Recent iMessage messages:
         }
         function handleAction_185() {
             if (!currentEditingCharId) return;
-            const previous_5 = getDirectMessageById(currentEditingCharId),
-                name_25 = safeText(document.getElementById('x-char-edit-name')?.value, 'Char'),
-                followingRaw_2 = String(
-                    document.getElementById('x-char-edit-following')?.value ?? '',
-                ).trim(),
-                followersRaw_2 = String(
-                    document.getElementById('x-char-edit-followers')?.value ?? '',
-                ).trim();
+            const previous_5 = _value16(currentEditingCharId);
+            const name_25 = safeText(document.getElementById('x-char-edit-name')?.value, 'Char');
+            const followingRaw_2 = String(
+                document.getElementById('x-char-edit-following')?.value ?? '',
+            ).trim();
+            const followersRaw_2 = String(
+                document.getElementById('x-char-edit-followers')?.value ?? '',
+            ).trim();
             if (
                 (followingRaw_2 &&
                     (!/^\d+$/.test(followingRaw_2) ||
@@ -6412,8 +6777,8 @@ Recent iMessage messages:
                         )),
                         draft_14
                     );
-                }),
-                value_1134 = currentEditingCharId;
+                });
+            const value_1134 = currentEditingCharId;
             if (updated) syncCharPostIdentity(updated, previous_5);
             closeCharEditSheet();
             renderDirectMessages();
@@ -6522,7 +6887,7 @@ Recent iMessage messages:
             return '';
         }
         async function openCharProfileGenerateSheet(value_388) {
-            const item_34 = getDirectMessageById(value_388);
+            const item_34 = _value16(value_388);
             if (
                 !item_34 ||
                 item_34.kind === 'bot' ||
@@ -6531,29 +6896,37 @@ Recent iMessage messages:
             )
                 return;
             currentGeneratingCharId = String(item_34.id);
-            const config_7 = normalizeCharProfileImagePromptConfig(
+            const config_7 = getXState().activeXPlayerAccountId;
+            const _value133 = document.getElementById('x-char-profile-generate-direction');
+            if (_value133) _value133.value = '';
+            const _value134 = normalizeCharProfileImagePromptConfig(
                 item_34.profileImagePromptConfig,
             );
-            charProfilePresetDrafts = config_7.presets.map((preset_4) => ({
+            charProfilePresetDrafts = _value134.presets.map((preset_4) => ({
                 ...preset_4,
             }));
-            const countInput = document.getElementById('x-char-profile-generate-count'),
-                imageToggle = document.getElementById('x-char-profile-image-toggle'),
-                referenceToggle = document.getElementById('x-char-profile-reference-toggle'),
-                xCharProfilePresetNameElement = document.getElementById(
-                    'x-char-profile-preset-name',
-                );
+            const countInput = document.getElementById('x-char-profile-generate-count');
+            const imageToggle = document.getElementById('x-char-profile-image-toggle');
+            const referenceToggle = document.getElementById('x-char-profile-reference-toggle');
+            const xCharProfilePresetNameElement = document.getElementById(
+                'x-char-profile-preset-name',
+            );
             if (countInput) countInput.value = '3';
             if (imageToggle) imageToggle.checked = false;
             if (xCharProfilePresetNameElement) xCharProfilePresetNameElement.value = '';
-            setCharProfilePromptFieldValues(config_7);
-            renderCharProfilePresetOptions(config_7.activePresetId);
+            setCharProfilePromptFieldValues(_value134);
+            renderCharProfilePresetOptions(_value134.activePresetId);
             charProfileReferenceDraft = await resolveCharProfileReferenceUrl(item_34);
+            if (
+                config_7 !== getXState().activeXPlayerAccountId ||
+                currentGeneratingCharId !== String(item_34.id)
+            )
+                return;
             charProfileReferenceFileNameDraft = item_34.profileImageFaceReferenceFileName || '';
             charProfileReferenceChanged = false;
             if (referenceToggle)
                 referenceToggle.checked =
-                    !!charProfileReferenceDraft && config_7.autoUseReferenceFace;
+                    !!charProfileReferenceDraft && _value134.autoUseReferenceFace;
             renderCharProfileReferenceDraft();
             handleAction_189();
             if (typeof window.openView === 'function') window.openView(charProfileGenerateSheet);
@@ -6712,101 +7085,101 @@ Recent iMessage messages:
             value_392,
             value_394 = [],
             value_397 = false,
+            _value135 = '',
         ) {
             const join_398 = normalizeDmMessages(item_38.messages)
-                    .slice(-12)
-                    .map(serializeDmMessageForAi).join(`
-`),
-                handleAction_61_1178 = getSelectedWorldBookContext(
-                    item_38.name +
-                        ' ' +
-                        item_38.bio +
-                        ' ' +
-                        item_38.persona +
-                        ' ' +
-                        currentProfile.persona,
-                    getCharacterBoundWorldBookIds(item_38),
-                ),
-                content_4 =
-                    `Return strict JSON only: {"posts":[{"authorName":"","handle":"","text":"","translation":"","likes":0,"reposts":0,"commentsCount":10,"imageCandidate":false,"imagePrompt":"","comments":[{"authorName":"","handle":"","text":"","translation":"","replies":[{"authorName":"","handle":"","text":"","translation":""}]}]}]}.
-Generate exactly ` +
-                    value_392 +
-                    ` new text-first X profile posts written by this Char. Every post MUST contain at least 10 distinct top-level comment objects in comments. Replies do not count toward the 10-comment minimum. Posts must feel like the Char's own public life and remain consistent with their persona, recent private conversation, User relationship and worldbook.
-` +
-                    (value_397
-                        ? 'Mark exactly one visually suitable post with imageCandidate:true and provide a detailed Simplified Chinese imagePrompt that directly matches that post. All other posts use imageCandidate:false and imagePrompt:"".'
-                        : 'Every post must use imageCandidate:false and imagePrompt:"". Do not create any image entry.') +
-                    `
-Only the named Char may author the posts. All generated commenters and repliers must be non-User accounts; never write a comment or reply as the current User.
-The Char and commenters may use any language natural to their identity and context. Every post, comment and reply must include translation: Simplified Chinese for non-Chinese originals, or "" for Chinese originals. Never return an image URL or external image.
-Char: ` +
-                    JSON.stringify({
-                        id: item_38.id,
-                        name: item_38.name,
-                        handle: item_38.handle,
-                        bio: item_38.bio,
-                        persona: item_38.persona,
-                    }) +
-                    `
-User: ` +
-                    JSON.stringify({
-                        name: currentProfile.name,
-                        handle: currentProfile.handle,
-                        bio: currentProfile.bio,
-                        persona: currentProfile.persona,
-                    }) +
-                    `
-Recent private chat: ` +
-                    (join_398 || 'None') +
-                    `
-Do not repeat these post texts: ` +
-                    (value_394.length ? value_394.join(' | ') : 'None') +
-                    `
-Worldbook:
-` +
-                    (handleAction_61_1178 || 'None'),
-                raw_16 = await requestXChatCompletion(
-                    [
-                        {
-                            role: 'system',
-                            content:
-                                'Generate strict JSON for a fictional X character profile. Output JSON only.',
-                        },
-                        {
-                            role: 'user',
-                            content: content_4,
-                        },
-                    ],
+                .slice(-12)
+                .map(serializeDmMessageForAi)
+                .join('\n');
+            const handleAction_61_1178 = getSelectedWorldBookContext(
+                item_38.name +
+                    ' ' +
+                    item_38.bio +
+                    ' ' +
+                    item_38.persona +
+                    ' ' +
+                    currentProfile.persona +
+                    ' ' +
+                    _value135,
+                getCharacterBoundWorldBookIds(item_38),
+            );
+            const content_4 =
+                'Return strict JSON only: {"posts":[{"authorName":"","handle":"","text":"","translation":"","likes":0,"reposts":0,"commentsCount":10,"imageCandidate":false,"imagePrompt":"","comments":[{"authorName":"","handle":"","text":"","translation":"","replies":[{"authorName":"","handle":"","text":"","translation":""}]}]}]}.\nGenerate exactly ' +
+                value_392 +
+                " new text-first X profile posts written by this Char. Every post MUST contain at least 10 distinct top-level comment objects in comments. Replies do not count toward the 10-comment minimum. Posts must feel like the Char's own public life and remain consistent with their persona, recent private conversation, User relationship and worldbook.\n" +
+                (value_397
+                    ? 'Mark exactly one visually suitable post with imageCandidate:true and provide a detailed Simplified Chinese imagePrompt that directly matches that post. All other posts use imageCandidate:false and imagePrompt:"".'
+                    : 'Every post must use imageCandidate:false and imagePrompt:"". Do not create any image entry.') +
+                '\nOnly the named Char may author the posts. All generated commenters and repliers must be non-User accounts; never write a comment or reply as the current User.\nThe Char and commenters may use any language natural to their identity and context. Every post, comment and reply must include translation: Simplified Chinese for non-Chinese originals, or "" for Chinese originals. Never return an image URL or external image.\nChar: ' +
+                JSON.stringify({
+                    id: item_38.id,
+                    name: item_38.name,
+                    handle: item_38.handle,
+                    bio: item_38.bio,
+                    persona: item_38.persona,
+                }) +
+                '\nUser: ' +
+                JSON.stringify({
+                    name: currentProfile.name,
+                    handle: currentProfile.handle,
+                    bio: currentProfile.bio,
+                    persona: currentProfile.persona,
+                }) +
+                '\nRecent private chat: ' +
+                (join_398 || 'None') +
+                '\nUser-requested direction for these posts (follow it when supplied, while keeping the character consistent): ' +
+                (_value135 || 'None; use the character and context naturally.') +
+                '\nDo not repeat these post texts: ' +
+                (value_394.length ? value_394.join(' | ') : 'None') +
+                '\nWorldbook:\n' +
+                (handleAction_61_1178 || 'None');
+            const raw_16 = await requestXChatCompletion(
+                [
                     {
-                        temperature: 0.9,
+                        role: 'system',
+                        content:
+                            'Generate strict JSON for a fictional X character profile. Output JSON only.',
                     },
-                ),
-                parsed_6 = parseJsonPayload(raw_16),
-                posts_10 = sanitizeApiGeneratedPosts(
-                    Array.isArray(parsed_6)
-                        ? parsed_6
-                        : Array.isArray(parsed_6?.posts)
-                          ? parsed_6.posts
-                          : [],
                     {
-                        forceOuterAuthor: true,
+                        role: 'user',
+                        content: content_4,
                     },
-                );
+                ],
+                {
+                    temperature: 0.9,
+                },
+            );
+            const parsed_6 = parseJsonPayload(raw_16);
+            const posts_10 = sanitizeApiGeneratedPosts(
+                Array.isArray(parsed_6)
+                    ? parsed_6
+                    : Array.isArray(parsed_6?.posts)
+                      ? parsed_6.posts
+                      : [],
+                {
+                    forceOuterAuthor: true,
+                },
+            );
             return normalizeCharProfilePosts(posts_10, item_38);
         }
-        async function handleAction_197(item_39, profileImagePromptConfig_2) {
+        async function handleAction_197(
+            item_39,
+            profileImagePromptConfig_2,
+            _value136 = getXState().activeXPlayerAccountId,
+        ) {
+            if (_value136 !== getXState().activeXPlayerAccountId) throw new Error('X 账号已切换');
             const previousAssetId = safeText(item_39.profileImageFaceReferenceAssetId);
-            let profileImageFaceReferenceAssetId_2 = previousAssetId,
-                profileImageFaceReferenceUrl_2 = item_39.profileImageFaceReferenceUrl || '';
+            let profileImageFaceReferenceAssetId_2 = previousAssetId;
+            let profileImageFaceReferenceUrl_2 = item_39.profileImageFaceReferenceUrl || '';
             if (charProfileReferenceChanged) {
                 if (charProfileReferenceDraft) {
                     if (!window.appStorage?.saveAssetFromDataUrl)
                         throw new Error('图片存储服务不可用');
                     const accountId_5 = safeText(
-                            getXState().activeXPlayerAccountId,
-                            'legacy',
-                        ).replace(/[^a-z0-9_-]+/gi, '-'),
-                        charId_3 = String(item_39.id).replace(/[^a-z0-9_-]+/gi, '-');
+                        getXState().activeXPlayerAccountId,
+                        'legacy',
+                    ).replace(/[^a-z0-9_-]+/gi, '-');
+                    const charId_3 = String(item_39.id).replace(/[^a-z0-9_-]+/gi, '-');
                     profileImageFaceReferenceAssetId_2 =
                         'x_account_' + accountId_5 + '_char_' + charId_3 + '_profile_face';
                     await window.appStorage.saveAssetFromDataUrl(
@@ -6825,6 +7198,7 @@ Worldbook:
                     profileImageFaceReferenceUrl_2 = '';
                 }
             }
+            if (_value136 !== getXState().activeXPlayerAccountId) throw new Error('X 账号已切换');
             const updated_2 = updateDirectMessage(item_39.id, (draft_15) => {
                 return (
                     (draft_15.profileImagePromptConfig = profileImagePromptConfig_2),
@@ -6838,64 +7212,60 @@ Worldbook:
                 );
             });
             if (!updated_2) throw new Error('Char 生图配置保存失败');
-            return (
-                previousAssetId &&
-                    previousAssetId !== profileImageFaceReferenceAssetId_2 &&
-                    (await window.appStorage
-                        ?.deleteAsset?.(previousAssetId)
-                        ['catch'](() => undefined)),
-                updated_2
-            );
+            previousAssetId &&
+                previousAssetId !== profileImageFaceReferenceAssetId_2 &&
+                (await window.appStorage?.deleteAsset?.(previousAssetId)['catch'](() => undefined));
+            return updated_2;
         }
         async function handleAction_83() {
             if (charProfileGenerationInFlight || !currentGeneratingCharId) return;
-            const item_40 = getDirectMessageById(currentGeneratingCharId),
-                xCharProfileGenerateRunBtnElement = document.getElementById(
-                    'x-char-profile-generate-run-btn',
-                ),
-                countInput_2 = document.getElementById('x-char-profile-generate-count');
-            if (!item_40 || item_40.kind === 'bot' || !xCharProfileGenerateRunBtnElement) return;
+            const item_40 = _value16(currentGeneratingCharId);
+            const xCharProfileGenerateRunBtnElement = getXState().activeXPlayerAccountId;
+            const _value137 = safeText(
+                document.getElementById('x-char-profile-generate-direction')?.value,
+            );
+            const _value138 = document.getElementById('x-char-profile-generate-run-btn');
+            const countInput_2 = document.getElementById('x-char-profile-generate-count');
+            if (!item_40 || item_40.kind === 'bot' || !_value138) return;
             const requestedCount = Math.min(
                 10,
                 Math.max(1, Number.parseInt(countInput_2?.value, 10) || 3),
             );
             if (countInput_2) countInput_2.value = String(requestedCount);
             const imageEnabled =
-                    document.getElementById('x-char-profile-image-toggle')?.checked === true,
-                activePresetId_4 = String(
-                    document.getElementById('x-char-profile-image-preset')?.value || '',
-                ),
-                promptFields = getCharProfilePromptFieldValues(),
-                promptConfig = normalizeCharProfileImagePromptConfig({
-                    ...promptFields,
-                    presets: charProfilePresetDrafts,
-                    activePresetId: activePresetId_4,
-                    autoUseReferenceFace:
-                        imageEnabled &&
-                        document.getElementById('x-char-profile-reference-toggle')?.checked ===
-                            true,
-                });
+                document.getElementById('x-char-profile-image-toggle')?.checked === true;
+            const activePresetId_4 = String(
+                document.getElementById('x-char-profile-image-preset')?.value || '',
+            );
+            const promptFields = getCharProfilePromptFieldValues();
+            const promptConfig = normalizeCharProfileImagePromptConfig({
+                ...promptFields,
+                presets: charProfilePresetDrafts,
+                activePresetId: activePresetId_4,
+                autoUseReferenceFace:
+                    imageEnabled &&
+                    document.getElementById('x-char-profile-reference-toggle')?.checked === true,
+            });
             charProfileGenerationInFlight = true;
-            xCharProfileGenerateRunBtnElement.disabled = true;
-            xCharProfileGenerateRunBtnElement.innerHTML =
-                '<i class="fas fa-spinner fa-spin"></i> 生成中';
+            _value138.disabled = true;
+            _value138.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中';
             let completed = false;
             try {
-                const collected = [],
-                    existingTexts = (item_40.profilePosts || [])
-                        .map((post_37) => safeText(post_37.text))
-                        .filter(Boolean),
-                    value_1201 = new Set(
-                        existingTexts.map((text_14) => text_14.toLocaleLowerCase()),
-                    ),
-                    addPosts = (items_1209) =>
+                const collected = [];
+                const existingTexts = (item_40.profilePosts || [])
+                    .map((post_37) => safeText(post_37.text))
+                    .filter(Boolean);
+                const value_1201 = new Set(
+                    existingTexts.map((text_14) => text_14.toLocaleLowerCase()),
+                );
+                const addPosts = (items_1209) =>
                         items_1209.forEach((post_38) => {
                             const toLocaleLowerCase_1211 = post_38.text.toLocaleLowerCase();
                             collected.length < requestedCount &&
                                 !value_1201.has(toLocaleLowerCase_1211) &&
                                 (value_1201.add(toLocaleLowerCase_1211), collected.push(post_38));
-                        }),
-                    maxAttempts = Math.ceil(requestedCount / 3) + 3;
+                        });
+                const maxAttempts = Math.ceil(requestedCount / 3) + 3;
                 let attempt = 0;
                 while (collected.length < requestedCount && attempt < maxAttempts) {
                     const batchCount = Math.min(3, requestedCount - collected.length);
@@ -6905,8 +7275,11 @@ Worldbook:
                             batchCount,
                             [...existingTexts, ...collected.map((post_39) => post_39.text)],
                             imageEnabled && attempt === 0,
+                            _value137,
                         ),
                     );
+                    if (xCharProfileGenerateRunBtnElement !== getXState().activeXPlayerAccountId)
+                        return;
                     attempt += 1;
                 }
                 if (
@@ -6914,14 +7287,15 @@ Worldbook:
                     collected.some((post_40) => post_40.commentList.length < 10)
                 )
                     throw new Error('Insufficient Char profile content');
-                let generatedImage = null,
-                    value_1206 = null;
+                let generatedImage = null;
+                let value_1206 = null;
                 if (imageEnabled) {
                     const targetPost =
-                            collected.find((post_41) => post_41.imageCandidate) || collected[0],
-                        safeText_429 = safeText(targetPost.imageCandidatePrompt, targetPost.text),
-                        finalPrompt = [safeText_429, promptConfig.lastPrompt].filter(Boolean).join(`
-`);
+                        collected.find((post_41) => post_41.imageCandidate) || collected[0];
+                    const safeText_429 = safeText(targetPost.imageCandidatePrompt, targetPost.text);
+                    const finalPrompt = [safeText_429, promptConfig.lastPrompt]
+                        .filter(Boolean)
+                        .join('\n');
                     try {
                         if (!window.u2ImageGeneration?.generate)
                             throw new Error('生图功能尚未加载，请刷新后重试');
@@ -6955,7 +7329,20 @@ Worldbook:
                     delete post_42.imageCandidate;
                     delete post_42.imageCandidatePrompt;
                 });
-                const latestItem = await handleAction_197(item_40, promptConfig);
+                if (xCharProfileGenerateRunBtnElement !== getXState().activeXPlayerAccountId)
+                    return;
+                const latestItem = await handleAction_197(
+                    item_40,
+                    promptConfig,
+                    xCharProfileGenerateRunBtnElement,
+                );
+                if (xCharProfileGenerateRunBtnElement !== getXState().activeXPlayerAccountId)
+                    return;
+                if (!getDirectMessageById(item_40.id))
+                    updateDirectMessage(item_40.id, (_value139) => ({
+                        ..._value139,
+                        profileGeneratedAt: Date.now(),
+                    }));
                 updateXState((draft_16) => {
                     draft_16.xGeneratedPosts = prependUniquePosts(
                         draft_16.xGeneratedPosts || [],
@@ -7061,13 +7448,14 @@ Worldbook:
             const item_42 = currentDmId ? getDirectMessageById(currentDmId) : null;
             if (!item_42 || !getLinkedImessageCharForDm(item_42)) return null;
             const imessageContextMount_2 = normalizeImessageContextMount({
-                    ...item_42.imessageContextMount,
-                    ...patch,
-                }),
-                handleAction_202_1233 = updateDirectMessage(item_42.id, (draft_17) => {
+                ...item_42.imessageContextMount,
+                ...patch,
+            });
+            const handleAction_202_1233 = _value19(item_42.id, (draft_17) => {
                     return ((draft_17.imessageContextMount = imessageContextMount_2), draft_17);
                 });
-            return (renderDmSettingsImessageContext(), handleAction_202_1233);
+            renderDmSettingsImessageContext();
+            return handleAction_202_1233;
         }
         function handleAction_200() {
             const value_1235 = currentDmId ? getDirectMessageById(currentDmId) : null;
@@ -7078,7 +7466,7 @@ Worldbook:
                 confirmText: '清空',
                 isDestructive: true,
                 onConfirm: () => {
-                    updateDirectMessage(value_1235.id, (value_1236) => {
+                    _value19(value_1235.id, (value_1236) => {
                         return ((value_1236.messages = []), value_1236);
                     });
                     closeDmSettingsSheet();
@@ -7110,10 +7498,9 @@ Worldbook:
                 },
             });
         }
-        function updateDirectMessage(value_1240, updater) {
+        function _value19(value_1240, updater) {
             let value_1242 = null;
-            return (
-                updateXState((value_1243) => {
+            updateXState((value_1243) => {
                     value_1243.xDirectMessages = (value_1243.xDirectMessages || []).map(
                         (value_1244) => {
                             if (String(value_1244.id) !== String(value_1240)) return value_1244;
@@ -7129,20 +7516,19 @@ Worldbook:
                             return ((value_1242 = next), next);
                         },
                     );
-                }),
-                value_1242
-            );
+                });
+            return value_1242;
         }
         function syncCharPostIdentity(char_17, value_1248 = {}) {
             if (!char_17) return;
-            const charId_4 = String(char_17.id || ''),
-                currentHandle = canonicalAccountHandle(char_17.handle, char_17.name),
-                previousHandle = canonicalAccountHandle(value_1248?.handle, value_1248?.name),
-                avatar_6 = handleAction_55(
-                    char_17.avatar,
-                    'char:' + charId_4 + ':' + (char_17.handle || char_17.name),
-                ),
-                matchesChar = (post_43 = {}) => {
+            const charId_4 = String(char_17.id || '');
+            const currentHandle = canonicalAccountHandle(char_17.handle, char_17.name);
+            const previousHandle = canonicalAccountHandle(value_1248?.handle, value_1248?.name);
+            const avatar_6 = handleAction_55(
+                char_17.avatar,
+                'char:' + charId_4 + ':' + (char_17.handle || char_17.name),
+            );
+            const matchesChar = (post_43 = {}) => {
                     if (
                         charId_4 &&
                         String(post_43.authorId || post_43.accountId || '') === charId_4
@@ -7156,32 +7542,45 @@ Worldbook:
                         postHandle &&
                             (postHandle === currentHandle || postHandle === previousHandle),
                     );
-                },
-                applyIdentity = (post_44 = {}, force_2 = false) => {
-                    const refPost_2 = post_44.refPost
-                        ? applyIdentity(post_44.refPost)
-                        : post_44.refPost;
-                    if (!force_2 && !matchesChar(post_44))
-                        return refPost_2 === post_44.refPost
-                            ? post_44
-                            : {
-                                  ...post_44,
-                                  refPost: refPost_2,
-                              };
+                };
+            const applyIdentity = (post_44 = {}, force_2 = false) => {
+                const refPost_2 = post_44.refPost
+                    ? applyIdentity(post_44.refPost)
+                    : post_44.refPost;
+                const _value140 = {};
+                ['comments', 'commentList', 'replies'].forEach((_value141) => {
+                    if (Array.isArray(post_44[_value141]))
+                        _value140[_value141] = post_44[_value141].map((_value142) =>
+                            applyIdentity(_value142),
+                        );
+                });
+                if (!force_2 && !matchesChar(post_44))
                     return {
                         ...post_44,
                         refPost: refPost_2,
-                        authorId: charId_4,
-                        authorName: char_17.name,
-                        name: char_17.name,
-                        handle: char_17.handle,
-                        authorAvatar: avatar_6,
-                        avatar: avatar_6,
+                        ..._value140,
                     };
+                return {
+                    ...post_44,
+                    ..._value140,
+                    refPost: refPost_2,
+                    authorId: charId_4,
+                    authorName: char_17.name,
+                    name: char_17.name,
+                    handle: char_17.handle,
+                    authorAvatar: avatar_6,
+                    avatar: avatar_6,
                 };
+            };
             updateXState((draft_19) => {
                 draft_19.xGeneratedPosts = (draft_19.xGeneratedPosts || []).map((post_45) =>
                     applyIdentity(post_45),
+                );
+                draft_19.xPostThreads = Object.fromEntries(
+                    Object.entries(draft_19.xPostThreads || {}).map(([_value143, _value144]) => [
+                        _value143,
+                        applyIdentity(_value144),
+                    ]),
                 );
                 draft_19.xDirectMessages = (draft_19.xDirectMessages || []).map((item_44) => ({
                     ...item_44,
@@ -7203,42 +7602,43 @@ Worldbook:
                 const refreshed = applyIdentity(postData[postId_7]);
                 if (refreshed !== postData[postId_7]) postData[postId_7] = refreshed;
             });
+            value_45.forEach((_value145, _value146) =>
+                value_45.set(_value146, applyIdentity(_value145)),
+            );
         }
         function appendDmMessage(dmId_4, source_12, value_1265, translation_3 = '') {
             const text_15 = safeText(value_1265);
             if (!text_15) return null;
-            const value_1268 = source_12 !== 'user',
-                isOpenConversation =
-                    value_1268 &&
-                    String(currentDmId || '') === String(dmId_4) &&
-                    element_18?.classList.contains('active'),
-                message_8 = {
-                    id: makeLocalId('dm-msg'),
-                    source: source_12 === 'user' ? 'user' : 'char',
-                    text: text_15,
-                    translation: safeText(translation_3),
-                    createdAt: Date.now(),
-                };
-            return (
-                updateDirectMessage(dmId_4, (item_45) => {
+            const value_1268 = source_12 !== 'user';
+            const isOpenConversation =
+                value_1268 &&
+                String(currentDmId || '') === String(dmId_4) &&
+                element_18?.classList.contains('active');
+            const message_8 = {
+                id: makeLocalId('dm-msg'),
+                source: source_12 === 'user' ? 'user' : 'char',
+                text: text_15,
+                translation: safeText(translation_3),
+                createdAt: Date.now(),
+            };
+            _value19(dmId_4, (item_45) => {
                     item_45.messages.push(message_8);
                     if (isOpenConversation) item_45.lastReadAt = message_8.createdAt;
                     return item_45;
-                }),
-                renderDirectMessages(),
-                renderDmChat(),
-                message_8
-            );
+                });
+            renderDirectMessages();
+            renderDmChat();
+            return message_8;
         }
         function appendDmMessageBatch(dmId_5, value_1272, value_1273 = []) {
-            const value_1274 = value_1272 !== 'user',
-                isOpenConversation_2 =
-                    value_1274 &&
-                    String(currentDmId || '') === String(dmId_5) &&
-                    element_18?.classList.contains('active'),
-                now_1276 = Date.now(),
-                messages_5 = (Array.isArray(value_1273) ? value_1273 : [])
-                    .map((entry_9, value_1279) => {
+            const value_1274 = value_1272 !== 'user';
+            const isOpenConversation_2 =
+                value_1274 &&
+                String(currentDmId || '') === String(dmId_5) &&
+                element_18?.classList.contains('active');
+            const now_1276 = Date.now();
+            const messages_5 = (Array.isArray(value_1273) ? value_1273 : [])
+                .map((entry_9, value_1279) => {
                         const text_16 = safeText(
                             entry_9?.text || entry_9?.content || entry_9?.message,
                         );
@@ -7251,19 +7651,17 @@ Worldbook:
                             createdAt: now_1276 + value_1279,
                         };
                     })
-                    .filter(Boolean);
+                .filter(Boolean);
             if (!messages_5.length) return [];
-            return (
-                updateDirectMessage(dmId_5, (item_46) => {
+            _value19(dmId_5, (item_46) => {
                     item_46.messages.push(...messages_5);
                     if (isOpenConversation_2)
                         item_46.lastReadAt = messages_5[messages_5.length - 1].createdAt;
                     return item_46;
-                }),
-                renderDirectMessages(),
-                renderDmChat(),
-                messages_5
-            );
+                });
+            renderDirectMessages();
+            renderDmChat();
+            return messages_5;
         }
         function appendDmPostCard(dmId_6, postSnapshot_2) {
             const message_9 = {
@@ -7274,7 +7672,7 @@ Worldbook:
                 postSnapshot: normalizePostSnapshot(postSnapshot_2),
                 createdAt: Date.now(),
             };
-            updateDirectMessage(dmId_6, (value_1285) => {
+            _value19(dmId_6, (value_1285) => {
                 return (value_1285.messages.push(message_9), value_1285);
             });
             renderDirectMessages();
@@ -7367,8 +7765,8 @@ Worldbook:
                     ': ' +
                     safeText(value_1303?.text)
                 );
-            const postSnapshot_446 = normalizePostSnapshot(value_1303.postSnapshot),
-                contextLines = [];
+            const postSnapshot_446 = normalizePostSnapshot(value_1303.postSnapshot);
+            const contextLines = [];
             for (const value_1307 of postSnapshot_446.comments) {
                 if (contextLines.length >= 20) break;
                 contextLines.push(value_1307.name + ': ' + value_1307.text);
@@ -7377,79 +7775,81 @@ Worldbook:
                     contextLines.push('↳ ' + value_1308.name + ': ' + value_1308.text);
                 }
             }
-            const join_448 = contextLines.join(`
-`);
+            const join_448 = contextLines.join('\n');
             return (
                 currentProfile.name +
-                ` 转发了一条帖子：
-作者：` +
+                ' 转发了一条帖子：\n作者：' +
                 postSnapshot_446.name +
                 ' ' +
                 postSnapshot_446.handle +
-                `
-正文：` +
+                '\n正文：' +
                 postSnapshot_446.text +
-                `
-话题：` +
+                '\n话题：' +
                 (postSnapshot_446.topicTag || '无') +
-                `
-评论：
-` +
+                '\n图片：' +
+                (postSnapshot_446.images
+                    .map(
+                        (_value147, _value148) =>
+                            _value148 +
+                            1 +
+                            '. ' +
+                            (_value147.imageSource === 'placeholder' ? '占位图' : '图片') +
+                            '：' +
+                            safeText(_value147.text, '未填写描述'),
+                    )
+                    .join('\n') || '无') +
+                '\n评论：\n' +
                 (join_448 || '暂无评论')
             );
         }
         function handleAction_85(value_451) {
-            const post_49 = normalizePostSnapshot(value_451.postSnapshot),
-                value_1311 = post_49.images[0];
+            const post_49 = normalizePostSnapshot(value_451.postSnapshot);
+            const value_1311 = post_49.images[0];
             return (
-                `
-                <div class="x-dm-post-card" data-shared-post-id="` +
+                '\n                <div class="x-dm-post-card" data-shared-post-id="' +
                 escapeHtml(post_49.id) +
-                `">
-                    <div class="x-dm-post-card-author">
-                        <span class="x-avatar">` +
+                '">\n                    <div class="x-dm-post-card-author">\n                        <span class="x-avatar">' +
                 buildAvatarHtml(post_49.avatar, post_49.name) +
-                `</span>
-                        <span><strong>` +
+                '</span>\n                        <span><strong>' +
                 escapeHtml(post_49.name) +
                 '</strong><small>' +
                 escapeHtml(post_49.handle) +
-                `</small></span>
-                    </div>
-                    <p>` +
+                '</small></span>\n                    </div>\n                    <p>' +
                 renderPostTextHtml({
                     ...post_49,
                     text: post_49.text || '分享了一条帖子',
                 }) +
-                `</p>
-                    ` +
-                (value_1311
-                    ? '<img src="' +
-                      escapeHtml(value_1311.url) +
-                      '" alt="" onerror="this.remove()">'
-                    : '') +
-                `
-                    <span class="x-dm-post-card-label"><i class="fab fa-x-twitter"></i> X Post</span>
-                </div>
-            `
+                '</p>\n                    ' +
+                (value_1311?.imageSource === 'placeholder'
+                    ? '<div class="x-dm-post-placeholder">' + _value12(value_1311.text) + '</div>'
+                    : value_1311?.url
+                      ? '<img src="' +
+                        escapeHtml(value_1311.url) +
+                        '" alt="' +
+                        escapeHtml(value_1311.text || '') +
+                        '" onerror="this.remove()">'
+                      : '') +
+                '\n                    <span class="x-dm-post-card-label"><i class="fab fa-x-twitter"></i> X Post</span>\n                </div>\n            '
             );
         }
         function openDmChat(value_1312) {
+            if (!getDirectMessageById(value_1312)) return;
+            _value1('dm', value_1312);
             const string_1313 = String(value_1312);
-            value_39 !== string_1313 && ((value_39 = string_1313), (value_38 = count_34));
+            value_39 !== string_1313 && ((value_39 = string_1313), (_value8 = count_34));
             currentDmId = string_1313;
             const item_49 = (getXState().xDirectMessages || []).find(
-                    (value_1318) => String(value_1318.id) === string_1313,
-                ),
-                avatarEl_2 = document.getElementById('x-dm-chat-avatar'),
-                nameEl = document.getElementById('x-dm-chat-name'),
-                handleEl = document.getElementById('x-dm-chat-handle');
+                (value_1318) => String(value_1318.id) === string_1313,
+            );
+            const avatarEl_2 = document.getElementById('x-dm-chat-avatar');
+            const nameEl = document.getElementById('x-dm-chat-name');
+            const handleEl = document.getElementById('x-dm-chat-handle');
             if (item_49 && avatarEl_2)
                 avatarEl_2.innerHTML = buildAvatarHtml(item_49.avatar, item_49.name);
             if (item_49 && nameEl) nameEl.textContent = item_49.name;
             if (item_49 && handleEl) handleEl.textContent = item_49.handle || '@char';
-            const value_1315 = item_49 ? handleAction_166(item_49) : 0,
-                value_1316 = value_1315 > Number(item_49?.lastReadAt || 0);
+            const value_1315 = item_49 ? handleAction_166(item_49) : 0;
+            const value_1316 = value_1315 > Number(item_49?.lastReadAt || 0);
             if (element_19) element_19.innerHTML = '';
             element_18?.classList.add('active');
             element_18?.setAttribute('aria-hidden', 'false');
@@ -7460,7 +7860,7 @@ Worldbook:
                 value_1316 &&
                     setTimeout(() => {
                         if (currentDmId !== value_1317) return;
-                        updateDirectMessage(value_1317, (value_1319) => {
+                        _value19(value_1317, (value_1319) => {
                             return (
                                 (value_1319.lastReadAt = Math.max(
                                     Number(value_1319.lastReadAt) || 0,
@@ -7474,10 +7874,11 @@ Worldbook:
             });
         }
         function closeDmChat() {
-            const value_1320 = currentDmId,
-                value_1321 = value_1320
-                    ? '.x-dm-row[data-dm-id="' + escapeCssIdent(value_1320) + '"]'
-                    : '';
+            if (_value10('dm')) return;
+            const value_1320 = currentDmId;
+            const value_1321 = value_1320
+                ? '.x-dm-row[data-dm-id="' + escapeCssIdent(value_1320) + '"]'
+                : '';
             releaseFocusBeforeHide(element_18, value_1321);
             currentDmId = null;
             element_18?.classList.remove('active');
@@ -7486,24 +7887,23 @@ Worldbook:
         function renderDmChat(value_1322 = {}) {
             const item_50 = currentDmId ? getDirectMessageById(currentDmId) : null;
             if (!item_50 || !element_18) return;
-            const avatarEl_3 = document.getElementById('x-dm-chat-avatar'),
-                nameEl_2 = document.getElementById('x-dm-chat-name'),
-                handleEl_2 = document.getElementById('x-dm-chat-handle'),
-                messages_1327 = item_50.messages,
-                messages_6 = messages_1327.slice(-value_38);
+            const avatarEl_3 = document.getElementById('x-dm-chat-avatar');
+            const nameEl_2 = document.getElementById('x-dm-chat-name');
+            const handleEl_2 = document.getElementById('x-dm-chat-handle');
+            const messages_1327 = item_50.messages;
+            const messages_6 = messages_1327.slice(-_value8);
             if (avatarEl_3) avatarEl_3.innerHTML = buildAvatarHtml(item_50.avatar, item_50.name);
             if (nameEl_2) nameEl_2.textContent = item_50.name;
             if (handleEl_2) handleEl_2.textContent = item_50.handle || '@char';
             if (element_19) {
-                const value_1329 =
-                        messages_1327.length <= value_38 ? handleAction_177(item_50) : '',
-                    value_1330 = messages_6.length
-                        ? '<time class="x-dm-time-divider" datetime="' +
-                          escapeHtml(new Date(messages_6[0].createdAt).toISOString()) +
-                          '">' +
-                          escapeHtml(formatDmTimestamp(messages_6[0].createdAt)) +
-                          '</time>'
-                        : '';
+                const value_1329 = messages_1327.length <= _value8 ? handleAction_177(item_50) : '';
+                const value_1330 = messages_6.length
+                    ? '<time class="x-dm-time-divider" datetime="' +
+                      escapeHtml(new Date(messages_6[0].createdAt).toISOString()) +
+                      '">' +
+                      escapeHtml(formatDmTimestamp(messages_6[0].createdAt)) +
+                      '</time>'
+                    : '';
                 element_19.innerHTML = messages_1327.length
                     ? '' +
                       value_1329 +
@@ -7546,12 +7946,12 @@ Worldbook:
             const directMessageById_1332 = getDirectMessageById(currentDmId);
             if (
                 !directMessageById_1332 ||
-                value_38 >= (directMessageById_1332.messages || []).length
+                _value8 >= (directMessageById_1332.messages || []).length
             )
                 return;
-            const scrollTop_2 = element_19.scrollTop,
-                scrollHeight_2 = element_19.scrollHeight;
-            value_38 += count_34;
+            const scrollTop_2 = element_19.scrollTop;
+            const scrollHeight_2 = element_19.scrollHeight;
+            _value8 += count_34;
             renderDmChat({
                 preserveScroll: true,
                 scrollTop: scrollTop_2,
@@ -8161,31 +8561,87 @@ Rules:
         }
         function handleAction_95(value_595) {
             if (!imagePreviewOverlay) return;
-            const options_596 = {
-                text: safeText(value_595?.dataset?.imageText, 'Image'),
-                url: safeText(value_595?.dataset?.imageUrl),
+            const options_596 = safeText(value_595?.dataset?.composeImageId);
+            const _value149 = options_596
+                ? composeImageDraft.find((_value156) => _value156.id === options_596)
+                : null;
+            if (options_596 && !_value149) return;
+            const _value150 = {
+                text: _value149 ? _value149.text : safeText(value_595?.dataset?.imageText, 'Image'),
+                url: _value149 ? _value149.url : safeText(value_595?.dataset?.imageUrl),
                 postId: safeText(value_595?.dataset?.postId),
                 imageId: safeText(value_595?.dataset?.imageId),
-                imageSource: safeText(value_595?.dataset?.imageSource),
+                imageSource: safeText(_value149?.imageSource || value_595?.dataset?.imageSource),
+                composeImageId: options_596,
+                composeDraftRevision: _value3,
             };
-            value_13 = options_596;
-            const textEl_2 = document.getElementById('x-image-preview-text'),
-                imgEl = document.getElementById('x-image-preview-img'),
-                xImagePreviewActionsElement = document.getElementById('x-image-preview-actions');
-            if (textEl_2) textEl_2.textContent = options_596.text;
+            value_13 = _value150;
+            const textEl_2 = document.getElementById('x-image-preview-text');
+            const imgEl = document.getElementById('x-image-preview-img');
+            const xImagePreviewActionsElement = document.getElementById(
+                'x-image-preview-placeholder',
+            );
+            const _value151 = document.getElementById('x-image-preview-actions');
+            const _value152 = document.getElementById('x-image-description-editor');
+            const _value153 = document.getElementById('x-image-description-input');
+            const _value154 = document.getElementById('x-image-description-count');
+            const _value155 = document.getElementById('x-image-description-done');
+            imagePreviewOverlay.classList.toggle('is-compose-preview', !!_value149);
+            if (_value152) _value152.hidden = !_value149;
+            if (_value155) _value155.hidden = !_value149;
+            if (_value153) _value153.value = _value149 ? _value149.text : '';
+            if (_value154) _value154.textContent = (_value149?.text.length || 0) + '/1000';
+            textEl_2 && ((textEl_2.textContent = _value150.text), (textEl_2.hidden = !!_value149));
+            if (_value151)
+                _value151.hidden =
+                    _value150.imageSource !== 'generated' ||
+                    !_value150.postId ||
+                    !_value150.imageId;
             if (xImagePreviewActionsElement)
-                xImagePreviewActionsElement.hidden =
-                    options_596.imageSource !== 'generated' ||
-                    !options_596.postId ||
-                    !options_596.imageId;
+                xImagePreviewActionsElement.hidden = _value150.imageSource !== 'placeholder';
             imgEl &&
-                (options_596.url
-                    ? ((imgEl.src = options_596.url), (imgEl.style.display = 'block'))
+                ((imgEl.alt = _value150.text),
+                _value150.url
+                    ? ((imgEl.src = _value150.url), (imgEl.style.display = 'block'))
                     : (imgEl.removeAttribute('src'), (imgEl.style.display = 'none')));
             imagePreviewOverlay.classList.add('active');
             imagePreviewOverlay.setAttribute('aria-hidden', 'false');
         }
         function closeImagePreview() {
+            const _value157 = value_13;
+            if (!_value157?.composeImageId || _value157.composeDraftRevision !== _value3) return;
+            const _value158 = composeImageDraft.find(
+                (_value161) => _value161.id === _value157.composeImageId,
+            );
+            const _value159 = document.getElementById('x-image-description-input');
+            if (!_value158 || !_value159) return;
+            _value158.text = _value159.value.slice(0, 1000);
+            _value157.text = _value158.text;
+            const _value160 = document.getElementById('x-image-description-count');
+            if (_value160) _value160.textContent = _value158.text.length + '/1000';
+        }
+        function _value20() {
+            const _value162 = value_13;
+            if (_value162?.composeImageId && _value162.composeDraftRevision === _value3) {
+                closeImagePreview();
+                const _value163 = composeImageDraft.find(
+                    (_value168) => _value168.id === _value162.composeImageId,
+                );
+                const _value164 = Array.from(
+                    composeImagePreview?.querySelectorAll('[data-compose-preview-id]') || [],
+                ).find(
+                    (_value169) => _value169.dataset.composePreviewId === _value162.composeImageId,
+                );
+                const _value165 = _value164?.querySelector('img');
+                const _value166 = _value164?.parentElement.querySelector(
+                    '.x-compose-description-badge',
+                );
+                const _value167 = _value164?.querySelector('.x-image-placeholder-caption');
+                if (_value165 && _value163) _value165.alt = _value163.text;
+                if (_value167 && _value163) _value167.textContent = _value163.text;
+                if (_value166) _value166.hidden = !_value163?.text;
+            }
+            releaseFocusBeforeHide(imagePreviewOverlay);
             imagePreviewOverlay?.classList.remove('active');
             imagePreviewOverlay?.setAttribute('aria-hidden', 'true');
             value_13 = null;
@@ -8249,8 +8705,13 @@ Rules:
                     String(item_16_2.id || item_16_2.name) === String(currentActiveTopicId),
             );
             if (topic_17_2) handleAction_51(topic_17_2);
-            if (currentProfileIdentity?.kind === 'char') openDmProfile(currentProfileIdentity.id);
-            if (String(currentDetailPostId) === String(value_613)) openPostDetail(value_613);
+            if (_value5.at(-1)?.type === 'profile' && currentProfileIdentity)
+                openDmProfile(currentProfileIdentity.id);
+            if (
+                _value5.at(-1)?.type === 'post' &&
+                String(currentDetailPostId) === String(value_613)
+            )
+                openPostDetail(value_613);
         }
         async function handleAction_102() {
             const handleAction_96_616 = handleAction_96();
@@ -8285,42 +8746,45 @@ Rules:
             if (enabled_14) return;
             const button_623 = handleAction_96();
             if (!button_623) return;
-            const item_34_2 = (button_623.state.xDirectMessages || []).find(
-                (value_626) =>
+            const item_34_2 =
+                _value16(button_623.post.profileOwnerId || button_623.post.authorId) ||
+                (button_623.state.xDirectMessages || []).find(
+                    (value_626) =>
                     String(value_626.id) === String(button_623.post.profileOwnerId) ||
                     (value_626.profilePosts || []).some(
                         (item_26_627) => String(item_26_627.id) === String(button_623.post.id),
                     ),
-            );
+                );
             if (!item_34_2 || !window.u2ImageGeneration?.generate) {
                 if (typeof window.showToast === 'function')
                     window.showToast('当前图片无法重新生成');
                 return;
             }
             enabled_14 = true;
-            const string_625 = String(button_623.state.activeXPlayerAccountId),
-                button_2_2 = document.getElementById('x-image-regenerate-btn');
+            const string_625 = String(button_623.state.activeXPlayerAccountId);
+            const button_2_2 = document.getElementById('x-image-regenerate-btn');
             if (button_2_2) button_2_2.disabled = true;
             try {
                 const config_7_2 = normalizeCharProfileImagePromptConfig(
-                        item_34_2.profileImagePromptConfig,
-                    ),
-                    referenceImage_2 = config_7_2.autoUseReferenceFace
-                        ? await resolveCharProfileReferenceUrl(item_34_2)
-                        : '',
-                    join_630 = [
-                        safeText(button_623.image.text, button_623.post.text),
-                        config_7_2.lastPrompt,
-                    ].filter(Boolean).join(`
-`),
-                    value_631 = await window.u2ImageGeneration.generate(join_630, {
-                        referenceImage: referenceImage_2,
-                        charAppearance: config_7_2.charAppearance,
-                        userAppearance: config_7_2.userAppearance,
-                        artistPrompt: config_7_2.artistPrompt,
-                        negativePrompt: config_7_2.negativePrompt,
-                    }),
-                    url_4 = safeText(value_631?.imageUrl);
+                    item_34_2.profileImagePromptConfig,
+                );
+                const referenceImage_2 = config_7_2.autoUseReferenceFace
+                    ? await resolveCharProfileReferenceUrl(item_34_2)
+                    : '';
+                const join_630 = [
+                    safeText(button_623.image.text, button_623.post.text),
+                    config_7_2.lastPrompt,
+                ]
+                    .filter(Boolean)
+                    .join('\n');
+                const value_631 = await window.u2ImageGeneration.generate(join_630, {
+                    referenceImage: referenceImage_2,
+                    charAppearance: config_7_2.charAppearance,
+                    userAppearance: config_7_2.userAppearance,
+                    artistPrompt: config_7_2.artistPrompt,
+                    negativePrompt: config_7_2.negativePrompt,
+                });
+                const url_4 = safeText(value_631?.imageUrl);
                 if (!url_4) throw new Error('重新生成失败，已保留原图');
                 if (String(getXState().activeXPlayerAccountId) !== string_625) return;
                 handleAction_97(button_623.post.id, button_623.image.id, {
@@ -8349,7 +8813,7 @@ Rules:
             const handleAction_96_634 = handleAction_96();
             if (!handleAction_96_634) return;
             handleAction_97(handleAction_96_634.post.id, handleAction_96_634.image.id, null);
-            closeImagePreview();
+            _value20();
             handleAction_101(handleAction_96_634.post.id);
             await flushXStateNow('x-image-delete');
         }
@@ -8425,12 +8889,61 @@ Rules:
                 return (seen_5.add(key_7), true);
             });
         }
-        function openSearchGenerateSheet(mode_6 = 'home') {
+        function openSearchGenerateSheet() {
+            const _value170 = new Set();
+            return (getXState().xDirectMessages || [])
+                .filter((_value171) => _value171.origin === 'imessage' && _value171.kind !== 'bot')
+                .map((_value172) => normalizeDmChar(_value172, 'imessage'))
+                .filter((_value173) => {
+                    const _value174 = String(_value173.sourceFriendId || _value173.id);
+                    if (_value170.has(_value174)) return false;
+                    _value170.add(_value174);
+                    return true;
+                });
+        }
+        function _value21() {
+            return {
+                charPersona: document.getElementById('x-home-mount-char-persona')?.checked === true,
+                userPersona: document.getElementById('x-home-mount-user-persona')?.checked === true,
+                singleChat: document.getElementById('x-home-mount-single-chat')?.checked === true,
+                limit: normalizeImessageContextMount({
+                    limit: safeText(
+                        document.getElementById('x-home-single-chat-limit')?.value,
+                        '20',
+                    ),
+                }).limit,
+            };
+        }
+        function _value22(_value175 = false) {
+            const _value176 = document.getElementById('x-home-generation-options');
+            if (_value176) _value176.hidden = searchGenerateMode !== 'home';
+            const _value177 = openSearchGenerateSheet();
+            [
+                'x-home-mount-char-persona',
+                'x-home-mount-user-persona',
+                'x-home-mount-single-chat',
+            ].forEach((_value179) => {
+                const _value180 = document.getElementById(_value179);
+                if (!_value180) return;
+                if (_value175) _value180.checked = false;
+                _value180.disabled = _value179 !== 'x-home-mount-user-persona' && !_value177.length;
+            });
+            const _value178 = document.getElementById('x-home-single-chat-limit');
+            if (_value178) {
+                if (_value175) _value178.value = '20';
+                _value178.disabled =
+                    !_value177.length ||
+                    document.getElementById('x-home-mount-single-chat')?.checked !== true;
+            }
+        }
+        function _value23(mode_6 = 'home') {
+            if (advanceSheet) return;
             searchGenerateMode = mode_6 === 'discover' ? 'discover' : 'home';
+            _value22(true);
             if (searchGenerateInput) searchGenerateInput.value = '';
-            const title_4 = document.getElementById('x-search-generate-title'),
-                label_4 = document.getElementById('x-search-generate-label'),
-                runBtn = document.getElementById('x-search-generate-run-btn');
+            const title_4 = document.getElementById('x-search-generate-title');
+            const label_4 = document.getElementById('x-search-generate-label');
+            const runBtn = document.getElementById('x-search-generate-run-btn');
             if (searchGenerateMode === 'discover') {
                 if (title_4) title_4.textContent = '生成热搜';
                 if (label_4) label_4.textContent = '想搜索什么';
@@ -8578,79 +9091,246 @@ Worldbook:
                 '已生成 10 条热搜和 ' + newPosts.length + ' 条关联帖子'
             );
         }
-        async function generateHomeSearchPosts() {
-            const safeText_1393 = safeText(searchGenerateInput?.value),
-                handleAction_61_1394 = getSelectedWorldBookContext(
-                    safeText_1393 + ' ' + currentProfile.bio,
-                ),
-                searchUserProfile = {
-                    name: currentProfile.name,
-                    handle: currentProfile.handle,
-                    bio: currentProfile.bio,
-                },
-                handleAction_24_645 = handleAction_24(),
-                content_11 =
-                    `Return strict JSON only. Generate 5 to 10 realistic Weibo/X-style posts for the user's feed.
-The current User is context only. Never author a generated post, comment or reply as the User; use only distinct non-User accounts.
-Mix account types: official brand/media accounts, personal accounts, fan accounts, passers-by, marketing accounts, and niche community accounts.
-Mix tones: serious analysis, funny meme-style posts, subtle sarcasm, heated/controversial takes, recommendations, complaints, fan enthusiasm, and deliberately argument-starting opinions. Keep it plausible, not generic.
-Every post must be grounded in the topic, minimal user profile, and worldbook context when available. Avoid template-like filler.
-Each post must include: authorName, handle, text, translation, likes, reposts, commentsCount, mediaType ("text" or "image"), comments, and optional imagePrompt/images only when mediaType is "image". Every comment and reply must include translation.
-Posts can be pure text. Prefer text posts unless an image clearly adds value.
-Each post must have at least 5 comments.
-Comments should feel like a real international X feed: disagreements, jokes, memes, clarifications, fans defending someone, skeptical passers-by, and occasional heated replies are allowed.
-Every comment must be directly related to its own post. It must reference at least one concrete detail from the post text, topic, author stance, event, character, imagePrompt, or images[].text. Do not write generic reactions such as "interesting", "same", "nice", or comments that could fit any post.
-Replies are optional. If replies are included, each reply must respond to the parent comment's concrete point and connect back to the post.
-If mediaType is "image", describe the image subject, composition, light, mood, and relevant post detail in imagePrompt or images[].text. Do not invent inaccessible URLs.
-Authors may use any language natural to their identity and context. For every non-Chinese post, comment or reply, translation must contain accurate Simplified Chinese; Chinese originals use "". Keep imagePrompt and images[].text descriptions in Simplified Chinese.
-Topic: ` +
-                    (safeText_1393 || 'open recommendation feed') +
-                    `
-User profile: ` +
-                    JSON.stringify(searchUserProfile) +
-                    `
-Reusable existing authors (optional; when used, return their exact authorId): ` +
-                    JSON.stringify(handleAction_24_645) +
-                    `
-Worldbook:
-` +
-                    (handleAction_61_1394 || 'None'),
-                value_647 = await requestXChatCompletion(
+        function generateHomeSearchPosts(_value181) {
+            if (getXState().activeXPlayerAccountId !== _value181)
+                throw new Error('X 账号已切换，本次首页生成已取消');
+        }
+        async function _value24(_value182, _value183) {
+            generateHomeSearchPosts(_value183.accountId);
+            const _value184 = {
+                authorId: String(_value182.id),
+                name: _value182.name,
+                handle: _value182.handle,
+                bio: _value182.bio,
+            };
+            const _value185 = [];
+            if (_value183.mount.charPersona) {
+                const _value187 = getLinkedImessageCharForDm(_value182);
+                const _value188 = safeText(
+                    _value187?.persona ||
+                        _value187?.characterPersona ||
+                        _value187?.systemPrompt ||
+                        _value182.persona,
+                );
+                if (_value188) _value185.push('Mounted Char persona:\n' + _value188);
+            }
+            if (_value183.mount.singleChat) {
+                const _value189 = await handleAction_67({
+                    ..._value182,
+                    imessageContextMount: {
+                        enabled: true,
+                        limit: _value183.mount.limit,
+                    },
+                });
+                generateHomeSearchPosts(_value183.accountId);
+                if (_value189)
+                    _value185.push(
+                        "Private continuity for this post's author only. Other authors and commenters do not know this conversation. Do not quote or reveal private chat in a public post or comment.\n" +
+                            _value189,
+                    );
+            }
+            const _value186 =
+                'Return strict JSON only: {"posts":[{"authorId":"","authorName":"","handle":"","text":"","translation":"","mediaType":"text","comments":[{"authorName":"","handle":"","text":"","translation":""}]}]}.\nGenerate exactly 1 new public X post by the named author. Use the exact authorId, name and handle in the author identity below. Do not invent another account or replacement identity.\nThe post must contain at least 5 distinct, relevant top-level comments from non-User accounts. Never write a post, comment or reply as User. Keep the post natural for this author and the topic; text-only posts are fine. Do not invent image URLs.\nEvery post, comment and reply must include a Simplified Chinese translation when its original language is not Simplified Chinese; otherwise translation is "".\nTopic: ' +
+                (_value183.topic || 'open recommendation feed') +
+                '\nAuthor identity: ' +
+                JSON.stringify(_value184) +
+                '\nUser profile: ' +
+                JSON.stringify(_value183.userProfile) +
+                '\n' +
+                (_value185.length ? _value185.join('\n\n') + '\n' : '') +
+                'Worldbook:\n' +
+                (_value183.worldbook || 'None');
+            for (let _value190 = 0; _value190 < 2; _value190 += 1) {
+                generateHomeSearchPosts(_value183.accountId);
+                const _value191 = await requestXChatCompletion(
                     [
                         {
                             role: 'system',
                             content:
-                                'You are a JSON generator for a fictional X feed. Output only valid JSON.',
+                                'Generate one public X post by the specified character. Output JSON only.',
                         },
                         {
                             role: 'user',
-                            content: content_11,
+                            content: _value186,
                         },
                     ],
                     {
                         temperature: 0.9,
                     },
-                ),
-                jsonPayload_648 = parseJsonPayload(value_647),
-                sanitizeApiGeneratedPosts_649 = sanitizeApiGeneratedPosts(
-                    Array.isArray(jsonPayload_648)
-                        ? jsonPayload_648
-                        : Array.isArray(jsonPayload_648.posts)
-                          ? jsonPayload_648.posts
-                          : [],
-                ),
-                handleAction_124_1401 = appendGeneratedPosts(sanitizeApiGeneratedPosts_649);
-            return (
-                await flushXStateNow('x-search-generation'),
-                handleAction_124_1401.length
-                    ? '已生成 ' + handleAction_124_1401.length + ' 条帖子'
-                    : '没有生成可用帖子'
+                );
+                generateHomeSearchPosts(_value183.accountId);
+                const _value192 = parseJsonPayload(_value191);
+                const _value193 = Array.isArray(_value192)
+                    ? _value192
+                    : Array.isArray(_value192?.posts)
+                      ? _value192.posts
+                      : [];
+                const _value194 = sanitizeApiGeneratedPosts(_value193, {
+                    forceOuterAuthor: true,
+                });
+                for (const _value195 of _value194) {
+                    const _value196 = normalizeGeneratedPost({
+                        ..._value195,
+                        id: makeLocalId('x-home-char'),
+                        authorId: _value182.id,
+                        authorName: _value182.name,
+                        name: _value182.name,
+                        handle: _value182.handle,
+                        authorAvatar: _value182.avatar,
+                        profileOwnerId: _value182.id,
+                    });
+                    if (_value196?.text && _value196.commentList.length >= 5) return _value196;
+                }
+            }
+            throw new Error(_value182.name + ' 的主页帖子未生成完整，请重试');
+        }
+        async function _value25() {
+            const _value197 = getXState().activeXPlayerAccountId;
+            const safeText_1393 = safeText(searchGenerateInput?.value);
+            const handleAction_61_1394 = _value21();
+            const _value198 = document.getElementById('x-home-single-chat-limit');
+            if (_value198) _value198.value = String(handleAction_61_1394.limit);
+            const _value199 = openSearchGenerateSheet();
+            const _value200 =
+                !handleAction_61_1394.userPersona &&
+                safeText(currentProfile.bio) === safeText(currentProfile.persona)
+                    ? ''
+                    : currentProfile.bio;
+            const searchUserProfile = {
+                name: currentProfile.name,
+                handle: currentProfile.handle,
+                bio: _value200,
+                ...(handleAction_61_1394.userPersona
+                    ? {
+                          persona: currentProfile.persona,
+                      }
+                    : {}),
+            };
+            const _value201 = getSelectedWorldBookContext(
+                safeText_1393 +
+                    ' ' +
+                    _value200 +
+                    ' ' +
+                    (handleAction_61_1394.userPersona ? currentProfile.persona : ''),
             );
+            const _value202 = {
+                accountId: _value197,
+                topic: safeText_1393,
+                mount: handleAction_61_1394,
+                userProfile: searchUserProfile,
+                worldbook: _value201,
+            };
+            const _value203 = new Set(_value199.map((_value207) => String(_value207.id)));
+            const _value204 = new Set(
+                _value199.map((_value208) =>
+                    canonicalAccountHandle(_value208.handle, _value208.name),
+                ),
+            );
+            const handleAction_24_645 = handleAction_24()
+                .filter(
+                    (_value209) =>
+                        !_value203.has(String(_value209.authorId)) &&
+                        !_value204.has(canonicalAccountHandle(_value209.handle, _value209.name)),
+                )
+                .map(({ persona: _value210, ..._value211 }) => ({
+                    ..._value211,
+                    ...(handleAction_61_1394.charPersona
+                        ? {
+                              persona: _value210,
+                          }
+                        : {}),
+                }));
+            const content_11 =
+                'Return strict JSON only. Generate 5 to 10 realistic Weibo/X-style posts for the user\'s feed.\nThe current User is context only. Never author a generated post, comment or reply as the User; use only distinct non-User accounts.\nMix account types: official brand/media accounts, personal accounts, fan accounts, passers-by, marketing accounts, and niche community accounts.\nMix tones: serious analysis, funny meme-style posts, subtle sarcasm, heated/controversial takes, recommendations, complaints, fan enthusiasm, and deliberately argument-starting opinions. Keep it plausible, not generic.\nEvery post must be grounded in the topic, minimal user profile, and worldbook context when available. Avoid template-like filler.\nEach post must include: authorName, handle, text, translation, likes, reposts, commentsCount, mediaType ("text" or "image"), comments, and optional imagePrompt/images only when mediaType is "image". Every comment and reply must include translation.\nPosts can be pure text. Prefer text posts unless an image clearly adds value.\nEach post must have at least 5 comments.\nComments should feel like a real international X feed: disagreements, jokes, memes, clarifications, fans defending someone, skeptical passers-by, and occasional heated replies are allowed.\nEvery comment must be directly related to its own post. It must reference at least one concrete detail from the post text, topic, author stance, event, character, imagePrompt, or images[].text. Do not write generic reactions such as "interesting", "same", "nice", or comments that could fit any post.\nReplies are optional. If replies are included, each reply must respond to the parent comment\'s concrete point and connect back to the post.\nIf mediaType is "image", describe the image subject, composition, light, mood, and relevant post detail in imagePrompt or images[].text. Do not invent inaccessible URLs.\nAuthors may use any language natural to their identity and context. For every non-Chinese post, comment or reply, translation must contain accurate Simplified Chinese; Chinese originals use "". Keep imagePrompt and images[].text descriptions in Simplified Chinese.\nTopic: ' +
+                (safeText_1393 || 'open recommendation feed') +
+                '\nUser profile: ' +
+                JSON.stringify(searchUserProfile) +
+                '\nReusable existing authors (optional; when used, return their exact authorId): ' +
+                JSON.stringify(handleAction_24_645) +
+                '\nWorldbook:\n' +
+                (_value201 || 'None');
+            const value_647 = await requestXChatCompletion(
+                [
+                    {
+                        role: 'system',
+                        content:
+                            'You are a JSON generator for a fictional X feed. Output only valid JSON.',
+                    },
+                    {
+                        role: 'user',
+                        content: content_11,
+                    },
+                ],
+                {
+                    temperature: 0.9,
+                },
+            );
+            generateHomeSearchPosts(_value197);
+            const jsonPayload_648 = parseJsonPayload(value_647);
+            const sanitizeApiGeneratedPosts_649 = sanitizeApiGeneratedPosts(
+                Array.isArray(jsonPayload_648)
+                    ? jsonPayload_648
+                    : Array.isArray(jsonPayload_648.posts)
+                      ? jsonPayload_648.posts
+                      : [],
+            ).filter(
+                (_value212) =>
+                    !_value203.has(String(_value212.authorId)) &&
+                    !_value204.has(
+                        canonicalAccountHandle(
+                            _value212.handle || _value212.authorHandle,
+                            _value212.authorName || _value212.name,
+                        ),
+                    ),
+            );
+            const _value205 = [];
+            for (let _value213 = 0; _value213 < _value199.length; _value213 += 3) {
+                generateHomeSearchPosts(_value197);
+                _value205.push(
+                    ...(await Promise.all(
+                        _value199
+                            .slice(_value213, _value213 + 3)
+                            .map((_value214) => _value24(_value214, _value202)),
+                    )),
+                );
+            }
+            generateHomeSearchPosts(_value197);
+            const _value206 = [..._value205, ...sanitizeApiGeneratedPosts_649];
+            const handleAction_124_1401 = [];
+            for (let _value215 = 0; _value215 < _value206.length; _value215 += 50) {
+                handleAction_124_1401.push(
+                    ...appendGeneratedPosts(_value206.slice(_value215, _value215 + 50)),
+                );
+            }
+            if (_value205.length)
+                updateXState((_value216) => {
+                    _value216.xDirectMessages = _value216.xDirectMessages.map((_value217) => {
+                        const _value218 = _value205.filter(
+                            (_value219) => String(_value219.authorId) === String(_value217.id),
+                        );
+                        return _value218.length
+                            ? {
+                                  ..._value217,
+                                  profilePosts: prependUniquePosts(
+                                      _value217.profilePosts || [],
+                                      _value218,
+                                  ),
+                              }
+                            : _value217;
+                    });
+                });
+            await flushXStateNow('x-search-generation');
+            return handleAction_124_1401.length
+                ? '已生成 ' + handleAction_124_1401.length + ' 条帖子'
+                : '没有生成可用帖子';
         }
         async function handleAction_218() {
-            const runBtn_2 = document.getElementById('x-search-generate-run-btn'),
-                textContent_5 = searchGenerateMode === 'discover' ? '生成' : 'Generate';
+            if (advanceSheet) return;
+            advanceSheet = true;
+            const runBtn_2 = document.getElementById('x-search-generate-run-btn');
+            const textContent_5 = searchGenerateMode === 'discover' ? '生成' : 'Generate';
             runBtn_2?.classList.add('loading');
+            if (runBtn_2) runBtn_2.disabled = true;
             if (runBtn_2)
                 runBtn_2.textContent =
                     searchGenerateMode === 'discover' ? '生成中...' : 'Generating';
@@ -8658,7 +9338,7 @@ Worldbook:
                 const message_10 =
                     searchGenerateMode === 'discover'
                         ? await generateDiscoverSearchResults()
-                        : await generateHomeSearchPosts();
+                        : await _value25();
                 closeSearchGenerateSheet();
                 if (typeof window.showToast === 'function') window.showToast(message_10);
             } catch (error_14) {
@@ -8673,6 +9353,8 @@ Worldbook:
                         window.showToast('生成失败，请检查 API 配置或返回格式');
                 }
             } finally {
+                advanceSheet = false;
+                if (runBtn_2) runBtn_2.disabled = false;
                 runBtn_2?.classList.remove('loading');
                 if (runBtn_2) runBtn_2.textContent = textContent_5;
             }
@@ -8743,18 +9425,18 @@ Worldbook:
         function openAdvanceSheet() {
             if (advancePlotInput) advancePlotInput.value = '';
             populateAdvanceControls();
-            if (typeof window.openView === 'function') window.openView(advanceSheet);
-            else advanceSheet?.classList.add('active');
+            if (typeof window.openView === 'function') window.openView(_value2);
+            else _value2?.classList.add('active');
         }
         function closeAdvanceSheet() {
-            if (advanceSheet?.querySelector('.x-advance-sheet')?.classList.contains('is-loading'))
+            if (_value2?.querySelector('.x-advance-sheet')?.classList.contains('is-loading'))
                 return;
-            if (typeof window.closeView === 'function') window.closeView(advanceSheet);
-            else advanceSheet?.classList.remove('active');
+            if (typeof window.closeView === 'function') window.closeView(_value2);
+            else _value2?.classList.remove('active');
         }
         function handleAction_219(disabled_2) {
-            const sheet_2 = advanceSheet?.querySelector('.x-advance-sheet'),
-                runBtn_3 = document.getElementById('x-advance-run-btn');
+            const sheet_2 = _value2?.querySelector('.x-advance-sheet');
+            const runBtn_3 = document.getElementById('x-advance-run-btn');
             sheet_2?.classList.toggle('is-loading', disabled_2);
             runBtn_3?.classList.toggle('loading', disabled_2);
             runBtn_3 &&
@@ -8982,43 +9664,56 @@ Worldbook:
                     : [],
             };
         }
-        async function enrichPublishedPostImages(postId_14, imageSources_2 = []) {
-            const source_13 = (Array.isArray(imageSources_2) ? imageSources_2 : []).find(
-                (image_10) => image_10?.id && image_10?.url,
-            );
-            if (!source_13) return;
+        async function enrichPublishedPostImages(
+            postId_14,
+            imageSources_2 = [],
+            _value220 = getXState().activeXPlayerAccountId,
+        ) {
+            const source_13 = (Array.isArray(imageSources_2) ? imageSources_2 : [])
+                .filter(
+                    (image_10) =>
+                        image_10?.id && image_10?.url && image_10.imageSource !== 'placeholder',
+                )
+                .slice(0, 4);
             const visionApi = window.u2ImageUnderstanding;
-            if (!visionApi?.isConfigured?.()) {
-                savePostImageVision(postId_14, source_13.id, {
-                    status: 'skipped',
-                    reason: 'not-configured',
-                    analyzedAt: Date.now(),
-                });
-                await flushXStateNow('x-post-image-vision-skipped');
-                return;
-            }
-            try {
-                const vision_4 = await visionApi.analyze({
-                    url: source_13.url,
-                    mimeType: source_13.mimeType,
-                });
-                savePostImageVision(postId_14, source_13.id, vision_4);
-                await flushXStateNow('x-post-image-vision');
-            } catch (error_15) {
-                console.warn('[X] Post image understanding failed', error_15);
-                savePostImageVision(postId_14, source_13.id, {
-                    status: 'failed',
-                    reason: 'analysis-failed',
-                    analyzedAt: Date.now(),
-                });
-                await flushXStateNow('x-post-image-vision-failed');
+            for (const _value221 of source_13) {
+                if (_value220 !== getXState().activeXPlayerAccountId) return;
+                if (!visionApi?.isConfigured?.()) {
+                    savePostImageVision(postId_14, _value221.id, {
+                        status: 'skipped',
+                        reason: 'not-configured',
+                        analyzedAt: Date.now(),
+                    });
+                    await flushXStateNow('x-post-image-vision-skipped');
+                    continue;
+                }
+                try {
+                    const vision_4 = await visionApi.analyze({
+                        url: _value221.url,
+                        mimeType: _value221.mimeType,
+                    });
+                    if (_value220 !== getXState().activeXPlayerAccountId) return;
+                    savePostImageVision(postId_14, _value221.id, vision_4);
+                    await flushXStateNow('x-post-image-vision');
+                } catch (error_15) {
+                    if (_value220 !== getXState().activeXPlayerAccountId) return;
+                    console.warn('[X] Post image understanding failed', error_15);
+                    savePostImageVision(postId_14, _value221.id, {
+                        status: 'failed',
+                        reason: 'analysis-failed',
+                        analyzedAt: Date.now(),
+                    });
+                    await flushXStateNow('x-post-image-vision-failed');
+                }
             }
         }
         function handleAction_224(id_12) {
-            const state_18 = getXState(),
-                post_55 = getPostForInteraction(id_12, state_18),
-                thread_12 = getPostThread(id_12, state_18),
-                existingComments_2 = (thread_12.comments || []).slice(0, 25).map((comment_14) => ({
+            const state_18 = getXState();
+            const post_55 = getPostForInteraction(id_12, state_18);
+            const thread_12 = getPostThread(id_12, state_18);
+            const existingComments_2 = (thread_12.comments || [])
+                .slice(0, 25)
+                .map((comment_14) => ({
                     author: comment_14.name || comment_14.handle || '',
                     text: comment_14.text || '',
                     replies: (Array.isArray(comment_14.replies) ? comment_14.replies : [])
@@ -9027,11 +9722,12 @@ Worldbook:
                             author: reply_14.name || reply_14.handle || '',
                             text: reply_14.text || '',
                         })),
-                })),
-                images_3 = getPostImages(post_55).map((image_11) => ({
-                    text: image_11.text || image_11.description || '',
-                    vision: visionContextForImage(image_11.vision),
                 }));
+            const images_3 = getPostImages(post_55).map((image_11) => ({
+                text: image_11.text || image_11.description || '',
+                imageSource: image_11.imageSource || '',
+                vision: visionContextForImage(image_11.vision),
+            }));
             return {
                 user: {
                     name: currentProfile.name,
@@ -9058,75 +9754,53 @@ Worldbook:
             };
         }
         async function requestPostInteractionBatch(value_658, options_9 = {}) {
-            const includePrivateMessages_2 = options_9.includePrivateMessages !== false,
-                context_4 = handleAction_224(value_658),
-                contextText = JSON.stringify(context_4),
-                handleAction_61_1485 = getSelectedWorldBookContext(
-                    context_4.post.text +
-                        ' ' +
-                        context_4.post.topicTag +
-                        ' ' +
-                        currentProfile.persona +
-                        ' ' +
-                        contextText,
-                ),
-                outputShape = includePrivateMessages_2
-                    ? '{"comments":[{"authorName":"","handle":"","text":"","translation":"","replies":[{"authorName":"","handle":"","text":"","translation":""}]}],"privateMessages":[{"name":"","handle":"","bio":"","translation":"","persona":"","messages":[{"text":"","translation":""},{"text":"","translation":""}]}]}'
-                    : '{"comments":[{"authorName":"","handle":"","text":"","translation":"","replies":[{"authorName":"","handle":"","text":"","translation":""}]}]}',
-                content_6 =
-                    'Return strict JSON only in this shape: ' +
-                    outputShape +
-                    `.
-Generate engagement for this exact X post.
-Minimum requirements:
-- comments plus nested replies combined MUST contain at least 10 generated comment objects.
-- Comments and replies must react to concrete details from the post, image descriptions, topic, existing comments, User persona, or Worldbook.
-- When an image includes a ready vision object, use it as the only visual evidence. Do not invent visual details that are absent from that object.
-` +
-                    (includePrivateMessages_2
-                        ? `- privateMessages MUST contain at least 2 new stranger private-message conversations.
-- Each privateMessages[].messages MUST contain 2 to 5 incoming message objects, and every message is authored by that stranger.
-- Private messages must be prompted by this specific User post and must not reuse existing DM contacts.`
-                        : '- Do not include privateMessages or any private-message content.') +
-                    `
-- Never generate content authored by the current User. The User is context only.
-- Every generated author must be a non-User identity.
-- Every user-facing text object must include translation. If the original text is Simplified Chinese, translation must be "".
-- Do not include markdown, explanations, or text outside JSON.
-` +
-                    (options_9.retryReason ? 'Retry reason: ' + options_9.retryReason : '') +
-                    `
-
-User profile/persona:
-` +
-                    JSON.stringify(context_4.user) +
-                    `
-
-Post context:
-` +
-                    contextText +
-                    `
-
-Worldbook:
-` +
-                    (handleAction_61_1485 || 'None'),
-                raw_19 = await requestXChatCompletion(
-                    [
-                        {
-                            role: 'system',
-                            content:
-                                'Generate strict JSON for fictional X post engagement. Output JSON only.',
-                        },
-                        {
-                            role: 'user',
-                            content: content_6,
-                        },
-                    ],
+            const includePrivateMessages_2 = options_9.includePrivateMessages !== false;
+            const context_4 = handleAction_224(value_658);
+            const contextText = JSON.stringify(context_4);
+            const handleAction_61_1485 = getSelectedWorldBookContext(
+                context_4.post.text +
+                    ' ' +
+                    context_4.post.topicTag +
+                    ' ' +
+                    currentProfile.persona +
+                    ' ' +
+                    contextText,
+            );
+            const outputShape = includePrivateMessages_2
+                ? '{"comments":[{"authorName":"","handle":"","text":"","translation":"","replies":[{"authorName":"","handle":"","text":"","translation":""}]}],"privateMessages":[{"name":"","handle":"","bio":"","translation":"","persona":"","messages":[{"text":"","translation":""},{"text":"","translation":""}]}]}'
+                : '{"comments":[{"authorName":"","handle":"","text":"","translation":"","replies":[{"authorName":"","handle":"","text":"","translation":""}]}]}';
+            const content_6 =
+                'Return strict JSON only in this shape: ' +
+                outputShape +
+                ".\nGenerate engagement for this exact X post.\nMinimum requirements:\n- comments plus nested replies combined MUST contain at least 10 generated comment objects.\n- Comments and replies must react to concrete details from the post, image descriptions, topic, existing comments, User persona, or Worldbook.\n- Use each image's text as the author's optional description. When a ready vision object is present, ground visual claims in it and use the author's description as supplied context. Do not invent unseen details.\n- Images with imageSource:\"placeholder\" have no actual photograph. React only to their supplied descriptions; never claim to see or analyze a real photo for these entries.\n" +
+                (includePrivateMessages_2
+                    ? '- privateMessages MUST contain at least 2 new stranger private-message conversations.\n- Each privateMessages[].messages MUST contain 2 to 5 incoming message objects, and every message is authored by that stranger.\n- Private messages must be prompted by this specific User post and must not reuse existing DM contacts.'
+                    : '- Do not include privateMessages or any private-message content.') +
+                '\n- Never generate content authored by the current User. The User is context only.\n- Every generated author must be a non-User identity.\n- Every user-facing text object must include translation. If the original text is Simplified Chinese, translation must be "".\n- Do not include markdown, explanations, or text outside JSON.\n' +
+                (options_9.retryReason ? 'Retry reason: ' + options_9.retryReason : '') +
+                '\n\nUser profile/persona:\n' +
+                JSON.stringify(context_4.user) +
+                '\n\nPost context:\n' +
+                contextText +
+                '\n\nWorldbook:\n' +
+                (handleAction_61_1485 || 'None');
+            const raw_19 = await requestXChatCompletion(
+                [
                     {
-                        temperature: 0.9,
+                        role: 'system',
+                        content:
+                            'Generate strict JSON for fictional X post engagement. Output JSON only.',
                     },
-                ),
-                parsed_8 = parseJsonPayload(raw_19);
+                    {
+                        role: 'user',
+                        content: content_6,
+                    },
+                ],
+                {
+                    temperature: 0.9,
+                },
+            );
+            const parsed_8 = parseJsonPayload(raw_19);
             return {
                 comments: normalizePostInteractionComments(parsed_8),
                 privateMessages: includePrivateMessages_2
@@ -9211,22 +9885,25 @@ Worldbook:
             );
         }
         async function generatePostPublishInteractions(postId_16, options_11 = {}) {
-            const runKey = String(postId_16 || '');
-            if (!runKey || postVisionRuns.has(runKey)) return;
-            postVisionRuns.add(runKey);
+            const runKey = getXState().activeXPlayerAccountId;
+            const _value222 = runKey + ':' + (postId_16 || '');
+            if (!_value222 || postVisionRuns.has(_value222)) return;
+            postVisionRuns.add(_value222);
             try {
                 try {
                     await enrichPublishedPostImages(postId_16, options_11.imageSources);
                 } catch (error_16) {
                     console.warn('[X] Post image understanding persistence failed', error_16);
                 }
+                if (runKey !== getXState().activeXPlayerAccountId) return;
                 const result_3 = await requestPostInteractionsWithRetry(postId_16, {
-                        includePrivateMessages: true,
-                        minCommentItems: 10,
-                        minPrivateMessages: 2,
-                    }),
-                    handleAction_227_1516 = handleAction_227(postId_16, result_3.comments),
-                    addedDms = prependGeneratedPrivateMessages(result_3.privateMessages);
+                    includePrivateMessages: true,
+                    minCommentItems: 10,
+                    minPrivateMessages: 2,
+                });
+                if (runKey !== getXState().activeXPlayerAccountId) return;
+                const handleAction_227_1516 = handleAction_227(postId_16, result_3.comments);
+                const addedDms = prependGeneratedPrivateMessages(result_3.privateMessages);
                 await flushXStateNow('x-post-publish-interactions');
                 typeof window.showToast === 'function' &&
                     window.showToast(
@@ -9237,7 +9914,7 @@ Worldbook:
                 if (typeof window.showToast === 'function')
                     window.showToast('Post published, but API engagement generation failed');
             } finally {
-                postVisionRuns['delete'](runKey);
+                postVisionRuns['delete'](_value222);
             }
         }
         async function handleAction_230() {
@@ -9751,8 +10428,15 @@ Worldbook:
         }
         function switchTab(index_20, value_1596 = {}) {
             if (index_20 < 0 || index_20 >= navItems.length) return;
+            _value11();
+            currentDetailPostId = null;
+            currentProfileIdentity = null;
+            currentDmId = null;
+            currentTopicContext = null;
+            replyTarget = null;
             const value_1597 = currentIndex;
             currentIndex = index_20;
+            renderVisibleXTab(index_20, value_1596.state || getXState(), value_1596);
             const value_1598 = ++count_43;
             items_10.forEach((value_1600) => value_1600.cancel());
             items_10 = [];
@@ -9778,16 +10462,16 @@ Worldbook:
                 (value_1597 === index_20 || value_1596.resetHomeFeed) &&
                     handleAction_50(value_1599);
             if (value_1597 !== index_20) {
-                const value_1604 = tabs[index_20],
-                    value_1605 = tabs[value_1597],
-                    value_1606 = index_20 > value_1597 ? 1 : -1,
-                    options_1607 = {
-                        duration: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-                            ? 0
-                            : 320,
-                        easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
-                        fill: 'both',
-                    };
+                const value_1604 = tabs[index_20];
+                const value_1605 = tabs[value_1597];
+                const value_1606 = index_20 > value_1597 ? 1 : -1;
+                const options_1607 = {
+                    duration: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+                        ? 0
+                        : 320,
+                    easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+                    fill: 'both',
+                };
                 if (value_1604.animate && value_1605.animate) {
                     items_10 = [
                         value_1605.animate(
@@ -9856,12 +10540,16 @@ Worldbook:
                 if (typeof window.showToast === 'function') window.showToast('对应帖子不存在');
                 return;
             }
+            _value1('post', value_1615);
             const value_1617 = String(currentDetailPostId) !== String(value_1615);
             currentDetailPostId = value_1615;
-            const value_1618 = ++count_44,
-                detailPost = document.getElementById('x-detail-post'),
-                postThread_746 = getPostThread(value_1615);
+            const value_1618 = ++count_44;
+            const detailPost = document.getElementById('x-detail-post');
+            const postThread_746 = getPostThread(value_1615);
             if (value_1617) {
+                replyTarget = null;
+                const _value223 = document.getElementById('x-reply-input');
+                if (_value223) _value223.value = '';
                 value_33 = null;
                 value_31 = count_30;
                 count_32 = 0;
@@ -9872,54 +10560,35 @@ Worldbook:
             }
             detailPost &&
                 (detailPost.innerHTML =
-                    `
-                    <div class="x-detail-author">
-                        ` +
+                    '\n                    <div class="x-detail-author">\n                        ' +
                     buildAuthorAvatarButton(post_57, 'x-avatar') +
-                    `
-                        <div>
-                            <strong>` +
+                    '\n                        <div>\n                            <strong>' +
                     escapeHtml(post_57.name) +
-                    `</strong>
-                            <span>` +
+                    '</strong>\n                            <span>' +
                     escapeHtml(post_57.handle) +
-                    `</span>
-                        </div>
-                    </div>
-                    <p class="x-detail-text">` +
+                    '</span>\n                        </div>\n                    </div>\n                    <p class="x-detail-text">' +
                     renderPostTextHtml(post_57) +
-                    `</p>
-                    ` +
+                    '</p>\n                    ' +
                     buildExpandableTranslationHtml(
                         post_57.translation,
                         'x-post-translation-toggle',
                     ) +
-                    `
-                    ` +
+                    '\n                    ' +
                     handleAction_23(getPostImages(post_57), post_57.id) +
-                    `
-                    <div class="x-detail-inline-actions">
-                        <button id="x-detail-repost-btn" type="button" class="x-detail-inline-action ` +
+                    '\n                    <div class="x-detail-inline-actions">\n                        <button id="x-detail-repost-btn" type="button" class="x-detail-inline-action ' +
                     (postThread_746.reposted ? 'active' : '') +
-                    `" aria-label="Repost">
-                            <i class="fas fa-retweet"></i><span>` +
+                    '" aria-label="Repost">\n                            <i class="fas fa-retweet"></i><span>' +
                     escapeHtml(formatCompactCount(postThread_746.reposts)) +
-                    `</span>
-                        </button>
-                        <button id="x-detail-like-btn" type="button" class="x-detail-inline-action ` +
+                    '</span>\n                        </button>\n                        <button id="x-detail-like-btn" type="button" class="x-detail-inline-action ' +
                     (postThread_746.liked ? 'active' : '') +
-                    `" aria-label="Like">
-                            <i class="` +
+                    '" aria-label="Like">\n                            <i class="' +
                     (postThread_746.liked ? 'fas' : 'far') +
                     ' fa-heart"></i><span>' +
                     escapeHtml(formatCompactCount(postThread_746.likes)) +
-                    `</span>
-                        </button>
-                    </div>
-                `);
-            const xDetailRepostsElement = document.getElementById('x-detail-reposts'),
-                xDetailLikesElement = document.getElementById('x-detail-likes'),
-                xDetailCommentsElement_747 = document.getElementById('x-detail-comments');
+                    '</span>\n                        </button>\n                    </div>\n                ');
+            const xDetailRepostsElement = document.getElementById('x-detail-reposts');
+            const xDetailLikesElement = document.getElementById('x-detail-likes');
+            const xDetailCommentsElement_747 = document.getElementById('x-detail-comments');
             if (xDetailRepostsElement)
                 xDetailRepostsElement.textContent = formatCompactCount(postThread_746.reposts);
             if (xDetailLikesElement)
@@ -9944,6 +10613,7 @@ Worldbook:
             });
         }
         function closePostDetail() {
+            if (_value10('post')) return;
             count_44 += 1;
             postDetailView?.contains(document.activeElement) && document.activeElement.blur();
             postDetailView?.classList.remove('active');
@@ -10025,11 +10695,12 @@ Worldbook:
             if (window.isJiggleMode) return;
             if (window.globalDataReadyPromise) await window.globalDataReadyPromise;
             view.scrollTop = 0;
-            view.classList.add('active');
             ensureXEventBindings();
             xHomeFeedRenderLimit = xHomeFeedInitialLimit;
             const state_21 = getXState();
             syncCurrentProfile(state_21);
+            renderVisibleXTab(currentIndex, state_21, { resetHomeFeed: true });
+            view.classList.add('active');
             requestAnimationFrame(() => {
                 switchTab(currentIndex, {
                     state: state_21,
@@ -10039,6 +10710,7 @@ Worldbook:
             });
         }
         function closeXApp() {
+            _value11();
             count_43 += 1;
             items_10.forEach((value_1635) => value_1635.cancel());
             items_10 = [];
@@ -10061,7 +10733,7 @@ Worldbook:
             closeCharProfileGenerateSheet();
             closeEditSuperTopicSheet();
             closePostForwardSheet();
-            closeImagePreview();
+            _value20();
             view.classList.remove('active');
             flushXStateNow('x-close');
         }
@@ -10176,16 +10848,19 @@ Worldbook:
             nextDayBtn?.addEventListener('click', openAdvanceSheet);
             document
                 .getElementById('x-search-generate-btn')
-                ?.addEventListener('click', () => openSearchGenerateSheet('home'));
+                ?.addEventListener('click', () => _value23('home'));
             document
                 .getElementById('x-discover-search-btn')
-                ?.addEventListener('click', () => openSearchGenerateSheet('discover'));
+                ?.addEventListener('click', () => _value23('discover'));
             document
                 .getElementById('x-search-generate-close-btn')
                 ?.addEventListener('click', closeSearchGenerateSheet);
             document
                 .getElementById('x-search-generate-run-btn')
                 ?.addEventListener('click', handleAction_218);
+            document
+                .getElementById('x-home-mount-single-chat')
+                ?.addEventListener('change', () => _value22());
             document
                 .getElementById('x-advance-close-btn')
                 ?.addEventListener('click', closeAdvanceSheet);
@@ -10364,9 +11039,13 @@ Worldbook:
                 allowEmpty: true,
                 blurAfterSend: true,
             });
+            document.getElementById('x-image-preview-close')?.addEventListener('click', _value20);
             document
-                .getElementById('x-image-preview-close')
-                ?.addEventListener('click', closeImagePreview);
+                .getElementById('x-image-description-input')
+                ?.addEventListener('input', closeImagePreview);
+            document
+                .getElementById('x-image-description-done')
+                ?.addEventListener('click', _value20);
             document
                 .getElementById('x-image-download-btn')
                 ?.addEventListener('click', handleAction_102);
@@ -10400,7 +11079,16 @@ Worldbook:
                 ?.addEventListener('click', handleAction_110);
             composeCancelButton?.addEventListener('click', closeComposer);
             composeSubmitButton?.addEventListener('click', handleAction_115);
-            composeImageButton?.addEventListener('click', () => composeImageInput?.click());
+            composeImageButton?.addEventListener('click', () => _value?.click());
+            composeImageInput?.addEventListener('click', () => {
+                if (value_38 || _value4) return;
+                _value14('', 'placeholder') &&
+                    handleAction_95({
+                        dataset: {
+                            composeImageId: composeImageDraft.at(-1).id,
+                        },
+                    });
+            });
             composeImageUrlButton?.addEventListener('click', addComposeImageUrl);
             composeImageUrlInput?.addEventListener('keydown', (event_757) => {
                 event_757.key === 'Enter' &&
@@ -10408,11 +11096,39 @@ Worldbook:
                     event_757.keyCode !== 229 &&
                     (event_757.preventDefault(), addComposeImageUrl());
             });
-            composeImageClearButton?.addEventListener('click', () => {
-                composeImageDraft = '';
-                if (composeImageInput) composeImageInput.value = '';
-                if (composeImageUrlInput) composeImageUrlInput.value = '';
-                renderComposeImageDraft();
+            document
+                .getElementById('x-compose-image-link-toggle')
+                ?.addEventListener('click', (_value226) => {
+                    const _value227 = document.getElementById('x-compose-image-url-row');
+                    if (!_value227) return;
+                    _value227.hidden = !_value227.hidden;
+                    _value226.currentTarget.setAttribute(
+                        'aria-expanded',
+                        String(!_value227.hidden),
+                    );
+                    if (!_value227.hidden) composeImageUrlInput?.focus();
+                });
+            composeImagePreview?.addEventListener('click', (_value228) => {
+                const _value229 = _value228.target.closest('[data-compose-remove-id]');
+                const _value230 = _value228.target.closest('[data-compose-preview-id]');
+                if (_value229) {
+                    composeImageDraft = composeImageDraft.filter(
+                        (_value231) => _value231.id !== _value229.dataset.composeRemoveId,
+                    );
+                    renderComposeImageDraft();
+                } else {
+                    if (_value230) {
+                        const _value232 = composeImageDraft.find(
+                            (_value233) => _value233.id === _value230.dataset.composePreviewId,
+                        );
+                        if (_value232)
+                            handleAction_95({
+                                dataset: {
+                                    composeImageId: _value232.id,
+                                },
+                            });
+                    }
+                }
             });
             document
                 .querySelector('.x-compose-button')
@@ -10466,7 +11182,6 @@ Worldbook:
                 if (topicLink) {
                     event_7.preventDefault();
                     event_7.stopPropagation();
-                    closePostDetail();
                     openTopicDetail(topicLink.dataset.topicTag);
                     return;
                 }
@@ -10526,6 +11241,15 @@ Worldbook:
                     openCharEditSheet(profileEdit.dataset.profileEditId);
                     return;
                 }
+                const _value234 = event_7.target.closest('[data-profile-message-id]');
+                if (_value234) {
+                    event_7.preventDefault();
+                    event_7.stopPropagation();
+                    const _value235 = _value16(_value234.dataset.profileMessageId);
+                    const _value236 = _value17(_value235);
+                    if (_value236) openDmChat(_value236.id);
+                    return;
+                }
                 const profileGenerate = event_7.target.closest('#x-char-profile-generate-btn');
                 if (profileGenerate) {
                     event_7.preventDefault();
@@ -10567,18 +11291,19 @@ Worldbook:
                 );
                 if (profileTab) {
                     event_7.preventDefault();
-                    const nextTab = profileTab.getAttribute('data-x-profile-tab'),
-                        profileRoot = profileTab.closest('#x-profile-scroll, .x-dm-profile-scroll'),
-                        tabButtons = Array.from(
-                            profileRoot?.querySelectorAll(
-                                '.x-unified-profile-tabs button[data-x-profile-tab]',
-                            ) || [],
-                        ),
-                        panels_2 = Array.from(
-                            profileRoot?.querySelectorAll(
-                                '.x-profile-panel[data-x-profile-panel]',
-                            ) || [],
-                        );
+                    const nextTab = profileTab.getAttribute('data-x-profile-tab');
+                    const profileRoot = profileTab.closest(
+                        '#x-profile-scroll, .x-dm-profile-scroll',
+                    );
+                    const tabButtons = Array.from(
+                        profileRoot?.querySelectorAll(
+                            '.x-unified-profile-tabs button[data-x-profile-tab]',
+                        ) || [],
+                    );
+                    const panels_2 = Array.from(
+                        profileRoot?.querySelectorAll('.x-profile-panel[data-x-profile-panel]') ||
+                            [],
+                    );
                     switchButtonTabs(
                         tabButtons,
                         panels_2,
@@ -10622,7 +11347,7 @@ Worldbook:
                 const dmProfileButton = event_7.target.closest('[data-dm-profile-id]');
                 if (dmProfileButton) {
                     event_7.preventDefault();
-                    openDmProfile(dmProfileButton.dataset.dmProfileId);
+                    _value18(dmProfileButton.dataset.dmProfileId);
                     return;
                 }
                 const closeTrigger = event_7.target.closest('[data-x-close]');
@@ -10644,12 +11369,12 @@ Worldbook:
                 const replyButton = event_7.target.closest('.x-comment-reply-btn');
                 if (replyButton) {
                     event_7.preventDefault();
-                    const commentId_4 = replyButton.dataset.commentId,
-                        replyId_4 = replyButton.dataset.replyId || '';
+                    const commentId_4 = replyButton.dataset.commentId;
+                    const replyId_4 = replyButton.dataset.replyId || '';
                     let safeText_1713 = safeText(replyButton.dataset.replyName);
                     if (!safeText_1713 && currentDetailPostId) {
-                        const postThread_1714 = getPostThread(currentDetailPostId),
-                            comment_16 = findCommentById(postThread_1714, commentId_4);
+                        const postThread_1714 = getPostThread(currentDetailPostId);
+                        const comment_16 = findCommentById(postThread_1714, commentId_4);
                         safeText_1713 = replyId_4
                             ? safeText(
                                   findReplyById(comment_16, replyId_4)?.name,
@@ -10699,7 +11424,7 @@ Worldbook:
                 element_7,
                 dmSettingsSheet,
                 searchGenerateSheet,
-                advanceSheet,
+                _value2,
                 imagePreviewOverlay,
                 createTopicSheet,
                 postSettingsSheet,
@@ -10714,8 +11439,8 @@ Worldbook:
                         if (value_802 === element_7) handleAction_70();
                         if (value_802 === dmSettingsSheet) closeDmSettingsSheet();
                         if (value_802 === searchGenerateSheet) closeSearchGenerateSheet();
-                        if (value_802 === advanceSheet) closeAdvanceSheet();
-                        if (value_802 === imagePreviewOverlay) closeImagePreview();
+                        if (value_802 === _value2) closeAdvanceSheet();
+                        if (value_802 === imagePreviewOverlay) _value20();
                         if (value_802 === createTopicSheet) closeCreateTopicSheet();
                         if (value_802 === postSettingsSheet) closePostSettingsSheet();
                         if (value_802 === charEditSheet) closeCharEditSheet();
@@ -10806,16 +11531,13 @@ Worldbook:
                     );
                 },
             );
-            bindFilePreview(composeImageInput, xImageCompressionPresets.post, (src_8) => {
-                composeImageDraft = src_8;
-                renderComposeImageDraft();
-            });
+            _value?.addEventListener('change', _value15);
             const homeFeedButtons = Array.from(
-                    view.querySelectorAll('.x-home-feed-tabs button[data-feed]'),
-                ),
-                homeFeedPanels = Array.from(
-                    view.querySelectorAll('.x-feed-panel[data-feed-panel]'),
-                );
+                view.querySelectorAll('.x-home-feed-tabs button[data-feed]'),
+            );
+            const homeFeedPanels = Array.from(
+                view.querySelectorAll('.x-feed-panel[data-feed-panel]'),
+            );
             homeFeedButtons.forEach((button_5) => {
                 button_5.addEventListener('click', () => {
                     switchButtonTabs(
@@ -10828,9 +11550,11 @@ Worldbook:
                 });
             });
             const superTabButtons = Array.from(
-                    view.querySelectorAll('#x-super-profile-tabs button[data-super-tab]'),
-                ),
-                superPanels = Array.from(view.querySelectorAll('.x-super-feed[data-super-panel]'));
+                view.querySelectorAll('#x-super-profile-tabs button[data-super-tab]'),
+            );
+            const superPanels = Array.from(
+                view.querySelectorAll('.x-super-feed[data-super-panel]'),
+            );
             superTabButtons.forEach((button_6) => {
                 button_6.addEventListener('click', () => {
                     switchButtonTabs(

@@ -1422,6 +1422,14 @@
     background: #333;
     position: relative;
     overflow: hidden;
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    text-align: inherit;
+    cursor: pointer;
 }
 
 .tk-grid-text {
@@ -1499,9 +1507,10 @@
 
 .tk-share-actions-row {
     display: flex;
-    gap: 20px;
-    padding: 10px 15px 20px;
-    justify-content: flex-start;
+    gap: 12px;
+    padding: 10px 0 20px;
+    justify-content: space-between;
+    overflow-x: auto;
 }
 
 .tk-share-action-item {
@@ -1865,6 +1874,8 @@
 .tiktok-view .bottom-sheet-overlay {
     /* Base for sheets to override video if inside the same container */
     z-index: 800;
+    overflow: hidden;
+    overscroll-behavior: contain;
 }
 
 .tk-search-generate-sheet {
@@ -1877,6 +1888,8 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    flex: 0 1 auto;
+    min-height: 0;
 }
 
 .tk-search-generate-box {
@@ -1896,7 +1909,9 @@
     outline: 0;
     background: transparent;
     color: #111;
-    font-size: 15px;
+    min-width: 0;
+    font: inherit;
+    font-size: 16px;
 }
 
 .tk-search-generate-hint {
@@ -1907,6 +1922,9 @@
     width: 100%;
     margin: 0;
     box-sizing: border-box;
+    border: 0;
+    font-family: inherit;
+    cursor: pointer;
 }
 
 .tk-search-generate-count {
@@ -1930,6 +1948,7 @@
     color: #111;
     font: inherit;
     text-align: right;
+    font-size: 16px;
 }
 
 .tk-dm-profile-intro {
@@ -2187,7 +2206,15 @@
 .tk-grid-item img {
 }
 .tk-grid-item .tk-grid-text {
-    border: none !important;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    transform: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #111;
 }
 #tk-fullscreen-video-view img {
 }
@@ -2269,4 +2296,291 @@
 
 #tk-feed-container .tk-feed-progress {
     bottom: calc(var(--tk-bottom-nav-offset) + var(--tk-bottom-nav-height));
+}
+.tk-grid-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tk-grid-item [hidden] { display: none; }
+.tk-grid-without-cover .tk-grid-views { color: #6c717c; }
+.tk-grid-item:focus-visible { outline: 2px solid #8c9ebc; outline-offset: -3px; }
+.tk-grid-empty { grid-column: span 3; padding: 40px 0; text-align: center; color: #999; font-size: 13px; }
+.tk-video-card {
+    content-visibility: auto;
+    contain: layout paint style;
+}
+#tk-home-tab:not(.tk-motion-enabled) .tk-video-card *,
+#tk-home-tab:not(.tk-motion-enabled) .tk-video-card *::after,
+.tk-video-card:not(.tk-feed-playing) *,
+.tk-video-card:not(.tk-feed-playing) *::after {
+    animation-play-state: paused !important;
+}
+.tk-share-actions-row button.tk-share-action-item {
+    border: 0;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    padding: 0;
+    cursor: pointer;
+}
+#tk-profile-settings-sheet {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #24262c;
+}
+#tk-profile-settings-sheet .tk-settings-sheet {
+    padding: 10px 0 0;
+    max-height: 88%;
+    border-radius: 24px 24px 0 0;
+    background: #f5f6f8;
+}
+.tk-settings-sheet .sheet-handle {
+    flex-shrink: 0;
+    width: 32px;
+    height: 4px;
+    margin: 2px auto 14px;
+    background: #c4c6cc;
+    opacity: 1;
+}
+.tk-settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
+    padding: 0 20px 16px;
+}
+.tk-settings-header h2 {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 650;
+    letter-spacing: -0.3px;
+}
+.tk-settings-close {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #e9eaee;
+    color: #83868e;
+    cursor: pointer;
+}
+.tk-settings-sheet svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.tk-settings-content {
+    min-height: 0;
+    padding: 0 16px max(24px, env(safe-area-inset-bottom, 0px));
+    overscroll-behavior: contain;
+}
+.tk-settings-section + .tk-settings-section { margin-top: 20px; }
+.tk-settings-label {
+    margin: 0 12px 8px;
+    color: #878b94;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 18px;
+}
+.tk-settings-group {
+    overflow: hidden;
+    border: 1px solid #eeeff2;
+    border-radius: 18px;
+    background: #fff;
+}
+.tk-settings-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 74px;
+    padding: 14px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.15s ease;
+}
+.tk-settings-row + .tk-settings-row::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 62px;
+    right: 14px;
+    height: 1px;
+    background: #f0f1f4;
+}
+.tk-settings-icon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: #f2f3f6;
+    color: #6c717c;
+}
+.tk-settings-copy { flex: 1; min-width: 0; }
+.tk-settings-row-title {
+    display: block;
+    font-size: 15px;
+    font-weight: 550;
+    line-height: 22px;
+}
+.tk-settings-description {
+    display: block;
+    margin-top: 3px;
+    color: #8c9099;
+    font-size: 12px;
+    line-height: 18px;
+    overflow-wrap: anywhere;
+}
+.tk-settings-book-status {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.tk-settings-sheet .tk-settings-chevron {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: #b8bbc3;
+}
+.tk-settings-row-destructive .tk-settings-icon { color: #d65d68; background: #fff0f1; }
+.tk-settings-row-destructive .tk-settings-row-title { color: #cd5260; }
+.tk-settings-row:active { background: #f1f2f5; }
+.tk-settings-close:active { background: #dfe1e7; }
+.tk-settings-row:focus-visible, .tk-settings-close:focus-visible {
+    outline: 2px solid #8c9ebc;
+    outline-offset: -3px;
+}
+.tk-settings-row:disabled { opacity: 0.45; cursor: default; }
+@media (hover: hover) and (pointer: fine) {
+    .tk-settings-row:hover:not(:disabled) { background: #f8f9fb; }
+}
+@media (hover: hover) and (pointer: fine) {
+    .tk-settings-close:hover { background: #dfe1e7; }
+}
+
+.tk-image-preview-sheet {
+    min-height: 0;
+    padding-bottom: max(16px, var(--safe-bottom));
+}
+.tk-image-preview-content {
+    padding: 0 0 12px;
+    min-height: 0;
+}
+.tk-image-preview-image {
+    display: block;
+    width: 100%;
+    max-height: 52vh;
+    object-fit: contain;
+    border-radius: 14px;
+    background: #e8e8ed;
+}
+.tk-image-preview-image[hidden] { display: none; }
+.tk-image-preview-status {
+    margin: 14px 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #6e6e73;
+    overflow-wrap: anywhere;
+}
+.tk-image-preview-actions {
+    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+.tk-image-preview-actions button {
+    min-height: 44px;
+    padding: 10px 8px;
+    border: 0;
+    border-radius: 14px;
+    background: #fff;
+    color: #111;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+.tk-image-preview-actions button[data-action="apply"] { background: #111; color: #fff; }
+.tk-image-preview-actions button:disabled { opacity: 0.4; cursor: default; }
+.tk-image-preview-actions button:active:not(:disabled) { opacity: 0.7; }
+
+#tk-sub-profile-api-btn { padding: 0; font: inherit; cursor: pointer; }
+#tk-sub-profile-api-btn:disabled { opacity: 0.45; cursor: default; }
+#tk-sub-profile-api-btn:focus-visible { outline: 2px solid #8c9ebc; outline-offset: 2px; }
+.tk-grid-item .tk-grid-text {
+
+    border: none !important;
+}
+
+/* The TK settings use the existing Shop sheet layout. */
+#tk-profile-settings-sheet {
+    font-family: inherit;
+    color: #000;
+}
+#tk-profile-settings-sheet .tk-settings-shop-sheet {
+    height: auto;
+    max-height: 85%;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    border-radius: 28px 28px 0 0;
+    background: #fff;
+}
+.tk-settings-shop-sheet .sheet-handle {
+    width: 36px;
+    height: 5px;
+    margin: 8px auto 20px;
+    background: #c7c7cc;
+    opacity: 0.8;
+}
+.tk-settings-shop-sheet .sheet-title {
+    color: #101012;
+    font-size: 23px;
+    font-weight: 740;
+    letter-spacing: -0.035em;
+}
+.tk-settings-shop-sheet .tk-settings-row {
+    gap: 0;
+    height: auto;
+    min-height: 50px;
+    padding: 12px 16px;
+    border-radius: 0;
+}
+.tk-settings-shop-sheet .tk-settings-row + .tk-settings-row::before {
+    content: none;
+}
+.tk-settings-shop-sheet .tk-settings-icon {
+    margin-right: 12px;
+    width: 29px;
+    height: 29px;
+    border-radius: 7px;
+}
+.tk-settings-shop-sheet .tk-settings-row-title {
+    font-size: 17px;
+    font-weight: inherit;
+    line-height: 22px;
+}
+.tk-settings-shop-sheet .tk-settings-book-status {
+    font-size: 13px;
+    color: #8e8e93;
+    margin-right: 6px;
+    max-width: 44%;
+}
+.tk-settings-shop-sheet .tk-settings-chevron {
+    color: #c7c7cc;
 }

@@ -507,12 +507,12 @@
                     coverUrl: toMediaReference(result.setup.coverUrl),
                     cast: Array.isArray(result.setup.cast)
                         ? result.setup.cast.map((actor) =>
-                              actor && typeof actor === 'object'
-                                  ? {
-                                        ...actor,
-                                        avatar: toMediaReference(actor.avatar),
-                                    }
-                                  : actor,
+                    actor && typeof actor === 'object'
+                        ? {
+                              ...actor,
+                              avatar: toMediaReference(actor.avatar),
+                          }
+                        : actor,
                           )
                         : result.setup.cast,
                 };
@@ -1407,11 +1407,32 @@
                 });
             },
         );
-        (Array.isArray(next.xDirectMessages) ? next.xDirectMessages : []).forEach((dm, dmIndex) => {
+        [
+            ...(Array.isArray(next.xAccounts) ? next.xAccounts : []),
+            ...(Array.isArray(next.xDirectMessages) ? next.xDirectMessages : []),
+        ].forEach((dm, dmIndex) => {
             const charId =
                 String(dm?.id ?? dmIndex)
                     .replace(/[^a-z0-9_-]+/gi, '-')
                     .slice(0, 80) || `char-${dmIndex}`;
+            persistField(dm, 'avatar', 'avatarAssetId', scopedAssetId(`char_${charId}_avatar`), {
+                ownerType: 'x_char_profile',
+                ownerId: String(dm?.id ?? dmIndex),
+                accountId: accountNamespace,
+                field: 'avatar',
+            });
+            persistField(
+                dm,
+                'coverImage',
+                'coverImageAssetId',
+                scopedAssetId(`char_${charId}_cover`),
+                {
+                    ownerType: 'x_char_profile',
+                    ownerId: String(dm?.id ?? dmIndex),
+                    accountId: accountNamespace,
+                    field: 'coverImage',
+                },
+            );
             persistField(
                 dm,
                 'profileImageFaceReferenceUrl',
@@ -1540,7 +1561,12 @@
                 if (image?.assetId && !image.url) image.url = await getAssetUrl(image.assetId);
             }
         }
-        for (const dm of Array.isArray(next.xDirectMessages) ? next.xDirectMessages : []) {
+        for (const dm of [
+            ...(Array.isArray(next.xAccounts) ? next.xAccounts : []),
+            ...(Array.isArray(next.xDirectMessages) ? next.xDirectMessages : []),
+        ]) {
+            await hydrateField(dm, 'avatar', 'avatarAssetId');
+            await hydrateField(dm, 'coverImage', 'coverImageAssetId');
             await hydrateField(
                 dm,
                 'profileImageFaceReferenceUrl',
@@ -1729,16 +1755,16 @@
                 );
                 const threadRows = Object.entries(persistedTarget.xPostThreads || {}).map(
                     ([postId, value]) => ({
-                        postId,
-                        value,
-                    }),
+                                postId,
+                                value,
+                            }),
                 );
                 await replaceCollectionRecords(stores[STORES.xThreads], threadRows, 'postId');
                 const dmRows = (persistedTarget.xDirectMessages || []).map((item, index) => ({
-                    ...item,
-                    id: String(item?.id ?? item?.charId ?? `x-dm-${index}`),
-                    updatedAt: Number(item?.updatedAt) || now,
-                }));
+                                    ...item,
+                                    id: String(item?.id ?? item?.charId ?? `x-dm-${index}`),
+                                    updatedAt: Number(item?.updatedAt) || now,
+                                }));
                 await replaceCollectionRecords(stores[STORES.xDms], dmRows, 'id');
                 stores[STORES.xAccountWorlds].delete(targetId);
                 persistedTargetResult = persistedTarget;
@@ -1858,10 +1884,10 @@
                                     ? persistedValue.xDirectMessages
                                     : []
                             ).map((item, index) => ({
-                                ...item,
-                                id: String(item?.id ?? item?.charId ?? `x-dm-${index}`),
-                                updatedAt: Number(item?.updatedAt) || now,
-                            }));
+                                    ...item,
+                                    id: String(item?.id ?? item?.charId ?? `x-dm-${index}`),
+                                    updatedAt: Number(item?.updatedAt) || now,
+                                }));
                             await replaceCollectionRecords(stores[STORES.xDms], dmRows, 'id');
                             const currentXAssets = collectAssetReferences(persistedValue);
                             removedXAssetIds = Array.from(previousXAssets).filter(
@@ -6265,7 +6291,8 @@
         );
         const existingTypes = await withStore([STORES.imFriends], 'readonly', (stores) =>
             Promise.all(
-                prepared.map((char) => requestToPromise(stores[STORES.imFriends].get(char.id))),
+                prepared.map((char) =>
+                                requestToPromise(stores[STORES.imFriends].get(char.id))),
             ),
         );
         if (existingTypes.some((friend) => friend && friend.type !== 'char')) {
@@ -6308,8 +6335,7 @@
                             existingMessages[index].forEach((message) =>
                                 stores[STORES.imMessages].delete(message.id),
                             );
-                            char.messages.forEach((message) =>
-                                stores[STORES.imMessages].put(message),
+                            char.messages.forEach((message) => stores[STORES.imMessages].put(message),
                             );
                             const current = existingFriends[index];
                             const restoredFields = char.offline
@@ -7443,7 +7469,8 @@
         if (momentMessages.length > 0) {
             reportProgress(progressCallback, '迁移朋友圈消息...', 68);
             await withStore([STORES.imMomentMessages], 'readwrite', (stores) => {
-                momentMessages.forEach((message) => stores[STORES.imMomentMessages].put(message));
+                momentMessages.forEach((message) =>
+                    stores[STORES.imMomentMessages].put(message));
             });
         }
         const stickers = Array.isArray(imessage.stickers) ? imessage.stickers : [];
