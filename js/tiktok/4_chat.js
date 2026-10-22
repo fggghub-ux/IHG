@@ -79,7 +79,7 @@
     function tkDmProfileIntroHtml(char_4) {
         const tkDmResolveAvatar_15 = tkDmResolveAvatar(char_4),
             value_16 = tkDmResolveAvatar_15
-                ? '<img src="' + tkDmEscapeHtml(tkDmResolveAvatar_15) + '" alt="">'
+                ? "<img referrerpolicy=\"no-referrer\" src=\"" + tkDmEscapeHtml(tkDmResolveAvatar_15) + '" alt="">'
                 : '<i class="fas fa-user"></i>';
         return (
             `
@@ -305,7 +305,7 @@
                   )
                 : tkState.profile.avatar,
             value_42 = selfAvatarUrl
-                ? '<img src="' + tkDmEscapeHtml(selfAvatarUrl) + '">'
+                ? "<img referrerpolicy=\"no-referrer\" src=\"" + tkDmEscapeHtml(selfAvatarUrl) + '">'
                 : '<i class="fas fa-user"></i>',
             element = document.createElement('div');
         element.className = 'tk-follow-item';
@@ -335,7 +335,7 @@
         followedChars.forEach((char_5) => {
             const tkDmResolveAvatar_46 = tkDmResolveAvatar(char_5),
                 value_47 = tkDmResolveAvatar_46
-                    ? '<img src="' + tkDmResolveAvatar_46 + '">'
+                    ? "<img referrerpolicy=\"no-referrer\" src=\"" + tkDmResolveAvatar_46 + '">'
                     : '<i class="fas fa-user"></i>',
                 element_48 = document.createElement('div');
             element_48.className = 'tk-follow-item';
@@ -370,7 +370,7 @@
                             : relationLabel || '开始聊天吧',
                     tkDmResolveAvatar_53 = tkDmResolveAvatar(char_6),
                     value_54 = tkDmResolveAvatar_53
-                        ? '<img src="' + tkDmResolveAvatar_53 + '">'
+                        ? "<img referrerpolicy=\"no-referrer\" src=\"" + tkDmResolveAvatar_53 + '">'
                         : '<i class="fas fa-user"></i>',
                     dmItem = document.createElement('div');
                 dmItem.className = 'tk-activity-item';
@@ -453,7 +453,7 @@
                 item_2.className = 'tk-import-item';
                 item_2.style.opacity = alreadyExists ? '0.5' : '1';
                 const value_60 = friend.avatarUrl
-                    ? '<img src="' +
+                    ? "<img referrerpolicy=\"no-referrer\" src=\"" +
                       friend.avatarUrl +
                       '" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">'
                     : '<i class="fas fa-user"></i>';
@@ -1589,7 +1589,7 @@
                 let text_205 = '';
                 !isConsecutive
                     ? (text_205 = tkDmResolveAvatar_178
-                          ? '<img src="' +
+                          ? "<img referrerpolicy=\"no-referrer\" src=\"" +
                             tkDmResolveAvatar_178 +
                             '" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 6px; object-fit: cover; background: #f0f0f0; flex-shrink: 0; align-self: flex-end;">'
                           : '<div style="width: 30px; height: 30px; border-radius: 50%; background: #f0f0f0; display: flex; justify-content: center; align-items: center; margin-right: 6px; color: #999; flex-shrink: 0; align-self: flex-end;"><i class="fas fa-user"></i></div>')

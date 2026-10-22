@@ -219,17 +219,18 @@
         return 'https://picsum.photos/seed/' + encodeURIComponent(value_57) + '/150/150';
     };
     window.tkResolveAvatar = function (id_2, name_2, value_60) {
+        const mediaUrl = window.tkNormalizeMediaUrl;
         if (String(id_2 || '') === 'profile')
-            return tkState?.profile?.avatar || value_60 || window.tkGetRandomAvatarUrl('profile');
+            return mediaUrl(tkState?.profile?.avatar) || mediaUrl(value_60) || window.tkGetRandomAvatarUrl('profile');
         const stableSeed = id_2 || name_2 || 'tk_avatar_' + Math.floor(Math.random() * 1000000),
             tkChar = id_2 && window.tkGetChar ? window.tkGetChar(id_2) : null;
         if (tkChar) {
-            if (tkChar.avatar) return tkChar.avatar;
+            if (mediaUrl(tkChar.avatar)) return mediaUrl(tkChar.avatar);
             return window.tkGetRandomAvatarUrl(
                 (tkChar.id || id_2 || name_2) + '_deleted_or_empty_avatar',
             );
         }
-        if (value_60) return value_60;
+        if (mediaUrl(value_60)) return mediaUrl(value_60);
         if (window.resolveYtLinkedImChar) {
             const imChar = window.resolveYtLinkedImChar({
                 id: id_2,
@@ -237,7 +238,7 @@
                 handle: id_2,
                 name: name_2,
             });
-            if (imChar && imChar.avatarUrl) return imChar.avatarUrl;
+            if (imChar && mediaUrl(imChar.avatarUrl)) return mediaUrl(imChar.avatarUrl);
         }
         return window.tkGetRandomAvatarUrl(stableSeed);
     };
@@ -1496,7 +1497,7 @@
                 video_12.authorAvatar,
             );
             const value_279 = finalAvatar
-                ? '<img src="' + finalAvatar + '">'
+                ? "<img referrerpolicy=\"no-referrer\" src=\"" + finalAvatar + '">'
                 : '<i class="fas fa-user"></i>';
             let formattedDesc = video_12.desc || '';
             formattedDesc = formattedDesc.replace(
@@ -1551,7 +1552,7 @@
                 cardContentHtml +=
                     '\n                    <div class="tk-feed-visual ' +
                     (mediaType_3 === 'image' ? 'tk-feed-image-visual' : '') +
-                    '">\n                        <img src="' +
+                    "\">\n                        <img referrerpolicy=\"no-referrer\" src=\"" +
                     tkEscapeAttr(visualImageUrl) +
                     '" alt="" loading="' +
                     (value_103 < 2 ? 'eager' : 'lazy') +
@@ -2302,7 +2303,7 @@
                           '">翻译</span>'
                         : '',
                     value_145 = authorAvatar_142
-                        ? '<img src="' +
+                        ? "<img referrerpolicy=\"no-referrer\" src=\"" +
                           tkEscapeAttr(authorAvatar_142) +
                           '" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">'
                         : '<i class="fas fa-user"></i>',
@@ -2420,7 +2421,7 @@
                         const rName = replyIdentity.authorName || 'User',
                             rAvatarUrl = replyIdentity.authorAvatar,
                             value_153 = rAvatarUrl
-                                ? '<img src="' +
+                                ? "<img referrerpolicy=\"no-referrer\" src=\"" +
                                   tkEscapeAttr(rAvatarUrl) +
                                   '" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">'
                                 : '<i class="fas fa-user"></i>',
@@ -2695,7 +2696,7 @@
                           char_10.avatar,
                       ),
                       value_187 = avatarUrl_2
-                          ? '<img src="' +
+                          ? "<img referrerpolicy=\"no-referrer\" src=\"" +
                             tkEscapeAttr(avatarUrl_2) +
                             '" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">'
                           : '<i class="fas fa-user"></i>';

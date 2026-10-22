@@ -139,9 +139,19 @@ function normalizeTkState(rawState = {}) {
             boundWorldBookIds: Array.isArray(safeState.settings?.boundWorldBookIds)
                 ? safeState.settings.boundWorldBookIds.filter(Boolean)
                 : [],
+            feedDefaultsVersion: 1,
         },
         chars: chars_2,
-        videos: Array.isArray(safeState.videos) ? safeState.videos : defaults.videos,
+        // The bridge's empty fallback has no TikTok activity state. An already
+        // initialized empty feed (including older explicit clears) stays empty.
+        videos:
+            Array.isArray(safeState.videos) &&
+            (safeState.videos.length ||
+                safeState.settings?.feedDefaultsVersion === 1 ||
+                safeState.settings?.videosCleared === true ||
+                Object.prototype.hasOwnProperty.call(safeState, 'activity'))
+                ? safeState.videos
+                : defaults.videos,
         dms: Array.isArray(safeState.dms) ? safeState.dms : defaults.dms,
     };
 }
@@ -180,12 +190,28 @@ window.tkGetChar = function (charId) {
 };
 const tkVideoAssetUrls = new Map();
 window.tkCacheVideoAsset = (_value4, _value5) => tkVideoAssetUrls.set(_value4, _value5);
+window.tkNormalizeMediaUrl = function (source) {
+    if (typeof source !== 'string') return '';
+    let url = source.trim().replace(/&amp;/g, '&');
+    if (!url || /^(?:null|undefined|\[object Object\])$/i.test(url)) return '';
+    const bundled = url.match(
+        /^(?:file:\/\/\/android_asset\/(?:www|public)\/|(?:capacitor|ionic|https?):\/\/localhost\/)(assets\/.+)$/i,
+    );
+    if (bundled) url = bundled[1];
+    if (url.startsWith('/assets/')) url = url.slice(1);
+    if (/^http:\/\/(?:picsum\.photos|api\.dicebear\.com)\//i.test(url))
+        url = url.replace(/^http:/i, 'https:');
+    if (/^(?:https?:|blob:|data:image\/)/i.test(url) || url.startsWith('//')) return url;
+    if (/^(?:\/|\.\.?\/|assets\/)/i.test(url) || /\.(?:avif|gif|jpe?g|png|svg|webp)(?:[?#].*)?$/i.test(url))
+        return url;
+    return '';
+};
 window.tkGetVideoCover = function (_value6 = {}) {
     return (
         tkVideoAssetUrls.get(_value6.generatedCoverAssetId) ||
-        _value6.cover ||
-        _value6.bgImage ||
-        _value6.imageUrl ||
+        window.tkNormalizeMediaUrl(_value6.cover) ||
+        window.tkNormalizeMediaUrl(_value6.bgImage) ||
+        window.tkNormalizeMediaUrl(_value6.imageUrl) ||
         ''
     );
 };
@@ -196,10 +222,32 @@ window.tkHydrateVideoAssets = async function () {
     ];
     await Promise.all(
         _value8.map(async (_value0) => {
-            const _value1 = await window.appStorage?.getAssetUrl?.(_value0);
-            if (_value1) tkVideoAssetUrls.set(_value0, _value1);
+            try {
+                const _value1 = await window.appStorage?.getAssetUrl?.(_value0);
+                if (_value1) tkVideoAssetUrls.set(_value0, _value1);
+            } catch (error) {
+                console.warn('TikTok image recovery failed:', error);
+            }
         }),
     );
+    const restores = [];
+    const seen = new WeakSet();
+    const visit = (entry) => {
+        if (!entry || typeof entry !== 'object' || seen.has(entry)) return;
+        seen.add(entry);
+        for (const field of ['avatar', 'authorAvatar', 'cover', 'bgImage', 'imageUrl']) {
+            const assetId = entry[field + 'AssetId'];
+            if (!assetId || (entry[field] && !String(entry[field]).startsWith('blob:'))) continue;
+            restores.push(
+                Promise.resolve(window.appStorage?.getAssetUrl?.(assetId))
+                    .then((url) => { if (url) entry[field] = url; })
+                    .catch((error) => console.warn('TikTok media recovery failed:', error)),
+            );
+        }
+        Object.values(entry).forEach(visit);
+    };
+    visit(tkState);
+    await Promise.all(restores);
 };
 window.tkSaveChar = function (charData) {
     const existing = tkState.chars.find((c_2) => c_2.id === charData.id);
@@ -342,6 +390,13 @@ window.tkClearData = async function (_value23) {
                       }),
                   })),
               });
+    if (_value23 === 'videos' || _value23 === 'all') {
+        _value26.settings = {
+            ..._value26.settings,
+            feedDefaultsVersion: 1,
+            videosCleared: true,
+        };
+    }
     const _value27 = (_value35) => {
         Object.keys(tkState).forEach((_value36) => delete tkState[_value36]);
         Object.assign(tkState, _value35);
@@ -409,6 +464,8 @@ window.globalDataReadyPromise && typeof window.globalDataReadyPromise.then === '
     ? (window.tkDataReadyPromise = window.globalDataReadyPromise
           .then(async () => {
               window.tkLoadStateFromStore();
+              if (window.getAppState?.('tiktok')?.settings?.feedDefaultsVersion !== 1)
+                  persistTkState();
               await window.tkHydrateVideoAssets();
               refreshTkUiAfterHydration();
               return true;
@@ -429,8 +486,40 @@ window.globalDataReadyPromise && typeof window.globalDataReadyPromise.then === '
     const homeBar = document.getElementById('home-bar');
     const tkNavItems = document.querySelectorAll('.tk-bottom-nav .tk-nav-item[data-target]');
     const tkTabContents = document.querySelectorAll('.tk-tab-content');
+    const mediaLoads = new WeakMap();
+    function prepareTkImage(image) {
+        const source = image.getAttribute('src') || '';
+        const previous = mediaLoads.get(image);
+        image.referrerPolicy = 'no-referrer';
+        if (!source || previous?.source === source) return;
+        const normalized = window.tkNormalizeMediaUrl(source);
+        mediaLoads.set(image, { source: normalized || source, retried: false });
+        if (normalized && normalized !== source) image.src = normalized;
+    }
+    function prepareTkImages(root) {
+        if (root?.matches?.('img')) prepareTkImage(root);
+        root?.querySelectorAll?.('img').forEach(prepareTkImage);
+    }
+    prepareTkImages(tkView);
+    tkView?.addEventListener('error', (event) => {
+        const image = event.target;
+        if (!(image instanceof HTMLImageElement)) return;
+        prepareTkImage(image);
+        const load = mediaLoads.get(image);
+        if (!load || load.retried || !/^https?:\/\//i.test(image.src)) return;
+        load.retried = true;
+        image.src = load.source;
+    }, true);
+    if (tkView && typeof MutationObserver === 'function') {
+        new MutationObserver((changes) => {
+            changes.forEach((change) => {
+                if (change.type === 'attributes') prepareTkImage(change.target);
+                else change.addedNodes.forEach(prepareTkImages);
+            });
+        }).observe(tkView, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] });
+    }
     function initTikTok() {
-        handleAction_15(count);
+        handleAction_14(count);
     }
     tkAppBtn &&
         tkView &&

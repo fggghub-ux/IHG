@@ -2529,7 +2529,7 @@
 
 /* The TK settings use the existing Shop sheet layout. */
 #tk-profile-settings-sheet {
-    font-family: inherit;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
     color: #000;
 }
 #tk-profile-settings-sheet .tk-settings-shop-sheet {
@@ -2571,8 +2571,8 @@
     border-radius: 7px;
 }
 .tk-settings-shop-sheet .tk-settings-row-title {
-    font-size: 17px;
-    font-weight: inherit;
+    font-size: 15px;
+    font-weight: 550;
     line-height: 22px;
 }
 .tk-settings-shop-sheet .tk-settings-book-status {
@@ -2583,4 +2583,24 @@
 }
 .tk-settings-shop-sheet .tk-settings-chevron {
     color: #c7c7cc;
+}
+.tk-settings-shop-sheet [data-tk-clear="videos"] .tk-settings-icon {
+    background: #ff4b4c;
+    color: #fff;
+}
+.tk-settings-shop-sheet [data-tk-clear="dms"] .tk-settings-icon {
+    background: #34c759;
+    color: #fff;
+}
+.tk-settings-shop-sheet [data-tk-clear="videos"] .tk-settings-icon svg,
+.tk-settings-shop-sheet [data-tk-clear="dms"] .tk-settings-icon svg {
+    fill: currentColor;
+    stroke-width: 0;
+}
+.tk-settings-shop-sheet .tk-settings-row-destructive .tk-settings-icon {
+    background: #ff3b30;
+    color: #fff;
+}
+.tk-settings-shop-sheet .tk-settings-row-destructive .tk-settings-row-title {
+    color: #ff3b30;
 }
