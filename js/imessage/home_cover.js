@@ -1,4 +1,4 @@
-// Home-only cover selection. The account avatar remains owned by settings.js.
+// Home-only image warmup and cover selection. Account state remains owned by settings.js.
 (window.u2OnStorageReady || (callback => document.addEventListener('DOMContentLoaded', callback)))(() => {
     const button = document.getElementById('imessage-home-cover');
     const input = document.getElementById('imessage-home-cover-input');
@@ -20,6 +20,25 @@
     image.src = typeof saved === 'string' && saved.startsWith('data:image/')
         ? saved
         : 'assets/imessage/home-cover-default.jpg';
+
+    // Paint the current account's Home avatar without waiting for the queued
+    // Settings initializer. Read only: Settings still owns uploads and switching.
+    const avatar = document.getElementById('imessage-avatar-img');
+    if (avatar) {
+        const settings = window.appStorage?.readDomain?.('settings', {}) || {};
+        const accounts = Array.isArray(settings.accounts) ? settings.accounts : [];
+        const user = settings.currentAccountId
+            ? accounts.find(account => String(account?.id) === String(settings.currentAccountId)) || {}
+            : settings.userState || {};
+        avatar.src = user.avatarUrl || 'assets/default-user-avatar.jpg';
+        avatar.style.display = 'block';
+        const icon = document.getElementById('imessage-avatar-icon');
+        if (icon) icon.style.display = 'none';
+    }
+    // Decode while Home is still offscreen; opening it should not start loading.
+    [image, avatar].forEach(element => {
+        if (element?.decode) element.decode().catch(() => {});
+    });
     let toastTimer;
 
     function showStatus(text) {
@@ -67,4 +86,4 @@
             button.disabled = false;
         }
     });
-});
+}, { queue: false });

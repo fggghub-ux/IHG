@@ -23,6 +23,14 @@ async function prepare(page, base) {
         Object.defineProperty(navigator, 'standalone', {value:true});
     });
     await page.goto(base, {waitUntil:'load'});
+    if (!base.includes('/baseline/')) {
+        await page.waitForFunction(() => ['imessage-avatar-img','imessage-home-cover-img'].every(id => {
+            const image=document.getElementById(id);
+            return image.loading === 'eager' && image.complete && image.naturalWidth > 0;
+        }));
+        assert.equal(await page.locator('#imessage-view').evaluate(el=>el.classList.contains('active')),false);
+        console.log('PASS Home images loaded before the App opens');
+    }
     await page.addStyleTag({content:'*, *::before, *::after { transition: none !important; animation: none !important; }'});
     await page.evaluate(async () => {
         await window.appStorage.ready;
@@ -90,7 +98,7 @@ async function snapshot(page, tab) {
             await page.evaluate(()=>window.globalDataReadyPromise);
             await page.waitForFunction(()=>document.getElementById('imessage-home-cover-img').src.startsWith('data:image/'));
             assert.equal(await page.locator('#imessage-home-cover-img').getAttribute('src'),cover);
-            await page.waitForFunction(()=>document.getElementById('imessage-avatar-img').getAttribute('src') === 'assets/default-user-avatar.jpg');
+            await page.waitForFunction(()=>document.getElementById('settings-avatar-img').getAttribute('src') === 'assets/default-user-avatar.jpg');
             await page.evaluate(()=>{
                 document.getElementById('u2-login-screen')?.remove();
                 document.body.classList.remove('u2-login-locked');
@@ -134,6 +142,18 @@ async function snapshot(page, tab) {
             assert.equal(await page.evaluate(()=>window.imData.friends.find(x=>x.nickname==='Migration Char').avatarUrl),'assets/imessage/default-char-avatar.jpg');
             assert.equal(await page.evaluate(()=>window.imData.friends.find(x=>x.nickname==='Migration NPC').avatarUrl),null);
 
+            // Saved Home uploads are restored and decoded while the App stays closed.
+            const uploadedAvatar = await page.locator('#imessage-avatar-img').getAttribute('src');
+            await page.waitForFunction(()=>window.appStorage.readDomain('settings',{}).accounts?.some(x=>x.name==='Uploaded User'));
+            await page.evaluate(()=>window.appStorage.flushPendingWrites());
+            await page.reload({waitUntil:'load'});
+            await page.waitForFunction(() => ['imessage-avatar-img','imessage-home-cover-img'].every(id => {
+                const image=document.getElementById(id);
+                return image.src.startsWith('data:image/') && image.complete && image.naturalWidth > 0;
+            }));
+            assert.equal(await page.locator('#imessage-avatar-img').getAttribute('src'),uploadedAvatar);
+            assert.equal(await page.locator('#imessage-home-cover-img').getAttribute('src'),cover);
+            assert.equal(await page.locator('#imessage-view').evaluate(el=>el.classList.contains('active')),false);
             assert.deepEqual(errors,[],'no page errors');
             console.log('PASS',viewport.width,'Home entries, cover upload/persistence, default avatars and account fallback ownership');
             await context.close();

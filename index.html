@@ -21,6 +21,9 @@
             content="auto"
             data-android="https://ceshi2-7s6.pages.dev"
         />
+        <!-- Prepare iMessage Home images before its first open. -->
+        <link rel="preload" as="image" href="assets/default-user-avatar.jpg" fetchpriority="high" />
+        <link rel="preload" as="image" href="assets/imessage/home-cover-default.jpg" fetchpriority="high" />
         <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/app-icon-192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/app-icon-512.png" />
@@ -6785,11 +6788,11 @@
                             <p class="line-profile-sign" id="imessage-profile-sign">Default User</p>
                         </div>
                         <div class="line-profile-avatar">
-                            <i class="fas fa-user" id="imessage-avatar-icon"></i>
-                            <img id="imessage-avatar-img" src="" alt="" style="display:none;">
+                            <i class="fas fa-user" id="imessage-avatar-icon" style="display:none;"></i>
+                            <img id="imessage-avatar-img" src="assets/default-user-avatar.jpg" alt="" loading="eager" decoding="sync" fetchpriority="high">
                         </div>
                         <button class="im-home-cover" id="imessage-home-cover" type="button" aria-label="Change cover photo">
-                            <img id="imessage-home-cover-img" alt="Home cover">
+                            <img id="imessage-home-cover-img" src="assets/imessage/home-cover-default.jpg" alt="Home cover" loading="eager" decoding="sync" fetchpriority="high">
                         </button>
                     </div>
                     <input id="imessage-home-cover-input" type="file" accept="image/*" hidden>
@@ -20117,7 +20120,7 @@
 <script src="js/imessage/2_core.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-sync=118-selective-20261022"></script>
         <script src="js/imessage/vector_memory.js?v=20260807-local-vector-memory-v1&memory-recall-promotion=20260813-v1&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/3_contacts.js?v=20260718-friend-profile-import-v1&render-cache=20260801-v1&vendor-lazy=20260803-v1&startup-queue=20260804-v1&official=20260827-v1&contact-card-actions=20260916-v4&repair=20261003&home-avatar-migration=20261023-v1"></script>
-    <script src="js/imessage/home_cover.js?v=20260913-v1"></script>
+    <script src="js/imessage/home_cover.js?v=20260913-v1&home-images=20261023-v1"></script>
         <script src="js/imessage/3_groups.js?v=20260718-group-poll-v4-group-memory-editor-v1&observer=20260730-v1&render-cache=20260801-v1&user-avatar=20260802-v1&group-auto-translation=20260803-v1&startup-queue=20260804-v1&context-limit=20260804-v1&group-identity-css-v1&member-sync-private-permissions=20260812-v1&theme-avatar-hooks=20260814-v2&worldbook=20260817-v1&online-chat-optimization=20260818-v1&token-usage=20260822-v1&online-prompts=20260905-v2&history-index=20260907-v1&cross-group-memory=20260919-v1&group-chat-search=20260924-v1&tap-response=20260924-v1&repair=20261003&apk-sync=113-selective-20261022&apk-ui=111-rebuild-20261016"></script>
         <script src="js/imessage/chat_record_forward.js?v=20261007-107-r1&apk-sync=111-selective"></script>
         <script src="js/imessage/4_chat_common.js?v=image-assets-20260803-v1&auto-image=20260807-v1&startup-queue=20260804-v1&auto-face-lock=20260813-v1&prompt-parts=20260819-v1&repair=20261003&apk-sync=111-selective"></script>
