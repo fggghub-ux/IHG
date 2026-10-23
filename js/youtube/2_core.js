@@ -1,3 +1,5 @@
+const YT_DEFAULT_USER_AVATAR_URL = window.U2_DEFAULT_USER_AVATAR_URL || 'assets/default-user-avatar.jpg';
+
 let mockVideos = [],
     currentChatHistory = [],
     mockSubscriptions = [],
@@ -276,7 +278,7 @@ function getPreferredAppleIdUser() {
                 runtimeUser.handle ||
                 (resolvedName ? resolvedName.toLowerCase().replace(/\s+/g, '') : 'user'),
             avatarUrl:
-                currentAccount.avatarUrl || runtimeUser.avatarUrl || runtimeUser.avatar || '',
+                currentAccount.avatarUrl || runtimeUser.avatarUrl || runtimeUser.avatar || YT_DEFAULT_USER_AVATAR_URL,
             persona:
                 currentAccount.persona || currentAccount.signature || runtimeUser.persona || '',
             subs: runtimeUser.subs || '0',
@@ -288,7 +290,7 @@ function getPreferredAppleIdUser() {
         handle:
             runtimeUser.handle ||
             (runtimeUser.name ? runtimeUser.name.toLowerCase().replace(/\s+/g, '') : 'user'),
-        avatarUrl: runtimeUser.avatarUrl || runtimeUser.avatar || '',
+        avatarUrl: runtimeUser.avatarUrl || runtimeUser.avatar || YT_DEFAULT_USER_AVATAR_URL,
         persona: runtimeUser.persona || '',
         subs: runtimeUser.subs || '0',
         videos: runtimeUser.videos || '0',
@@ -301,7 +303,7 @@ function createYtUserStateFromAppleId() {
         handle:
             appleUser.handle ||
             (appleUser.name ? appleUser.name.toLowerCase().replace(/\s+/g, '') : 'user'),
-        avatarUrl: appleUser.avatarUrl || '',
+        avatarUrl: appleUser.avatarUrl || YT_DEFAULT_USER_AVATAR_URL,
         persona: appleUser.persona || '',
         subs: appleUser.subs || '0',
         videos: appleUser.videos || '0',
@@ -319,7 +321,7 @@ function normalizeYtUserState(value_34) {
                 ? resolvedName_2.toLowerCase().replace(/\s+/g, '')
                 : fallbackUser.handle || 'user')
         ).replace(/^@/, ''),
-        avatarUrl: safeUser.avatarUrl || safeUser.avatar || fallbackUser.avatarUrl || '',
+        avatarUrl: safeUser.avatarUrl || safeUser.avatar || fallbackUser.avatarUrl || YT_DEFAULT_USER_AVATAR_URL,
         persona: safeUser.persona || fallbackUser.persona || '',
         subs: safeUser.subs || fallbackUser.subs || '0',
         videos: safeUser.videos || fallbackUser.videos || '0',

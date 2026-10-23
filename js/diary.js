@@ -414,7 +414,7 @@
         }
         return {
             name: value_4.profile.name || name_2,
-            avatarUrl: value_4.profile.avatarUrl || '',
+            avatarUrl: value_4.profile.avatarUrl || window.U2_DEFAULT_USER_AVATAR_URL || 'assets/default-user-avatar.jpg',
         };
     }
     function handleAction_44(value_169, value_170 = '') {
@@ -575,7 +575,7 @@
             </footer>`;
         options.comments_count.textContent = result_185.comments.length + ' 条';
         options.comment_empty.hidden = result_185.comments.length > 0;
-        options.comment_avatar.innerHTML = handleAction_40(value_4.profile.avatarUrl);
+        options.comment_avatar.innerHTML = handleAction_40(value_4.profile.avatarUrl || window.U2_DEFAULT_USER_AVATAR_URL || 'assets/default-user-avatar.jpg');
         options.comment_list.innerHTML = result_185.comments
             .map(
                 (value_190) =>
@@ -584,7 +584,7 @@
                     handleAction_39(value_190.id) +
                     `">
                 <div class="diary-comment-avatar">` +
-                    handleAction_40(value_4.profile.avatarUrl) +
+                    handleAction_40(value_4.profile.avatarUrl || window.U2_DEFAULT_USER_AVATAR_URL || 'assets/default-user-avatar.jpg') +
                     `</div>
                 <div class="diary-comment-copy">
                     <header><strong>` +
@@ -605,7 +605,7 @@
     }
     function handleAction_49() {
         options.profile_name.textContent = value_4.profile.name || name_2;
-        options.profile_avatar.innerHTML = handleAction_40(value_4.profile.avatarUrl);
+        options.profile_avatar.innerHTML = handleAction_40(value_4.profile.avatarUrl || window.U2_DEFAULT_USER_AVATAR_URL || 'assets/default-user-avatar.jpg');
         options.total_count.textContent = String(value_4.entries.length);
     }
     function handleAction_50() {
@@ -891,7 +891,7 @@
         handleAction_46();
     }
     function handleProfile_edit_btnClick() {
-        avatarUrl_2 = value_4.profile.avatarUrl || '';
+        avatarUrl_2 = value_4.profile.avatarUrl || window.U2_DEFAULT_USER_AVATAR_URL || 'assets/default-user-avatar.jpg';
         options.profile_name_input.value = value_4.profile.name || name_2;
         options.profile_avatar_btn.innerHTML = handleAction_40(avatarUrl_2);
         handleAction_59(options.profile_editor, options.profile_name_input);

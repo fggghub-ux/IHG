@@ -16,6 +16,7 @@
         contactCardActionStatusElement = document.getElementById('contact-card-action-status'),
         contactCardAddFriendElement = document.getElementById('contact-card-add-friend'),
         contactCardRequestFriendElement = document.getElementById('contact-card-request-friend');
+    const DEFAULT_CHAR_AVATAR_URL = 'assets/imessage/default-char-avatar.jpg';
     let value_5 = null;
     function updateFriendRequestIndicators_2() {
         const some_34 = (window.imData.friendRequests || []).some(
@@ -51,7 +52,7 @@
         if (friendSignatureInputElement) friendSignatureInputElement.value = '';
         if (friendRelationshipInputElement) friendRelationshipInputElement.value = '';
         if (friendProfileImportInput_3) friendProfileImportInput_3.value = '';
-        setFriendAvatar(null);
+        setFriendAvatar(DEFAULT_CHAR_AVATAR_URL, { isDefault: true });
     }
     async function handleAction_9(friendOrId, mutator, value_41 = {}) {
         if (!window.imApp.commitFriendsChange) return false;
@@ -805,21 +806,37 @@
                 if (showToast_2) showToast_2(error_3?.message || '角色设定导入失败');
             }
         }));
-    function setFriendAvatar(src_2) {
-        const friendAvatarImg_2 = document.getElementById('friend-avatar-img'),
-            friendAvatarPreview = document.getElementById('friend-avatar-preview'),
-            friendAvatarIcon_2 = friendAvatarPreview
-                ? friendAvatarPreview.querySelector('i')
-                : null;
-        if (!friendAvatarImg_2 || !friendAvatarIcon_2) return;
-        src_2
-            ? ((friendAvatarImg_2.src = src_2),
-              (friendAvatarImg_2.style.display = 'block'),
-              (friendAvatarIcon_2.style.display = 'none'))
-            : ((friendAvatarImg_2.style.display = 'none'),
-              (friendAvatarIcon_2.style.display = 'block'),
-              (friendAvatarImg_2.src = ''));
+    function setFriendAvatar(url, options = {}) {
+        const friendAvatarImg = document.getElementById('friend-avatar-img');
+        const friendAvatarPreview = document.getElementById('friend-avatar-preview');
+        const friendAvatarIcon = friendAvatarPreview ? friendAvatarPreview.querySelector('i') : null;
+
+        if (!friendAvatarImg || !friendAvatarIcon) return;
+
+        if (url) {
+            friendAvatarImg.src = url;
+            friendAvatarImg.dataset.defaultAvatar = options.isDefault ? 'true' : 'false';
+            friendAvatarImg.style.display = 'block';
+            friendAvatarIcon.style.display = 'none';
+        } else {
+            friendAvatarImg.style.display = 'none';
+            friendAvatarIcon.style.display = 'block';
+            friendAvatarImg.src = '';
+            delete friendAvatarImg.dataset.defaultAvatar;
+        }
     }
+
+    function getPendingFriendAvatar(includeDefault) {
+        const image = document.getElementById('friend-avatar-img');
+        if (!image || image.style.display !== 'block') {
+            return includeDefault ? DEFAULT_CHAR_AVATAR_URL : null;
+        }
+        if (image.dataset.defaultAvatar === 'true') {
+            return includeDefault ? DEFAULT_CHAR_AVATAR_URL : null;
+        }
+        return image.src || (includeDefault ? DEFAULT_CHAR_AVATAR_URL : null);
+    }
+
     const confirmAddFriendBtn = document.getElementById('confirm-add-friend-btn'),
         confirmAddNpcBtn = document.getElementById('confirm-add-npc-btn');
     let isAddingFriend = false,
@@ -852,11 +869,7 @@
                     relationship: document.getElementById('friend-relationship-input')
                         ? document.getElementById('friend-relationship-input').value
                         : '',
-                    avatarUrl:
-                        document.getElementById('friend-avatar-img') &&
-                        document.getElementById('friend-avatar-img').style.display === 'block'
-                            ? document.getElementById('friend-avatar-img').src
-                            : null,
+                    avatarUrl: getPendingFriendAvatar(true),
                     messages: [],
                     chatBg: null,
                     customCssEnabled: false,
@@ -910,11 +923,7 @@
                     relationship: document.getElementById('friend-relationship-input')
                         ? document.getElementById('friend-relationship-input').value
                         : '',
-                    avatarUrl:
-                        document.getElementById('friend-avatar-img') &&
-                        document.getElementById('friend-avatar-img').style.display === 'block'
-                            ? document.getElementById('friend-avatar-img').src
-                            : null,
+                    avatarUrl: getPendingFriendAvatar(false),
                     messages: [],
                     chatBg: null,
                     customCssEnabled: false,

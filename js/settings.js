@@ -1,4 +1,6 @@
 (function () {
+    const DEFAULT_USER_AVATAR_URL = 'assets/default-user-avatar.jpg';
+    window.U2_DEFAULT_USER_AVATAR_URL = DEFAULT_USER_AVATAR_URL;
     let accounts_2 = [],
         currentAccountId_3 = null,
         userState_2 = {
@@ -923,7 +925,8 @@
                 signature_2 = UI.inputs.detailSignature ? UI.inputs.detailSignature.value : '',
                 persona_2 = UI.inputs.detailPersona.value,
                 avatarUrl_3 =
-                    UI.inputs.detailAvatarImg.style.display === 'block'
+                    UI.inputs.detailAvatarImg.style.display === 'block' &&
+                    UI.inputs.detailAvatarImg.dataset.defaultAvatar !== 'true'
                         ? UI.inputs.detailAvatarImg.src
                         : null;
             if (isCreatingNewAccount) {
@@ -980,15 +983,10 @@
                     }
             });
         function setDetailAvatar(url_2) {
-            if (url_2) {
-                UI.inputs.detailAvatarImg.src = url_2;
-                UI.inputs.detailAvatarImg.style.display = 'block';
-                if (UI.inputs.detailAvatarIcon) UI.inputs.detailAvatarIcon.style.display = 'none';
-            } else {
-                UI.inputs.detailAvatarImg.style.display = 'none';
-                if (UI.inputs.detailAvatarIcon) UI.inputs.detailAvatarIcon.style.display = 'block';
-                UI.inputs.detailAvatarImg.src = '';
-            }
+            UI.inputs.detailAvatarImg.src = url_2 || DEFAULT_USER_AVATAR_URL;
+            UI.inputs.detailAvatarImg.dataset.defaultAvatar = url_2 ? 'false' : 'true';
+            UI.inputs.detailAvatarImg.style.display = 'block';
+            if (UI.inputs.detailAvatarIcon) UI.inputs.detailAvatarIcon.style.display = 'none';
         }
         const syncUIs_38 = window.syncUIs;
         window.syncUIs = function () {
@@ -997,15 +995,11 @@
                 settingsAvatarImg = document.getElementById('settings-avatar-img'),
                 settingsAvatarIcon = document.querySelector('.apple-id-avatar-small .fa-user');
             settingsName && (settingsName.textContent = userState_2.name || '未登录 Apple ID');
-            if (userState_2.avatarUrl) {
-                settingsAvatarImg &&
-                    ((settingsAvatarImg.src = userState_2.avatarUrl),
-                    (settingsAvatarImg.style.display = 'block'));
-                if (settingsAvatarIcon) settingsAvatarIcon.style.display = 'none';
-            } else {
-                if (settingsAvatarImg) settingsAvatarImg.style.display = 'none';
-                if (settingsAvatarIcon) settingsAvatarIcon.style.display = 'block';
+            if (settingsAvatarImg) {
+                settingsAvatarImg.src = userState_2.avatarUrl || DEFAULT_USER_AVATAR_URL;
+                settingsAvatarImg.style.display = 'block';
             }
+            if (settingsAvatarIcon) settingsAvatarIcon.style.display = 'none';
             const displayName = document.getElementById('display-name'),
                 displayPhone = document.getElementById('display-phone'),
                 displaySignature = document.getElementById('display-signature'),
@@ -1016,30 +1010,22 @@
             if (displaySignature)
                 displaySignature.textContent =
                     userState_2.signature || '添加账号后可同步头像、名称与签名';
-            if (userState_2.avatarUrl) {
-                editAvatarImg &&
-                    ((editAvatarImg.src = userState_2.avatarUrl),
-                    (editAvatarImg.style.display = 'block'));
-                if (editAvatarIcon) editAvatarIcon.style.display = 'none';
-            } else {
-                if (editAvatarImg) editAvatarImg.style.display = 'none';
-                if (editAvatarIcon) editAvatarIcon.style.display = 'block';
+            if (editAvatarImg) {
+                editAvatarImg.src = userState_2.avatarUrl || DEFAULT_USER_AVATAR_URL;
+                editAvatarImg.style.display = 'block';
             }
+            if (editAvatarIcon) editAvatarIcon.style.display = 'none';
             const imProfileName = document.getElementById('imessage-profile-name'),
                 imProfileSign = document.getElementById('imessage-profile-sign'),
                 imAvatarImg = document.getElementById('imessage-avatar-img'),
                 imAvatarIcon = document.getElementById('imessage-avatar-icon');
             if (imProfileName) imProfileName.textContent = userState_2.name || 'Default User';
             if (imProfileSign) imProfileSign.textContent = userState_2.signature || 'No Signature';
-            if (userState_2.avatarUrl) {
-                imAvatarImg &&
-                    ((imAvatarImg.src = userState_2.avatarUrl),
-                    (imAvatarImg.style.display = 'block'));
-                if (imAvatarIcon) imAvatarIcon.style.display = 'none';
-            } else {
-                if (imAvatarImg) imAvatarImg.style.display = 'none';
-                if (imAvatarIcon) imAvatarIcon.style.display = 'block';
+            if (imAvatarImg) {
+                imAvatarImg.src = userState_2.avatarUrl || DEFAULT_USER_AVATAR_URL;
+                imAvatarImg.style.display = 'block';
             }
+            if (imAvatarIcon) imAvatarIcon.style.display = 'none';
         };
         window.syncUIs && window.syncUIs();
         document.getElementById('close-account-sheet-btn')?.addEventListener('click', () => {
