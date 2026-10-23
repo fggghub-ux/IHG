@@ -8726,6 +8726,14 @@ window.addEventListener('pagehide', () => {
         imHeaderLeft.addEventListener('click', () => {
             closeView_2(imessageView_3);
         });
+    const chatsEditBtn = document.getElementById('chats-edit-btn');
+    if (chatsEditBtn) {
+        chatsEditBtn.addEventListener('click', () => {
+            if (imHeaderLeft) imHeaderLeft.click();
+            else closeView_2(imessageView_3);
+        });
+    }
+
     const imHeaderRight = document.querySelector('.line-header-right');
     if (imHeaderRight) {
         const bookmarkBtn = imHeaderRight.querySelector('.fa-bookmark');

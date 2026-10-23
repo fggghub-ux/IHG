@@ -112,6 +112,11 @@
                     : (friendActionsSheet.style.display = 'flex')
                 : handleAction_11();
         });
+    const chatsAddFriendBtn = document.getElementById('chats-add-friend-btn');
+    if (chatsAddFriendBtn) {
+        chatsAddFriendBtn.addEventListener('click', handleAction_11);
+    }
+
     openAddFriendSheetBtn &&
         openAddFriendSheetBtn.addEventListener('click', () => {
             if (friendActionsSheet && typeof window.closeView === 'function')
