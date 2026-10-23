@@ -467,6 +467,11 @@
     outline-offset: 2px;
 }
 
+.online-prompt-panel .online-prompt-select:focus {
+    outline: none;
+    box-shadow: none;
+}
+
 .online-prompt-decision:not([hidden]) {
     position: absolute;
     z-index: 4;

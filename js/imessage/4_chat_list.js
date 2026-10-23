@@ -21,10 +21,16 @@
             apk110New_22 =
                 friend_2.type === 'group' &&
                 window.imApp?.areGroupTitlesEnabled?.(friend_2) === false;
+        const cachedGiftContext = window.imApp.isGiftContextMessage?.({
+            role: 'system',
+            content: friend_2.lastMessagePreview,
+        });
         let preview_2 =
-                !apk110New_22 && typeof friend_2.lastMessagePreview === 'string'
-                    ? friend_2.lastMessagePreview
-                    : '',
+                cachedGiftContext
+                    ? '[礼物]'
+                    : !apk110New_22 && typeof friend_2.lastMessagePreview === 'string'
+                      ? friend_2.lastMessagePreview
+                      : '',
             timestamp_2 = Number(friend_2.lastMessageTimestamp) || 0,
             count_2 = window.imApp.getFriendMessageCount
                 ? window.imApp.getFriendMessageCount(friend_2)
@@ -32,7 +38,7 @@
         if (lastLoadedMsg) {
             let apk110New_26 = lastLoadedMsg;
             if (
-                apk110New_22 &&
+                (apk110New_22 || window.imApp.isGiftContextMessage?.(apk110New_26)) &&
                 window.imApp.getFriendMessagePreview &&
                 !window.imApp.getFriendMessagePreview(apk110New_26, friend_2)
             ) {

@@ -2585,7 +2585,7 @@
     color: #c7c7cc;
 }
 .tk-settings-shop-sheet [data-tk-clear="videos"] .tk-settings-icon {
-    background: #ff4b4c;
+    background: #ff3b30;
     color: #fff;
 }
 .tk-settings-shop-sheet [data-tk-clear="dms"] .tk-settings-icon {
@@ -2594,8 +2594,13 @@
 }
 .tk-settings-shop-sheet [data-tk-clear="videos"] .tk-settings-icon svg,
 .tk-settings-shop-sheet [data-tk-clear="dms"] .tk-settings-icon svg {
+    width: 16px;
+    height: 16px;
     fill: currentColor;
     stroke-width: 0;
+}
+.tk-settings-shop-sheet [data-tk-clear="videos"] .tk-settings-icon svg {
+    width: calc(16px * 18 / 14);
 }
 .tk-settings-shop-sheet .tk-settings-row-destructive .tk-settings-icon {
     background: #ff3b30;

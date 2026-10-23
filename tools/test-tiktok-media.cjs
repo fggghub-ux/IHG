@@ -143,7 +143,7 @@ const path = require("node:path");
         new Set(fonts).size === 1 &&
         getComputedStyle(titles[0]).fontSize === "15px" &&
         getComputedStyle(titles[0]).fontWeight === "550" &&
-        background("videos") === "rgb(255, 75, 76)" &&
+        background("videos") === background("all") &&
         background("dms") === "rgb(52, 199, 89)" &&
         background("all") === "rgb(255, 59, 48)" &&
         sheet.querySelector('[data-tk-clear="dms"] svg').children.length === 1

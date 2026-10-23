@@ -4938,8 +4938,17 @@ window.imApp.markMomentMessagesLoaded = function (loaded_3 = true) {
 window.imApp.markStickersLoaded = function (loaded_4 = true) {
     window.imData.stickersLoaded = !!loaded_4;
 };
+window.imApp.isGiftContextMessage = function (message) {
+    return (
+        message?.role === 'system' &&
+        [message.content, message.text].some(
+            (text) => typeof text === 'string' && /^\[Gift event\]/.test(text.trim()),
+        )
+    );
+};
 window.imApp.getFriendMessagePreview = function (value_230, apk110New_958) {
     const targetMessage_4 = value_230 || {};
+    if (window.imApp.isGiftContextMessage(targetMessage_4)) return '';
     if (targetMessage_4.type === 'memory_request') return '';
     if (targetMessage_4.type === 'user_phone_access_card') {
         const value_874 = Array.isArray(targetMessage_4.visits) ? targetMessage_4.visits : [];

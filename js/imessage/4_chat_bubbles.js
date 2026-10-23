@@ -1465,10 +1465,11 @@
     }
     function renderSystemNoticeBubble_2(apk110New_408, apk110New_409) {
         return (
-            apk110New_408?.type === 'group' &&
-            apk110New_409?.type === 'system_notice' &&
-            apk110New_409.noticeKind === 'group_title_changed' &&
-            window.imApp?.areGroupTitlesEnabled?.(apk110New_408) === false
+            window.imApp?.isGiftContextMessage?.(apk110New_409) ||
+            (apk110New_408?.type === 'group' &&
+                apk110New_409?.type === 'system_notice' &&
+                apk110New_409.noticeKind === 'group_title_changed' &&
+                window.imApp?.areGroupTitlesEnabled?.(apk110New_408) === false)
         );
     }
     function apk110New_43(msg_6, friend_11, container_3, value_147 = Date.now()) {

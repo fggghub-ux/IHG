@@ -835,14 +835,12 @@
     function setBindAccountDetailAvatar(url_2) {
         bindAccountDetailAvatarUrl = url_2 || null;
         bindAccountDetailAvatarImg &&
-            ((bindAccountDetailAvatarImg.src = bindAccountDetailAvatarUrl || ''),
-            (bindAccountDetailAvatarImg.style.display = bindAccountDetailAvatarUrl
-                ? 'block'
-                : 'none'));
-        bindAccountDetailAvatarIcon &&
-            (bindAccountDetailAvatarIcon.style.display = bindAccountDetailAvatarUrl
-                ? 'none'
-                : 'block');
+            ((bindAccountDetailAvatarImg.src =
+                bindAccountDetailAvatarUrl ||
+                window.U2_DEFAULT_USER_AVATAR_URL ||
+                'assets/default-user-avatar.jpg'),
+            (bindAccountDetailAvatarImg.style.display = 'block'));
+        bindAccountDetailAvatarIcon && (bindAccountDetailAvatarIcon.style.display = 'none');
     }
     function getAccountById(accountId) {
         if (!accountId || accountId === 'none') return null;
