@@ -697,7 +697,7 @@
         inlineImageInput.id = 'home-edit-controls';
         inlineImageInput.className = 'home-edit-controls';
         inlineImageInput.innerHTML =
-            '<button type="button" class="home-edit-done-btn">完成</button>';
+            '<button type="button" class="home-edit-done-btn">Done</button>';
         appEl.appendChild(inlineImageInput);
         sheetEl = document.getElementById('home-widget-sheet');
         !sheetEl &&
