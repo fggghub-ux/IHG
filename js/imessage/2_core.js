@@ -5002,6 +5002,8 @@ window.imApp.getFriendMessagePreview = function (value_230, apk110New_958) {
     }
     if (targetMessage_4.type === 'pay_transfer')
         return ('[转账] ' + (targetMessage_4.description || '')).trim();
+    if (targetMessage_4.type === 'gift')
+        return `[Gift] ${targetMessage_4.giftName || targetMessage_4.text || ''}`.trim();
     if (targetMessage_4.type === 'group_red_packet')
         return ('[群红包] ' + (targetMessage_4.description || '')).trim();
     if (targetMessage_4.type === 'voice_call_record')

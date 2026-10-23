@@ -27,7 +27,7 @@
         });
         let preview_2 =
                 cachedGiftContext
-                    ? '[礼物]'
+                    ? '[Gift]'
                     : !apk110New_22 && typeof friend_2.lastMessagePreview === 'string'
                       ? friend_2.lastMessagePreview
                       : '',
@@ -35,6 +35,10 @@
             count_2 = window.imApp.getFriendMessageCount
                 ? window.imApp.getFriendMessageCount(friend_2)
                 : Number(friend_2.messageCount) || loadedMessages.length || 0;
+        const cachedGift = /^Gift: (.+)\r?\nValue \$\d+\.\d{2}(?:\r?\nDescription: [\s\S]*)?$/.exec(
+            preview_2,
+        );
+        if (cachedGift) preview_2 = `[Gift] ${cachedGift[1]}`.trim();
         if (lastLoadedMsg) {
             let apk110New_26 = lastLoadedMsg;
             if (

@@ -1145,21 +1145,6 @@
                     else alert('赠送失败');
                 }
 
-                if (success && window.imChat?.handleAiReply) {
-                    const giftFriend =
-                        (window.imData?.friends || []).find(
-                            (candidate) => String(candidate.id) === String(friend.id),
-                        ) || friend;
-                    const activeContainer =
-                        document
-                            .getElementById('chat-interface-' + friend.id)
-                            ?.querySelector('.ins-chat-messages') || null;
-                    void window.imChat.handleAiReply(giftFriend, activeContainer, null, {
-                        source: 'shop_gift',
-                        silent: true,
-                        extraSystemPrompt: `User 刚刚赠送了礼物“${itemNames}”（价值 $${order.total.toFixed(2)}）。${cleanDescription ? ` Description: ${cleanDescription}.` : ''}请以 Char 身份结合人设和关系自然回应这份礼物。`,
-                    });
-                }
                 return success;
             } finally {
                 this.giftOrdersInFlight.delete(orderId);

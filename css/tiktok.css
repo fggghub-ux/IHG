@@ -2594,13 +2594,16 @@
 }
 .tk-settings-shop-sheet [data-tk-clear="videos"] .tk-settings-icon svg,
 .tk-settings-shop-sheet [data-tk-clear="dms"] .tk-settings-icon svg {
-    width: 16px;
-    height: 16px;
     fill: currentColor;
     stroke-width: 0;
 }
 .tk-settings-shop-sheet [data-tk-clear="videos"] .tk-settings-icon svg {
-    width: calc(16px * 18 / 14);
+    width: calc(14.5px * 18 / 14);
+    height: 14.5px;
+}
+.tk-settings-shop-sheet [data-tk-clear="dms"] .tk-settings-icon svg {
+    width: 17px;
+    height: 17px;
 }
 .tk-settings-shop-sheet .tk-settings-row-destructive .tk-settings-icon {
     background: #ff3b30;
