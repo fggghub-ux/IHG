@@ -206,18 +206,24 @@
         'app-icon-6': APP_ICON_BASE + 'library.jpg',
         'app-icon-7': APP_ICON_BASE + 'netflix.jpg',
         'app-icon-8': APP_ICON_BASE + 'lover.jpg',
-        'app-icon-9': APP_ICON_BASE + 'appstore.jpg.jpg',
-        'app-icon-10': APP_ICON_BASE + 'gallery.jpg.jpg',
-        'app-icon-11': APP_ICON_BASE + 'mcp.jpg.jpg',
-        'app-icon-12': APP_ICON_BASE + 'ao3.jpg.jpg',
+        'app-icon-9': APP_ICON_BASE + 'appstore.jpg',
+        'app-icon-10': APP_ICON_BASE + 'gallery.jpg',
+        'app-icon-11': APP_ICON_BASE + 'mcp.jpg',
+        'app-icon-12': APP_ICON_BASE + 'ao3.jpg',
         'app-icon-13': APP_ICON_BASE + 'diary.jpg',
-        'app-icon-14': APP_ICON_BASE + 'call.jpg.jpg',
-        'app-icon-15': APP_ICON_BASE + 'cphone.jpg.jpg',
-        'app-icon-16': APP_ICON_BASE + 'cycle.jpg.jpg',
+        'app-icon-14': APP_ICON_BASE + 'call.jpg',
+        'app-icon-15': APP_ICON_BASE + 'cphone.jpg',
+        'app-icon-16': APP_ICON_BASE + 'cycle.jpg',
         'dock-icon-settings': APP_ICON_BASE + 'settings.jpg',
         'dock-icon-imessage': APP_ICON_BASE + 'imessage.jpg',
         'dock-icon-youtube': APP_ICON_BASE + 'youtube.jpg',
     };
+    function normalizeDefaultAppIconUrl(url) {
+        return (
+            Object.values(DEFAULT_APP_ICONS).find((defaultIcon) => url === defaultIcon + '.jpg') ||
+            url
+        );
+    }
     let themeState_2 = {
         bgUrl: null,
         uiChineseEnabled: false,
@@ -4650,7 +4656,7 @@
                 };
             }
             return {
-                url: _value80.url || null,
+                url: normalizeDefaultAppIconUrl(_value80.url) || null,
                 assetId: '',
             };
         }
@@ -5682,7 +5688,11 @@
         }
         function applyThemeAppIcons(state) {
             if (!Array.isArray(state.apps)) return;
-            state.apps.forEach((app_6) => applyAppIconStyles(app_6));
+            state.apps.forEach((app_6) => {
+                if (!app_6.iconAssetId)
+                    app_6.icon = normalizeDefaultAppIconUrl(app_6.icon);
+                applyAppIconStyles(app_6);
+            });
         }
         async function commitThemeAppIconChanges(toastMessage_2 = '') {
             applyThemeAppIcons(themeState_2);
