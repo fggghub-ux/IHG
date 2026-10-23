@@ -580,20 +580,6 @@
                     </div>
 
                         <!-- More Apps (2 slots) -->
-                        <div
-                            class="app-item bstage-app"
-                            id="app-bstage-btn"
-                            style="cursor: pointer;"
-                        >
-                            <div
-                                class="app-icon icon-placeholder"
-                                id="app-icon-3"
-                                style="background: #ffffff; color: #1c1c1e; border: 1px solid #e5e5ea; display: flex; justify-content: center; align-items: center; font-size: 26px;"
-                            >
-                                <i class="fas fa-layer-group"></i>
-                            </div>
-                            <span class="app-name" data-u2-i18n="home.app.bstage">b.stage</span>
-                        </div>
                         <div class="app-item x-app" id="app-x-btn" style="cursor: pointer;">
                             <div
                                 class="app-icon icon-placeholder"
@@ -603,6 +589,19 @@
                                 <i class="fa-brands fa-x-twitter"></i>
                             </div>
                             <span class="app-name" data-u2-i18n="home.app.x">X</span>
+                        </div>
+                        <div
+                            class="app-item youtube-app"
+                            id="dock-icon-youtube"
+                            style="cursor: pointer;"
+                        >
+                            <div
+                                class="app-icon"
+                                style="background: #ffffff; color: #1c1c1e; font-size: 38px; border: 1px solid #e5e5ea; display: flex; justify-content: center; align-items: center;"
+                            >
+                                <i class="fab fa-youtube"></i>
+                            </div>
+                            <span class="app-name" data-u2-i18n="home.app.youtube">YouTube</span>
                         </div>
                         <!-- Notification Widget (1x4 = 4 slots) -->
                         <div class="notification-widget" id="notification-widget-desktop-1">
@@ -732,20 +731,18 @@
                             <span class="app-name" data-u2-i18n="home.app.netflix">Netflix</span>
                         </div>
                         <div
-                            class="app-item loves-app"
-                            id="app-loves-btn"
+                            class="app-item bstage-app"
+                            id="app-bstage-btn"
                             style="cursor: pointer;"
-                            onclick="if(window.lovesApp && typeof window.lovesApp.open === 'function') window.lovesApp.open(); else { const v = document.getElementById('lovers-space-view'); if(v) v.classList.add('active'); }"
                         >
                             <div
                                 class="app-icon icon-placeholder"
-                                id="app-icon-8"
-                                style="background: #ffffff; color: #1c1c1e; border: 1px solid #e5e5ea; display: flex; justify-content: center; align-items: center; font-size: 28px;"
-                                onclick="event.stopPropagation(); if(window.lovesApp && typeof window.lovesApp.open === 'function') window.lovesApp.open(); else { const v = document.getElementById('lovers-space-view'); if(v) v.classList.add('active'); }"
+                                id="app-icon-3"
+                                style="background: #ffffff; color: #1c1c1e; border: 1px solid #e5e5ea; display: flex; justify-content: center; align-items: center; font-size: 26px;"
                             >
-                                <i class="fas fa-heart"></i>
+                                <i class="fas fa-layer-group"></i>
                             </div>
-                            <span class="app-name" data-u2-i18n="home.app.loves">Loves</span>
+                            <span class="app-name" data-u2-i18n="home.app.bstage">b.stage</span>
                         </div>
 
                         <!-- Photo Widget (Row 5 & 6, 4x2 = 8 slots) -->
@@ -942,17 +939,20 @@
                         <span class="app-name">信息</span>
                     </div>
                     <div
-                        class="app-item youtube-app"
-                        id="dock-icon-youtube"
+                        class="app-item loves-app"
+                        id="app-loves-btn"
                         style="cursor: pointer;"
+                        onclick="if(window.lovesApp && typeof window.lovesApp.open === 'function') window.lovesApp.open(); else { const v = document.getElementById('lovers-space-view'); if(v) v.classList.add('active'); }"
                     >
                         <div
-                            class="app-icon"
-                            style="background: #ffffff; color: #1c1c1e; font-size: 38px; border: 1px solid #e5e5ea; display: flex; justify-content: center; align-items: center;"
+                            class="app-icon icon-placeholder"
+                            id="app-icon-8"
+                            style="background: #ffffff; color: #1c1c1e; border: 1px solid #e5e5ea; display: flex; justify-content: center; align-items: center; font-size: 28px;"
+                            onclick="event.stopPropagation(); if(window.lovesApp && typeof window.lovesApp.open === 'function') window.lovesApp.open(); else { const v = document.getElementById('lovers-space-view'); if(v) v.classList.add('active'); }"
                         >
-                            <i class="fab fa-youtube"></i>
+                            <i class="fas fa-heart"></i>
                         </div>
-                        <span class="app-name" data-u2-i18n="home.app.youtube">YouTube</span>
+                        <span class="app-name" data-u2-i18n="home.app.loves">Loves</span>
                     </div>
                 </div>
             </div>
@@ -20258,7 +20258,7 @@
         <script src="js/mcp.js?v=20260906-relay-ui-v1&android-input=20260906-v1&storage-persistence=20260907-v1&repair=20261003"></script>
         <script src="js/diary.js?v=20260913-diary-v6-prompt-toggle-scroll&api-error-dialog=20260923-v1&repair=20261003&home-avatar-migration=20261023-v1"></script>
         <script src="js/ao3.js?v=20260904-ao3-cp-search-v12&persona=20260920-v4&api-error-dialog=20260923-v2&repair=20261003&apk-sync=113-selective-20261022"></script>
-        <script src="js/home_desktop.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=113-selective-20261022"></script>
+        <script src="js/home_desktop.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=113-selective-20261022&app-positions=20261024-v1"></script>
         <script src="js/home_widget_panel_enhance.js?v=20260830-widget-image-flush-v1&couple-text=20260911-v1&repair=20261003&settings=20261010-r1&apk-sync=111-selective"></script>
         <!-- 引入主逻辑脚本 -->
         <script src="script.js?v=20260725-modal-owner-v1&home-swipe=20260801-scrollend-v2&performance=20260801-v1&splash-notice-handshake=20260813-v1&reader-selection=20260819-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1"></script>

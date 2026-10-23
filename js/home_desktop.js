@@ -2,7 +2,7 @@
     const PAGE_EDGE_PX = 44;
     const count_2 = 24;
     const DOCK_CAPACITY = 4;
-    const schemaVersion_3 = 9;
+    const schemaVersion_3 = 10;
     const count_5 = 3;
     const count_6 = 450;
     const count_7 = window.matchMedia('(pointer: coarse)').matches ? 12 : 8;
@@ -902,6 +902,8 @@
         value_169 &&
             Number(safe.schemaVersion || 0) < 9 &&
             handleAction_3(pages_4, dock_3, widgets_3);
+        if (value_169 && Number(safe.schemaVersion || 0) < 10)
+            migrateHomeAppPositions(pages_4, dock_3);
         pages_4 = pages_4.map((page) =>
             page.filter((item_2) => !isRemovedWidgetItem(item_2, widgets_3)),
         );
@@ -941,6 +943,21 @@
                 defaultPhotoWidgetAdded: true,
             }
         );
+    }
+    function migrateHomeAppPositions(pages, dock) {
+        const replacements = {
+            'app-bstage-btn': 'app-x-btn',
+            'app-x-btn': 'dock-icon-youtube',
+            'dock-icon-youtube': 'app-loves-btn',
+            'app-loves-btn': 'app-bstage-btn',
+        };
+        [...pages, dock].forEach((items) => {
+            items.forEach((item, index) => {
+                if (item.kind !== 'app' || !replacements[item.id]) return;
+                items[index] = { ...item, id: replacements[item.id] };
+            });
+        });
+        desktopStateNeedsSave = true;
     }
     function handleAction_29(value_192, value_193 = {}) {
         const handleAction_120_194 = handleAction_120();
