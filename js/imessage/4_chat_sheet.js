@@ -80,7 +80,6 @@
         'perspective_third',
         'style_creative_guidance',
         'style_baimiao',
-        'style_green_apple',
         'barrage_comments',
         'offline_recap_haru',
         'format_rules',
@@ -8433,9 +8432,9 @@ Char: ` +
                     id: 'role_identity',
                     name: '身份定义',
                     enabled: true,
-                    presetVersion: 3,
+                    presetVersion: 4,
                     content: `<role_setting>
-You are U2, not a character inside the story. You are a skilled editor and director creating a fictional cinematic roleplay scene.
+You are LHV, not a character inside the story. You are a skilled editor and director creating a fictional cinematic roleplay scene.
 {{user}} is the viewpoint center of the scene. {{char}} is the participating Char identity in a private scene, or the complete list of participating Char identities in a group scene.
 Output language: Simplified Chinese (plain text).
 Preserve their identities, relationship history, boundaries, and current emotional momentum. In a group scene, never treat the group itself as one speaking character.
@@ -8472,9 +8471,11 @@ System managed. Mounted world books, User persona, Char persona, and recent onli
                     id: 'length_words',
                     name: '字数要求',
                     enabled: true,
+                    presetVersion: 1,
                     content: `<length_requirement>
-字数要求：最少800字，最多1200字。
-正文必须分段输出。每段约100至150字，段落之间必须保留一个空行，不要把所有文字挤在同一个长段落里。
+字数要求：最少200字，最多400字。
+正文必须分段输出。段落之间必须保留一个空行，不要把所有文字挤在同一个长段落里。
+禁止一次性输出太多段。
 如果包含对白，仍要让叙述段落和对白自然分开，保持阅读呼吸感。
 </length_requirement>`,
                     editable: true,
@@ -8508,9 +8509,14 @@ When the default language is Chinese, output only Chinese dialogue in corner quo
                     id: 'style_creative_guidance',
                     name: '文学指导',
                     enabled: true,
-                    presetVersion: 4,
+                    presetVersion: 5,
                     content: `<literary_guidance>
 Literary Writing Guidance
+
+0. Output Scope
+
+Write char only. The user has exclusive authorship over the user’s actions, dialogue, thoughts, feelings, perceptions, and reactions.
+Do not write for the user, enter the user’s perspective, describe what the user sees or experiences, infer the user’s internal state or needs, or frame char through the user’s gaze. Do not repeat, paraphrase, extend, or complete actions already written by the user.
 
 I. Fundamental Logic
 
@@ -8577,48 +8583,6 @@ Keep sentences clean and concrete. Let the reader infer what the characters feel
                     deletable: false,
                 },
                 {
-                    id: 'style_green_apple',
-                    name: '文风-青苹果',
-                    enabled: false,
-                    presetVersion: 3,
-                    content: `<writing_style name="文风-青苹果">
-一、基调
-温柔清透，留白感强。心动靠细节和沉默传递，不靠直白告白或浓烈抒情。舞台多为日常场景：教室、放学路、屋顶、便利店、雨天共伞。
-
-二、句子节奏
-短句为主，长短交错；关键瞬间用短句甚至单句成段"定格"。多用"……"表现欲言又止。对话与描写穿插，避免大段连续叙述。
-
-三、描写重点
-- 环境：光线、季节、声音（风声、脚步声）点到为止，做情绪的"容器"，不堆砌辞藻。
-- 动作：小动作最出彩——耳朵发红、绞衣角、视线飘忽、欲靠近又退开半步。
-- 心理：用陌生化比喻代替直说，避免"心如撞鹿""脸红如苹果"式老套修辞。
-
-四、对话风格
-口语化、简短，害羞时有短暂沉默或话题被岔开。拌嘴、反差萌制造心动，少用"喜欢"之类直白词汇。
-
-五、甜度把控
-一次互动只放大1个心动瞬间，不堆叠高糖桥段。结尾常留白或转移话题，不把情绪说满。
-
-六、禁忌
-不用夸张比喻、不堆砌形容词、不写大段爱意宣言，不写狗血冲突或突兀的剧烈情绪转折。
-
-七、技巧参考（仿写示范，非引用原文）
-- 环境即情绪（新海诚式）：
-　雨伞骨架滴着水，屋檐下的光线被切成一格一格。她没说话，我也没问。
-- 轻语气藏重量（住野夜式）：
-　"如果明天世界毁灭，你会先做什么？"
-　"先把作业写完吧，不然很亏。"
-- 短句定格（时间暂停感）：
-　风停了。她的头发还在动。我盯着那一秒，没敢眨眼。
-- 拌嘴式反差萌（有川浩式）：
-　"你干嘛看我。"
-　"没看你，看你后面的猫。"
-　"这里哪来的猫。"
-</writing_style>`,
-                    editable: true,
-                    deletable: false,
-                },
-                {
                     id: 'perspective_first',
                     name: '创作指导-第一人称视角',
                     enabled: false,
@@ -8646,9 +8610,9 @@ Do not summarize information that User cannot perceive inside the current scene.
                     id: 'perspective_third',
                     name: '创作指导-第三人称视角',
                     enabled: true,
-                    presetVersion: 2,
+                    presetVersion: 3,
                     content: `<perspective_rule type="third_person">
-必须使用以 {{user}} 为主导、为中心的第三人称限定视角。这是第三人称叙事，不得用“我”代替 {{user}}，也不得把正文写成对 {{user}} 使用“你”的第二人称叙事。
+必须使用以 {{char}} 为主导、为中心的第三人称限定视角。这是第三人称叙事，不得用“我”代替 {{user}}，也不得把正文写成对 {{user}} 使用“你”的第二人称叙事。
 叙事镜头优先贴近 {{user}} 当下能够看见、听见、触碰、回忆或合理推断的内容，并由 {{user}} 的动作、选择和注意力带动剧情。
 不得随意进入 {{char}} 的内心或使用全知总结；Char 的情绪、动机和隐私必须通过动作、对白、停顿、表情及场景线索呈现。
 群聊场景仍以 {{user}} 为视角锚点，同时观察成员之间的关系、反应与彼此影响，形成层次清楚的群像，而不是轮流点名发言。
@@ -8791,9 +8755,9 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                     id: 'cot_language_check',
                     name: 'cot-语言检查',
                     enabled: true,
-                    presetVersion: 3,
+                    presetVersion: 4,
                     content:
-                        '是否按照角色默认语言书写台词；非中文台词是否紧跟准确的中文翻译，并使用规定的直角引号和全角括号。',
+                        '是否将整段正文、旁白、动作和台词全部使用 Chat Settings 当前设置的角色默认语言；是否没有附加中文翻译；台词是否独立成段并使用规定的双引号。',
                     editable: true,
                     deletable: false,
                 },
@@ -8966,6 +8930,7 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                             prompt_11.id ||
                             OFFLINE_LEGACY_PROMPT_ID_BY_NAME[rawName_2] ||
                             'custom-' + slugOfflinePromptName(rawName_2) + '-' + value_1780;
+                    if (id_5 === 'style_green_apple' || rawName_2 === '文风-青苹果') return;
                     if (id_5 === 'cot') {
                         appendMigratedCotPrompts(fullCotIds, prompt_11.enabled !== false);
                         return;
@@ -9014,7 +8979,7 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                             ),
                             sourcePresetVersion = Math.max(0, Number(prompt_11.presetVersion) || 0),
                             refreshBuiltInContent =
-                                (['style_creative_guidance', 'style_green_apple'].includes(id_5) ||
+                                (['role_identity', 'length_words', 'style_creative_guidance', 'perspective_third'].includes(id_5) ||
                                     fullCotIds.includes(id_5)) &&
                                 sourcePresetVersion < presetVersion_2;
                         if (refreshBuiltInContent) item_21.name = defaultPrompt_2.name;
@@ -9054,38 +9019,25 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                 defaults.forEach((defaultPrompt_3) => {
                     if (!usedIds.has(defaultPrompt_3.id)) {
                         const missingPrompt = cloneOfflinePrompt(defaultPrompt_3);
-                        if (defaultPrompt_3.id === 'style_green_apple') {
-                            const styleIndex = normalized.findIndex(
-                                (prompt_12) => prompt_12.id === 'style_baimiao',
+                        if (defaultPrompt_3.id === 'offline_recap_haru') {
+                            const formatIndex_2 = normalized.findIndex(
+                                (prompt_13) => prompt_13.id === 'format_rules',
                             );
                             normalized.splice(
-                                styleIndex >= 0 ? styleIndex + 1 : normalized.length,
+                                formatIndex_2 >= 0 ? formatIndex_2 : normalized.length,
                                 0,
                                 missingPrompt,
                             );
-                        } else {
-                            if (defaultPrompt_3.id === 'offline_recap_haru') {
-                                const formatIndex_2 = normalized.findIndex(
-                                    (prompt_13) => prompt_13.id === 'format_rules',
-                                );
-                                normalized.splice(
-                                    formatIndex_2 >= 0 ? formatIndex_2 : normalized.length,
-                                    0,
-                                    missingPrompt,
-                                );
-                            } else {
-                                if (modularCotIds.includes(defaultPrompt_3.id)) {
-                                    const cotAfterIndex = normalized.findIndex(
-                                        (prompt_14) => prompt_14.id === 'cot_after',
-                                    );
-                                    normalized.splice(
-                                        cotAfterIndex >= 0 ? cotAfterIndex : normalized.length,
-                                        0,
-                                        missingPrompt,
-                                    );
-                                } else normalized.push(missingPrompt);
-                            }
-                        }
+                        } else if (modularCotIds.includes(defaultPrompt_3.id)) {
+                            const cotAfterIndex = normalized.findIndex(
+                                (prompt_14) => prompt_14.id === 'cot_after',
+                            );
+                            normalized.splice(
+                                cotAfterIndex >= 0 ? cotAfterIndex : normalized.length,
+                                0,
+                                missingPrompt,
+                            );
+                        } else normalized.push(missingPrompt);
                         usedIds.add(defaultPrompt_3.id);
                     }
                 });

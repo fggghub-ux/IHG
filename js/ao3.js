@@ -65,49 +65,11 @@ Show emotion through actions, objects, silence, distance, light, sound, smell, a
 Avoid ornate metaphors, abstract emotional labels, and author commentary.
 Keep sentences clean and concrete. Let the reader infer what the characters feel from what they do.
 </writing_style>`,
-            style_green_apple: `<writing_style name="文风-青苹果">
-一、基调
-温柔清透，留白感强。心动靠细节和沉默传递，不靠直白告白或浓烈抒情。舞台多为日常场景：教室、放学路、屋顶、便利店、雨天共伞。
-
-二、句子节奏
-短句为主，长短交错；关键瞬间用短句甚至单句成段"定格"。多用"……"表现欲言又止。对话与描写穿插，避免大段连续叙述。
-
-三、描写重点
-- 环境：光线、季节、声音（风声、脚步声）点到为止，做情绪的"容器"，不堆砌辞藻。
-- 动作：小动作最出彩——耳朵发红、绞衣角、视线飘忽、欲靠近又退开半步。
-- 心理：用陌生化比喻代替直说，避免"心如撞鹿""脸红如苹果"式老套修辞。
-
-四、对话风格
-口语化、简短，害羞时有短暂沉默或话题被岔开。拌嘴、反差萌制造心动，少用"喜欢"之类直白词汇。
-
-五、甜度把控
-一次互动只放大1个心动瞬间，不堆叠高糖桥段。结尾常留白或转移话题，不把情绪说满。
-
-六、禁忌
-不用夸张比喻、不堆砌形容词、不写大段爱意宣言，不写狗血冲突或突兀的剧烈情绪转折。
-
-七、技巧参考（仿写示范，非引用原文）
-- 环境即情绪（新海诚式）：
-　雨伞骨架滴着水，屋檐下的光线被切成一格一格。她没说话，我也没问。
-- 轻语气藏重量（住野夜式）：
-　"如果明天世界毁灭，你会先做什么？"
-　"先把作业写完吧，不然很亏。"
-- 短句定格（时间暂停感）：
-　风停了。她的头发还在动。我盯着那一秒，没敢眨眼。
-- 拌嘴式反差萌（有川浩式）：
-　"你干嘛看我。"
-　"没看你，看你后面的猫。"
-　"这里哪来的猫。"
-</writing_style>`,
         }),
         freeze_8 = Object.freeze({
             style_baimiao: {
                 name: '白开水',
                 text: freeze_7.style_baimiao,
-            },
-            style_green_apple: {
-                name: '青苹果',
-                text: freeze_7.style_green_apple,
             },
         });
     let message_9 = null,
@@ -250,6 +212,13 @@ Keep sentences clean and concrete. Let the reader infer what the characters feel
             createdAt: handleAction_26(message_199.createdAt),
         };
     }
+    function isRemovedAo3WritingStyle(style) {
+        return (
+            style?.key === 'style_green_apple' ||
+            style?.id === 'style_green_apple' ||
+            /<writing_style\b[^>]*\bname=["']文风-青苹果["']/.test(String(style?.text || ''))
+        );
+    }
     function handleAction_31(value_202, value_203 = 0) {
         if (!value_202 || typeof value_202 !== 'object') return null;
         const id_2 = handleAction_20(value_202.id, 'ao3-work-' + (value_203 + 1), 120),
@@ -263,7 +232,9 @@ Keep sentences clean and concrete. Let the reader infer what the characters feel
                 .filter(Boolean)
                 .slice(0, 50),
             value_207 =
-                value_202.writingStyle && typeof value_202.writingStyle === 'object'
+                value_202.writingStyle &&
+                typeof value_202.writingStyle === 'object' &&
+                !isRemovedAo3WritingStyle(value_202.writingStyle)
                     ? value_202.writingStyle
                     : {},
             value_208 =
@@ -428,7 +399,12 @@ Keep sentences clean and concrete. Let the reader infer what the characters feel
         );
     }
     function handleAction_38(value_238, value_239 = 0) {
-        if (!value_238 || typeof value_238 !== 'object') return null;
+        if (
+            !value_238 ||
+            typeof value_238 !== 'object' ||
+            isRemovedAo3WritingStyle(value_238)
+        )
+            return null;
         const name_4 = handleAction_20(value_238.name, '', 60),
             text_6 = handleAction_20(value_238.text, '', 2000);
         return name_4 && text_6
