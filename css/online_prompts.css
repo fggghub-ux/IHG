@@ -618,6 +618,14 @@
     cursor: pointer;
 }
 
+.online-prompt-builtin-toggles {
+    margin-top: 10px;
+    overflow: hidden;
+    border: 1px solid #dedee3;
+    border-radius: 12px;
+    background: #fff;
+}
+
 .online-prompt-living-vibe {
     position: relative;
     display: flex;
@@ -625,15 +633,16 @@
     justify-content: space-between;
     gap: 12px;
     min-height: 50px;
-    margin-top: 10px;
     padding: 11px 14px;
-    border: 1px solid #dedee3;
-    border-radius: 12px;
     background: #fff;
     color: #1c1c1e;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+}
+
+.online-prompt-living-vibe + .online-prompt-living-vibe {
+    border-top: 1px solid #dedee3;
 }
 
 @media (prefers-reduced-motion: reduce) {

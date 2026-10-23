@@ -12235,16 +12235,18 @@
                                 >当前预设</label
                             >
                             <select id="online-prompt-select" class="online-prompt-select"></select>
-                            <label class="online-prompt-living-vibe" for="online-prompt-living-vibe-toggle">
-                                <span>内置自主交流</span>
-                                <input id="online-prompt-living-vibe-toggle" type="checkbox" role="switch" checked>
-                                <span class="online-prompt-living-vibe-slider" aria-hidden="true"></span>
-                            </label>
-                            <label class="online-prompt-living-vibe" for="online-prompt-punctuation-toggle">
-                                <span>标点符号准则</span>
-                                <input id="online-prompt-punctuation-toggle" type="checkbox" role="switch" checked>
-                                <span class="online-prompt-living-vibe-slider" aria-hidden="true"></span>
-                            </label>
+                            <div class="online-prompt-builtin-toggles">
+                                <label class="online-prompt-living-vibe" for="online-prompt-living-vibe-toggle">
+                                    <span>内置自主交流</span>
+                                    <input id="online-prompt-living-vibe-toggle" type="checkbox" role="switch" checked>
+                                    <span class="online-prompt-living-vibe-slider" aria-hidden="true"></span>
+                                </label>
+                                <label class="online-prompt-living-vibe" for="online-prompt-punctuation-toggle">
+                                    <span>标点符号准则</span>
+                                    <input id="online-prompt-punctuation-toggle" type="checkbox" role="switch" checked>
+                                    <span class="online-prompt-living-vibe-slider" aria-hidden="true"></span>
+                                </label>
+                            </div>
                             <div class="online-prompt-toolbar">
                                 <button
                                     type="button"
@@ -18400,37 +18402,37 @@
                 >
                     <!-- Music -->
                     <div id="friend-phone-app-music" aria-label="Music" title="Music" class="app-item">
-                        <div style="background: rgb(255, 45, 85); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 30px;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-music.jpg" alt=""></div>
+                        <div class="app-icon icon-placeholder cphone-app-icon"><i class="fas fa-music cphone-app-icon-fallback" aria-hidden="true"></i><img class="friend-phone-app-icon" src="assets/cphone/char-phone-music.jpg" alt=""></div>
                         <div class="friend-phone-app-label app-name">Music</div>
                     </div>
                     <!-- 健康 -->
                     <div id="friend-phone-app-health" aria-label="Health" title="Health" class="app-item">
-                        <div style="background: rgb(255, 255, 255); color: rgb(255, 45, 85); display: flex; justify-content: center; align-items: center; font-size: 32px;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-health.jpg" alt=""></div>
+                        <div class="app-icon icon-placeholder cphone-app-icon"><i class="fas fa-heart cphone-app-icon-fallback" aria-hidden="true"></i><img class="friend-phone-app-icon" src="assets/cphone/char-phone-health.jpg" alt=""></div>
                         <div class="friend-phone-app-label app-name">Health</div>
                     </div>
                     <!-- Pay -->
                     <div id="friend-phone-app-pay" aria-label="Wallet" title="Wallet" class="app-item">
-                        <div style="background: rgb(0, 122, 255); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 28px;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-wallet.jpg" alt=""></div>
+                        <div class="app-icon icon-placeholder cphone-app-icon"><i class="fas fa-wallet cphone-app-icon-fallback" aria-hidden="true"></i><img class="friend-phone-app-icon" src="assets/cphone/char-phone-wallet.jpg" alt=""></div>
                         <div class="friend-phone-app-label app-name">Wallet</div>
                     </div>
                     <!-- Game -->
                     <div id="friend-phone-app-game" aria-label="Games" title="Games" class="app-item">
-                        <div style="background: rgb(0, 0, 0); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 30px;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-games.jpg" alt=""></div>
+                        <div class="app-icon icon-placeholder cphone-app-icon"><i class="fas fa-gamepad cphone-app-icon-fallback" aria-hidden="true"></i><img class="friend-phone-app-icon" src="assets/cphone/char-phone-games.jpg" alt=""></div>
                         <div class="friend-phone-app-label app-name">Games</div>
                     </div>
                     <!-- 电话 -->
                     <div id="friend-phone-app-call" aria-label="Phone" title="Phone" class="app-item">
-                        <div style="background: rgb(52, 199, 89); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 28px;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-phone.jpg" alt=""></div>
+                        <div class="app-icon icon-placeholder cphone-app-icon"><i class="fas fa-phone cphone-app-icon-fallback" aria-hidden="true"></i><img class="friend-phone-app-icon" src="assets/cphone/char-phone-phone.jpg" alt=""></div>
                         <div class="friend-phone-app-label app-name">Phone</div>
                     </div>
                     <!-- 文件 (Files) -->
                     <div id="friend-phone-app-files" aria-label="Files" title="Files" class="app-item">
-                        <div style="background: rgb(255, 255, 255); color: rgb(0, 122, 255); display: flex; justify-content: center; align-items: center; font-size: 30px;" class="app-icon icon-placeholder"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-files.jpg" alt=""></div>
+                        <div class="app-icon icon-placeholder cphone-app-icon"><i class="fas fa-folder cphone-app-icon-fallback" aria-hidden="true"></i><img class="friend-phone-app-icon" src="assets/cphone/char-phone-files.jpg" alt=""></div>
                         <div class="friend-phone-app-label app-name">Files</div>
                     </div>
                     <!-- Weibo -->
                     <div id="friend-phone-app-weibo" aria-label="Weibo" title="Weibo" class="app-item">
-                        <div style="background: linear-gradient(135deg, #ff8a00, #ff2d55); color: rgb(255, 255, 255); display: flex; justify-content: center; align-items: center; font-size: 30px;" class="app-icon icon-placeholder"><i class="fab fa-weibo"></i></div>
+                        <div class="app-icon icon-placeholder cphone-app-icon"><i class="fab fa-weibo cphone-app-icon-fallback" aria-hidden="true"></i></div>
                         <div class="friend-phone-app-label app-name">Weibo</div>
                     </div>
                 </div>
@@ -19035,15 +19037,15 @@
                 <div class="dock-container">
                     <div class="dock cphone-home-dock">
                         <div class="app-item" id="friend-phone-app-settings" aria-label="Settings" title="Settings">
-                            <div class="app-icon"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-settings.jpg" alt=""></div>
+                            <div class="app-icon cphone-app-icon"><i class="fas fa-cog cphone-app-icon-fallback" aria-hidden="true"></i><img class="friend-phone-app-icon" src="assets/cphone/char-phone-settings.jpg" alt=""></div>
                             <span class="app-name">Settings</span>
                         </div>
                         <div class="app-item" id="friend-phone-app-imessage" aria-label="Message" title="Message">
-                            <div class="app-icon"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-message.jpg" alt=""></div>
+                            <div class="app-icon cphone-app-icon"><i class="fas fa-comment cphone-app-icon-fallback" aria-hidden="true"></i><img class="friend-phone-app-icon" src="assets/cphone/char-phone-message.jpg" alt=""></div>
                             <span class="app-name">Message</span>
                         </div>
                         <div class="app-item" id="friend-phone-app-safari" aria-label="Safari" title="Safari">
-                            <div class="app-icon"><img class="friend-phone-app-icon" src="assets/cphone/char-phone-safari.jpg" alt=""></div>
+                            <div class="app-icon cphone-app-icon"><i class="fab fa-safari cphone-app-icon-fallback" aria-hidden="true"></i><img class="friend-phone-app-icon" src="assets/cphone/char-phone-safari.jpg" alt=""></div>
                             <span class="app-name">Safari</span>
                         </div>
                     </div>
