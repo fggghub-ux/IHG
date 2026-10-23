@@ -1659,8 +1659,8 @@ body:has(#u2-login-screen:not(.is-hidden)) #pages-container > .page-wrapper * {
     height: 34px;
     border: 0;
     border-radius: 17px;
-    background: rgba(255, 255, 255, 0.92);
-    color: #111;
+    background: #007aff;
+    color: #ffffff;
     font: inherit;
     font-size: 13px;
     font-weight: 700;
