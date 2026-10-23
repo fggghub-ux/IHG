@@ -1143,6 +1143,14 @@ button.group-private-chat-detail-bubble {
     }
 }
 
+/* Keep the iPad Home title in its own layer while the app slides in.
+   Its glyphs extend below the 62px header; WebKit can clip the initial
+   shared-layer raster to that header before repainting after entry. */
+.app-ipad-layout #imessage-view[data-im-active-surface="home"] > .line-header::before {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
 #imessage-view[data-im-active-surface="home"] > .line-content {
     padding-top: 50px;
 }
