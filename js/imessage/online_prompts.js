@@ -330,15 +330,20 @@
         );
         if (!value_115) throw new Error('应用失败，请重试');
     }
-    async function setBuiltinLivingVibeEnabled(value_117, _value2) {
+    async function setBuiltinEntryEnabled(value_117, field, _value2) {
         const _value3 = value.imApp.getFriendById(value_117);
         if (!_value3) throw new Error('聊天已不存在');
-        const _value4 = _value3.builtinLivingVibeEnabled;
+        const previousSettings = {
+            builtinLivingVibeEnabled: _value3.builtinLivingVibeEnabled,
+            builtinPunctuationEnabled: _value3.builtinPunctuationEnabled,
+        };
         try {
             const _value5 = await value.imApp.commitScopedFriendChange(
                 value_117,
                 (_value6) => {
-                    _value6.builtinLivingVibeEnabled = _value2 !== false;
+                    if (typeof _value6.builtinPunctuationEnabled !== 'boolean')
+                        _value6.builtinPunctuationEnabled = _value6.builtinLivingVibeEnabled !== false;
+                    _value6[field] = _value2 !== false;
                 },
                 {
                     silent: true,
@@ -355,11 +360,19 @@
                 value.imData.currentSettingsFriend,
             ])) {
                 if (!_value8 || String(_value8.id) !== String(value_117)) continue;
-                if (_value4 === undefined) delete _value8.builtinLivingVibeEnabled;
-                else _value8.builtinLivingVibeEnabled = _value4;
+                for (const [key, previous] of Object.entries(previousSettings)) {
+                    if (previous === undefined) delete _value8[key];
+                    else _value8[key] = previous;
+                }
             }
             throw _value7;
         }
+    }
+    async function setBuiltinLivingVibeEnabled(friendId, enabled) {
+        return setBuiltinEntryEnabled(friendId, 'builtinLivingVibeEnabled', enabled);
+    }
+    async function setBuiltinPunctuationEnabled(friendId, enabled) {
+        return setBuiltinEntryEnabled(friendId, 'builtinPunctuationEnabled', enabled);
     }
     async function deletePreset_2(value_117) {
         const handleAction_13_118 = normalizePresets_2(value.imData.onlinePromptPresets),
@@ -412,6 +425,7 @@
         savePreset: savePreset_2,
         applyPreset: applyPreset_2,
         setBuiltinLivingVibeEnabled,
+        setBuiltinPunctuationEnabled,
         deletePreset: deletePreset_2,
     };
     value.imApp = value.imApp || {};

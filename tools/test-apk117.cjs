@@ -429,7 +429,7 @@ const path = require('node:path');
             },
         );
         await check(
-            'actual manual reply cancels delay and sends living-vibe flag through all worldbook positions',
+            'actual manual reply cancels delay and sends independent built-in flags through all worldbook positions',
             async () => {
                 const app = window.imApp,
                     f = app.getFriendById('117-char');
@@ -484,11 +484,16 @@ const path = require('node:path');
                 };
                 window.u2Api = { ...original.api, fetchChatCompletion: window.fetch };
                 app.getWorldBookContextForFriendByPosition = (position, friend, text, options) => {
-                    test.positions.push({ position, includeBuiltin: options?.includeBuiltin });
+                    test.positions.push({
+                        position,
+                        autonomy: options?.builtinLivingVibeEnabled,
+                        punctuation: options?.builtinPunctuationEnabled,
+                    });
                     return (
                         'USER_WORLD_' +
                         position +
-                        (options?.includeBuiltin === false ? '' : ' BUILTIN_SHOULD_BE_ABSENT')
+                        (options?.builtinLivingVibeEnabled === false ? '' : ' AUTONOMY_SHOULD_BE_ABSENT') +
+                        (options?.builtinPunctuationEnabled === false ? '' : ' PUNCTUATION_REMAINS')
                     );
                 };
                 window.imChat.maybeAutoReplyAfterUserMessage(app.getFriendById(f.id), null, {
@@ -504,10 +509,11 @@ const path = require('node:path');
                 return (
                     test.requests > 0 &&
                     ['system_depth', 'before_role', 'after_role'].every((p) =>
-                        test.positions.some((x) => x.position === p && x.includeBuiltin === false),
+                        test.positions.some((x) => x.position === p && x.autonomy === false && x.punctuation === true),
                     ) &&
                     test.prompts.some((p) => p.includes('USER_WORLD_')) &&
-                    !test.prompts.some((p) => p.includes('BUILTIN_SHOULD_BE_ABSENT'))
+                    !test.prompts.some((p) => p.includes('AUTONOMY_SHOULD_BE_ABSENT')) &&
+                    test.prompts.some((p) => p.includes('PUNCTUATION_REMAINS'))
                 );
             },
         );

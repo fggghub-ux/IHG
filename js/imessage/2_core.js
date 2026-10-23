@@ -2651,6 +2651,11 @@ window.imApp.normalizeFriendData = function (friend_8) {
             ? normalized_2.onlinePromptPresetId.trim()
             : '';
     normalized_2.builtinLivingVibeEnabled = normalized_2.builtinLivingVibeEnabled !== false;
+    // Before the split, the same switch controlled both built-in entries.
+    normalized_2.builtinPunctuationEnabled =
+        typeof normalized_2.builtinPunctuationEnabled === 'boolean'
+            ? normalized_2.builtinPunctuationEnabled
+            : normalized_2.builtinLivingVibeEnabled;
     const cotDefaultVersion_2 = Number(normalized_2.cotDefaultVersion) || 0;
     normalized_2.cotEnabled = cotDefaultVersion_2 >= 2 && normalized_2.cotEnabled === true;
     normalized_2.cotDefaultVersion = 2;
@@ -7067,7 +7072,11 @@ window.getGlobalWorldBookContextByPosition = function (
         items_1221.push(value_355.trim());
     }
     if (value_1215.includeBuiltin !== false && window.getBuiltinWorldBookContext) {
-        const builtinSection = window.getBuiltinWorldBookContext(position_2, contextText_2);
+        const builtinSection = window.getBuiltinWorldBookContext(
+            position_2,
+            contextText_2,
+            value_1215,
+        );
         builtinSection && items_1221.push(builtinSection.trim());
     }
     return items_1221

@@ -7338,7 +7338,10 @@ Topics do not need to be “interesting.” They need to be real: things {{char}
             const trim_2783 = String(options_7.worldBookTriggerText || '').trim();
             trim_2783 && (text_2842 += '\n' + trim_2783);
             const worldBookOptions = {
-                includeBuiltin: friend_31.builtinLivingVibeEnabled !== false,
+                builtinLivingVibeEnabled: friend_31.builtinLivingVibeEnabled !== false,
+                builtinPunctuationEnabled:
+                    friend_31.builtinPunctuationEnabled ??
+                    (friend_31.builtinLivingVibeEnabled !== false),
             };
             const systemDepthWorldBookContext_2 = window.imApp
                 ?.getWorldBookContextForFriendByPosition

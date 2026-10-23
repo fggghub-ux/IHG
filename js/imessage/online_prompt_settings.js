@@ -24,6 +24,9 @@
         livingVibeToggle = chatOnlinePromptSheetElement.querySelector(
             '#online-prompt-living-vibe-toggle',
         ),
+        punctuationToggle = chatOnlinePromptSheetElement.querySelector(
+            '#online-prompt-punctuation-toggle',
+        ),
         onlinePromptNoticeElement =
             chatOnlinePromptSheetElement.querySelector('.online-prompt-notice');
     if (
@@ -602,6 +605,10 @@
         value_4 = value_153.id;
         if (livingVibeToggle)
             livingVibeToggle.checked = value_153.builtinLivingVibeEnabled !== false;
+        if (punctuationToggle)
+            punctuationToggle.checked =
+                value_153.builtinPunctuationEnabled ??
+                (value_153.builtinLivingVibeEnabled !== false);
         value_10 = document.activeElement;
         if (value_10?.matches?.('input, textarea, select, [contenteditable="true"]'))
             value_10.blur();
@@ -616,22 +623,36 @@
     onlinePromptDecisionElement.addEventListener('click', (event) => {
         if (event.target === onlinePromptDecisionElement) value_9?.('cancel');
     });
-    livingVibeToggle?.addEventListener('change', () => {
-        const previous = window.imApp.getFriendById(value_4)?.builtinLivingVibeEnabled !== false;
-        const enabled = livingVibeToggle.checked;
-        if (inert_2 || value_9) {
-            livingVibeToggle.checked = previous;
-            return;
-        }
-        void handleAction_38(async () => {
-            try {
-                await onlinePrompts_3.setBuiltinLivingVibeEnabled(value_4, enabled);
-            } catch (error) {
-                livingVibeToggle.checked = previous;
-                throw error;
+    function bindBuiltinToggle(toggle, field, save) {
+        toggle?.addEventListener('change', () => {
+            const friend = window.imApp.getFriendById(value_4);
+            const previous = friend?.[field] ?? (friend?.builtinLivingVibeEnabled !== false);
+            const enabled = toggle.checked;
+            if (inert_2 || value_9) {
+                toggle.checked = previous;
+                return;
             }
+            const friendId = value_4;
+            void handleAction_38(async () => {
+                try {
+                    await save(friendId, enabled);
+                } catch (error) {
+                    toggle.checked = previous;
+                    throw error;
+                }
+            });
         });
-    });
+    }
+    bindBuiltinToggle(
+        livingVibeToggle,
+        'builtinLivingVibeEnabled',
+        onlinePrompts_3.setBuiltinLivingVibeEnabled,
+    );
+    bindBuiltinToggle(
+        punctuationToggle,
+        'builtinPunctuationEnabled',
+        onlinePrompts_3.setBuiltinPunctuationEnabled,
+    );
     chatOnlinePromptSettingsBtnElement &&
         (chatOnlinePromptSettingsBtnElement.addEventListener('keydown', (event_154) => {
             (event_154.key === 'Enter' || event_154.key === ' ') &&
