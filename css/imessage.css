@@ -7493,6 +7493,11 @@ button.group-private-chat-detail-bubble {
     max-width: min(85%, 240px) !important;
 }
 
+/* Collapse markup indentation instead of rendering blank text lines. */
+.im-text-bubble-shell.voice-message-bubble {
+    white-space: normal;
+}
+
 .voice-message-bubble-main {
     display: flex;
     align-items: center;

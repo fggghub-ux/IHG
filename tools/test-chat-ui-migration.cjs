@@ -395,6 +395,13 @@ const {execFileSync} = require('node:child_process');
                     }
                 );
             });
+            await check('Character voice collapsed height hugs its controls', () => {
+                const b=document.querySelector('#chat-interface-ui-char [data-message-id="ai-voice"] .voice-message-bubble');
+                const main=b.querySelector('.voice-message-bubble-main'), style=getComputedStyle(b);
+                const height=b.getBoundingClientRect().height;
+                const expected=main.getBoundingClientRect().height+parseFloat(style.paddingTop)+parseFloat(style.paddingBottom);
+                return Math.abs(height-expected)<2 || {height,expected,whiteSpace:style.whiteSpace};
+            });
             await check('Character voice shares text shell in both avatar modes and tail states', async () => {
                 const page=document.getElementById('chat-interface-ui-char');
                 for(const mode of ['one','two']) {
