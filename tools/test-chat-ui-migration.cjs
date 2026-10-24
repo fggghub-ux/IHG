@@ -1050,6 +1050,262 @@ const {execFileSync} = require('node:child_process');
                     path: path.join(process.env.CHAT_UI_SCREENSHOTS, label + '.png'),
                 });
             }
+            // Album presentation keeps IHG's one-message data and detail viewer.
+            await page.evaluate(() => {
+                const host = document.querySelector('#chat-interface-ui-char .ins-chat-messages');
+                window.__albumOriginalNodes = [...host.childNodes];
+                window.__renderAlbumFixture = (count, mode = 'one', role = 'user') => {
+                    host.replaceChildren();
+                    const friend = {...window.imApp.getFriendById('ui-char'), showAvatar:true, avatarDisplayMode:mode};
+                    const images = Array.from({length:count}, (_,i) => {
+                        const canvas=document.createElement('canvas');canvas.width=240;canvas.height=240;
+                        const ctx=canvas.getContext('2d');ctx.fillStyle=['#b6c6d0','#aebbb5','#d1c4b7'][i%3];ctx.fillRect(0,0,240,240);
+                        ctx.fillStyle='#222';ctx.font='64px sans-serif';ctx.fillText(String(i+1),95,140);
+                        return canvas.toDataURL();
+                    });
+                    const message={id:'album-fixture',role,type:'image',imageSource:'real',content:images[0],
+                        albumImages:images.slice(1).map((url,i)=>({url,fileName:'photo-'+(i+2)+'.png'})),
+                        description:'Album detail fixture',timestamp:Date.now()};
+                    window.__albumFixture={host,friend,message,images,before:JSON.stringify(message)};
+                    window.imChat.renderMessageBubble(message,friend,host);
+                    window.imChat.renderMessageBubble({id:'album-after',role:'assistant',type:'text',content:'After album',timestamp:Date.now()+1},friend,host);
+                    host.scrollTop=0;
+                };
+                window.__renderAlbumFixture(3);
+            });
+            await page.waitForFunction(() => [...document.querySelectorAll('.photo-batch-card img')].every(i=>i.complete&&i.naturalWidth));
+            await check('album uses GPT label, icons, stack and one original message', () => {
+                const row=document.querySelector('[data-message-id="album-fixture"]'),s=row.querySelector('.photo-batch-summary');
+                return s.querySelector('.photo-batch-label').textContent==='3 photos'
+                    &&s.querySelectorAll('.photo-batch-grid-icon rect').length===4
+                    &&s.querySelector('.photo-batch-toggle svg')!=null
+                    &&s.querySelectorAll('.photo-batch-card').length===3
+                    &&!row.querySelector('.chat-image-album')
+                    &&row.querySelectorAll('.chat-message-header').length===1
+                    &&row.querySelector('.chat-message-header').getBoundingClientRect().bottom<=s.getBoundingClientRect().top+1
+                    &&JSON.stringify(window.__albumFixture.message)===window.__albumFixture.before;
+            });
+            // Real pointer events: both directions cycle, a swipe must not open the viewer.
+            for(const direction of [-1,1]) {
+                const rect=await page.locator('.photo-batch-stack').boundingBox();
+                const startX=rect.x+rect.width*.5, y=rect.y+rect.height*.5;
+                await page.mouse.move(startX,y);
+                await page.mouse.down();
+                await page.mouse.move(startX+direction*100,y,{steps:5});
+                await page.mouse.up();
+                await page.waitForTimeout(450);
+            }
+            await check('left and right album swipe advance without opening detail',()=>{
+                const cards=[...document.querySelectorAll('.photo-batch-card')];
+                return cards.find(c=>c.classList.contains('is-top')).dataset.photoIndex==='2'
+                    &&getComputedStyle(document.getElementById('chat-image-detail-overlay')||document.createElement('div')).display!=='flex';
+            });
+            await page.locator('.photo-batch-stack').click({position:{x:60,y:60}});
+            await page.waitForFunction(()=>document.querySelector('#chat-image-detail-overlay .chat-image-detail-counter')?.textContent==='3/3');
+            await check('stack tap opens preserved IHG detail at the visible photo',()=>{
+                const overlay=document.getElementById('chat-image-detail-overlay');
+                return getComputedStyle(overlay).display==='flex'
+                    &&overlay.querySelector('.chat-image-detail-desc').textContent==='Album detail fixture'
+                    &&!!overlay.querySelector('.chat-image-detail-next')&&!!overlay.querySelector('.chat-image-detail-prev');
+            });
+            await page.locator('.chat-image-detail-prev').click();
+            await page.waitForFunction(()=>document.querySelector('.chat-image-detail-counter').textContent==='2/3');
+            await page.locator('.chat-image-detail-next').click();
+            await page.waitForFunction(()=>document.querySelector('.chat-image-detail-counter').textContent==='3/3');
+            await page.locator('.chat-image-detail-close').click();
+            // Track real animation frames, not only the final expanded/collapsed state.
+            await page.evaluate(async()=>{
+                const s=document.querySelector('.photo-batch-summary');
+                window.__albumImages=[...s.querySelectorAll('img')];
+                window.__albumBeforeRects=[...s.querySelectorAll('.photo-batch-card')].map(c=>c.getBoundingClientRect().toJSON());
+                s.querySelector('.photo-batch-toggle').click();
+                window.__albumFirstRects=[...s.querySelectorAll('.photo-batch-card')].map(c=>c.getBoundingClientRect().toJSON());
+                window.__albumMotion=[];
+                await new Promise(resolve=>{
+                    const sample=()=>{
+                        window.__albumMotion.push([...s.querySelectorAll('.photo-batch-card')].map(c=>({rect:c.getBoundingClientRect().toJSON(),opacity:getComputedStyle(c).opacity})));
+                        if(s.classList.contains('is-morphing'))requestAnimationFrame(sample);else resolve();
+                    };requestAnimationFrame(sample);
+                });
+            });
+            await check('PhotoStack morph starts in place, stays solid and reuses decoded images',()=>{
+                const s=document.querySelector('.photo-batch-summary'),cards=[...s.querySelectorAll('.photo-batch-card')];
+                const maxJump=Math.max(...window.__albumBeforeRects.map((r,i)=>Math.max(Math.abs(r.top-window.__albumFirstRects[i].top),Math.abs(r.left-window.__albumFirstRects[i].left))));
+                return (s.classList.contains('is-expanded')&&maxJump<2
+                    &&window.__albumMotion.length>3
+                    &&window.__albumMotion.every(frame=>frame.every(c=>c.opacity==='1'))
+                    &&cards.every((c,i)=>c.querySelector('img')===window.__albumImages[i])
+                    &&cards.every((c,i)=>i===0||c.getBoundingClientRect().top>cards[i-1].getBoundingClientRect().bottom)
+                    &&!s.querySelector('.chat-message-header,.im-message-avatar'))||{maxJump,frames:window.__albumMotion.length};
+            });
+            if(process.env.CHAT_UI_SCREENSHOTS) await page.screenshot({path:path.join(process.env.CHAT_UI_SCREENSHOTS,label+'-album-expanded.png')});
+            // Every expanded image enters the same original viewer, including its index.
+            await page.locator('.photo-batch-card[data-photo-index="1"]').click();
+            await page.waitForFunction(()=>document.querySelector('.chat-image-detail-counter').textContent==='2/3');
+            await page.locator('.chat-image-detail-close').click();
+            await page.evaluate(async()=>{
+                const {host}=window.__albumFixture;host.scrollTop=host.scrollHeight;
+                window.__albumCollapseScroll=[host.scrollTop];
+                document.querySelector('.photo-batch-toggle').click();
+                window.__albumCollapseScroll.push(host.scrollTop);
+                await new Promise(resolve=>{
+                    const sample=()=>{window.__albumCollapseScroll.push(host.scrollTop);
+                        if(document.querySelector('.photo-batch-summary').classList.contains('is-morphing'))requestAnimationFrame(sample);else resolve();};requestAnimationFrame(sample);
+                });
+            });
+            await check('collapse stays within native scroll bounds without overshoot',()=>{
+                const values=window.__albumCollapseScroll,s=document.querySelector('.photo-batch-summary'),host=window.__albumFixture.host;
+                const steps=values.slice(1).map((v,i)=>Math.abs(v-values[i]));
+                return (!s.classList.contains('is-expanded')&&values.every(v=>v>=values.at(-1)-1&&v<=values[0]+1)
+                    &&values.at(-1)===Math.min(values[0],host.scrollHeight-host.clientHeight)
+                    &&host.scrollHeight-host.clientHeight>=host.scrollTop-1
+                    &&[...s.querySelectorAll('.photo-batch-card')].filter(c=>c.style.opacity==='1').length===3
+                    &&JSON.stringify(window.__albumFixture.message)===window.__albumFixture.before)||{values,steps};
+            });
+            if(process.env.CHAT_UI_SCREENSHOTS) await page.screenshot({path:path.join(process.env.CHAT_UI_SCREENSHOTS,label+'-album-stack.png')});
+            for (const [count,mode,role] of [[2,'two','user'],[9,'one','assistant'],[9,'two','user']]) {
+                await page.evaluate(args=>window.__renderAlbumFixture(...args),[count,mode,role]);
+                await page.waitForFunction(()=>[...document.querySelectorAll('.photo-batch-card img')].every(i=>i.complete&&i.naturalWidth));
+                await page.evaluate(()=>document.querySelector('.photo-batch-toggle').click());
+                await page.waitForFunction(()=>!document.querySelector('.photo-batch-summary').classList.contains('is-morphing'));
+                await check('album counts and avatars stay outside expanded photos '+count+'/'+mode+'/'+role,()=>{
+                    const s=document.querySelector('.photo-batch-summary'),r=s.closest('.chat-row'),fixture=window.__albumFixture;
+                    return s.querySelector('.photo-batch-label').textContent===fixture.images.length+' photos'
+                        &&!s.querySelector('.chat-message-header,.im-message-avatar')
+                        &&(fixture.friend.avatarDisplayMode==='two'?r.querySelectorAll(':scope > .im-message-avatar').length===1:r.querySelectorAll('.chat-message-header').length===1)
+                        &&JSON.stringify(fixture.message)===fixture.before
+                        &&fixture.host.scrollWidth<=fixture.host.clientWidth+1;
+                });
+                await page.evaluate(()=>document.querySelector('.photo-batch-toggle').click());
+                await page.waitForFunction(()=>!document.querySelector('.photo-batch-summary').classList.contains('is-morphing'));
+                await check('only three collapsed layers visible '+count+'/'+mode+'/'+role,()=>{
+                    const cards=[...document.querySelectorAll('.photo-batch-card')];
+                    return cards.filter(c=>c.style.opacity==='1').length===Math.min(3,cards.length);
+                });
+            }
+            // Trusted clicks must not engage the chat's automatic bottom follower.
+            async function sampleActualAlbumToggle() {
+                const before=await page.evaluate(()=>{
+                    const h=window.__albumFixture.host;
+                    window.__albumScrollWrites=[];
+                    const descriptor=Object.getOwnPropertyDescriptor(Element.prototype,'scrollTop');
+                    Object.defineProperty(h,'scrollTop',{configurable:true,get(){return descriptor.get.call(this);},set(value){const before=descriptor.get.call(this);descriptor.set.call(this,value);const after=descriptor.get.call(this);if(after!==before)window.__albumScrollWrites.push({value,before,after});}});
+                    window.__albumActualScrollSamples=[h.scrollTop];
+                    window.__albumScrollSampling=true;
+                    const sample=()=>{window.__albumActualScrollSamples.push(h.scrollTop);if(window.__albumScrollSampling)requestAnimationFrame(sample);};requestAnimationFrame(sample);
+                    return h.scrollTop;
+                });
+                const rect=await page.locator('.photo-batch-toggle').boundingBox();
+                assert.ok(rect.y>100&&rect.y+rect.height<height-70,'toggle must already be visible before trusted click');
+                await page.mouse.click(rect.x+rect.width/2,rect.y+rect.height/2);
+                await page.waitForFunction(()=>!document.querySelector('.photo-batch-summary').classList.contains('is-morphing'));
+                await page.waitForTimeout(100);
+                return await page.evaluate(before=>{
+                    const h=window.__albumFixture.host;
+                    window.__albumScrollSampling=false;
+                    const result={before,after:h.scrollTop,maxScroll:h.scrollHeight-h.clientHeight,
+                        min:Math.min(...window.__albumActualScrollSamples),max:Math.max(...window.__albumActualScrollSamples),writes:window.__albumScrollWrites};
+                    delete h.scrollTop;
+                    return result;
+                },before);
+            }
+            async function setupScrollScenario(count,tail) {
+                await page.evaluate(({count,tail})=>{
+                    window.__renderAlbumFixture(count);
+                    const h=window.__albumFixture.host;
+                    h.querySelector('[data-message-id="album-after"]').remove();
+                    const before=document.createElement('div');before.style.cssText='height:1200px;flex-shrink:0';h.prepend(before);
+                    if(tail){const after=document.createElement('div');after.style.cssText='height:1600px;flex-shrink:0';h.appendChild(after);}
+                },{count,tail});
+                await page.waitForFunction(()=>[...document.querySelectorAll('.photo-batch-card img')].every(i=>i.complete&&i.naturalWidth));
+                await page.waitForTimeout(500);
+            }
+            await setupScrollScenario(3,true);
+            await page.evaluate(()=>{
+                const h=window.__albumFixture.host,s=h.querySelector('.photo-batch-summary');
+                h.dispatchEvent(new WheelEvent('wheel',{deltaY:-1,bubbles:true}));
+                h.scrollTop+=s.getBoundingClientRect().top-h.getBoundingClientRect().top-200;
+            });
+            for(const action of ['expand','collapse']) {
+                const result=await sampleActualAlbumToggle();
+                assert.ok(result.min===result.before&&result.max===result.before&&result.writes.length===0,label+' history-middle '+action+': '+JSON.stringify(result));
+                console.log('PASS',label,'trusted album '+action+' keeps history viewport unchanged, no scripted scrolling');
+            }
+            await setupScrollScenario(2,false);
+            await page.evaluate(()=>{const h=window.__albumFixture.host;h.scrollTop=h.scrollHeight;});
+            const expandAtBottom=await sampleActualAlbumToggle();
+            assert.ok(expandAtBottom.min===expandAtBottom.before&&expandAtBottom.max===expandAtBottom.before&&expandAtBottom.writes.length===0,label+' bottom expand: '+JSON.stringify(expandAtBottom));
+            console.log('PASS',label,'trusted bottom expand never follows photos to their end');
+            await page.evaluate(()=>{const h=window.__albumFixture.host;h.scrollTop=h.scrollHeight;});
+            const collapseAtBottom=await sampleActualAlbumToggle();
+            assert.ok(collapseAtBottom.min>=collapseAtBottom.after-1&&collapseAtBottom.max<=collapseAtBottom.before+1&&collapseAtBottom.after===Math.min(collapseAtBottom.before,collapseAtBottom.maxScroll)&&collapseAtBottom.writes.length===0,label+' bottom collapse: '+JSON.stringify(collapseAtBottom));
+            console.log('PASS',label,'trusted bottom collapse has only native boundary clamp, no scripted scroll or overshoot');
+            // Album reading must not disable the ordinary explicit latest-message action.
+            await page.evaluate(()=>{const h=window.__albumFixture.host;h.dispatchEvent(new WheelEvent('wheel',{deltaY:-1,bubbles:true}));h.scrollTop=0;});
+            await page.waitForFunction(()=>document.querySelector('#chat-interface-ui-char .im-chat-scroll-latest').classList.contains('is-visible'));
+            await page.locator('#chat-interface-ui-char .im-chat-scroll-latest').click();
+            await page.waitForFunction(()=>{const h=window.__albumFixture.host;return h.scrollHeight-h.clientHeight-h.scrollTop<2;});
+            console.log('PASS',label,'explicit follow-latest still works after album interaction');
+            await check('Char-side Loves invitation HTML remains visible in all avatar modes',async()=>{
+                const h=window.__albumFixture.host;
+                for(const mode of ['none','one','two']) {
+                    h.replaceChildren();
+                    const friend={...window.imApp.getFriendById('ui-char'),showAvatar:mode!=='none',avatarDisplayMode:mode==='none'?'one':mode};
+                    const message={id:'char-loves-check',role:'assistant',sender:friend.id,type:'html',timestamp:Date.now(),
+                        content:'<div class="loves-invite-bubble" style="background:#fff;border-radius:16px;padding:12px;border:1px solid #e5e5ea;max-width:220px;margin:2px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="width:28px;height:28px;border-radius:8px;background:#000;color:#fff"><i class="fas fa-heart"></i></div><strong>Loves 邀请</strong></div><div style="font-size:13px;line-height:1.4">我向你发送了情侣空间的邀请，快来接受吧！</div></div>'};
+                    const original=message.content;window.imChat.renderMessageBubble(message,friend,h);
+                    await Promise.all(h.getAnimations({subtree:true}).filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})));
+                    const row=h.querySelector('[data-message-id="char-loves-check"]'),card=row?.querySelector('.loves-invite-bubble'),style=card&&getComputedStyle(card),r=card?.getBoundingClientRect();
+                    if(!row?.classList.contains('ai-row')||!r?.width||!r?.height||style.display==='none'||style.visibility==='hidden'||Number(style.opacity)===0||message.content!==original||!card.textContent.includes('Loves 邀请'))return {mode,style:style?.cssText,rect:r?.toJSON()};
+                }
+                return true;
+            });
+            await page.evaluate(async()=>{
+                window.__renderAlbumFixture(3);
+                const {host,friend,message,images}=window.__albumFixture;
+                for(let i=0;i<images.length;i++)await window.appStorage.saveAssetFromDataUrl('album-asset-'+i,images[i]);
+                message.content='';message.contentAssetId='album-asset-0';
+                message.albumImages=images.slice(1).map((_,i)=>({assetId:'album-asset-'+(i+1)}));
+                host.replaceChildren();window.imChat.renderMessageBubble(message,friend,host);
+            });
+            await page.waitForFunction(()=>document.querySelectorAll('.photo-batch-card img').length===3&&[...document.querySelectorAll('.photo-batch-card img')].every(i=>i.complete&&i.naturalWidth));
+            await check('album restores all photos from IHG asset IDs',()=>[...document.querySelectorAll('.photo-batch-card img')].every(i=>i.src.startsWith('blob:')));
+            await page.evaluate(()=>window.__renderAlbumFixture(1));
+            await check('one-photo messages retain their existing image renderer',()=>!!document.querySelector('[data-message-id="album-fixture"] .chat-image-bubble-img')&&!document.querySelector('.photo-batch-summary'));
+            await page.evaluate(()=>{
+                window.__albumFixture.host.replaceChildren(...window.__albumOriginalNodes);
+                window.__albumFixture.host.classList.add('avatar-mode-two');
+                delete window.__renderAlbumFixture;delete window.__albumOriginalNodes;
+            });
+            await page.evaluate(()=>{
+                window.__albumAutoReply=window.imChat.maybeAutoReplyAfterUserMessage;
+                window.imChat.maybeAutoReplyAfterUserMessage=()=>false;
+                window.__albumMessageCount=window.imApp.getFriendById('ui-char').messages.length;
+                window.imChat.openAttachmentSheet();
+            });
+            await page.locator('#chat-attachment-sheet .album-image-entry').click();
+            const albumUpload=Buffer.from((await page.evaluate(()=>window.__testImage)).split(',')[1],'base64');
+            const uploadFile=i=>({name:'album-'+i+'.png',mimeType:'image/png',buffer:albumUpload});
+            await page.locator('#modal-image-composer-input').setInputFiles([uploadFile(1),uploadFile(2),uploadFile(3)]);
+            await page.waitForFunction(()=>document.querySelectorAll('.modal-image-composer-item').length===3);
+            await check('original composer retains multi-upload preview and description field',()=>document.getElementById('modal-title').textContent==='相册图片'&&document.getElementById('modal-image-composer-input').multiple&&!!document.querySelector('#modal-textarea'));
+            await page.locator('.modal-image-composer-item button').first().click();
+            await page.waitForFunction(()=>document.querySelectorAll('.modal-image-composer-item').length===2);
+            await page.locator('#modal-image-composer-input').setInputFiles([uploadFile(4)]);
+            await page.waitForFunction(()=>document.querySelectorAll('.modal-image-composer-item').length===3);
+            await page.locator('#modal-textarea').fill('Album composer test');
+            await page.locator('#modal-prompt-confirm-btn').click();
+            await page.waitForFunction(()=>{
+                const f=window.imApp.getFriendById('ui-char');
+                return f.messages.length===window.__albumMessageCount+1
+                    &&[...document.querySelectorAll('#chat-interface-ui-char .chat-row')].some(r=>r.dataset.messageId===f.messages.at(-1).id);
+            });
+            await check('composer sends one IHG message with albumImages and new presentation',()=>{
+                const f=window.imApp.getFriendById('ui-char'),m=f.messages.at(-1);
+                const row=[...document.querySelectorAll('#chat-interface-ui-char .chat-row')].find(r=>r.dataset.messageId===m.id);
+                return (m.type==='image'&&m.imageSource==='real'&&m.description==='Album composer test'&&m.albumImages.length===2&&!!row?.querySelector('.photo-batch-summary'))||{type:m.type,source:m.imageSource,description:m.description,count:m.albumImages?.length,hasRow:!!row,hasAlbum:!!row?.querySelector('.photo-batch-summary')};
+            });
+            await page.evaluate(()=>{window.imChat.maybeAutoReplyAfterUserMessage=window.__albumAutoReply;delete window.__albumAutoReply;});
             if (label === 'phone') {
                 await page.reload({ waitUntil: 'load' });
                 await page.waitForFunction(() => typeof window.imChat?.openChatTab === 'function');

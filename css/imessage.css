@@ -5181,82 +5181,139 @@ button.group-private-chat-detail-bubble {
 }
 
 .chat-row .chat-bubble.album-image-message-bubble {
-    max-width: min(64vw, 214px) !important;
+    width: 100%;
+    max-width: 100% !important;
     overflow: visible;
 }
 
-.chat-image-album {
+/* GX/GPT photo-batch presentation for IHG album messages. */
+.photo-batch-summary {
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: 20px;
+    margin: 10px 0 5px;
+    box-sizing: border-box;
+}
+
+.photo-batch-summary.is-user { flex-direction: row-reverse; }
+.photo-batch-content {
+    width: 154px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.photo-batch-summary.is-user .photo-batch-content { align-items: flex-end; }
+
+.photo-batch-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #8e8e93;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.photo-batch-summary.is-user .photo-batch-label { flex-direction: row-reverse; }
+.photo-batch-grid-icon {
+    width: 15px;
+    height: 15px;
+    display: block;
+    color: currentColor;
+    flex: 0 0 auto;
+}
+
+.photo-batch-stack {
     position: relative;
-    width: min(62vw, 214px);
-    height: min(67vw, 236px);
-    min-height: 170px;
-    cursor: pointer;
+    width: 140px;
+    height: 140px;
+    margin: 0 7px 7px 0;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    box-shadow: none;
+    z-index: 1;
+    transition: opacity .2s ease, transform .24s cubic-bezier(.22,.8,.25,1);
     touch-action: pan-y;
-    user-select: none;
-    -webkit-user-select: none;
 }
 
-.chat-image-album-stack {
-    position: absolute;
-    inset: 0 24px 0 0;
+.photo-batch-stack::before {
+    display: none;
 }
 
-.chat-image-album-layer {
+.photo-batch-card {
     position: absolute;
+    inset: 0;
+    display: block;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 5px 14px rgba(0,0,0,.09);
+    overflow: hidden;
+    transform-origin: 50% 86%;
+    transition: transform .28s cubic-bezier(.22,.8,.25,1), opacity .2s ease;
+    will-change: transform, opacity;
+    touch-action: pan-y;
+}
+
+.photo-batch-card.is-top { z-index: 100; }
+
+.photo-batch-card img {
     width: 100%;
     height: 100%;
-    border-radius: 10px;
+    display: block;
+    border-radius: 11px;
     object-fit: cover;
-    background: #e5e5ea;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-    pointer-events: none;
+    background: #f2f2f7;
 }
 
-.chat-image-album-layer.layer-front {
-    z-index: 3;
-}
-.chat-image-album-layer.layer-back-1 {
-    z-index: 2;
-    transform: translateX(12px) scale(0.98);
-    transform-origin: left center;
-}
-.chat-image-album-layer.layer-back-2 {
-    z-index: 1;
-    transform: translateX(24px) scale(0.96);
-    transform-origin: left center;
-}
-
-.chat-image-album-counter {
-    position: absolute;
-    z-index: 4;
-    right: 8px;
-    bottom: 8px;
-    padding: 3px 7px;
-    border-radius: 10px;
-    background: rgba(0, 0, 0, 0.55);
-    color: #fff;
-    font-size: 11px;
-    line-height: 1.2;
-}
-
-.chat-image-album-expand {
-    position: absolute;
-    z-index: 5;
-    left: -65px;
-    top: 48%;
+.photo-batch-toggle {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    margin: 0 0 54px;
+    padding: 0;
     border: 0;
-    border-radius: 14px;
-    padding: 5px 8px;
-    background: #e4e4e7;
-    color: #777;
-    font-size: 11px;
-    white-space: nowrap;
+    border-radius: 50%;
+    background: #ededf0;
+    color: #8e8e93;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    font-size: 0;
     cursor: pointer;
+    transition: transform .28s cubic-bezier(.22,.8,.25,1), margin .28s ease;
 }
 
-.ai-row .chat-image-album-expand {
-    left: auto;
-    right: -65px;
+.photo-batch-download-icon {
+    width: 14px;
+    height: 14px;
+    display: block;
+    margin: auto;
+    color: currentColor;
+}
+
+/* The same decoded image elements move between stack and expanded positions.
+   No nested chat rows/headers: the album inherits its original row's avatar. */
+.photo-batch-summary.is-expanded { align-items: flex-start; margin-bottom: 5px; }
+.photo-batch-summary.is-expanded .photo-batch-content { width: min(58vw, 204px); }
+.photo-batch-summary.is-expanded .photo-batch-stack { width: min(56vw, 200px); margin-right: 0; }
+.photo-batch-summary.is-expanded .photo-batch-card { box-shadow: none; }
+.photo-batch-summary.is-expanded .photo-batch-toggle {
+    margin-top: 64px;
+    margin-bottom: 0;
+    transform: rotate(180deg);
+}
+.photo-batch-summary.is-morphing .photo-batch-card { transition: none; }
+.photo-batch-toggle { position: relative; left: 6px; }
+@media (min-width: 768px) {
+    .photo-batch-content { width: 182px; }
+    .photo-batch-stack { width: 168px; height: 168px; }
+    .photo-batch-label { font-size: 15px; }
+    .photo-batch-toggle { width: 34px; height: 34px; flex-basis: 34px; margin-bottom: 67px; }
+    .photo-batch-download-icon { width: 16px; height: 16px; }
+    .photo-batch-summary.is-expanded .photo-batch-toggle { margin-top: 74px; margin-bottom: 0; }
 }
 
 .modal-image-composer-list {

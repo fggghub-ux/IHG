@@ -4344,6 +4344,311 @@
         overlay_3.focus();
         void value_286(imageUrl_3_2);
     }
+    /* PhotoStack by Wren036 (https://github.com/Wren036/PhotoStack).
+       https://polyformproject.org/licenses/noncommercial/1.0.0/
+       Adapted from fggghub-ux/PhotoStack README, “展开 / 收起动画”:
+       shared 280ms X/rotation/scale timeline; 280+45*i ms Y timelines;
+       solid, reused images; FLIP following rows; no scripted viewport scrolling.
+       The source explicitly does not ship a host-independent expand/collapse function. */
+    function attachPhotoAlbumMorph(summary, stack, cards, cardOrder, motion, container, groupId) {
+        const expandedGroups = container._imExpandedPhotoGroups || new Set();
+        container._imExpandedPhotoGroups = expandedGroups;
+        const toggle = summary.querySelector('.photo-batch-toggle');
+        const expandedLayout = () => {
+            const size = stack.offsetWidth;
+            stack.style.height = (cards.length * (size + 3) - 3) + 'px';
+            cards.forEach((card, index) => {
+                card.style.width = card.style.height = size + 'px';
+                card.style.transition = 'none';
+                card.style.transform = `translate(0, ${index * (size + 3)}px)`;
+                card.style.opacity = '1';
+                card.style.zIndex = String(100 - index);
+            });
+        };
+        // Capture components rather than interpolating CSS matrices (iOS scale jump).
+        const pose = card => {
+            const matrix = new DOMMatrix(getComputedStyle(card).transform);
+            const rect = stack.getBoundingClientRect();
+            const width = card.offsetWidth, height = card.offsetHeight;
+            return {
+                x: rect.left + width * .5 + matrix.e,
+                y: rect.top + container.scrollTop + height * .86 + matrix.f,
+                width: width * Math.hypot(matrix.a, matrix.b),
+                height: height * Math.hypot(matrix.c, matrix.d),
+                rotation: Math.atan2(matrix.b, matrix.a) * 180 / Math.PI,
+            };
+        };
+        toggle.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (summary.classList.contains('is-morphing') || motion.frame) return;
+            const expanding = !summary.classList.contains('is-expanded');
+            // Opening an album is a reading action, not a request to follow new content.
+            // Cancel the existing follower's pending frame before the album changes size.
+            renderMessageContextByFriend_3.get(container)?.releaseFollowing();
+            const following = [];
+            for (let node = summary.closest('.chat-row').nextElementSibling; node; node = node.nextElementSibling) {
+                if (!node.offsetHeight) continue;
+                following.push({ node, top: node.getBoundingClientRect().top, transform: node.style.transform });
+            }
+            const originalZ = cards.map(card => card.style.zIndex);
+            const visibleOuter = cardOrder[Math.min(2, cards.length - 1)];
+            const from = cards.map(card => !expanding || Number(card.style.opacity) > 0
+                ? pose(card) : pose(visibleOuter));
+            summary.classList.add('is-morphing');
+            summary.classList.toggle('is-expanded', expanding);
+            if (expanding) expandedGroups.add(groupId);
+            else expandedGroups.delete(groupId);
+            toggle.setAttribute('aria-expanded', String(expanding));
+            toggle.setAttribute('aria-label', expanding ? '收起图片' : '展开图片');
+            if (expanding) expandedLayout();
+            else motion.apply();
+            // Put invisible cards behind the outer peek, not at an arbitrary distant pose.
+            const to = cards.map(card => !expanding && Number(card.style.opacity) === 0
+                ? pose(visibleOuter) : pose(card));
+            if (expanding) cards.forEach((card, index) => { card.style.zIndex = originalZ[index]; });
+            following.forEach(item => { item.delta = item.top - item.node.getBoundingClientRect().top; });
+            const duration = matchMedia('(prefers-reduced-motion: reduce)').matches
+                ? 0 : 280 + 45 * (cards.length - 1);
+            const ease = progress => 1 - (1 - progress) * (1 - progress);
+            const lerp = (a, b, p) => a + (b - a) * p;
+            const startedAt = performance.now();
+            const draw = now => {
+                const elapsed = now - startedAt;
+                const progress = duration ? Math.min(1, elapsed / duration) : 1;
+                const horizontal = duration ? ease(Math.min(1, elapsed / 280)) : 1;
+                const rect = stack.getBoundingClientRect();
+                cards.forEach((card, index) => {
+                    const a = from[index], b = to[index];
+                    const vertical = duration ? ease(Math.min(1, elapsed / (280 + 45 * index))) : 1;
+                    const width = card.offsetWidth, height = card.offsetHeight;
+                    const x = lerp(a.x, b.x, horizontal) - rect.left - width * .5;
+                    const y = lerp(a.y, b.y, vertical) - container.scrollTop - rect.top - height * .86;
+                    const sx = lerp(a.width, b.width, horizontal) / width;
+                    const sy = lerp(a.height, b.height, horizontal) / height;
+                    card.style.transition = 'none';
+                    card.style.opacity = '1';
+                    card.style.transform = `translate(${x}px, ${y}px) rotate(${lerp(a.rotation, b.rotation, horizontal)}deg) scale(${sx}, ${sy})`;
+                });
+                following.forEach(({ node, delta }) => {
+                    node.style.transform = `translateY(${delta * (1 - ease(progress))}px)`;
+                });
+                if (progress < 1 && summary.isConnected) requestAnimationFrame(draw);
+                else {
+                    if (expanding) expandedLayout();
+                    else motion.apply();
+                    following.forEach(({ node, transform }) => { node.style.transform = transform; });
+                    summary.classList.remove('is-morphing');
+                }
+            };
+            draw(startedAt);
+        });
+        if (expandedGroups.has(groupId)) {
+            summary.classList.add('is-expanded');
+            toggle.setAttribute('aria-expanded', 'true');
+            toggle.setAttribute('aria-label', '收起图片');
+            requestAnimationFrame(() => { if (summary.isConnected) expandedLayout(); });
+        }
+        // Reflow the expanded album when its own available width changes.
+        let previousWidth = 0;
+        const resize = new ResizeObserver(() => {
+            if (!summary.isConnected) { resize.disconnect(); return; }
+            const width = stack.offsetWidth;
+            if (width === previousWidth || summary.classList.contains('is-morphing')) return;
+            previousWidth = width;
+            if (summary.classList.contains('is-expanded')) expandedLayout();
+        });
+        resize.observe(stack);
+    }
+
+    // GX/GPT renderPhotoBatchGroup presentation and swipe motion, adapted to
+    // IHG's one image message with albumImages and its existing detail viewer.
+    function mountChatPhotoAlbum(summary, message, container, openDetail) {
+        const count = 1 + message.albumImages.length;
+        const gridIconSvg = `<svg class="photo-batch-grid-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor"></rect><rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor"></rect><rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor"></rect><rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor"></rect></svg>`;
+        const downloadIconSvg = `<svg class="photo-batch-download-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></line></svg>`;
+        summary.innerHTML = `
+            <div class="photo-batch-content">
+                <div class="photo-batch-label">${gridIconSvg}<span>${count} photos</span></div>
+                <div class="photo-batch-stack" aria-label="${count} photos"></div>
+            </div>
+            <button type="button" class="photo-batch-toggle" aria-label="展开图片" aria-expanded="false">
+                ${downloadIconSvg}
+            </button>
+        `;
+
+        const stack = summary.querySelector('.photo-batch-stack');
+        const cards = Array.from({ length: count }, (_, index) => {
+            const card = document.createElement('div');
+            card.className = 'photo-batch-card';
+            card.dataset.photoIndex = String(index);
+            card.tabIndex = 0;
+            card.setAttribute('role', 'button');
+            card.setAttribute('aria-label', '查看第 ' + (index + 1) + ' 张图片');
+            const image = document.createElement('img');
+            image.alt = '';
+            image.draggable = false;
+            card.appendChild(image);
+            stack.appendChild(card);
+            // Keep IHG's asset URL lookup, including albums restored from storage.
+            void handleAction_27(message, index).then(src => {
+                if (src) image.src = src;
+            }).catch(() => undefined);
+            card.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openDetail(index);
+                }
+            });
+            return card;
+        });
+        const cardOrder = cards.slice();
+
+        // Gesture timing and scrub behavior adapted from fggghub-ux/PhotoStack
+        // (PolyForm Noncommercial 1.0.0). The order wraps so either direction
+        // moves the visible card to the back, as required by this chat UI.
+        let suppressClickUntil = 0;
+        const stackMotion = {
+            frame: 0,
+            apply() {
+                stack.style.height = '';
+                cardOrder.forEach((card, depth) => {
+                    card.style.width = card.style.height = '';
+                    card.style.transition = '';
+                    card.classList.toggle('is-top', depth === 0);
+                    card.style.zIndex = String(100 - depth);
+                    card.style.opacity = depth < 3 ? '1' : '0';
+                    if (depth === 0) card.style.transform = 'translateX(0) rotate(0deg) scale(1)';
+                    else {
+                        const offset = 8 + (depth - 1) * 7;
+                        const rotation = 2.2 * Math.min(depth, 3);
+                        const scale = Math.max(.82, 1 - .055 * depth);
+                        card.style.transform = `translateX(${offset}px) rotate(${rotation}deg) scale(${scale})`;
+                    }
+                });
+            },
+            scrub(direction, progress) {
+                const width = stack?.offsetWidth || 140;
+                const peak = width * .52;
+                cardOrder.forEach(card => { card.style.transition = 'none'; });
+                this.apply();
+                cardOrder.forEach(card => { card.style.transition = 'none'; });
+                const current = cardOrder[0];
+                const next = cardOrder[1];
+                const third = cardOrder[2];
+                let x;
+                let rotation;
+                let scale = 1;
+                if (progress <= .5) {
+                    const phase = progress / .5;
+                    x = direction * peak * phase;
+                    rotation = direction * 8 * phase;
+                } else {
+                    const phase = (progress - .5) / .5;
+                    x = direction * (peak - (peak - 8) * phase);
+                    rotation = direction * (8 - 5.8 * phase);
+                    scale = 1 - .055 * phase;
+                }
+                current.style.transform = `translateX(${x}px) rotate(${rotation}deg) scale(${scale})`;
+                current.style.zIndex = progress < .5 ? '110' : '98';
+                if (next) {
+                    next.style.transform = `translateX(${8 * (1 - progress)}px) rotate(${2.2 * (1 - progress)}deg) scale(${.945 + .055 * progress})`;
+                    next.style.opacity = '1';
+                    next.style.zIndex = '105';
+                }
+                if (third) {
+                    third.style.transform = `translateX(${15 - 7 * progress}px) rotate(${4.4 - 2.2 * progress}deg) scale(${.89 + .055 * progress})`;
+                    third.style.opacity = '1';
+                }
+            },
+            finish(direction, fromProgress) {
+                if (this.frame) cancelAnimationFrame(this.frame);
+                const duration = Math.max(140, (1 - fromProgress) * 340);
+                const startedAt = performance.now();
+                const step = (now) => {
+                    const elapsed = Math.min(1, (now - startedAt) / duration);
+                    const eased = 1 - Math.pow(1 - elapsed, 2);
+                    this.scrub(direction, fromProgress + (1 - fromProgress) * eased);
+                    if (elapsed < 1) {
+                        this.frame = requestAnimationFrame(step);
+                        return;
+                    }
+                    this.frame = 0;
+                    cardOrder.push(cardOrder.shift());
+                    this.apply();
+                };
+                this.frame = requestAnimationFrame(step);
+            }
+        };
+        stackMotion.apply();
+
+        if (stack) {
+            let pointerId = null;
+            let startX = 0;
+            let startY = 0;
+            let lastX = 0;
+            let lastTime = 0;
+            let velocity = 0;
+            let dragging = false;
+            let deltaX = 0;
+            stack.style.touchAction = 'pan-y';
+            stack.addEventListener('pointerdown', (event) => {
+                if (summary.classList.contains('is-expanded') || summary.classList.contains('is-morphing') || event.button > 0) return;
+                if (stackMotion.frame) return;
+                pointerId = event.pointerId;
+                startX = lastX = event.clientX;
+                startY = event.clientY;
+                lastTime = event.timeStamp;
+                velocity = 0;
+                deltaX = 0;
+                dragging = false;
+                stack.setPointerCapture?.(pointerId);
+            });
+            stack.addEventListener('pointermove', (event) => {
+                if (pointerId !== event.pointerId) return;
+                const dx = event.clientX - startX;
+                const dy = event.clientY - startY;
+                if (!dragging && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) dragging = true;
+                if (!dragging) return;
+                suppressClickUntil = Date.now() + 450;
+                event.preventDefault();
+                if (event.timeStamp > lastTime) {
+                    velocity = .7 * ((event.clientX - lastX) / (event.timeStamp - lastTime)) + .3 * velocity;
+                }
+                lastX = event.clientX;
+                lastTime = event.timeStamp;
+                deltaX = dx;
+                stackMotion.scrub(dx < 0 ? -1 : 1, Math.min(1, Math.abs(dx) / Math.max(120, stack.offsetWidth * 1.45)));
+            });
+            const release = (event, cancelled = false) => {
+                if (pointerId !== event.pointerId) return;
+                stack.releasePointerCapture?.(pointerId);
+                pointerId = null;
+                const progress = Math.min(1, Math.abs(deltaX) / Math.max(120, stack.offsetWidth * 1.45));
+                const fling = Math.abs(velocity) > .4 && progress > .04;
+                if (!cancelled && dragging && (progress > .32 || fling)) {
+                    stackMotion.finish(deltaX < 0 ? -1 : 1, progress);
+                } else {
+                    stackMotion.apply();
+                }
+                dragging = false;
+            };
+            stack.addEventListener('pointerup', event => release(event));
+            stack.addEventListener('pointercancel', event => release(event, true));
+        }
+
+        stack.addEventListener('click', event => {
+            if (Date.now() < suppressClickUntil || summary.classList.contains('is-morphing')) return;
+            event.preventDefault();
+            event.stopPropagation();
+            const index = summary.classList.contains('is-expanded')
+                ? Number(event.target.closest('.photo-batch-card')?.dataset.photoIndex)
+                : Number(cardOrder[0].dataset.photoIndex);
+            if (Number.isInteger(index)) openDetail(index);
+        });
+        attachPhotoAlbumMorph(summary, stack, cards, cardOrder, stackMotion, container, String(message.id || message.timestamp));
+    }
+
     function renderImageBubble_2(msg_18, friend_31, element_304, timestamp_10 = Date.now()) {
         const isUser = msg_18.role === 'user';
         const value_722 = !isUser && friend_31.type === 'group';
@@ -4403,17 +4708,7 @@
         const value_318 = 1 + (Array.isArray(msg_18.albumImages) ? msg_18.albumImages.length : 0);
         const value_320 = value_318 > 1;
         const value_321 = value_320
-            ? '<div class="chat-image-album" role="group" aria-label="' +
-              value_318 +
-              ' 张图片，可左右滑动" tabindex="0">\n                <button type="button" class="chat-image-album-expand" aria-label="展开 ' +
-              value_318 +
-              ' 张图片">展开 ' +
-              value_318 +
-              '</button>\n                <div class="chat-image-album-stack">\n                    <img class="chat-image-album-layer layer-back-2" alt="" loading="lazy" decoding="async" draggable="false">\n                    <img class="chat-image-album-layer layer-back-1" alt="" loading="lazy" decoding="async" draggable="false">\n                    <img class="chat-image-album-layer layer-front" src="' +
-              escapeHtml(value_317) +
-              '" alt="第 1 张图片" loading="lazy" decoding="async" draggable="false">\n                    <span class="chat-image-album-counter">1/' +
-              value_318 +
-              '</span>\n                </div>\n            </div>'
+            ? '<div class="photo-batch-summary ' + (isUser ? 'is-user' : 'is-char') + '"></div>'
             : '<img class="chat-image-bubble-img" src="' +
               escapeHtml(value_317) +
               '" style="width: min(56vw, 200px); height: min(56vw, 200px); max-width: 200px; max-height: 200px; aspect-ratio: 1 / 1; border-radius: 12px; object-fit: cover; display: block; background: #e5e5ea; cursor: pointer;">';
@@ -4472,132 +4767,12 @@
                 openChatImageDetail(msg_18, friend_31, timestamp_10, senderName_3);
             });
         if (value_320) {
-            const chatImageAlbumElement = row_14.querySelector('.chat-image-album');
-            const items_333 = [
-                chatImageAlbumElement.querySelector('.layer-front'),
-                chatImageAlbumElement.querySelector('.layer-back-1'),
-                chatImageAlbumElement.querySelector('.layer-back-2'),
-            ];
-            let count_334 = 0;
-            let count_335 = 0;
-            const value_336 = () => {
-                    const value_345 = ++count_335;
-                    chatImageAlbumElement.querySelector('.chat-image-album-counter').textContent =
-                        count_334 + 1 + '/' + value_318;
-                    items_333.forEach((element_346, value_347) => {
-                        const value_348 = count_334 + value_347,
-                            value_349 = value_348 < value_318;
-                        element_346.style.display = value_349 ? 'block' : 'none';
-                        element_346.removeAttribute('src');
-                        if (!value_349) return;
-                        element_346.alt =
-                            value_347 === 0 ? '第 ' + (value_348 + 1) + ' 张图片' : '';
-                        void handleAction_27(msg_18, value_348)
-                            .then((src_3) => {
-                                if (value_345 === count_335 && element_346.isConnected && src_3)
-                                    element_346.src = src_3;
-                            })
-                            ['catch'](() => undefined);
-                    });
-                };
-            const value_337 = () => {
-                    const senderName_3_2 = isUser
-                        ? getEffectiveUserProfile(friend_31).name
-                        : speakerName || friend_31?.nickname || friend_31?.realName || 'Char';
-                    openChatImageDetail(msg_18, friend_31, timestamp_10, senderName_3_2, count_334);
-                };
-            chatImageAlbumElement
-                .querySelector('.chat-image-album-expand')
-                .addEventListener('click', (event_352) => {
-                    event_352.preventDefault();
-                    event_352.stopPropagation();
-                    value_337();
-                });
-            let value_341 = null;
-            let count_342 = 0;
-            const value_343 = (value_353, value_354) => {
-                if (!value_341) return;
-                const value_355 = value_353 - value_341.x,
-                    value_356 = value_354 - value_341.y;
-                value_341 = null;
-                Math.abs(value_355) > 32 &&
-                    Math.abs(value_355) > Math.abs(value_356) * 1.15 &&
-                    ((count_334 = Math.max(
-                        0,
-                        Math.min(value_318 - 1, count_334 + (value_355 < 0 ? 1 : -1)),
-                    )),
-                    (count_342 = Date.now() + 450),
-                    value_336());
-            };
-            chatImageAlbumElement.addEventListener('pointerdown', (event_357) => {
-                if (event_357.pointerType === 'touch' || event_357.target.closest('button')) return;
-                value_341 = {
-                    x: event_357.clientX,
-                    y: event_357.clientY,
-                };
-            });
-            chatImageAlbumElement.addEventListener('pointerup', (event_358) => {
-                if (event_358.pointerType !== 'touch')
-                    value_343(event_358.clientX, event_358.clientY);
-            });
-            chatImageAlbumElement.addEventListener('pointercancel', () => {
-                    value_341 = null;
-                });
-            chatImageAlbumElement.addEventListener(
-                'touchstart',
-                (event_359) => {
-                    if (event_359.target.closest('button')) return;
-                    const value_360 = event_359.touches?.[0];
-                    if (value_360)
-                        value_341 = {
-                            x: value_360.clientX,
-                            y: value_360.clientY,
-                        };
-                },
-                {
-                    passive: true,
-                },
-            );
-            chatImageAlbumElement.addEventListener(
-                'touchend',
-                (value_361) => {
-                    const value_362 = value_361.changedTouches?.[0];
-                    if (value_362) value_343(value_362.clientX, value_362.clientY);
-                },
-                {
-                    passive: true,
-                },
-            );
-            chatImageAlbumElement.addEventListener(
-                'touchcancel',
-                () => {
-                    value_341 = null;
-                },
-                {
-                    passive: true,
-                },
-            );
-            chatImageAlbumElement.addEventListener('click', (event_363) => {
-                if (event_363.target.closest('button')) return;
-                if (Date.now() < count_342) return;
-                value_337();
-            });
-            chatImageAlbumElement.addEventListener('keydown', (event_364) => {
-                if (event_364.key === 'ArrowLeft' || event_364.key === 'ArrowRight') {
-                    event_364.preventDefault();
-                    count_334 = Math.max(
-                        0,
-                        Math.min(
-                            value_318 - 1,
-                            count_334 + (event_364.key === 'ArrowRight' ? 1 : -1),
-                        ),
-                    );
-                    value_336();
-                } else
-                    (event_364.key === 'Enter' || event_364.key === ' ') &&
-                        (event_364.preventDefault(), value_337());
-            });
-            value_336();
+            const senderName = isUser
+                ? getEffectiveUserProfile(friend_31).name
+                : speakerName || friend_31?.nickname || friend_31?.realName || 'Char';
+            mountChatPhotoAlbum(row_14.querySelector('.photo-batch-summary'), msg_18,
+                element_304, index => openChatImageDetail(
+                    msg_18, friend_31, timestamp_10, senderName, index));
         }
         element_304.appendChild(row_14);
         window.imChat.scrollToBottom(element_304);
