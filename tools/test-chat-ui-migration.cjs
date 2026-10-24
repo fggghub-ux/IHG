@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
+const {execFileSync} = require('node:child_process');
 (async () => {
     const root = path.resolve(__dirname, '..');
     const server = http.createServer((req, res) => {
@@ -234,6 +235,34 @@ const http = require('node:http');
                     }
                 );
             });
+            const gptCore = fs.readFileSync(path.resolve(root, '../GX/js/imessage/2_core.js'), 'utf8');
+            const gptFormatter = gptCore.slice(gptCore.indexOf('window.imApp.formatTime = function'), gptCore.indexOf('window.imApp.addMomentNotification')).replace(/^window.imApp.formatTime = /, '').trim().replace(/;$/, '');
+            await page.evaluate(source => {window.__gptFormat = (0,eval)('(' + source + ')');}, gptFormatter);
+            await check('timestamp separators use GPT rules even with custom time', () => {
+                const dates=[Date.now(),Date.now()-86400000,Date.now()-2*86400000,new Date(2026,9,10,11,5).getTime()];
+                for(const t of dates) {
+                    const container=document.createElement('div');
+                    window.imChat.renderTimestamp(t,container,{type:'char',timeAware:false,customTimeEnabled:true,customTimeAnchors:[]});
+                    const stamp=container.querySelector('span');
+                    if(stamp.textContent!==window.__gptFormat(t)||stamp.getAttribute('role')!=='button')return stamp.outerHTML;
+                }
+                return true;
+            });
+            await check('stored family-card symbols preserve half/full width', () => {
+                const f=window.imApp.getFriendById('ui-char'), c=document.createElement('div');
+                window.imChat.renderMessageBubble({id:'old-family',role:'user',type:'pay_transfer',paymentAction:'family_card',amount:100,description:'亲属卡额度 \u00a5100 / \uffe5200',timestamp:Date.now()},f,c);
+                return c.textContent.includes('$100 / ＄200') && !/[\u00a5\uffe5]/.test(c.textContent);
+            });
+            await check('Loves invitation stays clear of every-message avatar', () => {
+                const f={...window.imApp.getFriendById('ui-char'),showAvatar:true,avatarDisplayMode:'two'}, host=document.createElement('div');
+                host.className='ins-chat-messages avatar-mode-two';
+                document.getElementById('chat-interface-ui-char').appendChild(host);
+                window.imChat.renderMessageBubble({id:'loves-regression',role:'user',type:'html',content:'<div class="loves-invite-bubble" style="max-width:220px;padding:12px;margin:2px;border:1px solid #ddd;border-radius:16px">Loves 邀请<br>我向你发送了情侣空间的邀请，快来接受吧！</div>',timestamp:Date.now()},f,host);
+                const row=host.querySelector('.chat-row'), card=row.querySelector('.loves-invite-bubble'), avatar=row.querySelector('.im-message-avatar');
+                const a=avatar.getBoundingClientRect(),b=card.getBoundingClientRect();
+                const result=a.left>=b.right+5 && b.width<=220 && b.width>100 || {avatar:a.toJSON(),card:b.toJSON()};
+                host.remove();return result;
+            });
             await page.evaluate(() =>
                 document.querySelector('#chat-interface-ui-char .chat-back-btn').click(),
             );
@@ -313,8 +342,25 @@ const http = require('node:http');
                     e.dispatchEvent(new Event('change', { bubbles: true }));
                     await new Promise((r) => setTimeout(r, 350));
                 }
-                window.closeView(document.getElementById('chat-settings-sheet'));
             });
+            await page.evaluate(() => document.querySelector('#chat-settings-sheet .char-settings-tab[data-tab="theme"]').click());
+            await check('Avatar row matches language selector and has its own divider', () => {
+                const body=document.getElementById('avatar-position-body');
+                const select=document.getElementById('avatar-position-select');
+                const language=document.getElementById('chat-language-select');
+                const own=getComputedStyle(select), reference=getComputedStyle(language);
+                const label=getComputedStyle(body.querySelector('label'));
+                const toggleLabel=getComputedStyle(document.getElementById('chat-avatar-toggle').closest('.form-item').querySelector('label'));
+                const divider=getComputedStyle(body), other=getComputedStyle(body.nextElementSibling);
+                return (getComputedStyle(body).display==='flex' &&
+                    label.color===toggleLabel.color && own.fontSize===reference.fontSize &&
+                    own.fontFamily===reference.fontFamily && own.fontWeight===reference.fontWeight &&
+                    own.color===reference.color && own.backgroundColor===reference.backgroundColor &&
+                    own.borderTopWidth==='0px' && !!select.nextElementSibling?.classList.contains('fa-chevron-right') &&
+                    divider.borderBottomWidth===other.borderBottomWidth && divider.borderBottomColor===other.borderBottomColor) ||
+                    {label:label.color,toggle:toggleLabel.color,font:own.fontSize,reference:reference.fontSize,border:divider.borderBottom,other:other.borderBottom};
+            });
+            await page.evaluate(() => window.closeView(document.getElementById('chat-settings-sheet')));
             await page.waitForFunction(
                 () =>
                     window.imApp.getFriendById('ui-char').showAvatar &&
@@ -356,6 +402,25 @@ const http = require('node:http');
                     && ['flex','inline-flex'].includes(getComputedStyle(last).display)
                     && /AM|PM/.test(last.textContent)
                     && getComputedStyle(user, '::before').content.includes('Read') || {classes:p.className,first:getComputedStyle(first).display,last:getComputedStyle(last).display,text:last.textContent,read:getComputedStyle(user,'::before').content};
+            });
+            await check('outside timestamp leaves room before the next bubble', () => {
+                const p=document.getElementById('chat-interface-ui-char');
+                let checked=0;
+                for(const row of p.querySelectorAll('.chat-row:not(.has-next):has(.bubble-meta)')) {
+                    const meta=row.querySelector('.bubble-meta');
+                    if(getComputedStyle(meta).display==='none')continue;
+                    let next=row.nextElementSibling;
+                    while(next&&!next.classList.contains('chat-row'))next=next.nextElementSibling;
+                    const bubble=next?.querySelector('.chat-bubble');
+                    if(!bubble)continue;
+                    const gap=bubble.getBoundingClientRect().top-meta.getBoundingClientRect().bottom;
+                    if(gap<7.5)return {id:row.dataset.messageId,gap};
+                    checked++;
+                }
+                p.classList.remove('timestamp-outside');
+                const inside=[...p.querySelectorAll('.chat-row')].every(r=>getComputedStyle(r).marginBottom==='0px');
+                p.classList.add('timestamp-outside');
+                return checked>1 && inside || {checked,inside};
             });
             await check('Avatar One groups headers and Two restores each-message avatars', async () => {
                 const a = window.imApp;
@@ -845,6 +910,20 @@ const http = require('node:http');
                     },
                 );
             }
+            await check('group avatars share every-message renderer and user toggle', async () => {
+                const a=window.imApp;
+                await a.commitFriendChange('ui-group',f=>{f.showGroupUserAvatar=true;},{silent:true});
+                for(const [id,role] of [['group-ai-one','assistant'],['group-ai-two','assistant'],['group-user','user']])
+                    await a.appendFriendMessage('ui-group',{id,role,type:'text',content:id,speakerMemberId:'ui-char',speaker:'Test Char',timestamp:Date.now()},{silent:true});
+                await window.imChat.openChatTab(a.getFriendById('ui-group'));
+                const p=document.getElementById('chat-interface-ui-group');
+                const rows=[...p.querySelectorAll('.chat-row[data-message-id^="group-"]')];
+                const ok=rows.length===3 && rows.every(r=>r.querySelector(':scope > .im-message-avatar img')) && !p.querySelector('.group-ai-avatar-slot');
+                if(!ok)return {rows:rows.map(r=>r.outerHTML.slice(0,250))};
+                await a.commitFriendChange('ui-group',f=>{f.showGroupUserAvatar=false;},{silent:true});
+                window.imChat.rerenderChatContainer(a.getFriendById('ui-group'),p.querySelector('.ins-chat-messages'),{scroll:false});
+                return !p.querySelector('.user-row > .im-message-avatar') && !!p.querySelector('.ai-row > .im-message-avatar');
+            });
             await check('group transfer card and detail keep the original UI', async () => {
                 const a=window.imApp;
                 await a.appendFriendMessage('ui-group',{id:'group-transfer',role:'assistant',type:'pay_transfer',payKind:'char_to_user_pending',amount:42,description:'Group test',timestamp:Date.now()},{silent:true});
@@ -855,21 +934,37 @@ const http = require('node:http');
                 p._closeTransferDetailOverlay();return ok;
             });
             await page.evaluate(() => {
+                document.querySelector('#chat-interface-ui-group .chat-back-btn').click();
+                window.imChat.renderChatsList();
+            });
+            await check('group list badge fits and its text is centered', () => {
+                const badge=document.querySelector('.chat-group-label');
+                if(!badge)return 'missing group badge';
+                const r=badge.getBoundingClientRect(),p=badge.parentElement.getBoundingClientRect();
+                const range=document.createRange();range.selectNodeContents(badge);
+                const t=range.getBoundingClientRect();
+                return r.top>=p.top && r.bottom<=p.bottom && Math.abs((t.top+t.bottom-r.top-r.bottom)/2)<2 || {badge:r.toJSON(),parent:p.toJSON(),text:t.toJSON()};
+            });
+            await page.evaluate(() => {
                 window.imApp.openGroupDetails(window.imApp.getFriendById('ui-group'));
-                window.openView(document.getElementById('group-context-settings-sheet'));
+            });
+            await check('Group Settings moves horizontally during opening', async () => {
+                await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+                const m=new DOMMatrix(getComputedStyle(document.getElementById('group-details-sheet')).transform);
+                return m.m41>0 && m.m42===0 || {x:m.m41,y:m.m42};
             });
             await page.waitForFunction(
                 () =>
                     Math.abs(
                         new DOMMatrix(
                             getComputedStyle(
-                                document.getElementById('group-context-settings-sheet'),
+                                document.getElementById('group-details-sheet'),
                             ).transform,
                         ).m41,
                     ) < 1,
             );
             await check('Group Settings horizontal transition and group UI preserved', () => {
-                const sheet = document.getElementById('group-context-settings-sheet'),
+                const sheet = document.getElementById('group-details-sheet'),
                     style = getComputedStyle(sheet);
                 return (
                     (style.transitionProperty.includes('transform') &&
@@ -882,6 +977,29 @@ const http = require('node:http');
                     }
                 );
             });
+            await page.evaluate(() => window.openView(document.getElementById('group-context-settings-sheet')));
+            await page.waitForTimeout(450);
+            const baselineCss=execFileSync('git',['show','22d35a1:css/imessage.css'],{cwd:root,encoding:'utf8',maxBuffer:2e6});
+            const manageCompare=await page.evaluate(async css=>{
+                const sheet=document.getElementById('group-context-settings-sheet');
+                await Promise.all(sheet.getAnimations({subtree:true}).filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})));
+                const snapshot=()=>[sheet.querySelector('.bottom-sheet'),sheet.querySelector('.detail-sheet-content'),...sheet.querySelectorAll('.settings-group')].filter(Boolean).map(e=>{
+                    const r=e.getBoundingClientRect();return {top:r.top,left:r.left,width:r.width,height:r.height,border:getComputedStyle(e).borderRadius};
+                });
+                const actual=snapshot();
+                const link=document.querySelector('link[href^="css/imessage.css"]');link.disabled=true;
+                const style=document.createElement('style');style.textContent=css;document.head.appendChild(style);
+                await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+                const expected=snapshot();style.remove();link.disabled=false;
+                return {actual,expected};
+            },baselineCss);
+            assert.deepEqual(manageCompare.actual,manageCompare.expected,label+' Manage Group geometry must match pre-migration');
+            console.log('PASS',label,'Manage Group matches pre-migration geometry');
+            if (process.env.CHAT_UI_SCREENSHOTS) {
+                await page.waitForTimeout(450);
+                fs.mkdirSync(process.env.CHAT_UI_SCREENSHOTS,{recursive:true});
+                await page.screenshot({path:path.join(process.env.CHAT_UI_SCREENSHOTS,label+'-manage.png')});
+            }
             await page.evaluate(() => {
                 window.closeView(document.getElementById('group-context-settings-sheet'));
                 window.closeView(document.getElementById('group-details-sheet'));

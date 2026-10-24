@@ -112,7 +112,7 @@ userLiveBackBtn &&
                 document.getElementById('yt-summary-views').textContent = userLiveTotalViews;
                 document.getElementById('yt-summary-hot').textContent = userLiveMaxHot;
                 document.getElementById('yt-summary-subs').textContent = '+' + userLiveNewSubs;
-                document.getElementById('yt-summary-sc').textContent = '$' + userLiveTotalSC;
+                document.getElementById('yt-summary-sc').textContent = '＄' + userLiveTotalSC;
                 if (userLiveSummarySheet) userLiveSummarySheet.classList.add('active');
             },
         });
@@ -234,7 +234,7 @@ ytWithdrawBtn &&
             window.showCustomModal({
                 title: '收益提现',
                 message:
-                    '确认将 YouTube 创作者收益 $' + total_3.toFixed(2) + ' 提现到 Pay 钱包吗？',
+                    '确认将 YouTube 创作者收益 ＄' + total_3.toFixed(2) + ' 提现到 Pay 钱包吗？',
                 confirmText: '确认提现',
                 cancelText: '取消',
                 onConfirm: () => {
@@ -248,7 +248,7 @@ ytWithdrawBtn &&
                 },
             });
         else {
-            if (confirm('确认提现 $' + total_3.toFixed(2) + ' 吗？')) {
+            if (confirm('确认提现 ＄' + total_3.toFixed(2) + ' 吗？')) {
                 channelState.dataCenter.sc = 0;
                 channelState.dataCenter.commission = 0;
                 saveYoutubeData();
@@ -1729,7 +1729,7 @@ function renderUserLiveChatRow(comment_6, element_242 = userLiveChatContainer) {
     if (comment_6.amount) {
         const value_244 =
             typeof comment_6.amount === 'number' || /^\d+(\.\d+)?$/.test(String(comment_6.amount))
-                ? '$' + comment_6.amount
+                ? '＄' + comment_6.amount
                 : comment_6.amount;
         element_243.classList.add('yt-user-live-superchat');
         element_243.style.backgroundColor = comment_6.color || '#8e8e93';
@@ -2670,7 +2670,7 @@ function addUserLiveChatMessage(name_7, text_6, amount_3, color_2, translationZh
         element_366.classList.add('yt-user-live-superchat');
         let value_367 = amount_3;
         (typeof amount_3 === 'number' || /^\d+(\.\d+)?$/.test(String(amount_3))) &&
-            (value_367 = '$' + amount_3);
+            (value_367 = '＄' + amount_3);
         element_366.style.backgroundColor = color_2 || '#8e8e93';
         element_366.style.padding = '8px 12px';
         element_366.style.borderRadius = '8px';

@@ -203,8 +203,8 @@
             window.showToast &&
                 window.showToast(
                     type_2 === 'income'
-                        ? '已到账 $' + balance_2.toFixed(2)
-                        : '已支付 $' + balance_2.toFixed(2),
+                        ? '已到账 ＄' + balance_2.toFixed(2)
+                        : '已支付 ＄' + balance_2.toFixed(2),
                 ),
             true
         );

@@ -1042,7 +1042,7 @@
                     canCurrentUserClaim: canCurrentUserClaim_2,
                 } = model,
                 value_187 = Number(targetMsg_5.amount) || 0,
-                textContent_2 = targetMsg_5.description || '转账',
+                textContent_2 = window.imDataUtils.normalizeCurrencySymbols(targetMsg_5.description || '转账'),
                 familyCardText =
                     (targetMsg_5.paymentAction || '') +
                     ' ' +
@@ -1121,7 +1121,7 @@
             } = model;
 
             const amount = Number(targetMsg.amount) || 0;
-            const description = targetMsg.description || '转账';
+            const description = window.imDataUtils.normalizeCurrencySymbols(targetMsg.description || '转账');
             const familyCardText = `${targetMsg.paymentAction || ''} ${targetMsg.cardTitle || ''} ${targetMsg.description || ''} ${targetMsg.content || ''}`;
             const isFamilyCard = targetMsg.paymentAction === 'family_card'
                 || targetMsg.paymentAction === 'family_card_increase'

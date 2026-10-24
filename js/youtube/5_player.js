@@ -1080,7 +1080,7 @@ function renderYtCharLiveLotteryInlineStatus(lottery_2 = getYtCharLiveLottery())
 function parseYtCharLotteryCashAmount(value_144) {
     const text_4 = String(value_144 || '').trim(),
         match_4 =
-            text_4.match(/(?:¥|￥|RMB|人民币)\s*(\d+(?:\.\d+)?)/i) ||
+            text_4.match(/(?:\$|＄|RMB|人民币)\s*(\d+(?:\.\d+)?)/i) ||
             text_4.match(/(\d+(?:\.\d+)?)\s*元/),
         amount_2 = match_4 ? Number(match_4[1]) : 0;
     return Number.isFinite(amount_2) && amount_2 > 0 ? Math.round(amount_2 * 100) / 100 : 0;
@@ -2230,7 +2230,7 @@ function addChatMessage(
             const superChatTier_2 = getYtSuperChatTier(amount_4);
             let value_284 = amount_4;
             (typeof amount_4 === 'number' || /^\d+(\.\d+)?$/.test(String(amount_4))) &&
-                (value_284 = '$' + amount_4);
+                (value_284 = '＄' + amount_4);
             row.style.backgroundColor = superChatTier_2.color;
             row.style.setProperty('--yt-sc-text-color', superChatTier_2.textColor);
             row.dataset.superChatTier = superChatTier_2.key;
@@ -3950,7 +3950,7 @@ ytScCloseBtn?.addEventListener('click', () => {
 });
 function updateScBtn() {
     applyYtSuperChatTheme(currentScAmount);
-    ytSendScBtn && (ytSendScBtn.textContent = '发送 $' + currentScAmount);
+    ytSendScBtn && (ytSendScBtn.textContent = '发送 ＄' + currentScAmount);
 }
 scAmountBtns.forEach((btn) => {
     btn.addEventListener('click', () => {

@@ -1444,8 +1444,8 @@ offerData.price 用于展示，offerData.rmbAmount 是纯数字，代表换算�
                                         title: '合作邀请',
                                         offerType: 'video',
                                         requirement: '详谈',
-                                        price: '$5000',
-                                        penalty: '$2000',
+                                        price: '＄5000',
+                                        penalty: '＄2000',
                                     },
                                     offerStatus: 'pending',
                                 };

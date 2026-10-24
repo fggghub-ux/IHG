@@ -376,7 +376,7 @@
                     </div>
                     <div class="bstage-profile-stat-bubble" style="background-color: #2c2c2e; color: #fff; border: none;">
                         <span class="bstage-stat-label" style="color: #aaa;">订阅收益</span>
-                        <span class="bstage-stat-value" id="bstage-profile-sub-revenue" style="color: #fff;">$0.00</span>
+                        <span class="bstage-stat-value" id="bstage-profile-sub-revenue" style="color: #fff;">＄0.00</span>
                     </div>
                 </div>
 
@@ -6003,7 +6003,7 @@ User 评论：` +
         return Math.max(0, getBstageTotalRevenueCny() - getBstageWithdrawnRevenueCny());
     }
     function handleAction_106(value_13) {
-        return '$' + Math.max(0, Number(value_13) || 0).toFixed(2);
+        return '＄' + Math.max(0, Number(value_13) || 0).toFixed(2);
     }
     function updateBstageProfileStats() {
         const subCountEl = document.getElementById('bstage-profile-pop-sub-count'),

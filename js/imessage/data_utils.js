@@ -6,6 +6,10 @@
         if (root) root.imDataUtils = imDataUtils_2;
     }
 })(typeof globalThis !== 'undefined' ? globalThis : null, function createImessageDataUtils() {
+    function normalizeCurrencySymbols(value) {
+        return String(value == null ? '' : value).replace(/\u00a5/g, '$').replace(/\uffe5/g, '＄');
+    }
+
     function toValidDate(value) {
         const date = value instanceof Date ? new Date(value.getTime()) : new Date(value);
         return Number.isNaN(date.getTime()) ? null : date;
@@ -1222,7 +1226,7 @@
         );
     }
     return {
-        formatUsTime, formatUsDate, formatUsDateTime,
+        normalizeCurrencySymbols, formatUsTime, formatUsDate, formatUsDateTime,
         isCustomChatTimeEnabled: _value,
         normalizeChatTimeAnchors: _value2,
         getChatTimestamp: _value3,

@@ -68,7 +68,7 @@
     }
 
     function escapeHtml(value_4) {
-        return String(value_4 == null ? '' : value_4)
+        return window.imDataUtils.normalizeCurrencySymbols(value_4)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
@@ -109,37 +109,25 @@
                 'assets/moren-thumb.jpg',
         };
     }
-    function syncGroupUserAvatarState_3(friend_3, container_2) {
-        if (!container_2) return;
-        const enabled_2 = friend_3?.type === 'group' && friend_3.showGroupUserAvatar === true;
-        container_2.classList.toggle('show-group-user-avatar', enabled_2);
-        if (!enabled_2) {
-            container_2.style.removeProperty('--group-user-avatar-image');
-            return;
-        }
-        const avatarUrl_2 = getEffectiveUserProfile(friend_3).avatarUrl || 'assets/moren-thumb.jpg';
-        container_2.style.setProperty(
-            '--group-user-avatar-image',
-            'url(' + JSON.stringify(String(avatarUrl_2)) + ')',
-        );
+    function syncGroupUserAvatarState_3(friend, container) {
+        syncSingleChatAvatarState(friend, container);
     }
     function syncSingleChatAvatarState(friend, container) {
         if (!container) return;
         const isTwo =
-            (!friend?.type || friend.type === 'char') &&
-            friend?.showAvatar === true &&
-            friend?.avatarDisplayMode === 'two';
+            friend?.type === 'group' || ((!friend?.type || friend.type === 'char') &&
+            friend?.showAvatar === true && friend?.avatarDisplayMode === 'two');
         container.classList.toggle('avatar-mode-two', isTwo);
     }
 
     function decorateMessageRowAvatar(row, friend, message = {}) {
+        const isGroup = friend?.type === 'group';
         const isCharFriend = !friend?.type || friend.type === 'char';
         const isEveryMessageMode = friend?.avatarDisplayMode === 'two';
         if (
             !row ||
-            !friend?.showAvatar ||
-            !isCharFriend ||
-            !isEveryMessageMode ||
+            !(isGroup ? (message.role !== 'user' || friend.showGroupUserAvatar === true)
+                : (friend?.showAvatar && isCharFriend && isEveryMessageMode)) ||
             row.querySelector(':scope > .im-message-avatar')
         )
             return row;
@@ -155,6 +143,8 @@
         let profile;
         if (isUser) {
             profile = getEffectiveUserProfile(friend, message);
+        } else if (isGroup) {
+            profile = resolveGroupBubbleIdentity(friend, message);
         } else {
             profile = {
                 name: friend?.nickname || friend?.realName || 'AI',
@@ -256,23 +246,15 @@
         );
         apk110New_163.parentElement.insertBefore(apk110New_164, apk110New_163);
     }
-    function handleAction_20(
-        row_4,
-        friend_6,
-        message_5 = renderMessageContextByFriend.get(friend_6),
-    ) {
-        if (!row_4 || friend_6?.type !== 'group' || message_5?.role !== 'user') return;
-        const profile_2 = getEffectiveUserProfile(friend_6, message_5);
-        return (
-            row_4.setAttribute('data-user-account-id', profile_2.accountId || ''),
-            row_4.style.setProperty(
-                '--group-user-avatar-image',
-                'url(' +
-                    JSON.stringify(String(profile_2.avatarUrl || 'assets/moren-thumb.jpg')) +
-                    ')',
-            ),
-            profile_2
-        );
+    function handleAction_20(row, friend, message = renderMessageContextByFriend.get(friend)) {
+        if (!row || friend?.type !== 'group' || message?.role !== 'user') return;
+        const profile = getEffectiveUserProfile(friend, message);
+        row.setAttribute('data-user-account-id', profile.accountId || '');
+        const avatar = row.querySelector(':scope > .im-message-avatar.is-user');
+        if (!friend.showGroupUserAvatar) avatar?.remove();
+        else if (avatar) avatar.querySelector('img').src = profile.avatarUrl || 'assets/moren-thumb.jpg';
+        else decorateMessageRowAvatar(row, friend, message);
+        return profile;
     }
     function apk110New_25() {
         const apk110New_169 = Array.isArray(window.imData?.friends) ? window.imData.friends : [];
@@ -541,7 +523,7 @@
         hasPrev,
         message_6 = null,
     ) {
-        if (!friend_10 || !friend_10.showAvatar || hasPrev) return '';
+        if (!friend_10 || friend_10.type === 'group' || !friend_10.showAvatar || hasPrev) return '';
         if ((!friend_10.type || friend_10.type === 'char') && friend_10.avatarDisplayMode === 'two') return '';
         const date = new Date(getChatDisplayTimestamp(friend_10, value_46));
         const dateStr = date.toLocaleString('en-US', {
@@ -2215,20 +2197,12 @@
             const text_372 = '';
             let text_373 = '';
             if (isGroupMessage) {
-                const value_195 = String(name_166).trim().charAt(0) || '?';
-                const value_196 = avatarUrl_167
-                    ? '<img src="' +
-                      avatarUrl_167 +
-                      '" onerror="this.src=\'assets/moren-thumb.jpg\'" loading="lazy" decoding="async" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">'
-                    : '<div class="chat-avatar-small">' + value_195 + '</div>';
                 text_373 =
                     '\n                    <div class="group-ai-bubble-wrap">\n                        ' +
                     (enabled_170
                         ? ''
                         : '<div class="group-ai-speaker-name">' + name_166 + '</div>') +
-                    '\n                        <div class="group-ai-bubble-row">\n                            <div class="group-ai-avatar-slot">' +
-                    (enabled_170 ? '<div class="group-ai-avatar-placeholder"></div>' : value_196) +
-                    '</div>\n                            <div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble group-red-packet-bubble">' +
+                    '\n                        <div class="group-ai-bubble-row">\n                            ' + '\n                            <div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble group-red-packet-bubble">' +
                     value_366_2 +
                     text_372 +
                     '</div>\n                        </div>\n                    </div>\n                ';
@@ -3023,6 +2997,7 @@
             String(lastMessage?.content ?? lastMessage?.text ?? ''),
             lastMessage?.showTranslation ? 1 : 0,
             friend_18?.showAvatar ? 1 : 0,
+            friend_18?.showGroupUserAvatar ? 1 : 0,
             String(friend_18?.avatarDisplayMode || 'one'),
             friend_18?.continuousBubbles === false ? 0 : 1,
             String(friend_18?.replyStyle || 'inside'),
@@ -3679,9 +3654,7 @@
         const _value144 = !!window.imDataUtils?.isCustomChatTimeEnabled?.(_value142);
         const _value145 = getChatDisplayTimestamp(_value142, timestamp_4);
         const _value146 = document.createElement('span');
-        _value146.textContent = _value144
-            ? window.imDataUtils.formatUsDateTime(_value145)
-            : window.imApp.formatTime?.(_value145) || '';
+        _value146.textContent = window.imApp.formatTime?.(_value145) || '';
         if (_value144) {
             div.classList.add('chat-timestamp-editable');
             _value146.setAttribute('role', 'button');
@@ -3875,20 +3848,12 @@
         );
         let text_645 = '';
         if (isGroupMessage_2) {
-            const value_275 = String(speakerName_5).trim().charAt(0) || '?';
-            const value_276 = speakerAvatar_3
-                ? '<img src="' +
-                  speakerAvatar_3 +
-                  '" onerror="this.src=\'assets/moren-thumb.jpg\'" loading="lazy" decoding="async" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">'
-                : '<div class="chat-avatar-small">' + value_275 + '</div>';
             text_645 =
                 '\n                    <div class="group-ai-bubble-wrap">\n                    ' +
                 (enabled_640
                     ? ''
                     : '<div class="group-ai-speaker-name">' + speakerName_5 + '</div>') +
-                '\n                    <div class="group-ai-bubble-row">\n                        <div class="group-ai-avatar-slot">' +
-                (enabled_640 ? '<div class="group-ai-avatar-placeholder"></div>' : value_276) +
-                '</div>\n                        <div class="chat-bubble ai-bubble">' +
+                '\n                    <div class="group-ai-bubble-row">\n                        ' + '\n                        <div class="chat-bubble ai-bubble">' +
                 text_642 +
                 '</div>\n                    </div>\n                </div>\n            ';
         } else
@@ -4466,20 +4431,12 @@
             '</div>';
         let value_325 = value_324;
         if (value_722) {
-            const value_740 = String(speakerName).trim().charAt(0) || '?';
-            const value_741 = value_724
-                ? '<img src="' +
-                  escapeHtml(value_724) +
-                  '" onerror="this.src=\'assets/moren-thumb.jpg\'" loading="lazy" decoding="async" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">'
-                : '<div class="chat-avatar-small">' + escapeHtml(value_740) + '</div>';
             value_325 =
                 '\n                    <div class="group-ai-bubble-wrap">\n                    ' +
                 (enabled_727
                     ? ''
                     : '<div class="group-ai-speaker-name">' + escapeHtml(speakerName) + '</div>') +
-                '\n                    <div class="group-ai-bubble-row">\n                        <div class="group-ai-avatar-slot">' +
-                (enabled_727 ? '<div class="group-ai-avatar-placeholder"></div>' : value_741) +
-                '</div>\n                        ' +
+                '\n                    <div class="group-ai-bubble-row">\n                        ' + '\n                        ' +
                 value_324 +
                 '\n                    </div>\n                </div>\n            ';
         }
@@ -4685,7 +4642,7 @@
         handleAction_20(row_15, friend_32, msg_19);
         const amount_2 = Number(msg_19.amount) || 0;
         const value_758 = '$' + amount_2.toFixed(2);
-        const description_2 = String(msg_19.description || '').trim();
+        const description_2 = window.imDataUtils.normalizeCurrencySymbols(msg_19.description).trim();
         const parties = handleAction_23(msg_19, friend_32);
         const {
             payKind: payKind_3,
@@ -4843,17 +4800,8 @@
                           : '<div class="group-ai-speaker-name">' +
                             escapeHtml(speakerName_6) +
                             '</div>') +
-                      '\n                        <div class="group-ai-bubble-row">\n                            <div class="group-ai-avatar-slot">' +
-                      (enabled_373
-                          ? '<div class="group-ai-avatar-placeholder"></div>'
-                          : value_370
-                            ? '<img src="' +
-                              escapeHtml(value_370) +
-                              '" onerror="this.src=\'assets/moren-thumb.jpg\'" loading="lazy" decoding="async" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">'
-                            : '<div class="chat-avatar-small">' +
-                              escapeHtml(String(speakerName_6).charAt(0) || '?') +
-                              '</div>') +
-                      '</div>\n                            <div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble">' +
+                      '\n                        <div class="group-ai-bubble-row">\n                            ' +
+                      '\n                            <div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble">' +
                       value_394 +
                       text_396 +
                       '</div>\n                        </div>\n                    </div>'
@@ -5058,7 +5006,6 @@
                     ? `<div class="group-ai-bubble-wrap">
                             ${sameSpeaker ? '' : `<div class="group-ai-speaker-name">${escapeHtml(speakerName)}</div>`}
                             <div class="group-ai-bubble-row">
-                                <div class="group-ai-avatar-slot">${sameSpeaker ? '<div class="group-ai-avatar-placeholder"></div>' : speakerAvatar ? `<img src="${escapeHtml(speakerAvatar)}" onerror="this.src='assets/moren-thumb.jpg'" loading="lazy" decoding="async" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">` : `<div class="chat-avatar-small">${escapeHtml(String(speakerName).charAt(0) || '?')}</div>`}</div>
                                 <div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble apple-cash-bubble">${contentHtml}${metaHtml}</div>
                             </div>
                         </div>`
@@ -5314,12 +5261,6 @@
             '</div>';
         let value_436 = value_824;
         if (isGroupMessage_3) {
-            const value_830 = String(speakerName_7).trim().charAt(0) || '?';
-            const value_831 = value_812
-                ? '<img src="' +
-                  value_812 +
-                  '" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">'
-                : '<div class="chat-avatar-small">' + escapeHtml(value_830) + '</div>';
             value_436 =
                 '\n                <div class="group-ai-bubble-wrap">\n                    ' +
                 (enabled_425
@@ -5327,9 +5268,7 @@
                     : '<div class="group-ai-speaker-name">' +
                       escapeHtml(speakerName_7) +
                       '</div>') +
-                '\n                    <div class="group-ai-bubble-row">\n                        <div class="group-ai-avatar-slot">' +
-                (enabled_425 ? '<div class="group-ai-avatar-placeholder"></div>' : value_831) +
-                '</div>\n                        ' +
+                '\n                    <div class="group-ai-bubble-row">\n                        ' + '\n                        ' +
                 value_824 +
                 '\n                    </div>\n                </div>\n            ';
         }
@@ -5540,16 +5479,11 @@
         const bubbleHtml = `<div class="chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'} voice-message-bubble">${contentHtml}</div>`;
         let bubbleWrapperHtml = bubbleHtml;
         if (isGroupMessage) {
-            const avatarInitial = String(speakerName).trim().charAt(0) || '?';
-            const avatarImg = speakerAvatar
-                ? `<img src="${speakerAvatar}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">`
-                : `<div class="chat-avatar-small">${escapeHtml(avatarInitial)}</div>`;
 
             bubbleWrapperHtml = `
                     <div class="group-ai-bubble-wrap">
                         ${sameSpeaker ? '' : `<div class="group-ai-speaker-name">${escapeHtml(speakerName)}</div>`}
                         <div class="group-ai-bubble-row">
-                            <div class="group-ai-avatar-slot">${sameSpeaker ? '<div class="group-ai-avatar-placeholder"></div>' : avatarImg}</div>
                             ${bubbleHtml}
                         </div>
                     </div>
@@ -5745,20 +5679,12 @@
             '\n            </div>\n        ';
         let value_471 = value_470;
         if (value_459) {
-            const value_862 = String(value_461).trim().charAt(0) || '?';
-            const value_863 = value_848
-                ? '<img src="' +
-                  escapeHtml(value_848) +
-                  '" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">'
-                : '<div class="chat-avatar-small">' + escapeHtml(value_862) + '</div>';
             value_471 =
                 '\n                <div class="group-ai-bubble-wrap sticker-group-wrap">\n                    ' +
                 (enabled_464
                     ? ''
                     : '<div class="group-ai-speaker-name">' + escapeHtml(value_461) + '</div>') +
-                '\n                    <div class="group-ai-bubble-row">\n                        <div class="group-ai-avatar-slot">' +
-                (enabled_464 ? '<div class="group-ai-avatar-placeholder"></div>' : value_863) +
-                '</div>\n                        ' +
+                '\n                    <div class="group-ai-bubble-row">\n                        ' + '\n                        ' +
                 value_470 +
                 '\n                    </div>\n                </div>\n            ';
         }
@@ -5936,15 +5862,6 @@
             </div>`;
         let value_514 = value_513;
         if (value_880) {
-            const value_899 =
-                    String(speakerName_8 || '?')
-                        .trim()
-                        .charAt(0) || '?',
-                value_519 = value_497
-                    ? '<img src="' +
-                      escapeHtml(value_497) +
-                      '" onerror="this.src=\'assets/moren-thumb.jpg\'" loading="lazy" decoding="async" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">'
-                    : '<div class="chat-avatar-small">' + escapeHtml(value_899) + '</div>';
             value_514 =
                 `<div class="group-ai-bubble-wrap">
                 ` +
@@ -5954,9 +5871,7 @@
                       escapeHtml(speakerName_8) +
                       '</div>') +
                 `
-                <div class="group-ai-bubble-row"><div class="group-ai-avatar-slot">` +
-                (enabled_500 ? '<div class="group-ai-avatar-placeholder"></div>' : value_519) +
-                '</div>' +
+                <div class="group-ai-bubble-row">` + '' +
                 value_513 +
                 `</div>
             </div>`;
@@ -6593,12 +6508,6 @@
                 '</div>';
         let value_561 = value_1011;
         if (value_990) {
-            const value_569 = String(value_992).trim().charAt(0) || '?',
-                value_570 = value_539
-                    ? '<img src="' +
-                      escapeHtml(value_539) +
-                      '" onerror="this.src=\'assets/moren-thumb.jpg\'" loading="lazy" decoding="async" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">'
-                    : '<div class="chat-avatar-small">' + escapeHtml(value_569) + '</div>';
             value_561 =
                 `
                 <div class="group-ai-bubble-wrap">
@@ -6608,9 +6517,7 @@
                     : '<div class="group-ai-speaker-name">' + escapeHtml(value_992) + '</div>') +
                 `
                     <div class="group-ai-bubble-row">
-                        <div class="group-ai-avatar-slot">` +
-                (enabled_996 ? '<div class="group-ai-avatar-placeholder"></div>' : value_570) +
-                `</div>
+                        ` + `
                         ` +
                 value_1011 +
                 `
@@ -6911,7 +6818,7 @@
         row_21.setAttribute('data-timestamp', value_590);
         row_21.setAttribute('data-message-id', window.imChat.ensureMessageId(msg_29, 'html'));
         handleAction_20(row_21, value_588, msg_29);
-        const value_595 = msg_29.content || msg_29.text || '';
+        const value_595 = window.imDataUtils.normalizeCurrencySymbols(msg_29.content || msg_29.text || '');
         const handleAction_7_596 = buildMessageHeaderHtml(
             value_591,
             value_588,
