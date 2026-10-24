@@ -440,12 +440,7 @@
                     const date = new Date(entry_4.createdAt),
                         time = Number.isNaN(date.getTime())
                             ? ''
-                            : date.toLocaleString('zh-CN', {
-                                  month: 'numeric',
-                                  day: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                              });
+                            : window.imDataUtils.formatUsDateTime(date);
                     return (
                         `<article class="im-anonymous-entry">
                     <div class="im-anonymous-entry-meta">

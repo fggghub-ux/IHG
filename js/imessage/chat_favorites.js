@@ -177,11 +177,13 @@
                       (friend) => String(friend.id) === favoritesFriendId,
                   ) || null;
         }
-        function formatTime_2(timestamp_2) {
-            const value_3 = Number(timestamp_2);
-            if (!Number.isFinite(value_3) || value_3 <= 0) return '';
-            if (global.imApp?.formatTime) return global.imApp.formatTime(value_3);
-            return new Date(value_3).toLocaleString();
+        function formatTime_2(timestamp) {
+            const value = Number(timestamp);
+            if (!Number.isFinite(value) || value <= 0) return '';
+            if (global.imApp?.formatTime_2) return global.imApp.formatTime_2(value);
+            return window.imDataUtils?.formatUsDateTime
+                ? window.imDataUtils.formatUsDateTime(value)
+                : new Date(value).toLocaleString('en-US', { hour12: true });
         }
         function renderFavorites() {
             const friend_4 = getLiveFriend();

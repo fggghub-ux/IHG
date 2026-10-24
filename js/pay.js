@@ -203,8 +203,8 @@
             window.showToast &&
                 window.showToast(
                     type_2 === 'income'
-                        ? '已到账 ￥' + balance_2.toFixed(2)
-                        : '已支付 ￥' + balance_2.toFixed(2),
+                        ? '已到账 $' + balance_2.toFixed(2)
+                        : '已支付 $' + balance_2.toFixed(2),
                 ),
             true
         );
@@ -405,7 +405,7 @@
                           ? '已退回'
                           : '等待收下';
                 option_6.querySelector('.pay-bank-number').textContent =
-                    '额度 ¥' + Number(value_39.limit).toFixed(2);
+                    '额度 $' + Number(value_39.limit).toFixed(2);
                 const transferInTargetEl_4 = option_6.querySelector('.pay-outgoing-family-actions');
                 if (value_39.status === 'accepted') {
                     const element_42 = document.createElement('button');
@@ -956,12 +956,12 @@
                     cardTitle: cardTitle_2,
                     description:
                         value_131 === 'gift'
-                            ? '亲属卡额度 ¥' + amount_4.toFixed(2)
-                            : '额度由 ¥' +
+                            ? '亲属卡额度 $' + amount_4.toFixed(2)
+                            : '额度由 $' +
                               previousLimit_3.toFixed(2) +
-                              ' 调整至 ¥' +
+                              ' 调整至 $' +
                               amount_4.toFixed(2),
-                    content: '[亲属卡] ' + cardTitle_2 + ' ¥' + amount_4.toFixed(2),
+                    content: '[亲属卡] ' + cardTitle_2 + ' $' + amount_4.toFixed(2),
                     timestamp: Date.now(),
                 },
                 value_134 = await window.imApp.appendFriendMessage(result_124.id, options_133, {

@@ -2230,7 +2230,7 @@ function addChatMessage(
             const superChatTier_2 = getYtSuperChatTier(amount_4);
             let value_284 = amount_4;
             (typeof amount_4 === 'number' || /^\d+(\.\d+)?$/.test(String(amount_4))) &&
-                (value_284 = '￥' + amount_4);
+                (value_284 = '$' + amount_4);
             row.style.backgroundColor = superChatTier_2.color;
             row.style.setProperty('--yt-sc-text-color', superChatTier_2.textColor);
             row.dataset.superChatTier = superChatTier_2.key;
@@ -3145,9 +3145,9 @@ async function getCharResponse(
 【User 明确请求抽奖】当前已有一轮抽奖正在进行，不能同时再次发起。lotterySuggestion 必须返回 {"shouldStart":false,"prize":"","prizeType":"gift","cashAmount":0,"durationSec":30}，主播应自然提醒 User 等待当前开奖。`
                   : `
 
-【User 明确请求抽奖｜由 Char 自主决定】User 正在明确要求主播发抽奖。请严格根据主播完整人设、与 User 的关系、当前情绪和本场直播内容，决定主播愿不愿意发；不得默认同意，也不得由观众替主播决定。只能返回以下三种完全合法的 JSON 之一：礼物抽奖示例 lotterySuggestion={"shouldStart":true,"prize":"签名海报","prizeType":"gift","cashAmount":0,"durationSec":30}；现金抽奖示例 lotterySuggestion={"shouldStart":true,"prize":"¥66现金","prizeType":"cash","cashAmount":66,"durationSec":30}；拒绝示例 lotterySuggestion={"shouldStart":false,"prize":"","prizeType":"gift","cashAmount":0,"durationSec":30}。durationSec 可选择 10 到 60 的整数。只要 charBubbles 表示同意、答应、宣布奖品或声称马上开始，shouldStart 就必须为 true，且必须同时返回具体 prize；绝对不能出现“嘴上答应但 shouldStart=false 或漏掉 lotterySuggestion”的矛盾。shouldStart=false 时应按人设自然拒绝、回避或提出理由，绝对不能声称抽奖已经开始。禁止把 shouldStart 返回成字符串。`)
+【User 明确请求抽奖｜由 Char 自主决定】User 正在明确要求主播发抽奖。请严格根据主播完整人设、与 User 的关系、当前情绪和本场直播内容，决定主播愿不愿意发；不得默认同意，也不得由观众替主播决定。只能返回以下三种完全合法的 JSON 之一：礼物抽奖示例 lotterySuggestion={"shouldStart":true,"prize":"签名海报","prizeType":"gift","cashAmount":0,"durationSec":30}；现金抽奖示例 lotterySuggestion={"shouldStart":true,"prize":"$66现金","prizeType":"cash","cashAmount":66,"durationSec":30}；拒绝示例 lotterySuggestion={"shouldStart":false,"prize":"","prizeType":"gift","cashAmount":0,"durationSec":30}。durationSec 可选择 10 到 60 的整数。只要 charBubbles 表示同意、答应、宣布奖品或声称马上开始，shouldStart 就必须为 true，且必须同时返回具体 prize；绝对不能出现“嘴上答应但 shouldStart=false 或漏掉 lotterySuggestion”的矛盾。shouldStart=false 时应按人设自然拒绝、回避或提出理由，绝对不能声称抽奖已经开始。禁止把 shouldStart 返回成字符串。`)
         : (content_4 += `
-每次响应还要返回一个合法的候选抽奖对象。非现金示例：lotterySuggestion={"shouldStart":true,"prize":"签名海报","prizeType":"gift","cashAmount":0,"durationSec":30}；现金示例：lotterySuggestion={"shouldStart":true,"prize":"¥66现金","prizeType":"cash","cashAmount":66,"durationSec":30}。这只是候选奖品，前端仅会以极低概率真正触发抽奖；不要为了该字段强行让 charBubbles 宣布抽奖。`);
+每次响应还要返回一个合法的候选抽奖对象。非现金示例：lotterySuggestion={"shouldStart":true,"prize":"签名海报","prizeType":"gift","cashAmount":0,"durationSec":30}；现金示例：lotterySuggestion={"shouldStart":true,"prize":"$66现金","prizeType":"cash","cashAmount":66,"durationSec":30}。这只是候选奖品，前端仅会以极低概率真正触发抽奖；不要为了该字段强行让 charBubbles 宣布抽奖。`);
     activeConnection &&
         (content_4 += `
 当前连线有效时还必须返回 connectionNarrative={"text":"连线用户的公开环境、动作或氛围描写","translationZh":"简体中文翻译或空字符串"}。该描写会公开显示并写入会话记录。`);
@@ -3950,7 +3950,7 @@ ytScCloseBtn?.addEventListener('click', () => {
 });
 function updateScBtn() {
     applyYtSuperChatTheme(currentScAmount);
-    ytSendScBtn && (ytSendScBtn.textContent = '发送 ￥' + currentScAmount);
+    ytSendScBtn && (ytSendScBtn.textContent = '发送 $' + currentScAmount);
 }
 scAmountBtns.forEach((btn) => {
     btn.addEventListener('click', () => {

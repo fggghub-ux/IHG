@@ -652,8 +652,8 @@
                                 <i class="fas fa-user"></i>
                             </div>
                             <div class="group-red-packet-detail-title" style="font-size:17px; font-weight:700; color:#111; text-align:center;">发红包的人</div>
-                            <div class="group-red-packet-detail-summary" style="font-size:12px; color:#8e8e93; margin-top:6px; text-align:center;">总金额 ¥0.00 · 恭喜发财</div>
-                            <div class="group-red-packet-detail-claim-amount" style="font-size:36px; line-height:1.1; font-weight:800; color:#111; text-align:center; margin-top:14px;">¥0.00</div>
+                            <div class="group-red-packet-detail-summary" style="font-size:12px; color:#8e8e93; margin-top:6px; text-align:center;">总金额 $0.00 · 恭喜发财</div>
+                            <div class="group-red-packet-detail-claim-amount" style="font-size:36px; line-height:1.1; font-weight:800; color:#111; text-align:center; margin-top:14px;">$0.00</div>
                             <div style="font-size:12px; color:#8e8e93; margin-top:6px;">你抢到的金额</div>
                         </div>
                     </div>
@@ -736,11 +736,11 @@
             if (titleEl) titleEl.textContent = packetSenderDisplayMeta_152.name || '发红包的人';
             if (summaryEl)
                 summaryEl.textContent =
-                    '总金额 ¥' +
+                    '总金额 $' +
                     totalAmount_3.toFixed(2) +
                     ' · ' +
                     (targetMsg_3.description || '恭喜发财');
-            if (claimAmountEl) claimAmountEl.textContent = '¥' + myAmount.toFixed(2);
+            if (claimAmountEl) claimAmountEl.textContent = '$' + myAmount.toFixed(2);
             if (progressTextEl)
                 progressTextEl.textContent = length_154 + '/' + packetCount_3 + ' 人领取';
             if (statusEl)
@@ -748,7 +748,7 @@
                     ? '已被抢完'
                     : '剩余 ' +
                       (targetMsg_3.remainingCount || 0) +
-                      ' 个，¥' +
+                      ' 个，$' +
                       Number(targetMsg_3.remainingAmount || 0).toFixed(2);
             const innerHTML_2 = packetSenderDisplayMeta_152.avatarUrl
                 ? '<img src="' +
@@ -790,7 +790,7 @@
                             `</div>
                             </div>
                         </div>
-                        <div style="font-size:16px; font-weight:800; color:#111;">¥` +
+                        <div style="font-size:16px; font-weight:800; color:#111;">$` +
                             Number(item_10.amount || 0).toFixed(2) +
                             `</div>
                     </div>
@@ -948,22 +948,24 @@
                 _closeRedPacketDetailOverlay_2();
             });
     }
-    function ensureTransferDetailOverlayForExistingPage_2(page_3, friend_7) {
-        if (!page_3) return;
-        const existingOverlay = page_3.querySelector('.pay-transfer-detail-overlay'),
-            hasManagedOverlay =
-                existingOverlay &&
-                page_3._transferDetailOverlayManaged === true &&
-                typeof page_3._openTransferDetailOverlay === 'function';
+    function ensureTransferDetailOverlayForExistingPage_2(page, friend) {
+        if (!page) return;
+
+        const existingOverlay = page.querySelector('.pay-transfer-detail-overlay');
+        const hasManagedOverlay = existingOverlay &&
+            page._transferDetailOverlayManaged === true &&
+            typeof page._openTransferDetailOverlay === 'function';
+
         if (hasManagedOverlay) return;
-        existingOverlay &&
-            (existingOverlay.remove(),
-            (page_3._openTransferDetailOverlay = null),
-            (page_3._closeTransferDetailOverlay = null),
-            (page_3._transferDetailOverlayManaged = false));
-        page_3.insertAdjacentHTML(
-            'beforeend',
-            `
+
+        if (existingOverlay) {
+            existingOverlay.remove();
+            page._openTransferDetailOverlay = null;
+            page._closeTransferDetailOverlay = null;
+            page._transferDetailOverlayManaged = false;
+        }
+
+        page.insertAdjacentHTML('beforeend', friend.type === 'group' ? `
                 <div class="pay-transfer-detail-overlay" style="display:none; position:absolute; inset:0; z-index:1200; background:rgba(0,0,0,0.28); align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
                     <div class="pay-transfer-detail-card" style="width:100%; max-width:320px; border-radius:28px; background:rgba(255,255,255,0.96);    padding:20px 18px 16px; box-sizing:border-box;">
                         <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
@@ -975,7 +977,7 @@
                                 <div class="pay-transfer-detail-action-text" style="font-size:12px; color:#8e8e93; margin-top:3px;">向你转账</div>
                             </div>
                         </div>
-                        <div class="pay-transfer-detail-amount" style="font-size:34px; line-height:1.1; font-weight:800; color:#111; text-align:center; margin:8px 0 10px;">¥0.00</div>
+                        <div class="pay-transfer-detail-amount" style="font-size:34px; line-height:1.1; font-weight:800; color:#111; text-align:center; margin:8px 0 10px;">$0.00</div>
                         <div class="pay-transfer-detail-desc" style="font-size:14px; color:#666; text-align:center; line-height:1.5; min-height:21px; margin-bottom:18px;">转账说明</div>
                         <div style="border-radius:18px; background:#f7f7fa; padding:12px 14px; margin-bottom:16px;">
                             <div style="font-size:12px; color:#8e8e93; margin-bottom:6px;">转账详情</div>
@@ -987,26 +989,51 @@
                         </div>
                     </div>
                 </div>
-        `,
-        );
-        const transferDetailOverlay = page_3.querySelector('.pay-transfer-detail-overlay'),
-            transferDetailAvatar = page_3.querySelector('.pay-transfer-detail-avatar'),
-            transferDetailName = page_3.querySelector('.pay-transfer-detail-name'),
-            transferDetailAmount = page_3.querySelector('.pay-transfer-detail-amount'),
-            transferDetailDesc = page_3.querySelector('.pay-transfer-detail-desc'),
-            transferDetailSummary = page_3.querySelector('.pay-transfer-detail-summary'),
-            transferDetailRejectBtn = page_3.querySelector('.pay-transfer-detail-reject-btn'),
-            transferDetailClaimBtn = page_3.querySelector('.pay-transfer-detail-claim-btn'),
-            insChatMessagesElement_179 = page_3.querySelector('.ins-chat-messages');
+        ` : `
+                <div class="pay-transfer-detail-overlay" style="display:none; position:absolute; inset:0; z-index:1200; background:rgba(0,0,0,0.28); align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+                    <div class="pay-transfer-detail-card" style="width:100%; max-width:320px; border-radius:28px; background:rgba(255,255,255,0.96);    padding:20px 18px 16px; box-sizing:border-box;">
+                        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+                            <div class="pay-transfer-detail-avatar" style="width:52px; height:52px; border-radius:50%; overflow:hidden; background:#e5e5ea; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                <i class="fas fa-user" style="color:#8e8e93; font-size:20px;"></i>
+                            </div>
+                            <div style="min-width:0;">
+                                <div class="pay-transfer-detail-name" style="font-size:17px; font-weight:700; color:#111; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">付款人</div>
+                            </div>
+                        </div>
+                        <div class="pay-transfer-detail-amount" style="font-size:34px; line-height:1.1; font-weight:800; color:#111; text-align:center; margin:8px 0 10px;">$0.00</div>
+                        <div class="pay-transfer-detail-desc" style="display:none; font-size:14px; color:#666; text-align:center; line-height:1.5; min-height:21px; margin-bottom:18px;"></div>
+                        <div style="border-radius:18px; background:#f7f7fa; padding:12px 14px; margin-bottom:16px;">
+                            <div style="font-size:12px; color:#8e8e93; margin-bottom:6px;">Details</div>
+                            <div class="pay-transfer-detail-summary" style="display:none; font-size:14px; color:#222; line-height:1.5;"></div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button type="button" class="pay-transfer-detail-reject-btn" style="flex:1; height:46px; border:none; border-radius:16px; background:#f2f2f7; color:#666; font-size:16px; font-weight:600; cursor:pointer;">退回</button>
+                            <button type="button" class="pay-transfer-detail-claim-btn" style="flex:1; height:46px; border:none; border-radius:16px; background:#111; color:#fff; font-size:16px; font-weight:700; cursor:pointer;">收下</button>
+                        </div>
+                    </div>
+                </div>
+        `);
+
+        const transferDetailOverlay = page.querySelector('.pay-transfer-detail-overlay');
+        const transferDetailAvatar = page.querySelector('.pay-transfer-detail-avatar');
+        const transferDetailName = page.querySelector('.pay-transfer-detail-name');
+        const transferDetailAmount = page.querySelector('.pay-transfer-detail-amount');
+        const transferDetailDesc = page.querySelector('.pay-transfer-detail-desc');
+        const transferDetailSummary = page.querySelector('.pay-transfer-detail-summary');
+        const transferDetailRejectBtn = page.querySelector('.pay-transfer-detail-reject-btn');
+        const transferDetailClaimBtn = page.querySelector('.pay-transfer-detail-claim-btn');
+        const msgContainerProxy = page.querySelector('.ins-chat-messages');
         let pendingTransferMsg = null;
-        function _closeTransferDetailOverlay_2() {
+
+        function closeTransferDetailOverlay() {
             pendingTransferMsg = null;
             if (transferDetailOverlay) transferDetailOverlay.style.display = 'none';
         }
-        function _openTransferDetailOverlay_2(targetMsg_5) {
+
+        function openGroupTransferDetailOverlay(targetMsg_5) {
             if (!transferDetailOverlay || !targetMsg_5) return;
             pendingTransferMsg = targetMsg_5;
-            const model = normalizePayTransferMessage_2(targetMsg_5, friend_7),
+            const model = normalizePayTransferMessage_2(targetMsg_5, friend),
                 {
                     status: status_3,
                     payerName: value_183,
@@ -1029,13 +1056,13 @@
                     targetMsg_5.paymentAction === 'family_card_increase' ||
                     familyCardText.includes('亲属卡');
             if (transferDetailName) transferDetailName.textContent = value_183;
-            if (transferDetailAmount) transferDetailAmount.textContent = '¥' + value_187.toFixed(2);
+            if (transferDetailAmount) transferDetailAmount.textContent = '$' + value_187.toFixed(2);
             if (transferDetailDesc) transferDetailDesc.textContent = textContent_2;
             if (transferDetailSummary)
                 transferDetailSummary.textContent = isFamilyCard
                     ? '备注：' + textContent_2
                     : value_183 + ' 向 ' + payeeName_3 + ' 转账，备注：' + textContent_2;
-            const transferDetailActionText = page_3.querySelector(
+            const transferDetailActionText = page.querySelector(
                 '.pay-transfer-detail-action-text',
             );
             if (transferDetailActionText) {
@@ -1077,68 +1104,146 @@
             }
             transferDetailOverlay.style.display = 'flex';
         }
-        page_3._openTransferDetailOverlay = _openTransferDetailOverlay_2;
-        page_3._closeTransferDetailOverlay = _closeTransferDetailOverlay_2;
-        page_3._transferDetailOverlayManaged = true;
-        window.imChat.ensureRedPacketDetailOverlayForExistingPage(page_3, friend_7);
-        insChatMessagesElement_179 &&
-            insChatMessagesElement_179.addEventListener(
-                'click',
-                (e) => {
-                    const row = e.target.closest('.chat-row');
-                    if (!row) return;
-                    const messageId = row.getAttribute('data-message-id'),
-                        ts = row.getAttribute('data-timestamp'),
-                        liveFriend =
-                            window.imData.currentActiveFriend &&
-                            String(window.imData.currentActiveFriend.id) === String(friend_7.id)
-                                ? window.imData.currentActiveFriend
-                                : friend_7;
-                    if ((!messageId && !ts) || !liveFriend.messages) return;
-                    const msg_5 = liveFriend.messages.find((item_12) => {
-                        if (messageId && String(item_12.id) === String(messageId)) return true;
-                        return String(item_12.timestamp) === String(ts);
-                    });
-                    if (!msg_5 || msg_5.type !== 'pay_transfer') return;
-                    const validKinds = [
-                        'user_to_char',
-                        'char_to_user_pending',
-                        'char_received',
-                        'char_to_user_claimed',
-                        'user_received_from_char',
-                        'user_rejected_from_char',
-                        'char_to_user_rejected',
-                        'user_to_char_rejected',
-                    ];
-                    if (!validKinds.includes(msg_5.payKind)) return;
-                    const bubble = e.target.closest(
-                        '.chat-bubble.pay-transfer-bubble, .pay-transfer-card',
-                    );
-                    if (!bubble) return;
-                    e.preventDefault();
-                    e.stopPropagation();
-                    _openTransferDetailOverlay_2(msg_5);
-                },
-                true,
-            );
-        transferDetailOverlay &&
-            transferDetailOverlay.addEventListener('click', (event_199) => {
-                event_199.target === transferDetailOverlay && _closeTransferDetailOverlay_2();
+
+        function openTransferDetailOverlay(targetMsg) {
+            if (friend.type === 'group') return openGroupTransferDetailOverlay(targetMsg);
+            if (!transferDetailOverlay || !targetMsg) return;
+
+            pendingTransferMsg = targetMsg;
+
+            const model = normalizePayTransferMessage_2(targetMsg, friend);
+            const {
+                status,
+                payerName,
+                payeeName,
+                payerAvatar,
+                canCurrentUserClaim
+            } = model;
+
+            const amount = Number(targetMsg.amount) || 0;
+            const description = targetMsg.description || '转账';
+            const familyCardText = `${targetMsg.paymentAction || ''} ${targetMsg.cardTitle || ''} ${targetMsg.description || ''} ${targetMsg.content || ''}`;
+            const isFamilyCard = targetMsg.paymentAction === 'family_card'
+                || targetMsg.paymentAction === 'family_card_increase'
+                || familyCardText.includes('亲属卡');
+
+            if (transferDetailName) transferDetailName.textContent = payerName;
+            if (transferDetailAmount) transferDetailAmount.textContent = `$${amount.toFixed(2)}`;
+            const visibleDescription = String(description || '').trim();
+            const hasCustomDescription = !!visibleDescription && visibleDescription !== '转账' && visibleDescription !== '转账说明';
+            if (transferDetailDesc) {
+                transferDetailDesc.textContent = hasCustomDescription ? visibleDescription : '';
+                transferDetailDesc.style.display = hasCustomDescription ? 'block' : 'none';
+            }
+            if (transferDetailSummary) {
+                transferDetailSummary.textContent = hasCustomDescription ? `Note：${visibleDescription}` : '';
+                transferDetailSummary.style.display = hasCustomDescription ? 'block' : 'none';
+            }
+
+            if (transferDetailAvatar) {
+                if (payerAvatar) {
+                    transferDetailAvatar.innerHTML = `<img src="${payerAvatar}" style="width:100%; height:100%; object-fit:cover; display:block;">`;
+                } else {
+                    transferDetailAvatar.innerHTML = `<i class="fas fa-user" style="color:#8e8e93; font-size:20px;"></i>`;
+                }
+            }
+
+            // 按钮容器
+            const actionsContainer = transferDetailRejectBtn ? transferDetailRejectBtn.parentElement : null;
+
+            // 根据状态控制按钮显示
+            // 如果是已经被处理过的记录（任何已收下或退回的状态），隐藏所有按钮及其容器
+            if (canCurrentUserClaim) {
+                if (actionsContainer) actionsContainer.style.display = 'flex';
+                if (transferDetailRejectBtn) {
+                    transferDetailRejectBtn.style.display = 'block';
+                    transferDetailRejectBtn.textContent = '退回';
+                }
+                if (transferDetailClaimBtn) {
+                    transferDetailClaimBtn.style.display = 'block';
+                    transferDetailClaimBtn.textContent = '收下';
+                }
+            } else {
+                if (actionsContainer) actionsContainer.style.display = 'none';
+            }
+
+            transferDetailOverlay.style.display = 'flex';
+        }
+
+            page._openTransferDetailOverlay = openTransferDetailOverlay;
+            page._closeTransferDetailOverlay = closeTransferDetailOverlay;
+            page._transferDetailOverlayManaged = true;
+            window.imChat.ensureRedPacketDetailOverlayForExistingPage(page, friend);
+
+        if (msgContainerProxy) {
+            msgContainerProxy.addEventListener('click', (e) => {
+                const row = e.target.closest('.chat-row');
+                if (!row) return;
+
+                const messageId = row.getAttribute('data-message-id');
+                const ts = row.getAttribute('data-timestamp');
+                const liveFriend = window.imData.currentActiveFriend &&
+                    String(window.imData.currentActiveFriend.id) === String(friend.id)
+                    ? window.imData.currentActiveFriend
+                    : friend;
+
+                if ((!messageId && !ts) || !liveFriend.messages) return;
+
+                const msg = liveFriend.messages.find(item => {
+                    if (messageId && String(item.id) === String(messageId)) return true;
+                    return String(item.timestamp) === String(ts);
+                });
+
+                // 允许双方转账在点击时都弹出（包括处理前和处理后的所有payKind）
+                if (!msg || msg.type !== 'pay_transfer') return;
+
+                // 仅允许基础的转账和系统交互过的转账气泡可点击（排除某些纯通知类型的转账卡片如果存在的话）
+                const validKinds = [
+                    'user_to_char', 'char_to_user_pending', // 待处理
+                    'char_received', 'char_to_user_claimed', 'user_received_from_char', // 已收下
+                    'user_rejected_from_char', 'char_to_user_rejected', 'user_to_char_rejected' // 已退还
+                ];
+
+                if (!validKinds.includes(msg.payKind)) return;
+
+                const bubble = e.target.closest('.chat-bubble.pay-transfer-bubble, .pay-transfer-card');
+                if (!bubble) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+                openTransferDetailOverlay(msg);
+            }, true);
+        }
+
+        if (transferDetailOverlay) {
+            transferDetailOverlay.addEventListener('click', (e) => {
+                if (e.target === transferDetailOverlay) {
+                    closeTransferDetailOverlay();
+                }
             });
-        transferDetailRejectBtn &&
+        }
+
+        if (transferDetailRejectBtn) {
             transferDetailRejectBtn.addEventListener('click', () => {
-                const targetMsg_6 = pendingTransferMsg;
-                _closeTransferDetailOverlay_2();
-                targetMsg_6 &&
-                    window.imChat.rejectIncomingTransfer &&
-                    window.imChat.rejectIncomingTransfer(friend_7, targetMsg_6);
+                const targetMsg = pendingTransferMsg;
+                closeTransferDetailOverlay();
+                if (targetMsg) {
+                    if (window.imChat.rejectIncomingTransfer) {
+                        window.imChat.rejectIncomingTransfer(friend, targetMsg);
+                    }
+                }
             });
-        transferDetailClaimBtn &&
+        }
+
+        if (transferDetailClaimBtn) {
             transferDetailClaimBtn.addEventListener('click', () => {
-                const targetMsg_7 = pendingTransferMsg;
-                _closeTransferDetailOverlay_2();
-                targetMsg_7 && window.imChat.claimIncomingTransfer(friend_7, targetMsg_7);
+                const targetMsg = pendingTransferMsg;
+                closeTransferDetailOverlay();
+                if (targetMsg) {
+                    window.imChat.claimIncomingTransfer(friend, targetMsg);
+                }
             });
+        }
     }
     async function claimIncomingTransfer_2(value_202, message_203, value_204 = {}) {
         if (!value_202 || !message_203 || message_203.claimed) return;
@@ -1201,7 +1306,7 @@
                   targetName: payerName_208,
                   cardTitle: '收款',
                   payStatus: 'completed',
-                  content: '[收款] ' + description_2 + ' ¥' + amount_3.toFixed(2),
+                  content: '[收款] ' + description_2 + ' $' + amount_3.toFixed(2),
                   timestamp: timestamp_2,
                   apiRunId: value_204.apiRunId || null,
                   rollbackSourceMessage: rollbackSourceMessage_2,
@@ -1221,7 +1326,7 @@
                   targetName: payerName_208,
                   cardTitle: payeeName_209 + '已收款',
                   payStatus: 'completed',
-                  content: '[对方已收款] ' + description_2 + ' ¥' + amount_3.toFixed(2),
+                  content: '[对方已收款] ' + description_2 + ' $' + amount_3.toFixed(2),
                   timestamp: timestamp_2,
                   apiRunId: value_204.apiRunId || null,
                   rollbackSourceMessage: rollbackSourceMessage_2,
@@ -1251,7 +1356,7 @@
                           (message_221.senderName = payerName_208),
                           (message_221.receiverName = payeeName_209),
                           (message_221.content =
-                              '[对方转账已领取] ' + description_2 + ' ¥' + amount_3.toFixed(2)))
+                              '[对方转账已领取] ' + description_2 + ' $' + amount_3.toFixed(2)))
                         : ((message_221.payKind = 'char_received'),
                           (message_221.payDirection = payTransferMessage_11_207.direction),
                           (message_221.cardTitle = payeeName_209 + '已收款'),
@@ -1261,7 +1366,7 @@
                           (message_221.senderName = payerName_208),
                           (message_221.receiverName = payeeName_209),
                           (message_221.content =
-                              '[对方转账已领取] ' + description_2 + ' ¥' + amount_3.toFixed(2)));
+                              '[对方转账已领取] ' + description_2 + ' $' + amount_3.toFixed(2)));
                     updatedMsg = message_221;
                 },
                 {
@@ -1293,7 +1398,7 @@
                           (message_223.senderName = payerName_208),
                           (message_223.receiverName = payeeName_209),
                           (message_223.content =
-                              '[对方转账已领取] ' + description_2 + ' ¥' + amount_3.toFixed(2)))
+                              '[对方转账已领取] ' + description_2 + ' $' + amount_3.toFixed(2)))
                         : ((message_223.payKind = 'char_received'),
                           (message_223.payDirection = payTransferMessage_11_207.direction),
                           (message_223.cardTitle = payeeName_209 + '已收款'),
@@ -1303,7 +1408,7 @@
                           (message_223.senderName = payerName_208),
                           (message_223.receiverName = payeeName_209),
                           (message_223.content =
-                              '[对方转账已领取] ' + description_2 + ' ¥' + amount_3.toFixed(2)));
+                              '[对方转账已领取] ' + description_2 + ' $' + amount_3.toFixed(2)));
                     if (!value_222.messages) value_222.messages = [];
                     value_222.messages.push(receiveMsg);
                     updatedMsg = message_223;
@@ -1435,7 +1540,7 @@
                   targetName: payerName_235,
                   cardTitle: '已退还',
                   payStatus: 'completed',
-                  content: '[已退还] ' + description_3 + ' ¥' + amount_4.toFixed(2),
+                  content: '[已退还] ' + description_3 + ' $' + amount_4.toFixed(2),
                   timestamp: timestamp_3,
                   apiRunId: value_231.apiRunId || null,
                   rollbackSourceMessage: rollbackSourceMessage_3,
@@ -1455,7 +1560,7 @@
                   targetName: payerName_235,
                   cardTitle: '已退还',
                   payStatus: 'completed',
-                  content: '[对方已退还] ' + description_3 + ' ¥' + amount_4.toFixed(2),
+                  content: '[对方已退还] ' + description_3 + ' $' + amount_4.toFixed(2),
                   timestamp: timestamp_3,
                   apiRunId: value_231.apiRunId || null,
                   rollbackSourceMessage: rollbackSourceMessage_3,
@@ -1485,7 +1590,7 @@
                           (message_249.senderName = payerName_235),
                           (message_249.receiverName = payeeName_236),
                           (message_249.content =
-                              '[转账已退还] ' + description_3 + ' ¥' + amount_4.toFixed(2)))
+                              '[转账已退还] ' + description_3 + ' $' + amount_4.toFixed(2)))
                         : ((message_249.payKind = 'user_to_char_rejected'),
                           (message_249.payDirection = payTransferMessage_11_234.direction),
                           (message_249.cardTitle = '已退还'),
@@ -1495,7 +1600,7 @@
                           (message_249.senderName = payerName_235),
                           (message_249.receiverName = payeeName_236),
                           (message_249.content =
-                              '[转账已退还] ' + description_3 + ' ¥' + amount_4.toFixed(2)));
+                              '[转账已退还] ' + description_3 + ' $' + amount_4.toFixed(2)));
                     updatedMsg_2 = message_249;
                 },
                 {
@@ -1527,7 +1632,7 @@
                           (message_251.senderName = payerName_235),
                           (message_251.receiverName = payeeName_236),
                           (message_251.content =
-                              '[转账已退还] ' + description_3 + ' ¥' + amount_4.toFixed(2)))
+                              '[转账已退还] ' + description_3 + ' $' + amount_4.toFixed(2)))
                         : ((message_251.payKind = 'user_to_char_rejected'),
                           (message_251.payDirection = payTransferMessage_11_234.direction),
                           (message_251.cardTitle = '已退还'),
@@ -1537,7 +1642,7 @@
                           (message_251.senderName = payerName_235),
                           (message_251.receiverName = payeeName_236),
                           (message_251.content =
-                              '[转账已退还] ' + description_3 + ' ¥' + amount_4.toFixed(2)));
+                              '[转账已退还] ' + description_3 + ' $' + amount_4.toFixed(2)));
                     if (!value_250.messages) value_250.messages = [];
                     value_250.messages.push(rejectMsg);
                     updatedMsg_2 = message_251;

@@ -20,6 +20,7 @@
     let restingHeight = window.innerHeight;
     let restingWidth = window.innerWidth;
     let keyboardOpen = false;
+    let preservingStatusViewport = false;
     let appliedHeight = -1;
     let appliedTop = -1;
     const timers = new Set();
@@ -58,6 +59,14 @@
         if (!focused && !keyboardOpen) restingHeight = Math.max(height, window.innerHeight);
         keyboardOpen = restingHeight - height > 100 && (focused || keyboardOpen);
         if (height >= restingHeight - 72) keyboardOpen = false;
+        // STATUS edits keep the existing app frame, as on GPT. This viewport
+        // owner also waits for keyboard dismissal before resuming normal sizing.
+        const statusModalOpen = !!document.querySelector(
+            '#custom-modal-overlay.active[data-keep-background="true"]',
+        );
+        if (statusModalOpen) preservingStatusViewport = true;
+        else if (!keyboardOpen || focused) preservingStatusViewport = false;
+        if (preservingStatusViewport) return;
         root.classList.toggle('app-keyboard-open', keyboardOpen);
         if (height !== appliedHeight) {
             root.style.setProperty('--app-viewport-height', height + 'px');

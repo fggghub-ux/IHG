@@ -58,6 +58,7 @@
             document.getElementById('custom-modal-overlay')?.classList.add('im-chats-status-modal');
             window.showCustomModal({
                 title: 'STATUS',
+                isolateChatBackground: true,
                 type: 'prompt',
                 placeholder: 'Enter Your Current Status',
                 defaultValue: currentValue,

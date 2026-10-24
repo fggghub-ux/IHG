@@ -76,20 +76,13 @@
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
     }
-    function handleAction_5(value_21) {
-        const value_22 = Number(value_21) || 0;
-        if (!value_22) return '';
-        const date = new Date(value_22);
-        return (
-            date.getMonth() +
-            1 +
-            '/' +
-            date.getDate() +
-            ' ' +
-            date.getHours().toString().padStart(2, '0') +
-            ':' +
-            date.getMinutes().toString().padStart(2, '0')
-        );
+    function handleAction_5(timestamp) {
+        const time = Number(timestamp) || 0;
+        if (!time) return '';
+        const date = new Date(time);
+        return window.imDataUtils?.formatUsDateTime
+            ? window.imDataUtils.formatUsDateTime(date)
+            : date.toLocaleString('en-US', { hour12: true });
     }
     function getPrivateChatMessageTranslation(message_2) {
         if (!message_2 || typeof message_2 !== 'object') return '';

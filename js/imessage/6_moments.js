@@ -656,15 +656,9 @@
         if (timeEl) {
             const d = new Date(m_2.time);
             timeEl.textContent =
-                d.getFullYear() +
-                '-' +
-                (d.getMonth() + 1) +
-                '-' +
-                d.getDate() +
-                ' ' +
-                d.getHours().toString().padStart(2, '0') +
-                ':' +
-                d.getMinutes().toString().padStart(2, '0');
+                window.imDataUtils?.formatUsDateTime
+                ? window.imDataUtils.formatUsDateTime(d)
+                : d.toLocaleString('en-US', { hour12: true });
             let translateButton = document.getElementById('moment-detail-translate-btn');
             !translateButton &&
                 ((translateButton = document.createElement('span')),
@@ -1632,13 +1626,7 @@
     function handleAction_46(value_334) {
         const number = Number(value_334);
         if (!Number.isFinite(number) || number <= 0) return '';
-        return new Date(number).toLocaleString('zh-CN', {
-            month: 'numeric',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-        });
+        return window.imDataUtils.formatUsDateTime(new Date(number));
     }
     function handleAction_47(value_335, value_336) {
         const result_337 = handleAction_42(value_335?.privateChats).find(

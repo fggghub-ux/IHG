@@ -100,7 +100,7 @@
         <link rel="stylesheet" href="css/worldbook.css?v=20261007-107-r1&apk-sync=113-selective-20261022" />
         <link rel="stylesheet" href="css/app_guide_modal.css?v=20261007-107-r1" />
         <link rel="stylesheet" href="css/online_prompts.css?v=20260905-v6&repair=20261003&apk-sync=117-selective-20261022&ui-fixes=20261024-v1" />
-        <link rel="stylesheet" href="css/imessage.css?v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&apk-sync=118-selective-20261022&home-avatar-migration=20261023-v1&ipad-home-title=20261023-v1&chats-migration=20261023-v1" />
+        <link rel="stylesheet" href="css/imessage.css?v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&apk-sync=118-selective-20261022&home-avatar-migration=20261023-v1&ipad-home-title=20261023-v1&chats-migration=20261023-v1&chat-ui=20261024-v2" />
         <link rel="stylesheet" href="css/pay.css?v=20260923-gallery-layout-v1&repair=20261003" />
         <link
             rel="stylesheet"
@@ -5157,37 +5157,37 @@
                                     class="sc-amount-btn selected"
                                     data-amount="30"
                                     style="padding:12px; text-align:center; border-radius:14px; cursor:pointer;"
-                                    >￥30</div
+                                    >$30</div
                                 >
                                 <div
                                     class="sc-amount-btn"
                                     data-amount="50"
                                     style="padding:12px; text-align:center; border-radius:14px; cursor:pointer;"
-                                    >￥50</div
+                                    >$50</div
                                 >
                                 <div
                                     class="sc-amount-btn"
                                     data-amount="100"
                                     style="padding:12px; text-align:center; border-radius:14px; cursor:pointer;"
-                                    >￥100</div
+                                    >$100</div
                                 >
                                 <div
                                     class="sc-amount-btn"
                                     data-amount="200"
                                     style="padding:12px; text-align:center; border-radius:14px; cursor:pointer;"
-                                    >￥200</div
+                                    >$200</div
                                 >
                                 <div
                                     class="sc-amount-btn"
                                     data-amount="500"
                                     style="padding:12px; text-align:center; border-radius:14px; cursor:pointer;"
-                                    >￥500</div
+                                    >$500</div
                                 >
                                 <div
                                     class="sc-amount-btn"
                                     data-amount="1000"
                                     style="padding:12px; text-align:center; border-radius:14px; cursor:pointer;"
-                                    >￥1000</div
+                                    >$1000</div
                                 >
                             </div>
                             <input
@@ -5205,7 +5205,7 @@
                                 class="sheet-action confirm-action"
                                 id="yt-send-sc-btn"
                                 style="margin-top:14px; color:#fff;"
-                                >发送 ￥30</div
+                                >发送 $30</div
                             >
                         </div>
                     </div>
@@ -5563,7 +5563,7 @@
                                     <div
                                         id="yt-summary-sc"
                                         style="font-size:20px; font-weight:700; margin-top:6px;"
-                                        >￥0</div
+                                        >$0</div
                                     >
                                 </div>
                             </div>
@@ -13779,7 +13779,7 @@
                             <div class="pay-balance-block">
                                 <span>可用余额</span>
                                 <div class="pay-card-amount"
-                                    ><small>¥</small><span id="pay-total-amount">0.00</span></div
+                                    ><small>$</small><span id="pay-total-amount">0.00</span></div
                                 >
                             </div>
                             <div class="pay-card-number" id="pay-main-card-number"
@@ -13903,7 +13903,7 @@
                         <label class="pay-transfer-in-field" for="pay-transfer-in-amount">
                             <span>转入金额</span>
                             <div
-                                ><small>¥</small
+                                ><small>$</small
                                 ><input
                                     id="pay-transfer-in-amount"
                                     type="number"
@@ -13982,7 +13982,7 @@
                         <label class="pay-transfer-in-field" for="pay-family-gift-amount"
                             ><span id="pay-family-gift-amount-label">亲属卡额度</span
                             ><div
-                                ><small>¥</small
+                                ><small>$</small
                                 ><input
                                     id="pay-family-gift-amount"
                                     type="number"
@@ -14224,12 +14224,12 @@
                                     <div class="settings-text">默认语言</div>
                                     <select id="chat-language-select" style="border: none; background: transparent; color: #8e8e93; font-size: 16px; outline: none; text-align: right; direction: rtl; appearance: none; -webkit-appearance: none; padding-right: 5px;">
                                         <option value="zh">中文</option>
-                                        <option value="ko">韩语</option>
-                                        <option value="ja">日语</option>
                                         <option value="en">英语</option>
-                                        <option value="fr">法语</option>
-                                        <option value="yue">粤语</option>
                                         <option value="ru">俄语</option>
+                                        <option value="yue">粤语</option>
+                                        <option value="it">意大利语</option>
+                                        <option value="es">西班牙语</option>
+                                        <option value="ar">阿拉伯语</option>
                                         <option value="__custom__">自定义</option>
                                     </select>
                                     <i class="fas fa-chevron-right arrow"></i>
@@ -14398,16 +14398,21 @@
                                 </div>
 
                                 <div class="form-item" style="justify-content: space-between; border-bottom: 1px solid var(--separator-color);">
-                                    <label style="width: auto; font-size: 16px; color: #000;">单条显示头像</label>
+                                    <label style="width: auto; font-size: 16px; color: #000;">显示头像</label>
                                     <label class="toggle-switch">
                                     <input type="checkbox" id="chat-avatar-toggle">
                                     <span class="slider"></span>
                                 </label>
                             </div>
-                            <div class="form-item" style="justify-content: space-between; border-bottom: 1px solid var(--separator-color);">
-                                <label for="chat-every-message-avatar-toggle" style="width: auto; font-size: 16px; color: #000;">每条显示头像</label>
-                                <label class="toggle-switch"><input type="checkbox" id="chat-every-message-avatar-toggle"><span class="slider"></span></label>
-                            </div>
+                                <div id="avatar-position-body" style="display: none; padding: 0 16px 16px; background: #fff; flex-direction: column; gap: 8px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 5px;">
+                                        <label style="font-size: 14px; color: #8e8e93;">Avatar</label>
+                                        <select id="avatar-position-select" style="width: 120px; padding: 6px 10px; border-radius: 8px; border: 1px solid #e5e5ea; background: #f2f2f7; font-size: 14px; outline: none; color: #111;">
+                                            <option value="one">单条</option>
+                                            <option value="two">每条</option>
+                                        </select>
+                                    </div>
+                                </div>
                             <div class="form-item" style="justify-content: space-between; border-bottom: 1px solid var(--separator-color);">
                                 <label for="chat-continuous-bubbles-toggle" style="width: auto; font-size: 16px; color: #000;">连续气泡</label>
                                 <label class="toggle-switch"><input type="checkbox" id="chat-continuous-bubbles-toggle" checked><span class="slider"></span></label>
@@ -18023,7 +18028,7 @@
                             <div>
                                 <div class="lovers-savings-kicker">共享目标</div>
                                 <div id="lovers-savings-total" class="lovers-savings-total"
-                                    >¥0.00</div
+                                    >$0.00</div
                                 >
                             </div>
                             <div class="lovers-savings-jar">
@@ -18031,7 +18036,7 @@
                             </div>
                         </div>
                         <div class="lovers-savings-goal-row">
-                            <span id="lovers-savings-goal">目标 ¥5,200.00</span>
+                            <span id="lovers-savings-goal">目标 $5,200.00</span>
                             <span id="lovers-savings-percent">0%</span>
                         </div>
                         <div class="lovers-savings-progress-track">
@@ -18041,7 +18046,7 @@
                             ></div>
                         </div>
                         <div id="lovers-savings-left" class="lovers-savings-left"
-                            >还差 ¥5,200.00</div
+                            >还差 $5,200.00</div
                         >
                     </section>
 
@@ -18057,7 +18062,7 @@
                                 <div
                                     id="lovers-savings-user-amount"
                                     class="lovers-savings-person-amount"
-                                    >¥0.00</div
+                                    >$0.00</div
                                 >
                             </div>
                         </div>
@@ -18072,7 +18077,7 @@
                                 <div
                                     id="lovers-savings-char-amount"
                                     class="lovers-savings-person-amount"
-                                    >¥0.00</div
+                                    >$0.00</div
                                 >
                             </div>
                         </div>
@@ -18097,11 +18102,11 @@
                         <div class="lovers-savings-day-totals">
                             <div>
                                 <span>我</span>
-                                <strong id="lovers-savings-day-user">¥0.00</strong>
+                                <strong id="lovers-savings-day-user">$0.00</strong>
                             </div>
                             <div>
                                 <span>TA</span>
-                                <strong id="lovers-savings-day-char">¥0.00</strong>
+                                <strong id="lovers-savings-day-char">$0.00</strong>
                             </div>
                         </div>
                         <div id="lovers-savings-records" class="lovers-savings-records"></div>
@@ -18252,7 +18257,7 @@
                     <div
                         id="lovers-savings-withdraw-result-amount"
                         class="lovers-savings-result-amount"
-                        >¥0.00</div
+                        >$0.00</div
                     >
                     <div class="lovers-savings-result-reason-card">
                         <span id="lovers-savings-withdraw-result-reason-label">同意理由</span>
@@ -18680,7 +18685,7 @@
                                 >
                                     <div style="font-size: 12px; opacity: 0.9;">活期余额</div>
                                     <div style="font-size: 16px; font-weight: 600;"
-                                        >¥ 12,050.00</div
+                                        >$ 12,050.00</div
                                     >
                                 </div>
                             </div>
@@ -18706,7 +18711,7 @@
                                 >
                                     <div style="font-size: 12px; opacity: 0.9;">可用额度</div>
                                     <div style="font-size: 16px; font-weight: 600;"
-                                        >¥ 38,500.00</div
+                                        >$ 38,500.00</div
                                     >
                                 </div>
                             </div>
@@ -20171,80 +20176,80 @@
         <script src="js/about_info_modal.js?v=20261007-107-r1&settings=20261010-r1"></script>
         <script src="js/login.js?v=20260801-resume-recovery-v1&changelog-notice=20260819-v1&repair=20261003&settings=20261010-r1"></script>
         <script src="js/app_guide_modal.js?v=20261007-107-r1"></script>
-        <script src="js/viewport_layout.js?v=20261020-ipad-apk-layout"></script>
+        <script src="js/viewport_layout.js?v=20261020-ipad-apk-layout&status-viewport=20261024-v1"></script>
         <script src="js/ipad_scroll.js?v=20261020-native-scroll"></script>
         <script src="js/mobile_input_compat.js?v=20261009-restored-repairs"></script>
         <script src="js/background_activity.js?v=20260907-capacitor-resume-v1&repair=20261003"></script>
         <script src="js/system_notifications.js?v=20260907-capacitor-v1&image-assets=20260803-v1&custom-sound-v3&ios-notification=20260924-v1&repair=20261003&apk-sync=111-selective"></script>
 
         <!-- 引入 iMessage 模块分段代码 -->
-        <script src="js/imessage/game.js?v=20260830-appstore-anonymous-qa-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=111-selective"></script>
-        <script src="js/imessage/data_utils.js?v=20261007-107-r1&apk-sync=118-selective-20261022"></script>
+        <script src="js/imessage/game.js?v=20260830-appstore-anonymous-qa-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=111-selective&chat-ui=20261024-v2"></script>
+        <script src="js/imessage/data_utils.js?v=20261007-107-r1&apk-sync=118-selective-20261022&chat-ui=20261024-v2"></script>
         <script src="js/imessage/weather_context.js?v=20261007-107-r1"></script>
         <script src="js/imessage/online_prompts.js?v=20260905-v2&repair=20261003&apk-sync=117-selective-20261022"></script>
         <script src="js/imessage/group_titles.js?v=apk110-selective&apk-sync=111-selective"></script>
-<script src="js/imessage/2_core.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-sync=118-selective-20261022&chats-migration=20261023-v1&ui-fixes=20261024-v1&gift-update=20261024-v1"></script>
+<script src="js/imessage/2_core.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-sync=118-selective-20261022&chats-migration=20261023-v1&ui-fixes=20261024-v1&gift-update=20261024-v1&chat-ui=20261024-v3"></script>
         <script src="js/imessage/vector_memory.js?v=20260807-local-vector-memory-v1&memory-recall-promotion=20260813-v1&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/3_contacts.js?v=20260718-friend-profile-import-v1&render-cache=20260801-v1&vendor-lazy=20260803-v1&startup-queue=20260804-v1&official=20260827-v1&contact-card-actions=20260916-v4&repair=20261003&home-avatar-migration=20261023-v1&chats-migration=20261023-v1"></script>
     <script src="js/imessage/home_cover.js?v=20260913-v1&home-images=20261023-v1"></script>
-    <script src="js/imessage/chats_featured.js?v=20261023-chats-v1"></script>
-        <script src="js/imessage/3_groups.js?v=20260718-group-poll-v4-group-memory-editor-v1&observer=20260730-v1&render-cache=20260801-v1&user-avatar=20260802-v1&group-auto-translation=20260803-v1&startup-queue=20260804-v1&context-limit=20260804-v1&group-identity-css-v1&member-sync-private-permissions=20260812-v1&theme-avatar-hooks=20260814-v2&worldbook=20260817-v1&online-chat-optimization=20260818-v1&token-usage=20260822-v1&online-prompts=20260905-v2&history-index=20260907-v1&cross-group-memory=20260919-v1&group-chat-search=20260924-v1&tap-response=20260924-v1&repair=20261003&apk-sync=113-selective-20261022&apk-ui=111-rebuild-20261016"></script>
-        <script src="js/imessage/chat_record_forward.js?v=20261007-107-r1&apk-sync=111-selective"></script>
+    <script src="js/imessage/chats_featured.js?v=20261023-chats-v1&chat-ui=20261024-v2"></script>
+        <script src="js/imessage/3_groups.js?v=20260718-group-poll-v4-group-memory-editor-v1&observer=20260730-v1&render-cache=20260801-v1&user-avatar=20260802-v1&group-auto-translation=20260803-v1&startup-queue=20260804-v1&context-limit=20260804-v1&group-identity-css-v1&member-sync-private-permissions=20260812-v1&theme-avatar-hooks=20260814-v2&worldbook=20260817-v1&online-chat-optimization=20260818-v1&token-usage=20260822-v1&online-prompts=20260905-v2&history-index=20260907-v1&cross-group-memory=20260919-v1&group-chat-search=20260924-v1&tap-response=20260924-v1&repair=20261003&apk-sync=113-selective-20261022&apk-ui=111-rebuild-20261016&chat-ui=20261024-v2"></script>
+        <script src="js/imessage/chat_record_forward.js?v=20261007-107-r1&apk-sync=111-selective&chat-ui=20261024-v2"></script>
         <script src="js/imessage/4_chat_common.js?v=image-assets-20260803-v1&auto-image=20260807-v1&startup-queue=20260804-v1&auto-face-lock=20260813-v1&prompt-parts=20260819-v1&repair=20261003&apk-sync=111-selective"></script>
-        <script src="js/imessage/4_chat_status.js?v=20260821-status-memory-request-v1&template-avatar=20260821-v1&template-history-fallback=20260821-v1&paging=20260801-button-only-v1&startup-queue=20260804-v1&status-refresh=20260821-v1&offline-html-template-sanitize=20260822-v1&status-css-snapshot=20260822-v1&imessage-performance=20260825-v1&mcp-chat-settings=20260901-v2&repair=20261003"></script>
-        <script src="js/imessage/4_chat_payment.js?v=20260725-single-chat-cot-v1&startup-queue=20260804-v1&group-identity-css-v1&group-member-resolution=20260812-v1&repair=20261003&apk-sync=117-selective-20261022"></script>
+        <script src="js/imessage/4_chat_status.js?v=20260821-status-memory-request-v1&template-avatar=20260821-v1&template-history-fallback=20260821-v1&paging=20260801-button-only-v1&startup-queue=20260804-v1&status-refresh=20260821-v1&offline-html-template-sanitize=20260822-v1&status-css-snapshot=20260822-v1&imessage-performance=20260825-v1&mcp-chat-settings=20260901-v2&repair=20261003&chat-ui=20261024-v2"></script>
+        <script src="js/imessage/4_chat_payment.js?v=20260725-single-chat-cot-v1&startup-queue=20260804-v1&group-identity-css-v1&group-member-resolution=20260812-v1&repair=20261003&apk-sync=117-selective-20261022&chat-ui=20261024-v2"></script>
         <script src="js/imessage/voice_message_audio.js?v=20261015-apk111&apk-sync=113-selective-20261022"></script>
-        <script src="js/imessage/4_chat_bubbles.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&apk-patch=20261022-1&apk-sync=118-selective-20261022&ui-fixes=20261024-v1"></script>
-        <script src="js/imessage/chat_search.js?v=20260718-chat-history-search-v2&keyboard-guard=20260801-v1&startup-queue=20260804-v1&location-timezone=20260825-v1&location-translation=20260825-v1&history-index=20260907-v1&group-chat-search=20260924-v3&repair=20261003&apk-sync=111-selective"></script>
-        <script src="js/imessage/chat_favorites.js?v=20260723-chat-favorites-v3&startup-queue=20260804-v1&repair=20261003&apk-sync=117-selective-20261022"></script>
+        <script src="js/imessage/4_chat_bubbles.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&apk-patch=20261022-1&apk-sync=118-selective-20261022&ui-fixes=20261024-v1&chat-ui=20261024-v2"></script>
+        <script src="js/imessage/chat_search.js?v=20260718-chat-history-search-v2&keyboard-guard=20260801-v1&startup-queue=20260804-v1&location-timezone=20260825-v1&location-translation=20260825-v1&history-index=20260907-v1&group-chat-search=20260924-v3&repair=20261003&apk-sync=111-selective&chat-ui=20261024-v2"></script>
+        <script src="js/imessage/chat_favorites.js?v=20260723-chat-favorites-v3&startup-queue=20260804-v1&repair=20261003&apk-sync=117-selective-20261022&chat-ui=20261024-v2"></script>
         <script src="js/imessage/tts.js?v=20261007-107-r1&apk-sync=111-selective"></script>
-        <script src="js/imessage/4_chat_ai.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=118-selective-20261022"></script>
+        <script src="js/imessage/4_chat_ai.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=118-selective-20261022&chat-ui=20261024-v2"></script>
         <script src="js/imessage/offline_regex.js?v=20260705-offline-regex-v1&html-template=20260822-v3&offline-text-replacement=20260913-v1&repair=20261003"></script>
         <script src="js/imessage/offline_reasoning.js?v=20260718-offline-cot-v1&custom-cot=20260823-v1&repair=20261003"></script>
         <script src="js/imessage/offline_summary_errors.js?v=20260907-detailed-errors-v1&repair=20261003"></script>
-        <script src="js/imessage/4_chat_sheet.js?v=20261007-107-r1&apk-sync=118-selective-20261022&home-avatar-migration=20261023-v1"></script>
+        <script src="js/imessage/4_chat_sheet.js?v=20261007-107-r1&apk-sync=118-selective-20261022&home-avatar-migration=20261023-v1&chat-ui=20261024-v2"></script>
         <script src="js/imessage/4_chat_link.js?v=20260726-light-link-theatre-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&picsum-cdn=20260815-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=113-selective-20261022"></script>
         <script src="js/imessage/4_chat_list.js?chat-runtime-performance=20260803-v1&startup-queue=20260804-v1&theme-surfaces=20260814-v1&imessage-performance=20260825-v2&mobile-latest=20260825-v1&mobile-performance=20260825-v1&official=20260827-v1&history-index=20260907-v1&chat-observer-lifecycle=20260920-v1&group-chat-search=20260924-v1&repair=20261003&settings=20261010-r1&apk-sync=111-selective&home-avatar-migration=20261023-v1&chats-migration=20261023-v1&ui-fixes=20261024-v1&gift-update=20261024-v1"></script>
-        <script src="js/imessage/4_chat_interface.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=111-selective&apk-ui=111-rebuild-20261016"></script>
+        <script src="js/imessage/4_chat_interface.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=111-selective&apk-ui=111-rebuild-20261016&chat-ui=20261024-v2"></script>
         <script src="js/imessage/4_chat_voice_call.js?v=20261009-restored-repairs&apk-sync=111-selective"></script>
         <script src="js/imessage/video_call.js?v=20261020-ipad-call-keyboard&apk-sync=111-selective"></script>
         <script src="js/imessage/4_chat_main.js?v=20261007-107-r1&apk-sync=113-selective-20261022"></script>
         <script src="js/imessage/online_prompt_settings.js?v=20260905-v6&repair=20261003&apk-sync=117-selective-20261022"></script>
-        <script src="js/imessage/5_settings.js?v=20261009-original-layout-clear&apk-sync=118-selective-20261022&ui-fixes=20261024-v1"></script>
-        <script src="js/imessage/6_moments.js?v=20260718-moments-target-reply-v1&auto-translation=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&current-account-avatar-v1&moment-visibility=20260811-v1&relationship-engagement=20260811-v1&char-batch=20260825-v1&comment-threads=20260825-v3&private-chat-labels=20260825-v1&moment-private-chats=20260825-v4&interaction-render=20260911-v1&api-error-dialog=20260923-v1&moments-home=20260923-v2&repair=20261003&shop-moments=20261010-v1&apk-sync=113-selective-20261022&home-avatar-migration=20261023-v1"></script>
+        <script src="js/imessage/5_settings.js?v=20261009-original-layout-clear&apk-sync=118-selective-20261022&ui-fixes=20261024-v1&chat-ui=20261024-v2"></script>
+        <script src="js/imessage/6_moments.js?v=20260718-moments-target-reply-v1&auto-translation=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&current-account-avatar-v1&moment-visibility=20260811-v1&relationship-engagement=20260811-v1&char-batch=20260825-v1&comment-threads=20260825-v3&private-chat-labels=20260825-v1&moment-private-chats=20260825-v4&interaction-render=20260911-v1&api-error-dialog=20260923-v1&moments-home=20260923-v2&repair=20261003&shop-moments=20261010-v1&apk-sync=113-selective-20261022&home-avatar-migration=20261023-v1&chat-ui=20261024-v2"></script>
 
         <script src="js/imessage/user_phone_access_ui.js?v=20260928-auto-toggle-scroll-v1&ihg=20260929-106-r1&repair=20261003"></script>
 
         <!-- 引入其他应用模块 -->
-        <script src="js/pay.js?v=20260710-storage-ready-v1&open-performance=20260801-v1&startup-queue=20260804-v1&pay-transfer-bank=20260812-v1&family-card=20260921-v4&repair=20261003&apk-sync=113-selective-20261022"></script>
-        <script src="js/bstage.js?v=20260725-android-keyboard-actions-v2&subscribers=20260730-cap-compact-v1&keyboard-guard=20260801-v1&api=20260803-unified-v1&provider=20260807-v1&image-assets=20260803-v1&startup-queue=20260804-v1&frequency-penalty=20260822-v1&bstage-pop-memory=20260921-v1&api-error-dialog=20260923-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003"></script>
+        <script src="js/pay.js?v=20260710-storage-ready-v1&open-performance=20260801-v1&startup-queue=20260804-v1&pay-transfer-bank=20260812-v1&family-card=20260921-v4&repair=20261003&apk-sync=113-selective-20261022&chat-ui=20261024-v2"></script>
+        <script src="js/bstage.js?v=20260725-android-keyboard-actions-v2&subscribers=20260730-cap-compact-v1&keyboard-guard=20260801-v1&api=20260803-unified-v1&provider=20260807-v1&image-assets=20260803-v1&startup-queue=20260804-v1&frequency-penalty=20260822-v1&bstage-pop-memory=20260921-v1&api-error-dialog=20260923-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&chat-ui=20261024-v2"></script>
         <!-- 引入世界书核心模块脚本 -->
         <script src="js/builtin_worldbook.js?v=20260713-disable-override-limit-v2&repair=20261003"></script>
         <script src="js/worldbook.js?v=20261007-107-r1&apk-sync=113-selective-20261022"></script>
         <!-- 引入核心 UI 管理与设置模块脚本 -->
         <script src="js/ui.js?v=20260811-no-glass-v1&toast-full-message=20260822-v1&notification-banner-v3=&repair=20261003&shop-moments=20261010-v1&apk-sync=118-selective-20261022"></script>
         <script src="js/ui_translation.js?v=20260807-global-ui-zh-v1&repair=20261003"></script>
-        <script src="js/settings.js?v=20261007-107-r1&settings=20261010-r1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&apk-sync=117-selective-20261022&home-avatar-migration=20261023-v1&app-icons=20261024-v2"></script>
+        <script src="js/settings.js?v=20261007-107-r1&settings=20261010-r1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&apk-sync=117-selective-20261022&home-avatar-migration=20261023-v1&app-icons=20261024-v2&chat-ui=20261024-v2"></script>
         <script src="js/imessage/official_accounts.js?v=20260828-youtu-preview-stable-v5&api-error-dialog=20260923-v1&official-css-generation=20260928-v1&ihg=20260929-106-r1&repair=20261003&settings=20261010-r1&apk-sync=111-selective"></script>
         <script src="js/vendor/mcp_client_sdk.js?v=20260901-mobile-mcp-v3&repair=20261003"></script>
         <script src="js/mcp_relay_config.js?v=20260906-relay-v2&repair=20261003"></script>
         <script src="js/imessage/mcp_integration.js?v=20260906-relay-v3&version-compat=20260907-v1&storage-persistence=20260907-v1&repair=20261003"></script>
         <script src="js/imessage/mcp_chat_config.js?v=20260901-mobile-mcp-v3&mcp-tool-history=20260906-v1&repair=20261003"></script>
         <script src="js/library.js?v=20260911-netease-android-v1&player-performance=20260817-v1&open-performance=20260801-v1&vendor-lazy=20260803-v1&startup-queue=20260804-v1&reader-comments=20260817-v3&reader-selection=20260819-v1&reader-touch-compat=20260830-v1&netease-pagination=20260912-v1&together-listening-invite=20260916-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=117-selective-20261022"></script>
-        <script src="js/loves.js?v=20261007-107-r1&cphone=20261010-r2&apk-sync=117-selective-20261022"></script>
+        <script src="js/loves.js?v=20261007-107-r1&cphone=20261010-r2&apk-sync=117-selective-20261022&chat-ui=20261024-v2"></script>
         <script src="js/tiktok/2_core.js?v=20260712-tiktok-feed-cleanup-v1&open-performance=20260801-v1&startup-queue=20260804-v1&fluidity=20260927-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=118-selective-20261022&tk-repair=20261022-v1&home-avatar-migration=20261023-v1"></script>
         <script src="js/cphone.js?v=20261007-107-r1&cphone=20261010-r2&apk-sync=113-selective-20261022"></script>
         <script src="js/tiktok/3_home.js?v=20261007-107-r1&apk-sync=118-selective-20261022&tk-repair=20261022-v1"></script>
         <script src="js/tiktok/4_chat.js?v=20260712-tiktok-polish-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=118-selective-20261022&tk-repair=20261022-v1"></script>
         <script src="js/tiktok/5_profile.js?v=20260712-tiktok-polish-v1&performance=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&fluidity=20260927-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=118-selective-20261022&tk-repair=20261022-v1&ui-fixes=20261024-v1"></script>
         <script src="js/tiktok/6_image_generation.js?apk-sync=118-selective-20261022&tk-repair=20261022-v1"></script>
-        <script src="js/youtube/2_core.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v2&ihg=20260929-106-r1&repair=20261003&home-avatar-migration=20261023-v1"></script>
+        <script src="js/youtube/2_core.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v2&ihg=20260929-106-r1&repair=20261003&home-avatar-migration=20261023-v1&chat-ui=20261024-v2"></script>
         <script src="js/youtube/3_channel.js?v=20260717-char-lottery-consistency-v18&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003"></script>
         <script src="js/youtube/4_settings.js?repair=20261003&apk-sync=113-selective-20261022"></script>
-        <script src="js/youtube/5_player.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v2&ihg=20260929-106-r1&repair=20261003"></script>
+        <script src="js/youtube/5_player.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v2&ihg=20260929-106-r1&repair=20261003&chat-ui=20261024-v2"></script>
         <script src="js/youtube/6_community.js?v=20260801-dm-generation-fix-v19&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&composer-focus=20260811-v1&api-error-dialog=20260923-v1&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003"></script>
         <script src="js/youtube/7_trending.js?worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&repair=20261003"></script>
-        <script src="js/youtube/8_user_live.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003"></script>
+        <script src="js/youtube/8_user_live.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003&chat-ui=20261024-v2"></script>
         <script src="js/netflix_game_core.js?v=20260811-character-relations-v3&repair=20261003"></script>
         <script src="js/netflix.js?v=20260928-story-hub-direct-v3&open-performance=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=113-selective-20261022"></script>
         <script src="js/shopping.js?v=20260710-storage-ready-v1&performance=20260801-v2&api=20260803-unified-v1&startup-queue=20260804-v1&shop-fixes=20260820-v2&api-error-dialog=20260923-v1&layout=20260923-gallery-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1&apk-sync=113-selective-20261022&apk-patch=20261022-1&gift-update=20261024-v1"></script>

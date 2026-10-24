@@ -543,6 +543,166 @@ This is not a message sent by User in the group. No member may claim to have see
             }
         );
     }
+    function openChatCallChooser(friend_6) {
+        const friendId_9 = String(friend_6?.id ?? '').trim();
+        if (!friendId_9) return;
+        let callOverlay = document.getElementById('custom-call-overlay');
+        if (!callOverlay) {
+            callOverlay = document.createElement('div');
+            callOverlay.id = 'custom-call-overlay';
+            callOverlay.style.position = 'fixed';
+            callOverlay.style.inset = '0';
+            callOverlay.style.backgroundColor = 'rgba(0,0,0,0.4)';
+            callOverlay.style.zIndex = '10000';
+            callOverlay.style.display = 'flex';
+            callOverlay.style.alignItems = 'flex-end';
+            callOverlay.style.justifyContent = 'center';
+            const sheet_2 = document.createElement('div');
+            sheet_2.style.width = '100%';
+            sheet_2.style.backgroundColor = 'transparent';
+            sheet_2.style.padding = '10px';
+            sheet_2.style.boxSizing = 'border-box';
+            sheet_2.style.paddingBottom = 'max(10px, env(safe-area-inset-bottom))';
+            const menuGroup = document.createElement('div');
+            menuGroup.style.backgroundColor = '#fff';
+            menuGroup.style.borderRadius = '14px';
+            menuGroup.style.overflow = 'hidden';
+            const videoBtn = document.createElement('div'),
+                element_87 = document.createElement('span');
+            element_87.textContent = '视频通话';
+            element_87.style.position = 'relative';
+            element_87.style.display = 'inline-block';
+            const element_88 = document.createElement('span');
+            element_88.textContent = 'beta版测试中';
+            element_88.style.position = 'absolute';
+            element_88.style.left = 'calc(100% + 6px)';
+            element_88.style.top = '50%';
+            element_88.style.transform = 'translateY(-50%)';
+            element_88.style.fontSize = '11px';
+            element_88.style.opacity = '0.65';
+            element_88.style.whiteSpace = 'nowrap';
+            element_87.appendChild(element_88);
+            videoBtn.appendChild(element_87);
+            videoBtn.style.padding = '18px 0';
+            videoBtn.style.textAlign = 'center';
+            videoBtn.style.fontSize = '20px';
+            videoBtn.style.color = '#007aff';
+            videoBtn.style.borderBottom = '1px solid #e5e5ea';
+            videoBtn.style.cursor = 'pointer';
+            videoBtn.addEventListener('click', (event_90) => {
+                event_90.stopPropagation();
+                callOverlay.style.display = 'none';
+                const friendId_8_2 = String(callOverlay.dataset.friendId || '').trim(),
+                    friend_7_2 =
+                        window.imApp?.getFriendById?.(friendId_8_2) ||
+                        (window.imData?.friends || []).find(
+                            (item_6_2) => String(item_6_2.id) === friendId_8_2,
+                        );
+                if (!friend_7_2) {
+                    if (window.showToast) window.showToast('联系人不存在或已被删除');
+                    return;
+                }
+                if (window.imChat?.openVideoCall) window.imChat.openVideoCall(friend_7_2);
+                else {
+                    if (window.showToast) window.showToast('视频通话准备中...');
+                }
+            });
+            const element_169_2 = document.createElement('div');
+            element_169_2.innerText = '语音通话';
+            element_169_2.style.padding = '18px 0';
+            element_169_2.style.textAlign = 'center';
+            element_169_2.style.fontSize = '20px';
+            element_169_2.style.color = '#007aff';
+            element_169_2.style.cursor = 'pointer';
+            element_169_2.addEventListener('click', (event_171) => {
+                event_171.stopPropagation();
+                callOverlay.style.display = 'none';
+                const friendId_8 = String(callOverlay.dataset.friendId || '').trim(),
+                    friend_7 =
+                        window.imApp?.getFriendById?.(friendId_8) ||
+                        (window.imData?.friends || []).find(
+                            (item_6) => String(item_6.id) === friendId_8,
+                        );
+                if (!friend_7) {
+                    if (window.showToast) window.showToast('联系人不存在或已被删除');
+                    return;
+                }
+                if (window.imChat && window.imChat.openVoiceCall) window.imChat.openVoiceCall(friend_7);
+                else {
+                    if (window.showToast) window.showToast('语音通话准备中...');
+                }
+            });
+            menuGroup.appendChild(videoBtn);
+            menuGroup.appendChild(element_169_2);
+            sheet_2.appendChild(menuGroup);
+            callOverlay.appendChild(sheet_2);
+            document.body.appendChild(callOverlay);
+            callOverlay.addEventListener('click', (event_175) => {
+                event_175.target === callOverlay && (callOverlay.style.display = 'none');
+            });
+        }
+        callOverlay.dataset.friendId = friendId_9;
+        callOverlay.style.display = 'flex';
+    }
+    window.imChat.openChatCallChooser = openChatCallChooser;
+
+const IM_CHAT_BACK_BADGE_STORAGE_KEY = 'imessage_chat_back_badge';
+const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
+
+    function getChatBackBadgeValue() {
+        const stored = window.appStorage?.loadLegacyKey?.(IM_CHAT_BACK_BADGE_STORAGE_KEY, null);
+        return stored == null ? IM_CHAT_BACK_BADGE_DEFAULT : String(stored);
+    }
+
+    function renderChatBackBadge(page, value = getChatBackBadgeValue()) {
+        const normalized = String(value == null ? '' : value).trim();
+        const badge = page?.querySelector?.('.im-chat-back-count');
+        const backButton = page?.querySelector?.('.im-chat-back-btn');
+        const restoreHotspot = page?.querySelector?.('.im-chat-back-restore-hotspot');
+        if (badge) {
+            badge.textContent = normalized;
+            badge.hidden = !normalized;
+        }
+        if (backButton) {
+            backButton.setAttribute('aria-label', '返回');
+            backButton.classList.toggle('has-count', !!normalized);
+        }
+        if (restoreHotspot) {
+            restoreHotspot.hidden = !!normalized;
+            restoreHotspot.setAttribute('aria-label', '编辑数字');
+        }
+    }
+
+    function openChatBackBadgeEditor(page) {
+        if (!window.showCustomModal) return;
+        const overlay = document.getElementById('custom-modal-overlay');
+        const modalInput = document.getElementById('modal-input');
+        const clearModalClass = () => {
+            overlay?.classList.remove('im-chat-back-count-modal');
+            if (modalInput && document.activeElement !== modalInput) modalInput.inputMode = 'text';
+        };
+        overlay?.classList.add('im-chat-back-count-modal');
+        window.showCustomModal({
+            type: 'prompt',
+            title: 'STATUS',
+            isolateChatBackground: true,
+            defaultValue: getChatBackBadgeValue(),
+            placeholder: '2991',
+            confirmText: '确认',
+            onCancel: clearModalClass,
+            onConfirm: async (value) => {
+                const normalized = String(value == null ? '' : value).trim();
+                await window.appStorage?.saveLegacyKey?.(IM_CHAT_BACK_BADGE_STORAGE_KEY, normalized);
+                document.querySelectorAll('.active-chat-interface.im-chat-char').forEach((chatPage) => {
+                    renderChatBackBadge(chatPage, normalized);
+                });
+                clearModalClass();
+            },
+        });
+        if (modalInput) modalInput.inputMode = 'numeric';
+    }
+
+
     async function openChatTab_2(friend_6) {
         const value_34 = ++count,
             chatsContent_2 = document.getElementById('chats-content'),
@@ -593,6 +753,7 @@ This is not a message sent by User in the group. No member may claim to have see
         const isGroupChat = friend_6.type === 'group',
             isNpcChat = friend_6.type === 'npc',
             value_134 = friend_6.type === 'official',
+            isCharChat = !isGroupChat && !isNpcChat && !value_134,
             className_2 =
                 'active-chat-interface im-chat-interface ' +
                 (isGroupChat
@@ -601,7 +762,7 @@ This is not a message sent by User in the group. No member may claim to have see
                       ? 'im-chat-npc'
                       : value_134
                         ? 'im-chat-official'
-                        : 'im-chat-single'),
+                        : 'im-chat-single') + (isCharChat ? ' im-chat-char' : ''),
             isSleeping_2 = window.imApp.isCharacterSleeping(friend_6),
             statusLabel = formatStatusLabel(isSleeping_2 ? 'offline' : 'online', isSleeping_2),
             value_44 = isSleeping_2 ? '#8e8e93' : '#34c759';
@@ -680,9 +841,6 @@ This is not a message sent by User in the group. No member may claim to have see
                         <div class="ins-chat-name">` +
                               friend_6.nickname +
                               `</div>
-                        <div class="ins-chat-sign"><div class="im-chat-status-dot"></div><span>` +
-                              statusLabel +
-                              `</span></div>
                    </div>`);
             }
             let text_146 = '';
@@ -701,12 +859,13 @@ This is not a message sent by User in the group. No member may claim to have see
                     isNpcChat
                         ? (text_146 =
                               '<button type="button" class="chat-menu-btn im-chat-icon-btn" aria-label="聊天设置" title="聊天设置"><i class="fas fa-bars" aria-hidden="true"></i></button>')
-                        : (text_146 = `<button type="button" class="chat-call-btn im-chat-icon-btn" aria-label="视频通话" title="视频通话"><i class="fas fa-phone-alt" aria-hidden="true"></i></button>
-                   <button type="button" class="chat-menu-btn im-chat-icon-btn" aria-label="聊天设置" title="聊天设置"><i class="fas fa-bars" aria-hidden="true"></i></button>`);
+                        : (text_146 = `<button type="button" class="chat-menu-btn im-chat-icon-btn" aria-label="Chat Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg></button>`);
             }
             const value_147_2 = isGroupChat
                 ? '<button type="button" class="chat-back-btn im-chat-back-btn im-chat-group-back-btn" aria-label="返回聊天列表" title="返回聊天列表"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>'
-                : '<button type="button" class="chat-back-btn im-chat-back-btn" aria-label="返回聊天列表" title="返回聊天列表"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>';
+                : isCharChat
+                  ? `<button type="button" class="chat-back-btn im-chat-back-btn" aria-label="返回"><svg class="im-chat-back-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6 L8.5 12 L15 18"></path></svg><span class="im-chat-back-count"></span></button><button type="button" class="im-chat-back-restore-hotspot" aria-label="编辑数字" hidden></button>`
+                  : '<button type="button" class="chat-back-btn im-chat-back-btn" aria-label="返回聊天列表" title="返回聊天列表"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>';
             let text_60 = '';
             isGroupChat
                 ? (text_60 =
@@ -793,7 +952,7 @@ This is not a message sent by User in the group. No member may claim to have see
                     ? ''
                     : '<button type="button" class="ins-input-icon plus-btn" aria-label="添加附件" title="添加附件"><i class="fas fa-plus" aria-hidden="true"></i></button>') +
                 `
-                        <input type="text" placeholder="imessage..." class="ins-message-input chat-input" inputmode="text" enterkeyhint="send" autocomplete="off">
+                        <input type="text" placeholder="iMessage" class="ins-message-input chat-input" inputmode="text" enterkeyhint="send" autocomplete="off">
                         <div class="im-chat-input-actions">
                             ` +
                 (value_134
@@ -828,7 +987,8 @@ This is not a message sent by User in the group. No member may claim to have see
                 window.imApp.applyGlobalChatCss(window.u2ThemeState || {});
             const backBtn = page_9.querySelector('.chat-back-btn');
             backBtn &&
-                backBtn.addEventListener('click', () => {
+                backBtn.addEventListener('click', (event) => {
+                    if (event.target.closest('.im-chat-back-count')) return;
                     if (profilePanelOverlay) {
                         const latestFriend = window.imApp.getFriendById(friend_6) || friend_6;
                         window.imChat.hideProfilePanel(latestFriend, profilePanelOverlay);
@@ -840,9 +1000,13 @@ This is not a message sent by User in the group. No member may claim to have see
                     window.imApp?.setActiveThemeSurface?.('chats');
                     window.imChat.updateChatsView();
                 });
+            page_9.querySelectorAll('.im-chat-back-count, .im-chat-back-restore-hotspot').forEach(button => {
+                button.addEventListener('click', event => {
+                    event.preventDefault(); event.stopPropagation(); openChatBackBadgeEditor(page_9);
+                });
+            });
             const cancelBatchBtn = page_9.querySelector('.chat-cancel-batch-btn'),
                 menuBtn = page_9.querySelector('.chat-menu-btn'),
-                callBtn = page_9.querySelector('.chat-call-btn'),
                 batchForwardBtnElement_149 = page_9.querySelector('.batch-forward-btn'),
                 batchDeleteBtnElement_150 = page_9.querySelector('.batch-delete-btn');
             function exitBatchSelectMode_3() {
@@ -850,111 +1014,6 @@ This is not a message sent by User in the group. No member may claim to have see
             }
             window.imChat.ensureTransferDetailOverlayForExistingPage(page_9, friend_6);
             window.imChat.ensureRedPacketDetailOverlayForExistingPage(page_9, friend_6);
-            callBtn &&
-                callBtn.addEventListener('click', () => {
-                    const friendId_9 = String(friend_6?.id ?? '').trim();
-                    if (!friendId_9) return;
-                    let callOverlay = document.getElementById('custom-call-overlay');
-                    if (!callOverlay) {
-                        callOverlay = document.createElement('div');
-                        callOverlay.id = 'custom-call-overlay';
-                        callOverlay.style.position = 'fixed';
-                        callOverlay.style.inset = '0';
-                        callOverlay.style.backgroundColor = 'rgba(0,0,0,0.4)';
-                        callOverlay.style.zIndex = '10000';
-                        callOverlay.style.display = 'flex';
-                        callOverlay.style.alignItems = 'flex-end';
-                        callOverlay.style.justifyContent = 'center';
-                        const sheet_2 = document.createElement('div');
-                        sheet_2.style.width = '100%';
-                        sheet_2.style.backgroundColor = 'transparent';
-                        sheet_2.style.padding = '10px';
-                        sheet_2.style.boxSizing = 'border-box';
-                        sheet_2.style.paddingBottom = 'max(10px, env(safe-area-inset-bottom))';
-                        const menuGroup = document.createElement('div');
-                        menuGroup.style.backgroundColor = '#fff';
-                        menuGroup.style.borderRadius = '14px';
-                        menuGroup.style.overflow = 'hidden';
-                        const videoBtn = document.createElement('div'),
-                            element_87 = document.createElement('span');
-                        element_87.textContent = '视频通话';
-                        element_87.style.position = 'relative';
-                        element_87.style.display = 'inline-block';
-                        const element_88 = document.createElement('span');
-                        element_88.textContent = 'beta版测试中';
-                        element_88.style.position = 'absolute';
-                        element_88.style.left = 'calc(100% + 6px)';
-                        element_88.style.top = '50%';
-                        element_88.style.transform = 'translateY(-50%)';
-                        element_88.style.fontSize = '11px';
-                        element_88.style.opacity = '0.65';
-                        element_88.style.whiteSpace = 'nowrap';
-                        element_87.appendChild(element_88);
-                        videoBtn.appendChild(element_87);
-                        videoBtn.style.padding = '18px 0';
-                        videoBtn.style.textAlign = 'center';
-                        videoBtn.style.fontSize = '20px';
-                        videoBtn.style.color = '#007aff';
-                        videoBtn.style.borderBottom = '1px solid #e5e5ea';
-                        videoBtn.style.cursor = 'pointer';
-                        videoBtn.addEventListener('click', (event_90) => {
-                            event_90.stopPropagation();
-                            callOverlay.style.display = 'none';
-                            const friendId_8_2 = String(callOverlay.dataset.friendId || '').trim(),
-                                friend_7_2 =
-                                    window.imApp?.getFriendById?.(friendId_8_2) ||
-                                    (window.imData?.friends || []).find(
-                                        (item_6_2) => String(item_6_2.id) === friendId_8_2,
-                                    );
-                            if (!friend_7_2) {
-                                if (window.showToast) window.showToast('联系人不存在或已被删除');
-                                return;
-                            }
-                            if (window.imChat?.openVideoCall)
-                                window.imChat.openVideoCall(friend_7_2);
-                            else {
-                                if (window.showToast) window.showToast('视频通话准备中...');
-                            }
-                        });
-                        const element_169_2 = document.createElement('div');
-                        element_169_2.innerText = '语音通话';
-                        element_169_2.style.padding = '18px 0';
-                        element_169_2.style.textAlign = 'center';
-                        element_169_2.style.fontSize = '20px';
-                        element_169_2.style.color = '#007aff';
-                        element_169_2.style.cursor = 'pointer';
-                        element_169_2.addEventListener('click', (event_171) => {
-                            event_171.stopPropagation();
-                            callOverlay.style.display = 'none';
-                            const friendId_8 = String(callOverlay.dataset.friendId || '').trim(),
-                                friend_7 =
-                                    window.imApp?.getFriendById?.(friendId_8) ||
-                                    (window.imData?.friends || []).find(
-                                        (item_6) => String(item_6.id) === friendId_8,
-                                    );
-                            if (!friend_7) {
-                                if (window.showToast) window.showToast('联系人不存在或已被删除');
-                                return;
-                            }
-                            if (window.imChat && window.imChat.openVoiceCall)
-                                window.imChat.openVoiceCall(friend_7);
-                            else {
-                                if (window.showToast) window.showToast('语音通话准备中...');
-                            }
-                        });
-                        menuGroup.appendChild(videoBtn);
-                        menuGroup.appendChild(element_169_2);
-                        sheet_2.appendChild(menuGroup);
-                        callOverlay.appendChild(sheet_2);
-                        document.body.appendChild(callOverlay);
-                        callOverlay.addEventListener('click', (event_175) => {
-                            event_175.target === callOverlay &&
-                                (callOverlay.style.display = 'none');
-                        });
-                    }
-                    callOverlay.dataset.friendId = friendId_9;
-                    callOverlay.style.display = 'flex';
-                });
             cancelBatchBtn &&
                 cancelBatchBtn.addEventListener('click', () => {
                     exitBatchSelectMode_3();
@@ -1867,6 +1926,7 @@ This is not a message sent by User in the group. No member may claim to have see
                 }));
             handleAction_20_128.shell?.remove();
         }
+        if (isCharChat) renderChatBackBadge(page_9);
         if (window.imApp.applyFriendBg) window.imApp.applyFriendBg(friend_6);
         if (window.imApp.initTimestampSetting) window.imApp.initTimestampSetting(friend_6);
         if (page_9) {
@@ -1874,10 +1934,6 @@ This is not a message sent by User in the group. No member may claim to have see
             page_9.classList.toggle(
                 'timestamp-outside',
                 !!friend_6.showTimestamp && friend_6.timestampPosition === 'outside',
-            );
-            page_9.classList.toggle(
-                'show-every-message-avatar',
-                friend_6.type === 'char' && friend_6.showEveryMessageAvatar === true,
             );
             page_9.classList.toggle(
                 'separate-bubbles',
@@ -1977,6 +2033,7 @@ This is not a message sent by User in the group. No member may claim to have see
             );
         msgContextMenu_2.style.top = nextTop + 'px';
     }
+    let contextMenuSession = 0;
     function showContextMenu_2(row_5, value_158) {
         const msgContextOverlayElement = document.getElementById('msg-context-overlay'),
             msgContextMenu = document.getElementById('msg-context-menu');
@@ -1986,6 +2043,7 @@ This is not a message sent by User in the group. No member may claim to have see
             row_5?.classList?.contains('unblock-request-row')
         )
             return;
+        contextMenuSession++;
         if (navigator.vibrate) navigator.vibrate(50);
         window.imData.currentActiveRow = row_5;
         row_5.classList.add('message-active');
@@ -2005,6 +2063,7 @@ This is not a message sent by User in the group. No member may claim to have see
         if (msgContextBubbleCloneElement_274) {
             msgContextBubbleCloneElement_274.innerHTML = '';
             const activeFriend = window.imData.currentActiveFriend;
+            msgContextBubbleCloneElement_274.dataset.chatType = activeFriend?.type || 'char';
             activeFriend?.id != null
                 ? msgContextBubbleCloneElement_274.setAttribute(
                       'data-current-friend-id',
@@ -2113,12 +2172,14 @@ This is not a message sent by User in the group. No member may claim to have see
         const msgContextOverlayElement_288 = document.getElementById('msg-context-overlay'),
             msgContextMenu_3 = document.getElementById('msg-context-menu');
         if (!msgContextOverlayElement_288 || !msgContextMenu_3) return;
+        const closingContextSession = ++contextMenuSession;
         msgContextMenu_3.style.opacity = '0';
         msgContextMenu_3.style.transform = 'scale(0.85)';
         window.imData.currentActiveRow &&
             (window.imData.currentActiveRow.classList.remove('message-active'),
             (window.imData.currentActiveRow = null));
         setTimeout(() => {
+            if (closingContextSession !== contextMenuSession) return;
             msgContextOverlayElement_288.style.display = 'none';
             const failedContainer_2 = document.getElementById('msg-context-bubble-clone');
             failedContainer_2 &&

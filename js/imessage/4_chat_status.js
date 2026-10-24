@@ -302,7 +302,7 @@
         const createdAt_2 = snapshot_2.createdAt ? new Date(snapshot_2.createdAt) : null,
             time_2 =
                 createdAt_2 && !Number.isNaN(createdAt_2.getTime())
-                    ? createdAt_2.toLocaleString()
+                    ? window.imDataUtils.formatUsDateTime(createdAt_2)
                     : '时间未记录';
         return renderStatusTemplate_2(value_81.statusTemplate, snapshot_2, {
             time: time_2,
@@ -384,7 +384,7 @@
             createdAt_3 = snapshot_5.createdAt ? new Date(snapshot_5.createdAt) : null,
             timeLabel =
                 createdAt_3 && !Number.isNaN(createdAt_3.getTime())
-                    ? createdAt_3.toLocaleString()
+                    ? window.imDataUtils.formatUsDateTime(createdAt_3)
                     : '时间未记录',
             field = (value_4) => escapeProfilePanelHtml(value_4 || '未记录'),
             value_114 =

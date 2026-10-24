@@ -508,11 +508,13 @@
                 (end < result_2.text.length ? '…' : '')
             );
         }
-        function formatResultTime(timestamp_4) {
-            const value_5 = Number(timestamp_4);
-            if (!Number.isFinite(value_5) || value_5 <= 0) return '';
-            if (global.imApp?.formatTime) return global.imApp.formatTime(value_5);
-            return new Date(value_5).toLocaleString();
+        function formatResultTime(timestamp) {
+            const value = Number(timestamp);
+            if (!Number.isFinite(value) || value <= 0) return '';
+            if (global.imApp?.formatTime) return global.imApp.formatTime(value);
+            return window.imDataUtils?.formatUsDateTime
+                ? window.imDataUtils.formatUsDateTime(value)
+                : new Date(value).toLocaleString('en-US', { hour12: true });
         }
         function handleAction_81() {
             return new Promise((value_107) => global.setTimeout(value_107, 0));

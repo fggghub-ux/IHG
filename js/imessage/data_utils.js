@@ -6,6 +6,40 @@
         if (root) root.imDataUtils = imDataUtils_2;
     }
 })(typeof globalThis !== 'undefined' ? globalThis : null, function createImessageDataUtils() {
+    function toValidDate(value) {
+        const date = value instanceof Date ? new Date(value.getTime()) : new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function formatUsTime(value, options = {}) {
+        const date = toValidDate(value);
+        if (!date) return '';
+        return date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            second: options.seconds ? '2-digit' : undefined,
+            hour12: true,
+        });
+    }
+
+    function formatUsDate(value, options = {}) {
+        const date = toValidDate(value);
+        if (!date) return '';
+        return date.toLocaleDateString('en-US', {
+            month: options.longMonth ? 'long' : 'numeric',
+            day: 'numeric',
+            year: options.includeYear === false ? undefined : 'numeric',
+        });
+    }
+
+    function formatUsDateTime(value, options = {}) {
+        const date = toValidDate(value);
+        if (!date) return '';
+        const dateText = formatUsDate(date, options);
+        const timeText = formatUsTime(date, options);
+        return [dateText, timeText].filter(Boolean).join(' ');
+    }
+
     function pad2(value_4) {
         return String(value_4).padStart(2, '0');
     }
@@ -407,20 +441,25 @@
               ) || null
             : null;
     }
-    function normalizeChatLanguage_2(value_125) {
-        const originalLanguage = String(value_125 || '').trim(),
-            language_2 = originalLanguage.toLowerCase();
-        if (!language_2 || ['zh', 'cn', 'zh-cn'].includes(language_2)) return 'zh';
-        if (['ko', 'kr'].includes(language_2)) return 'ko';
-        if (['ja', 'jp'].includes(language_2)) return 'ja';
-        if (language_2 === 'en') return 'en';
-        if (language_2 === 'fr') return 'fr';
-        if (['yue', 'cantonese', '粤语', '廣東話'].includes(language_2)) return 'yue';
-        if (['ru', 'russian', '俄语', '俄語'].includes(language_2)) return 'ru';
+    function normalizeChatLanguage_2(value) {
+        const originalLanguage = String(value || '').trim();
+        const language = originalLanguage.toLowerCase();
+        if (!language || ['zh', 'cn', 'zh-cn'].includes(language)) return 'zh';
+        if (['ko', 'kr'].includes(language)) return 'ko';
+        if (['ja', 'jp'].includes(language)) return 'ja';
+        if (language === 'en') return 'en';
+        if (language === 'fr') return 'fr';
+        if (['it', 'italian', '意大利语', '義大利語'].includes(language)) return 'it';
+        if (['es', 'spanish', '西班牙语', '西班牙語'].includes(language)) return 'es';
+        if (['pt', 'portuguese', '葡萄牙语', '葡萄牙語'].includes(language)) return 'pt';
+        if (['de', 'german', '德语', '德語'].includes(language)) return 'de';
+        if (['ar', 'arabic', '阿拉伯语', '阿拉伯語'].includes(language)) return 'ar';
+        if (['yue', 'cantonese', '粤语', '廣東話'].includes(language)) return 'yue';
+        if (['ru', 'russian', '俄语', '俄語'].includes(language)) return 'ru';
         return originalLanguage || 'zh';
     }
-    function getChatLanguageName_2(value_10_2) {
-        const language_3 = normalizeChatLanguage_2(value_10_2);
+    function getChatLanguageName_2(value) {
+        const language = normalizeChatLanguage_2(value);
         return (
             {
                 zh: 'Chinese',
@@ -428,10 +467,15 @@
                 ja: 'Japanese',
                 en: 'English',
                 fr: 'French',
+                it: 'Italian',
+                es: 'Spanish',
+                pt: 'Portuguese',
+                de: 'German',
+                ar: 'Arabic',
                 yue: 'Cantonese',
                 ru: 'Russian',
-            }[language_3] ||
-            language_3 ||
+            }[language] ||
+            language ||
             'Chinese'
         );
     }
@@ -590,26 +634,21 @@
     }
     function formatMemoryEventTime_3(messages, fallbackTimestamp = Date.now()) {
         const dates = (Array.isArray(messages) ? messages : [])
-                .map((message_5) => parseMessageTimestamp(message_5?.timestamp))
-                .filter(Boolean)
-                .sort((left, right) => left.getTime() - right.getTime()),
-            fallbackDate = parseMessageTimestamp(fallbackTimestamp) || new Date(),
-            start = dates[0] || fallbackDate,
-            end = dates[dates.length - 1] || start,
-            value_175 = (value_180) =>
-                value_180.getFullYear() +
-                '年' +
-                pad2(value_180.getMonth() + 1) +
-                '月' +
-                pad2(value_180.getDate()) +
-                '日',
-            value_176 = (value_181) =>
-                pad2(value_181.getHours()) + ':' + pad2(value_181.getMinutes()),
-            startText = value_175(start) + ' ' + value_176(start),
-            endText = value_175(end) + ' ' + value_176(end);
+            .map((message) => parseMessageTimestamp(message?.timestamp))
+            .filter(Boolean)
+            .sort((left, right) => left.getTime() - right.getTime());
+        const fallbackDate = parseMessageTimestamp(fallbackTimestamp) || new Date();
+        const start = dates[0] || fallbackDate;
+        const end = dates[dates.length - 1] || start;
+        const formatDate = (date) => formatUsDate(date);
+        const formatTime = (date) => formatUsTime(date);
+        const startText = `${formatDate(start)} ${formatTime(start)}`;
+        const endText = `${formatDate(end)} ${formatTime(end)}`;
         if (startText === endText) return startText;
-        if (value_175(start) === value_175(end)) return startText + '至' + value_176(end);
-        return startText + '至' + endText;
+        if (formatDate(start) === formatDate(end)) {
+            return `${startText}至${formatTime(end)}`;
+        }
+        return `${startText}至${endText}`;
     }
     function normalizeLocalDateTime(value_182) {
         const text_4 = String(value_182 || '').trim();
@@ -1183,6 +1222,7 @@
         );
     }
     return {
+        formatUsTime, formatUsDate, formatUsDateTime,
         isCustomChatTimeEnabled: _value,
         normalizeChatTimeAnchors: _value2,
         getChatTimestamp: _value3,

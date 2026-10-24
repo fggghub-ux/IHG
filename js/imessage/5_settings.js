@@ -3564,21 +3564,15 @@
             minutes = min_2 + Math.floor(Math.random() * (max_2 - min_2 + 1));
         return minutes * 60 * 1000;
     }
-    function formatAutonomousNextTime(timestamp_2) {
-        const value_5 = Number(timestamp_2) || 0;
-        if (value_5 <= 0) return '等待下次随机触发';
-        const date = new Date(value_5);
+    function formatAutonomousNextTime(timestamp) {
+        const value = Number(timestamp) || 0;
+        if (value <= 0) return '等待下次随机触发';
+        const date = new Date(value);
         if (Number.isNaN(date.getTime())) return '等待下次随机触发';
-        return (
-            '下次约 ' +
-            (date.getMonth() + 1) +
-            '月' +
-            date.getDate() +
-            '日 ' +
-            String(date.getHours()).padStart(2, '0') +
-            ':' +
-            String(date.getMinutes()).padStart(2, '0')
-        );
+        const dateTime = window.imDataUtils?.formatUsDateTime
+            ? window.imDataUtils.formatUsDateTime(date)
+            : date.toLocaleString('en-US', { hour12: true });
+        return `下次约 ${dateTime}`;
     }
     function getAutonomousIntervalValues(minInput_2, maxInput_2, value_618) {
         const fallback = normalizeAutonomousTask_2(value_618),
@@ -3867,31 +3861,29 @@
             throw value_671;
         }
     }
-    function formatSummarySourceMessage(msg_2, friend_43) {
-        if (friend_43?.type === 'group' && window.imApp.formatMessageForApiContext) {
-            const formatted = window.imApp.formatMessageForApiContext(msg_2, friend_43, {
-                    userName: userState_2?.name || 'User',
-                }),
-                value_678 = msg_2.timestamp
-                    ? new Date(msg_2.timestamp).toLocaleString('zh-CN', {
-                          hour12: false,
-                      })
-                    : '';
-            return (
-                '[' + value_678 + '] ' + (formatted?.content || msg_2.content || msg_2.text || '')
-            );
+    function formatSummarySourceMessage(msg, friend) {
+        if (friend?.type === 'group' && window.imApp.formatMessageForApiContext) {
+            const formatted = window.imApp.formatMessageForApiContext(msg, friend, {
+                userName: userState_2?.name || 'User'
+            });
+            const time = msg.timestamp
+                ? (window.imDataUtils?.formatUsDateTime
+                    ? window.imDataUtils.formatUsDateTime(msg.timestamp)
+                    : new Date(msg.timestamp).toLocaleString('en-US', { hour12: true }))
+                : '';
+            return `[${time}] ${formatted?.content || msg.content || msg.text || ''}`;
         }
-        const speaker_2 =
-                msg_2.role === 'assistant'
-                    ? friend_43.nickname || friend_43.realname || friend_43.realName || 'Char'
-                    : userState_2?.name || 'User',
-            value_675 = msg_2.timestamp
-                ? new Date(msg_2.timestamp).toLocaleString('zh-CN', {
-                      hour12: false,
-                  })
-                : '',
-            content_3 = msg_2.content || msg_2.text || '';
-        return '[' + value_675 + '] ' + speaker_2 + ': ' + content_3;
+
+        const speaker = msg.role === 'assistant'
+            ? (friend.nickname || friend.realname || friend.realName || 'Char')
+            : (userState_2?.name || 'User');
+        const time = msg.timestamp
+            ? (window.imDataUtils?.formatUsDateTime
+                ? window.imDataUtils.formatUsDateTime(msg.timestamp)
+                : new Date(msg.timestamp).toLocaleString('en-US', { hour12: true }))
+            : '';
+        const content = msg.content || msg.text || '';
+        return `[${time}] ${speaker}: ${content}`;
     }
     function normalizeSummaryApiEndpoint(config) {
         return window.u2Api.resolveChatCompletionsEndpoint(config.endpoint || '');
@@ -5288,7 +5280,6 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
             'timestamp-position-select',
         );
         const chatAvatarToggleElement_914 = document.getElementById('chat-avatar-toggle');
-        const apk110New_1226 = document.getElementById('chat-every-message-avatar-toggle');
         const apk110New_1227 = document.getElementById('chat-continuous-bubbles-toggle');
         const apk110New_1228 = document.getElementById('chat-reply-style-select');
         const chatLanguageSelect = document.getElementById('chat-language-select');
@@ -5311,13 +5302,16 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         const chatTtsSpeedInput = document.getElementById('chat-tts-speed-input');
         chatAvatarToggleElement_914 &&
             (chatAvatarToggleElement_914.checked = !!friend_57.showAvatar);
-        if (apk110New_1226) apk110New_1226.checked = friend_57.showEveryMessageAvatar === true;
         if (apk110New_1227) apk110New_1227.checked = friend_57.continuousBubbles !== false;
         if (apk110New_1228)
             apk110New_1228.value = friend_57.replyStyle === 'outside' ? 'outside' : 'inside';
+        const avatarBody = document.getElementById('avatar-position-body');
+        const avatarSelect = document.getElementById('avatar-position-select');
+        if (avatarBody) avatarBody.style.display = friend_57.showAvatar ? 'flex' : 'none';
+        if (avatarSelect) avatarSelect.value = friend_57.avatarDisplayMode === 'two' ? 'two' : 'one';
         if (chatLanguageSelect) {
             const language_2 = String(friend_57.language || 'zh').trim() || 'zh';
-            const standardLanguages = new Set(['zh', 'ko', 'ja', 'en', 'fr', 'yue', 'ru']);
+            const standardLanguages = new Set(['zh', 'en', 'ru', 'yue', 'it', 'es', 'ar']);
             const isCustomLanguage_2 = !standardLanguages.has(language_2);
             chatLanguageSelect.value = isCustomLanguage_2 ? '__custom__' : language_2;
             if (chatCustomLanguageRow_2)
@@ -5401,10 +5395,6 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         page_3.classList.toggle(
             'timestamp-outside',
             !!friend_59.showTimestamp && friend_59.timestampPosition === 'outside',
-        );
-        page_3.classList.toggle(
-            'show-every-message-avatar',
-            friend_59.type === 'char' && friend_59.showEveryMessageAvatar === true,
         );
         page_3.classList.toggle(
             'separate-bubbles',
@@ -5661,7 +5651,7 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
     const chatLanguageSelect_2 = document.getElementById('chat-language-select');
     const chatCustomLanguageRowElement = document.getElementById('chat-custom-language-row');
     const chatCustomLanguageInput = document.getElementById('chat-custom-language-input');
-    const value_92 = new Set(['zh', 'ko', 'ja', 'en', 'fr', 'yue', 'ru']);
+    const value_92 = new Set(['zh', 'en', 'ru', 'yue', 'it', 'es', 'ar']);
     chatLanguageSelect_2 &&
         chatLanguageSelect_2.addEventListener('change', async (event_966) => {
             if (window.imData.currentSettingsFriend) {
@@ -6178,45 +6168,56 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
             e_7.target.value = value_12_2;
             await saveChatTtsField('speed', value_12_2, e_7.target, previousValue_5);
         }));
-    const chatAvatarToggleElement = document.getElementById('chat-avatar-toggle');
-    chatAvatarToggleElement &&
-        chatAvatarToggleElement.addEventListener('change', async (event_1042) => {
+    const chatAvatarToggle = document.getElementById('chat-avatar-toggle');
+    const avatarPositionBody = document.getElementById('avatar-position-body');
+    const avatarPositionSelect = document.getElementById('avatar-position-select');
+    const rerenderAvatarSettingPreview = () => {
+        if (!window.imChat?.rerenderChatContainer) return;
+        const friend = window.imData.currentSettingsFriend;
+        const page = friend ? document.getElementById(`chat-interface-${friend.id}`) : null;
+        const msgContainer = page?.querySelector('.ins-chat-messages');
+        if (friend && msgContainer) window.imChat.rerenderChatContainer(friend, msgContainer, { scroll: false });
+    };
+    if (chatAvatarToggle && chatAvatarToggle.dataset.bound !== 'true') {
+        chatAvatarToggle.dataset.bound = 'true';
+        chatAvatarToggle.addEventListener('change', async (e) => {
             if (window.imData.currentSettingsFriend) {
-                const checked_10 = !!window.imData.currentSettingsFriend.showAvatar;
-                const showAvatar_3 = event_1042.target.checked;
-                const value_1045 = await commitSettingsFriendChange(
-                        (value_1046) => {
-                            value_1046.showAvatar = showAvatar_3;
-                        },
-                        {
-                            silent: true,
-                        },
-                    );
-                if (!value_1045) {
-                    event_1042.target.checked = checked_10;
+                const previousValue = !!window.imData.currentSettingsFriend.showAvatar;
+                const nextValue = e.target.checked;
+
+                const saved = await commitSettingsFriendChange((targetFriend) => {
+                    targetFriend.showAvatar = nextValue;
+                }, { silent: true });
+
+                if (!saved) {
+                    e.target.checked = previousValue;
                     showToast_2('头像设置保存失败');
                     return;
                 }
-                if (window.imChat && window.imChat.rerenderChatContainer) {
-                    const currentSettingsFriend_1047 = window.imData.currentSettingsFriend;
-                    const elementById_1048 = document.getElementById(
-                            'chat-interface-' + currentSettingsFriend_1047.id,
-                        );
-                    if (elementById_1048) {
-                        const insChatMessagesElement_1049 =
-                            elementById_1048.querySelector('.ins-chat-messages');
-                        if (insChatMessagesElement_1049)
-                            window.imChat.rerenderChatContainer(
-                                currentSettingsFriend_1047,
-                                insChatMessagesElement_1049,
-                                {
-                                    scroll: false,
-                                },
-                            );
-                    }
-                }
+                if (avatarPositionBody) avatarPositionBody.style.display = nextValue ? 'flex' : 'none';
+                rerenderAvatarSettingPreview();
             }
         });
+    }
+
+    if (avatarPositionSelect && avatarPositionSelect.dataset.bound !== 'true') {
+        avatarPositionSelect.dataset.bound = 'true';
+        avatarPositionSelect.addEventListener('change', async (e) => {
+            if (!window.imData.currentSettingsFriend) return;
+            const previousValue = window.imData.currentSettingsFriend.avatarDisplayMode === 'two' ? 'two' : 'one';
+            const nextValue = e.target.value === 'two' ? 'two' : 'one';
+            const saved = await commitSettingsFriendChange((targetFriend) => {
+                targetFriend.avatarDisplayMode = nextValue;
+            }, { silent: true });
+            if (!saved) {
+                e.target.value = previousValue;
+                showToast_2('头像样式保存失败');
+                return;
+            }
+            rerenderAvatarSettingPreview();
+        });
+    }
+
     const pinToggle_2 = document.getElementById('chat-pinned-toggle');
     pinToggle_2 &&
         pinToggle_2.addEventListener('change', async (event_1050) => {
@@ -6251,13 +6252,6 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         window.imData.currentSettingsFriend = currentSettingsFriend_12;
     }
     for (const [apk110New_1381, apk110New_1382, apk110New_1383, apk110New_1384, apk110New_1385] of [
-        [
-            'chat-every-message-avatar-toggle',
-            'showEveryMessageAvatar',
-            (apk110New_1386) => !!apk110New_1386,
-            '每条头像设置保存失败',
-            false,
-        ],
         [
             'chat-continuous-bubbles-toggle',
             'continuousBubbles',

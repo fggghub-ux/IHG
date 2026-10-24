@@ -56,6 +56,17 @@
         parent.appendChild(button);
         return true;
     };
+    function formatBubbleTime(value) {
+        if (window.imDataUtils?.formatUsTime) return window.imDataUtils.formatUsTime(value);
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        return date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+        });
+    }
+
     function escapeHtml(value_4) {
         return String(value_4 == null ? '' : value_4)
             .replace(/&/g, '&amp;')
@@ -112,40 +123,52 @@
             'url(' + JSON.stringify(String(avatarUrl_2)) + ')',
         );
     }
-    function decorateMessageRowAvatar(row_2, friend_4, message_3 = {}) {
+    function syncSingleChatAvatarState(friend, container) {
+        if (!container) return;
+        const isTwo =
+            (!friend?.type || friend.type === 'char') &&
+            friend?.showAvatar === true &&
+            friend?.avatarDisplayMode === 'two';
+        container.classList.toggle('avatar-mode-two', isTwo);
+    }
+
+    function decorateMessageRowAvatar(row, friend, message = {}) {
+        const isCharFriend = !friend?.type || friend.type === 'char';
+        const isEveryMessageMode = friend?.avatarDisplayMode === 'two';
         if (
-            !row_2 ||
-            friend_4?.type === 'group' ||
-            row_2.querySelector(':scope > .im-message-avatar')
+            !row ||
+            !friend?.showAvatar ||
+            !isCharFriend ||
+            !isEveryMessageMode ||
+            row.querySelector(':scope > .im-message-avatar')
         )
-            return row_2;
+            return row;
         if (
-            message_3.type === 'system_notice' ||
-            message_3.type === 'memory_request' ||
-            row_2.classList.contains('chat-system-row') ||
-            row_2.classList.contains('typing-row')
+            message.type === 'memory_request' ||
+            message.type === 'system_notice' ||
+            row.classList.contains('chat-system-row') ||
+            row.classList.contains('typing-row')
         )
-            return row_2;
-        const isUser_2 = message_3.role === 'user' || row_2.classList.contains('user-row');
+            return row;
+
+        const isUser = message.role === 'user' || row.classList.contains('user-row');
         let profile;
-        isUser_2
-            ? (profile = getEffectiveUserProfile(friend_4, message_3))
-            : (profile = {
-                  name: friend_4?.nickname || friend_4?.realName || 'AI',
-                  avatarUrl: friend_4?.avatarUrl || 'assets/moren-thumb.jpg',
-              });
+        if (isUser) {
+            profile = getEffectiveUserProfile(friend, message);
+        } else {
+            profile = {
+                name: friend?.nickname || friend?.realName || 'AI',
+                avatarUrl: friend?.avatarUrl || 'assets/moren-thumb.jpg',
+            };
+        }
+
         const avatar = document.createElement('span');
-        return (
-            (avatar.className = 'im-message-avatar ' + (isUser_2 ? 'is-user' : 'is-assistant')),
-            avatar.setAttribute('aria-hidden', 'true'),
-            (avatar.dataset.messageRole = isUser_2 ? 'user' : 'assistant'),
-            (avatar.innerHTML =
-                '<img src="' +
-                escapeHtml(profile.avatarUrl || 'assets/moren-thumb.jpg') +
-                '" alt="" loading="lazy" decoding="async" onerror="this.src=\'assets/moren-thumb.jpg\'">'),
-            row_2.appendChild(avatar),
-            row_2
-        );
+        avatar.className = `im-message-avatar ${isUser ? 'is-user' : 'is-assistant'}`;
+        avatar.setAttribute('aria-hidden', 'true');
+        avatar.dataset.messageRole = isUser ? 'user' : 'assistant';
+        avatar.innerHTML = `<img src="${escapeHtml(profile.avatarUrl || 'assets/moren-thumb.jpg')}" alt="" loading="lazy" decoding="async" onerror="this.src='assets/moren-thumb.jpg'">`;
+        row.appendChild(avatar);
+        return row;
     }
     function handleAction_18(value_122, value_123) {
         for (
@@ -158,6 +181,7 @@
         return null;
     }
     function handleAction_19(message_4, friend_5, value_127) {
+        syncSingleChatAvatarState(friend_5, value_127);
         const messageId_2 = String(message_4?.id || ''),
             row_3 = handleAction_18(
                 value_127,
@@ -518,6 +542,7 @@
         message_6 = null,
     ) {
         if (!friend_10 || !friend_10.showAvatar || hasPrev) return '';
+        if ((!friend_10.type || friend_10.type === 'char') && friend_10.avatarDisplayMode === 'two') return '';
         const date = new Date(getChatDisplayTimestamp(friend_10, value_46));
         const dateStr = date.toLocaleString('en-US', {
             month: 'long',
@@ -2159,20 +2184,11 @@
             escapeHtml(msg_7.description || '恭喜发财') +
             '</strong>\n                        <span class="group-red-packet-status">' +
             escapeHtml(value_365_2) +
-            '</span>\n                    </div>\n                </div>\n                <strong class="group-red-packet-amount">¥' +
+            '</span>\n                    </div>\n                </div>\n                <strong class="group-red-packet-amount">$' +
             totalAmount_2.toFixed(2) +
             '</strong>\n            </div>\n        ';
         const value_187 =
-            typeof window.formatChatBubbleTime === 'function'
-                ? window.formatChatBubbleTime(getChatDisplayTimestamp(friend_13, value_163))
-                : (() => {
-                      const value_191 = new Date(getChatDisplayTimestamp(friend_13, value_163));
-                      return (
-                          value_191.getHours() +
-                          ':' +
-                          value_191.getMinutes().toString().padStart(2, '0')
-                      );
-                  })();
+            formatBubbleTime(getChatDisplayTimestamp(friend_13, value_163));
         const handleAction_7_188 = buildMessageHeaderHtml(
             isUser_3,
             friend_13,
@@ -3006,6 +3022,10 @@
             Number(lastMessage?.timestamp) || 0,
             String(lastMessage?.content ?? lastMessage?.text ?? ''),
             lastMessage?.showTranslation ? 1 : 0,
+            friend_18?.showAvatar ? 1 : 0,
+            String(friend_18?.avatarDisplayMode || 'one'),
+            friend_18?.continuousBubbles === false ? 0 : 1,
+            String(friend_18?.replyStyle || 'inside'),
             friend_18?.showTimestamp ? 1 : 0,
             friend_18?.timeAware === false ? 0 : 1,
             friend_18?.customTimeEnabled === true ? 1 : 0,
@@ -3543,6 +3563,7 @@
         );
     }
     function renderChatHistory_2(friend_25, container_15, value_586 = {}) {
+        syncSingleChatAvatarState(friend_25, container_15);
         if (!friend_25 || !container_15) return;
         const handleAction_58_587 = handleAction_58(container_15);
         if (
@@ -3659,7 +3680,7 @@
         const _value145 = getChatDisplayTimestamp(_value142, timestamp_4);
         const _value146 = document.createElement('span');
         _value146.textContent = _value144
-            ? window.imDataUtils.formatChatDateTime(_value145)
+            ? window.imDataUtils.formatUsDateTime(_value145)
             : window.imApp.formatTime?.(_value145) || '';
         if (_value144) {
             div.classList.add('chat-timestamp-editable');
@@ -3739,16 +3760,7 @@
                 value_609_2 +
                 '</div>');
         const value_620 =
-            typeof window.formatChatBubbleTime === 'function'
-                ? window.formatChatBubbleTime(getChatDisplayTimestamp(friend_26, timestamp_5))
-                : (() => {
-                      const value_242 = new Date(getChatDisplayTimestamp(friend_26, timestamp_5));
-                      return (
-                          value_242.getHours() +
-                          ':' +
-                          value_242.getMinutes().toString().padStart(2, '0')
-                      );
-                  })();
+            formatBubbleTime(getChatDisplayTimestamp(friend_26, timestamp_5));
         text_619 +=
             '<span class="bubble-meta"><span class="bubble-time">' +
             value_620 +
@@ -3850,16 +3862,7 @@
                 value_626 +
                 '</div>');
         const value_643 =
-            typeof window.formatChatBubbleTime === 'function'
-                ? window.formatChatBubbleTime(getChatDisplayTimestamp(friend_27, timestamp_6))
-                : (() => {
-                      const value_274 = new Date(getChatDisplayTimestamp(friend_27, timestamp_6));
-                      return (
-                          value_274.getHours() +
-                          ':' +
-                          value_274.getMinutes().toString().padStart(2, '0')
-                      );
-                  })();
+            formatBubbleTime(getChatDisplayTimestamp(friend_27, timestamp_6));
         text_642 +=
             '<span class="bubble-meta"><span class="bubble-time">' + value_643 + '</span></span>';
         const headerHtml_2 = buildMessageHeaderHtml(
@@ -4158,14 +4161,12 @@
             getChatDisplayTimestamp(friend_30, timestamp_9 || msg_17.timestamp || Date.now()),
         );
         const textContent_4 =
-            typeof window.formatChatBubbleTime === 'function'
-                ? window.formatChatBubbleTime(
+            formatBubbleTime(
                       getChatDisplayTimestamp(
                           friend_30,
                           timestamp_9 || msg_17.timestamp || Date.now(),
                       ),
-                  )
-                : date_3.getHours() + ':' + date_3.getMinutes().toString().padStart(2, '0');
+                  );
         const imageUrl_3 = msg_17.content || window.imChat.CHAT_IMAGE_PLACEHOLDER_URL || '';
         const value_284 = 1 + (Array.isArray(msg_17.albumImages) ? msg_17.albumImages.length : 0);
         let imageUrl_3_2 = Math.min(value_284 - 1, Math.max(0, Number(value_281) || 0));
@@ -4452,16 +4453,7 @@
               escapeHtml(value_317) +
               '" style="width: min(56vw, 200px); height: min(56vw, 200px); max-width: 200px; max-height: 200px; aspect-ratio: 1 / 1; border-radius: 12px; object-fit: cover; display: block; background: #e5e5ea; cursor: pointer;">';
         const value_322 =
-            typeof window.formatChatBubbleTime === 'function'
-                ? window.formatChatBubbleTime(getChatDisplayTimestamp(friend_31, timestamp_10))
-                : (() => {
-                      const value_329 = new Date(getChatDisplayTimestamp(friend_31, timestamp_10));
-                      return (
-                          value_329.getHours() +
-                          ':' +
-                          value_329.getMinutes().toString().padStart(2, '0')
-                      );
-                  })();
+            formatBubbleTime(getChatDisplayTimestamp(friend_31, timestamp_10));
         const text_323 = '';
         const value_324 =
             '<div class="chat-bubble ' +
@@ -4653,7 +4645,7 @@
         element_304.appendChild(row_14);
         window.imChat.scrollToBottom(element_304);
     }
-    function renderPayTransferBubble_2(msg_19, friend_32, element_746, value_365 = Date.now()) {
+    function renderGroupOrFamilyTransferBubble(msg_19, friend_32, element_746, value_365 = Date.now()) {
         const value_366 = msg_19.role === 'user';
         const value_367 = !value_366 && friend_32.type === 'group';
         const value_368 = value_367 ? resolveGroupBubbleIdentity(friend_32, msg_19) : null;
@@ -4692,7 +4684,7 @@
         handleAction_22(row_15, friend_32, msg_19);
         handleAction_20(row_15, friend_32, msg_19);
         const amount_2 = Number(msg_19.amount) || 0;
-        const value_758 = '¥' + amount_2.toFixed(2);
+        const value_758 = '$' + amount_2.toFixed(2);
         const description_2 = String(msg_19.description || '').trim();
         const parties = handleAction_23(msg_19, friend_32);
         const {
@@ -4779,9 +4771,7 @@
         );
         const value_390 = new Date(getChatDisplayTimestamp(friend_32, value_365));
         const value_391 =
-            typeof window.formatChatBubbleTime === 'function'
-                ? window.formatChatBubbleTime(getChatDisplayTimestamp(friend_32, value_365))
-                : value_390.getHours() + ':' + value_390.getMinutes().toString().padStart(2, '0');
+            formatBubbleTime(getChatDisplayTimestamp(friend_32, value_365));
         if (isOfficialReceipt) {
             const sign = msg_19.cardTitle === '收款通知' ? '+' : '-';
             row_15.innerHTML =
@@ -4793,7 +4783,7 @@
                 escapeHtml(msg_19.cardTitle || '支付通知') +
                 '</div>\n                        <strong class="pay-receipt-card-amount">' +
                 sign +
-                '¥' +
+                '$' +
                 amount_2.toFixed(2) +
                 '</strong>\n                        <span class="pay-receipt-card-status">' +
                 (msg_19.cardTitle === '收款通知' ? '已收款' : '已付款') +
@@ -4928,6 +4918,212 @@
         }
         window.imChat.scrollToBottom(element_746);
     }
+
+    function renderPayTransferBubble_2(msg, friend, container, timestamp = Date.now()) {
+        const familyCardText = [msg.paymentAction, msg.cardTitle, msg.description, msg.content].join(
+            ' ',
+        );
+        if (
+            friend.type === 'group' ||
+            String(msg.payKind || '').startsWith('family_card_') ||
+            msg.paymentAction === 'family_card' ||
+            msg.paymentAction === 'family_card_increase' ||
+            familyCardText.includes('亲属卡')
+        ) {
+            return renderGroupOrFamilyTransferBubble(msg, friend, container, timestamp);
+        }
+        const isUser = msg.role === 'user';
+        const isGroupMessage = !isUser && friend.type === 'group';
+        const groupIdentity = isGroupMessage ? resolveGroupBubbleIdentity(friend, msg) : null;
+        const speakerName = groupIdentity?.name || null;
+        const speakerAvatar = groupIdentity?.avatarUrl || null;
+        const lastRow = container.lastElementChild;
+        let hasPrev = false;
+        let sameSpeaker = false;
+
+        if (lastRow) {
+            if (isUser && lastRow.classList.contains('user-row')) {
+                hasPrev = true;
+                lastRow.classList.add('has-next');
+            } else if (!isUser && lastRow.classList.contains('ai-row')) {
+                const previousSpeaker = lastRow.getAttribute('data-speaker') || null;
+                if (!isGroupMessage || previousSpeaker === speakerName) {
+                    hasPrev = true;
+                    sameSpeaker = isGroupMessage;
+                    lastRow.classList.add('has-next');
+                }
+            }
+        }
+
+        const row = document.createElement('div');
+        row.className = `chat-row ${isUser ? 'user-row' : 'ai-row'} ${hasPrev ? 'has-prev' : ''} ${isGroupMessage ? 'group-ai-row' : ''} ${isGroupMessage && sameSpeaker ? 'group-ai-row-continuous' : ''}`;
+        row.setAttribute('data-timestamp', timestamp);
+        row.setAttribute('data-message-id', window.imChat.ensureMessageId(msg, 'pay'));
+        if (speakerName) row.setAttribute('data-speaker', speakerName);
+        handleAction_22(row, friend, msg);
+        handleAction_20(row, friend, msg);
+
+        const amount = Number(msg.amount) || 0;
+        const amountText = `$${amount.toFixed(2)}`;
+        const description = msg.description || '转账';
+        const parties = handleAction_23(msg, friend);
+        const { status } = parties;
+
+        const isOfficialReceipt =
+            msg.targetName === 'Payment' ||
+            msg.cardTitle === '收款通知' ||
+            msg.cardTitle === '支付凭证';
+        const sourceFamilyCardText = `${msg.paymentAction || ''} ${msg.cardTitle || ''} ${msg.description || ''} ${msg.content || ''}`;
+        const isFamilyCard =
+            msg.paymentAction === 'family_card' ||
+            msg.paymentAction === 'family_card_increase' ||
+            sourceFamilyCardText.includes('亲属卡');
+        let extraClass = '';
+
+        if (status === 'claimed') {
+            extraClass = ' is-claimed';
+        } else if (status === 'rejected') {
+            extraClass = ' is-rejected';
+        } else {
+            extraClass = ' is-pending';
+        }
+
+        const headerHtml = buildMessageHeaderHtml(
+            isUser,
+            friend,
+            timestamp,
+            speakerName,
+            speakerAvatar,
+            hasPrev,
+            msg,
+        );
+
+        const timeStr = formatBubbleTime(timestamp);
+
+        if (isOfficialReceipt) {
+            // 微信支付样式居中大卡片
+            const sign = msg.cardTitle === '收款通知' ? '+' : '-';
+            row.innerHTML = `
+                    <div class="chat-checkbox-wrapper" style="display: ${window.imData.batchSelectMode ? 'flex' : 'none'}; width: 40px; justify-content: center; align-items: flex-end; padding-bottom: 10px; flex-shrink: 0; cursor: pointer; transition: all 0.2s;">
+                        <i class="far fa-circle chat-checkbox" data-timestamp="${timestamp}" style="color: #c7c7cc; font-size: 22px;"></i>
+                    </div>
+                        <div style="width:100%; display:flex; justify-content:center; padding:10px 0;">
+                        <div class="im-card-content pay-receipt-card" style="width:280px; background:#fff; border-radius:12px; padding:16px;  display:flex; flex-direction:column; align-items:center;">
+                            <div style="font-size:14px; color:#111; margin-bottom:8px;">${description}</div>
+                            <div style="font-size:28px; font-weight:bold; color:#111; margin-bottom:12px;">${sign}$${amount.toFixed(2)}</div>
+                              <div style="background:#f2f2f7; border-radius:16px; padding:4px 12px; font-size:12px; color:#8e8e93; margin-bottom:16px;">
+                                  ${timeStr}
+                              </div>
+                            <div style="width:100%; border-top:1px solid #f2f2f7; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:13px; color:#8e8e93;">账单详情</span>
+                                <i class="fas fa-chevron-right" style="font-size:12px; color:#c7c7cc;"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        } else {
+            const appleLogoSvg = `<svg class="pay-transfer-apple-mark" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.05 12.54c-.03-3.04 2.48-4.5 2.59-4.57-1.42-2.08-3.63-2.36-4.42-2.39-1.86-.2-3.67 1.11-4.62 1.11-.97 0-2.43-1.09-4.01-1.06-2.03.03-3.93 1.21-4.97 3.05-2.14 3.7-.54 9.14 1.5 12.13 1.02 1.46 2.2 3.09 3.78 3.03 1.54-.06 2.12-.97 3.98-.97 1.84 0 2.39.97 4 .93 1.66-.03 2.71-1.47 3.69-2.95 1.18-1.67 1.65-3.32 1.67-3.4-.04-.01-3.16-1.2-3.19-4.81ZM14 3.61A5.37 5.37 0 0 0 15.23 0a5.46 5.46 0 0 0-3.53 1.72 5.09 5.09 0 0 0-1.26 3.47A4.52 4.52 0 0 0 14 3.61Z"></path></svg>`;
+            const statusIconSvg =
+                status === 'claimed'
+                    ? `<svg class="pay-transfer-status-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 6.8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`
+                    : `<svg class="pay-transfer-status-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+            const contentHtml = `
+                    <div class="pay-transfer-card im-card-content${extraClass}">
+                        <div class="pay-transfer-card-top">
+                            <div class="pay-transfer-card-brand">${appleLogoSvg}<span>Apple Cash</span></div>
+                        </div>
+                        <div class="pay-transfer-card-bottom">
+                            <div class="pay-transfer-card-amount">${amountText}</div>
+                            <div class="pay-transfer-card-status" aria-label="${status}">${statusIconSvg}</div>
+                        </div>
+                    </div>
+                `;
+
+            if (isUser) {
+                const metaHtml = '';
+                row.innerHTML = `
+                        <div class="chat-checkbox-wrapper" style="display: ${window.imData.batchSelectMode ? 'flex' : 'none'}; width: 40px; justify-content: center; align-items: flex-end; padding-bottom: 10px; flex-shrink: 0; cursor: pointer; transition: all 0.2s;">
+                            <i class="far fa-circle chat-checkbox" data-timestamp="${timestamp}" style="color: #c7c7cc; font-size: 22px;"></i>
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+                            ${headerHtml}
+                            <div style="display: flex; justify-content: flex-end; align-items: flex-end; width: 100%;">
+                                <div class="chat-bubble user-bubble im-card-bubble pay-transfer-bubble apple-cash-bubble">${contentHtml}${metaHtml}</div>
+                            </div>
+                        </div>
+                    `;
+            } else {
+                const metaHtml = '';
+                const groupContent = isGroupMessage
+                    ? `<div class="group-ai-bubble-wrap">
+                            ${sameSpeaker ? '' : `<div class="group-ai-speaker-name">${escapeHtml(speakerName)}</div>`}
+                            <div class="group-ai-bubble-row">
+                                <div class="group-ai-avatar-slot">${sameSpeaker ? '<div class="group-ai-avatar-placeholder"></div>' : speakerAvatar ? `<img src="${escapeHtml(speakerAvatar)}" onerror="this.src='assets/moren-thumb.jpg'" loading="lazy" decoding="async" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">` : `<div class="chat-avatar-small">${escapeHtml(String(speakerName).charAt(0) || '?')}</div>`}</div>
+                                <div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble apple-cash-bubble">${contentHtml}${metaHtml}</div>
+                            </div>
+                        </div>`
+                    : `<div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble apple-cash-bubble">${contentHtml}${metaHtml}</div>`;
+                row.innerHTML = `
+                        <div class="chat-checkbox-wrapper" style="display: ${window.imData.batchSelectMode ? 'flex' : 'none'}; width: 40px; justify-content: center; align-items: flex-end; padding-bottom: 10px; flex-shrink: 0; cursor: pointer; transition: all 0.2s;">
+                            <i class="far fa-circle chat-checkbox" data-timestamp="${timestamp}" style="color: #c7c7cc; font-size: 22px;"></i>
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+                            ${headerHtml}
+                            <div style="display: flex; justify-content: flex-start; align-items: flex-end; width: 100%;">${groupContent}</div>
+                        </div>
+                    `;
+            }
+        }
+
+        container.appendChild(row);
+
+        // 允许用户向AI转账时，以及AI向用户转账时，都可以点击打开弹窗
+        if (!isOfficialReceipt && !isFamilyCard) {
+            const clickableBubble =
+                row.querySelector('.chat-bubble.pay-transfer-bubble apple-cash-bubble') ||
+                row.querySelector('.pay-transfer-card');
+            if (clickableBubble) {
+                clickableBubble.style.cursor = 'pointer';
+                clickableBubble.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const activePage = container.closest('.active-chat-interface');
+                    if (!activePage) {
+                        if (window.showToast) window.showToast('未找到聊天页面');
+                        return;
+                    }
+
+                    if (!activePage._openTransferDetailOverlay) {
+                        window.imChat.ensureTransferDetailOverlayForExistingPage(activePage, friend);
+                    }
+
+                    if (activePage._openTransferDetailOverlay) {
+                        const messageId = row.getAttribute('data-message-id');
+                        const rowTimestamp = row.getAttribute('data-timestamp');
+                        const liveFriend =
+                            window.imData.currentActiveFriend &&
+                            String(window.imData.currentActiveFriend.id) === String(friend.id)
+                                ? window.imData.currentActiveFriend
+                                : friend;
+                        const liveMsg = Array.isArray(liveFriend?.messages)
+                            ? liveFriend.messages.find((item) => {
+                                  if (messageId && String(item.id) === String(messageId)) return true;
+                                  return (
+                                      rowTimestamp && String(item.timestamp) === String(rowTimestamp)
+                                  );
+                              })
+                            : null;
+                        activePage._openTransferDetailOverlay(liveMsg || msg);
+                    } else if (window.showToast) {
+                        window.showToast('详情卡片初始化失败');
+                    }
+                });
+            }
+        }
+
+        window.imChat.scrollToBottom(container);
+    }
     function renderMomentForwardBubble_2(msg_20, value_400, element_401, value_402 = Date.now()) {
         let momentData = {};
         try {
@@ -4969,16 +5165,7 @@
             msg_20,
         );
         const value_409 =
-            typeof window.formatChatBubbleTime === 'function'
-                ? window.formatChatBubbleTime(getChatDisplayTimestamp(value_400, value_402))
-                : (() => {
-                      const value_411 = new Date(getChatDisplayTimestamp(value_400, value_402));
-                      return (
-                          value_411.getHours() +
-                          ':' +
-                          value_411.getMinutes().toString().padStart(2, '0')
-                      );
-                  })();
+            formatBubbleTime(getChatDisplayTimestamp(value_400, value_402));
         if (value_403) {
             let text_412 = '';
             row_16.innerHTML =
@@ -5020,6 +5207,7 @@
         window.imChat.scrollToBottom(element_401);
     }
     function renderVoiceMessageBubble_2(msg_21, friend_33, element_805, timestamp_11 = Date.now()) {
+        if (msg_21.role === 'user' && friend_33.type !== 'group') return renderUserVoiceMessageBubble(msg_21, friend_33, element_805, timestamp_11);
         const value_418 = msg_21.role !== 'assistant';
         const handleAction_18_808 = handleAction_18(
             element_805,
@@ -5083,16 +5271,7 @@
         const safeTranscript = escapeHtml(transcript_2 || '暂无转文字');
         const cleanTranslation = String(msg_21.translation || '').trim();
         const value_432 =
-            typeof window.formatChatBubbleTime === 'function'
-                ? window.formatChatBubbleTime(getChatDisplayTimestamp(friend_33, timestamp_11))
-                : (() => {
-                      const value_440 = new Date(getChatDisplayTimestamp(friend_33, timestamp_11));
-                      return (
-                          value_440.getHours() +
-                          ':' +
-                          value_440.getMinutes().toString().padStart(2, '0')
-                      );
-                  })();
+            formatBubbleTime(getChatDisplayTimestamp(friend_33, timestamp_11));
         const text_433 = '';
         const value_823 = !value_418 && window.imVoiceMessageAudio?.canManage?.(friend_33, msg_21);
         const apk111New_1110 = value_823
@@ -5285,6 +5464,213 @@
         element_805.appendChild(row_17);
         window.imChat.scrollToBottom(element_805);
     }
+
+    function renderUserVoiceMessageBubble(msg, friend, container, timestamp = Date.now()) {
+        const isUser = msg.role !== 'assistant';
+        const rows = Array.from(container.children).filter(
+            (el) =>
+                !el.classList.contains('chat-timestamp') &&
+                !el.classList.contains('typing-row') &&
+                !el.classList.contains('chat-offline-scene-row'),
+        );
+        const lastRow = rows.length > 0 ? rows[rows.length - 1] : null;
+        const isGroupMessage = !isUser && friend.type === 'group';
+        const safeSpeaker =
+            isGroupMessage && window.imChat.getGroupMessageSpeaker
+                ? window.imChat.getGroupMessageSpeaker(friend, msg)
+                : null;
+        const speakerName = isGroupMessage
+            ? (safeSpeaker && safeSpeaker.nickname) || msg.speaker || msg.senderName || '群成员'
+            : null;
+        const speakerAvatar = (safeSpeaker && safeSpeaker.avatarUrl) || msg.senderAvatarUrl || null;
+        let hasPrev = false;
+        let sameSpeaker = false;
+
+        if (lastRow) {
+            if (isUser && lastRow.classList.contains('user-row')) {
+                hasPrev = true;
+                lastRow.classList.add('has-next');
+            } else if (!isUser && lastRow.classList.contains('ai-row')) {
+                const prevSpeaker = lastRow.getAttribute('data-speaker') || null;
+                if (isGroupMessage) {
+                    if (prevSpeaker === speakerName) {
+                        hasPrev = true;
+                        sameSpeaker = true;
+                        lastRow.classList.add('has-next');
+                    }
+                } else if (!prevSpeaker) {
+                    hasPrev = true;
+                    sameSpeaker = true;
+                    lastRow.classList.add('has-next');
+                }
+            }
+        }
+
+        const row = document.createElement('div');
+        row.className = `chat-row ${isUser ? 'user-row' : 'ai-row'} ${hasPrev ? 'has-prev' : ''} ${isGroupMessage ? 'group-ai-row' : ''} ${isGroupMessage && sameSpeaker ? 'group-ai-row-continuous' : ''}`;
+        row.setAttribute('data-timestamp', timestamp);
+        row.setAttribute('data-message-id', window.imChat.ensureMessageId(msg, 'voice'));
+        if (speakerName) {
+            row.setAttribute('data-speaker', speakerName);
+        }
+        handleAction_22(row, friend, msg);
+        handleAction_20(row, friend, msg);
+
+        const transcript = String(msg.transcript || msg.text || '').trim();
+        const calculatedDuration = Math.min(18, Math.max(3, Math.ceil(transcript.length / 3)));
+        const duration = Math.min(18, Math.max(3, Number(msg.duration) || calculatedDuration));
+        const safeTranscript = escapeHtml(transcript || '暂无转文字');
+        const cleanTranslation = String(msg.translation || '').trim();
+        const timeStr = formatBubbleTime(timestamp);
+        const metaHtml = '';
+
+        const contentHtml = `
+                <button type="button" class="voice-message-bubble-inner" aria-expanded="false">
+                    <span class="voice-message-mic"><i class="fas fa-microphone-alt"></i></span>
+                    <span class="voice-message-wave" aria-hidden="true">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </span>
+                    <span class="voice-message-duration">${duration}s</span>
+                </button>
+                <div class="voice-message-transcript" hidden>${safeTranscript}</div>
+                ${cleanTranslation && msg.showTranslation ? `<div class="msg-translation" style="margin-top: 6px; padding-top: 6px; border-top: 1px solid ${isUser ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}; font-size: 13px; color: ${isUser ? 'rgba(255,255,255,0.7)' : '#8e8e93'}; line-height: 1.4; word-wrap: break-word; white-space: normal;">${escapeHtml(cleanTranslation)}</div>` : ''}
+                ${metaHtml}
+            `;
+
+        const bubbleHtml = `<div class="chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'} voice-message-bubble">${contentHtml}</div>`;
+        let bubbleWrapperHtml = bubbleHtml;
+        if (isGroupMessage) {
+            const avatarInitial = String(speakerName).trim().charAt(0) || '?';
+            const avatarImg = speakerAvatar
+                ? `<img src="${speakerAvatar}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">`
+                : `<div class="chat-avatar-small">${escapeHtml(avatarInitial)}</div>`;
+
+            bubbleWrapperHtml = `
+                    <div class="group-ai-bubble-wrap">
+                        ${sameSpeaker ? '' : `<div class="group-ai-speaker-name">${escapeHtml(speakerName)}</div>`}
+                        <div class="group-ai-bubble-row">
+                            <div class="group-ai-avatar-slot">${sameSpeaker ? '<div class="group-ai-avatar-placeholder"></div>' : avatarImg}</div>
+                            ${bubbleHtml}
+                        </div>
+                    </div>
+                `;
+        }
+
+        const headerHtml = buildMessageHeaderHtml(
+            isUser,
+            friend,
+            timestamp,
+            speakerName,
+            speakerAvatar,
+            hasPrev,
+            msg,
+        );
+
+        row.innerHTML = `
+                <div class="chat-checkbox-wrapper" style="display: ${window.imData.batchSelectMode ? 'flex' : 'none'}; width: 40px; justify-content: center; align-items: flex-end; padding-bottom: 10px; flex-shrink: 0; cursor: pointer; transition: all 0.2s;">
+                    <i class="far fa-circle chat-checkbox" data-timestamp="${timestamp}" style="color: #c7c7cc; font-size: 22px;"></i>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+                    ${headerHtml}
+                    <div style="display: flex; justify-content: ${isUser ? 'flex-end' : 'flex-start'}; align-items: flex-end; width: 100%;">
+                        ${bubbleWrapperHtml}
+                    </div>
+                </div>
+            `;
+
+        const voiceBubble = row.querySelector('.voice-message-bubble');
+        const voiceInner = row.querySelector('.voice-message-bubble-inner');
+        if (voiceBubble) {
+            const forcedBubbleStyle = {
+                display: 'inline-flex',
+                flexDirection: 'column',
+                width: 'max-content',
+                minWidth: '0',
+                maxWidth: 'min(77%, 240px)',
+                height: 'auto',
+                minHeight: '0',
+                maxHeight: 'none',
+                aspectRatio: 'auto',
+                flex: '0 0 auto',
+                padding: '8px 12px',
+                boxSizing: 'border-box',
+            };
+            Object.entries(forcedBubbleStyle).forEach(([property, value]) => {
+                const cssProperty = property.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
+                voiceBubble.style.setProperty(cssProperty, value, 'important');
+            });
+        }
+        if (voiceInner) {
+            voiceInner.style.setProperty('display', 'inline-flex', 'important');
+            voiceInner.style.setProperty('width', 'max-content', 'important');
+            voiceInner.style.setProperty('height', 'auto', 'important');
+            voiceInner.style.setProperty('min-height', '0', 'important');
+            voiceInner.style.setProperty('max-height', 'none', 'important');
+            voiceInner.style.setProperty('aspect-ratio', 'auto', 'important');
+        }
+
+        const toggle = voiceInner;
+        const transcriptEl = row.querySelector('.voice-message-transcript');
+        if (toggle && transcriptEl) {
+            toggle.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const shouldExpand = transcriptEl.hidden;
+                transcriptEl.hidden = !shouldExpand;
+                toggle.setAttribute('aria-expanded', shouldExpand ? 'true' : 'false');
+
+                const ttsFriend = window.u2Tts?.resolveMessageTtsFriend
+                    ? window.u2Tts.resolveMessageTtsFriend(friend, msg)
+                    : friend;
+                const canPlayTts = window.u2Tts?.canSpeakForFriend
+                    ? window.u2Tts.canSpeakForFriend(ttsFriend)
+                    : true;
+                if (
+                    shouldExpand &&
+                    canPlayTts &&
+                    window.u2Tts &&
+                    typeof window.u2Tts.speakTextCached === 'function'
+                ) {
+                    try {
+                        const cacheOwner = msg && typeof msg === 'object' ? msg : {};
+                        const audioUrl = await window.u2Tts.speakTextCached(
+                            transcript,
+                            ttsFriend,
+                            cacheOwner,
+                        );
+                        if (
+                            audioUrl &&
+                            msg &&
+                            typeof msg === 'object' &&
+                            !msg.ttsAudioUrl &&
+                            window.imApp?.updateFriendMessage
+                        ) {
+                            await window.imApp.updateFriendMessage(
+                                friend.id,
+                                {
+                                    id: msg.id || row.getAttribute('data-message-id') || null,
+                                    timestamp: row.getAttribute('data-timestamp') || timestamp || null,
+                                },
+                                (targetMsg) => {
+                                    if (targetMsg) targetMsg.ttsAudioUrl = audioUrl;
+                                },
+                                { silent: true },
+                            );
+                        }
+                    } catch (error) {
+                        console.error('Voice message playback failed', error);
+                        if (window.showToast)
+                            window.showToast(
+                                window.u2Tts?.getUserErrorMessage?.(error) || '语音播放失败',
+                            );
+                    }
+                }
+            });
+        }
+
+        container.appendChild(row);
+        window.imChat.scrollToBottom(container);
+    }
     function renderStickerMessageBubble_2(msg_22, value_454, element_455, value_456 = Date.now()) {
         const value_457 = msg_22.role !== 'assistant';
         const handleAction_18_458 = handleAction_18(
@@ -5345,16 +5731,7 @@
         const stickerUrl_2 = String(msg_22.stickerUrl || msg_22.content || '').trim();
         const stickerName_2 = String(msg_22.stickerName || msg_22.text || 'Sticker').trim();
         const value_468 =
-            typeof window.formatChatBubbleTime === 'function'
-                ? window.formatChatBubbleTime(getChatDisplayTimestamp(value_454, value_456))
-                : (() => {
-                      const value_475 = new Date(getChatDisplayTimestamp(value_454, value_456));
-                      return (
-                          value_475.getHours() +
-                          ':' +
-                          value_475.getMinutes().toString().padStart(2, '0')
-                      );
-                  })();
+            formatBubbleTime(getChatDisplayTimestamp(value_454, value_456));
         const text_469 = '';
         const value_470 =
             '\n            <div class="sticker-message-wrap" title="' +
@@ -6332,21 +6709,12 @@
 `) || '暂无见面总结'
         );
     }
-    function formatOfflineMeetingTimestamp(timestamp_12) {
-        const value_17 = Number(timestamp_12) || Date.now(),
-            value_1030 = new Date(value_17),
-            pad = (num) => String(num).padStart(2, '0');
-        return (
-            value_1030.getFullYear() +
-            '年' +
-            (value_1030.getMonth() + 1) +
-            '月' +
-            value_1030.getDate() +
-            '日 ' +
-            pad(value_1030.getHours()) +
-            ':' +
-            pad(value_1030.getMinutes())
-        );
+    function formatOfflineMeetingTimestamp(timestamp) {
+        const value = Number(timestamp) || Date.now();
+        const date = new Date(value);
+        return window.imDataUtils?.formatUsDateTime
+            ? window.imDataUtils.formatUsDateTime(date)
+            : date.toLocaleString('en-US', { hour12: true });
     }
     function handleAction_100(element_578, msg_26) {
         element_578.innerHTML =
@@ -6555,9 +6923,7 @@
         );
         const value_597 = new Date(getChatDisplayTimestamp(value_588, value_590));
         const value_601 =
-            typeof window.formatChatBubbleTime === 'function'
-                ? window.formatChatBubbleTime(getChatDisplayTimestamp(value_588, value_590))
-                : value_597.getHours() + ':' + value_597.getMinutes().toString().padStart(2, '0');
+            formatBubbleTime(getChatDisplayTimestamp(value_588, value_590));
         if (value_591) {
             const text_602 = '';
             row_21.innerHTML =
@@ -6661,16 +7027,7 @@
             text_1077 +
             '\n                </div>\n            </div>\n        ';
         const value_619 =
-            typeof window.formatChatBubbleTime === 'function'
-                ? window.formatChatBubbleTime(getChatDisplayTimestamp(friend_37, timestamp_14))
-                : (() => {
-                      const value_624 = new Date(getChatDisplayTimestamp(friend_37, timestamp_14));
-                      return (
-                          value_624.getHours() +
-                          ':' +
-                          value_624.getMinutes().toString().padStart(2, '0')
-                      );
-                  })();
+            formatBubbleTime(getChatDisplayTimestamp(friend_37, timestamp_14));
         const headerHtml_3 = buildMessageHeaderHtml(
             isUser_5,
             friend_37,

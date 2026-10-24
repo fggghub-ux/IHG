@@ -112,7 +112,7 @@ userLiveBackBtn &&
                 document.getElementById('yt-summary-views').textContent = userLiveTotalViews;
                 document.getElementById('yt-summary-hot').textContent = userLiveMaxHot;
                 document.getElementById('yt-summary-subs').textContent = '+' + userLiveNewSubs;
-                document.getElementById('yt-summary-sc').textContent = '￥' + userLiveTotalSC;
+                document.getElementById('yt-summary-sc').textContent = '$' + userLiveTotalSC;
                 if (userLiveSummarySheet) userLiveSummarySheet.classList.add('active');
             },
         });
@@ -234,7 +234,7 @@ ytWithdrawBtn &&
             window.showCustomModal({
                 title: '收益提现',
                 message:
-                    '确认将 YouTube 创作者收益 ￥' + total_3.toFixed(2) + ' 提现到 Pay 钱包吗？',
+                    '确认将 YouTube 创作者收益 $' + total_3.toFixed(2) + ' 提现到 Pay 钱包吗？',
                 confirmText: '确认提现',
                 cancelText: '取消',
                 onConfirm: () => {
@@ -248,7 +248,7 @@ ytWithdrawBtn &&
                 },
             });
         else {
-            if (confirm('确认提现 ￥' + total_3.toFixed(2) + ' 吗？')) {
+            if (confirm('确认提现 $' + total_3.toFixed(2) + ' 吗？')) {
                 channelState.dataCenter.sc = 0;
                 channelState.dataCenter.commission = 0;
                 saveYoutubeData();
@@ -811,7 +811,7 @@ function renderUserLiveLotteryPrizeRows(prizes_2 = null) {
                 <button type="button" class="yt-user-live-lottery-prize-remove" aria-label="删除奖项"><i class="fas fa-minus-circle"></i></button>
                 <div class="yt-lottery-prize-value">
                     <label class="yt-lottery-prize-amount-wrap">
-                        <span>¥</span>
+                        <span>$</span>
                         <input class="yt-lottery-prize-amount" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" aria-label="每位中奖者金额" placeholder="每人金额" value="` +
             (Number(prize_2.amount) > 0 ? Number(prize_2.amount) : '') +
             `">
@@ -883,10 +883,10 @@ function collectUserLiveLotteryConfig() {
                 Math.round(Number(row_2.querySelector('.yt-lottery-prize-amount')?.value) * 100) /
                 100;
             if (!Number.isFinite(amount_2) || amount_2 < 0.01 || amount_2 > 1000000) {
-                if (window.showToast) window.showToast(name_2 + '每人金额需为 ¥0.01–¥1,000,000');
+                if (window.showToast) window.showToast(name_2 + '每人金额需为 $0.01–$1,000,000');
                 return (row_2.querySelector('.yt-lottery-prize-amount')?.focus(), null);
             }
-            prize_3 = '¥' + amount_2.toFixed(2);
+            prize_3 = '$' + amount_2.toFixed(2);
             totalCashAmount_2 =
                 Math.round((totalCashAmount_2 + amount_2 * winnerCount_2) * 100) / 100;
         } else {
@@ -1502,7 +1502,7 @@ async function requestUserLiveLotteryFollowup(lottery_11) {
                               : '刚刚',
                           value_220 =
                               gift?.type === 'cash' && Number(gift?.cashAmount) > 0
-                                  ? ' · ¥' + Number(gift.cashAmount).toFixed(2) + ' 已收入 Pay'
+                                  ? ' · $' + Number(gift.cashAmount).toFixed(2) + ' 已收入 Pay'
                                   : '';
                       return (
                           `
@@ -1629,7 +1629,7 @@ userLiveLotteryConfirm &&
             const payBalance = Number(window.getPayBalance());
             if (!Number.isFinite(payBalance) || payBalance < config.totalCashAmount) {
                 if (window.showToast)
-                    window.showToast('Pay 余额不足，需要 ¥' + config.totalCashAmount.toFixed(2));
+                    window.showToast('Pay 余额不足，需要 $' + config.totalCashAmount.toFixed(2));
                 return;
             }
         }
@@ -1729,7 +1729,7 @@ function renderUserLiveChatRow(comment_6, element_242 = userLiveChatContainer) {
     if (comment_6.amount) {
         const value_244 =
             typeof comment_6.amount === 'number' || /^\d+(\.\d+)?$/.test(String(comment_6.amount))
-                ? '￥' + comment_6.amount
+                ? '$' + comment_6.amount
                 : comment_6.amount;
         element_243.classList.add('yt-user-live-superchat');
         element_243.style.backgroundColor = comment_6.color || '#8e8e93';
@@ -2670,7 +2670,7 @@ function addUserLiveChatMessage(name_7, text_6, amount_3, color_2, translationZh
         element_366.classList.add('yt-user-live-superchat');
         let value_367 = amount_3;
         (typeof amount_3 === 'number' || /^\d+(\.\d+)?$/.test(String(amount_3))) &&
-            (value_367 = '￥' + amount_3);
+            (value_367 = '$' + amount_3);
         element_366.style.backgroundColor = color_2 || '#8e8e93';
         element_366.style.padding = '8px 12px';
         element_366.style.borderRadius = '8px';

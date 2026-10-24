@@ -681,22 +681,13 @@
             true
         );
     }
-    function formatEntryTime(timestamp_3) {
-        const value_117 = Number(timestamp_3) || 0;
-        if (!value_117) return '未知时间';
-        const requestedSet_2 = new Date(value_117),
-            pad = (number) => String(number).padStart(2, '0');
-        return (
-            requestedSet_2.getFullYear() +
-            '-' +
-            pad(requestedSet_2.getMonth() + 1) +
-            '-' +
-            pad(requestedSet_2.getDate()) +
-            ' ' +
-            pad(requestedSet_2.getHours()) +
-            ':' +
-            pad(requestedSet_2.getMinutes())
-        );
+    function formatEntryTime(timestamp) {
+        const value = Number(timestamp) || 0;
+        if (!value) return '未知时间';
+        const date = new Date(value);
+        return window.imDataUtils?.formatUsDateTime
+            ? window.imDataUtils.formatUsDateTime(date)
+            : date.toLocaleString('en-US', { hour12: true });
     }
     function handleAction_5(entry_6, value_39) {
         const type_3 = String(entry_6?.type || 'text');

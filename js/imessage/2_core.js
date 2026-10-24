@@ -863,7 +863,7 @@ window.imApp.setActiveThemeSurface = function (surface = 'home') {
     if (!imessageView) return;
     imessageView.dataset.imActiveSurface = String(surface || 'home');
 };
-function applyGlobalSurfaceCss({ styleId: id_10, enabled: enabled_3, css: css_5, scope: scope_4 }) {
+    function applyGlobalSurfaceCss({ styleId: id_10, enabled: enabled_3, css: css_5, scope: scope_4 }) {
     let elementById_139 = document.getElementById(id_10);
     !elementById_139 &&
         ((elementById_139 = document.createElement('style')),
@@ -2414,7 +2414,8 @@ window.imApp.normalizeFriendData = function (friend_8) {
     normalized_2.isPinned = !!normalized_2.isPinned;
     normalized_2.unreadCount = Math.max(0, Number(normalized_2.unreadCount) || 0);
     normalized_2.showTimestamp = !!normalized_2.showTimestamp;
-    normalized_2.showEveryMessageAvatar = normalized_2.showEveryMessageAvatar === true;
+    normalized_2.avatarDisplayMode = normalized_2.avatarDisplayMode === 'two' ? 'two' : 'one';
+    delete normalized_2.showEveryMessageAvatar;
     normalized_2.continuousBubbles = normalized_2.continuousBubbles !== false;
     normalized_2.replyStyle = normalized_2.replyStyle === 'outside' ? 'outside' : 'inside';
     normalized_2.timeAware = normalized_2.timeAware !== false;
@@ -3808,7 +3809,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                     value_601 =
                                         '[User 赠送给你一份礼物]\n商品：' +
                                         value_635 +
-                                        '\n价值：¥' +
+                                        '\n价值：$' +
                                         value_636.toFixed(2) +
                                         (trim_637 ? '\n付款方式：' + trim_637 : '');
                                 } else {
@@ -3893,7 +3894,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                                         'family_card_pending'
                                                     )
                                                         value_601 =
-                                                            '[用户赠送给你一张额度 ¥' +
+                                                            '[用户赠送给你一张额度 $' +
                                                             payAmount.toFixed(2) +
                                                             ' 的亲属卡，等待你决定收下或退回。]';
                                                     else {
@@ -3902,7 +3903,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                                             'family_card_accepted'
                                                         )
                                                             value_601 =
-                                                                '[用户赠送给你的额度 ¥' +
+                                                                '[用户赠送给你的额度 $' +
                                                                 payAmount.toFixed(2) +
                                                                 ' 的亲属卡已被你收下。]';
                                                         else {
@@ -3911,7 +3912,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                                                 'family_card_rejected'
                                                             )
                                                                 value_601 =
-                                                                    '[用户赠送给你的额度 ¥' +
+                                                                    '[用户赠送给你的额度 $' +
                                                                     payAmount.toFixed(2) +
                                                                     ' 的亲属卡已被你退回。]';
                                                             else {
@@ -3920,7 +3921,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                                                     'family_card_unbound'
                                                                 )
                                                                     value_601 =
-                                                                        '[用户赠送给你的亲属卡已解绑，原额度为 ¥' +
+                                                                        '[用户赠送给你的亲属卡已解绑，原额度为 $' +
                                                                         payAmount.toFixed(2) +
                                                                         '。]';
                                                                 else {
@@ -3929,12 +3930,12 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                                                         'family_card_adjust'
                                                                     )
                                                                         value_601 =
-                                                                            '[用户将赠送给你的亲属卡额度从 ¥' +
+                                                                            '[用户将赠送给你的亲属卡额度从 $' +
                                                                             Number(
                                                                                 normalizedMessage_3.previousLimit ||
                                                                                     0,
                                                                             ).toFixed(2) +
-                                                                            ' 调整到 ¥' +
+                                                                            ' 调整到 $' +
                                                                             payAmount.toFixed(2) +
                                                                             '。]';
                                                                     else {
@@ -3957,7 +3958,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                                                                 'user_to_char'
                                                                             )
                                                                                 value_601 =
-                                                                                    '[用户刚刚向你转账 ¥' +
+                                                                                    '[用户刚刚向你转账 $' +
                                                                                     payAmount.toFixed(
                                                                                         2,
                                                                                     ) +
@@ -3972,7 +3973,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                                                                     'char_received'
                                                                                 )
                                                                                     value_601 =
-                                                                                        '[你刚刚收下了用户的一笔转账 ¥' +
+                                                                                        '[你刚刚收下了用户的一笔转账 $' +
                                                                                         payAmount.toFixed(
                                                                                             2,
                                                                                         ) +
@@ -3985,7 +3986,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                                                                         'char_to_user_pending'
                                                                                     )
                                                                                         value_601 =
-                                                                                            '[你刚刚向用户发起了一笔转账 ¥' +
+                                                                                            '[你刚刚向用户发起了一笔转账 $' +
                                                                                             payAmount.toFixed(
                                                                                                 2,
                                                                                             ) +
@@ -4000,7 +4001,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                                                                                 'user_received_from_char'
                                                                                         )
                                                                                             value_601 =
-                                                                                                '[用户已领取你的转账 ¥' +
+                                                                                                '[用户已领取你的转账 $' +
                                                                                                 payAmount.toFixed(
                                                                                                     2,
                                                                                                 ) +
@@ -4013,7 +4014,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                                                                                 'user_rejected_from_char'
                                                                                             )
                                                                                                 value_601 =
-                                                                                                    '[用户退回了你的转账 ¥' +
+                                                                                                    '[用户退回了你的转账 $' +
                                                                                                     payAmount.toFixed(
                                                                                                         2,
                                                                                                     ) +
@@ -4026,7 +4027,7 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
                                                                                                     normalizedMessage_3.payKind ===
                                                                                                         'user_to_char_rejected') &&
                                                                                                     (value_601 =
-                                                                                                        '[你刚刚退回了用户的转账 ¥' +
+                                                                                                        '[你刚刚退回了用户的转账 $' +
                                                                                                         payAmount.toFixed(
                                                                                                             2,
                                                                                                         ) +
@@ -4139,23 +4140,14 @@ window.imApp.buildLinkedAccountMemoryContext = function (value_183, options_8 = 
     const charName_2 = normalizedFriend_5.nickname || normalizedFriend_5.realName || 'Char',
         value_665 = options_8?.includeTime !== false,
         maxMessagesPerFriend_2 = Math.max(1, Number(options_8.maxMessagesPerFriend) || 4),
-        value_667 = (value_669) => {
-            const value_670 = Number(value_669) || 0;
-            if (!value_670) return '未知时间';
-            const startDate_2 = new Date(value_670),
-                value_672 = (value_673) => String(value_673).padStart(2, '0');
-            return (
-                startDate_2.getFullYear() +
-                '-' +
-                value_672(startDate_2.getMonth() + 1) +
-                '-' +
-                value_672(startDate_2.getDate()) +
-                ' ' +
-                value_672(startDate_2.getHours()) +
-                ':' +
-                value_672(startDate_2.getMinutes())
-            );
-        },
+        value_667 = (timestamp) => {
+        const value = Number(timestamp) || 0;
+        if (!value) return '未知时间';
+        const date = new Date(value);
+        return window.imDataUtils?.formatUsDateTime
+            ? window.imDataUtils.formatUsDateTime(date)
+            : date.toLocaleString('en-US', { hour12: true });
+    },
         lines = [
             'Linked Friend Memory / 关联好友记忆:',
             "These are private friend chats belonging to the character. They are context about the character's own friends, not messages from the current User.",
@@ -4253,23 +4245,14 @@ window.imApp.buildXDirectMessageMemoryContext = function (value_186, options_9 =
             String(value_22_2 == null ? '' : value_22_2)
                 .replace(/[<>]/g, (character) => (character === '<' ? '‹' : '›'))
                 .slice(0, 800),
-        formatTime_2 = (value_725) => {
-            const timestamp_4 = Number(value_725) || 0;
-            if (!timestamp_4) return 'Unknown time';
-            const startDate_3 = new Date(timestamp_4),
-                value_728 = (value_729) => String(value_729).padStart(2, '0');
-            return (
-                startDate_3.getFullYear() +
-                '-' +
-                value_728(startDate_3.getMonth() + 1) +
-                '-' +
-                value_728(startDate_3.getDate()) +
-                ' ' +
-                value_728(startDate_3.getHours()) +
-                ':' +
-                value_728(startDate_3.getMinutes())
-            );
-        },
+        formatTime_2 = (value) => {
+        const timestamp = Number(value) || 0;
+        if (!timestamp) return 'Unknown time';
+        const date = new Date(timestamp);
+        return window.imDataUtils?.formatUsDateTime
+            ? window.imDataUtils.formatUsDateTime(date)
+            : date.toLocaleString('en-US', { hour12: true });
+    },
         formatMessage = (message_13) => {
             if (!message_13 || typeof message_13 !== 'object') return '';
             const isPostCard = message_13.type === 'post-card',
@@ -5445,7 +5428,7 @@ const IM_CHAT_LIST_RENDER_DEBOUNCE_MS = 180;
 let imChatListRenderTimer = null;
 let imChatListRenderBatchDepth = 0;
 let imChatListRenderDirty = false;
-function isImChatConversationOpen() {
+    function isImChatConversationOpen() {
     if (document.hidden) return false;
     const activeFriendId = window.imData?.currentActiveFriend?.id;
     if (activeFriendId == null || activeFriendId === '') return false;
@@ -5459,7 +5442,7 @@ function isImChatConversationOpen() {
     const page_2 = document.getElementById('chat-interface-' + activeFriendId);
     return !!page_2 && page_2.style.display !== 'none';
 }
-function flushImChatListRender() {
+    function flushImChatListRender() {
     imChatListRenderTimer = null;
     if (!imChatListRenderDirty || imChatListRenderBatchDepth > 0 || isImChatConversationOpen())
         return;
@@ -7569,20 +7552,28 @@ window.addImFriend = async function (friendData_2) {
     if (window.showToast) window.showToast('已添加好友: ' + friend_25.nickname);
     return true;
 };
-window.imApp.formatTime = function (value_1347) {
-    if (!value_1347) return '';
-    const date_3 = new Date(value_1347),
-        now_4 = new Date(),
-        value_1350 = date_3.toDateString() === now_4.toDateString(),
-        yesterday = new Date(now_4);
-    yesterday.setDate(now_4.getDate() - 1);
-    const value_1352 = date_3.toDateString() === yesterday.toDateString(),
-        hours_2 = date_3.getHours().toString().padStart(2, '0'),
-        minutes_2 = date_3.getMinutes().toString().padStart(2, '0');
-    if (value_1350) return hours_2 + ':' + minutes_2;
-    if (value_1352) return 'Yesterday';
-    return date_3.getMonth() + 1 + '/' + date_3.getDate() + ' ' + hours_2 + ':' + minutes_2;
-};
+window.imApp.formatTime = function(timestamp) {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    if (Number.isNaN(date.getTime())) return '';
+    const now = new Date();
+    const dayNumber = value => Date.UTC(value.getFullYear(), value.getMonth(), value.getDate());
+    const dayDifference = Math.round((dayNumber(now) - dayNumber(date)) / 86400000);
+    const timeText = window.imDataUtils?.formatUsTime
+        ? window.imDataUtils.formatUsTime(date)
+        : date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    if (dayDifference === 0) return timeText;
+    if (dayDifference === 1) return 'Yesterday';
+    if (dayDifference >= 2 && dayDifference <= 6) {
+        return date.toLocaleDateString('en-US', { weekday: 'long' });
+    }
+    return date.toLocaleDateString('en-US', {
+        month: 'numeric',
+        day: 'numeric',
+        year: '2-digit'
+    });
+  };
 window.imApp.addMomentNotification = async function (
     type_2,
     user_6,
@@ -8247,8 +8238,38 @@ window.addEventListener('pagehide', () => {
             apk110New_1572.style.display =
                 hasReferenceFace && apk110New_1780 === 'novelai' ? 'block' : 'none';
     }
+    async function createSquareAvatarFromDataUrl(dataUrl, options = {}) {
+        const sourceUrl = String(dataUrl || '').trim();
+        if (!/^data:image\//i.test(sourceUrl)) return null;
+
+        const { size = 256, mimeType = 'image/jpeg', quality = 0.84 } = options;
+        const targetSize = Math.max(1, Math.min(512, Math.round(Number(size) || 256)));
+        const img = await loadImageFromDataUrl(sourceUrl);
+        const naturalWidth = img.naturalWidth || img.width || 0;
+        const naturalHeight = img.naturalHeight || img.height || 0;
+        const sourceSize = Math.min(naturalWidth, naturalHeight);
+        if (!sourceSize) return null;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = targetSize;
+        canvas.height = targetSize;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return null;
+
+        const sourceX = Math.max(0, Math.round((naturalWidth - sourceSize) / 2));
+        const sourceY = Math.max(0, Math.round((naturalHeight - sourceSize) / 2));
+        ctx.drawImage(img, sourceX, sourceY, sourceSize, sourceSize, 0, 0, targetSize, targetSize);
+        return canvasToDataUrl(canvas, mimeType, quality);
+    }
+    window.imApp.createSquareAvatarFromDataUrl = createSquareAvatarFromDataUrl;
+
     function showCustomModal_2(options_35) {
         if (!customModalOverlay) return;
+        customModalOverlay.dataset.keepBackground = String(options_35.isolateChatBackground === true);
+        if (!options_35.isolateChatBackground) {
+            customModalOverlay.classList.remove('im-chat-back-count-modal', 'im-chats-status-modal');
+            if (modalInput) modalInput.inputMode = 'text';
+        }
         count_478++;
         handleAction_480(false);
         modalTitle.textContent = options_35.title || '提示';
@@ -8477,6 +8498,8 @@ window.addEventListener('pagehide', () => {
         handleAction_480(false);
         if (customModalOverlay.contains(document.activeElement)) document.activeElement.blur();
         customModalOverlay.classList.remove('active');
+        customModalOverlay.classList.remove('im-chat-back-count-modal', 'im-chats-status-modal');
+        if (modalInput) modalInput.inputMode = 'text';
         const closingSession = count_478;
         setTimeout(() => {
             if (closingSession === count_478 && !customModalOverlay.classList.contains('active')) {
@@ -10220,19 +10243,10 @@ window.addEventListener('pagehide', () => {
         if (selected_5) return selected_5;
         return getMemoryFriends()[0] || null;
     }
-    function formatManualMemoryTime(startDate_7 = new Date()) {
-        const value_1709 = (value_1710) => String(value_1710).padStart(2, '0');
-        return (
-            startDate_7.getFullYear() +
-            '年' +
-            value_1709(startDate_7.getMonth() + 1) +
-            '月' +
-            value_1709(startDate_7.getDate()) +
-            '日 ' +
-            value_1709(startDate_7.getHours()) +
-            ':' +
-            value_1709(startDate_7.getMinutes())
-        );
+    function formatManualMemoryTime(date = new Date()) {
+        return window.imDataUtils?.formatUsDateTime
+            ? window.imDataUtils.formatUsDateTime(date)
+            : date.toLocaleString('en-US', { hour12: true });
     }
     function handleAction_1428(value_52_2) {
         if (window.imChat?.normalizeMemoryTriggerKeywords)

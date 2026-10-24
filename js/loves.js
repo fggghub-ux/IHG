@@ -881,7 +881,7 @@ window.lovesApp = {
     formatMoney: function (amount_2) {
         const value_27 = Number(amount_2) || 0;
         return (
-            '¥' +
+            '$' +
             value_27.toLocaleString('zh-CN', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
@@ -3585,7 +3585,7 @@ User 刚刚在这条 Char 动态下评论：` + options_6.userComment);
                             '[支付卡片] ' +
                             (msg_2.description || msg_2.cardTitle || '') +
                             ' ' +
-                            (msg_2.amount ? '¥' + Number(msg_2.amount).toFixed(2) : '')
+                            (msg_2.amount ? '$' + Number(msg_2.amount).toFixed(2) : '')
                         ).trim()),
                     (content_2 = String(content_2 || '[特殊消息]')
                         .replace(/<[^>]+>/g, '')
@@ -3608,7 +3608,7 @@ User 刚刚在这条 Char 动态下评论：` + options_6.userComment);
             `你现在扮演 Char，需要处理情侣共享存钱罐的一次提款请求。
 
 【提款请求】
-User 想从存钱罐提款：¥` +
+User 想从存钱罐提款：$` +
             amount_4.toFixed(2) +
             `
 提款理由：` +
@@ -3870,7 +3870,7 @@ Char 已存：` +
                 payKind: 'system_notification',
                 payDirection: 'char_to_user',
                 amount: amount_5,
-                description: value_521 + ' ¥' + amount_5.toFixed(2),
+                description: value_521 + ' $' + amount_5.toFixed(2),
                 payerName: value_518,
                 payeeName: value_519,
                 senderName: value_518,
@@ -3878,7 +3878,7 @@ Char 已存：` +
                 targetName: value_519,
                 cardTitle: value_521,
                 payStatus: 'completed',
-                content: '[亲属卡] ' + value_521 + ' ¥' + amount_5.toFixed(2),
+                content: '[亲属卡] ' + value_521 + ' $' + amount_5.toFixed(2),
                 timestamp: timestamp_7,
             };
         }
@@ -3898,7 +3898,7 @@ Char 已存：` +
             targetName: value_519,
             cardTitle: '转账',
             payStatus: 'pending',
-            content: '[转账] ' + description_2 + ' ¥' + amount_5.toFixed(2),
+            content: '[转账] ' + description_2 + ' $' + amount_5.toFixed(2),
             timestamp: timestamp_7,
         };
     },
@@ -7588,7 +7588,7 @@ Extracted:`,
                                             <div style="font-size: 11px; color: ` +
                                             subtitleColor +
                                             `; margin-bottom: 4px; font-weight: 500;">当前金额</div>
-                                            <div style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">¥ ` +
+                                            <div style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">$ ` +
                                             value_492.amount +
                                             `</div>
                                         </div>
