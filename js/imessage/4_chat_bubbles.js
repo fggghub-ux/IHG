@@ -5254,7 +5254,9 @@
         const value_824 =
             '<div class="chat-bubble ' +
             (value_418 ? 'user-bubble' : 'ai-bubble') +
-            ' im-card-bubble voice-message-bubble' +
+            ((!friend_33.type || friend_33.type === 'char') && !value_418
+                ? ' im-text-bubble-shell voice-message-bubble'
+                : ' im-card-bubble voice-message-bubble') +
             (value_823 ? ' has-voice-actions' : '') +
             '">' +
             apk111New_1111 +

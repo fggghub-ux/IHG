@@ -353,12 +353,21 @@ const {execFileSync} = require('node:child_process');
                 const toggleLabel=getComputedStyle(document.getElementById('chat-avatar-toggle').closest('.form-item').querySelector('label'));
                 const divider=getComputedStyle(body), other=getComputedStyle(body.nextElementSibling);
                 return (getComputedStyle(body).display==='flex' &&
-                    label.color===toggleLabel.color && own.fontSize===reference.fontSize &&
+                    label.color===toggleLabel.color && label.fontSize===toggleLabel.fontSize && own.fontSize===reference.fontSize &&
                     own.fontFamily===reference.fontFamily && own.fontWeight===reference.fontWeight &&
                     own.color===reference.color && own.backgroundColor===reference.backgroundColor &&
                     own.borderTopWidth==='0px' && !!select.nextElementSibling?.classList.contains('fa-chevron-right') &&
                     divider.borderBottomWidth===other.borderBottomWidth && divider.borderBottomColor===other.borderBottomColor) ||
                     {label:label.color,toggle:toggleLabel.color,font:own.fontSize,reference:reference.fontSize,border:divider.borderBottom,other:other.borderBottom};
+            });
+            await check('Avatar row has toggle-row height and vertically centered contents', () => {
+                const row=document.getElementById('avatar-position-body');
+                const toggle=document.getElementById('chat-avatar-toggle').closest('.form-item');
+                const r=row.getBoundingClientRect(),t=toggle.getBoundingClientRect();
+                const elements=[row.querySelector('label'),row.querySelector('select'),row.querySelector('.arrow')];
+                return (r.height===t.height && elements.every(e=>{
+                    const b=e.getBoundingClientRect();return Math.abs((b.top+b.bottom-r.top-r.bottom)/2)<1;
+                }) && getComputedStyle(row.querySelector('.arrow')).fontSize===getComputedStyle(document.getElementById('chat-language-select').nextElementSibling).fontSize) || {row:r.height,toggle:t.height,contents:elements.map(e=>e.getBoundingClientRect().toJSON())};
             });
             await page.evaluate(() => window.closeView(document.getElementById('chat-settings-sheet')));
             await page.waitForFunction(
@@ -385,6 +394,29 @@ const {execFileSync} = require('node:child_process');
                         avatars: p.querySelectorAll('.im-message-avatar').length,
                     }
                 );
+            });
+            await check('Character voice shares text shell in both avatar modes and tail states', async () => {
+                const page=document.getElementById('chat-interface-ui-char');
+                for(const mode of ['one','two']) {
+                    const f={...window.imApp.getFriendById('ui-char'),showAvatar:true,avatarDisplayMode:mode};
+                    const host=document.createElement('div');host.className='ins-chat-messages';page.appendChild(host);
+                    window.imChat.renderMessageBubble({id:'shell-text',role:'assistant',type:'text',content:'Text',timestamp:Date.now()},f,host);
+                    window.imChat.renderMessageBubble({id:'shell-voice',role:'assistant',type:'voice_message',transcript:'Voice',duration:4,timestamp:Date.now()},f,host);
+                    const voice=host.querySelector('.voice-message-bubble'),text=host.querySelector('.ai-bubble:not(.voice-message-bubble)');
+                    if(voice.classList.contains('im-card-bubble')||!voice.querySelector('.voice-message-bubble-inner')||voice.querySelectorAll('.voice-message-action').length!==2) {host.remove();return 'voice internals or shell class';}
+                    for(const grouped of [true,false]) {
+                        for(const row of host.querySelectorAll('.chat-row')) {row.classList.toggle('has-prev',grouped);row.classList.toggle('has-next',grouped);}
+                        void host.offsetWidth;
+                        await Promise.all(host.getAnimations({subtree:true}).filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})));
+                        const a=getComputedStyle(voice),b=getComputedStyle(text);
+                        for(const key of ['backgroundColor','borderTopLeftRadius','borderBottomLeftRadius','paddingTop','paddingLeft'])
+                            if(a[key]!==b[key]){const result={mode,grouped,key,voice:a[key],text:b[key]};host.remove();return result;}
+                        const va=getComputedStyle(voice,'::after'),ta=getComputedStyle(text,'::after');
+                        if(va.content!==ta.content||va.backgroundImage!==ta.backgroundImage){host.remove();return {mode,grouped,voiceTail:va.content,textTail:ta.content};}
+                    }
+                    host.remove();
+                }
+                return true;
             });
             await check('outside timestamps show only at the end of each turn in US format', async () => {
                 const a = window.imApp, f = a.getFriendById('ui-char');

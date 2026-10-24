@@ -2668,7 +2668,7 @@
     font-size: 11px;
     font-weight: 400;
 }
-:scope .chat-bubble:not(.im-card-bubble):not(.voice-message-bubble) {
+:scope .chat-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell) {
     max-width: 77%;
     padding: calc(8px * var(--theme-font-scale, 1)) calc(12px * var(--theme-font-scale, 1));
     border: 0;
@@ -2677,23 +2677,23 @@
     font-size: 15px;
     line-height: 1.5;
 }
-:scope .user-bubble:not(.im-card-bubble):not(.voice-message-bubble) {
+:scope .user-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell) {
     background-color: #a0a0a0;
     color: #fff;
 }
-:scope .ai-bubble:not(.im-card-bubble):not(.voice-message-bubble) {
+:scope .ai-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell) {
     background-color: #e9e9ea;
     color: #000;
 }
-:scope .user-row.has-prev .user-bubble:not(.im-card-bubble):not(.voice-message-bubble),
-:scope .user-row.has-next .user-bubble:not(.im-card-bubble):not(.voice-message-bubble),
-:scope .ai-row.has-prev .ai-bubble:not(.im-card-bubble):not(.voice-message-bubble),
-:scope .ai-row.has-next .ai-bubble:not(.im-card-bubble):not(.voice-message-bubble) {
+:scope .user-row.has-prev .user-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell),
+:scope .user-row.has-next .user-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell),
+:scope .ai-row.has-prev .ai-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell),
+:scope .ai-row.has-next .ai-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell) {
     border-radius: 22px;
 }
 :scope
     .chat-row:not(.has-next)
-    .chat-bubble:not(.im-card-bubble):not(.voice-message-bubble)::after {
+    .chat-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell)::after {
     content: '';
     position: absolute;
     width: 15px;
@@ -2704,7 +2704,7 @@
 }
 :scope
     .chat-row:not(.has-next)
-    .user-bubble:not(.im-card-bubble):not(.voice-message-bubble)::after {
+    .user-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell)::after {
     right: 7px;
     bottom: -5px;
     transform-origin: bottom left;
@@ -2713,7 +2713,7 @@
 }
 :scope
     .chat-row:not(.has-next)
-    .ai-bubble:not(.im-card-bubble):not(.voice-message-bubble)::after {
+    .ai-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell)::after {
     left: -7px;
     bottom: -10px;
     transform-origin: bottom right;
@@ -3180,7 +3180,7 @@
 :scope .chat-row.ai-row + .chat-row.user-row {
     margin-top: 35px;
 }
-:scope .chat-bubble:not(.im-card-bubble):not(.voice-message-bubble) {
+:scope .chat-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell) {
     max-width: 77%;
     padding: calc(8px * var(--theme-font-scale, 1)) calc(12px * var(--theme-font-scale, 1));
     border: 0;
@@ -3189,23 +3189,23 @@
     font-size: 15px;
     line-height: 1.5;
 }
-:scope .user-bubble:not(.im-card-bubble):not(.voice-message-bubble) {
+:scope .user-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell) {
     background-color: #a0a0a0;
     color: #fff;
 }
-:scope .ai-bubble:not(.im-card-bubble):not(.voice-message-bubble) {
+:scope .ai-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell) {
     background-color: #e9e9ea;
     color: #000;
 }
-:scope .user-row.has-prev .user-bubble:not(.im-card-bubble):not(.voice-message-bubble),
-:scope .user-row.has-next .user-bubble:not(.im-card-bubble):not(.voice-message-bubble),
-:scope .ai-row.has-prev .ai-bubble:not(.im-card-bubble):not(.voice-message-bubble),
-:scope .ai-row.has-next .ai-bubble:not(.im-card-bubble):not(.voice-message-bubble) {
+:scope .user-row.has-prev .user-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell),
+:scope .user-row.has-next .user-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell),
+:scope .ai-row.has-prev .ai-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell),
+:scope .ai-row.has-next .ai-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell) {
     border-radius: 22px;
 }
 :scope
     .chat-row:not(.has-next)
-    .chat-bubble:not(.im-card-bubble):not(.voice-message-bubble)::after {
+    .chat-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell)::after {
     content: '';
     position: absolute;
     width: 15px;
@@ -3216,7 +3216,7 @@
 }
 :scope
     .chat-row:not(.has-next)
-    .user-bubble:not(.im-card-bubble):not(.voice-message-bubble)::after {
+    .user-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell)::after {
     right: 7px;
     bottom: -5px;
     transform-origin: bottom left;
@@ -3225,7 +3225,7 @@
 }
 :scope
     .chat-row:not(.has-next)
-    .ai-bubble:not(.im-card-bubble):not(.voice-message-bubble)::after {
+    .ai-bubble:is(:not(.im-card-bubble):not(.voice-message-bubble), .im-text-bubble-shell)::after {
     left: -7px;
     bottom: -10px;
     transform-origin: bottom right;
