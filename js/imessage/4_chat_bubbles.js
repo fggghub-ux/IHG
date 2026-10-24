@@ -2723,7 +2723,29 @@
         };
         overlay.addEventListener('click', close);
     }
-    function renderGiftBubble(msg, friend, container, timestamp = Date.now()) {
+    // Invitations share the gift presentation, but keep their own immutable state.
+    function getLovesInvitationStatus(message) {
+        const content = String(message?.content || message?.text || '');
+        const explicit = content.match(/data-loves-invitation=["'](pending|received)["']/)?.[1];
+        if (explicit) return explicit;
+        // Old saved HTML is recognized at render time; its UI is never mounted.
+        if (!/class=["'][^"']*\b(?:loves|lover)-invite-bubble\b/.test(content)) return null;
+        return /邀请已接受|我接受了你的邀请|TA 已接受|我已经接受/.test(content + ' ' + (message.text || ''))
+            ? 'received' : 'pending';
+    }
+    function buildGiftStyleCardHtml(received, timestamp, invitationStatus = null) {
+        const bowSvg =
+            '<svg class="gift-message-bow" viewBox="0 0 52 58" fill="none" aria-hidden="true"><path d="M25.8 27.5C16 16.1 7.4 15.1 5 20.3c-2.8 6.2 7.5 11.3 20.8 7.2Zm.4 0C36 16.1 44.6 15.1 47 20.3c2.8 6.2-7.5 11.3-20.8 7.2ZM26 27.5V56M13 31l13-3.5L7.5 48M39 31l-13-3.5L44.5 48M26 27.5V3" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        return `
+            <div class="gift-message-card im-card-content${received ? ' is-received' : ''}${invitationStatus ? ' loves-invitation-card' : ''}" ${invitationStatus ? `data-loves-invitation="${invitationStatus}"` : `data-gift-timestamp="${timestamp}" role="button" tabindex="0"`}>
+                <div class="gift-message-main">${bowSvg}<div class="gift-message-copy"><div class="gift-message-title">${invitationStatus ? 'Lover Invitation' : 'A Gift For You'}</div>${received ? '<div class="gift-message-status">Received</div>' : ''}</div></div>
+                <div class="gift-message-footer">${invitationStatus ? 'Lover' : 'Gift'}</div>
+            </div>`;
+    }
+    window.imChat.buildLovesInvitationCardHtml = status =>
+        buildGiftStyleCardHtml(status === 'received', null, status === 'received' ? 'received' : 'pending');
+
+    function renderGiftBubble(msg, friend, container, timestamp = Date.now(), invitationStatus = null) {
         const isUser = msg.role === 'user';
         const rows = Array.from(container.children).filter((el) =>
             el.classList?.contains('chat-row'),
@@ -2737,16 +2759,10 @@
         const row = document.createElement('div');
         row.className = `chat-row ${isUser ? 'user-row' : 'ai-row'}${hasPrev ? ' has-prev' : ''}`;
         row.dataset.timestamp = String(timestamp);
-        row.dataset.messageId = window.imChat.ensureMessageId(msg, 'gift');
+        row.dataset.messageId = window.imChat.ensureMessageId(msg, invitationStatus ? 'html' : 'gift');
         handleAction_20(row, friend, msg);
-        const data = normalizeGiftMessage(msg);
-        const bowSvg =
-            '<svg class="gift-message-bow" viewBox="0 0 52 58" fill="none" aria-hidden="true"><path d="M25.8 27.5C16 16.1 7.4 15.1 5 20.3c-2.8 6.2 7.5 11.3 20.8 7.2Zm.4 0C36 16.1 44.6 15.1 47 20.3c2.8 6.2-7.5 11.3-20.8 7.2ZM26 27.5V56M13 31l13-3.5L7.5 48M39 31l-13-3.5L44.5 48M26 27.5V3" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-        const card = `
-            <div class="gift-message-card im-card-content${data.status === 'received' ? ' is-received' : ''}" data-gift-timestamp="${timestamp}" role="button" tabindex="0">
-                <div class="gift-message-main">${bowSvg}<div class="gift-message-copy"><div class="gift-message-title">A Gift For You</div>${data.status === 'received' ? '<div class="gift-message-status">Received</div>' : ''}</div></div>
-                <div class="gift-message-footer">Gift</div>
-            </div>`;
+        const data = invitationStatus ? {status: invitationStatus} : normalizeGiftMessage(msg);
+        const card = buildGiftStyleCardHtml(data.status === 'received', timestamp, invitationStatus);
         const headerHtml = buildMessageHeaderHtml(
             isUser,
             friend,
@@ -2758,12 +2774,12 @@
         );
         row.innerHTML = `<div class="chat-checkbox-wrapper" style="display:${window.imData.batchSelectMode ? 'flex' : 'none'};width:40px;justify-content:center;align-items:flex-end;padding-bottom:10px;flex-shrink:0;"><i class="far fa-circle chat-checkbox" data-timestamp="${timestamp}" style="color:#c7c7cc;font-size:22px;"></i></div><div style="flex:1;display:flex;flex-direction:column;min-width:0;">${headerHtml}<div style="display:flex;justify-content:${isUser ? 'flex-end' : 'flex-start'};align-items:flex-end;width:100%;"><div class="chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'} im-card-bubble gift-message-bubble">${card}</div></div></div>`;
         const cardEl = row.querySelector('.gift-message-card');
-        cardEl?.addEventListener('click', (event) => {
+        if (!invitationStatus) cardEl?.addEventListener('click', (event) => {
             event.preventDefault();
             event.stopPropagation();
             openGiftDetailOverlay(msg, friend, cardEl);
         });
-        cardEl?.addEventListener('keydown', (event) => {
+        if (!invitationStatus) cardEl?.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
                 openGiftDetailOverlay(msg, friend, cardEl);
@@ -6974,6 +6990,8 @@
     window.imChat.renderPayTransferBubble = renderPayTransferBubble_2;
     window.imChat.renderVoiceMessageBubble = renderVoiceMessageBubble_2;
     function renderHtmlBubble_2(msg_29, value_588, element_589, value_590 = Date.now()) {
+        const invitationStatus = getLovesInvitationStatus(msg_29);
+        if (invitationStatus) return renderGiftBubble(msg_29, value_588, element_589, value_590, invitationStatus);
         const value_591 = msg_29.role === 'user';
         const lastElementChild_592 = element_589.lastElementChild;
         let enabled_593 = false;

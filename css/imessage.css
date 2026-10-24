@@ -5387,7 +5387,7 @@ button.group-private-chat-detail-bubble {
 .group-red-packet-status { margin-top: 4px; color: #8e8e93; font-size: 12px; }
 .group-red-packet-amount { display: block; margin-top: 10px; color: #111; font-size: 26px; font-weight: 800; letter-spacing: .2px; }
 
-/* Keep the original shared card rules; apply GPT sizing only to Loves invitations. */
+/* Shared HTML card sizing. Loves invitations use the gift-card renderer. */
 :where(.html-bubble).im-card-bubble {
     position: relative;
     max-width: min(72%, 260px);
@@ -5398,16 +5398,6 @@ button.group-private-chat-detail-bubble {
     max-width: 100%;
     box-sizing: border-box;
 }
-.im-chat-char .chat-row .html-bubble.im-card-bubble:has(.loves-invite-bubble, .lover-invite-bubble) {
-    max-width: min(72%, 260px) !important;
-}
-.im-chat-char .chat-row .html-bubble.im-card-bubble .loves-invite-bubble,
-.im-chat-char .chat-row .html-bubble.im-card-bubble .lover-invite-bubble {
-    width: min(62vw, 220px) !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-}
-
 :where(.html-bubble.im-card-bubble) .im-together-invite-card {
     width: min(70vw, 252px);
     max-width: 100%;

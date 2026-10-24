@@ -3988,13 +3988,7 @@ Char 已存：` +
                                     : 'msg_' + Date.now(),
                             sender: msg_3.sender,
                             role: 'assistant',
-                            content: `<div class="loves-invite-bubble" style="background:#fff; border-radius:16px; padding:12px; border:1px solid #e5e5ea;  color:#111; max-width:220px; margin:2px;">
-                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                                    <div style="width:28px; height:28px; border-radius:8px; background:#ff2d55; color:#fff; display:flex; justify-content:center; align-items:center; font-size:14px;"><i class="fas fa-heart"></i></div>
-                                    <div style="font-size:14px; font-weight:700;">邀请已接受</div>
-                                </div>
-                                <div style="font-size:13px; color:#333; line-height:1.4;">TA 已接受了你的情侣空间邀请。</div>
-                            </div>`,
+                            content: window.imChat.buildLovesInvitationCardHtml('received'),
                             text: '【邀请已接受】TA 已接受了你的情侣空间邀请。',
                             timestamp: Date.now(),
                             time: new Date().toLocaleTimeString('zh-CN', {
@@ -4036,13 +4030,7 @@ Char 已存：` +
                     : 'msg_' + Date.now(),
             sender: friend_16.id,
             role: 'assistant',
-            content: `<div class="loves-invite-bubble" style="background:#fff; border-radius:16px; padding:12px; border:1px solid #e5e5ea;  color:#111; max-width:220px; margin:2px;">
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                    <div style="width:28px; height:28px; border-radius:8px; background:#ff2d55; color:#fff; display:flex; justify-content:center; align-items:center; font-size:14px;"><i class="fas fa-heart"></i></div>
-                    <div style="font-size:14px; font-weight:700;">邀请已接受</div>
-                </div>
-                <div style="font-size:13px; color:#333; line-height:1.4;">我已经接受了你的情侣空间邀请，现在我们可以一起使用了。</div>
-            </div>`,
+            content: window.imChat.buildLovesInvitationCardHtml('received'),
             text: '【情侣空间】我接受了你的邀请',
             timestamp: lovesSpaceStartTime_2 - 100,
             type: 'html',
@@ -4257,14 +4245,7 @@ Char 已存：` +
                     : 'msg_' + Date.now(),
             sender: 'me',
             role: 'user',
-            content: `<div class="loves-invite-bubble" style="background:#fff; border-radius:16px; padding:12px; border:1px solid #e5e5ea;  color:#111; max-width:220px; margin:2px;">
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                    <div style="width:28px; height:28px; border-radius:8px; background:#000; color:#fff; display:flex; justify-content:center; align-items:center; font-size:14px;"><i class="fas fa-heart"></i></div>
-                    <div style="font-size:14px; font-weight:700;">Loves 邀请</div>
-                </div>
-                <div style="font-size:13px; color:#333; line-height:1.4; margin-bottom:8px;">我向你发送了情侣空间的邀请，快来接受吧！</div>
-                <div style="font-size:11px; color:#8e8e93;">点击接受进入专属空间</div>
-            </div>`,
+            content: window.imChat.buildLovesInvitationCardHtml('pending'),
             text: '【情侣空间邀请】我向你发送了情侣空间的邀请，快来接受吧！',
             timestamp: Date.now(),
             time: new Date().toLocaleTimeString('zh-CN', {

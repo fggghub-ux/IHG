@@ -258,10 +258,41 @@ const {execFileSync} = require('node:child_process');
                 host.className='ins-chat-messages avatar-mode-two';
                 document.getElementById('chat-interface-ui-char').appendChild(host);
                 window.imChat.renderMessageBubble({id:'loves-regression',role:'user',type:'html',content:'<div class="loves-invite-bubble" style="max-width:220px;padding:12px;margin:2px;border:1px solid #ddd;border-radius:16px">Loves 邀请<br>我向你发送了情侣空间的邀请，快来接受吧！</div>',timestamp:Date.now()},f,host);
-                const row=host.querySelector('.chat-row'), card=row.querySelector('.loves-invite-bubble'), avatar=row.querySelector('.im-message-avatar');
+                const row=host.querySelector('.chat-row'), card=row.querySelector('.loves-invitation-card'), avatar=row.querySelector('.im-message-avatar');
                 const a=avatar.getBoundingClientRect(),b=card.getBoundingClientRect();
                 const result=a.left>=b.right+5 && b.width<=220 && b.width>100 || {avatar:a.toJSON(),card:b.toJSON()};
                 host.remove();return result;
+            });
+            await check('Loves cards share gift geometry in both directions and all avatar modes', async () => {
+                const pane=document.getElementById('chat-interface-ui-char');
+                const host=document.createElement('div');host.className='ins-chat-messages';pane.appendChild(host);
+                const snapshot=()=>{
+                    const row=host.querySelector('.chat-row'),card=row.querySelector('.gift-message-card'),r=card.getBoundingClientRect(),rr=row.getBoundingClientRect(),avatar=row.querySelector('.im-message-avatar'),header=row.querySelector('.chat-message-header');
+                    const style=getComputedStyle(card),tail=getComputedStyle(card,'::after');
+                    return {width:r.width,height:r.height,left:r.left-rr.left,top:r.top-rr.top,background:style.backgroundImage,tail:[tail.left,tail.right,tail.borderLeftColor,tail.borderRightColor],avatar:avatar?{x:avatar.getBoundingClientRect().x-r.x,y:avatar.getBoundingClientRect().y-r.y}:null,headerGap:header?r.top-header.getBoundingClientRect().bottom:null,bow:card.querySelector('path').getAttribute('d')};
+                };
+                for(const mode of ['none','one','two'])for(const role of ['user','assistant'])for(const status of ['pending','received']) {
+                    const f={...window.imApp.getFriendById('ui-char'),showAvatar:mode!=='none',avatarDisplayMode:mode==='none'?'one':mode};
+                    const base={id:'loves-geometry',role,timestamp:Date.now()};
+                    host.replaceChildren();window.imChat.renderMessageBubble({...base,type:'gift',giftStatus:status},f,host);
+                    await Promise.all(host.getAnimations({subtree:true}).filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})));
+                    const gift=snapshot();
+                    host.replaceChildren();window.imChat.renderMessageBubble({...base,type:'html',content:window.imChat.buildLovesInvitationCardHtml(status)},f,host);
+                    await Promise.all(host.getAnimations({subtree:true}).filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})));
+                    const loves=snapshot(),card=host.querySelector('.loves-invitation-card');
+                    if(JSON.stringify(gift)!==JSON.stringify(loves)||card.hasAttribute('data-gift-timestamp')||card.querySelector('.gift-message-title').textContent!=='Lover Invitation'||card.querySelector('.gift-message-footer').textContent!=='Lover'||!!card.querySelector('.gift-message-status')!==(status==='received')){host.remove();return {mode,role,status,gift,loves};}
+                }
+                host.remove();return true;
+            });
+            await check('old Loves HTML renders only new fixed-state cards without changing saved messages',()=>{
+                const host=document.createElement('div'),f={...window.imApp.getFriendById('ui-char'),showAvatar:false};
+                const invite={id:'old-loves-invite',role:'user',type:'html',timestamp:Date.now(),content:'<div class="loves-invite-bubble"><strong>Loves 邀请</strong>我向你发送了情侣空间的邀请，快来接受吧！</div>'};
+                const accepted={id:'old-loves-accepted',role:'assistant',type:'html',timestamp:Date.now()+1,content:'<div class="loves-invite-bubble">邀请已接受<br>我已经接受了你的情侣空间邀请，现在我们可以一起使用了。</div>'};
+                const before=JSON.stringify([invite,accepted]);
+                window.imChat.renderMessageBubble(invite,f,host);window.imChat.renderMessageBubble(accepted,f,host);
+                window.imChat.renderMessageBubble({id:'loves-after',role:'assistant',type:'text',content:'Later reply',timestamp:Date.now()+2},f,host);
+                const cards=[...host.querySelectorAll('.loves-invitation-card')];
+                return cards.length===2&&!cards[0].classList.contains('is-received')&&cards[1].classList.contains('is-received')&&!host.querySelector('.loves-invite-bubble,.lover-invite-bubble')&&!host.textContent.includes('快来接受吧')&&JSON.stringify([invite,accepted])===before;
             });
             await page.evaluate(() =>
                 document.querySelector('#chat-interface-ui-char .chat-back-btn').click(),
@@ -1255,8 +1286,8 @@ const {execFileSync} = require('node:child_process');
                         content:'<div class="loves-invite-bubble" style="background:#fff;border-radius:16px;padding:12px;border:1px solid #e5e5ea;max-width:220px;margin:2px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="width:28px;height:28px;border-radius:8px;background:#000;color:#fff"><i class="fas fa-heart"></i></div><strong>Loves 邀请</strong></div><div style="font-size:13px;line-height:1.4">我向你发送了情侣空间的邀请，快来接受吧！</div></div>'};
                     const original=message.content;window.imChat.renderMessageBubble(message,friend,h);
                     await Promise.all(h.getAnimations({subtree:true}).filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})));
-                    const row=h.querySelector('[data-message-id="char-loves-check"]'),card=row?.querySelector('.loves-invite-bubble'),style=card&&getComputedStyle(card),r=card?.getBoundingClientRect();
-                    if(!row?.classList.contains('ai-row')||!r?.width||!r?.height||style.display==='none'||style.visibility==='hidden'||Number(style.opacity)===0||message.content!==original||!card.textContent.includes('Loves 邀请'))return {mode,style:style?.cssText,rect:r?.toJSON()};
+                    const row=h.querySelector('[data-message-id="char-loves-check"]'),card=row?.querySelector('.loves-invitation-card'),style=card&&getComputedStyle(card),r=card?.getBoundingClientRect();
+                    if(!row?.classList.contains('ai-row')||!r?.width||!r?.height||style.display==='none'||style.visibility==='hidden'||Number(style.opacity)===0||message.content!==original||!card.textContent.includes('Lover Invitation'))return {mode,style:style?.cssText,rect:r?.toJSON()};
                 }
                 return true;
             });
@@ -1306,6 +1337,43 @@ const {execFileSync} = require('node:child_process');
                 return (m.type==='image'&&m.imageSource==='real'&&m.description==='Album composer test'&&m.albumImages.length===2&&!!row?.querySelector('.photo-batch-summary'))||{type:m.type,source:m.imageSource,description:m.description,count:m.albumImages?.length,hasRow:!!row,hasAlbum:!!row?.querySelector('.photo-batch-summary')};
             });
             await page.evaluate(()=>{window.imChat.maybeAutoReplyAfterUserMessage=window.__albumAutoReply;delete window.__albumAutoReply;});
+            await page.evaluate(async()=>{
+                await window.imApp.commitFriendsChange(()=>window.imData.friends.push({id:'ui-loves',type:'char',nickname:'Loves Test',messages:[]}));
+                const f=window.imApp.getFriendById('ui-loves');await window.imChat.openChatTab(f);
+                window.__lovesDailySync=window.lovesApp.syncDailySavingsForFriend;
+                window.lovesApp.syncDailySavingsForFriend=async()=>{};
+                await window.lovesApp.sendInviteCard(f);
+                // The invitation is sent in Loves; entering its chat renders saved history.
+                await window.imChat.openChatTab(window.imApp.getFriendById('ui-loves'));
+            });
+            await check('actual Loves send preserves pending state and creates new invitation card',()=>{
+                const f=window.imApp.getFriendById('ui-loves'),m=f.messages.at(-1);
+                return f.pendingLovesInvite&&!f.hasLovesSpace&&m.role==='user'&&m.content.includes('data-loves-invitation="pending"')&&!m.content.includes('快来接受吧');
+            });
+            await page.evaluate(async()=>{
+                await window.lovesApp.handleInviteAccepted(window.imApp.getFriendById('ui-loves'));
+                const f=window.imApp.getFriendById('ui-loves'),h=document.querySelector('#chat-interface-ui-loves .ins-chat-messages');
+                window.imChat.renderMessageBubble({id:'loves-normal-reply',role:'assistant',type:'text',content:'Reply after acceptance',timestamp:Date.now()+1000},f,h);
+            });
+            await check('actual Loves acceptance creates a separate received card and keeps sender invitation blue',()=>{
+                const f=window.imApp.getFriendById('ui-loves'),h=document.querySelector('#chat-interface-ui-loves .ins-chat-messages');
+                const cards=[...h.querySelectorAll('.loves-invitation-card')];
+                return (f.hasLovesSpace&&!f.pendingLovesInvite&&f.messages.filter(m=>m.type==='html').length===2&&cards.length===2&&!cards[0].classList.contains('is-received')&&cards[1].classList.contains('is-received')&&cards[1].querySelector('.gift-message-status').textContent==='Received'&&!h.querySelector('.gift-detail-overlay'))||{space:f.hasLovesSpace,pending:f.pendingLovesInvite,messages:f.messages.map(m=>({id:m.id,type:m.type,role:m.role})),cards:cards.map(c=>({status:c.dataset.lovesInvitation,classes:c.className})),html:h.innerHTML.slice(0,1500)};
+            });
+            await page.evaluate(async()=>{
+                const f=window.imApp.getFriendById('ui-loves'),h=document.querySelector('#chat-interface-ui-loves .ins-chat-messages');
+                h.replaceChildren();window.imChat.renderChatHistory(f,h,{resetWindow:true,scroll:false});
+                window.lovesApp.syncDailySavingsForFriend=window.__lovesDailySync;
+            });
+            await check('Loves fixed card states survive history rerender',()=>{
+                const cards=[...document.querySelectorAll('#chat-interface-ui-loves .loves-invitation-card')];
+                return cards.length===2&&!cards[0].classList.contains('is-received')&&cards[1].classList.contains('is-received');
+            });
+            if(process.env.CHAT_UI_SCREENSHOTS) {
+                const directory=process.env.CHAT_UI_SCREENSHOTS;fs.mkdirSync(directory,{recursive:true});
+                await page.screenshot({path:path.join(directory,label+'-loves.png')});
+            }
+            await page.evaluate(()=>window.imChat.openChatTab(window.imApp.getFriendById('ui-char')));
             if (label === 'phone') {
                 await page.reload({ waitUntil: 'load' });
                 await page.waitForFunction(() => typeof window.imChat?.openChatTab === 'function');
