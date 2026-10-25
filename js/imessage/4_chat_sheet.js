@@ -66,6 +66,7 @@
                 });
         };
     const OFFLINE_AUTO_IMAGE_MARKER = '【线下生图】';
+    const OFFLINE_DEFAULT_CHAR_AVATAR_URL = 'assets/imessage/default-char-avatar.jpg';
     const OFFLINE_CHAT_PROMPT_ORDER = [
         'role_identity',
         'data_zone',
@@ -272,69 +273,112 @@
             name:
                 String(source_2.name || source_2.realName || source_2.nickname || 'User').trim() ||
                 'User',
+            handle: makeOfflineProfileHandle(source_2.handle || source_2.username || source_2.account, source_2.name || source_2.realName || source_2.nickname || 'User'),
             avatarUrl: window.imApp?.getChatUserAvatarUrl?.(value_103, source_2) || source_2.avatarUrl || source_2.avatar || window.U2_DEFAULT_USER_AVATAR_URL || 'assets/default-user-avatar.jpg',
             signature: String(source_2.signature || '').trim(),
             persona: String(source_2.persona || '').trim(),
             boundAccountId: boundAccount?.id ?? null,
         };
     }
-    function refreshOfflineUserIdentity_3(value_107) {
-        const requestedId =
-                typeof value_107 === 'object' && value_107 !== null ? value_107.id : value_107,
-            activeFriend_3 = window.imData?.currentActiveFriend;
-        if (
-            !activeFriend_3 ||
-            activeFriend_3.type === 'group' ||
-            String(activeFriend_3.id) !== String(requestedId)
-        )
-            return false;
-        const friend_3 = window.imApp?.getFriendById?.(requestedId) || activeFriend_3,
-            profile = handleAction_27(friend_3),
-            contentArea_2 = document.getElementById('offline-chat-content');
-        if (!contentArea_2) return false;
-        return (
-            contentArea_2.querySelectorAll('.offline-chat-bubble.user').forEach((bubble_2) => {
-                const nameEl = bubble_2.querySelector('.offline-chat-name');
-                if (nameEl) nameEl.textContent = profile.name;
-                const avatarEl = bubble_2.querySelector('.offline-chat-avatar');
-                if (avatarEl) {
-                    avatarEl.replaceChildren();
-                    if (profile.avatarUrl) {
-                        const img = document.createElement('img');
-                        img.src = profile.avatarUrl;
-                        img.alt = 'avatar';
-                        avatarEl.appendChild(img);
-                    } else {
-                        const icon_2 = document.createElement('i');
-                        icon_2.className = 'fas fa-user';
-                        avatarEl.appendChild(icon_2);
-                    }
-                }
-                const header = bubble_2.querySelector('.offline-chat-bubble-header');
-                let signEl = bubble_2.querySelector('.offline-chat-sign');
-                if (!profile.signature) signEl?.remove();
-                else {
-                    if (signEl) signEl.textContent = profile.signature;
-                    else {
-                        if (header) {
-                            signEl = document.createElement('div');
-                            signEl.className = 'offline-chat-sign';
-                            signEl.textContent = profile.signature;
-                            const nameContainer = header.querySelector(
-                                '.offline-chat-name-container',
-                            );
-                            header.insertBefore(
-                                signEl,
-                                nameContainer?.nextSibling || header.firstChild,
-                            );
-                        }
-                    }
-                }
-            }),
-            true
-        );
+    function makeOfflineProfileHandle(value, fallbackName = 'user') {
+        const source = String(value || fallbackName || 'user').trim().replace(/^@+/, '');
+        const compact = source.replace(/\s+/g, '').replace(/[^\p{L}\p{N}_.-]/gu, '').slice(0, 32) || 'user';
+        return `@${compact}`;
     }
+
+    function getOfflineCharProfile(friend) {
+        const name = String(friend?.realName || friend?.name || friend?.nickname || 'Char').trim() || 'Char';
+        const rawSignature = String(friend?.signature || '').trim();
+        return {
+            name,
+            handle: makeOfflineProfileHandle(friend?.handle || friend?.username || friend?.account, name),
+            avatarUrl: friend?.avatarUrl || friend?.avatar
+                || (!friend?.type || friend.type === 'char' ? OFFLINE_DEFAULT_CHAR_AVATAR_URL : ''),
+            signature: /^No Signature$/i.test(rawSignature) ? '' : rawSignature
+        };
+    }
+
+    const OFFLINE_PROFILE_DEFAULTS = Object.freeze({
+        user: Object.freeze({ following: '8', followers: '279K', views: '5M', likes: '17K', favorite: '1.9K' }),
+        assistant: Object.freeze({ following: '1', followers: '1.2M', views: '5M', likes: '17K', favorite: '1.9K' })
+    });
+
+    function normalizeOfflineProfileStat(value, fallback) {
+        const clean = String(value == null ? '' : value).trim().replace(/\s+/g, ' ').slice(0, 18);
+        return clean || String(fallback || '0');
+    }
+
+    function getOfflineEditableProfile(friend, isUser) {
+        const role = isUser ? 'user' : 'assistant';
+        const base = isUser ? handleAction_27(friend) : getOfflineCharProfile(friend);
+        base.handle = base.handle || makeOfflineProfileHandle('', base.name);
+        const stored = friend?.[isUser ? 'offlineUserProfile' : 'offlineCharProfile'];
+        const saved = stored && typeof stored === 'object' ? stored : {};
+        const defaults = OFFLINE_PROFILE_DEFAULTS[role];
+        const name = String(saved.name || base.name || (isUser ? 'User' : 'Char')).trim() || (isUser ? 'User' : 'Char');
+        return {
+            ...base,
+            name,
+            handle: makeOfflineProfileHandle(saved.handle, base.handle || name),
+            avatarUrl: String(saved.avatarUrl || base.avatarUrl || '').trim(),
+            avatarOverrideUrl: String(saved.avatarUrl || '').trim(),
+            following: normalizeOfflineProfileStat(saved.following, defaults.following),
+            followers: normalizeOfflineProfileStat(saved.followers, defaults.followers),
+            views: normalizeOfflineProfileStat(saved.views, defaults.views),
+            likes: normalizeOfflineProfileStat(saved.likes, defaults.likes),
+            favorite: normalizeOfflineProfileStat(saved.favorite, defaults.favorite)
+        };
+    }
+
+    function refreshOfflineUserIdentity_3(friendOrId) {
+        const requestedId = typeof friendOrId === 'object' && friendOrId !== null ? friendOrId.id : friendOrId;
+        const activeFriend = window.imData?.currentActiveFriend;
+        if (!activeFriend || activeFriend.type === 'group' || String(activeFriend.id) !== String(requestedId)) return false;
+        const friend = window.imApp?.getFriendById?.(requestedId) || activeFriend;
+        const profile = getOfflineEditableProfile(friend, true);
+        const contentArea = document.getElementById('offline-chat-content');
+        if (!contentArea) return false;
+
+        contentArea.querySelectorAll('.offline-chat-bubble.user').forEach((bubble) => {
+            const nameEl = bubble.querySelector('.offline-chat-name');
+            if (nameEl) nameEl.textContent = profile.name;
+            const handleEl = bubble.querySelector('.offline-chat-handle');
+            if (handleEl) handleEl.textContent = profile.handle;
+
+            const avatarEl = bubble.querySelector('.offline-chat-avatar');
+            if (avatarEl) {
+                avatarEl.replaceChildren();
+                if (profile.avatarUrl) {
+                    const img = document.createElement('img');
+                    img.src = profile.avatarUrl;
+                    img.alt = 'avatar';
+                    avatarEl.appendChild(img);
+                } else {
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-user';
+                    avatarEl.appendChild(icon);
+                }
+            }
+
+            const header = bubble.querySelector('.offline-chat-bubble-header');
+            let signEl = bubble.querySelector('.offline-chat-sign');
+            if (!profile.signature) {
+                signEl?.remove();
+            } else if (signEl) {
+                signEl.textContent = profile.signature;
+            } else if (header) {
+                signEl = document.createElement('div');
+                signEl.className = 'offline-chat-sign';
+                signEl.textContent = profile.signature;
+                header.appendChild(signEl);
+            }
+        });
+        return true;
+    }
+
     imChat_2.refreshOfflineUserIdentity = refreshOfflineUserIdentity_3;
+
+
     function getChatImagePlaceholderUrl() {
         return (
             window.imChat.CHAT_IMAGE_PLACEHOLDER_URL ||
@@ -870,32 +914,31 @@ The prompt must describe the same current moment with characters, action, settin
                 );
             };
         const isLikelyChineseText = (value_5_2) => /[\u3400-\u9fff]/.test(String(value_5_2 || ''));
-        const parseOfflineBilingualDialogue = (value_6, language_2) => {
-                if (window.imDataUtils?.parseBilingualDialogue)
-                    return window.imDataUtils.parseBilingualDialogue(value_6, language_2);
-                return {
-                    original: String(value_6 || '').trim(),
-                    translation: '',
-                };
-            };
+        const parseOfflineBilingualDialogue = (value, language) => {
+            return { original: String(value || '').trim(), translation: '' };
+        };
+
+
         const getOfflineChatLanguageName = (language_3) =>
                 window.imDataUtils?.getChatLanguageName
                     ? window.imDataUtils.getChatLanguageName(language_3)
                     : 'Chinese';
-        const value_185 = (value_413) => {
-                const text_2 = String(value_413 || '').trim();
-                if (!text_2) return '';
-                if (text_2.startsWith('「') && text_2.endsWith('」')) return text_2;
-                return '「' + text_2 + '」';
-            };
-        const getOfflineSpeechDisplayText = (value_415, value_416 = '') => {
-                const trim_417 = String(value_415 || '').trim(),
-                    trim_418 = String(value_416 || '').trim();
-                if (!trim_417) return '';
-                if (trim_418 && trim_418 !== trim_417 && !isLikelyChineseText(trim_417))
-                    return value_185(trim_417 + '（' + trim_418 + '）');
-                return value_185(trim_417);
-            };
+        const value_185 = (value) => {
+            const text = String(value || '').trim();
+            if (!text) return '';
+            if ((text.startsWith('"') && text.endsWith('"'))
+                || (text.startsWith('“') && text.endsWith('”'))) return text;
+            return `“${text}”`;
+        };
+
+
+        const getOfflineSpeechDisplayText = (original, translation = '') => {
+            const source = String(original || '').trim();
+            if (!source) return '';
+            return value_185(source);
+        };
+
+
         const normalizeOfflineSectionHeading = (value_7_2) =>
                 String(value_7_2 || '')
                     .trim()
@@ -990,7 +1033,7 @@ The prompt must describe the same current moment with characters, action, settin
                 String(value_9 || '')
                     .replace(/<[^>]+>/g, '')
                     .replace(/^[\s\-*•·]+/, '')
-                    .replace(/^(?:\d+|[①②③④⑤⑥⑦⑧⑨]|[A-Za-z])[\).、:：-]?\s*/, '')
+                    .replace(/^(?:(?:\d+|[①②③④⑤⑥⑦⑧⑨])[\).、:：-]?\s*|[A-Za-z][\).、:：-]\s+)/, '')
                     .trim();
         const getOfflineBarrageRandomLikes = () => Math.floor(Math.random() * 999) + 1;
         const parseOfflineBarrageTextBlock = (value_10) =>
@@ -1120,7 +1163,7 @@ The prompt must describe the same current moment with characters, action, settin
             };
         const normalizeOfflineChoiceText = (value_11) =>
                 normalizeOfflineListLine(value_11)
-                    .replace(/^(?:选项|选择|Choice)\s*\d*\s*[:：.、-]?\s*/i, '')
+                    .replace(/^(?:(?:选项|选择)\s*\d*\s*[:：.、-]?\s*|Choice(?:\s+\d+)?\s*[:：.、-]\s*)/i, '')
                     .trim();
         const parseOfflineChoiceBlocks = (value_178) => {
                 let choices_2 = [],
@@ -1302,112 +1345,74 @@ The prompt must describe the same current moment with characters, action, settin
                     )
                     .trim();
             };
-        const renderOfflinePlainTextWithFallbackSpeech = (
-            value_490,
-            items_491,
-            value_492,
-            value_493,
-            language_4,
-        ) => {
-            const text_6 = String(value_490 || '');
-            if (!value_493) return escapeSheetHtml(text_6).replace(/\n/g, '<br>');
-            const value_496 = /「([^」\n]{1,180})」/g;
-            let html_2 = '';
+        const renderOfflinePlainTextWithFallbackSpeech = (value, speechItems, enableVoice, allowFallbackSpeech, language) => {
+            const text = String(value || '');
+            if (!allowFallbackSpeech) {
+                return escapeSheetHtml(text).replace(/\n/g, '<br>');
+            }
+
+            // Current offline dialogue uses straight or curly double quotes.
+            const quoteRegex = /"([^"\n]{1,180})"|“([^”\n]{1,180})”/g;
+            let html = '';
             let lastIndex = 0;
-            let match_4 = null;
-            while ((match_4 = value_496.exec(text_6)) !== null) {
-                const bilingual = parseOfflineBilingualDialogue(match_4[1], language_4);
+            let match = null;
+            while ((match = quoteRegex.exec(text)) !== null) {
+                const original = String(match[1] ?? match[2] ?? '').trim();
+                const matchEnd = match.index + match[0].length;
+                const bilingual = parseOfflineBilingualDialogue(original, language);
                 if (!bilingual.original) continue;
-                html_2 += escapeSheetHtml(text_6.slice(lastIndex, match_4.index)).replace(
-                    /\n/g,
-                    '<br>',
-                );
-                const length_501 = items_491.length;
-                if (value_492) items_491.push(bilingual);
-                const value_502 = value_492 ? ' is-playable' : '';
-                const value_503 = value_492
-                    ? ' data-offline-speech-index="' +
-                      length_501 +
-                      '" role="button" tabindex="0" title="打开语音" aria-label="打开这段对话的语音弹窗"'
+                html += escapeSheetHtml(text.slice(lastIndex, match.index)).replace(/\n/g, '<br>');
+                const speechIndex = speechItems.length;
+                if (enableVoice) speechItems.push(bilingual);
+                const playableClass = enableVoice ? ' is-playable' : '';
+                const playableAttrs = enableVoice
+                    ? ` data-offline-speech-index="${speechIndex}" role="button" tabindex="0" title="播放语音" aria-label="播放这段对话" aria-busy="false"`
                     : '';
-                html_2 +=
-                    '<span class="offline-chat-speech offline-chat-dialogue' +
-                    value_502 +
-                    '"' +
-                    value_503 +
-                    '>' +
-                    escapeSheetHtml(match_4[0]) +
-                    '</span>';
-                lastIndex = match_4.index + match_4[0].length;
+                const dialogueHtml = escapeSheetHtml(match[0]);
+                html += `<span class="offline-chat-speech offline-chat-dialogue${playableClass}"${playableAttrs}>${dialogueHtml}</span>`;
+                lastIndex = matchEnd;
+                quoteRegex.lastIndex = matchEnd;
             }
-            html_2 += escapeSheetHtml(text_6.slice(lastIndex)).replace(/\n/g, '<br>');
-            return html_2;
+            html += escapeSheetHtml(text.slice(lastIndex)).replace(/\n/g, '<br>');
+            return html;
         };
-        const renderOfflineParagraphText = (value_504, speechItems, enableVoice_2, language_5) => {
-            const text_7 = String(value_504 || '');
+
+
+        const renderOfflineParagraphText = (value, speechItems, enableVoice, language) => {
+            const text = String(value || '');
             const speechRegex = /<speech\b([^>]*?)>([\s\S]*?)<\/speech>|<speech\b([^>]*?)\/>/gi;
-            let html_3 = '';
-            let lastIndex_2 = 0;
+            let html = '';
+            let lastIndex = 0;
             let hasExplicitSpeech = false;
-            let match_5 = null;
-            while ((match_5 = speechRegex.exec(text_7)) !== null) {
+            let match = null;
+
+            while ((match = speechRegex.exec(text)) !== null) {
                 hasExplicitSpeech = true;
-                html_3 += renderOfflinePlainTextWithFallbackSpeech(
-                    text_7.slice(lastIndex_2, match_5.index),
-                    speechItems,
-                    enableVoice_2,
-                    false,
-                    language_5,
-                );
-                const attrText_2 = match_5[1] || match_5[3] || '';
-                const attrs_5 = parseOfflineTagAttributes(attrText_2);
-                const innerText_2 = String(match_5[2] || '')
-                            .replace(/<[^>]+>/g, '')
-                            .trim();
-                const original_3 = parseOfflineBilingualDialogue(
-                    attrs_5.original || attrs_5.text || innerText_2,
-                    language_5,
-                );
-                const _value5 = original_3.original;
-                const translation_3 = String(
-                    attrs_5.translation || attrs_5.zh || attrs_5.cn || original_3.translation || '',
-                ).trim();
-                const offlineSpeechDisplayText = getOfflineSpeechDisplayText(
-                    _value5,
-                    translation_3,
-                );
-                if (offlineSpeechDisplayText) {
-                    const length_519 = speechItems.length;
-                    speechItems.push({
-                        original: _value5,
-                        translation: translation_3,
-                    });
-                    const value_520 = enableVoice_2 ? ' is-playable' : '';
-                    const value_521 = enableVoice_2
-                        ? ' data-offline-speech-index="' +
-                          length_519 +
-                          '" role="button" tabindex="0" title="打开语音" aria-label="打开这段对话的语音弹窗"'
+                html += renderOfflinePlainTextWithFallbackSpeech(text.slice(lastIndex, match.index), speechItems, enableVoice, false, language);
+                const attrText = match[1] || match[3] || '';
+                const attrs = parseOfflineTagAttributes(attrText);
+                const innerText = String(match[2] || '').replace(/<[^>]+>/g, '').trim();
+                const original = String(attrs.original || attrs.text || innerText || '').trim();
+                const translation = String(attrs.translation || attrs.zh || attrs.cn || '').trim();
+                const displayText = getOfflineSpeechDisplayText(original, translation);
+
+                if (displayText) {
+                    const speechIndex = speechItems.length;
+                    speechItems.push({ original, translation });
+                    const playableClass = enableVoice ? ' is-playable' : '';
+                    const playableAttrs = enableVoice
+                        ? ` data-offline-speech-index="${speechIndex}" role="button" tabindex="0" title="播放语音" aria-label="播放这段对话" aria-busy="false"`
                         : '';
-                    html_3 +=
-                        '<span class="offline-chat-speech offline-chat-dialogue' +
-                        value_520 +
-                        '"' +
-                        value_521 +
-                        '>' +
-                        escapeSheetHtml(offlineSpeechDisplayText) +
-                        '</span>';
+                    html += `<span class="offline-chat-speech offline-chat-dialogue${playableClass}"${playableAttrs}>${escapeSheetHtml(displayText).replace(/\n/g, '<br>')}</span>`;
                 }
-                lastIndex_2 = match_5.index + match_5[0].length;
+                lastIndex = match.index + match[0].length;
             }
-            html_3 += renderOfflinePlainTextWithFallbackSpeech(
-                text_7.slice(lastIndex_2),
-                speechItems,
-                enableVoice_2,
-                !hasExplicitSpeech,
-                language_5,
-            );
-            return html_3;
+
+            html += renderOfflinePlainTextWithFallbackSpeech(text.slice(lastIndex), speechItems, enableVoice, !hasExplicitSpeech, language);
+            return html;
         };
+
+
         const isTtsEnabledForFriend = (friend_5) =>
             getOfflineGroupMembers(friend_5)
                 .map(
@@ -1422,119 +1427,72 @@ The prompt must describe the same current moment with characters, action, settin
         const _value = (friend_5) =>
             friend_5?.type === 'group' ||
             !!window.u2Tts?.resolveFriendTtsSettings?.(friend_5)?.enabled;
-        const value_193 = (value_208, options_2 = {}) => {
-            const messageId_2 = options_2.messageId ? String(options_2.messageId) : '';
-            const enableVoice_3 = options_2.enableVoice !== false;
-            const enableBarrage_2 = !!options_2.enableBarrage;
-            const enableChoices_2 = !!options_2.enableChoices;
-            const enableRecap_2 = !!options_2.enableRecap;
-            const language_6 = options_2.language || 'zh';
-            const trim_225 = String(value_208 == null ? '' : value_208)
-                        .replace(
-                            /\r\n/g,
-                            `
-`,
-                        )
-                        .trim();
-            if (!trim_225) {
-                messageId_2 &&
-                    !options_2.speechItems &&
-                    (value_179['delete'](messageId_2),
-                    offlineBarrageRuntimeStore['delete'](messageId_2),
-                    value_181['delete'](messageId_2));
+        const value_193 = (value, options = {}) => {
+            const messageId = options.messageId ? String(options.messageId) : '';
+            const enableVoice = options.enableVoice !== false;
+            const enableBarrage = !!options.enableBarrage;
+            const enableChoices = !!options.enableChoices;
+            const enableRecap = !!options.enableRecap;
+            const language = options.language || 'zh';
+            const text = String(value == null ? '' : value).replace(/\r\n/g, '\n').trim();
+            if (!text) {
+                if (messageId) {
+                    value_179.delete(messageId);
+                    offlineBarrageRuntimeStore.delete(messageId);
+                    value_181.delete(messageId);
+                }
                 return '';
             }
-            const speechItems_2 = Array.isArray(options_2.speechItems) ? options_2.speechItems : [];
-            const recapExtraction_2 = enableRecap_2
-                        ? extractOfflineRecapBlock(trim_225)
-                        : {
-                              cleanText: trim_225,
-                              recap: '',
-                          };
-            const {
-                cleanText: cleanText_3,
-                barragesByParagraph: barragesByParagraph_2,
-                plainBarrageSections: plainBarrageSections_3,
-            } = parseOfflineBarrageBlocks(recapExtraction_2.cleanText);
-            const choiceParseResult = parseOfflineChoiceBlocks(cleanText_3);
-            const choices_3 = choiceParseResult.choices;
-            const normalizedText = choiceParseResult.cleanText
-                        .replace(/<paragraph\b[^>]*>/gi, '')
-                        .replace(
-                            /<\/paragraph>/gi,
-                            `
 
-`,
-                        )
-                        .trim();
+            const speechItems = Array.isArray(options.speechItems) ? options.speechItems : [];
+            const recapExtraction = enableRecap
+                ? extractOfflineRecapBlock(text)
+                : { cleanText: text, recap: '' };
+            const { cleanText, barragesByParagraph, plainBarrageSections } = parseOfflineBarrageBlocks(recapExtraction.cleanText);
+            const choiceParseResult = parseOfflineChoiceBlocks(cleanText);
+            const choices = choiceParseResult.choices;
+            const normalizedText = choiceParseResult.cleanText
+                .replace(/<paragraph\b[^>]*>/gi, '')
+                .replace(/<\/paragraph>/gi, '\n\n')
+                .trim();
             const paragraphs = normalizedText
-                        .split(/\n{2,}/)
-                        .map((part) => part.trim())
-                        .filter(Boolean);
+                .split(/\n{2,}/)
+                .map(part => part.trim())
+                .filter(Boolean);
             const allBarrageItems = []
-                        .concat(
-                            ...barragesByParagraph_2.map((items_4) =>
-                                Array.isArray(items_4) ? items_4 : [],
-                            ),
-                        )
-                        .concat(
-                            ...(plainBarrageSections_3 || []).map((items_5) =>
-                                Array.isArray(items_5) ? items_5 : [],
-                            ),
-                        )
-                        .filter((item_3) => item_3 && item_3.text);
-            messageId_2 &&
-                (offlineBarrageRuntimeStore.set(messageId_2, [allBarrageItems]),
-                value_181.set(messageId_2, choices_3));
-            const paragraphHtml_2 = paragraphs
-                        .map((part_2, value_552) => {
-                            const paragraphHtml = renderOfflineParagraphText(
-                                part_2,
-                                speechItems_2,
-                                enableVoice_3,
-                                language_6,
-                            );
-                            return (
-                                '<div class="offline-chat-paragraph-wrap"><p class="offline-chat-paragraph">' +
-                                paragraphHtml +
-                                '</p></div>'
-                            );
-                        })
-                        .join('');
-            const barrageButtonHtml =
-                        enableBarrage_2 && allBarrageItems.length > 0
-                            ? '<button type="button" class="offline-chat-barrage-btn offline-chat-barrage-final-btn" data-offline-barrage-index="0" title="查看弹幕" aria-label="查看弹幕"><i class="fas fa-comment-dots"></i><span>' +
-                              allBarrageItems.length +
-                              '</span></button>'
-                            : '';
-            const choiceHtml =
-                        enableChoices_2 && choices_3.length > 0
-                            ? '<div class="offline-chat-choice-list">' +
-                              choices_3
-                                  .map(
-                                      (value_554, value_555) =>
-                                          '<button type="button" class="offline-chat-choice-btn" data-offline-choice-index="' +
-                                          value_555 +
-                                          '"><span class="offline-chat-choice-index">' +
-                                          (value_555 + 1) +
-                                          '</span><span class="offline-chat-choice-text">' +
-                                          escapeSheetHtml(value_554) +
-                                          '</span></button>',
-                                  )
-                                  .join('') +
-                              '</div>'
-                            : '';
-            const recapHtml = recapExtraction_2.recap
-                        ? '<section class="offline-chat-recap"><div class="offline-chat-recap-title">【回顾】</div><div class="offline-chat-recap-content">' +
-                          escapeSheetHtml(
-                              recapExtraction_2.recap.replace(/^【回顾】\s*/, ''),
-                          ).replace(/\n/g, '<br>') +
-                          '</div></section>'
-                        : '';
-            const html_4 = paragraphHtml_2 + barrageButtonHtml + choiceHtml + recapHtml;
-            messageId_2 && !options_2.speechItems && value_179.set(messageId_2, speechItems_2);
-            return html_4;
+                .concat(...barragesByParagraph.map(items => Array.isArray(items) ? items : []))
+                .concat(...(plainBarrageSections || []).map(items => Array.isArray(items) ? items : []))
+                .filter(item => item && item.text);
+
+            if (messageId) {
+                offlineBarrageRuntimeStore.set(messageId, [allBarrageItems]);
+                value_181.set(messageId, choices);
+            }
+
+            const paragraphHtml = paragraphs
+                .map((part, index) => {
+                    const paragraphHtml = renderOfflineParagraphText(part, speechItems, enableVoice, language);
+                    return `<div class="offline-chat-paragraph-wrap"><p class="offline-chat-paragraph">${paragraphHtml}</p></div>`;
+                })
+                .join('');
+            const barrageButtonHtml = enableBarrage && allBarrageItems.length > 0
+                ? `<button type="button" class="offline-chat-barrage-btn offline-chat-barrage-final-btn" data-offline-barrage-index="0" title="查看弹幕" aria-label="查看弹幕"><i class="fas fa-comment-dots"></i><span>${allBarrageItems.length}</span></button>`
+                : '';
+            const choiceHtml = enableChoices && choices.length > 0
+                ? `<section class="offline-chat-choice-panel"><div class="offline-chat-choice-toggle">Related</div><div class="offline-chat-choice-list">${choices.map((choice, index) => `<button type="button" class="offline-chat-choice-btn" data-offline-choice-index="${index}"><span class="offline-chat-choice-text">${escapeSheetHtml(choice)}</span></button>`).join('')}</div></section>`
+                : '';
+            const recapHtml = recapExtraction.recap
+                ? `<section class="offline-chat-recap"><div class="offline-chat-recap-title">【回顾】</div><div class="offline-chat-recap-content">${escapeSheetHtml(recapExtraction.recap.replace(/^【回顾】\s*/, '')).replace(/\n/g, '<br>')}</div></section>`
+                : '';
+            const html = paragraphHtml + barrageButtonHtml + choiceHtml + recapHtml;
+
+            if (messageId) {
+                value_179.set(messageId, speechItems);
+            }
+            return html;
         };
+
+
         const OFFLINE_ACTIVE_NOTICE_KIND = 'offline_meeting_active';
         const OFFLINE_MEETING_RECORD_TYPE = 'offline_meeting_record';
         const value_194 = (value_556) =>
@@ -2269,6 +2227,10 @@ The prompt must describe the same current moment with characters, action, settin
                             role: role_2,
                             type: isSummary ? type_3 : isAutoImage ? type_2 : undefined,
                             content: parsed_4.content,
+                            translationZh: String(message_4?.translationZh || ''),
+                            translationState: message_4?.translationState || (message_4?.translationZh ? 'complete' : 'incomplete'),
+                            liked: message_4?.liked === true,
+                            saved: message_4?.saved === true,
                             reasoning:
                                 role_2 === 'assistant' && parsed_4.reasoning
                                     ? parsed_4.reasoning
@@ -2527,37 +2489,18 @@ The prompt must describe the same current moment with characters, action, settin
             if (value_700.messageId) value_179.set(String(value_700.messageId), items_701);
             return _value100;
         };
-        const value_221 = (activeFriend_5) => {
-                if (!activeFriend_5) return [];
-                const value_706 = Array.isArray(activeFriend_5.offlineMessages)
-                        ? activeFriend_5.offlineMessages
-                        : [],
-                    offlineMessages_2 = cloneOfflineMeetingMessages(value_706);
-                return (
-                    !value_212(value_706, offlineMessages_2) &&
-                        (window.imApp?.commitFriendMetaPatch
-                            ? void window.imApp.commitFriendMetaPatch(
-                                  activeFriend_5.id,
-                                  {
-                                      offlineMessages: offlineMessages_2,
-                                  },
-                                  {
-                                      silent: true,
-                                  },
-                              )
-                            : commitSheetFriendChange(
-                                  activeFriend_5,
-                                  (targetFriend_2) => {
-                                      targetFriend_2.offlineMessages = offlineMessages_2;
-                                  },
-                                  {
-                                      silent: true,
-                                      metaOnly: true,
-                                  },
-                              )),
-                    offlineMessages_2
-                );
-            };
+        const value_221 = (friend) => {
+            if (!friend) return [];
+            const current = Array.isArray(friend.offlineMessages) ? friend.offlineMessages : [];
+            const normalized = cloneOfflineMeetingMessages(current);
+            if (!value_212(current, normalized)) {
+                void commitSheetFriendChange(friend.id, target => {
+                    // Normalizing old rows must not replay an earlier read over live edits.
+                    target.offlineMessages = cloneOfflineMeetingMessages(target.offlineMessages || []);
+                }, { silent: true, metaOnly: true }).catch(error => console.error('Offline message normalization failed', error));
+            }
+            return normalized;
+        };
         const normalizeOfflineMeetingSessions = (activeFriend_6) => {
                 if (!activeFriend_6) return [];
                 const sessions = Array.isArray(activeFriend_6.offlineMeetingSessions)
@@ -4655,33 +4598,6 @@ The prompt must describe the same current moment with characters, action, settin
             if (result_2 === 'failed') throw new Error('图片保存失败，请稍后重试');
             return result_2;
         }
-        const getOfflineChatActionButtonsHtml = (
-                value_334,
-                value_337 = false,
-                value_1038 = null,
-            ) => {
-                if (value_337) return '';
-                if (isOfflineAutoImageMessage(value_1038))
-                    return '<div class="offline-chat-bubble-actions"><button type="button" class="offline-chat-action-btn" data-offline-action="save-image" title="保存到本地" aria-label="保存到本地"><i class="fas fa-download"></i></button><button type="button" class="offline-chat-action-btn danger" data-offline-action="delete" title="删除" aria-label="删除"><i class="fas fa-trash"></i></button></div>';
-                return (
-                    `
-                <div class="offline-chat-bubble-actions">
-                    <button type="button" class="offline-chat-action-btn" data-offline-action="edit" title="编辑" aria-label="编辑"><i class="fas fa-pen"></i></button>
-                    ` +
-                    (!value_334
-                        ? '<button type="button" class="offline-chat-action-btn" data-offline-action="reroll" title="重回" aria-label="重回"><i class="fas fa-redo"></i></button>'
-                        : '') +
-                    `
-                    ` +
-                    (!value_334 && value_1038?.continuationState === 'available'
-                        ? '<button type="button" class="offline-chat-action-btn" data-offline-action="continue" title="继续生成" aria-label="继续生成"><i class="fas fa-forward"></i></button>'
-                        : '') +
-                    `
-                    <button type="button" class="offline-chat-action-btn danger" data-offline-action="delete" title="删除" aria-label="删除"><i class="fas fa-trash"></i></button>
-                </div>
-            `
-                );
-            };
         const bindOfflineChatBubbleActions = (value_1039, message_19) => {
                 if (!value_1039 || !message_19?.id) return;
                 value_1039.querySelectorAll('[data-offline-action]').forEach((button_5) => {
@@ -4690,6 +4606,7 @@ The prompt must describe the same current moment with characters, action, settin
                     button_5.addEventListener('click', async (event_1042) => {
                         event_1042.preventDefault();
                         event_1042.stopPropagation();
+                        if (button_5.getAttribute('aria-disabled') === 'true') return;
                         const action_2 = button_5.getAttribute('data-offline-action'),
                             currentActiveFriend_1044 = window.imData?.currentActiveFriend;
                         if (isOfflineAutoImageMessage_2(currentActiveFriend_1044)) return;
@@ -4734,40 +4651,518 @@ The prompt must describe the same current moment with characters, action, settin
                     });
                 });
             };
-        const enableOfflineChatBubbleActions = (bubbleDiv, message_20) => {
-                const footer = bubbleDiv?.querySelector?.('.offline-chat-bubble-footer');
-                if (!footer || !message_20?.id) return;
-                footer.querySelector('.offline-chat-bubble-actions')?.remove();
-                footer.insertAdjacentHTML(
-                    'beforeend',
-                    getOfflineChatActionButtonsHtml(message_20.role === 'user', false, message_20),
-                );
-                bindOfflineChatBubbleActions(bubbleDiv, message_20);
+        const enableOfflineChatBubbleActions = (bubble, message) => {
+            if (!bubble || !message?.id) return;
+            bubble.querySelectorAll('.offline-chat-social-item').forEach(button => button.disabled = false);
+            bindOfflineShareMenu(bubble, message, false);
+            syncOfflineAuxiliaryAction(bubble, message, false);
+            bindOfflineTranslationControl(bubble, message, window.imData.currentActiveFriend, {
+                floor: Number(bubble.dataset.floor) || 1, depth: 0,
+                isAutoImage: isOfflineAutoImageMessage(message),
+                enableBarrage: isOfflineBarragePromptEnabled(window.imData.currentActiveFriend),
+                enableChoices: isOfflineChoicesPromptEnabled(window.imData.currentActiveFriend)
+            });
+        };
+
+        const setOfflineSocialInteractionVisual = (button, type, active) => {
+            if (!button) return;
+            const activeClass = type === 'like' ? 'is-liked' : 'is-saved';
+            button.classList.toggle(activeClass, active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            const icon = button.querySelector('i');
+            if (icon) icon.className = `${active ? 'fas' : 'far'} fa-${type === 'like' ? 'heart' : 'bookmark'}`;
+            button.classList.remove('is-popping');
+            if (active) {
+                void button.offsetWidth;
+                button.classList.add('is-popping');
+                window.setTimeout(() => button.classList.remove('is-popping'), 260);
+            }
+        };
+
+        const persistOfflineSocialInteraction = async (messageId, field, active) => {
+            const friend = window.imData.currentActiveFriend;
+            if (!friend) return false;
+            await patchOfflineMessage(friend, messageId, live => ({ ...live, [field]: active }));
+            return true;
+        };
+
+        const bindOfflineSocialInteractions = (bubble, message) => {
+            for (const [selector, type, field] of [
+                ['.offline-chat-like-action', 'like', 'liked'],
+                ['.offline-chat-favorite-action', 'favorite', 'saved']
+            ]) {
+                const button = bubble.querySelector(selector);
+                if (!button || button.dataset.interactionBound === 'true') continue;
+                button.dataset.interactionBound = 'true';
+                button.addEventListener('click', async event => {
+                    event.preventDefault(); event.stopPropagation();
+                    if (button.disabled) return;
+                    const activeClass = type === 'like' ? 'is-liked' : 'is-saved';
+                    const wasActive = button.classList.contains(activeClass);
+                    setOfflineSocialInteractionVisual(button, type, !wasActive);
+                    try {
+                        await persistOfflineSocialInteraction(message.id, field, !wasActive);
+                        if (type === 'favorite') window.showToast?.(!wasActive ? 'Saved' : 'Removed from favorites');
+                    } catch (error) {
+                        setOfflineSocialInteractionVisual(button, type, wasActive);
+                        window.showToast?.('状态保存失败');
+                    }
+                });
+                button.addEventListener('contextmenu', event => event.preventDefault());
+            }
+        };
+
+        const renderOfflineProfileBanner = (role, imageUrl) => {
+            const contentArea = document.getElementById('offline-chat-content');
+            if (!contentArea) return;
+            contentArea.querySelectorAll(`.offline-chat-bubble[data-profile-role="${role}"] .offline-chat-banner`).forEach((banner) => {
+                const value = String(imageUrl || '').trim();
+                banner.classList.toggle('has-image', !!value);
+                banner.style.backgroundImage = value ? `url("${value.replace(/(["\\])/g, '\\$1')}")` : '';
+            });
+        };
+
+        const readOfflineProfileImageFile = async (file, options) => {
+            if (!file || !String(file.type || '').startsWith('image/')) throw new Error('请选择图片文件');
+            if (window.imApp?.compressImageFile) {
+                return window.imApp.compressImageFile(file, {
+                    maxWidth: options.maxWidth,
+                    maxHeight: options.maxHeight,
+                    quality: 0.82,
+                    mimeType: 'image/jpeg'
+                });
+            }
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ''));
+                reader.onerror = () => reject(new Error('无法读取图片'));
+                reader.readAsDataURL(file);
+            });
+        };
+
+        const renderOfflineProfileEditorPreview = (button, imageUrl, fallbackText) => {
+            if (!button) return;
+            button.replaceChildren();
+            if (imageUrl) {
+                const image = document.createElement('img');
+                image.src = imageUrl;
+                image.alt = '';
+                button.appendChild(image);
+                return;
+            }
+            const fallback = document.createElement('span');
+            fallback.textContent = fallbackText;
+            button.appendChild(fallback);
+        };
+
+        const renderOfflineTranslationState = (bubbleDiv, message, friend, options, translated) => {
+            const textEl = bubbleDiv.querySelector('.offline-chat-bubble-text');
+            if (!textEl || options.isAutoImage || textEl.dataset.editing === 'true') return;
+            const source = translated ? String(message.translationZh || '') : String(message.content || '');
+            const display = value_218(source, message.role, options.depth);
+            const originalSpeech = translated ? (value_179.get(String(message.id)) || []).slice() : null;
+            textEl.innerHTML = value_220(source, message.role, options.depth, {
+                messageId: message.id,
+                enableVoice: message.role === 'assistant' && _value(friend),
+                enableBarrage: options.enableBarrage,
+                enableChoices: options.enableChoices,
+                enableRecap: message.role === 'assistant',
+                language: translated ? 'zh' : (friend?.language || 'zh')
+            });
+            if (translated && originalSpeech?.length) value_179.set(String(message.id), originalSpeech);
+            textEl.style.display = display ? '' : 'none';
+            bindOfflineChatTextControls(bubbleDiv, message, friend, options.floor);
+        };
+
+        const updateOfflineProfileCards = (role, profile) => {
+            const contentArea = document.getElementById('offline-chat-content');
+            if (!contentArea) return;
+            contentArea.querySelectorAll(`.offline-chat-bubble[data-profile-role="${role}"]`).forEach((bubble) => {
+                const assignments = [
+                    ['.offline-chat-name', profile.name],
+                    ['.offline-chat-handle', profile.handle],
+                    ['.offline-profile-following-value', profile.following],
+                    ['.offline-profile-followers-value', profile.followers],
+                    ['.offline-profile-views-value', profile.views],
+                    ['.offline-profile-likes-value', profile.likes],
+                    ['.offline-profile-favorite-value', profile.favorite]
+                ];
+                assignments.forEach(([selector, value]) => {
+                    const node = bubble.querySelector(selector);
+                    if (node) node.textContent = value;
+                });
+                const avatar = bubble.querySelector('.offline-chat-avatar');
+                if (avatar) {
+                    avatar.replaceChildren();
+                    if (profile.avatarUrl) {
+                        const image = document.createElement('img');
+                        image.src = profile.avatarUrl;
+                        image.alt = 'avatar';
+                        avatar.appendChild(image);
+                    } else {
+                        const icon = document.createElement('i');
+                        icon.className = 'fas fa-user';
+                        avatar.appendChild(icon);
+                    }
+                }
+            });
+        };
+
+        // Commit against the current friend inside the storage transaction. Never write a
+        // transcript captured before an API request over newer messages or reactions.
+        const patchOfflineMessage = async (friend, id, update, { append = false, removeLinkedImages = false } = {}) => {
+            let result = [];
+            const saved = await commitSheetFriendChange(friend.id, target => {
+                const rows = cloneOfflineMeetingMessages(target.offlineMessages || []);
+                const index = rows.findIndex(row => String(row.id) === String(id));
+                if (index >= 0) rows[index] = update(rows[index]);
+                else if (append) rows.push(update(null));
+                result = cloneOfflineMeetingMessages(removeLinkedImages && index >= 0
+                    ? rows.filter(row => String(row.id) === String(id) || String(row.sourceMessageId || "") !== String(id))
+                    : rows);
+                target.offlineMessages = result;
+            }, { silent: true, metaOnly: true });
+            if (!saved) throw new Error('Failed to save offline message');
+            return result;
+        };
+
+        const normalizeOfflineResponseFields = (raw, reasoning = '', streaming = false) => {
+            const normalized = offlineReasoning
+                ? offlineReasoning.normalizeResponse(raw, reasoning, { streaming })
+                : { content: String(raw || ''), reasoning: String(reasoning || '') };
+            return { ...normalized, ...window.imOfflineResponse.parse(normalized.content, { streaming }) };
+        };
+
+        const bindOfflineShareMenu = (bubble, message, disabled = false) => {
+            const button = bubble?.querySelector('.offline-chat-share-action');
+            if (!button || button.dataset.shareBound === 'true') return;
+            button.dataset.shareBound = 'true';
+            let timer = null, start = null;
+            const clear = () => { if (timer !== null) clearTimeout(timer); timer = null; };
+            const open = () => {
+                clear();
+                if (button.disabled || isOfflineAutoImageMessage_2(window.imData.currentActiveFriend)) return;
+                document.getElementById('offline-message-menu')?.remove();
+                const overlay = document.createElement('div');
+                overlay.id = 'offline-message-menu';
+                overlay.className = 'offline-message-menu-overlay';
+                const card = document.createElement('div');
+                card.className = 'offline-message-menu-card';
+                card.setAttribute('role', 'dialog');
+                card.setAttribute('aria-label', 'Message actions');
+                card.setAttribute('aria-modal', 'true');
+                // Same menu row styles and icon classes as the online More Actions card.
+                card.innerHTML = `<div class="msg-menu-item" data-offline-action="edit"><span>Edit</span><i class="far fa-edit" style="font-size:16px;color:#8e8e93"></i></div><div class="msg-menu-item" data-offline-action="reroll"><span>Reroll</span><i class="fas fa-rotate-left" style="font-size:16px;color:#8e8e93"></i></div><div class="msg-menu-item destructive" data-offline-action="delete"><span>Delete</span><i class="far fa-trash-alt" style="font-size:16px"></i></div>`;
+                if (message.role !== 'assistant' || isOfflineAutoImageMessage(message)) {
+                    const reroll = card.querySelector('[data-offline-action="reroll"]');
+                    reroll?.setAttribute('aria-disabled', 'true');
+                }
+                if (isOfflineAutoImageMessage(message)) card.querySelector('[data-offline-action="edit"]')?.setAttribute('aria-disabled', 'true');
+                const close = () => { overlay.remove(); button.focus({ preventScroll: true }); };
+                overlay.appendChild(card);
+                // Keep the menu in the same coordinate space as the existing app.
+                document.getElementById('offline-chat-view').appendChild(overlay);
+                const anchor = button.getBoundingClientRect();
+                const bounds = overlay.getBoundingClientRect();
+                card.style.left = `${Math.max(12, Math.min(anchor.right - bounds.left - 200, bounds.width - 212))}px`;
+                card.style.top = `${Math.max(12, Math.min(anchor.top - bounds.top - card.offsetHeight - 8, bounds.height - card.offsetHeight - 12))}px`;
+                bindOfflineChatBubbleActions(card, message);
+                card.addEventListener('click', event => {
+                    const row = event.target.closest('[data-offline-action]');
+                    if (row && row.getAttribute('aria-disabled') !== 'true') close();
+                }, true);
+                overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
+                overlay.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
+                card.querySelectorAll('.msg-menu-item').forEach(row => { row.tabIndex = 0; row.setAttribute('role', 'button'); row.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); row.click(); } }); });
+                card.querySelector('.msg-menu-item:not([aria-disabled="true"])')?.focus();
             };
-        const renderOfflineChatBubble = (messageOrText, isUser = true, options_6 = {}) => {
-            const contentArea_5 = document.getElementById('offline-chat-content');
-            if (!contentArea_5) return null;
-            const friend_11 = window.imData.currentActiveFriend;
-            if (!options_6.skipTheme) applyOfflineChatTheme_2(friend_11);
-            const rawMessage =
-                        messageOrText && typeof messageOrText === 'object'
-                            ? messageOrText
-                            : {
-                                  role: isUser ? 'user' : 'assistant',
-                                  content: String(messageOrText || ''),
-                                  timestamp: Date.now(),
-                              };
-            const message_21 = {
-                id:
-                    rawMessage.id ||
-                    createOfflineChatId(
-                        rawMessage.role === 'assistant' ? 'offline-ai' : 'offline-user',
-                    ),
+            button.disabled = disabled;
+            button.addEventListener('pointerdown', event => {
+                if (button.disabled || (event.button !== undefined && event.button !== 0)) return;
+                start = { id: event.pointerId, x: event.clientX, y: event.clientY };
+                clear();
+                timer = setTimeout(open, 800);
+            });
+            button.addEventListener('pointermove', event => {
+                if (start?.id === event.pointerId && Math.hypot(event.clientX - start.x, event.clientY - start.y) > 10) clear();
+            });
+            ['pointerup', 'pointercancel', 'pointerleave'].forEach(name => button.addEventListener(name, clear));
+            button.addEventListener('contextmenu', event => event.preventDefault());
+            button.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); });
+            button.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
+        };
+
+        // Reuse the first two feed icons for IHG-only actions, preserving five columns.
+        const syncOfflineAuxiliaryAction = (bubble, message, disabled = false) => {
+            const metrics = bubble?.querySelectorAll('.offline-chat-social-actions > .offline-chat-social-item');
+            if (!metrics?.length) return;
+            const action = isOfflineAutoImageMessage(message) ? 'save-image'
+                : message.role === 'assistant' && message.continuationState === 'available' ? 'continue' : '';
+            const old = metrics[1];
+            if (!action || old.tagName === 'BUTTON') return;
+            const button = document.createElement('button');
+            button.type = 'button'; button.className = old.className;
+            button.innerHTML = old.innerHTML;
+            button.dataset.offlineAction = action;
+            button.title = action === 'save-image' ? '保存到本地' : '继续生成';
+            button.setAttribute('aria-label', button.title);
+            button.disabled = disabled;
+            old.replaceWith(button);
+            bindOfflineChatBubbleActions(bubble, message);
+        };
+
+        let offlineProfileEditorContext = null;
+
+        const closeOfflineProfileEditor = () => {
+            const overlay = document.getElementById('offline-profile-editor');
+            if (!overlay) return;
+            if (typeof window.closeView === 'function') window.closeView(overlay);
+            else overlay.classList.remove('active');
+            overlay.setAttribute('aria-hidden', 'true');
+            offlineProfileEditorContext = null;
+        };
+
+        const ensureOfflineProfileEditor = () => {
+            let overlay = document.getElementById('offline-profile-editor');
+            if (overlay) return overlay;
+            overlay = document.createElement('div');
+            overlay.id = 'offline-profile-editor';
+            overlay.className = 'offline-profile-editor bottom-sheet-overlay detail-sheet-overlay';
+            overlay.setAttribute('aria-hidden', 'true');
+            overlay.innerHTML = `
+                <section class="offline-profile-editor-sheet bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="offline-profile-editor-title">
+                    <div class="offline-profile-editor-handle sheet-handle" aria-hidden="true"></div>
+                    <header class="offline-profile-editor-header">
+                        <button type="button" class="offline-profile-editor-cancel">Cancel</button>
+                        <strong id="offline-profile-editor-title">Edit profile</strong>
+                        <button type="button" class="offline-profile-editor-save">Save</button>
+                    </header>
+                    <div class="offline-profile-editor-fields">
+                        <div class="offline-profile-editor-avatar-row">
+                            <button type="button" class="offline-profile-editor-avatar-preview" aria-label="Upload avatar"><span>U</span></button>
+                            <input type="file" class="offline-profile-editor-avatar-input" accept="image/jpeg,image/png" hidden>
+                            <div><strong>Avatar</strong><p>Use the current account avatar first, then override it for X.</p></div>
+                        </div>
+                        ${[
+                            ['name', 'Name'],
+                            ['handle', '@ Account']
+                        ].map(([field, label]) => `<label class="offline-profile-editor-field"><span>${label}</span><input type="text" data-offline-profile-field="${field}" maxlength="32" autocomplete="off"></label>`).join('')}
+                        <div class="offline-profile-editor-banner-row">
+                            <button type="button" class="offline-profile-editor-banner-preview" aria-label="Upload cover"><span>Cover</span></button>
+                            <input type="file" class="offline-profile-editor-banner-input" accept="image/jpeg,image/png" hidden>
+                            <div><strong>Background</strong><p>Upload a cover image for the Me page header.</p></div>
+                        </div>
+                        ${[
+                            ['following', 'Following'],
+                            ['followers', 'Followers'],
+                            ['views', 'Views'],
+                            ['likes', 'Likes'],
+                            ['favorite', 'Favorite']
+                        ].map(([field, label]) => `<label class="offline-profile-editor-field"><span>${label}</span><input type="text" data-offline-profile-field="${field}" maxlength="32" autocomplete="off"></label>`).join('')}
+                    </div>
+                </section>
+            `;
+            document.getElementById('offline-chat-view')?.appendChild(overlay);
+            overlay.addEventListener('click', (event) => {
+                if (event.target === overlay) closeOfflineProfileEditor();
+            });
+            overlay.querySelector('.offline-profile-editor-cancel')?.addEventListener('click', closeOfflineProfileEditor);
+            const avatarInput = overlay.querySelector('.offline-profile-editor-avatar-input');
+            const bannerInput = overlay.querySelector('.offline-profile-editor-banner-input');
+            overlay.querySelector('.offline-profile-editor-avatar-preview')?.addEventListener('click', () => avatarInput?.click());
+            overlay.querySelector('.offline-profile-editor-banner-preview')?.addEventListener('click', () => bannerInput?.click());
+            avatarInput?.addEventListener('change', async () => {
+                const file = avatarInput.files?.[0];
+                if (!file || !offlineProfileEditorContext) return;
+                avatarInput.disabled = true;
+                try {
+                    const imageUrl = await readOfflineProfileImageFile(file, { maxWidth: 512, maxHeight: 512 });
+                    offlineProfileEditorContext.avatarDraft = imageUrl;
+                    offlineProfileEditorContext.avatarChanged = true;
+                    renderOfflineProfileEditorPreview(
+                        overlay.querySelector('.offline-profile-editor-avatar-preview'),
+                        imageUrl,
+                        'U'
+                    );
+                } catch (error) {
+                    console.error('Offline avatar update failed', error);
+                    window.showToast?.(error?.message || '无法读取头像');
+                } finally {
+                    avatarInput.value = '';
+                    avatarInput.disabled = false;
+                }
+            });
+            bannerInput?.addEventListener('change', async () => {
+                const file = bannerInput.files?.[0];
+                if (!file || !offlineProfileEditorContext) return;
+                bannerInput.disabled = true;
+                try {
+                    const imageUrl = await readOfflineProfileImageFile(file, { maxWidth: 1600, maxHeight: 900 });
+                    offlineProfileEditorContext.bannerDraft = imageUrl;
+                    offlineProfileEditorContext.bannerChanged = true;
+                    renderOfflineProfileEditorPreview(
+                        overlay.querySelector('.offline-profile-editor-banner-preview'),
+                        imageUrl,
+                        'Cover'
+                    );
+                } catch (error) {
+                    console.error('Offline background update failed', error);
+                    window.showToast?.(error?.message || '无法读取背景图');
+                } finally {
+                    bannerInput.value = '';
+                    bannerInput.disabled = false;
+                }
+            });
+            overlay.querySelector('.offline-profile-editor-save')?.addEventListener('click', async () => {
+                const context = offlineProfileEditorContext;
+                if (!context?.friend?.id) return;
+                const saveButton = overlay.querySelector('.offline-profile-editor-save');
+                const read = (field) => String(overlay.querySelector(`[data-offline-profile-field="${field}"]`)?.value || '').trim();
+                const name = read('name');
+                if (!name) {
+                    window.showToast?.('Name 不能为空');
+                    overlay.querySelector('[data-offline-profile-field="name"]')?.focus();
+                    return;
+                }
+                const nextProfile = {
+                    name: name.slice(0, 32),
+                    handle: makeOfflineProfileHandle(read('handle'), name),
+                    following: normalizeOfflineProfileStat(read('following'), context.profile.following),
+                    followers: normalizeOfflineProfileStat(read('followers'), context.profile.followers),
+                    views: normalizeOfflineProfileStat(read('views'), context.profile.views),
+                    likes: normalizeOfflineProfileStat(read('likes'), context.profile.likes),
+                    favorite: normalizeOfflineProfileStat(read('favorite'), context.profile.favorite)
+                };
+                if (context.avatarChanged) nextProfile.avatarUrl = context.avatarDraft;
+                else if (context.profile.avatarOverrideUrl) nextProfile.avatarUrl = context.profile.avatarOverrideUrl;
+                const field = context.isUser ? 'offlineUserProfile' : 'offlineCharProfile';
+                const bannerField = context.isUser ? 'offlineUserBannerUrl' : 'offlineCharBannerUrl';
+                if (saveButton) saveButton.disabled = true;
+                try {
+                    const saved = await commitSheetFriendChange(context.friend.id, (targetFriend) => {
+                        targetFriend[field] = nextProfile;
+                        if (context.bannerChanged) targetFriend[bannerField] = context.bannerDraft;
+                    }, { silent: true, metaOnly: true });
+                    if (!saved) throw new Error('Profile save failed');
+                    const displayProfile = {
+                        ...context.profile,
+                        ...nextProfile,
+                        avatarUrl: context.avatarChanged ? context.avatarDraft : context.profile.avatarUrl
+                    };
+                    const role = context.isUser ? 'user' : 'assistant';
+                    updateOfflineProfileCards(role, displayProfile);
+                    if (context.bannerChanged) renderOfflineProfileBanner(role, context.bannerDraft);
+                    closeOfflineProfileEditor();
+                    window.showToast?.('Profile saved');
+                } catch (error) {
+                    console.error('Offline profile save failed', error);
+                    window.showToast?.('资料保存失败');
+                } finally {
+                    if (saveButton) saveButton.disabled = false;
+                }
+            });
+            return overlay;
+        };
+
+        const openOfflineProfileEditor = (friend, isUser) => {
+            const overlay = ensureOfflineProfileEditor();
+            const latestFriend = window.imApp?.getFriendById?.(friend?.id) || friend;
+            if (!overlay || !latestFriend) return;
+            const profile = getOfflineEditableProfile(latestFriend, isUser);
+            const bannerField = isUser ? 'offlineUserBannerUrl' : 'offlineCharBannerUrl';
+            const bannerDraft = String(latestFriend[bannerField] || '').trim();
+            offlineProfileEditorContext = {
+                friend: latestFriend,
+                isUser,
+                profile,
+                avatarDraft: profile.avatarUrl,
+                bannerDraft,
+                avatarChanged: false,
+                bannerChanged: false
+            };
+            ['name', 'handle', 'following', 'followers', 'views', 'likes', 'favorite'].forEach((field) => {
+                const input = overlay.querySelector(`[data-offline-profile-field="${field}"]`);
+                if (input) input.value = profile[field] || '';
+            });
+            renderOfflineProfileEditorPreview(
+                overlay.querySelector('.offline-profile-editor-avatar-preview'),
+                profile.avatarUrl,
+                profile.name.slice(0, 1).toUpperCase()
+            );
+            renderOfflineProfileEditorPreview(
+                overlay.querySelector('.offline-profile-editor-banner-preview'),
+                bannerDraft,
+                'Cover'
+            );
+            if (typeof window.openView === 'function') window.openView(overlay);
+            else overlay.classList.add('active');
+            overlay.setAttribute('aria-hidden', 'false');
+        };
+
+        const bindOfflineTranslationControl = (bubbleDiv, message, friend, options) => {
+            const button = bubbleDiv.querySelector('.offline-chat-quotes-btn');
+            if (!button || message.role !== 'assistant' || options.isAutoImage) return;
+            button.disabled = message.translationState === 'pending' || bubbleDiv.querySelector('.offline-chat-bubble-text')?.dataset.editing === 'true';
+            if (message.translationState !== 'complete') button.textContent = message.translationState === 'pending' ? 'View quotes >' : '译文未完成';
+            else button.textContent = 'View quotes >';
+            button.title = message.translationState === 'complete' ? 'View quotes' : '译文未完成';
+            button.setAttribute('aria-label', button.title);
+            if (button.dataset.translationBound === 'true') return;
+            button.dataset.translationBound = 'true';
+            button.addEventListener('click', () => {
+                if (button.disabled || bubbleDiv.querySelector('.offline-chat-bubble-text')?.dataset.editing === 'true') return;
+                const liveFriend = window.imApp?.getFriendById?.(friend?.id) || friend;
+                const live = value_221(liveFriend).find(row => String(row.id) === String(message.id)) || message;
+                if (live.translationState !== 'complete' || !live.translationZh) {
+                    window.showToast?.('译文未完成'); return;
+                }
+                const translated = button.getAttribute('aria-pressed') !== 'true';
+                button.setAttribute('aria-pressed', String(translated));
+                button.classList.toggle('is-translated', translated);
+                renderOfflineTranslationState(bubbleDiv, live, liveFriend, options, translated);
+                window.showToast?.(translated ? 'Translated' : 'Show original');
+            });
+        };
+
+        const bindOfflineProfileCardControls = (bubbleDiv, message, friend, options) => {
+            const followButton = bubbleDiv.querySelector('.offline-chat-follow-btn');
+            followButton?.addEventListener('click', () => openOfflineProfileEditor(friend, options.isUser));
+            bindOfflineTranslationControl(bubbleDiv, message, friend, options);
+        };
+
+        const renderOfflineSocialIcon = (name) => {
+            if (name === 'comment') {
+                return '<svg class="offline-chat-social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 11.5c0 4.15-4.25 7.5-9.5 7.5-1.12 0-2.19-.15-3.18-.44L3.5 21l1.46-4.09C3.11 15.55 2 13.65 2 11.5 2 7.35 6.25 4 11.5 4S21 7.35 21 11.5Z"/></svg>';
+            }
+            const classes = {
+                repost: 'fas fa-retweet',
+                heart: 'far fa-heart',
+                bookmark: 'far fa-bookmark',
+                share: 'fas fa-arrow-up-from-bracket'
+            };
+            return `<i class="${classes[name] || ''}" aria-hidden="true"></i>`;
+        };
+
+        const renderOfflineChatBubble = (messageOrText, isUser = true, options = {}) => {
+            const contentArea = document.getElementById('offline-chat-content');
+            if (!contentArea) return null;
+
+            const friend = window.imData.currentActiveFriend;
+            if (!options.skipTheme) applyOfflineChatTheme_2(friend);
+            const rawMessage = messageOrText && typeof messageOrText === 'object'
+                ? messageOrText
+                : { role: isUser ? 'user' : 'assistant', content: String(messageOrText || ''), timestamp: Date.now() };
+            const message = {
+                ...rawMessage,
+                id: rawMessage.id || createOfflineChatId(rawMessage.role === 'assistant' ? 'offline-ai' : 'offline-user'),
                 role: rawMessage.role === 'assistant' ? 'assistant' : 'user',
                 type: rawMessage.type || '',
                 content: String(rawMessage.content || ''),
-                reasoning:
-                    rawMessage.role === 'assistant' ? String(rawMessage.reasoning || '') : '',
+                reasoning: rawMessage.role === 'assistant' ? String(rawMessage.reasoning || '') : '',
+                translationZh: String(rawMessage.translationZh || '').trim(),
+                translationState: rawMessage.translationState || (rawMessage.translationZh ? 'complete' : 'incomplete'),
+                liked: rawMessage.liked === true,
+                saved: rawMessage.saved === true,
                 timestamp: Number(rawMessage.timestamp) || Date.now(),
                 tokens: Number(rawMessage.tokens) || 0,
                 imageUrl: String(rawMessage.imageUrl || '').trim(),
@@ -4775,166 +5170,127 @@ The prompt must describe the same current moment with characters, action, settin
                 imageProvider: String(rawMessage.imageProvider || '').trim(),
                 imageModel: String(rawMessage.imageModel || '').trim(),
                 imageSize: String(rawMessage.imageSize || '').trim(),
-                faceReferenceUsed: rawMessage.faceReferenceUsed === true,
-                charFaceReferenceUsed: rawMessage.charFaceReferenceUsed === true,
-                userFaceReferenceUsed: rawMessage.userFaceReferenceUsed === true,
-                imageGenerationPrompt: String(rawMessage.imageGenerationPrompt || ''),
-                imageGenerationCompiledPrompt: String(
-                    rawMessage.imageGenerationCompiledPrompt || '',
-                ),
-                imageGenerationConfig: rawMessage.imageGenerationConfig || null,
-                generationState: ['failed', 'truncated'].includes(
-                    String(rawMessage.generationState || ''),
-                )
-                    ? String(rawMessage.generationState)
-                    : undefined,
-                continuationState:
-                    rawMessage.continuationState === 'available' ? 'available' : undefined,
-                ttsAudioAssets: value_194(rawMessage.ttsAudioAssets),
+                faceReferenceUsed: rawMessage.faceReferenceUsed === true
             };
-            isUser = message_21.role === 'user';
-            const isAutoImage_2 = isOfflineAutoImageMessage(message_21);
-            const offlineUserProfile = handleAction_27(friend_11);
-            const userName_3 = isUser
-                        ? offlineUserProfile.name
-                        : friend_11?.nickname || friend_11?.realName || 'TA';
-            const userSign = isUser ? offlineUserProfile.signature : friend_11?.signature || '';
-            const userAvatar = isUser ? offlineUserProfile.avatarUrl : friend_11?.avatarUrl || '';
-            const floor_3 = Number(options_6.floor) || 1;
-            const value_1063 = Number.isInteger(Number(options_6.depth))
-                        ? Number(options_6.depth)
-                        : 0;
-            const isReadOnly = !!options_6.readOnly;
-            const actionsDisabled_2 = isReadOnly || !!options_6.actionsDisabled;
-            const enableBarrage_3 = !isUser && isOfflineBarragePromptEnabled(friend_11);
-            const enableChoices_3 = !isUser && isOfflineChoicesPromptEnabled(friend_11);
-            const timeText = formatOfflineBubbleTime(message_21.timestamp);
-            const value_1069 = isAutoImage_2
-                        ? '图片 · ' + timeText
-                        : isUser
-                          ? '#' +
-                            floor_3 +
-                            ' · ' +
-                            countOfflineTextCharacters(message_21.content) +
-                            '字 · ' +
-                            timeText
-                          : '#' +
-                            floor_3 +
-                            ' · ' +
-                            (message_21.tokens || estimateOfflineTextTokens(message_21.content)) +
-                            ' tokens · ' +
-                            timeText;
-            const bubbleDiv_3 = document.createElement('div');
-            bubbleDiv_3.className = 'offline-chat-bubble ' + (isUser ? 'user' : 'ai');
-            bubbleDiv_3.setAttribute('data-message-id', message_21.id);
-            bubbleDiv_3.setAttribute('data-floor', String(floor_3));
-            let text_1071 =
-                    '<div class="offline-chat-avatar"><i class="fas fa-user"></i></div>';
-            userAvatar &&
-                (text_1071 =
-                    '<div class="offline-chat-avatar"><img src="' +
-                    escapeSheetHtml(userAvatar) +
-                    '" alt="avatar"></div>');
-            const parsedMessage =
-                        !isUser && !isAutoImage_2 && offlineReasoning
-                            ? offlineReasoning.normalizeResponse(
-                                  message_21.content,
-                                  message_21.reasoning,
-                              )
-                            : {
-                                  content: String(message_21.content || ''),
-                                  reasoning: '',
-                              };
+            isUser = message.role === 'user';
+            const isAutoImage = isOfflineAutoImageMessage(message);
+
+            const offlineUserProfile = getOfflineEditableProfile(friend, true);
+            const offlineCharProfile = getOfflineEditableProfile(friend, false);
+            const displayProfile = isUser ? offlineUserProfile : offlineCharProfile;
+            const userName = displayProfile.name;
+            const userHandle = displayProfile.handle;
+            const userSign = displayProfile.signature;
+            const userAvatar = displayProfile.avatarUrl;
+            const bannerUrl = String((isUser ? friend?.offlineUserBannerUrl : friend?.offlineCharBannerUrl) || '').trim();
+            const floor = Number(options.floor) || 1;
+            const depth = Number.isInteger(Number(options.depth)) ? Number(options.depth) : 0;
+            const isReadOnly = !!options.readOnly;
+            const actionsDisabled = isReadOnly || !!options.actionsDisabled;
+            const enableBarrageForMessage = !isUser && isOfflineBarragePromptEnabled(friend);
+            const enableChoicesForMessage = !isUser && isOfflineChoicesPromptEnabled(friend);
+            const timeText = formatOfflineBubbleTime(message.timestamp);
+            const contentMetric = isAutoImage
+                ? '0'
+                : (isUser
+                    ? `${countOfflineTextCharacters(message.content)}`
+                    : `${message.tokens || estimateOfflineTextTokens(message.content)}`);
+
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = `offline-chat-bubble ${isUser ? 'user' : 'ai'}`;
+            bubbleDiv.setAttribute('data-message-id', message.id);
+            bubbleDiv.setAttribute('data-floor', String(floor));
+            bubbleDiv.setAttribute('data-profile-role', isUser ? 'user' : 'assistant');
+
+            let avatarHtml = `<div class="offline-chat-avatar"><i class="fas fa-user"></i></div>`;
+            if (userAvatar) {
+                avatarHtml = `<div class="offline-chat-avatar"><img src="${escapeSheetHtml(userAvatar)}" alt="avatar"></div>`;
+            }
+
+            // reasoning 与正文分开渲染；旧标签消息在这里仍可兼容解析。
+            const parsedMessage = !isUser && !isAutoImage && offlineReasoning
+                ? offlineReasoning.normalizeResponse(message.content, message.reasoning)
+                : { content: String(message.content || ''), reasoning: '' };
             const rawThinking = parsedMessage.reasoning;
-            const content_8 = value_218(parsedMessage.content, message_21.role, value_1063);
-            const value_220_1075 = value_220(parsedMessage.content, message_21.role, value_1063, {
-                messageId: message_21.id,
-                enableVoice: !isUser && _value(friend_11),
-                enableBarrage: enableBarrage_3,
-                enableChoices: enableChoices_3,
-                enableRecap: !isUser,
-                language: friend_11?.language || 'zh',
-            });
-            const displayThinking = rawThinking
-                        ? buildOfflineThinkingHtml(rawThinking, false)
-                        : '';
-            const offlineChatActionButtonsHtml = getOfflineChatActionButtonsHtml(
-                        isUser,
-                        actionsDisabled_2,
-                        message_21,
-                    );
-            const match_1077 = String(message_21.imageSize || '').match(
-                        /(\d{2,5})\s*[x×]\s*(\d{2,5})/i,
-                    );
-            const value_1078 = match_1077
-                        ? Number(match_1077[1]) + ' / ' + Number(match_1077[2])
-                        : '1 / 1';
-            const value_1079 = isAutoImage_2
-                        ? '<figure class="offline-chat-generated-image"><img src="' +
-                          escapeSheetHtml(message_21.imageUrl) +
-                          '" alt="' +
-                          escapeSheetHtml(message_21.content || '线下剧情图片') +
-                          '" loading="lazy" decoding="async" style="--offline-generated-image-ratio: ' +
-                          value_1078 +
-                          ';"><figcaption>' +
-                          escapeSheetHtml(message_21.content || '线下剧情图片') +
-                          '</figcaption></figure>'
-                        : '';
-            bubbleDiv_3.innerHTML =
-                `
+            const displayText = value_218(parsedMessage.content, message.role, depth);
+            const displayThinking = rawThinking ? buildOfflineThinkingHtml(rawThinking, false) : '';
+
+            const imageDimensions = String(message.imageSize || '').match(/(\d{2,5})\s*[x×]\s*(\d{2,5})/i);
+            const imageRatio = imageDimensions ? `${Number(imageDimensions[1])} / ${Number(imageDimensions[2])}` : '1 / 1';
+            const imageHtml = isAutoImage
+                ? `<figure class="offline-chat-generated-image"><img src="${escapeSheetHtml(message.imageUrl)}" alt="${escapeSheetHtml(message.content || '线下剧情图片')}" loading="lazy" decoding="async" style="--offline-generated-image-ratio: ${imageRatio}"><figcaption>${escapeSheetHtml(message.content || '线下剧情图片')}</figcaption></figure>`
+                : '';
+
+            bubbleDiv.innerHTML = `
                 <div class="offline-chat-bubble-header">
-                    ` +
-                text_1071 +
-                `
-                    <div class="offline-chat-name-container">
-                        <span class="offline-chat-name">` +
-                escapeSheetHtml(userName_3) +
-                `</span>
+                    <div class="offline-chat-banner${bannerUrl ? ' has-image' : ''}" aria-hidden="true"></div>
+                    ${avatarHtml}
+                    <div class="offline-chat-profile-tools">
+                        <time class="offline-chat-timestamp" datetime="${new Date(message.timestamp).toISOString()}">${escapeSheetHtml(timeText)}</time>
+                        <button type="button" class="offline-chat-follow-btn" aria-pressed="false">Follow</button>
                     </div>
-                    ` +
-                (userSign
-                    ? '<div class="offline-chat-sign">' + escapeSheetHtml(userSign) + '</div>'
-                    : '') +
-                `
+                    <div class="offline-chat-name-container">
+                        <span class="offline-chat-name">${escapeSheetHtml(userName)}</span>
+                        <span class="offline-chat-handle">${escapeSheetHtml(userHandle)}</span>
+                    </div>
+                    <div class="offline-chat-profile-stats"><span><strong class="offline-profile-following-value">${escapeSheetHtml(displayProfile.following)}</strong> Following</span><span><strong class="offline-profile-followers-value">${escapeSheetHtml(displayProfile.followers)}</strong> Followers</span></div>
+                    ${userSign ? `<div class="offline-chat-sign">${escapeSheetHtml(userSign)}</div>` : ''}
                 </div>
                 <div class="offline-chat-bubble-body">
-                    ` +
-                (isAutoImage_2 ? value_1079 : displayThinking) +
-                `
-                    ` +
-                (isAutoImage_2
-                    ? ''
-                    : '<div class="offline-chat-bubble-text" ' +
-                      (value_220_1075 ? '' : 'style="display:none;"') +
-                      '>' +
-                      value_220_1075 +
-                      '</div>') +
-                `
+                    ${isAutoImage ? imageHtml : displayThinking}
+                    ${isAutoImage ? '' : `<div class="offline-chat-bubble-text" ${displayText ? '' : 'style="display:none;"'}>${value_220(parsedMessage.content, message.role, depth, {
+                        messageId: message.id,
+                        enableVoice: !isUser && _value(friend),
+                        enableBarrage: enableBarrageForMessage,
+                        enableChoices: enableChoicesForMessage,
+                        enableRecap: !isUser,
+                        language: friend?.language || 'zh'
+                    })}</div>`}
+                    <div class="offline-chat-view-row"><span><strong class="offline-profile-views-value">${escapeSheetHtml(displayProfile.views)}</strong> Views</span><button type="button" class="offline-chat-quotes-btn${isUser || isAutoImage ? ' is-static' : ''}" aria-pressed="false"${isUser || isAutoImage ? ' aria-disabled="true" tabindex="-1"' : ''}>View quotes &gt;</button></div>
                     <div class="offline-chat-bubble-footer">
-                        <div class="offline-chat-bubble-meta">` +
-                escapeSheetHtml(value_1069) +
-                `</div>
-                        ` +
-                offlineChatActionButtonsHtml +
-                `
+                        <div class="offline-chat-social-actions">
+                            <span class="offline-chat-social-item" aria-label="楼层">${renderOfflineSocialIcon('comment')}<span>${floor}</span></span>
+                            <span class="offline-chat-social-item" aria-label="字数或 Token">${renderOfflineSocialIcon('repost')}<span class="offline-chat-content-metric">${escapeSheetHtml(contentMetric)}</span></span>
+                            <button type="button" class="offline-chat-social-item offline-chat-like-action${message.liked ? ' is-liked' : ''}" aria-label="点赞" aria-pressed="${message.liked ? 'true' : 'false'}"${actionsDisabled ? ' disabled' : ''}><i class="${message.liked ? 'fas' : 'far'} fa-heart" aria-hidden="true"></i><span class="offline-profile-likes-value">${escapeSheetHtml(displayProfile.likes)}</span></button>
+                            <button type="button" class="offline-chat-social-item offline-chat-favorite-action${message.saved ? ' is-saved' : ''}" aria-label="收藏" aria-pressed="${message.saved ? 'true' : 'false'}"${actionsDisabled ? ' disabled' : ''}><i class="${message.saved ? 'fas' : 'far'} fa-bookmark" aria-hidden="true"></i><span class="offline-profile-favorite-value">${escapeSheetHtml(displayProfile.favorite)}</span></button>
+                            <button type="button" class="offline-chat-social-item offline-chat-social-action offline-chat-share-action" aria-label="More actions" title="More actions"${actionsDisabled ? ' disabled' : ''}>${renderOfflineSocialIcon('share')}</button>
+                            <span class="offline-chat-inline-edit-actions" aria-hidden="true"><button type="button" data-inline-edit-action="save" title="保存" aria-label="保存"><i class="fas fa-check"></i></button><button type="button" data-inline-edit-action="cancel" title="取消" aria-label="取消"><i class="fas fa-times"></i></button></span>
+                        </div>
                     </div>
                 </div>
             `;
-            if (!isAutoImage_2) bindOfflineThinkingToggle(bubbleDiv_3);
-            bindOfflineChatBubbleActions(bubbleDiv_3, message_21);
-            if (!isAutoImage_2)
-                bindOfflineChatTextControls(bubbleDiv_3, message_21, friend_11, floor_3);
-            const container_3 = options_6.container || contentArea_5;
-            container_3.appendChild(bubbleDiv_3);
-            if (options_6.scroll !== false && container_3 === contentArea_5)
-                scrollOfflineChatToBottom(contentArea_5);
-            return bubbleDiv_3;
+
+            const bannerEl = bubbleDiv.querySelector('.offline-chat-banner');
+            if (bannerEl && bannerUrl) bannerEl.style.backgroundImage = `url("${bannerUrl.replace(/(["\\])/g, '\\$1')}")`;
+
+            if (!isAutoImage) bindOfflineThinkingToggle(bubbleDiv);
+            bindOfflineChatBubbleActions(bubbleDiv, message);
+            bindOfflineSocialInteractions(bubbleDiv, message, { isUser, isAutoImage });
+            bindOfflineShareMenu(bubbleDiv, message, actionsDisabled);
+            syncOfflineAuxiliaryAction(bubbleDiv, message, actionsDisabled);
+            if (!isAutoImage) bindOfflineChatTextControls(bubbleDiv, message, friend, floor);
+            bindOfflineProfileCardControls(bubbleDiv, message, friend, {
+                floor,
+                depth,
+                isUser,
+                isAutoImage,
+                enableBarrage: enableBarrageForMessage,
+                enableChoices: enableChoicesForMessage
+            });
+
+            const container = options.container || contentArea;
+            container.appendChild(bubbleDiv);
+            if (options.scroll !== false && container === contentArea) scrollOfflineChatToBottom(contentArea);
+            return bubbleDiv;
         };
+
+
         const createStreamingBubble = (content_9 = '', isUser_2 = false, options_7 = {}) => {
             const message_22 = {
                 id: options_7.id || createOfflineChatId(isUser_2 ? 'offline-user' : 'offline-ai'),
                 role: isUser_2 ? 'user' : 'assistant',
                 content: content_9,
+                translationState: 'pending',
                 reasoning: options_7.reasoning || '',
                 timestamp: options_7.timestamp || Date.now(),
                 tokens: options_7.tokens || 0,
@@ -4961,15 +5317,7 @@ The prompt must describe the same current moment with characters, action, settin
                         renderTimerId = null;
                     };
             const renderStreamingState = () => {
-                const currentParsed = offlineReasoning
-                    ? offlineReasoning.normalizeResponse(currentContent, currentNativeReasoning, {
-                          streaming: !generationFinished,
-                      })
-                    : {
-                          content: currentContent,
-                          reasoning: currentNativeReasoning,
-                          incomplete: false,
-                      };
+                const currentParsed = normalizeOfflineResponseFields(currentContent, currentNativeReasoning, !generationFinished);
                 String(currentParsed.reasoning || '').trim() &&
                     (lastVisibleReasoning = String(currentParsed.reasoning).trim());
                 const parsed_5 =
@@ -4986,6 +5334,8 @@ The prompt must describe the same current moment with characters, action, settin
                 const finalDisplayContent = splitOfflineAutoImageMarker(parsed_5.content).content;
                 generationFinished &&
                     ((message_22.content = finalDisplayContent),
+                    (message_22.translationZh = parsed_5.translationZh),
+                    (message_22.translationState = parsed_5.translationState),
                     (message_22.reasoning = parsed_5.reasoning || ''));
                 const textContent_8 = generationFinished
                     ? value_218(finalDisplayContent, message_22.role, value_1090)
@@ -5075,30 +5425,15 @@ The prompt must describe the same current moment with characters, action, settin
                 },
                 setTokens: (value_1100) => {
                     const max_1101 = Math.max(0, Number(value_1100) || 0);
-                    const metaEl = bubbleDiv_4.querySelector('.offline-chat-bubble-meta');
-                    metaEl &&
-                        (metaEl.textContent =
-                            '#' +
-                            (Number(options_7.floor) || 1) +
-                            ' · ' +
-                            (max_1101 || estimateOfflineTextTokens(currentContent)) +
-                            ' tokens · ' +
-                            formatOfflineBubbleTime(message_22.timestamp));
+                    const metaEl = bubbleDiv_4.querySelector('.offline-chat-content-metric');
+                    if (metaEl) metaEl.textContent = String(max_1101 || estimateOfflineTextTokens(message_22.content));
                 },
                 enableActions: (finalMessage) => {
                     if (finalMessage) Object.assign(message_22, finalMessage);
                     enableOfflineChatBubbleActions(bubbleDiv_4, message_22);
                 },
                 getResult: () => {
-                    const parsed_7 = offlineReasoning
-                            ? offlineReasoning.normalizeResponse(
-                                  currentContent,
-                                  currentNativeReasoning,
-                              )
-                            : {
-                                  content: currentContent,
-                                  reasoning: currentNativeReasoning,
-                              };
+                    const parsed_7 = normalizeOfflineResponseFields(currentContent, currentNativeReasoning, false);
                     return lastVisibleReasoning && !String(parsed_7.reasoning || '').trim()
                         ? {
                               ...parsed_7,
@@ -5920,146 +6255,149 @@ The prompt must describe the same current moment with characters, action, settin
             void view_3.offsetWidth;
             view_3.classList.add('active');
         }
-        async function openOfflineMessageEditor(messageId_5) {
-            const currentActiveFriend_1251 = window.imData.currentActiveFriend;
-            if (!currentActiveFriend_1251) return;
-            const messages_11 = value_221(currentActiveFriend_1251);
-            const index_4 = messages_11.findIndex(
-                    (value_422) => String(value_422.id) === String(messageId_5),
-                );
-            if (index_4 < 0) return;
-            const bubble_6 = Array.from(document.querySelectorAll('.offline-chat-bubble')).find(
-                    (value_424) =>
-                        String(value_424.getAttribute('data-message-id') || '') ===
-                        String(messageId_5),
-                );
-            const textEl_3 = bubble_6 ? bubble_6.querySelector('.offline-chat-bubble-text') : null;
-            const actionsEl_2 = bubble_6
-                    ? bubble_6.querySelector('.offline-chat-bubble-actions')
-                    : null;
-            if (!bubble_6 || !textEl_3 || textEl_3.dataset.editing === 'true') return;
-            const originalText_2 = messages_11[index_4].content || '';
-            const innerHTML_8 = textEl_3.innerHTML;
-            const display_3 = textEl_3.style.display;
-            const minHeight_2 = textEl_3.style.minHeight;
-            const innerHTML_10 = actionsEl_2 ? actionsEl_2.innerHTML : '';
-            const measuredHeight = Math.ceil(textEl_3.getBoundingClientRect().height || 0);
-            textEl_3.dataset.editing = 'true';
-            textEl_3.style.display = '';
-            if (measuredHeight > 0) textEl_3.style.minHeight = measuredHeight + 'px';
-            textEl_3.innerHTML =
-                '<textarea class="offline-chat-inline-editor">' +
-                escapeSheetHtml(originalText_2) +
-                '</textarea>';
-            actionsEl_2 &&
-                (actionsEl_2.innerHTML = `
-                    <button type="button" class="offline-chat-action-btn" data-inline-edit-action="save" title="保存" aria-label="保存"><i class="fas fa-check"></i></button>
-                    <button type="button" class="offline-chat-action-btn" data-inline-edit-action="cancel" title="取消" aria-label="取消"><i class="fas fa-times"></i></button>
-                `);
-            const textarea_3 = textEl_3.querySelector('.offline-chat-inline-editor');
-            const restore_2 = () => {
-                    textEl_3.dataset.editing = 'false';
-                    textEl_3.innerHTML = innerHTML_8;
-                    textEl_3.style.display = display_3;
-                    textEl_3.style.minHeight = minHeight_2;
-                    textEl_3.querySelectorAll('[data-bound]').forEach((value_1266) => {
-                        delete value_1266.dataset.bound;
-                    });
-                    bindOfflineChatTextControls(
-                        bubble_6,
-                        messages_11[index_4],
-                        currentActiveFriend_1251,
-                        index_4 + 1,
-                    );
-                    actionsEl_2 &&
-                        ((actionsEl_2.innerHTML = innerHTML_10),
-                        actionsEl_2
-                            .querySelectorAll('[data-offline-action]')
-                            .forEach((button_7) => {
-                                button_7.addEventListener('click', async (event_1268) => {
-                                    event_1268.preventDefault();
-                                    event_1268.stopPropagation();
-                                    const action_3 = button_7.getAttribute('data-offline-action');
-                                    if (isOfflineAutoImageMessage_2(currentActiveFriend_1251))
-                                        return;
-                                    if (action_3 === 'edit')
-                                        await openOfflineMessageEditor(messageId_5);
-                                    if (action_3 === 'delete') {
-                                        buildOfflineThinkingHtml_2(currentActiveFriend_1251, true);
-                                        try {
-                                            await handleAction_290(messageId_5);
-                                        } finally {
-                                            buildOfflineThinkingHtml_2(
-                                                currentActiveFriend_1251,
-                                                false,
-                                            );
-                                        }
-                                    }
-                                    if (action_3 === 'reroll')
-                                        await rerollOfflineAssistantMessage(messageId_5, button_7);
-                                    if (action_3 === 'continue')
-                                        await rerollOfflineAssistantMessage_2(
-                                            messageId_5,
-                                            button_7,
-                                        );
-                                });
-                            }));
-                };
-            const save = async () => {
-                const content_10 = textarea_3 ? textarea_3.value : originalText_2;
-                const slice_1271 = messages_11.slice();
-                const _value102 =
-                    content_10 !== originalText_2 ? slice_1271[index_4].ttsAudioAssets : [];
-                slice_1271[index_4] = {
-                    ...slice_1271[index_4],
-                    content: content_10,
-                    ttsAudioAssets:
-                        content_10 !== originalText_2 ? [] : slice_1271[index_4].ttsAudioAssets,
-                    tokens:
-                        slice_1271[index_4].role === 'assistant'
-                            ? estimateOfflineTextTokens(content_10)
-                            : undefined,
-                    updatedAt: new Date().toISOString(),
-                };
-                const filter_1272 = slice_1271.filter(
-                        (value_1273, value_1274) =>
-                            value_1274 === index_4 ||
-                            String(value_1273.sourceMessageId || '') !== String(messageId_5),
-                    );
-                await persistOfflineMessages(currentActiveFriend_1251, filter_1272, {
-                    resetMessageIds: [messageId_5],
+        async function openOfflineMessageEditor(messageId) {
+            const activeFriend = window.imData.currentActiveFriend;
+            if (!activeFriend) return;
+            const messages = value_221(activeFriend);
+            const index = messages.findIndex(message => String(message.id) === String(messageId));
+            if (index < 0) return;
+
+            const bubble = Array.from(document.querySelectorAll('.offline-chat-bubble'))
+                .find(item => String(item.getAttribute('data-message-id') || '') === String(messageId));
+            const textEl = bubble ? bubble.querySelector('.offline-chat-bubble-text') : null;
+            const actionsEl = bubble ? bubble.querySelector('.offline-chat-social-actions') : null;
+            const editActions = actionsEl?.querySelector('.offline-chat-inline-edit-actions');
+            if (!bubble || !textEl || !actionsEl || !editActions || textEl.dataset.editing === 'true') return;
+
+            const quotesButton = bubble.querySelector('.offline-chat-quotes-btn');
+            const editingTranslation = messages[index].role === 'assistant'
+                && quotesButton?.getAttribute('aria-pressed') === 'true';
+            const editingField = editingTranslation ? 'translationZh' : 'content';
+            const originalText = String(messages[index][editingField] || '');
+            const quotesWereDisabled = quotesButton?.disabled || false;
+            if (quotesButton) quotesButton.disabled = true;
+            const originalHtml = textEl.innerHTML;
+            const originalDisplay = textEl.style.display;
+            const originalMinHeight = textEl.style.minHeight;
+            const measuredHeight = Math.ceil(textEl.getBoundingClientRect().height || 0);
+            const editorListeners = new AbortController();
+            textEl.dataset.editing = 'true';
+            textEl.style.display = '';
+            if (measuredHeight > 0) textEl.style.minHeight = `${measuredHeight}px`;
+            textEl.innerHTML = `<textarea class="offline-chat-inline-editor">${escapeSheetHtml(originalText)}</textarea>`;
+            actionsEl.classList.add('is-editing');
+            editActions.setAttribute('aria-hidden', 'false');
+
+            const textarea = textEl.querySelector('.offline-chat-inline-editor');
+            const restore = () => {
+                editorListeners.abort();
+                textEl.dataset.editing = 'false';
+                if (quotesButton) quotesButton.disabled = quotesWereDisabled;
+                textEl.innerHTML = originalHtml;
+                textEl.style.display = originalDisplay;
+                textEl.style.minHeight = originalMinHeight;
+                actionsEl.classList.remove('is-editing');
+                editActions.setAttribute('aria-hidden', 'true');
+                textEl.querySelectorAll('[data-bound]').forEach((control) => {
+                    delete control.dataset.bound;
                 });
-                await _value3(_value102);
-                renderOfflineCurrentMessages(currentActiveFriend_1251);
+                bindOfflineChatTextControls(bubble, messages[index], activeFriend, index + 1);
             };
-            if (actionsEl_2) {
-                const saveBtn_2 = actionsEl_2.querySelector('[data-inline-edit-action="save"]');
-                const cancelBtn_2 = actionsEl_2.querySelector('[data-inline-edit-action="cancel"]');
-                if (saveBtn_2)
-                    saveBtn_2.addEventListener('click', async (event_11) => {
-                        event_11.preventDefault();
-                        event_11.stopPropagation();
+            let saving = false;
+            const save = async () => {
+                if (saving) return;
+                saving = true;
+                try {
+                    const nextValue = textarea ? textarea.value : originalText;
+                    const changed = nextValue !== originalText;
+                    let obsoleteAudio = [];
+                    await patchOfflineMessage(activeFriend, messageId, live => {
+                        // Edit only the version that was visible when the editor opened.
+                        // Merge into the latest row so the other language and reactions survive.
+                        const next = { ...live, [editingField]: nextValue, updatedAt: new Date().toISOString() };
+                        if (editingTranslation) {
+                            next.translationState = nextValue.trim() ? 'complete' : 'incomplete';
+                        } else if (changed) {
+                            obsoleteAudio = live.ttsAudioAssets || [];
+                            next.ttsAudioAssets = [];
+                            if (live.role === 'assistant') next.tokens = estimateOfflineTextTokens(nextValue);
+                            next.offlineRegexAppliedRevisions = {};
+                        }
+                        return next;
+                    }, { removeLinkedImages: !editingTranslation && changed });
+                    if (obsoleteAudio.length) await _value3(obsoleteAudio);
+                    editorListeners.abort();
+                    const friend = window.imApp?.getFriendById?.(activeFriend.id) || activeFriend;
+                    renderOfflineCurrentMessages(friend);
+                    if (editingTranslation && nextValue.trim()) {
+                        const rows = value_221(friend);
+                        const updated = rows.find(row => String(row.id) === String(messageId));
+                        const updatedBubble = Array.from(document.querySelectorAll('#offline-chat-content .offline-chat-bubble'))
+                            .find(item => String(item.dataset.messageId) === String(messageId));
+                        if (updated && updatedBubble) {
+                            const quotes = updatedBubble.querySelector('.offline-chat-quotes-btn');
+                            quotes?.setAttribute('aria-pressed', 'true');
+                            quotes?.classList.add('is-translated');
+                            const visibleRows = getOfflineUnarchivedDialogueRows(rows);
+                            const rowIndex = visibleRows.findIndex(row => String(row.message.id) === String(messageId));
+                            renderOfflineTranslationState(updatedBubble, updated, friend, {
+                                floor: getOfflineMessageFloor(rows, messageId),
+                                depth: Math.max(0, visibleRows.length - 1 - rowIndex),
+                                isAutoImage: false,
+                                enableBarrage: isOfflineBarragePromptEnabled(friend),
+                                enableChoices: isOfflineChoicesPromptEnabled(friend)
+                            }, true);
+                        }
+                    }
+                } finally {
+                    saving = false;
+                }
+            };
+
+            const saveBtn = editActions.querySelector('[data-inline-edit-action="save"]');
+            const cancelBtn = editActions.querySelector('[data-inline-edit-action="cancel"]');
+            saveBtn?.addEventListener('click', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                saveBtn.disabled = true;
+                if (cancelBtn) cancelBtn.disabled = true;
+                try {
+                    await save();
+                } finally {
+                    saveBtn.disabled = false;
+                    if (cancelBtn) cancelBtn.disabled = false;
+                }
+            }, { signal: editorListeners.signal });
+            cancelBtn?.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                restore();
+            }, { signal: editorListeners.signal });
+            if (textarea) {
+                const resizeEditor = () => {
+                    textarea.style.height = '0px';
+                    textarea.style.height = `${Math.max(measuredHeight, textarea.scrollHeight)}px`;
+                };
+                resizeEditor();
+                textarea.focus();
+                textarea.selectionStart = textarea.value.length;
+                textarea.selectionEnd = textarea.value.length;
+                textarea.addEventListener('input', resizeEditor, { signal: editorListeners.signal });
+                textarea.addEventListener('keydown', async (event) => {
+                    if (event.isComposing || event.keyCode === 229) return;
+                    if ((event.ctrlKey || event.metaKey) && (event.key === 'Enter' || event.keyCode === 13)) {
+                        event.preventDefault();
                         await save();
-                    });
-                if (cancelBtn_2)
-                    cancelBtn_2.addEventListener('click', (event_12) => {
-                        event_12.preventDefault();
-                        event_12.stopPropagation();
-                        restore_2();
-                    });
+                    }
+                    if (event.key === 'Escape') {
+                        event.preventDefault();
+                        restore();
+                    }
+                }, { signal: editorListeners.signal });
             }
-            textarea_3 &&
-                (textarea_3.focus(),
-                (textarea_3.selectionStart = textarea_3.value.length),
-                (textarea_3.selectionEnd = textarea_3.value.length),
-                textarea_3.addEventListener('keydown', async (event_1277) => {
-                    if (event_1277.isComposing || event_1277.keyCode === 229) return;
-                    (event_1277.ctrlKey || event_1277.metaKey) &&
-                        (event_1277.key === 'Enter' || event_1277.keyCode === 13) &&
-                        (event_1277.preventDefault(), await save());
-                    event_1277.key === 'Escape' && (event_1277.preventDefault(), restore_2());
-                }));
         }
+
+
         async function handleAction_290(messageId_6) {
             const currentActiveFriend_1279 = window.imData.currentActiveFriend;
             if (!currentActiveFriend_1279) return;
@@ -6129,6 +6467,7 @@ The prompt must describe the same current moment with characters, action, settin
                               activeFriend_35?.realName || activeFriend_35?.nickname || 'Char',
                           ).trim() || 'Char';
                 return {
+                defaultLanguage: getOfflineChatLanguageName(activeFriend_35?.language),
                     userName: userName_4,
                     userPersona: userProfile.persona,
                     userAvatarUrl: userProfile.avatarUrl,
@@ -6142,7 +6481,8 @@ The prompt must describe the same current moment with characters, action, settin
         const replaceOfflinePromptVariables = (content_11, identityContext_2) =>
                 String(content_11 || '')
                     .replace(/\{\{user\}\}/g, () => identityContext_2.userName)
-                    .replace(/\{\{char\}\}/g, () => identityContext_2.charName);
+                    .replace(/\{\{default_language\}\}/g, () => identityContext_2.defaultLanguage || 'Chinese')
+                .replace(/\{\{char\}\}/g, () => identityContext_2.charName);
         const value_129 = (activeFriend_36, items_1301) => {
                 const currentUserState_4 = window.getUserState
                         ? window.getUserState()
@@ -6409,6 +6749,8 @@ The prompt must describe the same current moment with characters, action, settin
                             role: 'system',
                             content: buildOfflineAutoImageRequirement(),
                         }),
+                    apiMessages.push({ role: 'system', content: replaceOfflinePromptVariables(`Return one JSON object with exactly two string fields, in this order: "content", then "translationZh". Finish the complete content first in {{default_language}}, including narration, actions, descriptions, transitions, dialogue, enabled recap, barrage and player-choice sections. Then translate that exact content into Simplified Chinese in translationZh. Preserve paragraph breaks, dialogue, section order and all options one-to-one. Never generate a second story. Escape quotes and newlines as JSON strings. Do not put the translation inside content. Any enabled frontend thinking/COT blocks remain outside this object and follow their existing requirements; do not put thinking inside either string. No Markdown fences.
+The Default Language is {{default_language}}. It overrides any conflicting older language or plain-text transport instructions. Original-language context contains only content, never translationZh. If an automatic-image marker is requested, place that exact marker at the end of content inside the JSON string, never outside the object. Do not include the image marker or its technical scene description in translationZh.`, identityContext_3) }),
                     {
                         messages: apiMessages,
                         cotValidation: {
@@ -6440,22 +6782,8 @@ The prompt must describe the same current moment with characters, action, settin
                         value_1374 = true,
                         value_1375 = false,
                     ) => {
-                        const streamedResult = streamingBubble?.finish
-                                ? streamingBubble.finish()
-                                : streamingBubble?.getResult
-                                  ? streamingBubble.getResult()
-                                  : null,
-                            normalized_2 =
-                                streamedResult ||
-                                (offlineReasoning
-                                    ? offlineReasoning.normalizeResponse(
-                                          content_13,
-                                          nativeReasoning,
-                                      )
-                                    : {
-                                          content: String(content_13 || ''),
-                                          reasoning: String(nativeReasoning || ''),
-                                      });
+                        streamingBubble?.finish?.();
+                        const normalized_2 = normalizeOfflineResponseFields(content_13, nativeReasoning, false);
                         if (!value_486 && !String(normalized_2.content || '').trim()) {
                             const exhaustedTokens = [
                                     'length',
@@ -6499,6 +6827,8 @@ The prompt must describe the same current moment with characters, action, settin
                         if (streamingBubble?.setTokens) streamingBubble.setTokens(value_498);
                         return {
                             content: normalized_2.content,
+                            translationZh: normalized_2.translationZh,
+                            translationState: value_486 || !value_1374 || value_1375 ? 'incomplete' : normalized_2.translationState,
                             reasoning: normalized_2.reasoning || '',
                             tokens: value_498,
                             aborted: value_486,
@@ -7859,27 +8189,21 @@ Char: ` +
             const offlineChatBubbleTextElement_1660 = bubble_7?.querySelector(
                     '.offline-chat-bubble-text',
                 );
-            const metaEl_2 = bubble_7?.querySelector('.offline-chat-bubble-meta');
-            const actionsEl_3 = bubble_7?.querySelector('.offline-chat-bubble-actions');
+            const metaEl_2 = bubble_7?.querySelector('.offline-chat-content-metric');
+            const actionsEl_3 = bubble_7?.querySelector('.offline-chat-social-actions');
             const innerHTML_7 = offlineChatBubbleTextElement_1660?.innerHTML || '';
             const textContent_4 = metaEl_2?.textContent || '';
             const actionButtons = actionsEl_3
                     ? Array.from(actionsEl_3.querySelectorAll('button'))
                     : [];
             const string_1665 = String(value_1658.content || '');
-            let content_17 = string_1665;
+            let content_17 = '';
             let reasoning_2 = String(value_1658.reasoning || '');
             let value_1668 = Number(value_1658.tokens) || 0;
             const value_1669 = (streaming_2 = true) => {
                 if (!offlineChatBubbleTextElement_1660) return;
-                const parsed_11 = offlineReasoning
-                        ? offlineReasoning.normalizeResponse(content_17, reasoning_2, {
-                              streaming: streaming_2,
-                          })
-                        : {
-                              content: content_17,
-                              reasoning: reasoning_2,
-                          };
+                const responseFields = normalizeOfflineResponseFields(content_17, reasoning_2, streaming_2);
+                const parsed_11 = { ...responseFields, content: value_325(string_1665, responseFields.content) };
                 renderOfflineThinkingState(bubble_7, parsed_11.reasoning, {
                     expanded: streaming_2 && !!parsed_11.reasoning,
                 });
@@ -7925,26 +8249,19 @@ Char: ` +
                         return (
                             value_1669(false),
                             {
-                                content: content_17.slice(string_1665.length),
+                                ...normalizeOfflineResponseFields(content_17, reasoning_2, false),
                                 reasoning: reasoning_2,
                             }
                         );
                     },
                     getResult: () => ({
-                        content: content_17.slice(string_1665.length),
+                        ...normalizeOfflineResponseFields(content_17, reasoning_2, false),
                         reasoning: reasoning_2,
                     }),
                     getFullText: () => content_17,
                     setTokens: (value_1681) => {
                         value_1668 = Math.max(0, Number(value_1681) || 0);
-                        if (metaEl_2)
-                            metaEl_2.textContent =
-                                '#' +
-                                (index_6 + 1) +
-                                ' · ' +
-                                (value_1668 || estimateOfflineTextTokens(content_17)) +
-                                ' tokens · ' +
-                                formatOfflineBubbleTime(value_1658.timestamp);
+                        if (metaEl_2) metaEl_2.textContent = String(value_1668 || estimateOfflineTextTokens(content_17));
                     },
                 };
             actionButtons.forEach((actionButton) => {
@@ -7952,6 +8269,8 @@ Char: ` +
                 actionButton.style.opacity = '0.45';
             });
             buildOfflineThinkingHtml_2(currentActiveFriend_1655, true);
+            const viewButton = bubble_7?.querySelector(".offline-chat-quotes-btn");
+            if (viewButton) viewButton.disabled = true;
             try {
                 value_1669(true);
                 const requestContext_2 = await value_296(
@@ -7971,7 +8290,7 @@ Char: ` +
                 items_1683.push({
                     role: 'user',
                     content:
-                        '请从上一条回复中断的位置继续生成后续内容，只输出尚未生成的部分，不要重复已有文字。',
+                        '请从上一条回复中断的位置继续生成后续内容，content 只输出尚未生成的部分，不要重复已有文字；translationZh 必须翻译上一条已保存正文加本次 content 后的完整正文，保持全部段落和选项一一对应。仍按两字段 JSON 输出。',
                 });
                 const message_1685 = await requestOfflineAssistantReplyWithCotValidation(
                         requestContext_2,
@@ -7985,6 +8304,8 @@ Char: ` +
                 slice_1687[index_6] = {
                     ...value_1658,
                     content: splitOfflineAutoImageMarker(content_18).content,
+                    translationZh: message_1685.translationZh,
+                    translationState: message_1685.translationState,
                     ttsAudioAssets: [],
                     reasoning: message_1685.reasoning || value_1658.reasoning || undefined,
                     tokens: message_1685.tokens || value_1668,
@@ -7994,13 +8315,9 @@ Char: ` +
                     updatedAt: new Date().toISOString(),
                 };
                 const nextScene = splitOfflineAutoImageMarker(content_18).scene;
-                const value_1689 = await persistOfflineMessages(
-                        currentActiveFriend_1655,
-                        slice_1687,
-                        {
-                            resetMessageIds: [messageId_7],
-                        },
-                    );
+                const value_1689 = await patchOfflineMessage(currentActiveFriend_1655, messageId_7, live => ({ ...live,
+                    ...slice_1687[index_6], liked: live.liked, saved: live.saved
+                }));
                 await _value3(value_1658.ttsAudioAssets);
                 if (nextScene)
                     await generateOfflineAutoImage(
@@ -8073,9 +8390,9 @@ Char: ` +
                         String(messageId_8),
                 );
             const textEl_4 = bubble_8 ? bubble_8.querySelector('.offline-chat-bubble-text') : null;
-            const metaEl_3 = bubble_8 ? bubble_8.querySelector('.offline-chat-bubble-meta') : null;
+            const metaEl_3 = bubble_8 ? bubble_8.querySelector('.offline-chat-content-metric') : null;
             const value_667 = bubble_8
-                    ? bubble_8.querySelector('.offline-chat-bubble-actions')
+                    ? bubble_8.querySelector('.offline-chat-social-actions')
                     : null;
             const innerHTML_11 = textEl_4 ? textEl_4.innerHTML : '';
             const display_4 = textEl_4 ? textEl_4.style.display : '';
@@ -8084,15 +8401,7 @@ Char: ` +
             const timestamp_6 = Date.now();
             let streamContent = '';
             let streamReasoning = '';
-            const getStreamResult = (streaming_3 = true) =>
-                    offlineReasoning
-                        ? offlineReasoning.normalizeResponse(streamContent, streamReasoning, {
-                              streaming: streaming_3,
-                          })
-                        : {
-                              content: streamContent,
-                              reasoning: streamReasoning,
-                          };
+            const getStreamResult = (streaming = true) => normalizeOfflineResponseFields(streamContent, streamReasoning, streaming);
             const renderStreamState = (streaming_4 = true) => {
                 if (!textEl_4 || !bubble_8) return;
                 const parsed_12 = getStreamResult(streaming_4);
@@ -8150,19 +8459,7 @@ Char: ` +
                           setTokens: (value_699) => {
                               if (metaEl_3) {
                                   const max_700 = Math.max(0, Number(value_699) || 0);
-                                  metaEl_3.textContent =
-                                      '#' +
-                                      (targetIndex + 1) +
-                                      ' · ' +
-                                      (max_700 ||
-                                          estimateOfflineTextTokens(
-                                              streamReasoning +
-                                                  `
-` +
-                                                  streamContent,
-                                          )) +
-                                      ' tokens · ' +
-                                      formatOfflineBubbleTime(timestamp_6);
+                                  metaEl_3.textContent = String(max_700 || estimateOfflineTextTokens(getStreamResult().content));
                               }
                           },
                           getResult: () => getStreamResult(false),
@@ -8181,6 +8478,8 @@ Char: ` +
                 element_701.style.opacity = '0.45';
             });
             buildOfflineThinkingHtml_2(activeFriend_44, true);
+            const viewButton = bubble_8?.querySelector('.offline-chat-quotes-btn');
+            if (viewButton) viewButton.disabled = true;
             textEl_4 &&
                 (renderOfflineThinkingState(bubble_8, ''),
                 (textEl_4.dataset.rerolling = 'true'),
@@ -8192,6 +8491,8 @@ Char: ` +
                 const requestContext_3 = await value_296(activeFriend_44, contextMessages);
                 const {
                     content: content_27,
+                    translationZh: translationZh_27,
+                    translationState: translationState_27,
                     reasoning: reasoning_4,
                     tokens: tokens_2,
                     truncated: truncated_3,
@@ -8206,6 +8507,8 @@ Char: ` +
                 const options_1732 = {
                     ...slice_1731[targetIndex],
                     content: splitOfflineAutoImageMarker(content_27).content,
+                    translationZh: translationZh_27,
+                    translationState: translationState_27,
                     ttsAudioAssets: [],
                     reasoning: reasoning_4 || undefined,
                     tokens: tokens_2,
@@ -8222,9 +8525,9 @@ Char: ` +
                             value_716 === targetIndex ||
                             String(value_715.sourceMessageId || '') !== String(messageId_8),
                     );
-                const value_714 = await persistOfflineMessages(activeFriend_44, filter_713, {
-                        resetMessageIds: [messageId_8],
-                    });
+                const value_714 = await patchOfflineMessage(activeFriend_44, messageId_8, live => ({ ...live,
+                    ...options_1732, liked: live.liked, saved: live.saved
+                }), { removeLinkedImages: true });
                 await _value3(originalMessage.ttsAudioAssets);
                 if (scene_712)
                     await generateOfflineAutoImage(
@@ -8386,6 +8689,7 @@ Char: ` +
             语言和字数: 'length_words',
             字数要求: 'length_words',
             双语对话: 'bilingual_dialogue',
+            文本格式: 'bilingual_dialogue',
             NSFW: 'nsfw',
             文风基调: 'style_baimiao',
             '文风-白描': 'style_baimiao',
@@ -8465,20 +8769,23 @@ System managed. Mounted world books, User persona, Char persona, and recent onli
                     editable: true,
                     deletable: false,
                 },
-                {
-                    id: 'bilingual_dialogue',
-                    name: '双语对话',
-                    enabled: true,
-                    presetVersion: 1,
-                    content: `<bilingual_dialogue>
-All spoken dialogue in the response must use {{char}}'s default language configured in Chat Settings.
-When the default language is not Chinese, every spoken line must use this exact format without variation: 「default-language dialogue（Chinese translation）」. Example: 「잘자（晚安）」.
-The text before the full-width parentheses must contain only the default-language dialogue. The text inside the parentheses must contain only its Chinese translation.
-When the default language is Chinese, output only Chinese dialogue in corner quotes, for example: 「晚安」. Do not append a duplicate Chinese translation.
-</bilingual_dialogue>`,
-                    editable: true,
-                    deletable: false,
-                },
+            {
+                id: 'bilingual_dialogue',
+                name: '文本格式',
+                enabled: true,
+                presetVersion: 5,
+                content: `<offline_text_format>
+Chat Settings currently sets {{char}}'s Default Language to {{default_language}}. This current setting is authoritative and overrides the language of online history, previous replies, the user's input, and the scene atmosphere.
+
+Return one JSON object with exactly two string fields, in this order: "content", then "translationZh". Finish the complete content first in {{default_language}}, including narration, actions, descriptions, transitions, dialogue, enabled recap, barrage and player-choice sections. Then translate that exact content into Simplified Chinese in translationZh. Preserve paragraph breaks, dialogue, section order and all options one-to-one. Never generate a second story. Escape quotes and newlines as JSON strings. Do not put the translation inside content. Any enabled frontend thinking/COT blocks remain outside this object and follow their existing requirements; do not put thinking inside either string. No Markdown fences.
+
+Keep ordinary prose in natural paragraphs with one blank line between paragraphs. Put every spoken line from Char inside straight or curly double quotation marks. A spoken line must occupy its own paragraph, separated from surrounding narration by a blank line. Do not place narration and quoted dialogue on the same line.
+
+Inside content, use plain narrative text only. The interface displays content and locally toggles translationZh. Never explain the formatting rules.
+</offline_text_format>`,
+                editable: true,
+                deletable: false
+            },
                 {
                     id: 'nsfw',
                     name: 'NSFW',
@@ -8668,23 +8975,24 @@ System managed. Vectorized Char short-term, long-term, and cherished memories ar
                     deletable: false,
                     alwaysEnabled: true,
                 },
-                {
-                    id: 'format_rules',
-                    name: '格式示例',
-                    enabled: true,
-                    presetVersion: 2,
-                    content: `<formatting_rules>
-Output narrative prose only. Do not output JSON or Markdown code fences.
+            {
+                id: 'format_rules',
+                name: '格式示例',
+                enabled: true,
+                presetVersion: 5,
+                content: `<formatting_rules>
+Return one JSON object with exactly two string fields, in this order: "content", then "translationZh". Finish the complete content first in {{default_language}}, including narration, actions, descriptions, transitions, dialogue, enabled recap, barrage and player-choice sections. Then translate that exact content into Simplified Chinese in translationZh. Preserve paragraph breaks, dialogue, section order and all options one-to-one. Never generate a second story. Escape quotes and newlines as JSON strings. Do not put the translation inside content. Any enabled frontend thinking/COT blocks remain outside this object and follow their existing requirements; do not put thinking inside either string. No Markdown fences.
+Example transport shape: ${JSON.stringify({ content: 'Narration.\n\n"Dialogue."', translationZh: '叙述。\n\n“对白。”' })}. Use {{default_language}} for content; this English example illustrates structure only.
 Use normal paragraph prose with a blank line between paragraphs.
-Every spoken line from Char must be wrapped in Chinese corner quotes, for example: 「我在这里。」 Do not write bare Char dialogue and do not use "Char: dialogue" labels.
+Every spoken line from Char must be wrapped in straight double quotes or Chinese curly double quotes, for example: "I am here." or “我在这里。” Do not write bare Char dialogue and do not use "Char: dialogue" labels.
 If barrage comments are enabled, append exactly one plain 【弹幕】 section after all prose, containing at least 10 lines in the shape 观众名字：评论内容. Do not output likes; the frontend controls random likes.
 If player choices are enabled, append a plain 【选项】 section containing exactly three choice text lines.
 Do not output XML tags such as <speech>, <barrages>, <barrage>, <choices>, or <choice>; the frontend owns all UI.
-If a <thinking> block is produced for the frontend, put it before the prose and keep the final prose outside it.
+If a <thinking> block is produced for the frontend, put it before the JSON object and keep both content and translationZh outside it.
 </formatting_rules>`,
-                    editable: true,
-                    deletable: false,
-                },
+                editable: true,
+                deletable: false
+            },
                 {
                     id: 'offline_recap_haru',
                     name: '线下回顾byHaru',
@@ -8963,7 +9271,7 @@ If a <thinking> block is produced for the frontend, put it before the prose and 
                             ),
                             sourcePresetVersion = Math.max(0, Number(prompt_11.presetVersion) || 0),
                             refreshBuiltInContent =
-                                (['role_identity', 'length_words', 'style_creative_guidance', 'perspective_third'].includes(id_5) ||
+                                (['role_identity', 'length_words', 'style_creative_guidance', 'perspective_third', 'bilingual_dialogue', 'format_rules'].includes(id_5) ||
                                     fullCotIds.includes(id_5)) &&
                                 sourcePresetVersion < presetVersion_2;
                         if (refreshBuiltInContent) item_21.name = defaultPrompt_2.name;
@@ -11445,6 +11753,7 @@ Persona: ` +
                     }
                 });
             if (sendBtn && offlineChatInputElement_2134) {
+                offlineChatInputElement_2134.addEventListener('input', () => sendBtn.classList.toggle('has-input', !!offlineChatInputElement_2134.value.trim()));
                 const handleClick_2 = async () => {
                     if (enabled_2137) {
                         value_2138 &&
@@ -11561,6 +11870,8 @@ Persona: ` +
                             );
                             const {
                                 content: content_22,
+                                translationZh: translationZh_22,
+                                translationState: translationState_22,
                                 reasoning: reasoning_5,
                                 tokens: tokens_4,
                                 aborted: aborted_3,
@@ -11578,6 +11889,8 @@ Persona: ` +
                             const aiMsgObj = {
                                 ...pendingAiMessage,
                                 content: autoImageOutput.content,
+                                translationZh: translationZh_22,
+                                translationState: translationState_22,
                                 reasoning: reasoning_5 || undefined,
                                 tokens: Math.max(0, Number(tokens_4) || 0),
                                 generationState: truncated_4 ? 'truncated' : undefined,
@@ -11596,10 +11909,7 @@ Persona: ` +
                                         preserveScroll: false,
                                     });
                                 else {
-                                    const persistedMessages = await persistOfflineMessages(
-                                        activeFriend_49,
-                                        latestMessages.concat(aiMsgObj),
-                                    );
+                                    const persistedMessages = await patchOfflineMessage(activeFriend_49, aiMsgObj.id, live => ({ ...live, ...aiMsgObj }), { append: true });
                                     const _value5 =
                                         persistedMessages.find(
                                             (_value6) => String(_value6.id) === String(aiMsgObj.id),
@@ -11650,6 +11960,8 @@ Persona: ` +
                                             const failedMessage = {
                                                 ...pendingAiMessage,
                                                 content: content_23,
+                                                translationZh: String(failedResult.translationZh || ''),
+                                                translationState: 'incomplete',
                                                 reasoning:
                                                     String(failedResult.reasoning || '').trim() ||
                                                     undefined,
@@ -11663,10 +11975,7 @@ Persona: ` +
                                                           ? 'reasoning_tokens_exhausted'
                                                           : 'request_failed',
                                             };
-                                            await persistOfflineMessages(
-                                                activeFriend_49,
-                                                latestMessages_2.concat(failedMessage),
-                                            );
+                                            await patchOfflineMessage(activeFriend_49, failedMessage.id, live => ({ ...live, ...failedMessage }), { append: true });
                                             renderOfflineCurrentMessages(activeFriend_49, {
                                                 scroll: true,
                                                 preserveScroll: false,
@@ -11708,7 +12017,8 @@ Persona: ` +
                             enabled_2137 = false;
                             value_2138 = null;
                             sendBtn.classList.remove('is-generating', 'is-stopping');
-                            sendBtn.innerHTML = innerHTML_9;
+                            sendBtn.innerHTML = '<span>Send</span>';
+                            sendBtn.classList.toggle('has-input', !!offlineChatInputElement_2134.value.trim());
                             sendBtn.title = title_4;
                             const offlineChatContentElement_2252 =
                                 document.getElementById('offline-chat-content');

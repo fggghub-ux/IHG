@@ -87,7 +87,7 @@
         </script>
         <link
             rel="stylesheet"
-            href="css/global.css?v=20261020-ipad-apk-layout&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&chats-scroll-toast=20261025-v1"
+            href="css/global.css?v=20261020-ipad-apk-layout&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&chats-scroll-toast=20261025-v1&offline-ui=20261025-v1"
         />
         <link
             rel="stylesheet"
@@ -100,7 +100,8 @@
         <link rel="stylesheet" href="css/worldbook.css?v=20261007-107-r1&apk-sync=113-selective-20261022" />
         <link rel="stylesheet" href="css/app_guide_modal.css?v=20261007-107-r1" />
         <link rel="stylesheet" href="css/online_prompts.css?v=20260905-v6&repair=20261003&apk-sync=117-selective-20261022&ui-fixes=20261024-v1" />
-        <link rel="stylesheet" href="css/imessage.css?loves-ui=20261024-v1&album-ui=20261024-v2&v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&apk-sync=118-selective-20261022&home-avatar-migration=20261023-v1&ipad-home-title=20261023-v1&chats-migration=20261023-v1&chat-ui=20261024-v2&chat-repair=20261024-v4&chats-scroll-toast=20261025-v1&chats-search-scroll=20261025-v2" />
+        <link rel="stylesheet" href="css/imessage.css?loves-ui=20261024-v1&album-ui=20261024-v2&v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&apk-sync=118-selective-20261022&home-avatar-migration=20261023-v1&ipad-home-title=20261023-v1&chats-migration=20261023-v1&chat-ui=20261024-v2&chat-repair=20261024-v4&chats-scroll-toast=20261025-v1&chats-search-scroll=20261025-v2&offline-ui=20261025-v1" />
+        <link rel="stylesheet" href="css/offline-feed.css?v=20261025-v1">
         <link rel="stylesheet" href="css/pay.css?v=20260923-gallery-layout-v1&repair=20261003" />
         <link
             rel="stylesheet"
@@ -6522,10 +6523,10 @@
                         <textarea
                             class="offline-chat-input"
                             id="offline-chat-input"
-                            placeholder="输入你想做的事或说的话..."
+                            placeholder="1 Notification"
                         ></textarea>
-                        <div class="offline-chat-send" id="offline-chat-send-btn">
-                            <i class="fas fa-arrow-up"></i>
+                        <div class="offline-chat-send" id="offline-chat-send-btn" role="button" aria-label="Send">
+                            <span>Send</span>
                         </div>
                     </div>
                 </div>
@@ -20210,7 +20211,8 @@
         <script src="js/imessage/offline_regex.js?v=20260705-offline-regex-v1&html-template=20260822-v3&offline-text-replacement=20260913-v1&repair=20261003"></script>
         <script src="js/imessage/offline_reasoning.js?v=20260718-offline-cot-v1&custom-cot=20260823-v1&repair=20261003"></script>
         <script src="js/imessage/offline_summary_errors.js?v=20260907-detailed-errors-v1&repair=20261003"></script>
-        <script src="js/imessage/4_chat_sheet.js?v=20261007-107-r1&apk-sync=118-selective-20261022&home-avatar-migration=20261023-v1&chat-ui=20261024-v2"></script>
+        <script src="js/imessage/offline_response.js?v=20261025-v1"></script>
+        <script src="js/imessage/4_chat_sheet.js?v=20261007-107-r1&apk-sync=118-selective-20261022&home-avatar-migration=20261023-v1&chat-ui=20261024-v2&offline-ui=20261025-v1"></script>
         <script src="js/imessage/4_chat_link.js?v=20260726-light-link-theatre-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&picsum-cdn=20260815-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=113-selective-20261022"></script>
         <script src="js/imessage/4_chat_list.js?chat-runtime-performance=20260803-v1&startup-queue=20260804-v1&theme-surfaces=20260814-v1&imessage-performance=20260825-v2&mobile-latest=20260825-v1&mobile-performance=20260825-v1&official=20260827-v1&history-index=20260907-v1&chat-observer-lifecycle=20260920-v1&group-chat-search=20260924-v1&repair=20261003&settings=20261010-r1&apk-sync=111-selective&home-avatar-migration=20261023-v1&chats-migration=20261023-v1&ui-fixes=20261024-v1&gift-update=20261024-v1&chat-repair=20261024-v3"></script>
         <script src="js/imessage/4_chat_interface.js?v=20261007-107-r1&settings=20261010-r1&apk-sync=111-selective&apk-ui=111-rebuild-20261016&chat-ui=20261024-v2"></script>

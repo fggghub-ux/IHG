@@ -1,0 +1,779 @@
+
+/* Offline feed layout; profile geometry and typography below come from GX/GPT. */
+#offline-chat-view .offline-chat-bubble { display:flex; flex-direction:column; flex-shrink:0; }
+#offline-chat-view .offline-chat-bubble-body { display:flex; flex-direction:column; gap:0; }
+#offline-chat-view .offline-chat-avatar { display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
+#offline-chat-view .offline-chat-avatar img { border-radius:50%; }
+#offline-chat-view .offline-chat-inline-editor { font:inherit; }
+#offline-chat-view .offline-chat-input-area { padding:6px 16px max(12px, env(safe-area-inset-bottom, 0px)); flex-shrink:0; }
+#offline-chat-view .offline-chat-input-bar { display:flex; }
+#offline-chat-view .offline-chat-input { flex:1; min-width:0; max-height:120px; resize:none; outline:none; box-sizing:border-box; font-size:15px; }
+#offline-chat-view :is(.offline-chat-send,.offline-chat-attachment) { display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; }
+#offline-chat-view .offline-chat-send { margin-left:8px; }
+#offline-chat-view .offline-chat-attachment { width:32px; height:32px; margin-right:4px; font-size:20px; }
+
+#offline-chat-view .offline-chat-bubble-text { word-break:break-word; }
+#offline-chat-view .offline-chat-bubble-text.is-streaming { white-space:pre-wrap; }
+#offline-chat-view .offline-chat-speech { display:inline; }
+/* Offline profile-feed UI — adapted from the supplied 线下-X source. */
+#offline-chat-view {
+    --offline-profile-bg: #ffffff;
+    --offline-profile-text: #1a1a1a;
+    --offline-profile-muted: #8a8a8a;
+    --offline-profile-stats: #6e6e6e;
+    --offline-profile-line: rgba(0, 0, 0, 0.12);
+    --offline-profile-dialogue-line: #e0e0e0;
+    background: var(--offline-profile-bg) !important;
+    color: var(--offline-profile-text);
+}
+
+#offline-chat-view .offline-chat-content {
+    align-items: center;
+    gap: 0;
+    padding: 0 0 28px;
+    background: var(--offline-profile-bg) !important;
+}
+
+#offline-chat-view .offline-chat-content.offline-chat-history-list {
+    align-items: stretch;
+    gap: 20px;
+    padding: 20px 16px;
+}
+
+#offline-chat-view .offline-chat-bubble {
+    width: 100%;
+    max-width: 480px;
+    box-sizing: border-box;
+    align-items: stretch;
+    margin: 32px auto 0;
+    padding: 0 16px 16px;
+    overflow: visible;
+    background: var(--offline-profile-bg) !important;
+    border: 0 !important;
+    border-radius: 0;
+    text-align: left;
+}
+
+#offline-chat-view .offline-chat-bubble-header {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 173px 0 0;
+}
+
+#offline-chat-view .offline-chat-banner {
+    position: absolute;
+    inset: 0 0 auto;
+    display: block;
+    width: 100%;
+    height: 120px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background:
+        radial-gradient(circle at 78% 12%, rgba(255, 255, 255, 0.22), transparent 28%),
+        linear-gradient(135deg, #050505, #2b2b30);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: default;
+}
+
+#offline-chat-view .offline-chat-banner.has-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.16));
+    pointer-events: none;
+}
+
+#offline-chat-view .offline-chat-banner:not(.has-image)::after {
+    content: "X";
+    position: absolute;
+    right: 22px;
+    bottom: -26px;
+    color: rgba(255, 255, 255, 0.1);
+    font-size: 128px;
+    font-weight: 900;
+    line-height: 1;
+    pointer-events: none;
+}
+
+#offline-chat-view .offline-chat-avatar {
+    position: absolute;
+    top: 95px;
+    left: 0;
+    z-index: 2;
+    width: 80px;
+    height: 80px;
+    box-sizing: border-box;
+    margin: 0;
+    border: 4px solid var(--offline-profile-bg);
+    border-radius: 50%;
+    background: #e8e8e8;
+}
+
+#offline-chat-view .offline-chat-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#offline-chat-view .offline-chat-avatar i {
+    color: #b5b5b5;
+    font-size: 28px;
+}
+
+#offline-chat-view .offline-chat-profile-tools {
+    position: absolute;
+    top: 132px;
+    right: -4px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#offline-chat-view .offline-chat-timestamp {
+    color: var(--offline-profile-muted);
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: 550;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+}
+
+#offline-chat-view .offline-chat-follow-btn {
+    min-width: 52px;
+    min-height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 999px;
+    background: #1a1a1a;
+    color: #ffffff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#offline-chat-view .offline-chat-name-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+#offline-chat-view .offline-chat-name {
+    color: var(--offline-profile-text);
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+#offline-chat-view .offline-chat-handle {
+    color: var(--offline-profile-muted);
+    font-size: 14px;
+    font-weight: 350;
+    line-height: 1.2;
+}
+
+#offline-chat-view .offline-chat-profile-stats {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 18px;
+    color: var(--offline-profile-stats);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+#offline-chat-view .offline-chat-profile-stats strong {
+    color: inherit;
+    font-weight: 600;
+}
+
+#offline-chat-view .offline-chat-sign {
+    margin: 14px 0 0;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--offline-profile-text);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.45;
+}
+
+#offline-chat-view .offline-chat-bubble-body {
+    width: 100%;
+    max-width: none;
+    margin-top: 14px;
+    align-items: stretch;
+}
+
+#offline-chat-view .offline-chat-bubble-text,
+#offline-chat-view .offline-chat-bubble.user .offline-chat-bubble-text {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent !important;
+    box-shadow: none;
+    color: var(--offline-profile-text) !important;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+#offline-chat-view .offline-chat-paragraph-wrap {
+    margin: 0 0 1em;
+}
+
+#offline-chat-view .offline-chat-paragraph-wrap:last-child {
+    margin-bottom: 0;
+}
+
+#offline-chat-view .offline-chat-dialogue,
+#offline-chat-view .offline-chat-speech {
+    padding: 0 2px 0.05em;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: inset 0 -0.42em 0 var(--offline-profile-dialogue-line);
+    color: var(--offline-profile-text) !important;
+    font-weight: 570;
+    text-decoration: none;
+}
+
+#offline-chat-view .offline-chat-choice-panel {
+    margin: 12px 0 0;
+    padding: 0;
+}
+
+#offline-chat-view .offline-chat-choice-toggle {
+    padding: 2px 0 0;
+    color: var(--offline-profile-muted);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+#offline-chat-view .offline-chat-choice-list {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+#offline-chat-view .offline-chat-choice-btn {
+    width: 100%;
+    margin: 0;
+    padding: 10px 0;
+    border: 0;
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.06);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--offline-profile-text);
+    text-align: left;
+}
+
+#offline-chat-view .offline-chat-choice-btn:last-child {
+    border-bottom: 0;
+}
+
+#offline-chat-view .offline-chat-choice-index {
+    display: none;
+}
+
+#offline-chat-view .offline-chat-view-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 12px;
+    color: var(--offline-profile-muted);
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+#offline-chat-view .offline-chat-view-row strong {
+    color: var(--offline-profile-text);
+    font-weight: 700;
+}
+
+#offline-chat-view .offline-chat-quotes-btn {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--offline-profile-muted);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#offline-chat-view .offline-chat-quotes-btn.is-static {
+    cursor: default;
+}
+
+#offline-chat-view .offline-chat-quotes-btn.is-loading {
+    opacity: 0.5;
+}
+
+#offline-chat-view .offline-chat-quotes-btn.is-translated {
+    color: var(--offline-profile-text);
+}
+
+#offline-chat-view .offline-chat-bubble-footer {
+    display: block;
+    min-height: 0;
+    margin-top: 12px;
+}
+
+#offline-chat-view .offline-chat-social-actions {
+    display: grid;
+    grid-template-columns: repeat(4, max-content) 22px;
+    align-items: center;
+    justify-content: space-between;
+    width: calc(100% - 22px);
+    gap: 0;
+    color: var(--offline-profile-muted);
+    font-family: sans-serif;
+}
+
+#offline-chat-view .offline-chat-social-item {
+    min-width: 0;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+#offline-chat-view .offline-chat-social-item:nth-child(2) {
+    transform: translateX(-3px);
+}
+
+#offline-chat-view .offline-chat-social-item:nth-child(4) {
+    transform: translateX(3px);
+}
+
+#offline-chat-view .offline-chat-social-item:last-child {
+    justify-self: end;
+}
+
+#offline-chat-view .offline-chat-share-action,
+#offline-chat-view .offline-chat-inline-edit-actions {
+    grid-column: 5;
+    grid-row: 1;
+    justify-self: end;
+}
+
+#offline-chat-view .offline-chat-social-icon {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    overflow: visible;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#offline-chat-view .offline-chat-social-item > i {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+    font-size: 18px;
+    line-height: 1;
+    text-align: center;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+#offline-chat-view .offline-chat-social-item:nth-child(2) .offline-chat-social-icon {
+    width: 23px;
+    height: 23px;
+}
+
+#offline-chat-view .offline-chat-like-action > i {
+    font-size: 19px;
+}
+
+#offline-chat-view .offline-chat-like-action.is-liked > i {
+    color: #ff4b4b;
+}
+
+#offline-chat-view .offline-chat-favorite-action.is-saved > i {
+    color: #ffb000;
+}
+
+#offline-chat-view .offline-chat-social-item.is-popping > i {
+    animation: offline-social-pop 0.24s cubic-bezier(0.17, 0.84, 0.44, 1);
+}
+
+@keyframes offline-social-pop {
+    0% { transform: scale(1); }
+    48% { transform: scale(1.34); }
+    100% { transform: scale(1); }
+}
+
+#offline-chat-view .offline-chat-inline-edit-actions {
+    display: none;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+    color: var(--offline-profile-muted);
+}
+
+#offline-chat-view .offline-chat-inline-edit-actions button {
+    width: 20px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+#offline-chat-view .offline-chat-social-actions.is-editing .offline-chat-share-action {
+    display: none;
+}
+
+#offline-chat-view .offline-chat-social-actions.is-editing .offline-chat-inline-edit-actions {
+    display: inline-flex;
+}
+
+#offline-chat-view .offline-chat-social-actions.is-editing :is(.offline-chat-like-action, .offline-chat-favorite-action) {
+    pointer-events: none;
+}
+
+#offline-chat-view button.offline-chat-social-item {
+    cursor: pointer;
+}
+
+#offline-chat-view button.offline-chat-social-item:disabled {
+    cursor: default;
+    opacity: 0.42;
+}
+
+#offline-chat-view .offline-chat-input-area {
+    padding-top: 10px;
+    border-top: 0.5px solid var(--offline-profile-line);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+#offline-chat-view .offline-chat-input-bar {
+    min-height: 48px;
+    padding: 4px 6px;
+    align-items: center;
+    border: 0;
+    border-radius: 24px;
+    background: #f5f5f5;
+    box-shadow: none;
+}
+
+#offline-chat-view .offline-chat-attachment {
+    margin-bottom: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    color: #555555;
+}
+
+#offline-chat-view .offline-chat-input {
+    height: 36px;
+    min-height: 36px;
+    padding: 8px 12px;
+    border: 0;
+    background: transparent;
+    color: var(--offline-profile-text);
+    line-height: 20px;
+}
+
+#offline-chat-view .offline-chat-input::placeholder {
+    color: #aaaaaa;
+}
+
+#offline-chat-view .offline-chat-send {
+    width: auto;
+    min-width: 52px;
+    height: 36px;
+    margin-right: 8px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    margin-bottom: 0;
+    color: #c7c7c7;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 36px;
+}
+
+#offline-chat-view .offline-chat-send.has-input {
+    color: #0a0a0a;
+}
+
+#offline-chat-view .offline-chat-send:not(.is-generating):not(.is-stopping) i {
+    display: none;
+}
+
+#offline-chat-view .offline-chat-send.is-generating,
+#offline-chat-view .offline-chat-send.is-stopping {
+    min-width: 36px;
+    border-radius: 18px;
+    background: #111111;
+    color: #ffffff;
+}
+
+#offline-chat-view .offline-profile-editor {
+    position: absolute;
+    inset: 0;
+    z-index: 1120;
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-end;
+    background: rgba(0, 0, 0, 0.4);
+    color: #050505;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+#offline-chat-view .offline-profile-editor.active {
+    display: flex;
+}
+
+#offline-chat-view .offline-profile-editor-sheet {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: 86%;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 0 0 calc(18px + env(safe-area-inset-bottom, 0px));
+    border-radius: 20px 20px 0 0;
+    background: #f5f5f7;
+    color: #050505;
+}
+
+#offline-chat-view .offline-profile-editor-handle {
+    width: 36px;
+    height: 5px;
+    margin: 8px auto 20px;
+    border-radius: 3px;
+    background: #8e8e93;
+    opacity: 0.8;
+}
+
+#offline-chat-view .offline-profile-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 16px 14px;
+}
+
+#offline-chat-view .offline-profile-editor-header strong {
+    font-size: 16px;
+    font-weight: 850;
+}
+
+#offline-chat-view .offline-profile-editor-header button {
+    border: 0;
+    background: transparent;
+    color: #050505;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+#offline-chat-view .offline-profile-editor-cancel {
+    justify-self: start;
+    padding: 0;
+    background: transparent;
+    color: #050505;
+}
+
+#offline-chat-view .offline-profile-editor-header .offline-profile-editor-save {
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 999px !important;
+    background: #050505;
+    color: #ffffff;
+}
+
+#offline-chat-view .offline-profile-editor-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 16px;
+    overflow-y: auto;
+}
+
+#offline-chat-view .offline-profile-editor-avatar-row,
+#offline-chat-view .offline-profile-editor-banner-row,
+#offline-chat-view .offline-profile-editor-field {
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    background: #ffffff;
+}
+
+#offline-chat-view .offline-profile-editor-avatar-row,
+#offline-chat-view .offline-profile-editor-banner-row {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 13px;
+}
+
+#offline-chat-view .offline-profile-editor-avatar-preview,
+#offline-chat-view .offline-profile-editor-banner-preview {
+    flex: 0 0 auto;
+    overflow: hidden;
+    border: 0;
+    background: #050505;
+    color: #ffffff;
+    font-family: inherit;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+#offline-chat-view .offline-profile-editor-avatar-preview {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+#offline-chat-view .offline-profile-editor-banner-preview {
+    width: 102px;
+    height: 62px;
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at 78% 12%, rgba(255, 255, 255, 0.22), transparent 28%),
+        linear-gradient(135deg, #050505, #2b2b30);
+}
+
+#offline-chat-view :is(.offline-profile-editor-avatar-preview, .offline-profile-editor-banner-preview) img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+#offline-chat-view :is(.offline-profile-editor-avatar-row, .offline-profile-editor-banner-row) p {
+    margin: 5px 0 0;
+    color: #6f6f75;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+#offline-chat-view .offline-profile-editor-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 12px 13px;
+}
+
+#offline-chat-view .offline-profile-editor-field span {
+    color: #6f6f75;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+#offline-chat-view .offline-profile-editor-field input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #050505;
+    font-family: inherit;
+    font-size: 15px;
+}
+
+@media (min-width: 768px) {
+    #offline-chat-view .offline-chat-content {
+        padding-bottom: 36px;
+    }
+
+    #offline-chat-view .offline-chat-bubble {
+        max-width: 720px;
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+
+    #offline-chat-view .offline-chat-bubble-header {
+        padding-top: 209px;
+    }
+
+    #offline-chat-view .offline-chat-banner {
+        height: 156px;
+    }
+
+    #offline-chat-view .offline-chat-avatar {
+        top: 131px;
+    }
+
+    #offline-chat-view .offline-chat-profile-tools {
+        top: 168px;
+    }
+
+    #offline-chat-view .offline-chat-input-area {
+        padding-right: max(24px, calc((100% - 720px) / 2));
+        padding-left: max(24px, calc((100% - 720px) / 2));
+    }
+}
+
+@media (min-width: 1024px) and (orientation: landscape) {
+    #offline-chat-view .offline-chat-bubble {
+        max-width: 860px;
+    }
+
+    #offline-chat-view .offline-chat-input-area {
+        padding-right: max(32px, calc((100% - 860px) / 2));
+        padding-left: max(32px, calc((100% - 860px) / 2));
+    }
+}
+
+/* The three-row action card reuses the online .msg-menu-item presentation. */
+#offline-chat-view .offline-message-menu-overlay { position:absolute; inset:0; z-index:1100; background:rgba(0,0,0,.4); }
+#offline-chat-view .offline-message-menu-card { position:absolute; display:flex; flex-direction:column; min-width:200px; width:200px; max-width:calc(100% - 24px); overflow:hidden; border-radius:14px; background:#fff; }
+#offline-chat-view .offline-message-menu-card .msg-menu-item:last-child { border-bottom:0; }
+#offline-chat-view .offline-chat-quotes-btn:disabled { opacity:.45; cursor:wait; }
+#offline-chat-view .offline-chat-share-action { touch-action:pan-y; -webkit-touch-callout:none; user-select:none; }
+#offline-chat-view .offline-chat-social-actions.is-editing :is([data-offline-action="continue"],[data-offline-action="save-image"]) { pointer-events:none; }
+
+#offline-chat-view .offline-message-menu-card [aria-disabled="true"] { opacity:.4; cursor:default; }
