@@ -3527,8 +3527,8 @@ button.group-private-chat-detail-bubble {
     caret-color: #007aff;
 }
 
-/* Search and the top bar stay fixed; featured images and conversations share
-   one scrollport so the list can use all of the space below Search. */
+/* The top bar stays fixed; Search, featured images and conversations share
+   one scrollport below the Messages header. */
 .chats-scroll-content {
     display: flex;
     flex-direction: column;
