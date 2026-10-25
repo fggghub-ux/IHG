@@ -9825,7 +9825,8 @@ window.addEventListener('pagehide', () => {
             relativeLeft = itemRect.left - containerRect.left,
             apk110New_2012 = itemRect.width;
         lineNavIndicator.style.width = apk110New_2012 + 'px';
-        lineNavIndicator.style.left = relativeLeft + 'px';
+        // Animate the indicator on its own compositor layer, including Moments.
+        lineNavIndicator.style.transform = `translateX(${relativeLeft}px)`;
     }
     setTimeout(() => {
         if (navHomeBtn && navHomeBtn.classList.contains('active'))

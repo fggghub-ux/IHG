@@ -731,6 +731,7 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
             return;
         }
         if (value_34 !== count) return;
+        window.imChat.captureChatsScrollPosition?.();
         window.imApp?.setActiveThemeSurface?.('chat-detail');
         window.imData.currentActiveFriend = currentActiveFriend_2;
         const handleAction_20_128 = handleAction_20(currentActiveFriend_2, chatsContent_2);

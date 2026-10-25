@@ -6,6 +6,15 @@
     window.imChat = window.imChat || {};
     const imChat_3 = window.imChat;
     const chatsSearchInput = document.getElementById('chats-search-input');
+    let savedChatsScrollTop = 0;
+    let shouldRestoreChatsScroll = false;
+    window.imChat.captureChatsScrollPosition = () => {
+        const scrollport = document.getElementById('chats-scroll-content');
+        if (shouldRestoreChatsScroll || !scrollport || !scrollport.getClientRects().length) return;
+        savedChatsScrollTop = scrollport.scrollTop;
+        shouldRestoreChatsScroll = true;
+    };
+
 
     function handleAction_4(friend_2) {
         if (!friend_2)
@@ -133,6 +142,13 @@
                 if (emptyState) emptyState.style.display = 'flex';
                 if (listContainer) listContainer.style.display = 'none';
             }
+        }
+        // Hiding the list's contents during a conversation can clamp scrollTop.
+        // Restore only on return, after the list has its full dimensions again.
+        if (!window.imData.currentActiveFriend && shouldRestoreChatsScroll) {
+            const scrollport = document.getElementById('chats-scroll-content');
+            if (scrollport) scrollport.scrollTop = savedChatsScrollTop;
+            shouldRestoreChatsScroll = false;
         }
         if (window.imApp.updateChatsUnreadBadges) window.imApp.updateChatsUnreadBadges();
     }
@@ -288,6 +304,7 @@
                 return;
             }
             const liveFriend = (window.imData.friends || []).find(entry => String(entry.id) === String(item.dataset.friendId)) || friend;
+            window.imChat.captureChatsScrollPosition();
             window.imChat.openChatTab(liveFriend);
         });
         bindChatPinGesture(item);

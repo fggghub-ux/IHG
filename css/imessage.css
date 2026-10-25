@@ -2193,7 +2193,9 @@ button.group-private-chat-detail-bubble {
 /* Animated Indicator for iMessage */
 .line-nav-indicator {
     position: absolute;
-    left: 5px;
+    left: 0;
+    transform: translateX(5px);
+    will-change: transform;
     top: auto;
     bottom: 5px;
     height: 48px;
@@ -2202,7 +2204,7 @@ button.group-private-chat-detail-bubble {
     border-radius: 28px;
     z-index: 0;
     transition:
-        left 0.28s cubic-bezier(0.25, 0.1, 0.25, 1),
+        transform 0.28s cubic-bezier(0.25, 0.1, 0.25, 1),
         width 0.28s ease;
     pointer-events: none;
 }
