@@ -937,7 +937,7 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                         <button class="im-together-listening-control" type="button" data-together-listening-control="next" aria-label="下一首"><i class="fas fa-forward-step"></i></button>
                         <span class="im-together-listening-progress"></span>
                     </div>
-                    <div class="reply-preview-container" style="display:none; padding: 10px 14px; background: #f2f2f7; border-radius: 18px; margin-bottom: 10px; font-size: 13px; color: #8e8e93; position: relative; margin-left: 10px; margin-right: 10px; max-width: fit-content; border: 1px solid #e5e5ea; ">
+                    <div class="reply-preview-container" style="display:none; padding: 10px 14px; background: #e9e9ea; border-radius: 18px; margin-bottom: 10px; font-size: 13px; color: #8e8e93; position: relative; margin-left: 10px; margin-right: 10px; max-width: fit-content; border: 1px solid #e5e5ea; ">
                         <div class="reply-preview-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 24px; color: #333; max-width: 250px;"></div>
                         <button type="button" class="reply-cancel-btn" aria-label="取消回复" title="取消回复" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; border-radius: 50%; background: #ccc; color: #fff; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 10px;"><i class="fas fa-times" aria-hidden="true"></i></button>
                     </div>
