@@ -15358,7 +15358,7 @@ button.moment-private-chat-bubble.has-translation {
 }
 
 .offline-settings-auto-image .offline-settings-worldbook-main > i {
-    background: #8F8E93;
+    background: #EDEDED;
 }
 
 .offline-settings-auto-image .offline-settings-worldbook-main small {
@@ -15400,7 +15400,7 @@ button.moment-private-chat-bubble.has-translation {
     height: 34px;
     border-radius: 50%;
     background: #111;
-    color: #fff;
+    color: #636366;
     display: flex;
     align-items: center;
     justify-content: center;
