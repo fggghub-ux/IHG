@@ -2418,7 +2418,9 @@ window.imApp.normalizeFriendData = function (friend_8) {
     delete normalized_2.showEveryMessageAvatar;
     normalized_2.continuousBubbles = normalized_2.continuousBubbles !== false;
     normalized_2.replyStyle = normalized_2.replyStyle === 'outside' ? 'outside' : 'inside';
-    normalized_2.timeAware = normalized_2.timeAware !== false;
+    normalized_2.timeAware = normalized_2.type === 'char' || isGroupChat_2
+        ? normalized_2.timeAware === true
+        : normalized_2.timeAware !== false;
     normalized_2.customTimeEnabled =
         normalized_2.type === 'char' && normalized_2.customTimeEnabled === true;
     normalized_2.customTimeAnchors =
@@ -2458,7 +2460,9 @@ window.imApp.normalizeFriendData = function (friend_8) {
           };
     if (normalized_2.timeAware === false)
         normalized_2.locationProfile.timeDifferenceEnabled = false;
-    normalized_2.allowRoleRecall = normalized_2.allowRoleRecall !== false;
+    normalized_2.allowRoleRecall = normalized_2.type === 'char'
+        ? normalized_2.allowRoleRecall === true
+        : normalized_2.allowRoleRecall !== false;
     normalized_2.allowCharBlock = !isGroupChat_2 && normalized_2.allowCharBlock === true;
     normalized_2.blockState = isGroupChat_2
         ? window.imApp.normalizeChatBlockState(null)

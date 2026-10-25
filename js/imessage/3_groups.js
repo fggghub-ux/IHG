@@ -931,7 +931,7 @@
         groupContextEnabledToggle && (groupContextEnabledToggle.checked = checked_2);
         groupContextLimitInput && (groupContextLimitInput.value = value_3);
         groupTimeAwareToggle &&
-            (groupTimeAwareToggle.checked = currentViewingGroup.timeAware !== false);
+            (groupTimeAwareToggle.checked = currentViewingGroup.timeAware === true);
         apk110New_29 &&
             (apk110New_29.checked = window.imApp.areGroupTitlesEnabled(currentViewingGroup));
         groupAutoExpandTranslationToggle &&
@@ -2341,7 +2341,7 @@
             const enabled_2 = !!(groupContextEnabledToggle && groupContextEnabledToggle.checked),
                 timeAware_2 = groupTimeAwareToggle
                     ? !!groupTimeAwareToggle.checked
-                    : currentViewingGroup.timeAware !== false,
+                    : currentViewingGroup.timeAware === true,
                 apk110New_567 = apk110New_29
                     ? apk110New_29.checked === true
                     : window.imApp.areGroupTitlesEnabled(currentViewingGroup),

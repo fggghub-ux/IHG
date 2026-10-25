@@ -19,6 +19,7 @@ const server = http.createServer((req, res) => {
                     context: value_296, stream: createStreamingBubble,
                     reroll: rerollOfflineAssistantMessage, continue: rerollOfflineAssistantMessage_2,
                     choices: normalizeOfflineChoiceText, text: value_193,
+                    settings: renderOfflineChatSettings,
                     patch: patchOfflineMessage
                 };
                 value_365_2();`);
@@ -49,6 +50,13 @@ const server = http.createServer((req, res) => {
                 await window.imChat.openChatTab(window.imApp.getFriendById('offline-fixture'));
                 window.imChat.openAttachmentSheet();
                 await window.__offlineTest.open();
+            });
+            await require('./test-offline-defaults.cjs')(page, label);
+            if (process.env.OFFLINE_DEFAULTS_ONLY) { await context.close(); continue; }
+            // Existing-user regression fixture explicitly opts into optional feed features.
+            await page.evaluate(async()=>{
+                await window.imApp.saveGlobalOfflinePrompts({prompts:window.imData.offlinePrompts.map(p=>({...p,enabled:p.enabled||['barrage_comments','player_choices'].includes(p.id)}))});
+                window.__offlineTest.render(window.imApp.getFriendById('offline-fixture'));
             });
             await page.waitForSelector('.offline-chat-share-action');
             const check=async(name,fn)=>{const result=await page.evaluate(fn);assert.equal(result,true,`${label} ${name}: ${JSON.stringify(result)}`);console.log('PASS',label,name)};

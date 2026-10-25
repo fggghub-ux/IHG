@@ -8665,7 +8665,7 @@ Do not reveal Char's private thoughts unless they are expressed through visible 
                 {
                     id: 'perspective_second',
                     name: '创作指导-第二人称视角',
-                    enabled: false,
+                    enabled: true,
                     content: `<perspective_rule type="second_person">
 Use second-person narration. "You" refers to User.
 Keep the camera close to User's perception and bodily experience.
@@ -8677,7 +8677,7 @@ Do not summarize information that User cannot perceive inside the current scene.
                 {
                     id: 'perspective_third',
                     name: '创作指导-第三人称视角',
-                    enabled: true,
+                    enabled: false,
                     presetVersion: 3,
                     content: `<perspective_rule type="third_person">
 必须使用以 {{char}} 为主导、为中心的第三人称限定视角。这是第三人称叙事，不得用“我”代替 {{user}}，也不得把正文写成对 {{user}} 使用“你”的第二人称叙事。
@@ -8691,7 +8691,7 @@ Do not summarize information that User cannot perceive inside the current scene.
                 {
                     id: 'barrage_comments',
                     name: '弹幕评论',
-                    enabled: true,
+                    enabled: false,
                     presetVersion: 4,
                     content: `<barrage_comment_rules>
 This rule is enabled by default, but the user may turn it off in the offline settings.
@@ -8714,7 +8714,7 @@ Do not let barrage comments change the story. They are UI reactions only, not ca
                 {
                     id: 'player_choices',
                     name: '玩家选项',
-                    enabled: true,
+                    enabled: false,
                     presetVersion: 3,
                     content: `<player_choice_rules>
 Inside the content string, after the final narrative paragraph and any barrage section, output only choice button text. The frontend will create all buttons and option UI.
@@ -8731,7 +8731,7 @@ Do not make choices generic. Tie them to the current scene, relationship, object
                 {
                     id: 'task_instruction',
                     name: '任务要求',
-                    enabled: true,
+                    enabled: false,
                     presetVersion: 3,
                     content: `<task_instruction>
 All story text produced under these task instructions must use {{default_language}}, the current Chat Settings Default Language. The language of these instructions does not determine the output language. For non-Chinese Default Languages, only translationZh uses Chinese to translate the same content; for Chinese, translationZh stays empty.
@@ -8759,7 +8759,7 @@ System managed. Vectorized Char short-term, long-term, and cherished memories ar
             {
                 id: 'format_rules',
                 name: '格式示例',
-                enabled: true,
+                enabled: false,
                 presetVersion: 6,
                 content: `<formatting_rules>
 Return one JSON object with exactly two string fields, in this order: "content", then "translationZh". Finish the complete content first in {{default_language}}, including narration, actions, descriptions, transitions, dialogue, enabled recap, barrage and player-choice sections. If the Default Language is Chinese, generate the Chinese content only once and set translationZh to the empty string ""; never duplicate, paraphrase or translate the Chinese original into another Chinese version. For every non-Chinese Default Language, translate that exact completed content into Simplified Chinese in translationZh. Preserve paragraph breaks, dialogue, section order and all options one-to-one. Never generate a second story. All audience names, barrage comments and player-choice text inside content must use {{default_language}}, never Chinese unless Chinese is the Default Language. The fixed section markers 【弹幕】 and 【选项】 are parser delimiters only, not a language instruction. Escape quotes and newlines as JSON strings. Do not put the translation inside content. Any enabled frontend thinking/COT blocks remain outside this object and follow their existing requirements; do not put thinking inside either string. No Markdown fences.
@@ -8798,7 +8798,7 @@ If a <thinking> block is produced for the frontend, put it before the JSON objec
                 {
                     id: 'cot_before',
                     name: 'COT前',
-                    enabled: true,
+                    enabled: false,
                     presetVersion: 6,
                     content: `请先思考并逐项检查：
 <thinking>`,
@@ -8808,7 +8808,7 @@ If a <thinking> block is produced for the frontend, put it before the JSON objec
                 {
                     id: 'cot_scene_planning',
                     name: 'cot-情景规划',
-                    enabled: true,
+                    enabled: false,
                     presetVersion: 3,
                     content:
                         '是否结合世界书、人设、记忆、线上与线下上下文及角色动机规划当前情景；是否承接前文、避免重复，并推进下一步因果发展。',
@@ -8818,7 +8818,7 @@ If a <thinking> block is produced for the frontend, put it before the JSON objec
                 {
                     id: 'cot_literary_guidance',
                     name: 'cot-文学指导',
-                    enabled: true,
+                    enabled: false,
                     presetVersion: 4,
                     content:
                         '是否遵循已启用的 <literary_guidance> 标签；是否仿写并参照至少三部与当前题材、风格相关的名著。',
@@ -8828,7 +8828,7 @@ If a <thinking> block is produced for the frontend, put it before the JSON objec
                 {
                     id: 'cot_language_check',
                     name: 'cot-语言检查',
-                    enabled: true,
+                    enabled: false,
                     presetVersion: 4,
                     content:
                         '是否将整段正文、旁白、动作和台词全部使用 Chat Settings 当前设置的角色默认语言；是否没有附加中文翻译；台词是否独立成段并使用规定的双引号。',
@@ -8838,7 +8838,7 @@ If a <thinking> block is produced for the frontend, put it before the JSON objec
                 {
                     id: 'cot_output_audit',
                     name: 'cot-输出审查',
-                    enabled: true,
+                    enabled: false,
                     presetVersion: 3,
                     content:
                         '是否遵循全部启用的格式规则与任务要求；是否保持情节连续并输出所有必需部分；是否将思考完整留在 <thinking> 内、正文置于标签后。',
@@ -8862,7 +8862,7 @@ If a <thinking> block is produced for the frontend, put it before the JSON objec
                 {
                     id: 'cot_after',
                     name: 'COT后',
-                    enabled: true,
+                    enabled: false,
                     presetVersion: 5,
                     content: '</thinking>',
                     editable: true,

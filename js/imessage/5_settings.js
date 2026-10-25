@@ -5332,7 +5332,7 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
               };
         if (chatMessageCountMinInput) chatMessageCountMinInput.value = String(messageRange.min);
         if (chatMessageCountMaxInput) chatMessageCountMaxInput.value = String(messageRange.max);
-        chatTimeAwareToggle && (chatTimeAwareToggle.checked = friend_57.timeAware !== false);
+        chatTimeAwareToggle && (chatTimeAwareToggle.checked = friend_57.timeAware === true);
         syncCustomTimeSettings(friend_57);
         if (_value9) _value9.hidden = friend_57.type !== 'char';
         if (_value8)
@@ -5340,7 +5340,7 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         syncAutoReplyDelaySettings(friend_57);
         handleAction_39(friend_57);
         chatRoleRecallToggle &&
-            (chatRoleRecallToggle.checked = friend_57.allowRoleRecall !== false);
+            (chatRoleRecallToggle.checked = friend_57.allowRoleRecall === true);
         chatCharBlockToggleElement_921 &&
             (chatCharBlockToggleElement_921.checked = friend_57.allowCharBlock === true);
         if (chatBlockFriendBtnElement_922) {
@@ -5772,7 +5772,7 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         ((chatTimeAwareToggleElement.dataset.bound = 'true'),
         chatTimeAwareToggleElement.addEventListener('change', async (event_988) => {
             if (window.imData.currentSettingsFriend) {
-                const checked_7 = window.imData.currentSettingsFriend.timeAware !== false;
+                const checked_7 = window.imData.currentSettingsFriend.timeAware === true;
                 const timeAware_2 = event_988.target.checked;
                 const value_991 = await commitSettingsFriendChange(
                     (targetFriend_18) => {
@@ -5923,7 +5923,7 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         ((chatRoleRecallToggleElement.dataset.bound = 'true'),
         chatRoleRecallToggleElement.addEventListener('change', async (event_994) => {
             if (window.imData.currentSettingsFriend) {
-                const checked_8 = window.imData.currentSettingsFriend.allowRoleRecall !== false;
+                const checked_8 = window.imData.currentSettingsFriend.allowRoleRecall === true;
                 const checked_996 = event_994.target.checked;
                 const saved_21 = await commitSettingsFriendChange(
                         (targetFriend_19) => {
