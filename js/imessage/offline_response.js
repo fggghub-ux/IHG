@@ -21,7 +21,7 @@
         }
         return { text, end: source.length, complete: false };
     };
-    const parse = (raw, { streaming = false } = {}) => {
+    const parse = (raw, { streaming = false, translationRequired = true } = {}) => {
         const source = String(raw || '').trimStart().replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
         if (!source.startsWith('{')) return {
             content: source.startsWith('`') ? '' : source,
@@ -47,11 +47,11 @@
         let complete = false;
         try {
             const parsed = JSON.parse(source);
-            complete = typeof parsed.content === 'string' && typeof parsed.translationZh === 'string'
-                && !!parsed.content.trim() && !!parsed.translationZh.trim();
+            complete = typeof parsed.content === 'string' && !!parsed.content.trim()
+                && (!translationRequired || (typeof parsed.translationZh === 'string' && !!parsed.translationZh.trim()));
         } catch (_) {}
-        return { content: fields.content || '', translationZh: fields.translationZh || '',
-            translationState: complete ? 'complete' : streaming ? 'pending' : 'incomplete' };
+        return { content: fields.content || '', translationZh: translationRequired ? fields.translationZh || '' : '',
+            translationState: complete ? (translationRequired ? 'complete' : 'not-needed') : streaming ? 'pending' : 'incomplete' };
     };
     window.imOfflineResponse = { parse };
 })();

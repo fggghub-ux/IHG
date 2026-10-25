@@ -12,10 +12,6 @@
     const OFFLINE_STREAM_RENDER_INTERVAL = 80;
     const count_8 = 10;
     const count_9 = 10;
-    const scrollTop_2 = 1000000000;
-    const threshold_2 = 2;
-    const count_12 = 2;
-    const count_13 = 1200;
     const OFFLINE_COT_PROMPT_IDS = new Set([
         'cot_before',
         'cot_scene_planning',
@@ -2227,6 +2223,7 @@ The prompt must describe the same current moment with characters, action, settin
                             role: role_2,
                             type: isSummary ? type_3 : isAutoImage ? type_2 : undefined,
                             content: parsed_4.content,
+                            contentLanguage: message_4?.contentLanguage || undefined,
                             translationZh: String(message_4?.translationZh || ''),
                             translationState: message_4?.translationState || (message_4?.translationZh ? 'complete' : 'incomplete'),
                             liked: message_4?.liked === true,
@@ -4168,32 +4165,17 @@ The prompt must describe the same current moment with characters, action, settin
                     threshold
                 );
             };
-        const value_268_2 = (contentArea_4) => {
-                if (!contentArea_4) return false;
-                return (
-                    contentArea_4.scrollHeight -
-                        contentArea_4.scrollTop -
-                        contentArea_4.clientHeight <=
-                    threshold_2
-                );
-            };
         const value_269 = (value_951, value_952 = {}) => {
                 if (!value_951) return;
                 const offlineChatScrollLatestElement = document.getElementById(
                     'offline-chat-scroll-latest',
                 );
                 if (!offlineChatScrollLatestElement) return;
-                if (Number.isFinite(value_952.inputHeight)) {
-                    const _offlineLatestBottom_2 =
-                        Math.max(0, Math.round(value_952.inputHeight)) + 12 + 'px';
-                    offlineChatScrollLatestElement._offlineLatestBottom !==
-                        _offlineLatestBottom_2 &&
-                        (offlineChatScrollLatestElement.style.setProperty(
-                            '--im-chat-latest-bottom',
-                            _offlineLatestBottom_2,
-                        ),
-                        (offlineChatScrollLatestElement._offlineLatestBottom =
-                            _offlineLatestBottom_2));
+                const inputHeight = document.querySelector('#offline-chat-view .offline-chat-input-area')?.getBoundingClientRect().height || 0;
+                const latestBottom = Math.max(0, Math.round(inputHeight)) + 12 + 'px';
+                if (offlineChatScrollLatestElement._offlineLatestBottom !== latestBottom) {
+                    offlineChatScrollLatestElement.style.setProperty('--im-chat-latest-bottom', latestBottom);
+                    offlineChatScrollLatestElement._offlineLatestBottom = latestBottom;
                 }
                 const value_953 =
                         value_952.hasOverflow == null
@@ -4218,251 +4200,16 @@ The prompt must describe the same current moment with characters, action, settin
                     (offlineChatScrollLatestElement._offlineLatestVisible =
                         _offlineLatestVisible_2));
             };
-        const value_270 = (() => {
-                let value_958 = null,
-                    following_2 = false,
-                    enabled_960 = false,
-                    renderFrameId_4 = null,
-                    renderFrameId_5 = null,
-                    offlinePromptMigrationSavePromise_2 = null,
-                    value_964 = null,
-                    value_965 = null,
-                    value_966 = null,
-                    inputHeight_2 = 0,
-                    enabled_969 = false,
-                    count_970 = 0,
-                    count_971 = 0;
-                const value_972 = () => {
-                        if (renderFrameId_4 === null) return;
-                        if (typeof window.cancelAnimationFrame === 'function')
-                            window.cancelAnimationFrame(renderFrameId_4);
-                        else clearTimeout(renderFrameId_4);
-                        renderFrameId_4 = null;
-                    },
-                    value_973 = () => {
-                        if (renderFrameId_5 === null) return;
-                        if (typeof window.cancelAnimationFrame === 'function')
-                            window.cancelAnimationFrame(renderFrameId_5);
-                        else clearTimeout(renderFrameId_5);
-                        renderFrameId_5 = null;
-                    },
-                    value_974 = () => {
-                        if (offlinePromptMigrationSavePromise_2 === null) return;
-                        clearTimeout(offlinePromptMigrationSavePromise_2);
-                        offlinePromptMigrationSavePromise_2 = null;
-                    },
-                    scheduleLegacyOfflinePromptCleanup_2 = () => {
-                        renderFrameId_5 !== null &&
-                            (value_973(), scheduleLegacyOfflinePromptCleanup_4());
-                        if (!value_958 || enabled_960 || !following_2) return;
-                        value_958.scrollTop = scrollTop_2;
-                        count_970 = value_958.scrollTop;
-                        value_269(value_958, {
-                            following: true,
-                        });
-                    },
-                    scheduleLegacyOfflinePromptCleanup_3 = () => {
-                        if (!value_958 || enabled_960 || !following_2 || renderFrameId_4 !== null)
-                            return;
-                        const render_3 = () => {
-                            renderFrameId_4 = null;
-                            scheduleLegacyOfflinePromptCleanup_2();
-                        };
-                        if (typeof window.requestAnimationFrame === 'function')
-                            renderFrameId_4 = window.requestAnimationFrame(render_3);
-                        else renderFrameId_4 = setTimeout(render_3, 0);
-                    },
-                    value_977 = () => {
-                        if (!value_958 || enabled_960 || !following_2) return;
-                        value_974();
-                        scheduleLegacyOfflinePromptCleanup_3();
-                        offlinePromptMigrationSavePromise_2 = setTimeout(() => {
-                            offlinePromptMigrationSavePromise_2 = null;
-                            scheduleLegacyOfflinePromptCleanup_3();
-                        }, 120);
-                    },
-                    value_979 = () => {
-                        value_972();
-                        value_973();
-                        value_974();
-                        if (value_964) value_964.disconnect();
-                        if (value_965) value_965.disconnect();
-                        if (value_966) value_966.disconnect();
-                        value_958 &&
-                            (value_958.removeEventListener('scroll', handleScroll),
-                            value_958.removeEventListener('load', value_985, true),
-                            value_958.removeEventListener('error', value_985, true),
-                            value_958.removeEventListener('pointerdown', value_983, true),
-                            value_958.removeEventListener('touchstart', value_983, true),
-                            value_958.removeEventListener('wheel', handleWheel, true));
-                        value_964 = null;
-                        value_965 = null;
-                        value_966 = null;
-                        value_958 = null;
-                    },
-                    value_980 = () => {
-                        value_972();
-                        value_974();
-                        enabled_969 = true;
-                        following_2 = false;
-                    },
-                    scheduleLegacyOfflinePromptCleanup_4 = () => {
-                        if (!value_958 || enabled_960) return;
-                        const scrollTop_989 = value_958.scrollTop,
-                            scrollHeight_990 = value_958.scrollHeight,
-                            clientHeight_991 = value_958.clientHeight;
-                        if (scrollHeight_990 - scrollTop_989 - clientHeight_991 <= threshold_2) {
-                            following_2 = true;
-                            enabled_969 = false;
-                        } else {
-                            if (
-                                !enabled_969 &&
-                                Date.now() <= count_971 &&
-                                scrollTop_989 < count_970 - count_12
-                            )
-                                value_980();
-                            else enabled_969 && (following_2 = false);
-                        }
-                        value_269(value_958, {
-                            following: following_2,
-                            hasOverflow: scrollHeight_990 - clientHeight_991 > 1,
-                        });
-                    },
-                    handleScroll = () => {
-                        if (!value_958 || enabled_960 || renderFrameId_5 !== null) return;
-                        const render_4 = () => {
-                            renderFrameId_5 = null;
-                            scheduleLegacyOfflinePromptCleanup_4();
-                        };
-                        if (typeof window.requestAnimationFrame === 'function')
-                            renderFrameId_5 = window.requestAnimationFrame(render_4);
-                        else renderFrameId_5 = setTimeout(render_4, 0);
-                    },
-                    value_983 = () => {
-                        if (!value_958 || enabled_960) return;
-                        count_970 = value_958.scrollTop;
-                        count_971 = Date.now() + count_13;
-                        handleScroll();
-                    },
-                    handleWheel = (value_993) => {
-                        value_983();
-                        (Number(value_993?.deltaY) || 0) < 0 && (value_980(), handleScroll());
-                    },
-                    value_985 = (event_994) => {
-                        const target_995 = event_994?.target;
-                        if (target_995?.matches?.('.offline-chat-generated-image img'))
-                            handleScroll();
-                    },
-                    value_986 = (value_996, value_997 = {}) => {
-                        if (!value_996) return;
-                        if (value_958 !== value_996) {
-                            value_979();
-                            value_958 = value_996;
-                            value_958.addEventListener('scroll', handleScroll, {
-                                passive: true,
-                            });
-                            value_958.addEventListener('load', value_985, true);
-                            value_958.addEventListener('error', value_985, true);
-                            value_958.addEventListener('pointerdown', value_983, {
-                                passive: true,
-                                capture: true,
-                            });
-                            value_958.addEventListener('touchstart', value_983, {
-                                passive: true,
-                                capture: true,
-                            });
-                            value_958.addEventListener('wheel', handleWheel, {
-                                passive: true,
-                                capture: true,
-                            });
-                            // Passive layout observation only: explicit send/stream actions own scrolling.
-                            typeof window.MutationObserver === 'function' &&
-                                ((value_964 = new window.MutationObserver(() => {
-                                    handleScroll();
-                                })),
-                                value_964.observe(value_958, {
-                                    childList: true,
-                                }));
-                            const offlineChatViewOfflineChatInputAreaElement =
-                                document.querySelector(
-                                    '#offline-chat-view .offline-chat-input-area',
-                                );
-                            inputHeight_2 =
-                                offlineChatViewOfflineChatInputAreaElement?.getBoundingClientRect()
-                                    .height || 0;
-                            typeof window.ResizeObserver === 'function' &&
-                                ((value_965 = new window.ResizeObserver(() => {
-                                    handleScroll();
-                                })),
-                                value_965.observe(value_958),
-                                offlineChatViewOfflineChatInputAreaElement &&
-                                    ((value_966 = new window.ResizeObserver((value_998) => {
-                                        inputHeight_2 =
-                                            value_998?.[0]?.borderBoxSize?.[0]?.blockSize ??
-                                            offlineChatViewOfflineChatInputAreaElement.getBoundingClientRect()
-                                                .height ??
-                                            0;
-                                        value_269(value_958, {
-                                            following: following_2,
-                                            inputHeight: inputHeight_2,
-                                        });
-                                        handleScroll();
-                                    })),
-                                    value_966.observe(offlineChatViewOfflineChatInputAreaElement)));
-                        }
-                        enabled_960 = false;
-                        following_2 =
-                            value_997.force === true ||
-                            (value_997.following == null
-                                ? isOfflineChatNearBottom(value_958)
-                                : value_997.following === true);
-                        enabled_969 = !following_2;
-                        count_970 = value_958.scrollTop;
-                        if (value_997.immediate !== false) scheduleLegacyOfflinePromptCleanup_2();
-                        scheduleLegacyOfflinePromptCleanup_3();
-                        value_269(value_958, {
-                            following: following_2,
-                            inputHeight: inputHeight_2,
-                        });
-                    };
-                return {
-                    follow: (value_999, value_1000 = {}) => {
-                        value_986(value_999, {
-                            ...value_1000,
-                            force: value_1000.force !== false,
-                        });
-                        value_977();
-                    },
-                    preserve: (value_1001) => {
-                        if (value_958 !== value_1001)
-                            return {
-                                following: isOfflineChatNearBottom(value_1001),
-                            };
-                        return (
-                            (enabled_960 = true),
-                            value_972(),
-                            value_974(),
-                            {
-                                following: following_2,
-                            }
-                        );
-                    },
-                    restore: (value_1002, value_1003, value_1004 = {}) =>
-                        value_986(value_1002, {
-                            following: value_1004.force === true || value_1003?.following === true,
-                            immediate: value_1004.immediate,
-                        }),
-                    refresh: () => scheduleLegacyOfflinePromptCleanup_3(),
-                    settle: () => value_977(),
-                    isFollowing: (value_1005) =>
-                        value_958 === value_1005
-                            ? following_2 && !enabled_960
-                            : isOfflineChatNearBottom(value_1005),
-                };
-            })();
-        const scrollOfflineChatToBottom = (value_1006) => {
-                if (value_1006) value_270.follow(value_1006);
-            };
+        const bindOfflineScrollStatus = (contentArea) => {
+            if (!contentArea || contentArea.dataset.offlineScrollBound === 'true') return;
+            contentArea.dataset.offlineScrollBound = 'true';
+            contentArea.addEventListener('scroll', () => value_269(contentArea), { passive: true });
+        };
+        const scrollOfflineChatToBottom = (contentArea) => {
+            if (!contentArea) return;
+            contentArea.scrollTop = contentArea.scrollHeight;
+            value_269(contentArea);
+        };
         const value_272_2 = (value_1007) => {
                 const toggle_4 = document.getElementById('offline-chat-scroll-latest');
                 if (!toggle_4 || toggle_4.dataset.bound === 'true') return;
@@ -4811,11 +4558,18 @@ The prompt must describe the same current moment with characters, action, settin
             return result;
         };
 
-        const normalizeOfflineResponseFields = (raw, reasoning = '', streaming = false) => {
+        const normalizeOfflineContentLanguage = (language) =>
+            window.imDataUtils?.normalizeChatLanguage?.(language) || 'zh';
+        const isOfflineChineseContent = (message, friend) =>
+            normalizeOfflineContentLanguage(message?.contentLanguage || friend?.language) === 'zh';
+        const normalizeOfflineResponseFields = (raw, reasoning = '', streaming = false, language = window.imData?.currentActiveFriend?.language) => {
             const normalized = offlineReasoning
                 ? offlineReasoning.normalizeResponse(raw, reasoning, { streaming })
                 : { content: String(raw || ''), reasoning: String(reasoning || '') };
-            return { ...normalized, ...window.imOfflineResponse.parse(normalized.content, { streaming }) };
+            const contentLanguage = normalizeOfflineContentLanguage(language);
+            return { ...normalized, ...window.imOfflineResponse.parse(normalized.content, {
+                streaming, translationRequired: contentLanguage !== 'zh'
+            }), contentLanguage };
         };
 
         const bindOfflineShareMenu = (bubble, message, disabled = false) => {
@@ -4851,6 +4605,24 @@ The prompt must describe the same current moment with characters, action, settin
                 const bounds = overlay.getBoundingClientRect();
                 card.style.left = `${Math.max(12, Math.min(anchor.right - bounds.left - 200, bounds.width - 212))}px`;
                 card.style.top = `${Math.max(12, Math.min(anchor.top - bounds.top - card.offsetHeight - 8, bounds.height - card.offsetHeight - 12))}px`;
+                // Opening a menu during a touch must not turn the same release into
+                // a click on its Delete row. Require a fresh press on a menu item.
+                let pressedRow = null, pressedTarget = null;
+                overlay.addEventListener('pointerdown', event => {
+                    pressedTarget = event.target;
+                    pressedRow = event.target.closest('[data-offline-action]');
+                }, true);
+                overlay.addEventListener('pointercancel', () => { pressedRow = null; pressedTarget = null; }, true);
+                overlay.addEventListener('click', event => {
+                    const row = event.target.closest('[data-offline-action]');
+                    const allowed = row ? row === pressedRow : event.target === pressedTarget;
+                    pressedRow = null;
+                    pressedTarget = null;
+                    if (!allowed) {
+                        event.preventDefault();
+                        event.stopImmediatePropagation();
+                    }
+                }, true);
                 bindOfflineChatBubbleActions(card, message);
                 card.addEventListener('click', event => {
                     const row = event.target.closest('[data-offline-action]');
@@ -4858,13 +4630,15 @@ The prompt must describe the same current moment with characters, action, settin
                 }, true);
                 overlay.addEventListener('click', event => { if (event.target === overlay) close(); });
                 overlay.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
-                card.querySelectorAll('.msg-menu-item').forEach(row => { row.tabIndex = 0; row.setAttribute('role', 'button'); row.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); row.click(); } }); });
+                card.querySelectorAll('.msg-menu-item').forEach(row => { row.tabIndex = 0; row.setAttribute('role', 'button'); row.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); pressedRow = row; row.click(); } }); });
                 card.querySelector('.msg-menu-item:not([aria-disabled="true"])')?.focus();
+                if (navigator.vibrate) navigator.vibrate(50);
             };
             button.disabled = disabled;
             button.addEventListener('pointerdown', event => {
                 if (button.disabled || (event.button !== undefined && event.button !== 0)) return;
                 start = { id: event.pointerId, x: event.clientX, y: event.clientY };
+                try { button.setPointerCapture(event.pointerId); } catch (_) {}
                 clear();
                 timer = setTimeout(open, 800);
             });
@@ -5087,17 +4861,24 @@ The prompt must describe the same current moment with characters, action, settin
         const bindOfflineTranslationControl = (bubbleDiv, message, friend, options) => {
             const button = bubbleDiv.querySelector('.offline-chat-quotes-btn');
             if (!button || message.role !== 'assistant' || options.isAutoImage) return;
-            button.disabled = message.translationState === 'pending' || bubbleDiv.querySelector('.offline-chat-bubble-text')?.dataset.editing === 'true';
-            if (message.translationState !== 'complete') button.textContent = message.translationState === 'pending' ? 'View quotes >' : '译文未完成';
-            else button.textContent = 'View quotes >';
-            button.title = message.translationState === 'complete' ? 'View quotes' : '译文未完成';
+            const editing = bubbleDiv.querySelector('.offline-chat-bubble-text')?.dataset.editing === 'true';
+            const chinese = isOfflineChineseContent(message, friend);
+            button.disabled = !editing && !chinese && message.translationState === 'pending';
+            button.textContent = chinese || message.translationState === 'complete' || message.translationState === 'pending' ? 'View quotes >' : '译文未完成';
+            button.title = chinese || message.translationState === 'complete' ? 'View quotes' : '译文未完成';
             button.setAttribute('aria-label', button.title);
             if (button.dataset.translationBound === 'true') return;
             button.dataset.translationBound = 'true';
             button.addEventListener('click', () => {
-                if (button.disabled || bubbleDiv.querySelector('.offline-chat-bubble-text')?.dataset.editing === 'true') return;
+                if (bubbleDiv.querySelector('.offline-chat-bubble-text')?.dataset.editing === 'true') {
+                    window.showToast?.('No completed edits'); return;
+                }
+                if (button.disabled) return;
                 const liveFriend = window.imApp?.getFriendById?.(friend?.id) || friend;
                 const live = value_221(liveFriend).find(row => String(row.id) === String(message.id)) || message;
+                if (isOfflineChineseContent(live, liveFriend)) {
+                    window.showToast?.('Already in Chinese'); return;
+                }
                 if (live.translationState !== 'complete' || !live.translationZh) {
                     window.showToast?.('译文未完成'); return;
                 }
@@ -5276,6 +5057,7 @@ The prompt must describe the same current moment with characters, action, settin
                 role: isUser_2 ? 'user' : 'assistant',
                 content: content_9,
                 translationState: 'pending',
+                contentLanguage: normalizeOfflineContentLanguage(options_7.contentLanguage || window.imData.currentActiveFriend?.language),
                 reasoning: options_7.reasoning || '',
                 timestamp: options_7.timestamp || Date.now(),
                 tokens: options_7.tokens || 0,
@@ -5302,7 +5084,9 @@ The prompt must describe the same current moment with characters, action, settin
                         renderTimerId = null;
                     };
             const renderStreamingState = () => {
-                const currentParsed = normalizeOfflineResponseFields(currentContent, currentNativeReasoning, !generationFinished);
+                const contentArea = document.getElementById('offline-chat-content');
+                const shouldFollowBottom = isOfflineChatNearBottom(contentArea);
+                const currentParsed = normalizeOfflineResponseFields(currentContent, currentNativeReasoning, !generationFinished, message_22.contentLanguage);
                 String(currentParsed.reasoning || '').trim() &&
                     (lastVisibleReasoning = String(currentParsed.reasoning).trim());
                 const parsed_5 =
@@ -5359,8 +5143,8 @@ The prompt must describe the same current moment with characters, action, settin
                                 ))
                               : (textEl_2.textContent = textContent_8))
                         : ((textEl_2.innerHTML = ''), (textEl_2.style.display = 'none')));
-                if (generationFinished) value_270.settle();
-                else value_270.refresh();
+                if (shouldFollowBottom) scrollOfflineChatToBottom(contentArea);
+                else value_269(contentArea);
                 return parsed_5;
             };
             const value_1086 = () => {
@@ -5418,7 +5202,7 @@ The prompt must describe the same current moment with characters, action, settin
                     enableOfflineChatBubbleActions(bubbleDiv_4, message_22);
                 },
                 getResult: () => {
-                    const parsed_7 = normalizeOfflineResponseFields(currentContent, currentNativeReasoning, false);
+                    const parsed_7 = normalizeOfflineResponseFields(currentContent, currentNativeReasoning, false, message_22.contentLanguage);
                     return lastVisibleReasoning && !String(parsed_7.reasoning || '').trim()
                         ? {
                               ...parsed_7,
@@ -5618,7 +5402,7 @@ The prompt must describe the same current moment with characters, action, settin
                 const button_6 = document.createElement('button');
                 button_6.type = 'button';
                 button_6.className = 'offline-chat-history-card';
-                button_6.innerHTML = '<i class="fas fa-history"></i><span>查看历史见面</span>';
+                button_6.innerHTML = '<i class="fas fa-history"></i><span>Forever romance</span>';
                 button_6.addEventListener('click', () => handleAction_285(value_1135));
                 element_1134.appendChild(button_6);
             };
@@ -5871,8 +5655,7 @@ The prompt must describe the same current moment with characters, action, settin
                     (value_1195.preserveScroll !== false &&
                         offlineChatContentElement_1196.children.length > 0 &&
                         value_1195.scroll !== true),
-                value_1198 = value_1197 ? value_273_2(offlineChatContentElement_1196) : null,
-                preserve_1199 = value_270.preserve(offlineChatContentElement_1196);
+                value_1198 = value_1197 ? value_273_2(offlineChatContentElement_1196) : null;
             offlineChatContentElement_1196.innerHTML = '';
             const offlineChatViewOfflineChatTitleElement = document.querySelector(
                 '#offline-chat-view .offline-chat-title',
@@ -5950,13 +5733,12 @@ The prompt must describe the same current moment with characters, action, settin
             ) {
                 const placeholder_2 = document.createElement('div');
                 placeholder_2.className = 'offline-chat-placeholder';
-                placeholder_2.textContent = '开始一次线下见面';
+                placeholder_2.textContent = 'Notification Center';
                 documentFragment.appendChild(placeholder_2);
             }
             offlineChatContentElement_1196.appendChild(documentFragment);
-            value_270.restore(offlineChatContentElement_1196, preserve_1199, {
-                force: !value_1198 && value_1195.scroll !== false,
-            });
+            bindOfflineScrollStatus(offlineChatContentElement_1196);
+            value_269(offlineChatContentElement_1196);
             if (isOfflineAutoImageMessage_2(value_1194))
                 buildOfflineThinkingHtml_2(value_1194, true);
             if (value_1198) value_274_2(offlineChatContentElement_1196, value_1198);
@@ -5981,7 +5763,7 @@ The prompt must describe the same current moment with characters, action, settin
             const backBtn = document.createElement('button');
             backBtn.type = 'button';
             backBtn.className = 'offline-chat-history-back';
-            backBtn.innerHTML = '<i class="fas fa-chevron-left"></i> 返回当前见面';
+            backBtn.innerHTML = '<i class="fas fa-chevron-left"></i> First encounter';
             backBtn.addEventListener('click', () => renderOfflineCurrentMessages(activeFriend_31));
             contentArea_6.appendChild(backBtn);
             if (sessions_3.length === 0) {
@@ -6138,7 +5920,7 @@ The prompt must describe the same current moment with characters, action, settin
             const backBtn_2 = document.createElement('button');
             backBtn_2.type = 'button';
             backBtn_2.className = 'offline-chat-history-back';
-            backBtn_2.innerHTML = '<i class="fas fa-chevron-left"></i> 返回历史见面';
+            backBtn_2.innerHTML = '<i class="fas fa-chevron-left"></i> Notification Center';
             backBtn_2.addEventListener('click', () => handleAction_285(activeFriend_33));
             contentArea_7.appendChild(backBtn_2);
             const messages_10 = cloneOfflineMeetingMessages(session_9.messages || []),
@@ -6260,7 +6042,7 @@ The prompt must describe the same current moment with characters, action, settin
             const editingField = editingTranslation ? 'translationZh' : 'content';
             const originalText = String(messages[index][editingField] || '');
             const quotesWereDisabled = quotesButton?.disabled || false;
-            if (quotesButton) quotesButton.disabled = true;
+            if (quotesButton) quotesButton.disabled = false;
             const originalHtml = textEl.innerHTML;
             const originalDisplay = textEl.style.display;
             const originalMinHeight = textEl.style.minHeight;
@@ -6734,10 +6516,11 @@ The prompt must describe the same current moment with characters, action, settin
                             role: 'system',
                             content: buildOfflineAutoImageRequirement(),
                         }),
-                    apiMessages.push({ role: 'system', content: replaceOfflinePromptVariables(`Return one JSON object with exactly two string fields, in this order: "content", then "translationZh". Finish the complete content first in {{default_language}}, including narration, actions, descriptions, transitions, dialogue, enabled recap, barrage and player-choice sections. Then translate that exact content into Simplified Chinese in translationZh. Preserve paragraph breaks, dialogue, section order and all options one-to-one. Never generate a second story. Escape quotes and newlines as JSON strings. Do not put the translation inside content. Any enabled frontend thinking/COT blocks remain outside this object and follow their existing requirements; do not put thinking inside either string. No Markdown fences.
+                    apiMessages.push({ role: 'system', content: replaceOfflinePromptVariables(`Return one JSON object with exactly two string fields, in this order: "content", then "translationZh". Finish the complete content first in {{default_language}}, including narration, actions, descriptions, transitions, dialogue, enabled recap, barrage and player-choice sections. If the Default Language is Chinese, generate the Chinese content only once and set translationZh to the empty string ""; never duplicate, paraphrase or translate the Chinese original into another Chinese version. For every non-Chinese Default Language, translate that exact completed content into Simplified Chinese in translationZh. Preserve paragraph breaks, dialogue, section order and all options one-to-one. Never generate a second story. All audience names, barrage comments and player-choice text inside content must use {{default_language}}, never Chinese unless Chinese is the Default Language. The fixed section markers 【弹幕】 and 【选项】 are parser delimiters only, not a language instruction. Escape quotes and newlines as JSON strings. Do not put the translation inside content. Any enabled frontend thinking/COT blocks remain outside this object and follow their existing requirements; do not put thinking inside either string. No Markdown fences.
 The Default Language is {{default_language}}. It overrides any conflicting older language or plain-text transport instructions. Original-language context contains only content, never translationZh. If an automatic-image marker is requested, place that exact marker at the end of content inside the JSON string, never outside the object. Do not include the image marker or its technical scene description in translationZh.`, identityContext_3) }),
                     {
                         messages: apiMessages,
+                        responseLanguage: normalizeOfflineContentLanguage(activeFriend_59.language),
                         cotValidation: {
                             expectedTitles: cotCompilation.expectedTitles || [],
                         },
@@ -6755,6 +6538,7 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                         currentApiConfig_3.endpoint,
                     ),
                     activeOfflineFriend = window.imData.currentActiveFriend,
+                    responseLanguage = normalizeOfflineContentLanguage(options_8.contentLanguage || activeOfflineFriend?.language),
                     value_468 =
                         options_8.stream !== false &&
                         activeOfflineFriend?.offlineStreamEnabled !== false,
@@ -6768,7 +6552,7 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                         value_1375 = false,
                     ) => {
                         streamingBubble?.finish?.();
-                        const normalized_2 = normalizeOfflineResponseFields(content_13, nativeReasoning, false);
+                        const normalized_2 = normalizeOfflineResponseFields(content_13, nativeReasoning, false, responseLanguage);
                         if (!value_486 && !String(normalized_2.content || '').trim()) {
                             const exhaustedTokens = [
                                     'length',
@@ -6812,6 +6596,7 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                         if (streamingBubble?.setTokens) streamingBubble.setTokens(value_498);
                         return {
                             content: normalized_2.content,
+                            contentLanguage: normalized_2.contentLanguage,
                             translationZh: normalized_2.translationZh,
                             translationState: value_486 || !value_1374 || value_1375 ? 'incomplete' : normalized_2.translationState,
                             reasoning: normalized_2.reasoning || '',
@@ -7064,7 +6849,9 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                     expectedTitles_2 = Array.isArray(requestContext?.cotValidation?.expectedTitles)
                         ? requestContext.cotValidation.expectedTitles
                         : [],
-                    firstResult = await value_297(apiMessages_2, streamingBubble_2, value_1415);
+                    firstResult = await value_297(apiMessages_2, streamingBubble_2, {
+                        ...value_1415, contentLanguage: requestContext?.responseLanguage || value_1415.contentLanguage
+                    });
                 if (
                     firstResult.aborted ||
                     !expectedTitles_2.length ||
@@ -8275,7 +8062,9 @@ Char: ` +
                 items_1683.push({
                     role: 'user',
                     content:
-                        '请从上一条回复中断的位置继续生成后续内容，content 只输出尚未生成的部分，不要重复已有文字；translationZh 必须翻译上一条已保存正文加本次 content 后的完整正文，保持全部段落和选项一一对应。仍按两字段 JSON 输出。',
+                        isOfflineChineseContent(null, currentActiveFriend_1655)
+                            ? '请从上一条回复中断的位置继续生成后续内容，content 只输出尚未生成的中文部分，不要重复已有文字；translationZh 必须为空字符串，不要重复输出中文。仍按两字段 JSON 输出。'
+                            : '请从上一条回复中断的位置继续生成后续内容，content 必须使用当前默认语言，只输出尚未生成的部分，不要重复已有文字；translationZh 必须翻译上一条已保存正文加本次 content 后的完整正文，保持全部段落和选项一一对应。仍按两字段 JSON 输出。',
                 });
                 const message_1685 = await requestOfflineAssistantReplyWithCotValidation(
                         requestContext_2,
@@ -8291,6 +8080,7 @@ Char: ` +
                     content: splitOfflineAutoImageMarker(content_18).content,
                     translationZh: message_1685.translationZh,
                     translationState: message_1685.translationState,
+                    contentLanguage: message_1685.contentLanguage,
                     ttsAudioAssets: [],
                     reasoning: message_1685.reasoning || value_1658.reasoning || undefined,
                     tokens: message_1685.tokens || value_1668,
@@ -8478,6 +8268,7 @@ Char: ` +
                     content: content_27,
                     translationZh: translationZh_27,
                     translationState: translationState_27,
+                    contentLanguage: contentLanguage_27,
                     reasoning: reasoning_4,
                     tokens: tokens_2,
                     truncated: truncated_3,
@@ -8494,6 +8285,7 @@ Char: ` +
                     content: splitOfflineAutoImageMarker(content_27).content,
                     translationZh: translationZh_27,
                     translationState: translationState_27,
+                    contentLanguage: contentLanguage_27,
                     ttsAudioAssets: [],
                     reasoning: reasoning_4 || undefined,
                     tokens: tokens_2,
@@ -8758,11 +8550,11 @@ System managed. Mounted world books, User persona, Char persona, and recent onli
                 id: 'bilingual_dialogue',
                 name: '文本格式',
                 enabled: true,
-                presetVersion: 5,
+                presetVersion: 6,
                 content: `<offline_text_format>
 Chat Settings currently sets {{char}}'s Default Language to {{default_language}}. This current setting is authoritative and overrides the language of online history, previous replies, the user's input, and the scene atmosphere.
 
-Return one JSON object with exactly two string fields, in this order: "content", then "translationZh". Finish the complete content first in {{default_language}}, including narration, actions, descriptions, transitions, dialogue, enabled recap, barrage and player-choice sections. Then translate that exact content into Simplified Chinese in translationZh. Preserve paragraph breaks, dialogue, section order and all options one-to-one. Never generate a second story. Escape quotes and newlines as JSON strings. Do not put the translation inside content. Any enabled frontend thinking/COT blocks remain outside this object and follow their existing requirements; do not put thinking inside either string. No Markdown fences.
+Return one JSON object with exactly two string fields, in this order: "content", then "translationZh". Finish the complete content first in {{default_language}}, including narration, actions, descriptions, transitions, dialogue, enabled recap, barrage and player-choice sections. If the Default Language is Chinese, generate the Chinese content only once and set translationZh to the empty string ""; never duplicate, paraphrase or translate the Chinese original into another Chinese version. For every non-Chinese Default Language, translate that exact completed content into Simplified Chinese in translationZh. Preserve paragraph breaks, dialogue, section order and all options one-to-one. Never generate a second story. All audience names, barrage comments and player-choice text inside content must use {{default_language}}, never Chinese unless Chinese is the Default Language. The fixed section markers 【弹幕】 and 【选项】 are parser delimiters only, not a language instruction. Escape quotes and newlines as JSON strings. Do not put the translation inside content. Any enabled frontend thinking/COT blocks remain outside this object and follow their existing requirements; do not put thinking inside either string. No Markdown fences.
 
 Keep ordinary prose in natural paragraphs with one blank line between paragraphs. Put every spoken line from Char inside straight or curly double quotation marks. A spoken line must occupy its own paragraph, separated from surrounding narration by a blank line. Do not place narration and quoted dialogue on the same line.
 
@@ -8900,17 +8692,19 @@ Do not summarize information that User cannot perceive inside the current scene.
                     id: 'barrage_comments',
                     name: '弹幕评论',
                     enabled: true,
-                    presetVersion: 3,
+                    presetVersion: 4,
                     content: `<barrage_comment_rules>
 This rule is enabled by default, but the user may turn it off in the offline settings.
 When enabled, keep using it in every later offline reply for this character unless the user disables the setting.
-Output only barrage comment text. The frontend will create exactly one barrage button after the prose and will generate random likes.
+Inside the content string, output only barrage comment text for this section. The frontend will create exactly one barrage button after the prose and will generate random likes.
 After all prose is finished, add one plain text section headed exactly:
 【弹幕】
+This fixed marker is only a frontend parser delimiter. Write all viewer names and comment text in {{default_language}}, the current Chat Settings Default Language. Never use Chinese just because this marker is Chinese.
 Then write at least 10 short audience-style comments, one comment per line.
-Every line must include the viewer name and content in this exact plain text shape:
-观众名字：评论内容
-Do not output likes, numbers, XML, HTML, JSON, buttons, labels, or UI instructions.
+Every line must include the viewer name and content in this plain text shape:
+viewer name: comment text
+Both parts must be written in {{default_language}}. The matching translationZh section translates those exact names and comments into Chinese; if the Default Language is Chinese, translationZh stays empty.
+Do not output likes, numbers, XML, HTML, nested JSON, buttons, labels, or UI instructions inside this section. The top-level response must still follow the required content/translationZh JSON transport.
 Comments should sound like viewers reading a novel or watching a film: react to tension, notice details, guess what may happen next, praise the protagonist, or lightly tease the plot.
 Do not let barrage comments change the story. They are UI reactions only, not canon and not dialogue.
 </barrage_comment_rules>`,
@@ -8921,13 +8715,14 @@ Do not let barrage comments change the story. They are UI reactions only, not ca
                     id: 'player_choices',
                     name: '玩家选项',
                     enabled: true,
-                    presetVersion: 2,
+                    presetVersion: 3,
                     content: `<player_choice_rules>
-After the final narrative paragraph and any barrage section, output only choice button text. The frontend will create all buttons and option UI.
+Inside the content string, after the final narrative paragraph and any barrage section, output only choice button text. The frontend will create all buttons and option UI.
 Add one plain text section headed exactly:
 【选项】
-Then write exactly 3 short choices, one choice per line. Do not output XML, HTML, JSON, button markup, numbering requirements, or UI instructions.
-Each choice should be about 10 Chinese characters, actionable, and able to lead naturally into the next scene or deepen the current tension.
+Then write exactly 3 short choices, one choice per line. Do not output XML, HTML, nested JSON, button markup, numbering requirements, or UI instructions inside this section. The top-level response must still follow the required content/translationZh JSON transport.
+This fixed marker is only a frontend parser delimiter. Write all three choices in {{default_language}}, the current Chat Settings Default Language. Never use Chinese just because this marker is Chinese.
+Each choice should be a short, natural phrase in that language, actionable, and able to lead naturally into the next scene or deepen the current tension. The matching translationZh section translates these same three choices into Chinese one-to-one; if the Default Language is Chinese, translationZh stays empty.
 Do not make choices generic. Tie them to the current scene, relationship, objects, and unresolved momentum.
 </player_choice_rules>`,
                     editable: true,
@@ -8937,8 +8732,9 @@ Do not make choices generic. Tie them to the current scene, relationship, object
                     id: 'task_instruction',
                     name: '任务要求',
                     enabled: true,
-                    presetVersion: 2,
+                    presetVersion: 3,
                     content: `<task_instruction>
+All story text produced under these task instructions must use {{default_language}}, the current Chat Settings Default Language. The language of these instructions does not determine the output language. For non-Chinese Default Languages, only translationZh uses Chinese to translate the same content; for Chinese, translationZh stays empty.
 根据当前剧情、人物动机和最近互动推进故事。优先承接 {{user}} 的最新动作或话语。
 处理好互动、对白、身体动作、环境变化和场景节奏，不要只做解释或总结。
 若 {{char}} 包含多位群成员，每轮依据最新输入和剧情连续性选取 1 至 2 位主要 Char 重点推动当前片段；其他成员可通过短暂反应、插话、行动和成员间关系自然参与，保持群像小说般的整体感。不要随机轮换主角，也不要让所有成员机械地平均发言。
@@ -8964,13 +8760,14 @@ System managed. Vectorized Char short-term, long-term, and cherished memories ar
                 id: 'format_rules',
                 name: '格式示例',
                 enabled: true,
-                presetVersion: 5,
+                presetVersion: 6,
                 content: `<formatting_rules>
-Return one JSON object with exactly two string fields, in this order: "content", then "translationZh". Finish the complete content first in {{default_language}}, including narration, actions, descriptions, transitions, dialogue, enabled recap, barrage and player-choice sections. Then translate that exact content into Simplified Chinese in translationZh. Preserve paragraph breaks, dialogue, section order and all options one-to-one. Never generate a second story. Escape quotes and newlines as JSON strings. Do not put the translation inside content. Any enabled frontend thinking/COT blocks remain outside this object and follow their existing requirements; do not put thinking inside either string. No Markdown fences.
+Return one JSON object with exactly two string fields, in this order: "content", then "translationZh". Finish the complete content first in {{default_language}}, including narration, actions, descriptions, transitions, dialogue, enabled recap, barrage and player-choice sections. If the Default Language is Chinese, generate the Chinese content only once and set translationZh to the empty string ""; never duplicate, paraphrase or translate the Chinese original into another Chinese version. For every non-Chinese Default Language, translate that exact completed content into Simplified Chinese in translationZh. Preserve paragraph breaks, dialogue, section order and all options one-to-one. Never generate a second story. All audience names, barrage comments and player-choice text inside content must use {{default_language}}, never Chinese unless Chinese is the Default Language. The fixed section markers 【弹幕】 and 【选项】 are parser delimiters only, not a language instruction. Escape quotes and newlines as JSON strings. Do not put the translation inside content. Any enabled frontend thinking/COT blocks remain outside this object and follow their existing requirements; do not put thinking inside either string. No Markdown fences.
 Example transport shape: ${JSON.stringify({ content: 'Narration.\n\n"Dialogue."', translationZh: '叙述。\n\n“对白。”' })}. Use {{default_language}} for content; this English example illustrates structure only.
+For a Chinese Default Language, use this shape instead: ${JSON.stringify({ content: '中文叙述。\n\n“对白。”', translationZh: '' })}. Generate only this one Chinese version.
 Use normal paragraph prose with a blank line between paragraphs.
 Every spoken line from Char must be wrapped in straight double quotes or Chinese curly double quotes, for example: "I am here." or “我在这里。” Do not write bare Char dialogue and do not use "Char: dialogue" labels.
-If barrage comments are enabled, append exactly one plain 【弹幕】 section after all prose, containing at least 10 lines in the shape 观众名字：评论内容. Do not output likes; the frontend controls random likes.
+If barrage comments are enabled, append exactly one plain 【弹幕】 section after all prose, containing at least 10 lines in the shape viewer name: comment text. Both viewer names and comments in content use {{default_language}}; the fixed marker remains unchanged. Do not output likes; the frontend controls random likes.
 If player choices are enabled, append a plain 【选项】 section containing exactly three choice text lines.
 Do not output XML tags such as <speech>, <barrages>, <barrage>, <choices>, or <choice>; the frontend owns all UI.
 If a <thinking> block is produced for the frontend, put it before the JSON object and keep both content and translationZh outside it.
@@ -9256,7 +9053,7 @@ If a <thinking> block is produced for the frontend, put it before the JSON objec
                             ),
                             sourcePresetVersion = Math.max(0, Number(prompt_11.presetVersion) || 0),
                             refreshBuiltInContent =
-                                (['role_identity', 'length_words', 'style_creative_guidance', 'perspective_third', 'bilingual_dialogue', 'format_rules'].includes(id_5) ||
+                                (['role_identity', 'length_words', 'style_creative_guidance', 'perspective_third', 'bilingual_dialogue', 'format_rules', 'barrage_comments', 'player_choices', 'task_instruction'].includes(id_5) ||
                                     fullCotIds.includes(id_5)) &&
                                 sourcePresetVersion < presetVersion_2;
                         if (refreshBuiltInContent) item_21.name = defaultPrompt_2.name;
@@ -11841,6 +11638,7 @@ Persona: ` +
                                 content: content_22,
                                 translationZh: translationZh_22,
                                 translationState: translationState_22,
+                                contentLanguage: contentLanguage_22,
                                 reasoning: reasoning_5,
                                 tokens: tokens_4,
                                 aborted: aborted_3,
@@ -11860,6 +11658,7 @@ Persona: ` +
                                 content: autoImageOutput.content,
                                 translationZh: translationZh_22,
                                 translationState: translationState_22,
+                                contentLanguage: contentLanguage_22,
                                 reasoning: reasoning_5 || undefined,
                                 tokens: Math.max(0, Number(tokens_4) || 0),
                                 generationState: truncated_4 ? 'truncated' : undefined,
@@ -11929,6 +11728,7 @@ Persona: ` +
                                             const failedMessage = {
                                                 ...pendingAiMessage,
                                                 content: content_23,
+                                                contentLanguage: failedResult.contentLanguage,
                                                 translationZh: String(failedResult.translationZh || ''),
                                                 translationState: 'incomplete',
                                                 reasoning:
@@ -11989,11 +11789,6 @@ Persona: ` +
                             sendBtn.innerHTML = '<span>Send</span>';
                             sendBtn.classList.toggle('has-input', !!offlineChatInputElement_2134.value.trim());
                             sendBtn.title = title_4;
-                            const offlineChatContentElement_2252 =
-                                document.getElementById('offline-chat-content');
-                            const isFollowing_2253 = value_270.isFollowing(
-                                offlineChatContentElement_2252,
-                            );
                             setTimeout(() => {
                                     try {
                                         offlineChatInputElement_2134.focus({
@@ -12002,8 +11797,6 @@ Persona: ` +
                                     } catch (value_2254) {
                                         offlineChatInputElement_2134.focus();
                                     }
-                                    if (isFollowing_2253)
-                                        scrollOfflineChatToBottom(offlineChatContentElement_2252);
                                 }, 50);
                         }
                     }

@@ -30,7 +30,7 @@ const server = http.createServer((req, res) => {
     await new Promise(resolve => server.listen(0,'127.0.0.1',resolve));
     const browser = await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH || '/tmp/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
     try {
-        for (const [label,width,height] of [['phone',390,844]]) {
+        for (const [label,width,height] of [['phone',390,844],['portrait',820,1148],['landscape',1180,788]]) {
             const context = await browser.newContext({viewport:{width,height},hasTouch:true,isMobile:true,userAgent:'Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X)'});
             const page=await context.newPage();
             const errors=[];page.on('console',msg=>{if(msg.type()==='error'&&!msg.text().startsWith('Failed to load'))console.log('CONSOLE',msg.text().slice(0,2000))});page.on('pageerror',error=>{errors.push(error.message); console.log('PAGEERROR',error.message)});
@@ -120,6 +120,16 @@ const server = http.createServer((req, res) => {
             await page.waitForTimeout(180);
             assert.equal(await page.evaluate(()=>document.getElementById('offline-chat-content').scrollTop),0,'Stream must respect a user who scrolls up');
             console.log('PASS scrolling up during streaming stops automatic following');
+            await page.locator('#offline-chat-scroll-latest').click();
+            for (let i=0;i<3;i++) {
+                await page.evaluate(()=>{window.__stage='cot';window.__writes=[];window.__stream.appendReasoningChunk('Another reasoning paragraph.\n'.repeat(15));});
+                await page.waitForTimeout(160);
+                assert.equal(await page.evaluate(()=>window.__writes.filter(e=>e.kind==='scroll').length),1,'Each CoT render gets only the GPT single bottom write');
+                await page.evaluate(()=>{window.__stage='idle';window.__writes=[];});
+                await page.waitForTimeout(180);
+                assert.equal(await page.evaluate(()=>window.__writes.filter(e=>e.kind==='scroll').length),0,'No observer or timer scroll writes after the CoT render');
+            }
+            console.log('PASS CoT renders use one GPT scroll without delayed follow writes');
 
             await context.close();
         }

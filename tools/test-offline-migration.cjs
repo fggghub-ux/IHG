@@ -59,7 +59,7 @@ const server = http.createServer((req, res) => {
             });
             await page.waitForFunction(()=>document.querySelector('.offline-chat-bubble.ai .offline-chat-avatar img')?.naturalWidth>0);
             await check('unset Char avatar uses the same assets default as Contacts',()=>document.querySelector('.offline-chat-bubble.ai .offline-chat-avatar img').getAttribute('src')==='assets/imessage/default-char-avatar.jpg');
-            await check('short notification texts each occupy one line',()=>['Removed from favorites','Translated','Show original'].every(text=>{window.showToast(text);const t=document.getElementById('global-toast')||document.querySelector('.toast-bubble'),range=document.createRange();range.selectNodeContents(t);return range.getClientRects().length===1}));
+            await check('short notification texts each occupy one line',()=>['Removed from favorites','Translated','Show original','Already in Chinese','No completed edits'].every(text=>{window.showToast(text);const t=document.getElementById('global-toast')||document.querySelector('.toast-bubble'),range=document.createRange();range.selectNodeContents(t);return range.getClientRects().length===1}));
             await page.screenshot({path:`/tmp/offline-initial-${label}.png`});
             await check('source composer layout stays horizontal',()=>{const bar=document.querySelector('.offline-chat-input-bar'),input=document.getElementById('offline-chat-input'),send=document.getElementById('offline-chat-send-btn');return getComputedStyle(bar).display==='flex'&&send.getBoundingClientRect().left>input.getBoundingClientRect().left&&bar.getBoundingClientRect().height<70});
             await check('English choices retain the first letter',()=>['Ask him.','Come closer.','Stay here.','Choiceful prose'].every(text=>window.__offlineTest.choices(text)===text)&&window.__offlineTest.choices('A. Ask him.')==='Ask him.');
@@ -100,16 +100,29 @@ const server = http.createServer((req, res) => {
                 await page.locator('.offline-chat-bubble.ai .offline-chat-quotes-btn').click();
                 await check('old corner quotes have no compatibility speech wrapper',()=>!window.__offlineTest.text('「Legacy quote」',{messageId:'old-corner',enableVoice:true}).includes('offline-chat-speech'));
             }
+            const accidentalDialogs=[];
+            const dismissUnexpected=async dialog=>{accidentalDialogs.push(dialog.message());await dialog.dismiss()};
+            page.on('dialog',dismissUnexpected);
+            await page.evaluate(()=>{window.__vibrations=[];Object.defineProperty(navigator,'vibrate',{configurable:true,value:duration=>{window.__vibrations.push(duration);return true}})});
             const share=page.locator('.offline-chat-bubble.ai .offline-chat-share-action');
             await share.scrollIntoViewIfNeeded();
-            const box=await share.boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();await page.waitForTimeout(850);await page.mouse.up();
+            const box=await share.boundingBox();
+            const touch=await context.newCDPSession(page);
+            await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2}]});
+            await page.waitForTimeout(850);
+            await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+            await page.waitForTimeout(150);
+            await page.evaluate(()=>document.querySelector('#offline-message-menu [data-offline-action="delete"]').dispatchEvent(new MouseEvent('click',{bubbles:true})));
+            assert.deepEqual(accidentalDialogs,[],label+' opening gesture must never invoke Delete');
+            await check('touch long press opens once with online 50ms feedback',()=>window.__vibrations.length===1&&window.__vibrations[0]===50&&!!document.querySelector('#offline-message-menu'));
+            page.off('dialog',dismissUnexpected);
             await check('800ms share menu matches online action card',()=>{const c=document.querySelector('.offline-message-menu-card');return c&&[...c.querySelectorAll('.msg-menu-item span')].map(n=>n.textContent).join(',')==='Edit,Reroll,Delete'&&getComputedStyle(c).width==='200px'&&getComputedStyle(c.querySelector('.msg-menu-item')).fontSize==='16px'});
             await page.locator('#offline-message-menu [data-offline-action="edit"]').click();
             await page.locator('.offline-chat-inline-editor').fill('An edited room.\n\n"A changed line."');
             await check('View cannot replace an unsaved original editor',()=>{
                 const view=document.querySelector('.offline-chat-bubble.ai .offline-chat-quotes-btn');
                 view.dispatchEvent(new MouseEvent('click',{bubbles:true}));
-                return view.disabled&&document.querySelector('.offline-chat-inline-editor')?.value==='An edited room.\n\n"A changed line."'&&view.getAttribute('aria-pressed')==='false';
+                return !view.disabled&&document.querySelector('.toast-bubble').textContent==='No completed edits'&&document.querySelector('.offline-chat-inline-editor')?.value==='An edited room.\n\n"A changed line."'&&view.getAttribute('aria-pressed')==='false';
             });
             const oldTranslation=await page.evaluate(()=>window.imApp.getFriendById('offline-fixture').offlineMessages.find(m=>m.id==='offline-ai').translationZh);
             await page.locator('.offline-chat-bubble.ai [data-inline-edit-action="save"]').click();
@@ -130,7 +143,7 @@ const server = http.createServer((req, res) => {
             await check('View cannot replace an unsaved translation editor',()=>{
                 const view=document.querySelector('.offline-chat-bubble.ai .offline-chat-quotes-btn');
                 view.dispatchEvent(new MouseEvent('click',{bubbles:true}));
-                return view.disabled&&document.querySelector('.offline-chat-inline-editor')?.value==='修改后的中文译文。\n\n“新的对白。”'&&view.getAttribute('aria-pressed')==='true';
+                return !view.disabled&&document.querySelector('.toast-bubble').textContent==='No completed edits'&&document.querySelector('.offline-chat-inline-editor')?.value==='修改后的中文译文。\n\n“新的对白。”'&&view.getAttribute('aria-pressed')==='true';
             });
             await page.locator('.offline-chat-bubble.ai [data-inline-edit-action="save"]').click();
             await page.waitForFunction(()=>!document.querySelector('.offline-chat-inline-editor'));
@@ -164,7 +177,7 @@ const server = http.createServer((req, res) => {
             await page.waitForFunction(()=>!document.querySelector('.offline-profile-editor.active'));
             await check('profile Save persists source override fields',()=>window.imApp.getFriendById('offline-fixture').offlineCharProfile?.name==='Edited Char'&&document.querySelector('.offline-chat-bubble.ai .offline-chat-name').textContent==='Edited Char'&&[['following','11'],['followers','42K'],['views','7M'],['likes','23K'],['favorite','6.5K']].every(([field,value])=>window.imApp.getFriendById('offline-fixture').offlineCharProfile[field]===value&&[...document.querySelectorAll('.offline-chat-bubble.ai .offline-profile-'+field+'-value')].every(el=>el.textContent===value)));
             if(label==='phone') {
-                await check('only two presets migrate; custom toggles remain',()=>{
+                await check('language presets migrate; custom toggles remain',()=>{
                     const defaults=window.__offlineTest.defaults(); const old=defaults.map(x=>({...x, enabled:false}));old.find(x=>x.id==='bilingual_dialogue').presetVersion=1;old.find(x=>x.id==='bilingual_dialogue').name='双语对话';old.find(x=>x.id==='bilingual_dialogue').content='old';
                     const migrated=window.__offlineTest.prompts(old);return migrated.find(x=>x.id==='bilingual_dialogue').name==='文本格式'&&!migrated.find(x=>x.id==='bilingual_dialogue').enabled&&migrated.filter(x=>x.id.startsWith('cot_')).every(x=>!x.enabled);
                 });
@@ -273,6 +286,7 @@ const server = http.createServer((req, res) => {
                     return m?.translationState==='complete'&&m.translationZh.startsWith('原文')&&f.offlineMessages.some(m=>m.id==='concurrent-message')&&f.offlineCharProfile.name==='Edited Char'&&f.offlineCharProfile.avatarUrl.startsWith('data:')&&f.offlineCharBannerUrl.startsWith('data:');
                 });
             }
+            await require('./test-offline-followups.cjs')(page, context, label);
             await page.screenshot({path:`/tmp/offline-${label}.png`,fullPage:true});
             assert.deepEqual(errors,[],label+' runtime errors');
             await context.close();
