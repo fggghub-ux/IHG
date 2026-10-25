@@ -3989,7 +3989,7 @@ Char 已存：` +
                             sender: msg_3.sender,
                             role: 'assistant',
                             content: window.imChat.buildLovesInvitationCardHtml('received'),
-                            text: '【邀请已接受】TA 已接受了你的情侣空间邀请。',
+                            text: '【Invitation Accepted】TA accepted your invitation.',
                             timestamp: Date.now(),
                             time: new Date().toLocaleTimeString('zh-CN', {
                                 hour: '2-digit',
@@ -4031,7 +4031,7 @@ Char 已存：` +
             sender: friend_16.id,
             role: 'assistant',
             content: window.imChat.buildLovesInvitationCardHtml('received'),
-            text: '【情侣空间】我接受了你的邀请',
+            text: '【Lover】I accepted your invitation.',
             timestamp: lovesSpaceStartTime_2 - 100,
             type: 'html',
         };
@@ -4246,7 +4246,7 @@ Char 已存：` +
             sender: 'me',
             role: 'user',
             content: window.imChat.buildLovesInvitationCardHtml('pending'),
-            text: '【情侣空间邀请】我向你发送了情侣空间的邀请，快来接受吧！',
+            text: '【Lover Invitation】Love is the eternal romanticism.',
             timestamp: Date.now(),
             time: new Date().toLocaleTimeString('zh-CN', {
                 hour: '2-digit',
@@ -4270,7 +4270,7 @@ Char 已存：` +
             metaOnly: true,
         });
         window.showToast &&
-            window.showToast('已向 ' + (friend_17.nickname || friend_17.realname) + ' 发送邀请！');
+            window.showToast('Invitation sent to ' + (friend_17.nickname || friend_17.realname) + ' ！');
         if (String(this.currentFriend?.id || '') === String(friend_17.id))
             this.renderRelationshipState(friend_17);
     },
