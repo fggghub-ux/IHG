@@ -4228,7 +4228,6 @@ The prompt must describe the same current moment with characters, action, settin
                     value_964 = null,
                     value_965 = null,
                     value_966 = null,
-                    value_967 = null,
                     inputHeight_2 = 0,
                     enabled_969 = false,
                     count_970 = 0,
@@ -4282,16 +4281,6 @@ The prompt must describe the same current moment with characters, action, settin
                             scheduleLegacyOfflinePromptCleanup_3();
                         }, 120);
                     },
-                    value_978 = () => {
-                        if (!value_965 || !value_958) return;
-                        const messages_8 = value_958.querySelectorAll('.offline-chat-bubble'),
-                            lastMessage_2 =
-                                messages_8.length > 0 ? messages_8[messages_8.length - 1] : null;
-                        if (lastMessage_2 === value_967) return;
-                        if (value_967) value_965.unobserve(value_967);
-                        value_967 = lastMessage_2;
-                        if (value_967) value_965.observe(value_967);
-                    },
                     value_979 = () => {
                         value_972();
                         value_973();
@@ -4309,7 +4298,6 @@ The prompt must describe the same current moment with characters, action, settin
                         value_964 = null;
                         value_965 = null;
                         value_966 = null;
-                        value_967 = null;
                         value_958 = null;
                     },
                     value_980 = () => {
@@ -4363,7 +4351,7 @@ The prompt must describe the same current moment with characters, action, settin
                     value_985 = (event_994) => {
                         const target_995 = event_994?.target;
                         if (target_995?.matches?.('.offline-chat-generated-image img'))
-                            scheduleLegacyOfflinePromptCleanup_3();
+                            handleScroll();
                     },
                     value_986 = (value_996, value_997 = {}) => {
                         if (!value_996) return;
@@ -4387,10 +4375,9 @@ The prompt must describe the same current moment with characters, action, settin
                                 passive: true,
                                 capture: true,
                             });
+                            // Passive layout observation only: explicit send/stream actions own scrolling.
                             typeof window.MutationObserver === 'function' &&
                                 ((value_964 = new window.MutationObserver(() => {
-                                    value_978();
-                                    scheduleLegacyOfflinePromptCleanup_3();
                                     handleScroll();
                                 })),
                                 value_964.observe(value_958, {
@@ -4405,7 +4392,6 @@ The prompt must describe the same current moment with characters, action, settin
                                     .height || 0;
                             typeof window.ResizeObserver === 'function' &&
                                 ((value_965 = new window.ResizeObserver(() => {
-                                    scheduleLegacyOfflinePromptCleanup_3();
                                     handleScroll();
                                 })),
                                 value_965.observe(value_958),
@@ -4420,7 +4406,7 @@ The prompt must describe the same current moment with characters, action, settin
                                             following: following_2,
                                             inputHeight: inputHeight_2,
                                         });
-                                        scheduleLegacyOfflinePromptCleanup_3();
+                                        handleScroll();
                                     })),
                                     value_966.observe(offlineChatViewOfflineChatInputAreaElement)));
                         }
@@ -4432,7 +4418,6 @@ The prompt must describe the same current moment with characters, action, settin
                                 : value_997.following === true);
                         enabled_969 = !following_2;
                         count_970 = value_958.scrollTop;
-                        value_978();
                         if (value_997.immediate !== false) scheduleLegacyOfflinePromptCleanup_2();
                         scheduleLegacyOfflinePromptCleanup_3();
                         value_269(value_958, {
@@ -11800,29 +11785,12 @@ Persona: ` +
                         let enabled_2221 = false;
                         try {
                             if (content_21) {
-                                const value_2237 = Array.isArray(activeFriend_49.offlineMessages)
-                                    ? activeFriend_49.offlineMessages
-                                    : [];
                                 userMsg = {
                                     id: createOfflineChatId('offline-user'),
                                     role: 'user',
                                     content: content_21,
                                     timestamp: Date.now(),
                                 };
-                                element_2220 = renderOfflineChatBubble(userMsg, true, {
-                                    floor: getOfflineDialogueRows(value_2237).length + 1,
-                                    depth: 0,
-                                    actionsDisabled: true,
-                                });
-                                element_2220?.classList.add('is-persistence-pending');
-                                element_2220?.setAttribute('aria-busy', 'true');
-                                await new Promise((render_7) => {
-                                        typeof window.requestAnimationFrame === 'function'
-                                            ? window.requestAnimationFrame(() =>
-                                                  window.requestAnimationFrame(render_7),
-                                              )
-                                            : setTimeout(render_7, 0);
-                                    });
                             }
                             await value_279(activeFriend_49);
                             const previousMessages = value_221(activeFriend_49);
@@ -11843,9 +11811,10 @@ Persona: ` +
                                         (message_37) =>
                                                 String(message_37.id) === String(userMsg.id),
                                     ) || userMsg;
-                                element_2220?.classList.remove('is-persistence-pending');
-                                element_2220?.removeAttribute('aria-busy');
-                                enableOfflineChatBubbleActions(element_2220, persistedUserMsg);
+                                element_2220 = renderOfflineChatBubble(persistedUserMsg, true, {
+                                    floor: getOfflineMessageFloor(messagesWithUser, persistedUserMsg.id),
+                                    depth: 0
+                                });
                             }
                             const timestamp_5 = Date.now();
                             const id_9 = createOfflineChatId('offline-ai');
