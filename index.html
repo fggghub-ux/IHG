@@ -87,7 +87,7 @@
         </script>
         <link
             rel="stylesheet"
-            href="css/global.css?v=20261020-ipad-apk-layout&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016"
+            href="css/global.css?v=20261020-ipad-apk-layout&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&chats-scroll-toast=20261025-v1"
         />
         <link
             rel="stylesheet"
@@ -100,7 +100,7 @@
         <link rel="stylesheet" href="css/worldbook.css?v=20261007-107-r1&apk-sync=113-selective-20261022" />
         <link rel="stylesheet" href="css/app_guide_modal.css?v=20261007-107-r1" />
         <link rel="stylesheet" href="css/online_prompts.css?v=20260905-v6&repair=20261003&apk-sync=117-selective-20261022&ui-fixes=20261024-v1" />
-        <link rel="stylesheet" href="css/imessage.css?loves-ui=20261024-v1&album-ui=20261024-v2&v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&apk-sync=118-selective-20261022&home-avatar-migration=20261023-v1&ipad-home-title=20261023-v1&chats-migration=20261023-v1&chat-ui=20261024-v2&chat-repair=20261024-v4" />
+        <link rel="stylesheet" href="css/imessage.css?loves-ui=20261024-v1&album-ui=20261024-v2&v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&apk-sync=118-selective-20261022&home-avatar-migration=20261023-v1&ipad-home-title=20261023-v1&chats-migration=20261023-v1&chat-ui=20261024-v2&chat-repair=20261024-v4&chats-scroll-toast=20261025-v1" />
         <link rel="stylesheet" href="css/pay.css?v=20260923-gallery-layout-v1&repair=20261003" />
         <link
             rel="stylesheet"
@@ -6918,40 +6918,42 @@
                                 </svg>
                             </label>
 
-                            <div class="chats-featured-section" aria-label="Featured images">
-                                <div class="chats-featured-item chats-featured-item-left">
-                                    <button type="button" class="chats-featured-status chats-featured-status-left" data-chats-featured-status="tearsorg" aria-label="Edit Tearsorg status">Touch you</button>
-                                    <button type="button" class="chats-featured-image-button" data-chats-featured="tearsorg" aria-label="Change Tearsorg image">
-                                        <span class="chats-featured-avatar-wrapper">
-                                            <img class="chats-featured-avatar-shadow" data-chats-featured-shadow="tearsorg" src="assets/imessage/chats-featured-tearsorg.jpg" alt="">
-                                            <img class="chats-featured-avatar" data-chats-featured-image="tearsorg" src="assets/imessage/chats-featured-tearsorg.jpg" alt="Tearsorg">
-                                        </span>
-                                    </button>
-                                    <span class="chats-featured-name">Tearsorg</span>
+                            <div class="chats-scroll-content" id="chats-scroll-content">
+                                <div class="chats-featured-section" aria-label="Featured images">
+                                    <div class="chats-featured-item chats-featured-item-left">
+                                        <button type="button" class="chats-featured-status chats-featured-status-left" data-chats-featured-status="tearsorg" aria-label="Edit Tearsorg status">Touch you</button>
+                                        <button type="button" class="chats-featured-image-button" data-chats-featured="tearsorg" aria-label="Change Tearsorg image">
+                                            <span class="chats-featured-avatar-wrapper">
+                                                <img class="chats-featured-avatar-shadow" data-chats-featured-shadow="tearsorg" src="assets/imessage/chats-featured-tearsorg.jpg" alt="">
+                                                <img class="chats-featured-avatar" data-chats-featured-image="tearsorg" src="assets/imessage/chats-featured-tearsorg.jpg" alt="Tearsorg">
+                                            </span>
+                                        </button>
+                                        <span class="chats-featured-name">Tearsorg</span>
+                                    </div>
+                                    <div class="chats-featured-item chats-featured-item-right">
+                                        <button type="button" class="chats-featured-status chats-featured-status-right" data-chats-featured-status="tiamo" aria-label="Edit TiAmo status">I'm so tired.</button>
+                                        <button type="button" class="chats-featured-image-button" data-chats-featured="tiamo" aria-label="Change TiAmo image">
+                                            <span class="chats-featured-avatar-wrapper">
+                                                <img class="chats-featured-avatar-shadow" data-chats-featured-shadow="tiamo" src="assets/imessage/chats-featured-tiamo.jpg" alt="">
+                                                <img class="chats-featured-avatar" data-chats-featured-image="tiamo" src="assets/imessage/chats-featured-tiamo.jpg" alt="TiAmo">
+                                            </span>
+                                        </button>
+                                        <span class="chats-featured-name">TiAmo</span>
+                                    </div>
                                 </div>
-                                <div class="chats-featured-item chats-featured-item-right">
-                                    <button type="button" class="chats-featured-status chats-featured-status-right" data-chats-featured-status="tiamo" aria-label="Edit TiAmo status">I'm so tired.</button>
-                                    <button type="button" class="chats-featured-image-button" data-chats-featured="tiamo" aria-label="Change TiAmo image">
-                                        <span class="chats-featured-avatar-wrapper">
-                                            <img class="chats-featured-avatar-shadow" data-chats-featured-shadow="tiamo" src="assets/imessage/chats-featured-tiamo.jpg" alt="">
-                                            <img class="chats-featured-avatar" data-chats-featured-image="tiamo" src="assets/imessage/chats-featured-tiamo.jpg" alt="TiAmo">
-                                        </span>
-                                    </button>
-                                    <span class="chats-featured-name">TiAmo</span>
+
+                                <input type="file" id="chats-featured-tearsorg-input" accept="image/*" hidden>
+                                <input type="file" id="chats-featured-tiamo-input" accept="image/*" hidden>
+
+                                <div id="chats-list-container" class="chats-list-container" style="display: none;">
+                                    <div id="chats-list">
+                                        <!-- Chat items will be injected here -->
+                                    </div>
                                 </div>
-                            </div>
 
-                            <input type="file" id="chats-featured-tearsorg-input" accept="image/*" hidden>
-                            <input type="file" id="chats-featured-tiamo-input" accept="image/*" hidden>
-
-                            <div id="chats-list-container" class="chats-list-container" style="display: none;">
-                                <div id="chats-list">
-                                    <!-- Chat items will be injected here -->
+                                <div id="chats-empty-state" class="chats-empty-state">
+                                    <p>Select a friend from the Home tab to start chatting.</p>
                                 </div>
-                            </div>
-
-                            <div id="chats-empty-state" class="chats-empty-state">
-                                <p>Select a friend from the Home tab to start chatting.</p>
                             </div>
                         </div>
                     </div>

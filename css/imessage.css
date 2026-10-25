@@ -3527,15 +3527,24 @@ button.group-private-chat-detail-bubble {
     caret-color: #007aff;
 }
 
-.chats-list-container {
+/* Search and the top bar stay fixed; featured images and conversations share
+   one scrollport so the list can use all of the space below Search. */
+.chats-scroll-content {
+    display: flex;
+    flex-direction: column;
     flex: 1;
     min-height: 0;
-    width: min(100%, var(--chats-list-max-width));
-    align-self: center;
+    width: 100%;
     overflow-x: hidden;
     overflow-y: auto;
-    padding: 0 0 var(--im-bottom-nav-space);
+    padding-bottom: var(--im-bottom-nav-space);
     -webkit-overflow-scrolling: touch;
+}
+
+.chats-list-container {
+    flex: 0 0 auto;
+    width: min(100%, var(--chats-list-max-width));
+    align-self: center;
 }
 
 #chats-list,
@@ -3715,7 +3724,7 @@ button.group-private-chat-detail-bubble {
     text-align: center;
     width: min(100%, var(--chats-list-max-width));
     align-self: center;
-    padding: 0 calc(40px * var(--chats-ui-scale)) calc(var(--im-bottom-nav-space) + (40px * var(--chats-ui-scale)));
+    padding: 0 calc(40px * var(--chats-ui-scale)) calc(40px * var(--chats-ui-scale));
 }
 
 .chats-empty-state p {

@@ -188,6 +188,9 @@ textarea,
     transition:
         opacity 0.3s ease,
         transform 0.3s cubic-bezier(0.17, 0.84, 0.44, 1);
+    /* Match short notifications to their unwrapped text width; max-width
+       still wraps long errors within the screen instead of truncating them. */
+    width: max-content;
     white-space: normal;
     text-align: center;
     box-sizing: border-box;
