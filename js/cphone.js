@@ -2608,22 +2608,15 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                     ).values(),
                 ];
             },
-        getCharUserMemory(value_378) {
-                return (Array.isArray(value_378.messages) ? value_378.messages : [])
-                    .filter(
-                        (message_379) =>
-                            (message_379?.role === 'user' || message_379?.role === 'assistant') &&
-                            message_379.excludedFromContext !== true &&
-                            !message_379.noticeKind &&
-                            this.messageText(message_379) !== '[消息]',
-                    )
-                    .slice(-20)
-                    .map((message_380) => ({
-                        speaker: message_380.role === 'user' ? 'User' : value_6(value_378),
-                        text: this.messageText(message_380).slice(0, 2000),
-                        translation: String(message_380.translation || '').slice(0, 1000),
-                    }));
-            },
+        getCharUserMemory(apk119Value530, {
+  userName = "User"
+} = {}) {
+  return (Array.isArray(apk119Value530.messages) ? apk119Value530.messages : []).filter(apk119Value531 => (apk119Value531?.["role"] === "user" || apk119Value531?.["role"] === "assistant") && apk119Value531.excludedFromContext !== true && !apk119Value531.noticeKind && this.messageText(apk119Value531) !== "[消息]").slice(-20).map(apk119Value532 => ({
+    speaker: apk119Value532.role === "user" ? userName : value_6(apk119Value530),
+    text: this.messageText(apk119Value532).slice(0, 2000),
+    translation: String(apk119Value532.translation || "").slice(0, 1000)
+  }));
+},
         getProgressWorldBooks(items_335, value_382, value_383_2) {
                 const items_384 = ['system_depth', 'before_role', 'after_role'];
                 return items_384

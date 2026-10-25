@@ -1,467 +1,321 @@
 (function () {
-    const STORAGE_KEY = 'u2_systemNotificationSettings',
-        SOUND_ASSET_ID = 'u2_system_notification_sound',
-        defaults = {
-            enabled: false,
-            permission:
-                typeof Notification !== 'undefined' ? Notification.permission : 'unsupported',
-            soundAssetId: '',
-            soundFileName: '',
-            soundMimeType: '',
-            soundDataUrl: '',
-        };
-    let settings = normalize(loadSettings()),
-        storageHydrated = false,
-        activeSound = null,
-        value = null;
-    function handleAction_4() {
-        return window.u2NativeBridge?.isNativeAndroid?.() === true;
-    }
-    function handleAction_5() {
-        const value_24 = window.navigator || (typeof navigator !== 'undefined' ? navigator : null),
-            value_25 =
-                /iPhone|iPad|iPod/i.test(value_24?.userAgent || '') ||
-                (value_24?.platform === 'MacIntel' && Number(value_24?.maxTouchPoints) > 1);
-        return (
-            value_25 &&
-            (value_24?.standalone === true ||
-                window.matchMedia?.('(display-mode: standalone)')?.matches === true)
-        );
-    }
-    async function resolveCustomSoundUrl_2() {
-        const serviceWorker_26 = window.navigator?.serviceWorker;
-        if (!serviceWorker_26?.register)
-            throw new Error('iOS Home Screen notifications require Service Worker support');
-        return (
-            !value &&
-                (value = serviceWorker_26
-                    .register('notification-sw.js', {
-                        scope: './',
-                    })
-                    .then((value_27) => {
-                        if (typeof value_27.showNotification !== 'function')
-                            throw new Error('Service Worker notifications are unavailable');
-                        return value_27;
-                    })
-                    ['catch']((value_28) => {
-                        value = null;
-                        throw value_28;
-                    })),
-            value
-        );
-    }
-    function normalize(value_2) {
-        const safe = value_2 && typeof value_2 === 'object' ? value_2 : {},
-            permission_3 = handleAction_8();
-        return {
-            enabled:
-                !!safe.enabled &&
-                permission_3 !== 'unsupported' &&
-                (!handleAction_4() || permission_3 !== 'denied'),
-            permission: permission_3,
-            soundAssetId: typeof safe.soundAssetId === 'string' ? safe.soundAssetId : '',
-            soundFileName:
-                typeof safe.soundFileName === 'string' ? safe.soundFileName.slice(0, 180) : '',
-            soundMimeType:
-                typeof safe.soundMimeType === 'string' ? safe.soundMimeType.slice(0, 100) : '',
-            soundDataUrl:
-                typeof safe.soundDataUrl === 'string' &&
-                /^data:(?:audio\/|application\/octet-stream)/i.test(safe.soundDataUrl)
-                    ? safe.soundDataUrl
-                    : '',
-        };
-    }
-    function getSettingsSnapshot(extra = {}) {
-        return {
-            enabled: !!settings.enabled,
-            permission: settings.permission,
-            soundAssetId: settings.soundAssetId,
-            soundFileName: settings.soundFileName,
-            soundMimeType: settings.soundMimeType,
-            hasCustomSound: !!(settings.soundAssetId || settings.soundDataUrl),
-            ...extra,
-        };
-    }
-    function handleAction_8() {
-        if (handleAction_4())
-            return window.u2NativeBridge.getNotificationPermission?.() || 'default';
-        if (typeof Notification === 'undefined') return 'unsupported';
-        return Notification.permission;
-    }
-    function loadSettings() {
-        try {
-            if (window.StorageManager && typeof window.StorageManager.load === 'function')
-                return window.StorageManager.load(STORAGE_KEY, defaults);
-            return defaults;
-        } catch (error_2) {
-            return (
-                console.warn('[system_notifications] Failed to load settings:', error_2),
-                defaults
-            );
-        }
-    }
-    async function saveSettings() {
-        try {
-            if (window.appStorage && typeof window.appStorage.saveLegacyKey === 'function')
-                return (await window.appStorage.saveLegacyKey(STORAGE_KEY, settings), true);
-            if (window.StorageManager && typeof window.StorageManager.save === 'function')
-                return window.StorageManager.save(STORAGE_KEY, settings) !== false;
-        } catch (error_3) {
-            console.warn('[system_notifications] Failed to save settings:', error_3);
-        }
-        return false;
-    }
-    function notifySettingsChanged(reason_2) {
-        window.dispatchEvent(
-            new CustomEvent('u2:system-notification-settings-changed', {
-                detail: getSettingsSnapshot({
-                    reason: reason_2,
-                }),
-            }),
-        );
-    }
-    async function hydrateSettingsFromStorage() {
-        if (storageHydrated)
-            return {
-                ...settings,
-            };
-        storageHydrated = true;
-        const loaded = loadSettings(),
-            normalized = normalize(loaded),
-            needsReconcile =
-                !!loaded?.enabled !== normalized.enabled ||
-                loaded?.permission !== normalized.permission;
-        settings = normalized;
-        if (needsReconcile) await saveSettings();
-        return (notifySettingsChanged('storage-ready'), getSettingsSnapshot());
-    }
-    function getSettings_2() {
-        const permission_2 = handleAction_8(),
-            permissionChanged = settings.permission !== permission_2;
-        settings.permission = permission_2;
-        if (handleAction_4() && permission_2 === 'denied') settings.enabled = false;
-        return (
-            permissionChanged && (void saveSettings(), notifySettingsChanged('permission')),
-            getSettingsSnapshot()
-        );
-    }
-    async function updateSettings_2(value_40 = {}) {
-        const enabled_2 = !!value_40.enabled;
-        if (!handleAction_4() && handleAction_8() === 'unsupported')
-            return (
-                (settings.enabled = false),
-                (settings.permission = 'unsupported'),
-                await saveSettings(),
-                notifySettingsChanged('settings'),
-                getSettingsSnapshot({
-                    unsupported: true,
-                })
-            );
-        let permission_4 = handleAction_8();
-        if (enabled_2 && permission_4 === 'default')
-            try {
-                permission_4 = handleAction_4()
-                    ? await window.u2NativeBridge.requestNotificationPermission()
-                    : await Notification.requestPermission();
-            } catch (error_4) {
-                console.warn('[system_notifications] Failed to request permission:', error_4);
-                permission_4 = handleAction_8();
-            }
-        if (enabled_2 && permission_4 === 'granted' && handleAction_5())
-            try {
-                await resolveCustomSoundUrl_2();
-            } catch (value_44) {
-                return (
-                    console.warn(
-                        '[system_notifications] iOS notification registration failed:',
-                        value_44,
-                    ),
-                    (settings.enabled = false),
-                    (settings.permission = permission_4),
-                    await saveSettings(),
-                    notifySettingsChanged('settings'),
-                    getSettingsSnapshot({
-                        unsupported: true,
-                    })
-                );
-            }
-        settings.enabled = enabled_2 && (!handleAction_4() || permission_4 === 'granted');
-        settings.permission = permission_4;
-        if (!settings.enabled) stopNotificationSound_2();
-        return (await saveSettings(), notifySettingsChanged('settings'), getSettingsSnapshot());
-    }
-    async function setCustomSound_2(sound = {}) {
-        const dataUrl_2 = typeof sound.dataUrl === 'string' ? sound.dataUrl : '';
-        if (!/^data:(?:audio\/|application\/octet-stream)/i.test(dataUrl_2))
-            throw new TypeError('Invalid audio data URL');
-        const soundFileName_2 = String(sound.fileName || '自定义提示音').slice(0, 180),
-            mimeType_2 = String(
-                sound.mimeType || dataUrl_2.slice(5, dataUrl_2.indexOf(';')) || 'audio/*',
-            ).slice(0, 100);
-        let soundAssetId_2 = '',
-            soundDataUrl_2 = dataUrl_2;
-        if (window.appStorage && typeof window.appStorage.saveAssetFromDataUrl === 'function') {
-            soundAssetId_2 = await window.appStorage.saveAssetFromDataUrl(
-                SOUND_ASSET_ID,
-                dataUrl_2,
-                {
-                    ownerType: 'system_notification',
-                    ownerId: 'global',
-                    field: 'sound',
-                    mimeType: mimeType_2,
-                },
-            );
-            soundDataUrl_2 = '';
-            const value_50 = await window.appStorage.getAssetUrl?.(soundAssetId_2);
-            if (!value_50) {
-                console.warn(
-                    '[system_notifications] Custom sound asset could not be resolved after upload',
-                );
-                throw new Error('提示音资源保存后无法读取');
-            }
-            if (!handleAction_17(value_50)) throw new Error('提示音资源无法预加载');
-        }
-        stopNotificationSound_2();
-        settings.soundAssetId = soundAssetId_2 || '';
-        settings.soundFileName = soundFileName_2;
-        settings.soundMimeType = mimeType_2;
-        settings.soundDataUrl = soundDataUrl_2;
-        if (soundDataUrl_2 && !handleAction_17(soundDataUrl_2))
-            throw new Error('提示音资源无法预加载');
-        return (await saveSettings(), notifySettingsChanged('sound'), getSettingsSnapshot());
-    }
-    async function clearCustomSound_2() {
-        const assetId = settings.soundAssetId;
-        stopNotificationSound_2();
-        settings.soundAssetId = '';
-        settings.soundFileName = '';
-        settings.soundMimeType = '';
-        settings.soundDataUrl = '';
-        await saveSettings();
-        if (assetId && window.appStorage && typeof window.appStorage.deleteAsset === 'function')
-            try {
-                await window.appStorage.deleteAsset(assetId);
-            } catch (error_5) {
-                console.warn(
-                    '[system_notifications] Failed to delete custom sound asset:',
-                    error_5,
-                );
-            }
-        return (notifySettingsChanged('sound'), getSettingsSnapshot());
-    }
-    async function resolveCustomSoundUrl() {
-        if (
-            settings.soundAssetId &&
-            window.appStorage &&
-            typeof window.appStorage.getAssetUrl === 'function'
-        )
-            return window.appStorage.getAssetUrl(settings.soundAssetId);
-        return settings.soundDataUrl || '';
-    }
-    function handleAction_17(value_53) {
-        if (!value_53)
-            return (
-                console.warn(
-                    '[system_notifications] Cannot preload custom sound: empty resource URL',
-                ),
-                false
-            );
-        if (typeof window.Audio !== 'function')
-            return (
-                console.warn(
-                    '[system_notifications] Cannot preload custom sound: Audio is unavailable',
-                ),
-                false
-            );
-        try {
-            const value_54 = new window.Audio(value_53);
-            return ((value_54.preload = 'auto'), value_54.load?.(), true);
-        } catch (value_55) {
-            return (
-                console.warn('[system_notifications] Failed to preload custom sound:', value_55),
-                false
-            );
-        }
-    }
-    function stopNotificationSound_2() {
-        if (!activeSound) return;
-        try {
-            activeSound.pause();
-            activeSound.currentTime = 0;
-        } catch (error) {}
-        activeSound = null;
-    }
-    async function playNotificationSound_2() {
-        if (!(settings.soundAssetId || settings.soundDataUrl) || typeof window.Audio !== 'function')
-            return false;
-        try {
-            const soundUrl = await resolveCustomSoundUrl();
-            if (!soundUrl)
-                return (
-                    console.warn('[system_notifications] Custom sound asset is missing'),
-                    false
-                );
-            return (
-                stopNotificationSound_2(),
-                (activeSound = new window.Audio(soundUrl)),
-                (activeSound.preload = 'auto'),
-                (activeSound.playsInline = true),
-                activeSound.addEventListener?.(
-                    'ended',
-                    () => {
-                        activeSound = null;
-                    },
-                    {
-                        once: true,
-                    },
-                ),
-                await activeSound.play(),
-                true
-            );
-        } catch (error_6) {
-            return (
-                console.warn('[system_notifications] Failed to play custom sound:', error_6),
-                false
-            );
-        }
-    }
-    function normalize_2(value_58 = {}) {
-        const friend_2 = value_58.friend || {},
-            message_2 = value_58.message || {};
-        return (
-            message_2.speaker ||
-            message_2.senderName ||
-            friend_2.nickname ||
-            friend_2.realName ||
-            friend_2.realname ||
-            friend_2.name ||
-            'iMessage'
-        );
-    }
-    function normalize_3(value_61 = {}) {
-        const message_3 = value_61.message || {},
-            preview = window.imApp?.getFriendMessagePreview
-                ? window.imApp.getFriendMessagePreview(message_3)
-                : message_3.content || message_3.text || message_3.message || '';
-        return String(preview || '新消息')
-            .replace(/\s+/g, ' ')
-            .trim()
-            .slice(0, 180);
-    }
-    async function handleAction_22(value_64, value_65, title_2, body_2, tag_2, data_2) {
-        let enabled_70 = false;
-        value_65.hasCustomSound && (enabled_70 = await playNotificationSound_2());
-        const options_2 = {
-            body: body_2,
-            tag: tag_2,
-            renotify: true,
-            silent: value_65.hasCustomSound && enabled_70,
-            icon: value_64.friend?.avatarUrl || 'assets/moren-thumb.jpg',
-            badge: 'assets/moren-thumb.jpg',
-            data: data_2,
-        };
-        try {
-            if (handleAction_4()) {
-                const apk110New_81 = await window.u2NativeBridge.showNotification({
-                    title: title_2,
-                    body: body_2,
-                    tag: tag_2,
-                    data: options_2.data,
-                    silent: options_2.silent,
-                });
-                if (apk110New_81) return true;
-                return (
-                    window.showBannerNotification?.(value_64.friend || {}, body_2, {
-                        force: true,
-                    }),
-                    false
-                );
-            }
-            if (handleAction_5()) {
-                const soundUrl_2 = await resolveCustomSoundUrl_2();
-                return (
-                    await soundUrl_2.showNotification(title_2, {
-                        body: options_2.body,
-                        tag: options_2.tag,
-                        icon: options_2.icon,
-                        badge: options_2.badge,
-                        data: options_2.data,
-                    }),
-                    true
-                );
-            }
-            const notification = new Notification(title_2, options_2);
-            return (
-                (notification.onclick = () => {
-                    window.focus();
-                    notification.close();
-                }),
-                true
-            );
-        } catch (error_7) {
-            return (
-                console.warn('[system_notifications] Failed to show notification:', error_7),
-                handleAction_4() &&
-                    window.showBannerNotification?.(value_64.friend || {}, body_2, {
-                        force: true,
-                    }),
-                false
-            );
-        }
-    }
-    function notifyIncomingMessage_2(loaded_2 = {}) {
-        const current = getSettings_2();
-        if (!current.enabled || current.permission !== 'granted') return false;
-        const value_76 = loaded_2.friend || {},
-            normalized_2 = normalize_2(loaded_2),
-            normalized_3 = normalize_3(loaded_2),
-            value_79 = loaded_2.message?.id
-                ? 'imessage-' + loaded_2.message.id
-                : 'imessage-' + (value_76.id || Date.now()),
-            options_80 = {
-                app: 'imessage',
-                friendId: value_76.id || null,
-                messageId: loaded_2.message?.id || null,
-            };
-        return (
-            void handleAction_22(
-                loaded_2,
-                current,
-                normalized_2,
-                normalized_3,
-                value_79,
-                options_80,
-            ),
-            true
-        );
-    }
-    window.u2SystemNotifications = {
-        getSettings: getSettings_2,
-        updateSettings: updateSettings_2,
-        setCustomSound: setCustomSound_2,
-        clearCustomSound: clearCustomSound_2,
-        playNotificationSound: playNotificationSound_2,
-        stopNotificationSound: stopNotificationSound_2,
-        notifyIncomingMessage: notifyIncomingMessage_2,
+  const apk119Value1 = "u2_systemNotificationSettings",
+    apk119Value2 = "u2_system_notification_sound",
+    apk119Value3 = {
+      enabled: false,
+      permission: typeof Notification !== "undefined" ? Notification.permission : "unsupported",
+      soundAssetId: "",
+      soundFileName: "",
+      soundMimeType: "",
+      soundDataUrl: ""
     };
-    window.addEventListener('u2-storage-ready', hydrateSettingsFromStorage, {
-        once: true,
+  let apk119Value4 = apk119Value11(apk119Value14()),
+    apk119Value5 = false,
+    apk119Value6 = null,
+    apk119Value7 = null;
+  function apk119Value8() {
+    return window.u2NativeBridge?.["isNativeAndroid"]?.() === true || window.u2NativeBridge?.["isNativeIOS"]?.() === true;
+  }
+  function apk119Value9() {
+    if (apk119Value8()) return false;
+    const apk119Value31 = window.navigator || (typeof navigator !== "undefined" ? navigator : null),
+      apk119Value32 = /iPhone|iPad|iPod/i.test(apk119Value31?.["userAgent"] || "") || apk119Value31?.["platform"] === "MacIntel" && Number(apk119Value31?.["maxTouchPoints"]) > 1;
+    return apk119Value32 && (apk119Value31?.["standalone"] === true || window.matchMedia?.("(display-mode: standalone)")?.["matches"] === true);
+  }
+  async function apk119Value10() {
+    const apk119Value33 = window.navigator?.["serviceWorker"];
+    if (!apk119Value33?.["register"]) throw new Error("Mobile notifications require Service Worker support");
+    return !apk119Value7 && (apk119Value7 = apk119Value33.register("notification-sw.js", {
+      scope: "./"
+    }).then(async apk119Value34 => {
+      if (typeof apk119Value34.showNotification !== "function") throw new Error("Service Worker notifications are unavailable");
+      const apk119Value35 = apk119Value34.installing || apk119Value34.waiting;
+      return !apk119Value34.active && apk119Value35 && apk119Value35.state !== "activated" && (await new Promise((apk119Value36, apk119Value37) => {
+        const apk119Value38 = setTimeout(() => apk119Value39(new Error("Notification worker activation timed out")), 5000),
+          apk119Value39 = apk119Value41 => {
+            clearTimeout(apk119Value38), apk119Value35.removeEventListener("statechange", apk119Value40), apk119Value41 ? apk119Value37(apk119Value41) : apk119Value36();
+          },
+          apk119Value40 = () => {
+            if (apk119Value35.state === "activated") apk119Value39();else {
+              if (apk119Value35.state === "redundant") apk119Value39(new Error("Notification worker activation failed"));
+            }
+          };
+        apk119Value35.addEventListener("statechange", apk119Value40), apk119Value40();
+      })), apk119Value34;
+    })["catch"](apk119Value42 => {
+      apk119Value7 = null;
+      throw apk119Value42;
+    })), apk119Value7;
+  }
+  function apk119Value11(apk119Value43) {
+    const apk119Value44 = apk119Value43 && typeof apk119Value43 === "object" ? apk119Value43 : {},
+      apk119Value45 = apk119Value13();
+    return {
+      enabled: !!apk119Value44.enabled && apk119Value45 !== "unsupported" && (!apk119Value8() || apk119Value45 !== "denied"),
+      permission: apk119Value45,
+      soundAssetId: typeof apk119Value44.soundAssetId === "string" ? apk119Value44.soundAssetId : "",
+      soundFileName: typeof apk119Value44.soundFileName === "string" ? apk119Value44.soundFileName.slice(0, 180) : "",
+      soundMimeType: typeof apk119Value44.soundMimeType === "string" ? apk119Value44.soundMimeType.slice(0, 100) : "",
+      soundDataUrl: typeof apk119Value44.soundDataUrl === "string" && /^data:(?:audio\/|application\/octet-stream)/i.test(apk119Value44.soundDataUrl) ? apk119Value44.soundDataUrl : ""
+    };
+  }
+  function apk119Value12(apk119Value46 = {}) {
+    return {
+      enabled: !!apk119Value4.enabled,
+      permission: apk119Value4.permission,
+      soundAssetId: apk119Value4.soundAssetId,
+      soundFileName: apk119Value4.soundFileName,
+      soundMimeType: apk119Value4.soundMimeType,
+      hasCustomSound: !!(apk119Value4.soundAssetId || apk119Value4.soundDataUrl),
+      ...apk119Value46
+    };
+  }
+  function apk119Value13() {
+    if (apk119Value8()) return window.u2NativeBridge.getNotificationPermission?.() || "default";
+    if (typeof Notification === "undefined") return "unsupported";
+    return Notification.permission;
+  }
+  function apk119Value14() {
+    try {
+      if (window.StorageManager && typeof window.StorageManager.load === "function") return window.StorageManager.load(apk119Value1, apk119Value3);
+      return apk119Value3;
+    } catch (apk119Value47) {
+      return console.warn("[system_notifications] Failed to load settings:", apk119Value47), apk119Value3;
+    }
+  }
+  async function apk119Value15() {
+    try {
+      if (window.appStorage && typeof window.appStorage.saveLegacyKey === "function") return await window.appStorage.saveLegacyKey(apk119Value1, apk119Value4), true;
+      if (window.StorageManager && typeof window.StorageManager.save === "function") return window.StorageManager.save(apk119Value1, apk119Value4) !== false;
+    } catch (apk119Value48) {
+      console.warn("[system_notifications] Failed to save settings:", apk119Value48);
+    }
+    return false;
+  }
+  function apk119Value16(apk119Value49) {
+    window.dispatchEvent(new CustomEvent("u2:system-notification-settings-changed", {
+      detail: apk119Value12({
+        reason: apk119Value49
+      })
+    }));
+  }
+  async function apk119Value17() {
+    if (apk119Value5) return {
+      ...apk119Value4
+    };
+    apk119Value5 = true;
+    const apk119Value50 = apk119Value14(),
+      apk119Value51 = apk119Value11(apk119Value50),
+      apk119Value52 = !!apk119Value50?.["enabled"] !== apk119Value51.enabled || apk119Value50?.["permission"] !== apk119Value51.permission;
+    apk119Value4 = apk119Value51;
+    if (apk119Value52) await apk119Value15();
+    return apk119Value16("storage-ready"), apk119Value12();
+  }
+  function apk119Value18() {
+    const apk119Value53 = apk119Value13(),
+      apk119Value54 = apk119Value4.permission !== apk119Value53;
+    apk119Value4.permission = apk119Value53;
+    if (apk119Value8() && apk119Value53 === "denied") apk119Value4.enabled = false;
+    if (apk119Value54) {
+      if (apk119Value5) void apk119Value15();
+      apk119Value16("permission");
+    }
+    return apk119Value12();
+  }
+  async function apk119Value19(apk119Value55 = {}) {
+    const apk119Value56 = !!apk119Value55.enabled;
+    if (apk119Value8()) await window.u2NativeBridge.ready?.();
+    if (!apk119Value8() && apk119Value13() === "unsupported") return apk119Value4.enabled = false, apk119Value4.permission = "unsupported", await apk119Value15(), apk119Value16("settings"), apk119Value12({
+      unsupported: true
     });
-    window.addEventListener('u2:native-notification-permission-changed', (value_81) => {
-        const permission_5 = String(value_81?.detail?.permission || handleAction_8());
-        settings.permission = permission_5;
-        if (handleAction_4() && permission_5 === 'denied') settings.enabled = false;
-        void saveSettings();
-        notifySettingsChanged('native-permission');
-    });
-    window.appStorage?.ready &&
-        typeof window.appStorage.ready.then === 'function' &&
-        window.appStorage.ready
-            .then(() => {
-                if (!storageHydrated) return hydrateSettingsFromStorage();
-                return undefined;
-            })
-            ['catch']((error_8) => {
-                console.warn('[system_notifications] Storage hydration failed:', error_8);
-            });
+    let apk119Value57 = apk119Value13();
+    if (apk119Value56 && apk119Value57 === "default") try {
+      apk119Value57 = apk119Value8() ? await window.u2NativeBridge.requestNotificationPermission() : await Notification.requestPermission();
+    } catch (apk119Value58) {
+      console.warn("[system_notifications] Failed to request permission:", apk119Value58), apk119Value57 = apk119Value13();
+    }
+    if (apk119Value56 && apk119Value57 === "granted" && apk119Value9()) try {
+      await apk119Value10();
+    } catch (apk119Value59) {
+      return console.warn("[system_notifications] iOS notification registration failed:", apk119Value59), apk119Value4.enabled = false, apk119Value4.permission = apk119Value57, await apk119Value15(), apk119Value16("settings"), apk119Value12({
+        unsupported: true
+      });
+    }
+    apk119Value4.enabled = apk119Value56 && (!apk119Value8() || apk119Value57 === "granted"), apk119Value4.permission = apk119Value57;
+    if (!apk119Value4.enabled) apk119Value24();
+    return await apk119Value15(), apk119Value16("settings"), apk119Value12();
+  }
+  async function apk119Value20(apk119Value60 = {}) {
+    const apk119Value61 = typeof apk119Value60.dataUrl === "string" ? apk119Value60.dataUrl : "";
+    if (!/^data:(?:audio\/|application\/octet-stream)/i.test(apk119Value61)) throw new TypeError("Invalid audio data URL");
+    const apk119Value62 = String(apk119Value60.fileName || "自定义提示音").slice(0, 180),
+      apk119Value63 = String(apk119Value60.mimeType || apk119Value61.slice(5, apk119Value61.indexOf(";")) || "audio/*").slice(0, 100);
+    let apk119Value64 = "",
+      apk119Value65 = apk119Value61;
+    if (window.appStorage && typeof window.appStorage.saveAssetFromDataUrl === "function") {
+      apk119Value64 = await window.appStorage.saveAssetFromDataUrl(apk119Value2, apk119Value61, {
+        ownerType: "system_notification",
+        ownerId: "global",
+        field: "sound",
+        mimeType: apk119Value63
+      }), apk119Value65 = "";
+      const apk119Value66 = await window.appStorage.getAssetUrl?.(apk119Value64);
+      if (!apk119Value66) {
+        console.warn("[system_notifications] Custom sound asset could not be resolved after upload");
+        throw new Error("提示音资源保存后无法读取");
+      }
+      if (!apk119Value23(apk119Value66)) throw new Error("提示音资源无法预加载");
+    }
+    apk119Value24(), apk119Value4.soundAssetId = apk119Value64 || "", apk119Value4.soundFileName = apk119Value62, apk119Value4.soundMimeType = apk119Value63, apk119Value4.soundDataUrl = apk119Value65;
+    if (apk119Value65 && !apk119Value23(apk119Value65)) throw new Error("提示音资源无法预加载");
+    return await apk119Value15(), apk119Value16("sound"), apk119Value12();
+  }
+  async function apk119Value21() {
+    const apk119Value67 = apk119Value4.soundAssetId;
+    apk119Value24(), apk119Value4.soundAssetId = "", apk119Value4.soundFileName = "", apk119Value4.soundMimeType = "", apk119Value4.soundDataUrl = "", await apk119Value15();
+    if (apk119Value67 && window.appStorage && typeof window.appStorage.deleteAsset === "function") try {
+      await window.appStorage.deleteAsset(apk119Value67);
+    } catch (apk119Value68) {
+      console.warn("[system_notifications] Failed to delete custom sound asset:", apk119Value68);
+    }
+    return apk119Value16("sound"), apk119Value12();
+  }
+  async function apk119Value22() {
+    if (apk119Value4.soundAssetId && window.appStorage && typeof window.appStorage.getAssetUrl === "function") return window.appStorage.getAssetUrl(apk119Value4.soundAssetId);
+    return apk119Value4.soundDataUrl || "";
+  }
+  function apk119Value23(apk119Value69) {
+    if (!apk119Value69) return console.warn("[system_notifications] Cannot preload custom sound: empty resource URL"), false;
+    if (typeof window.Audio !== "function") return console.warn("[system_notifications] Cannot preload custom sound: Audio is unavailable"), false;
+    try {
+      const apk119Value70 = new window.Audio(apk119Value69);
+      return apk119Value70.preload = "auto", apk119Value70.load?.(), true;
+    } catch (apk119Value71) {
+      return console.warn("[system_notifications] Failed to preload custom sound:", apk119Value71), false;
+    }
+  }
+  function apk119Value24() {
+    if (!apk119Value6) return;
+    try {
+      apk119Value6.pause(), apk119Value6.currentTime = 0;
+    } catch (apk119Value72) {}
+    apk119Value6 = null;
+  }
+  async function apk119Value25() {
+    if (!(apk119Value4.soundAssetId || apk119Value4.soundDataUrl) || typeof window.Audio !== "function") return false;
+    try {
+      const apk119Value73 = await apk119Value22();
+      if (!apk119Value73) return console.warn("[system_notifications] Custom sound asset is missing"), false;
+      return apk119Value24(), apk119Value6 = new window.Audio(apk119Value73), apk119Value6.preload = "auto", apk119Value6.playsInline = true, apk119Value6.addEventListener?.("ended", () => {
+        apk119Value6 = null;
+      }, {
+        once: true
+      }), await apk119Value6.play(), true;
+    } catch (apk119Value74) {
+      return console.warn("[system_notifications] Failed to play custom sound:", apk119Value74), false;
+    }
+  }
+  function apk119Value26(apk119Value75 = {}) {
+    const apk119Value76 = apk119Value75.friend || {},
+      apk119Value77 = apk119Value75.message || {};
+    return apk119Value77.speaker || apk119Value77.senderName || apk119Value76.nickname || apk119Value76.realName || apk119Value76.realname || apk119Value76.name || "iMessage";
+  }
+  function apk119Value27(apk119Value78 = {}) {
+    const apk119Value79 = apk119Value78.message || {},
+      apk119Value80 = window.imApp?.["getFriendMessagePreview"] ? window.imApp.getFriendMessagePreview(apk119Value79) : apk119Value79.content || apk119Value79.text || apk119Value79.message || "";
+    return String(apk119Value80 || "新消息").replace(/\s+/g, " ").trim().slice(0, 180);
+  }
+  async function apk119Value28(apk119Value81) {
+    let apk119Value82 = apk119Value81?.["avatarUrl"] || "";
+    if (!apk119Value82 && apk119Value81?.["avatarAssetId"] && window.appStorage?.["getAssetUrl"]) try {
+      apk119Value82 = (await window.appStorage.getAssetUrl(apk119Value81.avatarAssetId)) || "";
+    } catch (apk119Value83) {
+      console.warn("[system_notifications] Avatar unavailable:", apk119Value83);
+    }
+    return /^(?:javascript|file):/i.test(String(apk119Value82).trim()) ? "" : String(apk119Value82);
+  }
+  async function apk119Value29(apk119Value84, apk119Value85, apk119Value86, apk119Value87, apk119Value88, apk119Value89) {
+    const apk119Value90 = apk119Value84.friend || {},
+      apk119Value91 = await apk119Value28(apk119Value90);
+    let apk119Value92 = false;
+    apk119Value85.hasCustomSound && (apk119Value92 = await apk119Value25());
+    const apk119Value93 = {
+      body: apk119Value87,
+      tag: apk119Value88,
+      renotify: true,
+      silent: apk119Value85.hasCustomSound && apk119Value92,
+      icon: apk119Value91 || "assets/moren-thumb.jpg",
+      badge: "assets/moren-thumb.jpg",
+      data: apk119Value89
+    };
+    try {
+      if (apk119Value8()) {
+        const apk119Value95 = await window.u2NativeBridge.showNotification({
+          title: apk119Value86,
+          body: apk119Value87,
+          tag: apk119Value88,
+          senderId: ["group", "official"].includes(apk119Value90.type) ? "" : String(apk119Value90.id || ""),
+          senderName: apk119Value86,
+          avatarUrl: apk119Value91,
+          data: apk119Value93.data,
+          silent: apk119Value93.silent
+        });
+        if (apk119Value95) return true;
+        return window.showBannerNotification?.(apk119Value84.friend || {}, apk119Value87, {
+          force: true
+        }), false;
+      }
+      if (window.navigator?.["serviceWorker"]?.["register"]) try {
+        const apk119Value96 = await apk119Value10();
+        return await apk119Value96.showNotification(apk119Value86, apk119Value93), true;
+      } catch (apk119Value97) {
+        if (apk119Value9()) throw apk119Value97;
+        console.warn("[system_notifications] Worker notification unavailable:", apk119Value97);
+      }
+      const apk119Value94 = new Notification(apk119Value86, apk119Value93);
+      return apk119Value94.onclick = () => {
+        window.focus(), apk119Value94.close();
+      }, true;
+    } catch (apk119Value98) {
+      return console.warn("[system_notifications] Failed to show notification:", apk119Value98), apk119Value8() && window.showBannerNotification?.(apk119Value84.friend || {}, apk119Value87, {
+        force: true
+      }), false;
+    }
+  }
+  function apk119Value30(apk119Value99 = {}) {
+    const apk119Value100 = apk119Value18();
+    if (!apk119Value100.enabled || apk119Value100.permission !== "granted") return false;
+    const apk119Value101 = apk119Value99.friend || {},
+      apk119Value102 = apk119Value26(apk119Value99),
+      apk119Value103 = apk119Value27(apk119Value99),
+      apk119Value104 = apk119Value99.message?.["id"] ? "imessage-" + apk119Value99.message.id : "imessage-" + (apk119Value101.id || Date.now()),
+      apk119Value105 = {
+        app: "imessage",
+        friendId: apk119Value101.id || null,
+        messageId: apk119Value99.message?.["id"] || null
+      };
+    return void apk119Value29(apk119Value99, apk119Value100, apk119Value102, apk119Value103, apk119Value104, apk119Value105), true;
+  }
+  window.u2SystemNotifications = {
+    getSettings: apk119Value18,
+    updateSettings: apk119Value19,
+    setCustomSound: apk119Value20,
+    clearCustomSound: apk119Value21,
+    playNotificationSound: apk119Value25,
+    stopNotificationSound: apk119Value24,
+    notifyIncomingMessage: apk119Value30
+  }, window.addEventListener("u2-storage-ready", apk119Value17, {
+    once: true
+  }), window.addEventListener("u2:native-notification-permission-changed", apk119Value106 => {
+    const apk119Value107 = String(apk119Value106?.["detail"]?.["permission"] || apk119Value13());
+    apk119Value4.permission = apk119Value107;
+    if (apk119Value8() && apk119Value107 === "denied") apk119Value4.enabled = false;
+    if (apk119Value5) void apk119Value15();
+    apk119Value16("native-permission");
+  }), window.appStorage?.["ready"] && typeof window.appStorage.ready.then === "function" && window.appStorage.ready.then(() => {
+    if (!apk119Value5) return apk119Value17();
+    return undefined;
+  })["catch"](apk119Value108 => {
+    console.warn("[system_notifications] Storage hydration failed:", apk119Value108);
+  });
 })();

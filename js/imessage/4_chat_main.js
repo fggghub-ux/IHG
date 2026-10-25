@@ -252,6 +252,11 @@
             const menuItem = e_7.target.closest('.msg-menu-item');
             if (menuItem) {
                 const action = menuItem.getAttribute('data-action');
+                if (['edit', 'translate', 'speak'].includes(action)) {
+                    const rowId = window.imData.currentActiveRow?.getAttribute('data-message-id');
+                    const message = (window.imData.currentActiveFriend?.messages || []).find(item => String(item.id) === String(rowId));
+                    if (message?.type === 'file') { window.imChat.closeContextMenu(); return; }
+                }
                 if (action === 'reply') {
                     if (Date.now() < suppressReplyClickUntil) {
                         e_7.preventDefault();
@@ -448,6 +453,13 @@
                     }
                 } else {
                     if (action === 'copy') {
+                        const row = window.imData.currentActiveRow;
+                        const file = (window.imData.currentActiveFriend?.messages || []).find(message => message.type === 'file' && String(message.id) === String(row?.getAttribute('data-message-id')));
+                        if (file) {
+                            await window.imChat.copyFileText(file.fileData?.text || file.content);
+                            window.imChat.closeContextMenu();
+                            return;
+                        }
                         if (window.imData.currentActiveRow) {
                             const bubble_3 =
                                 window.imData.currentActiveRow.querySelector('.chat-bubble');

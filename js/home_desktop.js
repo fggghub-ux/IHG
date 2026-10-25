@@ -619,6 +619,7 @@
     let drag = null;
     let libraryDrag = null;
     let autoPageTimer = null;
+    let desktopAutoPageKey = null;
     let lastWidgetSheetOpenedAt = 0;
     let desktopStateNeedsSave = false;
     let value_18 = null;
@@ -1746,53 +1747,38 @@
         }
         findPermanentWidgetPageIndex_8(pages_11, widgets_10, entry_5);
     }
-    function findPermanentWidgetPageIndex_8(event_399, target_4, item_23, source_6 = 'desktop') {
-        handleAction_60();
-        value_19 = {
-            target: target_4,
-            item: item_23,
-            source: source_6,
-            pointerId: event_399.pointerId,
-            startX: event_399.clientX,
-            startY: event_399.clientY,
-            latestX: event_399.clientX,
-            latestY: event_399.clientY,
-            timer: setTimeout(() => {
-                if (!value_19) return;
-                const event_403 = value_19;
-                value_19 = null;
-                window.removeEventListener('pointermove', handlePointermove_2, true);
-                window.removeEventListener('pointerup', handleAction_59, true);
-                window.removeEventListener('pointercancel', handleAction_59, true);
-                handleAction_61();
-                window.preventAppClick = true;
-                (!navigator.hardwareConcurrency || navigator.hardwareConcurrency > 4) &&
-                    navigator.vibrate?.(8);
-                findPermanentWidgetPageIndex_7(
-                    {
-                        clientX: event_403.latestX,
-                        clientY: event_403.latestY,
-                        pointerId: event_403.pointerId,
-                    },
-                    event_403.target,
-                    event_403.item,
-                );
-            }, count_6),
-        };
-        source_6 === 'desktop' &&
-            (window.addEventListener('pointermove', handlePointermove_2, {
-                capture: true,
-                passive: true,
-            }),
-            window.addEventListener('pointerup', handleAction_59, {
-                capture: true,
-                passive: true,
-            }),
-            window.addEventListener('pointercancel', handleAction_59, {
-                capture: true,
-                passive: true,
-            }));
-    }
+    function findPermanentWidgetPageIndex_8(apk119Value520, apk119Value521, apk119Value522, apk119Value523 = "desktop") {
+  handleAction_60(), value_19 = {
+    target: apk119Value521,
+    item: apk119Value522,
+    source: apk119Value523,
+    pointerId: apk119Value520.pointerId,
+    startX: apk119Value520.clientX,
+    startY: apk119Value520.clientY,
+    latestX: apk119Value520.clientX,
+    latestY: apk119Value520.clientY,
+    frameRect: apk119Value520.frameRect,
+    timer: setTimeout(() => {
+      if (!value_19) return;
+      const apk119Value524 = value_19;
+      value_19 = null, window.removeEventListener("pointermove", handlePointermove_2, true), window.removeEventListener("pointerup", handleAction_59, true), window.removeEventListener("pointercancel", handleAction_59, true), handleAction_61(), window.preventAppClick = true, (!navigator.hardwareConcurrency || navigator.hardwareConcurrency > 4) && navigator.vibrate?.(8), findPermanentWidgetPageIndex_7({
+        clientX: apk119Value524.latestX,
+        clientY: apk119Value524.latestY,
+        pointerId: apk119Value524.pointerId,
+        frameRect: apk119Value524.frameRect
+      }, apk119Value524.target, apk119Value524.item);
+    }, count_6)
+  }, apk119Value523 === "desktop" && (window.addEventListener("pointermove", handlePointermove_2, {
+    capture: true,
+    passive: true
+  }), window.addEventListener("pointerup", handleAction_59, {
+    capture: true,
+    passive: true
+  }), window.addEventListener("pointercancel", handleAction_59, {
+    capture: true,
+    passive: true
+  }));
+}
     function handlePointermove_2(event_404) {
         if (!value_19 || event_404.pointerId !== value_19.pointerId) return;
         value_19.latestX = event_404.clientX;
@@ -1854,57 +1840,44 @@
             event_406.stopImmediatePropagation(),
             (window.preventAppClick = false));
     }
-    function handleMessage(value_409) {
-        const entry_6 = value_409.data;
-        if (!entry_6 || entry_6.source !== 'u2-html-widget' || typeof entry_6.id !== 'string')
-            return;
-        const widgets_11 = document.getElementById(entry_6.id);
-        if (!widgets_11 || !widgets_11.classList.contains('html-widget')) return;
-        const htmlWidgetFrameElement = widgets_11.querySelector('.html-widget-frame');
-        if (!htmlWidgetFrameElement || value_409.source !== htmlWidgetFrameElement.contentWindow)
-            return;
-        const boundingClientRect = htmlWidgetFrameElement.getBoundingClientRect(),
-            pages_12 = {
-                clientX: boundingClientRect.left + Number(entry_6.x || 0),
-                clientY: boundingClientRect.top + Number(entry_6.y || 0),
-                pointerId: entry_6.pointerId,
-                pointerType: entry_6.pointerType,
-                preventDefault() {},
-            },
-            options_412 = {
-                kind: 'widget',
-                id: entry_6.id,
-            };
-        if (entry_6.type === 'pointerdown') {
-            if (enabled) findPermanentWidgetPageIndex_7(pages_12, widgets_11, options_412);
-            else findPermanentWidgetPageIndex_8(pages_12, widgets_11, options_412, 'iframe');
-        } else {
-            if (entry_6.type === 'pointermove') {
-                if (drag?.item?.id === entry_6.id) handlePointermove_3(pages_12);
-                else {
-                    if (value_19?.item?.id === entry_6.id) {
-                        value_19.latestX = pages_12.clientX;
-                        value_19.latestY = pages_12.clientY;
-                        if (
-                            Math.hypot(
-                                pages_12.clientX - value_19.startX,
-                                pages_12.clientY - value_19.startY,
-                            ) > count_7
-                        )
-                            handleAction_60();
-                    }
-                }
-            } else {
-                if (entry_6.type === 'pointerup' || entry_6.type === 'pointercancel') {
-                    if (drag?.item?.id === entry_6.id)
-                        endDrag(pages_12, {
-                            save: true,
-                        });
-                    else handleAction_60();
-                }
-            }
+    function handleMessage(apk119Value530) {
+  const apk119Value531 = apk119Value530.data;
+  if (!apk119Value531 || apk119Value531.source !== "u2-html-widget" || typeof apk119Value531.id !== "string") return;
+  const apk119Value532 = document.getElementById(apk119Value531.id);
+  if (!apk119Value532 || !apk119Value532.classList.contains("html-widget")) return;
+  const apk119Value533 = apk119Value532.querySelector(".html-widget-frame");
+  if (!apk119Value533 || apk119Value530.source !== apk119Value533.contentWindow) return;
+  const apk119Value534 = drag?.["item"]?.["id"] === apk119Value531.id && drag.frameRect || value_19?.["item"]?.["id"] === apk119Value531.id && value_19.frameRect || apk119Value533.getBoundingClientRect(),
+    apk119Value535 = {
+      type: apk119Value531.type,
+      clientX: apk119Value534.left + Number(apk119Value531.x || 0),
+      clientY: apk119Value534.top + Number(apk119Value531.y || 0),
+      pointerId: apk119Value531.pointerId,
+      pointerType: apk119Value531.pointerType,
+      frameRect: apk119Value534,
+      preventDefault() {}
+    },
+    apk119Value536 = {
+      kind: "widget",
+      id: apk119Value531.id
+    };
+  if (apk119Value531.type === "pointerdown") {
+    if (enabled) findPermanentWidgetPageIndex_7(apk119Value535, apk119Value532, apk119Value536);else findPermanentWidgetPageIndex_8(apk119Value535, apk119Value532, apk119Value536, "iframe");
+  } else {
+    if (apk119Value531.type === "pointermove") {
+      if (drag?.["item"]?.["id"] === apk119Value531.id) handlePointermove_3(apk119Value535);else {
+        if (value_19?.["item"]?.["id"] === apk119Value531.id) {
+          value_19.latestX = apk119Value535.clientX, value_19.latestY = apk119Value535.clientY;
+          if (Math.hypot(apk119Value535.clientX - value_19.startX, apk119Value535.clientY - value_19.startY) > count_7) handleAction_60();
         }
+      }
+    } else {
+      if (apk119Value531.type === "pointerup" || apk119Value531.type === "pointercancel") {
+        if (drag?.["item"]?.["id"] === apk119Value531.id) handleAction_98(apk119Value535);else handleAction_60();
+      }
     }
+  }
+}
     function handleAction_65(value_413) {
         const value_414 = WIDGET_TYPES[value_413]?.defaultSize || [2, 2];
         return value_414[0] + ' x ' + value_414[1];
@@ -2833,793 +2806,560 @@
             images: mergeWidgetImagesWithDefaults(type_2, current.images),
         };
     }
-    function findPermanentWidgetPageIndex_7(event_585, target_2, item_24) {
-        if (drag)
-            endDrag(null, {
-                save: false,
-            });
-        const boundingClientRect_588 = target_2.getBoundingClientRect();
-        const placeholder_3 = document.createElement('div');
-        placeholder_3.className = 'desktop-drag-placeholder';
-        placeholder_3.style.width = Math.max(boundingClientRect_588.width, 60) + 'px';
-        placeholder_3.style.height = Math.max(boundingClientRect_588.height, 60) + 'px';
-        placeholder_3.style.gridColumn = getComputedStyle(target_2).gridColumn;
-        placeholder_3.style.gridRow = getComputedStyle(target_2).gridRow;
-        const source_7 = findItemLocation(item_24.id);
-        target_2.parentNode?.insertBefore(placeholder_3, target_2);
-        target_2.classList.add('desktop-dragging-source');
-        const ghost_3 = handleAction_101(target_2, item_24);
-        ghost_3.style.width = boundingClientRect_588.width + 'px';
-        ghost_3.style.height = boundingClientRect_588.height + 'px';
-        appEl.appendChild(ghost_3);
-        drag = {
-            item: item_24,
-            target: target_2,
-            ghost: ghost_3,
-            placeholder: placeholder_3,
-            source: source_7,
-            offsetX: event_585.clientX - boundingClientRect_588.left,
-            offsetY: event_585.clientY - boundingClientRect_588.top,
-            didMove: false,
-            previewKey: '',
-            lastQuickKey: '',
-            lastAppliedLayout: null,
-            originalPositionsCache: null,
-            nodeById: new Map(
-                [...document.querySelectorAll('.desktop-draggable')].map((value_592) => [
-                    value_592.dataset.desktopId,
-                    value_592,
-                ]),
-            ),
-            rectCache: new Map(),
-            rectCacheTime: performance.now(),
-        };
-        document.body.classList.add('home-desktop-dragging');
-        buildDropTargetsCache();
-        handleAction_100(event_585.clientX, event_585.clientY);
-        if (event_585.pointerId !== undefined)
-            try {
-                target_2.setPointerCapture?.(event_585.pointerId);
-            } catch (value_593) {}
-        window.addEventListener('pointermove', handlePointermove_3, {
-            capture: true,
-            passive: false,
-        });
-        window.addEventListener('pointerup', handleAction_98, {
-            capture: true,
-            passive: true,
-        });
-        window.addEventListener('pointercancel', handleAction_98, {
-            capture: true,
-            passive: true,
-        });
+    function findPermanentWidgetPageIndex_7(apk119Value715, apk119Value716, apk119Value717) {
+  if (drag) endDrag(null, {
+    save: false
+  });
+  const apk119Value718 = apk119Value716.getBoundingClientRect(),
+    apk119Value719 = getComputedStyle(apk119Value716),
+    apk119Value720 = handleAction_101(apk119Value716, apk119Value717),
+    apk119Value721 = document.createElement("div");
+  apk119Value721.className = "desktop-drag-placeholder", apk119Value721.style.width = Math.max(apk119Value718.width, 60) + "px", apk119Value721.style.height = Math.max(apk119Value718.height, 60) + "px", apk119Value721.style.gridColumn = apk119Value719.gridColumn, apk119Value721.style.gridRow = apk119Value719.gridRow;
+  const apk119Value722 = findItemLocation(apk119Value717.id);
+  apk119Value716.parentNode?.["insertBefore"](apk119Value721, apk119Value716), apk119Value716.classList.add("desktop-dragging-source"), apk119Value720.style.width = apk119Value718.width + "px", apk119Value720.style.height = apk119Value718.height + "px", appEl.appendChild(apk119Value720), drag = {
+    item: apk119Value717,
+    target: apk119Value716,
+    ghost: apk119Value720,
+    placeholder: apk119Value721,
+    source: apk119Value722,
+    pointerId: apk119Value715.pointerId,
+    frameRect: apk119Value715.frameRect,
+    nativeAndroid: false,
+    offsetX: apk119Value715.clientX - apk119Value718.left,
+    offsetY: apk119Value715.clientY - apk119Value718.top,
+    didMove: false,
+    previewKey: "",
+    candidateKey: "",
+    hoverTimer: null,
+    previewRAF: null,
+    layoutTask: null,
+    dropCache: new Map(),
+    previewPositions: new Map(),
+    dockDisplacedNodes: new Set(),
+    originalPositionsCache: new Map(desktopState.pages.flat().filter(apk119Value723 => apk119Value723.position).map(apk119Value724 => [apk119Value724.id, {
+      ...apk119Value724.position
+    }])),
+    nodeById: new Map([...document.querySelectorAll(".desktop-draggable")].map(apk119Value725 => [apk119Value725.dataset.desktopId, apk119Value725])),
+    geometryDirty: false,
+    ending: false
+  }, document.body.classList.add("home-desktop-dragging"), document.body.classList.toggle("home-android-desktop-dragging", false), value_96 = {
+    x: apk119Value715.clientX,
+    y: apk119Value715.clientY
+  }, _value = 0, buildDropTargetsCache(), handleAction_100(apk119Value715.clientX, apk119Value715.clientY);
+  if (apk119Value715.pointerId !== undefined) try {
+    apk119Value716.setPointerCapture?.(apk119Value715.pointerId);
+  } catch (apk119Value726) {}
+  window.addEventListener("pointermove", handlePointermove_3, {
+    capture: true,
+    passive: false
+  }), window.addEventListener("pointerup", handleAction_98, {
+    capture: true,
+    passive: true
+  }), window.addEventListener("pointercancel", handleAction_98, {
+    capture: true,
+    passive: true
+  }), apk119Value716.addEventListener("lostpointercapture", desktop119_148), pagesContainer.addEventListener("scroll", desktop119_146, {
+    passive: true
+  }), window.addEventListener("resize", desktop119_147, {
+    passive: true
+  }), window.addEventListener("blur", desktop119_150), window.addEventListener("pagehide", desktop119_150), document.addEventListener("visibilitychange", desktop119_149);
+}
+let dragMoveRAF = null,
+  value_96 = null,
+  _value = 0;
+const _value2 = (() => {
+  const apk119Value727 = /Android/i.test(navigator.userAgent);
+  if (apk119Value727 && navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 6) return 64;
+  if (window.devicePixelRatio > 2.5) return 48;
+  if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) return 48;
+  return 32;
+})();
+function handlePointermove_3(apk119Value728) {
+  if (!drag || drag.ending || !desktop119_143(apk119Value728, drag)) return;
+  apk119Value728.preventDefault(), value_96 = {
+    x: apk119Value728.clientX,
+    y: apk119Value728.clientY
+  }, drag.didMove = true, desktop119_144();
+}
+function desktop119_143(apk119Value729, apk119Value730) {
+  return apk119Value729.pointerId === undefined || apk119Value730.pointerId === undefined || apk119Value729.pointerId === apk119Value730.pointerId;
+}
+function desktop119_144() {
+  if (dragMoveRAF !== null || !drag || drag.ending) return;
+  const apk119Value731 = drag;
+  dragMoveRAF = requestAnimationFrame(() => {
+    dragMoveRAF = null;
+    if (drag !== apk119Value731 || apk119Value731.ending) return;
+    const apk119Value732 = value_96;
+    if (!apk119Value732) return;
+    (apk119Value731.geometryDirty || !dropTargetsCache) && (buildDropTargetsCache(), apk119Value731.geometryDirty = false);
+    const apk119Value733 = performance.now();
+    handleAction_100(apk119Value732.x, apk119Value732.y), maybeAutoPage(apk119Value732.x), apk119Value733 - _value >= _value2 && (desktop119_158(apk119Value732.x, apk119Value732.y), _value = apk119Value733);
+  });
+}
+function handleAction_98(apk119Value734) {
+  if (!drag || drag.ending || !desktop119_143(apk119Value734, drag)) return;
+  endDrag(apk119Value734, {
+    save: apk119Value734.type !== "pointercancel"
+  });
+}
+function desktop119_146() {
+  if (!drag || drag.ending) return;
+  if (dropTargetsCache) dropTargetsCache.scrollLeft = pagesContainer.scrollLeft;
+  desktop119_144();
+}
+function desktop119_147() {
+  if (!drag || drag.ending) return;
+  desktop119_160(drag), drag.candidateKey = "", handleAction_102(null), drag.geometryDirty = true, desktop119_144();
+}
+function desktop119_148(apk119Value735) {
+  if (drag && !drag.ending && desktop119_143(apk119Value735, drag)) desktop119_150();
+}
+function desktop119_149() {
+  if (document.hidden) desktop119_150();
+}
+function desktop119_150() {
+  handleAction_60();
+  if (drag) endDrag(null, {
+    save: false
+  });
+}
+function cleanupDesktopDragListeners(apk119Value736) {
+  window.removeEventListener("pointermove", handlePointermove_3, true), window.removeEventListener("pointerup", handleAction_98, true), window.removeEventListener("pointercancel", handleAction_98, true), apk119Value736.target.removeEventListener("lostpointercapture", desktop119_148), pagesContainer.removeEventListener("scroll", desktop119_146), window.removeEventListener("resize", desktop119_147);
+  if (dragMoveRAF !== null) cancelAnimationFrame(dragMoveRAF);
+  dragMoveRAF = null, clearAutoPage();
+  try {
+    apk119Value736.target.releasePointerCapture?.(apk119Value736.pointerId);
+  } catch (apk119Value737) {}
+}
+function endDrag(apk119Value738, apk119Value739 = {}) {
+  if (!drag) return;
+  const apk119Value740 = drag,
+    apk119Value741 = !!(apk119Value739.save && apk119Value740.didMove && apk119Value738 && apk119Value738.type !== "pointercancel");
+  apk119Value740.ending = true, cleanupDesktopDragListeners(apk119Value740);
+  const apk119Value742 = apk119Value738 && Number.isFinite(apk119Value738.clientX) && Number.isFinite(apk119Value738.clientY) ? {
+    x: apk119Value738.clientX,
+    y: apk119Value738.clientY
+  } : value_96;
+  value_96 = null;
+  if (!apk119Value741) {
+    desktop119_160(apk119Value740), finishDesktopDrag(apk119Value740, null, false);
+    return;
+  }
+  if (apk119Value740.geometryDirty || !dropTargetsCache) buildDropTargetsCache();else dropTargetsCache.scrollLeft = pagesContainer.scrollLeft;
+  const apk119Value743 = apk119Value742 ? handleAction_107(apk119Value742.x, apk119Value742.y, apk119Value740.item) : null,
+    apk119Value744 = desktop119_159(apk119Value743);
+  desktop119_160(apk119Value740, apk119Value744);
+  if (apk119Value742) handleAction_100(apk119Value742.x, apk119Value742.y);
+  finishDesktopDrag(apk119Value740, handleAction_110(apk119Value743, apk119Value740.item), true);
+}
+function finishDesktopDrag(apk119Value746, apk119Value747, apk119Value748) {
+  if (drag !== apk119Value746) return;
+  desktop119_160(apk119Value746), desktop119_165(), window.removeEventListener("blur", desktop119_150), window.removeEventListener("pagehide", desktop119_150), document.removeEventListener("visibilitychange", desktop119_149);
+  if (apk119Value747 && apk119Value748) moveItemInState(apk119Value746.item, apk119Value747);
+  apk119Value746.ghost.remove(), apk119Value746.placeholder.remove(), apk119Value746.target.classList.remove("desktop-dragging-source"), document.body.classList.remove("home-desktop-dragging"), document.body.classList.remove("home-android-desktop-dragging"), apk119Value746.dropCache.clear(), drag = null, dropTargetsCache = null, renderHomeDesktop_2();
+  if (apk119Value747 && apk119Value748) handleAction_27({
+    silent: true
+  });
+}
+function handleAction_100(apk119Value749, apk119Value750) {
+  if (!drag) return;
+  drag.ghost.style.transform = "translate3d(" + (apk119Value749 - drag.offsetX) + "px, " + (apk119Value750 - drag.offsetY) + "px, 0)";
+}
+function handleAction_101(apk119Value751, apk119Value752) {
+  const apk119Value753 = document.createElement("div");
+  apk119Value753.className = "desktop-drag-ghost desktop-drag-ghost-" + apk119Value752.kind, apk119Value753.setAttribute("aria-hidden", "true");
+  if (apk119Value752.kind === "app") {
+    const apk119Value754 = apk119Value751.querySelector(".app-icon");
+    if (apk119Value754) {
+      const apk119Value755 = apk119Value754.cloneNode(true);
+      apk119Value755.removeAttribute("id"), apk119Value755.querySelectorAll("[id]").forEach(apk119Value756 => apk119Value756.removeAttribute("id")), apk119Value753.appendChild(apk119Value755);
     }
-    let dragMoveRAF = null;
-    let value_96 = null;
-    let _value = 0;
-    const _value2 = (() => {
-        const _value6 = /Android/i.test(navigator.userAgent);
-        if (_value6 && navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 6)
-            return 64;
-        if (window.devicePixelRatio > 2.5) return 48;
-        if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) return 48;
-        return 32;
-    })();
-    function handlePointermove_3(event_594) {
-        if (!drag) return;
-        event_594.preventDefault();
-        value_96 = {
-            x: event_594.clientX,
-            y: event_594.clientY,
-        };
-        if (dragMoveRAF) return;
-        dragMoveRAF = requestAnimationFrame(() => {
-            if (!drag) {
-                dragMoveRAF = null;
-                return;
-            }
-            const drag_2 = value_96;
-            if (!drag_2) {
-                dragMoveRAF = null;
-                return;
-            }
-            const _value7 = performance.now();
-            drag.didMove = true;
-            handleAction_100(drag_2.x, drag_2.y);
-            maybeAutoPage(drag_2.x);
-            _value7 - _value >= _value2 &&
-                (handleAction_102(drag_2.x, drag_2.y), (_value = _value7));
-            dragMoveRAF = null;
-        });
+  } else {
+    const apk119Value757 = getComputedStyle(apk119Value751);
+    apk119Value753.style.background = apk119Value757.background, apk119Value753.style.borderRadius = apk119Value757.borderRadius;
+    const apk119Value758 = desktopState.widgets[apk119Value752.id]?.["name"] || apk119Value751.getAttribute("aria-label") || "Widget",
+      apk119Value759 = document.createElement("span");
+    apk119Value759.textContent = apk119Value758, apk119Value753.appendChild(apk119Value759);
+  }
+  return apk119Value753;
+}
+function maybeAutoPage(apk119Value760) {
+  if (!dropTargetsCache) buildDropTargetsCache();
+  const apk119Value761 = drag || libraryDrag,
+    {
+      viewport: apk119Value762,
+      pages: apk119Value763
+    } = dropTargetsCache;
+  if (!apk119Value761 || !apk119Value762.width) return;
+  const apk119Value764 = apk119Value762.rect,
+    apk119Value765 = drag ? dropTargetsCache.scrollLeft : pagesContainer.scrollLeft,
+    apk119Value766 = Math.round(apk119Value765 / apk119Value762.width);
+  let apk119Value767 = apk119Value766;
+  if (apk119Value760 < apk119Value764.left + PAGE_EDGE_PX) apk119Value767 -= 1;
+  if (apk119Value760 > apk119Value764.right - PAGE_EDGE_PX) apk119Value767 += 1;
+  apk119Value767 = Math.max(0, Math.min(apk119Value767, apk119Value763.length - 1));
+  if (apk119Value767 === apk119Value766) {
+    clearAutoPage();
+    return;
+  }
+  if (autoPageTimer !== null && desktopAutoPageKey === apk119Value767) return;
+  clearAutoPage(), desktopAutoPageKey = apk119Value767, autoPageTimer = setTimeout(() => {
+    clearAutoPage();
+    if ((drag || libraryDrag) !== apk119Value761 || apk119Value761.ending) return;
+    if (drag && value_96) {
+      const apk119Value769 = apk119Value767 < apk119Value766 ? value_96.x < apk119Value764.left + PAGE_EDGE_PX : value_96.x > apk119Value764.right - PAGE_EDGE_PX;
+      if (!apk119Value769) return;
     }
-    function handleAction_98(value_50) {
-        endDrag(value_50, {
-            save: true,
-        });
+    const apk119Value768 = apk119Value767 * apk119Value762.width;
+    drag && (desktop119_160(drag), drag.candidateKey = "", dropTargetsCache.scrollLeft = apk119Value768);
+    pagesContainer.scrollTo({
+      left: apk119Value768,
+      behavior: "auto"
+    }), handleAction_46(apk119Value767);
+    if (drag) desktop119_147();else dropTargetsCache = null;
+  }, 220);
+}
+function clearAutoPage() {
+  if (autoPageTimer !== null) clearTimeout(autoPageTimer);
+  autoPageTimer = null, desktopAutoPageKey = null;
+}
+function desktop119_158(apk119Value770, apk119Value771) {
+  if (!drag) return;
+  const apk119Value772 = handleAction_107(apk119Value770, apk119Value771, drag.item);
+  ;
+  const apk119Value773 = desktop119_159(apk119Value772);
+  if (drag.candidateKey === apk119Value773) return;
+  drag.candidateKey = apk119Value773, handleAction_102(handleAction_110(apk119Value772, drag.item));
+}
+function desktop119_159(apk119Value774) {
+  if (!apk119Value774) return "none";
+  return apk119Value774.type === "dock" ? "dock:" + apk119Value774.index : "page:" + apk119Value774.pageIndex + ":" + apk119Value774.row + ":" + apk119Value774.col;
+}
+function desktop119_160(apk119Value775, apk119Value776 = "") {
+  if (apk119Value775.hoverTimer !== null) clearTimeout(apk119Value775.hoverTimer);
+  if (apk119Value775.previewRAF !== null) cancelAnimationFrame(apk119Value775.previewRAF);
+  apk119Value775.hoverTimer = null, apk119Value775.previewRAF = null, apk119Value775.layoutTask && apk119Value775.layoutTask.key !== apk119Value776 && (apk119Value775.layoutTask.cancel(), apk119Value775.layoutTask = null);
+}
+
+function handleAction_102(apk119Value798) {
+  if (!drag) return;
+  if (!apk119Value798) {
+    desktop119_165(), drag.previewKey = "", drag.placeholder.hidden = true;
+    return;
+  }
+  const apk119Value799 = desktop119_159(apk119Value798);
+  if (drag.previewKey === apk119Value799) return;
+  drag.previewKey = apk119Value799, drag.placeholder.hidden = false, desktop119_166();
+  const apk119Value800 = apk119Value798.type === "dock" ? dockEl : dropTargetsCache?.["pages"][apk119Value798.pageIndex]?.["node"];
+  if (!apk119Value800) return;
+  if (apk119Value798.type === "page") {
+    const apk119Value803 = handleAction_121(drag.item),
+      apk119Value804 = drag.placeholder;
+    apk119Value804.style.gridRow = apk119Value798.row + 1 + " / span " + apk119Value803.rows, apk119Value804.style.gridColumn = apk119Value798.col + 1 + " / span " + apk119Value803.cols;
+    (apk119Value804.parentElement !== apk119Value800 || apk119Value804.nextElementSibling !== null) && apk119Value800.appendChild(apk119Value804);
+    _value3(apk119Value800, apk119Value798.pageLayout, drag.item.id);
+    return;
+  }
+  _value3(null, [], drag.item.id), drag.placeholder.style.gridRow = "", drag.placeholder.style.gridColumn = "";
+  const apk119Value801 = [...apk119Value800.children].filter(apk119Value805 => apk119Value805 !== drag.target && !apk119Value805.classList.contains("desktop-drag-placeholder") && !apk119Value805.classList.contains("empty-slot"));
+  if (apk119Value798.displacedDockItem) {
+    const apk119Value806 = drag.nodeById.get(apk119Value798.displacedDockItem.id);
+    apk119Value806 && (apk119Value806.classList.add("desktop-dock-displaced-preview"), drag.dockDisplacedNodes.add(apk119Value806));
+  }
+  const apk119Value802 = apk119Value801[apk119Value798.index] || null;
+  if (apk119Value802) {
+    if (drag.placeholder.nextElementSibling !== apk119Value802) apk119Value800.insertBefore(drag.placeholder, apk119Value802);
+  } else {
+    const apk119Value807 = [...apk119Value800.children].find(apk119Value808 => apk119Value808.classList.contains("empty-slot"));
+    if (apk119Value807) {
+      if (drag.placeholder.nextElementSibling !== apk119Value807) apk119Value800.insertBefore(drag.placeholder, apk119Value807);
+    } else {
+      if (drag.placeholder.parentElement !== apk119Value800 || drag.placeholder.nextElementSibling !== null) apk119Value800.appendChild(drag.placeholder);
     }
-    function endDrag(event_597, options_3 = {}) {
-        if (!drag) return;
-        window.removeEventListener('pointermove', handlePointermove_3, {
-            capture: true,
-            passive: false,
-        });
-        window.removeEventListener('pointerup', handleAction_98, {
-            capture: true,
-            passive: true,
-        });
-        window.removeEventListener('pointercancel', handleAction_98, {
-            capture: true,
-            passive: true,
-        });
-        dragMoveRAF && (cancelAnimationFrame(dragMoveRAF), (dragMoveRAF = null));
-        clearAutoPage();
-        const value_599 =
-            event_597 && Number.isFinite(event_597.clientX) && Number.isFinite(event_597.clientY)
-                ? {
-                      x: event_597.clientX,
-                      y: event_597.clientY,
-                  }
-                : value_96;
-        value_96 = null;
-        const value_600 = value_599 ? handleAction_107(value_599.x, value_599.y, drag.item) : null;
-        const drop_2 = handleAction_110(value_600, drag.item);
-        dockEl?.querySelectorAll('.desktop-dock-displaced-preview').forEach((element_603) => {
-            element_603.classList.remove('desktop-dock-displaced-preview');
-        });
-        drop_2 && moveItemInState(drag.item, drop_2);
-        drag.ghost.remove();
-        drag.placeholder.remove();
-        drag.target.classList.remove('desktop-dragging-source');
-        document.body.classList.remove('home-desktop-dragging');
-        const shouldSave = options_3.save && drag.didMove;
-        drag = null;
-        dropTargetsCache = null;
-        renderHomeDesktop_2();
-        if (shouldSave)
-            handleAction_27({
-                silent: true,
-            });
-    }
-    function handleAction_100(value_51, value_52) {
-        if (!drag) return;
-        drag.ghost.style.transform =
-            'translate3d(' +
-            (value_51 - drag.offsetX) +
-            'px, ' +
-            (value_52 - drag.offsetY) +
-            'px, 0)';
-    }
-    function handleAction_101(node_10, value_607) {
-        const appEl_5 = document.createElement('div');
-        appEl_5.className = 'desktop-drag-ghost desktop-drag-ghost-' + value_607.kind;
-        appEl_5.setAttribute('aria-hidden', 'true');
-        if (value_607.kind === 'app') {
-            const target_3 = node_10.querySelector('.app-icon');
-            if (target_3) {
-                const cloneNode_609 = target_3.cloneNode(true);
-                cloneNode_609.removeAttribute('id');
-                cloneNode_609
-                    .querySelectorAll('[id]')
-                    .forEach((value_610) => value_610.removeAttribute('id'));
-                appEl_5.appendChild(cloneNode_609);
-            }
-        } else {
-            const computedStyle = getComputedStyle(node_10);
-            appEl_5.style.background = computedStyle.background;
-            appEl_5.style.borderRadius = computedStyle.borderRadius;
-            const textContent_2 =
-                    desktopState.widgets[value_607.id]?.name ||
-                    node_10.getAttribute('aria-label') ||
-                    'Widget',
-                inlineImageInput_6 = document.createElement('span');
-            inlineImageInput_6.textContent = textContent_2;
-            appEl_5.appendChild(inlineImageInput_6);
-        }
-        return appEl_5;
-    }
-    function maybeAutoPage(clientX_2) {
-        if (!pagesContainer?.clientWidth) return;
-        const rect_3 = pagesContainer.getBoundingClientRect();
-        const pageIndex_4 = Math.round(pagesContainer.scrollLeft / pagesContainer.clientWidth);
-        let nextPage = pageIndex_4;
-        if (clientX_2 < rect_3.left + PAGE_EDGE_PX) nextPage -= 1;
-        if (clientX_2 > rect_3.right - PAGE_EDGE_PX) nextPage += 1;
-        nextPage = Math.max(
-            0,
-            Math.min(nextPage, document.querySelectorAll('.main-grid').length - 1),
-        );
-        if (nextPage === pageIndex_4 || autoPageTimer) return;
-        autoPageTimer = setTimeout(() => {
-            pagesContainer.scrollTo({
-                left: nextPage * pagesContainer.clientWidth,
-                behavior: 'auto',
-            });
-            dropTargetsCache = null;
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    if (drag) buildDropTargetsCache();
-                    handleAction_46(nextPage);
-                });
-            });
-            clearAutoPage();
-        }, 220);
-    }
-    function clearAutoPage() {
-        if (autoPageTimer) clearTimeout(autoPageTimer);
-        autoPageTimer = null;
-    }
-    function handleAction_102(value_617, value_618) {
-        if (!drag) return;
-        const drop_3 = handleAction_107(value_617, value_618, drag.item);
-        if (!drop_3) {
-            drag.previewKey && (handleAction_103(), (drag.previewKey = ''));
-            return;
-        }
-        const previewKey_2 =
-            drop_3.type +
-            ':' +
-            (drop_3.pageIndex ?? 'dock') +
-            ':' +
-            (drop_3.row ?? '') +
-            ':' +
-            (drop_3.col ?? '');
-        if (drag.lastQuickKey === previewKey_2) return;
-        drag.lastQuickKey = previewKey_2;
-        const _value8 = handleAction_110(drop_3, drag.item);
-        if (!_value8) {
-            handleAction_103();
-            drag.previewKey = '';
-            return;
-        }
-        const _value9 =
-            _value8.type +
-            ':' +
-            (_value8.pageIndex ?? 'dock') +
-            ':' +
-            (_value8.row ?? '') +
-            ':' +
-            (_value8.col ?? '') +
-            ':' +
-            _value8.index;
-        if (drag.previewKey === _value9) return;
-        drag.previewKey = _value9;
-        handleAction_103();
-        const container_3 =
-            _value8.type === 'dock'
-                ? dockEl
-                : document.querySelectorAll('.main-grid')[_value8.pageIndex];
-        if (_value8.type === 'page') {
-            const handleAction_121_624 = handleAction_121(drag.item);
-            const _value10 = drag.placeholder;
-            _value10.style.cssText =
-                '\n                grid-row: ' +
-                (_value8.row + 1) +
-                ' / span ' +
-                handleAction_121_624.rows +
-                ';\n                grid-column: ' +
-                (_value8.col + 1) +
-                ' / span ' +
-                handleAction_121_624.cols +
-                ';\n            ';
-            (_value10.parentElement !== container_3 || _value10.nextElementSibling !== null) &&
-                container_3.appendChild(_value10);
-            _value3(container_3, _value8.pageLayout, drag.item.id);
-            return;
-        }
-        const _value0 = [...container_3.children].filter(
-            (_value11) =>
-                _value11 !== drag.target &&
-                !_value11.classList.contains('desktop-drag-placeholder') &&
-                !_value11.classList.contains('empty-slot'),
-        );
-        _value8.displacedDockItem &&
-            _value0
-                .find((_value12) => _value12.dataset.desktopId === _value8.displacedDockItem.id)
-                ?.classList.add('desktop-dock-displaced-preview');
-        const _value1 = _value0[_value8.index] || null;
-        if (_value1) {
-            if (drag.placeholder.nextElementSibling !== _value1)
-                container_3.insertBefore(drag.placeholder, _value1);
-        } else {
-            const _value13 = [...container_3.children].find((_value14) =>
-                _value14.classList.contains('empty-slot'),
-            );
-            if (_value13) {
-                if (drag.placeholder.nextElementSibling !== _value13)
-                    container_3.insertBefore(drag.placeholder, _value13);
-            } else {
-                if (
-                    drag.placeholder.parentElement !== container_3 ||
-                    drag.placeholder.nextElementSibling !== null
-                )
-                    container_3.appendChild(drag.placeholder);
-            }
-        }
-    }
-    function handleAction_103() {
-        if (!drag) return;
-        drag.dockDisplacedNodes
-            ? (drag.dockDisplacedNodes.forEach((_value15) => {
-                  _value15.classList.remove('desktop-dock-displaced-preview');
-              }),
-              (drag.dockDisplacedNodes = null))
-            : dockEl?.querySelectorAll('.desktop-dock-displaced-preview').forEach((_value16) => {
-                  _value16.classList.remove('desktop-dock-displaced-preview');
-              });
-        if (drag.lastAppliedLayout && drag.lastAppliedLayout.length > 0) {
-            const _value17 = [];
-            drag.lastAppliedLayout.forEach((_value18) => {
-                const _value19 = drag.nodeById?.get(_value18.originalId || _value18.id);
-                if (_value19 && _value18.originalPosition) {
-                    const handleAction_121_624 = handleAction_121({
-                        id: _value18.originalId || _value18.id,
-                    });
-                    _value17.push({
-                        node: _value19,
-                        gridColumn:
-                            _value18.originalPosition.col +
-                            1 +
-                            ' / span ' +
-                            handleAction_121_624.cols,
-                        gridRow:
-                            _value18.originalPosition.row +
-                            1 +
-                            ' / span ' +
-                            handleAction_121_624.rows,
-                    });
-                }
-            });
-            _value17.length > 0 &&
-                requestAnimationFrame(() => {
-                    _value17.forEach(
-                        ({ node: _value20, gridColumn: drop_3, gridRow: _value21 }) => {
-                            _value20.style.gridColumn = drop_3;
-                            _value20.style.gridRow = _value21;
-                        },
-                    );
-                });
-            drag.lastAppliedLayout = null;
-        }
-    }
-    function _value3(_value22, _value23, _value24) {
-        if (!_value22 || !_value23) return;
-        const _value25 = [];
-        const _value26 = [];
-        _value23.forEach((_value27) => {
-            if (_value27.id === _value24) return;
-            const _value28 = drag?.nodeById?.get(_value27.id);
-            if (!_value28 || !_value27.position) return;
-            !drag.originalPositionsCache &&
-                ((drag.originalPositionsCache = new Map()),
-                desktopState.pages.flat().forEach((_value30) => {
-                    _value30.position &&
-                        drag.originalPositionsCache.set(_value30.id, {
-                            ..._value30.position,
-                        });
-                }));
-            const _value29 = drag.originalPositionsCache.get(_value27.id);
-            _value29 &&
-                _value25.push({
-                    originalId: _value27.id,
-                    originalPosition: _value29,
-                });
-            const handleAction_121_624 = handleAction_121(_value27);
-            _value26.push({
-                node: _value28,
-                gridColumn: _value27.position.col + 1 + ' / span ' + handleAction_121_624.cols,
-                gridRow: _value27.position.row + 1 + ' / span ' + handleAction_121_624.rows,
-            });
-        });
-        _value26.length > 0 &&
-            requestAnimationFrame(() => {
-                _value26.forEach(({ node: _value31, gridColumn: _value32, gridRow: _value33 }) => {
-                    _value31.style.gridColumn = _value32;
-                    _value31.style.gridRow = _value33;
-                });
-            });
-        if (drag) drag.lastAppliedLayout = _value25;
-    }
-    let dropTargetsCache = null;
-    function buildDropTargetsCache() {
-        const initialScrollLeft_2 = pagesContainer ? pagesContainer.scrollLeft : 0,
-            value_641 = dockEl.closest('.dock-container') || dockEl;
-        dropTargetsCache = {
-            initialScrollLeft: initialScrollLeft_2,
-            dock: {
-                rect: value_641.getBoundingClientRect(),
-                children: [...dockEl.children]
-                    .filter(
-                        (element_642) =>
-                            !element_642.classList.contains('desktop-drag-placeholder') &&
-                            !element_642.classList.contains('empty-slot') &&
-                            !element_642.classList.contains('desktop-dragging-source'),
-                    )
-                    .map((value_643) => {
-                        const boundingClientRect_644 = value_643.getBoundingClientRect();
-                        return {
-                            top: boundingClientRect_644.top,
-                            left: boundingClientRect_644.left,
-                            right: boundingClientRect_644.right,
-                            bottom: boundingClientRect_644.bottom,
-                            width: boundingClientRect_644.width,
-                            height: boundingClientRect_644.height,
-                        };
-                    }),
-            },
-            pages: [...document.querySelectorAll('.main-grid')].map((value_645) => {
-                const boundingClientRect_646 = value_645.getBoundingClientRect(),
-                    computedStyle_647 = getComputedStyle(value_645),
-                    paddingLeft_2 = parseFloat(computedStyle_647.paddingLeft) || 0,
-                    value_649 = parseFloat(computedStyle_647.paddingRight) || 0,
-                    columnGap_2 = parseFloat(computedStyle_647.columnGap) || 0,
-                    rowGap_2 = parseFloat(computedStyle_647.rowGap) || 0;
-                return {
-                    rect: {
-                        top: boundingClientRect_646.top,
-                        left: boundingClientRect_646.left,
-                        right: boundingClientRect_646.right,
-                        bottom: boundingClientRect_646.bottom,
-                        width: boundingClientRect_646.width,
-                        height: boundingClientRect_646.height,
-                    },
-                    paddingLeft: paddingLeft_2,
-                    columnGap: columnGap_2,
-                    rowGap: rowGap_2,
-                    columnWidth:
-                        (boundingClientRect_646.width -
-                            paddingLeft_2 -
-                            value_649 -
-                            columnGap_2 * 3) /
-                        4,
-                    rowHeight: 85,
-                };
-            }),
-        };
-    }
-    function handleAction_107(clientX_3, clientY_2, value_654) {
-        if (!dropTargetsCache) buildDropTargetsCache();
-        const dockRect = dropTargetsCache.dock.rect;
-        if (
-            clientY_2 >= dockRect.top &&
-            clientY_2 <= dockRect.bottom &&
-            clientX_3 >= dockRect.left &&
-            clientX_3 <= dockRect.right
-        )
-            return {
-                type: 'dock',
-                index: getCachedInsertionIndex(
-                    dropTargetsCache.dock.children,
-                    clientX_3,
-                    clientY_2,
-                    0,
-                ),
-            };
-        const deltaX =
-            (pagesContainer ? pagesContainer.scrollLeft : 0) - dropTargetsCache.initialScrollLeft;
-        for (let pageIndex_5 = 0; pageIndex_5 < dropTargetsCache.pages.length; pageIndex_5++) {
-            const page_4 = dropTargetsCache.pages[pageIndex_5],
-                pLeft = page_4.rect.left - deltaX,
-                pRight = page_4.rect.right - deltaX;
-            if (
-                clientY_2 >= page_4.rect.top &&
-                clientY_2 <= page_4.rect.bottom &&
-                clientX_3 >= pLeft &&
-                clientX_3 <= pRight
-            ) {
-                const value_662 = pLeft + page_4.paddingLeft,
-                    col_4 = Math.max(
-                        0,
-                        Math.min(
-                            3,
-                            Math.floor(
-                                (clientX_3 - value_662 + page_4.columnGap / 2) /
-                                    (page_4.columnWidth + page_4.columnGap),
-                            ),
-                        ),
-                    ),
-                    row_4 = Math.max(
-                        0,
-                        Math.min(
-                            5,
-                            Math.floor(
-                                (clientY_2 - page_4.rect.top + page_4.rowGap / 2) /
-                                    (page_4.rowHeight + page_4.rowGap),
-                            ),
-                        ),
-                    );
-                return {
-                    type: 'page',
-                    pageIndex: pageIndex_5,
-                    row: row_4,
-                    col: col_4,
-                    index: (desktopState.pages[pageIndex_5] || []).length,
-                };
-            }
-        }
-        const pageIndex_6 = Math.round(
-            (pagesContainer ? pagesContainer.scrollLeft : 0) /
-                (pagesContainer ? pagesContainer.clientWidth : 1),
-        );
+  }
+}
+function desktop119_165() {
+  if (!drag) return;
+  desktop119_166(), _value3(null, [], drag.item.id);
+}
+function desktop119_166() {
+  drag.dockDisplacedNodes.forEach(apk119Value809 => apk119Value809.classList.remove("desktop-dock-displaced-preview")), drag.dockDisplacedNodes.clear();
+}
+function _value3(apk119Value810, apk119Value811, apk119Value812) {
+  if (!drag || !apk119Value811) return;
+  const apk119Value813 = new Map();
+  apk119Value811.forEach(apk119Value814 => {
+    if (apk119Value814.id === apk119Value812) return;
+    const apk119Value815 = drag.nodeById.get(apk119Value814.id);
+    if (!apk119Value815 || !apk119Value814.position) return;
+    const apk119Value816 = drag.originalPositionsCache.get(apk119Value814.id);
+    if (!apk119Value816 || apk119Value816.row === apk119Value814.position.row && apk119Value816.col === apk119Value814.position.col) return;
+    const apk119Value817 = handleAction_121(apk119Value814),
+      apk119Value818 = drag.previewPositions.get(apk119Value814.id);
+    apk119Value813.set(apk119Value814.id, {
+      node: apk119Value815,
+      originalColumn: apk119Value818 ? apk119Value818.originalColumn : apk119Value815.style.gridColumn,
+      originalRow: apk119Value818 ? apk119Value818.originalRow : apk119Value815.style.gridRow,
+      gridColumn: apk119Value814.position.col + 1 + " / span " + apk119Value817.cols,
+      gridRow: apk119Value814.position.row + 1 + " / span " + apk119Value817.rows
+    });
+  }), drag.previewPositions.forEach((apk119Value819, apk119Value820) => {
+    if (apk119Value813.has(apk119Value820)) return;
+    apk119Value819.node.style.gridColumn = apk119Value819.originalColumn, apk119Value819.node.style.gridRow = apk119Value819.originalRow;
+  }), apk119Value813.forEach(({
+    node: apk119Value821,
+    gridColumn: apk119Value822,
+    gridRow: apk119Value823
+  }) => {
+    if (apk119Value821.style.gridColumn !== apk119Value822) apk119Value821.style.gridColumn = apk119Value822;
+    if (apk119Value821.style.gridRow !== apk119Value823) apk119Value821.style.gridRow = apk119Value823;
+  }), drag.previewPositions = apk119Value813;
+}
+let dropTargetsCache = null;
+function buildDropTargetsCache() {
+  const apk119Value824 = pagesContainer ? pagesContainer.scrollLeft : 0,
+    apk119Value825 = dockEl.closest(".dock-container") || dockEl,
+    apk119Value826 = drag?.["target"]["querySelector"](".html-widget-frame");
+  if (apk119Value826) drag.frameRect = apk119Value826.getBoundingClientRect();
+  dropTargetsCache = {
+    initialScrollLeft: apk119Value824,
+    scrollLeft: apk119Value824,
+    viewport: {
+      rect: pagesContainer.getBoundingClientRect(),
+      width: pagesContainer.clientWidth
+    },
+    dock: {
+      rect: apk119Value825.getBoundingClientRect(),
+      children: [...dockEl.children].filter(apk119Value827 => !apk119Value827.classList.contains("desktop-drag-placeholder") && !apk119Value827.classList.contains("empty-slot") && !apk119Value827.classList.contains("desktop-dragging-source")).map(apk119Value828 => {
+        const apk119Value829 = apk119Value828.getBoundingClientRect();
         return {
-            type: 'page',
-            pageIndex: pageIndex_6,
-            row: 0,
-            col: 0,
-            index: (desktopState.pages[pageIndex_6] || []).length,
+          top: apk119Value829.top,
+          left: apk119Value829.left,
+          right: apk119Value829.right,
+          bottom: apk119Value829.bottom,
+          width: apk119Value829.width,
+          height: apk119Value829.height
         };
-    }
-    function getCachedInsertionIndex(value_665, clientX_4, clientY_3, value_668) {
-        let bestIndex = value_665.length;
-        for (let index_8 = 0; index_8 < value_665.length; index_8 += 1) {
-            const value_671 = value_665[index_8],
-                top_672 = value_671.top,
-                value_673 = value_671.left - value_668,
-                width_674 = value_671.width,
-                height_2 = value_671.height,
-                verticalMiddle = top_672 + height_2 / 2,
-                horizontalMiddle = value_673 + width_674 / 2;
-            if (
-                clientY_3 < verticalMiddle ||
-                (Math.abs(clientY_3 - verticalMiddle) < height_2 / 2 &&
-                    clientX_4 < horizontalMiddle)
-            ) {
-                bestIndex = index_8;
-                break;
-            }
-        }
-        return bestIndex;
-    }
-    function handleAction_109(value_678, value_679) {
-        return !!handleAction_110(value_678, value_679);
-    }
-    function handleAction_110(value_680, item_13) {
-        if (!value_680) return null;
-        if (value_680.type === 'dock') {
-            if (item_13.kind !== 'app') return null;
-            const filter_689 = desktopState.dock.filter((dockItem) => dockItem.id !== item_13.id),
-                index_11 = Math.max(0, Math.min(value_680.index, filter_689.length));
-            if (filter_689.length < DOCK_CAPACITY)
-                return {
-                    ...value_680,
-                    index: index_11,
-                };
-            const handleAction_116_691 = findItemLocation(item_13.id);
-            if (handleAction_116_691?.type !== 'page') return null;
-            const result_692 = desktopState.pages[handleAction_116_691.pageIndex]?.find(
-                (value_697) => value_697.id === item_13.id,
-            );
-            if (!result_692?.position) return null;
-            const index_12 = Math.min(index_11, DOCK_CAPACITY - 1),
-                displacedDockItem_2 = filter_689[index_12];
-            if (!displacedDockItem_2) return null;
-            const filter_695 = (desktopState.pages[handleAction_116_691.pageIndex] || []).filter(
-                    (dockItem_2) => dockItem_2.id !== item_13.id,
-                ),
-                sourcePageLayout_2 = handleAction_111(
-                    filter_695,
-                    displacedDockItem_2,
-                    result_692.position.row,
-                    result_692.position.col,
-                );
-            return sourcePageLayout_2
-                ? {
-                      ...value_680,
-                      index: index_12,
-                      displacedDockItem: displacedDockItem_2,
-                      sourcePageIndex: handleAction_116_691.pageIndex,
-                      sourcePageLayout: sourcePageLayout_2,
-                  }
-                : null;
-        }
-        if (value_680.pageIndex < 0 || value_680.pageIndex >= desktopState.pages.length)
-            return null;
-        const items_682 = desktopState.pages[value_680.pageIndex] || [],
-            result_683 = items_682.find((value_699) => value_699.id === item_13.id),
-            filter_684 = items_682.filter((dockItem_3) => dockItem_3.id !== item_13.id),
-            handleAction_121_685 = handleAction_121(item_13),
-            row_5 = Math.max(
-                0,
-                Math.min(
-                    6 - handleAction_121_685.rows,
-                    Number.isInteger(value_680.row) ? value_680.row : 0,
-                ),
-            ),
-            col_5 = Math.max(
-                0,
-                Math.min(
-                    4 - handleAction_121_685.cols,
-                    Number.isInteger(value_680.col) ? value_680.col : 0,
-                ),
-            ),
-            pageLayout_2 = handleAction_111(
-                filter_684,
-                item_13,
-                row_5,
-                col_5,
-                result_683?.position,
-            );
-        return pageLayout_2
-            ? {
-                  ...value_680,
-                  index: filter_684.length,
-                  row: row_5,
-                  col: col_5,
-                  pageLayout: pageLayout_2,
-              }
-            : null;
-    }
-    function handleAction_111(value_701, value_702, row_6, col_6, value_705) {
-        const handleAction_121_706 = handleAction_121(value_702),
-            handleAction_120_707 = handleAction_120();
-        if (!handleAction_123(handleAction_120_707, row_6, col_6, handleAction_121_706))
-            return null;
-        handleAction_125(
-            handleAction_120_707,
-            row_6,
-            col_6,
-            handleAction_121_706.rows,
-            handleAction_121_706.cols,
-        );
-        const map_708 = handleAction_29(value_701, desktopState.widgets).map((value_711) => ({
-                ...value_711,
-                position: {
-                    ...value_711.position,
-                },
-            })),
-            widgetNodeCache_2 = new Map(),
-            items_710 = [];
-        map_708.forEach((value_712) => {
-            const handleAction_121_713 = handleAction_121(value_712);
-            handleAction_123(
-                handleAction_120_707,
-                value_712.position.row,
-                value_712.position.col,
-                handleAction_121_713,
-            )
-                ? (widgetNodeCache_2.set(value_712.id, {
-                      ...value_712.position,
-                  }),
-                  handleAction_125(
-                      handleAction_120_707,
-                      value_712.position.row,
-                      value_712.position.col,
-                      handleAction_121_713.rows,
-                      handleAction_121_713.cols,
-                  ))
-                : items_710.push(value_712);
-        });
-        for (const item_14 of items_710) {
-            const value_715 = value_705 || item_14.position,
-                node_14 = handleAction_114(
-                    handleAction_120_707,
-                    handleAction_121(item_14),
-                    value_715,
-                );
-            if (!node_14) return handleAction_112(map_708, value_702, row_6, col_6, value_705);
-            widgetNodeCache_2.set(item_14.id, node_14);
-            const handleAction_121_717 = handleAction_121(item_14);
-            handleAction_125(
-                handleAction_120_707,
-                node_14.row,
-                node_14.col,
-                handleAction_121_717.rows,
-                handleAction_121_717.cols,
-            );
-        }
-        return map_708
-            .map((value_718) => ({
-                ...value_718,
-                position: widgetNodeCache_2.get(value_718.id),
-            }))
-            .concat({
-                kind: value_702.kind,
-                id: value_702.id,
-                position: {
-                    row: row_6,
-                    col: col_6,
-                },
-            });
-    }
-    function handleAction_112(items_719, value_720, row_7, col_7, value_723) {
-        const handleAction_120_724 = handleAction_120(),
-            handleAction_121_725 = handleAction_121(value_720);
-        handleAction_125(
-            handleAction_120_724,
-            row_7,
-            col_7,
-            handleAction_121_725.rows,
-            handleAction_121_725.cols,
-        );
-        const sort_726 = [...items_719].sort((value_730, value_731) => {
-                const handleAction_121_732 = handleAction_121(value_730),
-                    handleAction_121_733 = handleAction_121(value_731);
-                return (
-                    handleAction_121_733.rows * handleAction_121_733.cols -
-                        handleAction_121_732.rows * handleAction_121_732.cols ||
-                    value_730.position.row - value_731.position.row ||
-                    value_730.position.col - value_731.position.col
-                );
-            }),
-            widgetNodeCache_3 = new Map();
-        let count_728 = 0;
-        function handleAction_729(value_734) {
-            if (value_734 >= sort_726.length) return true;
-            if (count_728++ > 50000) return false;
-            const item_15 = sort_726[value_734],
-                handleAction_121_736 = handleAction_121(item_15),
-                handleAction_113_737 = findPermanentWidgetPageIndex_9(
-                    handleAction_120_724,
-                    handleAction_121_736,
-                    value_723 || item_15.position,
-                );
-            for (const node_15 of handleAction_113_737) {
-                handleAction_125(
-                    handleAction_120_724,
-                    node_15.row,
-                    node_15.col,
-                    handleAction_121_736.rows,
-                    handleAction_121_736.cols,
-                );
-                widgetNodeCache_3.set(item_15.id, node_15);
-                if (handleAction_729(value_734 + 1)) return true;
-                handleAction_126(
-                    handleAction_120_724,
-                    node_15.row,
-                    node_15.col,
-                    handleAction_121_736.rows,
-                    handleAction_121_736.cols,
-                );
-                widgetNodeCache_3['delete'](item_15.id);
-            }
-            return false;
-        }
-        if (!handleAction_729(0)) return null;
-        return items_719
-            .map((value_739) => ({
-                ...value_739,
-                position: widgetNodeCache_3.get(value_739.id),
-            }))
-            .concat({
-                kind: value_720.kind,
-                id: value_720.id,
-                position: {
-                    row: row_7,
-                    col: col_7,
-                },
-            });
-    }
-    function findPermanentWidgetPageIndex_9(
-        value_740,
-        value_741,
-        value_742 = {
-            row: 0,
-            col: 0,
+      })
+    },
+    pages: [...document.querySelectorAll(".main-grid")].map(apk119Value830 => {
+      const apk119Value831 = apk119Value830.getBoundingClientRect(),
+        apk119Value832 = getComputedStyle(apk119Value830),
+        apk119Value833 = parseFloat(apk119Value832.paddingLeft) || 0,
+        apk119Value834 = parseFloat(apk119Value832.paddingRight) || 0,
+        apk119Value835 = parseFloat(apk119Value832.columnGap) || 0,
+        apk119Value836 = parseFloat(apk119Value832.rowGap) || 0;
+      return {
+        node: apk119Value830,
+        rect: {
+          top: apk119Value831.top,
+          left: apk119Value831.left,
+          right: apk119Value831.right,
+          bottom: apk119Value831.bottom,
+          width: apk119Value831.width,
+          height: apk119Value831.height
         },
-    ) {
-        const items_743 = [];
-        for (let row_8 = 0; row_8 <= 6 - value_741.rows; row_8 += 1) {
-            for (let col_8 = 0; col_8 <= 4 - value_741.cols; col_8 += 1) {
-                if (!handleAction_123(value_740, row_8, col_8, value_741)) continue;
-                items_743.push({
-                    row: row_8,
-                    col: col_8,
-                    distance: Math.abs(row_8 - value_742.row) + Math.abs(col_8 - value_742.col),
-                });
-            }
-        }
-        return (
-            items_743.sort(
-                (value_746, value_747) =>
-                    value_746.distance - value_747.distance ||
-                    value_746.row - value_747.row ||
-                    value_746.col - value_747.col,
-            ),
-            items_743.map(({ row: row_9, col: col_9 }) => ({
-                row: row_9,
-                col: col_9,
-            }))
-        );
+        paddingLeft: apk119Value833,
+        columnGap: apk119Value835,
+        rowGap: apk119Value836,
+        columnWidth: (apk119Value831.width - apk119Value833 - apk119Value834 - apk119Value835 * 3) / 4,
+        rowHeight: 85
+      };
+    })
+  };
+}
+function handleAction_107(apk119Value837, apk119Value838, apk119Value839) {
+  if (!dropTargetsCache) buildDropTargetsCache();
+  const apk119Value840 = dropTargetsCache.dock.rect;
+  if (apk119Value838 >= apk119Value840.top && apk119Value838 <= apk119Value840.bottom && apk119Value837 >= apk119Value840.left && apk119Value837 <= apk119Value840.right) return {
+    type: "dock",
+    index: getCachedInsertionIndex(dropTargetsCache.dock.children, apk119Value837, apk119Value838, 0)
+  };
+  const apk119Value841 = drag ? dropTargetsCache.scrollLeft : pagesContainer ? pagesContainer.scrollLeft : 0,
+    apk119Value842 = apk119Value841 - dropTargetsCache.initialScrollLeft;
+  for (let apk119Value844 = 0; apk119Value844 < dropTargetsCache.pages.length; apk119Value844++) {
+    const apk119Value845 = dropTargetsCache.pages[apk119Value844],
+      apk119Value846 = apk119Value845.rect.left - apk119Value842,
+      apk119Value847 = apk119Value845.rect.right - apk119Value842;
+    if (apk119Value838 >= apk119Value845.rect.top && apk119Value838 <= apk119Value845.rect.bottom && apk119Value837 >= apk119Value846 && apk119Value837 <= apk119Value847) {
+      const apk119Value848 = apk119Value846 + apk119Value845.paddingLeft,
+        apk119Value849 = Math.max(0, Math.min(3, Math.floor((apk119Value837 - apk119Value848 + apk119Value845.columnGap / 2) / (apk119Value845.columnWidth + apk119Value845.columnGap)))),
+        apk119Value850 = Math.max(0, Math.min(5, Math.floor((apk119Value838 - apk119Value845.rect.top + apk119Value845.rowGap / 2) / (apk119Value845.rowHeight + apk119Value845.rowGap))));
+      return {
+        type: "page",
+        pageIndex: apk119Value844,
+        row: apk119Value850,
+        col: apk119Value849,
+        index: (desktopState.pages[apk119Value844] || []).length
+      };
     }
+  }
+  const apk119Value843 = Math.max(0, Math.min(dropTargetsCache.pages.length - 1, Math.round(apk119Value841 / (dropTargetsCache.viewport.width || 1))));
+  return {
+    type: "page",
+    pageIndex: apk119Value843,
+    row: 0,
+    col: 0,
+    index: (desktopState.pages[apk119Value843] || []).length
+  };
+}
+function getCachedInsertionIndex(apk119Value851, apk119Value852, apk119Value853, apk119Value854) {
+  let apk119Value855 = apk119Value851.length;
+  for (let apk119Value856 = 0; apk119Value856 < apk119Value851.length; apk119Value856 += 1) {
+    const apk119Value857 = apk119Value851[apk119Value856],
+      apk119Value858 = apk119Value857.top,
+      apk119Value859 = apk119Value857.left - apk119Value854,
+      apk119Value860 = apk119Value857.width,
+      apk119Value861 = apk119Value857.height,
+      apk119Value862 = apk119Value858 + apk119Value861 / 2,
+      apk119Value863 = apk119Value859 + apk119Value860 / 2;
+    if (apk119Value853 < apk119Value862 || Math.abs(apk119Value853 - apk119Value862) < apk119Value861 / 2 && apk119Value852 < apk119Value863) {
+      apk119Value855 = apk119Value856;
+      break;
+    }
+  }
+  return apk119Value855;
+}
+function handleAction_109(apk119Value864, apk119Value865) {
+  return !!handleAction_110(apk119Value864, apk119Value865);
+}
+function handleAction_110(apk119Value866, apk119Value867) {
+  return finishDesktopLayout(generateDesktopLayout(apk119Value866, apk119Value867));
+}
+function finishDesktopLayout(apk119Value868) {
+  let apk119Value869;
+  do {
+    apk119Value869 = apk119Value868.next();
+  } while (!apk119Value869.done);
+  return apk119Value869.value;
+}
+function* generateDesktopLayout(apk119Value870, apk119Value871) {
+  if (!apk119Value870) return null;
+  if (apk119Value870.type === "dock") {
+    if (apk119Value871.kind !== "app") return null;
+    const apk119Value879 = desktopState.dock.filter(apk119Value887 => apk119Value887.id !== apk119Value871.id),
+      apk119Value880 = Math.max(0, Math.min(apk119Value870.index, apk119Value879.length));
+    if (apk119Value879.length < DOCK_CAPACITY) return {
+      ...apk119Value870,
+      index: apk119Value880
+    };
+    const apk119Value881 = findItemLocation(apk119Value871.id);
+    if (apk119Value881?.["type"] !== "page") return null;
+    const apk119Value882 = desktopState.pages[apk119Value881.pageIndex]?.["find"](apk119Value888 => apk119Value888.id === apk119Value871.id);
+    if (!apk119Value882?.["position"]) return null;
+    const apk119Value883 = Math.min(apk119Value880, 3),
+      apk119Value884 = apk119Value879[apk119Value883];
+    if (!apk119Value884) return null;
+    const apk119Value885 = (desktopState.pages[apk119Value881.pageIndex] || []).filter(apk119Value889 => apk119Value889.id !== apk119Value871.id),
+      apk119Value886 = yield* generateDesktopPageLayout(apk119Value885, apk119Value884, apk119Value882.position.row, apk119Value882.position.col);
+    return apk119Value886 ? {
+      ...apk119Value870,
+      index: apk119Value883,
+      displacedDockItem: apk119Value884,
+      sourcePageIndex: apk119Value881.pageIndex,
+      sourcePageLayout: apk119Value886
+    } : null;
+  }
+  if (apk119Value870.pageIndex < 0 || apk119Value870.pageIndex >= desktopState.pages.length) return null;
+  const apk119Value872 = desktopState.pages[apk119Value870.pageIndex] || [],
+    apk119Value873 = apk119Value872.find(apk119Value890 => apk119Value890.id === apk119Value871.id),
+    apk119Value874 = apk119Value872.filter(apk119Value891 => apk119Value891.id !== apk119Value871.id),
+    apk119Value875 = handleAction_121(apk119Value871),
+    apk119Value876 = Math.max(0, Math.min(6 - apk119Value875.rows, Number.isInteger(apk119Value870.row) ? apk119Value870.row : 0)),
+    apk119Value877 = Math.max(0, Math.min(4 - apk119Value875.cols, Number.isInteger(apk119Value870.col) ? apk119Value870.col : 0)),
+    apk119Value878 = yield* generateDesktopPageLayout(apk119Value874, apk119Value871, apk119Value876, apk119Value877, apk119Value873?.["position"]);
+  return apk119Value878 ? {
+    ...apk119Value870,
+    index: apk119Value874.length,
+    row: apk119Value876,
+    col: apk119Value877,
+    pageLayout: apk119Value878
+  } : null;
+}
+function handleAction_111(apk119Value892, apk119Value893, apk119Value894, apk119Value895, apk119Value896) {
+  return finishDesktopLayout(generateDesktopPageLayout(apk119Value892, apk119Value893, apk119Value894, apk119Value895, apk119Value896));
+}
+function* generateDesktopPageLayout(apk119Value897, apk119Value898, apk119Value899, apk119Value900, apk119Value901) {
+  const apk119Value902 = handleAction_121(apk119Value898),
+    apk119Value903 = handleAction_120();
+  if (!handleAction_123(apk119Value903, apk119Value899, apk119Value900, apk119Value902)) return null;
+  handleAction_125(apk119Value903, apk119Value899, apk119Value900, apk119Value902.rows, apk119Value902.cols);
+  const apk119Value904 = handleAction_29(apk119Value897, desktopState.widgets).map(apk119Value907 => ({
+      ...apk119Value907,
+      position: {
+        ...apk119Value907.position
+      }
+    })),
+    apk119Value905 = new Map(),
+    apk119Value906 = [];
+  apk119Value904.forEach(apk119Value908 => {
+    const apk119Value909 = handleAction_121(apk119Value908);
+    handleAction_123(apk119Value903, apk119Value908.position.row, apk119Value908.position.col, apk119Value909) ? (apk119Value905.set(apk119Value908.id, {
+      ...apk119Value908.position
+    }), handleAction_125(apk119Value903, apk119Value908.position.row, apk119Value908.position.col, apk119Value909.rows, apk119Value909.cols)) : apk119Value906.push(apk119Value908);
+  });
+  for (const apk119Value910 of apk119Value906) {
+    const apk119Value911 = apk119Value901 || apk119Value910.position,
+      apk119Value912 = handleAction_114(apk119Value903, handleAction_121(apk119Value910), apk119Value911);
+    if (!apk119Value912) return yield* generateDesktopRepackedLayout(apk119Value904, apk119Value898, apk119Value899, apk119Value900, apk119Value901);
+    apk119Value905.set(apk119Value910.id, apk119Value912);
+    const apk119Value913 = handleAction_121(apk119Value910);
+    handleAction_125(apk119Value903, apk119Value912.row, apk119Value912.col, apk119Value913.rows, apk119Value913.cols);
+  }
+  return apk119Value904.map(apk119Value914 => ({
+    ...apk119Value914,
+    position: apk119Value905.get(apk119Value914.id)
+  })).concat({
+    kind: apk119Value898.kind,
+    id: apk119Value898.id,
+    position: {
+      row: apk119Value899,
+      col: apk119Value900
+    }
+  });
+}
+function handleAction_112(apk119Value915, apk119Value916, apk119Value917, apk119Value918, apk119Value919) {
+  return finishDesktopLayout(generateDesktopRepackedLayout(apk119Value915, apk119Value916, apk119Value917, apk119Value918, apk119Value919));
+}
+function* generateDesktopRepackedLayout(apk119Value920, apk119Value921, apk119Value922, apk119Value923, apk119Value924) {
+  const apk119Value925 = handleAction_120(),
+    apk119Value926 = handleAction_121(apk119Value921);
+  handleAction_125(apk119Value925, apk119Value922, apk119Value923, apk119Value926.rows, apk119Value926.cols);
+  const apk119Value927 = [...apk119Value920].sort((apk119Value931, apk119Value932) => {
+      const apk119Value933 = handleAction_121(apk119Value931),
+        apk119Value934 = handleAction_121(apk119Value932);
+      return apk119Value934.rows * apk119Value934.cols - apk119Value933.rows * apk119Value933.cols || apk119Value931.position.row - apk119Value932.position.row || apk119Value931.position.col - apk119Value932.position.col;
+    }),
+    apk119Value928 = new Map();
+  let apk119Value929 = 0;
+  function* apk119Value930(apk119Value935) {
+    if (apk119Value935 >= apk119Value927.length) return true;
+    if (apk119Value929++ > 50000) return false;
+    yield;
+    const apk119Value936 = apk119Value927[apk119Value935],
+      apk119Value937 = handleAction_121(apk119Value936),
+      apk119Value938 = findPermanentWidgetPageIndex_9(apk119Value925, apk119Value937, apk119Value924 || apk119Value936.position);
+    for (const apk119Value939 of apk119Value938) {
+      handleAction_125(apk119Value925, apk119Value939.row, apk119Value939.col, apk119Value937.rows, apk119Value937.cols), apk119Value928.set(apk119Value936.id, apk119Value939);
+      if (yield* apk119Value930(apk119Value935 + 1)) return true;
+      handleAction_126(apk119Value925, apk119Value939.row, apk119Value939.col, apk119Value937.rows, apk119Value937.cols), apk119Value928["delete"](apk119Value936.id);
+    }
+    return false;
+  }
+  if (!(yield* apk119Value930(0))) return null;
+  return apk119Value920.map(apk119Value940 => ({
+    ...apk119Value940,
+    position: apk119Value928.get(apk119Value940.id)
+  })).concat({
+    kind: apk119Value921.kind,
+    id: apk119Value921.id,
+    position: {
+      row: apk119Value922,
+      col: apk119Value923
+    }
+  });
+}
     function handleAction_114(pages_13, widgets_12, entry_11) {
         return findPermanentWidgetPageIndex_9(pages_13, widgets_12, entry_11)[0] || null;
     }
@@ -4785,4 +4525,27 @@
         if (typeof window.closeView === 'function') window.closeView(el_4);
         else el_4.classList.remove('active');
     }
+function findPermanentWidgetPageIndex_9(apk119Value941, apk119Value942, apk119Value943 = {
+  row: 0,
+  col: 0
+}) {
+  const apk119Value944 = [];
+  for (let apk119Value945 = 0; apk119Value945 <= 6 - apk119Value942.rows; apk119Value945 += 1) {
+    for (let apk119Value946 = 0; apk119Value946 <= 4 - apk119Value942.cols; apk119Value946 += 1) {
+      if (!handleAction_123(apk119Value941, apk119Value945, apk119Value946, apk119Value942)) continue;
+      apk119Value944.push({
+        row: apk119Value945,
+        col: apk119Value946,
+        distance: Math.abs(apk119Value945 - apk119Value943.row) + Math.abs(apk119Value946 - apk119Value943.col)
+      });
+    }
+  }
+  return apk119Value944.sort((apk119Value947, apk119Value948) => apk119Value947.distance - apk119Value948.distance || apk119Value947.row - apk119Value948.row || apk119Value947.col - apk119Value948.col), apk119Value944.map(({
+    row: apk119Value949,
+    col: apk119Value950
+  }) => ({
+    row: apk119Value949,
+    col: apk119Value950
+  }));
+}
 })();

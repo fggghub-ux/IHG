@@ -114,6 +114,8 @@
                 xAccountSchemaVersion: 1,
                 xCharIdentityMigrationVersion: 0,
                 xCharProfileMediaMigrationVersion: 0,
+                xAccountModeration: {},
+                xOfficialNotifications: [],
                 xTopics: [],
                 boundWorldBookIds: [],
                 xVisitors: [],
@@ -501,7 +503,7 @@
         runtimeDirty = true;
         dirtyAppKeys.add(String(appKey_3));
         if (options_2.save !== false) scheduleSave();
-        return clone(appState_2[appKey_3]);
+        return options_2.returnState === false ? null : clone(appState_2[appKey_3]);
     };
     window.updateAppState = function value_57(appKey_4, updater, options_3 = {}) {
         if (!appKey_4) return null;

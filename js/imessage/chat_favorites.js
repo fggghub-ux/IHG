@@ -5,68 +5,62 @@
     function normalizeReason(value_2) {
         return String(value_2 || '').trim();
     }
-    function getFavoriteMessageText_2(message_2 = {}) {
-        if (!message_2 || message_2.role !== 'user') return '';
-        if (message_2.type === 'voice_message')
-            return String(message_2.transcript || message_2.text || '').trim();
-        if (message_2.type && message_2.type !== 'text') return '';
-        return String(message_2.content || message_2.text || '').trim();
-    }
-    function buildFavoriteCandidate_2(friend_2, options = {}) {
-        if (!friend_2 || friend_2.type !== 'char' || options.continueWithoutUser) return null;
-        const source_2 = String(options.source || '').trim();
-        if (source_2 && source_2 !== 'regenerate') return null;
-        const messages_2 = Array.isArray(friend_2.messages) ? friend_2.messages : [],
-            latestDialogueMessage = messages_2
-                .slice()
-                .reverse()
-                .find(
-                    (message_3) =>
-                        message_3 && (message_3.role === 'user' || message_3.role === 'assistant'),
-                );
-        if (!latestDialogueMessage || latestDialogueMessage.role !== 'user') return null;
-        const messageId_2 = String(latestDialogueMessage.id || '').trim(),
-            messageText_2 = getFavoriteMessageText_2(latestDialogueMessage);
-        if (!messageId_2 || !messageText_2) return null;
-        const favorites_2 = global.imApp?.normalizeFavoriteUserMessages
-            ? global.imApp.normalizeFavoriteUserMessages(friend_2.favoriteUserMessages)
-            : Array.isArray(friend_2.favoriteUserMessages)
-              ? friend_2.favoriteUserMessages
-              : [];
-        if (favorites_2.some((item) => String(item?.messageId || '') === messageId_2)) return null;
-        return {
-            messageId: messageId_2,
-            messageText: messageText_2,
-            messageType: latestDialogueMessage.type === 'voice_message' ? 'voice_message' : 'text',
-            messageTimestamp: Math.max(0, Number(latestDialogueMessage.timestamp) || 0),
-        };
-    }
-    function parseFavoriteSelection_2(rawPayload, candidate, value_19, now_2 = Date.now()) {
-        if (!candidate || !rawPayload) return null;
-        let payload = rawPayload;
-        if (typeof rawPayload === 'string')
-            try {
-                payload = JSON.parse(rawPayload);
-            } catch (value_24) {
-                return null;
-            }
-        if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null;
-        if (String(payload.messageId || '').trim() !== String(candidate.messageId || ''))
-            return null;
-        const reason_2 = normalizeReason(payload.reason);
-        if (!reason_2) return null;
-        const createdAt_2 = Math.max(0, Number(now_2) || Date.now());
-        return {
-            id: 'favorite-' + candidate.messageId + '-' + createdAt_2,
-            messageId: String(candidate.messageId),
-            messageText: String(candidate.messageText || '').trim(),
-            messageType: candidate.messageType === 'voice_message' ? 'voice_message' : 'text',
-            messageTimestamp: Math.max(0, Number(candidate.messageTimestamp) || 0),
-            reason: reason_2,
-            createdAt: createdAt_2,
-            sourceApiRunId: String(value_19 || ''),
-        };
-    }
+    function getFavoriteMessageText_2(apk119Value11 = {}) {
+  if (!apk119Value11 || apk119Value11.role !== "user") return "";
+  if (apk119Value11.type === "file") return global.imChat.formatFileForContext(apk119Value11);
+  if (apk119Value11.type === "voice_message") return String(apk119Value11.transcript || apk119Value11.text || "").trim();
+  if (apk119Value11.type && apk119Value11.type !== "text") return "";
+  return String(apk119Value11.content || apk119Value11.text || "").trim();
+}
+    function buildFavoriteCandidate_2(apk119Value12, apk119Value13 = {}) {
+  if (!apk119Value12 || apk119Value12.type !== "char" || apk119Value13.continueWithoutUser) return null;
+  const apk119Value14 = String(apk119Value13.source || "").trim();
+  if (apk119Value14 && apk119Value14 !== "regenerate") return null;
+  const apk119Value15 = Array.isArray(apk119Value12.messages) ? apk119Value12.messages : [],
+    apk119Value16 = apk119Value15.slice().reverse().find(apk119Value20 => apk119Value20 && (apk119Value20.role === "user" || apk119Value20.role === "assistant"));
+  if (!apk119Value16 || apk119Value16.role !== "user") return null;
+  const apk119Value17 = String(apk119Value16.id || "").trim(),
+    apk119Value18 = getFavoriteMessageText_2(apk119Value16);
+  if (!apk119Value17 || !apk119Value18) return null;
+  const apk119Value19 = global.imApp?.["normalizeFavoriteUserMessages"] ? global.imApp.normalizeFavoriteUserMessages(apk119Value12.favoriteUserMessages) : Array.isArray(apk119Value12.favoriteUserMessages) ? apk119Value12.favoriteUserMessages : [];
+  if (apk119Value19.some(apk119Value21 => String(apk119Value21?.["messageId"] || "") === apk119Value17)) return null;
+  return {
+    messageId: apk119Value17,
+    messageText: apk119Value18,
+    messageType: apk119Value16.type === "file" ? "file" : apk119Value16.type === "voice_message" ? "voice_message" : "text",
+    ...(apk119Value16.type === "file" ? {
+      fileData: global.imChat.normalizeFileData(apk119Value16.fileData)
+    } : {}),
+    messageTimestamp: Math.max(0, Number(apk119Value16.timestamp) || 0)
+  };
+}
+    function parseFavoriteSelection_2(apk119Value22, apk119Value23, apk119Value24, apk119Value25 = Date.now()) {
+  if (!apk119Value23 || !apk119Value22) return null;
+  let apk119Value26 = apk119Value22;
+  if (typeof apk119Value22 === "string") try {
+    apk119Value26 = JSON.parse(apk119Value22);
+  } catch (apk119Value29) {
+    return null;
+  }
+  if (!apk119Value26 || typeof apk119Value26 !== "object" || Array.isArray(apk119Value26)) return null;
+  if (String(apk119Value26.messageId || "").trim() !== String(apk119Value23.messageId || "")) return null;
+  const apk119Value27 = normalizeReason(apk119Value26.reason);
+  if (!apk119Value27) return null;
+  const apk119Value28 = Math.max(0, Number(apk119Value25) || Date.now());
+  return {
+    id: "favorite-" + apk119Value23.messageId + "-" + apk119Value28,
+    messageId: String(apk119Value23.messageId),
+    messageText: String(apk119Value23.messageText || "").trim(),
+    messageType: apk119Value23.messageType === "file" ? "file" : apk119Value23.messageType === "voice_message" ? "voice_message" : "text",
+    ...(apk119Value23.messageType === "file" ? {
+      fileData: global.imChat.normalizeFileData(apk119Value23.fileData)
+    } : {}),
+    messageTimestamp: Math.max(0, Number(apk119Value23.messageTimestamp) || 0),
+    reason: apk119Value27,
+    createdAt: apk119Value28,
+    sourceApiRunId: String(apk119Value24 || "")
+  };
+}
     async function commitFavoriteUserMessage_2(friendOrId, favorite) {
         if (!favorite || !global.imApp?.commitScopedFriendChange) return false;
         let inserted = false;
@@ -212,7 +206,7 @@
                 header.className = 'chat-favorite-card-header';
                 const label = document.createElement('strong');
                 label.textContent =
-                    favorite_2.messageType === 'voice_message' ? 'User 的语音' : 'User 的消息';
+                    favorite_2.messageType === 'file' ? 'User 的文件' : favorite_2.messageType === 'voice_message' ? 'User 的语音' : 'User 的消息';
                 const element_50 = document.createElement('span');
                 element_50.textContent = formatTime_2(favorite_2.messageTimestamp);
                 header.append(label, element_50);
@@ -252,6 +246,13 @@
                         : void onConfirm_2();
                 });
                 card.append(header, quote, reason_3, removeButton);
+                if (favorite_2.messageType === 'file' && favorite_2.fileData) {
+                    const fileCard = document.createElement('button');
+                    fileCard.type = 'button'; fileCard.className = 'im-file-card';
+                    fileCard.innerHTML = global.imChat.buildFileCardHtml(favorite_2);
+                    fileCard.addEventListener('click', () => global.imChat.openFileDetail(favorite_2));
+                    card.appendChild(fileCard);
+                }
                 documentFragment.appendChild(card);
             });
             list.appendChild(documentFragment);

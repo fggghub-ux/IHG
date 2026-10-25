@@ -685,3 +685,14 @@
         padding-right: 14px;
     }
 }
+
+.cycle-health-card { padding:18px; border:1px solid var(--cycle-line); border-radius:19px; background:#fff; }
+.cycle-health-card p { margin:0 0 9px; font-size:13px; line-height:1.6; }
+.cycle-health-card>small { display:block; color:var(--cycle-muted); font-size:11px; line-height:1.6; overflow-wrap:anywhere; }
+.cycle-health-actions { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 0; }
+.cycle-health-actions button { display:grid; place-items:center; width:44px; height:44px; padding:0; border:0; border-radius:50%; background:var(--cycle-soft); color:#9d446b; cursor:pointer; }
+.cycle-health-actions button svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.cycle-health-actions #cycle-health-connect { background:var(--cycle-ink); color:#fff; }
+.cycle-health-actions button:disabled { opacity:.45; cursor:default; }
+.cycle-health-actions button[hidden] { display:none!important; }
+.cycle-day-list button[aria-disabled="true"] { cursor:default; }

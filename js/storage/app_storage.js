@@ -2246,7 +2246,7 @@
         }).then(() => assetId);
     }
     async function saveAssetFromBlob(assetId, blob, extra = {}) {
-        if (!assetId || !(blob instanceof Blob) || !blob.size) return null;
+        if (!assetId || !(blob instanceof Blob) || (!blob.size && extra.ownerType !== 'im_file')) return null;
         await assertLargeAssetCapacity(blob);
         revokeRuntimeBlobUrl(assetId);
         return withStore([STORES.assets], 'readwrite', (stores) => {
@@ -2885,6 +2885,7 @@
             order: resolvedOrder,
             role: safe.role || 'assistant',
             type: safe.type || 'text',
+            ...(safe.type === 'file' ? {fileData: sanitizePersistentValue(cloneDeep(safe.fileData || {}))} : {}),
             deliveryStatus: safe.deliveryStatus === 'blocked' ? 'blocked' : '',
             excludedFromContext: safe.excludedFromContext === true,
             blockedDirection: ['user_blocks_char', 'char_blocks_user'].includes(
@@ -3241,6 +3242,7 @@
             id: row.id,
             role: row.role,
             type: row.type,
+            ...(row.type === 'file' ? {fileData: cloneDeep(row.fileData || {})} : {}),
             deliveryStatus: row.deliveryStatus === 'blocked' ? 'blocked' : '',
             excludedFromContext: row.excludedFromContext === true,
             blockedDirection: ['user_blocks_char', 'char_blocks_user'].includes(
@@ -4989,6 +4991,8 @@
                 xAccountSchemaVersion: 1,
                 xCharIdentityMigrationVersion: 0,
                 xCharProfileMediaMigrationVersion: 0,
+                xAccountModeration: {},
+                xOfficialNotifications: [],
                 xTopics: [],
                 xHomeBannerUrl: '',
                 xSearchBannerUrl: '',

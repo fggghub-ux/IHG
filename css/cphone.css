@@ -767,7 +767,6 @@
     #friend-pay-view,
     #friend-safari-view,
     #friend-music-view,
-    #friend-phonecall-view,
     #friend-phone-settings-sheet
 ) {
     background: #fbfbfc !important;
@@ -778,8 +777,7 @@
         #friend-health-view,
         #friend-pay-view,
         #friend-safari-view,
-        #friend-music-view,
-        #friend-phonecall-view
+        #friend-music-view
     )
     > div:first-child {
     background: #fbfbfc !important;
@@ -789,8 +787,7 @@
         #friend-health-view,
         #friend-pay-view,
         #friend-game-view,
-        #friend-music-view,
-        #friend-phonecall-view
+        #friend-music-view
     )
     > div:first-child {
     height: calc(var(--safe-top) + 118px) !important;
@@ -799,8 +796,7 @@
         #friend-health-view,
         #friend-pay-view,
         #friend-game-view,
-        #friend-music-view,
-        #friend-phonecall-view
+        #friend-music-view
     )
     > div:first-child
     > div {
@@ -811,8 +807,7 @@
 :is(
         #friend-health-view,
         #friend-pay-view,
-        #friend-music-view,
-        #friend-phonecall-view
+        #friend-music-view
     )
     > div:first-child
     > div
@@ -827,8 +822,7 @@
     #friend-health-back-btn,
     #friend-pay-back-btn,
     #friend-safari-back-btn,
-    #friend-music-back-btn,
-    #friend-phonecall-back-btn
+    #friend-music-back-btn
 ) {
     position: absolute !important;
     top: 8px;
@@ -856,7 +850,6 @@
     #friend-weibo-back-btn,
     #friend-safari-back-btn,
     #friend-music-back-btn,
-    #friend-phonecall-back-btn,
     #friend-settings-back-btn
 ):focus-visible {
     outline: 2px solid #171719;
@@ -865,8 +858,7 @@
 :is(
     #friend-health-content,
     #friend-pay-content,
-    #friend-music-content,
-    #friend-phonecall-view > div:last-child
+    #friend-music-content
 ) {
     min-height: 0;
     background: #fbfbfc !important;
@@ -975,52 +967,6 @@
 }
 .music-history-item > div:nth-child(2) {
     border-radius: 15px !important;
-}
-#friend-phonecall-view > div:last-child {
-    padding: 0 18px 24px;
-}
-#friend-phonecall-view > div:last-child > div:first-child {
-    justify-content: flex-start !important;
-    margin: 0 0 16px !important;
-}
-#friend-phonecall-view > div:last-child > div:first-child > div {
-    width: 100%;
-    max-width: 320px;
-    padding: 5px !important;
-    border: 1px solid #e7e7eb;
-    border-radius: 999px !important;
-    background: #fff !important;
-}
-#friend-call-tab-recent,
-#friend-call-tab-contacts {
-    flex: 1;
-    padding: 12px 10px !important;
-    border-radius: 999px !important;
-    text-align: center;
-    color: #85858b !important;
-    box-shadow: none !important;
-}
-#friend-call-tab-recent.active,
-#friend-call-tab-contacts.active {
-    background: #171719 !important;
-    color: #fff !important;
-}
-#friend-call-list,
-#friend-contact-list {
-    padding: 0 !important;
-}
-.call-history-item-new,
-.contact-item-new,
-#friend-call-list > div:not(.call-history-item-new) {
-    min-height: 72px;
-    margin-bottom: 8px;
-    padding: 11px 13px !important;
-    border: 1px solid #ececf0 !important;
-    border-radius: 19px;
-    background: #fff;
-}
-:is(#friend-call-list, #friend-contact-list) .fa-info-circle {
-    color: #85858b !important;
 }
 #friend-safari-search-bar {
     border: 1px solid #e6e6ea;
@@ -1216,3 +1162,100 @@
 .cphone-contact-delete:focus-visible { outline: 2px solid #b42332; outline-offset: 2px; }
 
 .cphone-generation-status[hidden] { display:none !important; }
+
+#friend-phonecall-view.cphone-call-view {
+    --call-paper: #fbfbfc;
+    --call-ink: #101012;
+    --call-muted: #85858b;
+    --call-line: #ececf0;
+    position: absolute;
+    inset: 0;
+    z-index: 220;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+    background: var(--call-paper);
+    color: var(--call-ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+#friend-phonecall-view.cphone-call-view.active { display: flex; }
+#friend-phonecall-view [hidden] { display: none !important; }
+#friend-phonecall-view *, #friend-phonecall-view *::before, #friend-phonecall-view *::after { box-sizing: border-box; }
+#friend-phonecall-view button, #friend-phonecall-view input { font-family: inherit; }
+#friend-phonecall-view button { cursor: pointer; -webkit-appearance: none; }
+#friend-phonecall-view button:disabled { opacity: .45; cursor: wait; }
+#friend-phonecall-view button:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
+.cphone-call-page { position: relative; display: flex; flex: 1; min-height: 0; flex-direction: column; }
+.cphone-call-content { overscroll-behavior: contain; }
+.cphone-call-date { margin: 24px 0 10px; color: #929299; font-size: 11px; font-weight: 500; letter-spacing: .03em; }
+.cphone-call-date:first-child { margin-top: 0; }
+.cphone-call-row { margin-bottom: 8px; }
+.cphone-call-avatar.is-stranger { border: 1px dashed #d8d8de; background: #f0f0f3; }
+.cphone-call-row-body { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 5px; }
+.cphone-call-row-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; font-weight: 600; }
+.cphone-call-star { margin-left: 6px; color: #a4a4ac; font-size: .7em; vertical-align: 1px; }
+.cphone-call-row-meta { display: flex; align-items: center; gap: 5px; overflow: hidden; color: #85858b; font-size: 13px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+.cphone-call-row.is-missed .cphone-call-row-name { color: #b95660; }
+.cphone-call-row-time { display: flex; flex: none; align-items: center; gap: 8px; color: #92929a; font-size: 11px; font-variant-numeric: tabular-nums; }
+.cphone-call-row-time > span { color: #b5b5be; font-size: 20px; font-weight: 300; }
+.cphone-call-contact-row { min-height: 76px; }
+.cphone-call-contact-row .cphone-call-row-meta { display: block; }
+.cphone-call-sheet { position: absolute; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; padding: calc(var(--safe-top, 0px) + 20px) 18px calc(var(--safe-bottom, 0px) + 20px); background: rgba(0,0,0,.28); }
+.cphone-call-generate-card { position: relative; width: min(100%, 430px); max-height: 100%; overflow-y: auto; padding: 56px 22px 22px; border: 0; border-radius: 28px; background: #fff; box-shadow: 0 24px 70px rgba(0,0,0,.12); outline: 0; }
+.cphone-call-close { display: grid; width: 34px; height: 34px; flex: none; padding: 0; place-items: center; border: 0; border-radius: 50%; background: #ececf0; color: #555; font-size: 13px !important; }
+.cphone-call-generate-card > .cphone-call-close { position: absolute; top: 15px; right: 15px; }
+.cphone-call-muted { color: var(--call-muted); font-size: 12px; line-height: 1.8; }
+.cphone-call-generate-card > label { display: block; margin: 0 0 9px; font-size: 13px; font-weight: 650; }
+#cphone-call-generate-count { width: 100%; min-height: 45px; padding: 11px 13px; border: 1px solid #e5e5e9; border-radius: 14px; outline: 0; background: #f7f7f9; color: var(--call-ink); font-size: 16px; }
+#cphone-call-generate-count:focus { border-color: #777780; box-shadow: 0 0 0 3px #eeeeef; }
+.cphone-call-primary { width: 100%; min-height: 48px; margin-top: 20px; border: 0; border-radius: 999px; background: var(--call-ink); color: #fff; font-size: 14px !important; font-weight: 700 !important; }
+.cphone-call-error { margin: 12px 0 0; color: #a24950; font-size: 12px; line-height: 1.7; }
+.cphone-call-detail-sheet { align-items: flex-end; padding: 0; }
+.cphone-call-detail-card { display: flex; width: 100%; max-height: calc(100% - var(--safe-top, 0px) - 18px); flex-direction: column; overflow: hidden; border-radius: 30px 30px 0 0; background: #f2f2f7; box-shadow: 0 -12px 60px rgba(0,0,0,.1); outline: 0; }
+.cphone-call-drawer-handle { width: 32px; height: 4px; flex-shrink: 0; margin: 10px auto 0; border-radius: 999px; background: #dedee2; }
+.cphone-call-detail-header { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.cphone-call-detail-content { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 4px 22px calc(var(--safe-bottom, 0px) + 22px); -webkit-overflow-scrolling: touch; }
+.cphone-call-profile { display: flex; flex-direction: column; align-items: center; margin: 20px 0 25px; text-align: center; }
+.cphone-call-profile > .cphone-call-avatar { width: 80px; height: 80px; font-size: 36px; background: #e5e5ea; color: #8e8e93; }
+.cphone-call-profile > h2 { max-width: 100%; margin: 13px 0 5px; overflow-wrap: anywhere; font-size: 24px; font-weight: 650; letter-spacing: -.03em; }
+.cphone-call-profile > p { margin: 0; color: var(--call-muted); font-size: 12px; line-height: 1.6; }
+.cphone-call-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 14px; margin: 0 0 25px; padding: 20px; border: 0; border-radius: 16px; background: #fff; }
+.cphone-call-facts > .is-wide { grid-column: 1 / -1; }
+.cphone-call-facts dt { margin-bottom: 7px; color: #9999a0; font-size: 10px; }
+.cphone-call-facts dd { margin: 0; color: #505059; font-size: 13px; font-variant-numeric: tabular-nums; }
+.cphone-call-detail-section { margin-bottom: 24px; padding: 16px; border-radius: 16px; background: #fff; }
+.cphone-call-detail-section > h3 { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 12px; color: #8c8c94; font-size: 11px; font-weight: 600; letter-spacing: .04em; }
+.cphone-call-prose { margin: 0; color: #4f4f58; font-size: 13px; line-height: 1.85; white-space: pre-wrap; overflow-wrap: anywhere; }
+.cphone-call-transcript { display: flex; flex-direction: column; gap: 12px; }
+.cphone-call-speaker { color: #55555e; font-weight: 600; }
+.cphone-call-transcript-line .cphone-call-prose { color: #4f4f58; font-size: 13px; line-height: 1.85; }
+.cphone-call-translation-toggle { margin: 8px 0 0; padding: 0; border: 0; background: none; color: #85858e; font-size: 10px !important; text-decoration: underline; text-underline-offset: 3px; }
+.cphone-call-translation { margin: 9px 0 0; padding-top: 9px; border-top: 1px solid #dcdce2; color: #7c7c85; font-size: 12px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+.cphone-call-secondary { display: flex; width: 100%; min-height: 46px; align-items: center; justify-content: center; gap: 10px; border: 1px solid var(--call-line); border-radius: 14px; background: #fafafa; color: #55555e; font-size: 12px !important; }
+.cphone-call-delete { width: 100%; min-height: 45px; margin-top: 10px; border: 0; border-radius: 16px; background: #fff; color: #b42332; font-size: 14px; font-weight: 650; text-align: center; }
+.cphone-call-contact-date { margin: 16px 0 8px; color: #aaaab1; font-size: 10px; }
+#friend-phonecall-view.u2-android-keyboard-open .cphone-call-generate-sheet { padding-bottom: 14px; }
+#friend-phonecall-view.u2-android-keyboard-open .cphone-call-tabs { display: none; }
+@media (prefers-reduced-motion: reduce) { #friend-phonecall-view .cphone-call-row { transition: none; } }
+.cphone-wallpaper-settings { margin: 0 20px 18px; padding: 18px; border: 1px solid #ececf0; border-radius: 19px; background: #fff; }
+.cphone-wallpaper-settings .friend-gen-heading { margin-bottom: 12px; }
+.cphone-wallpaper-url-row { display: flex; gap: 8px; }
+.cphone-wallpaper-url-row input { flex: 1; min-width: 0; min-height: 42px; padding: 0 12px; border: 1px solid #e6e6ea; border-radius: 12px; background: #f7f7f9; color: #171719; font-size: 14px; }
+.cphone-wallpaper-url-row button { min-width: 58px; border: 0; border-radius: 12px; background: #171719; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; }
+.cphone-wallpaper-actions { display: flex; gap: 9px; margin-top: 10px; }
+.cphone-wallpaper-actions button { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 0 12px; border: 1px solid #e6e6ea; border-radius: 12px; background: #f7f7f9; color: #171719; font-size: 12px; font-weight: 650; cursor: pointer; }
+.cphone-wallpaper-status { margin: 11px 0 0; color: #85858b; font-size: 12px; }
+.cphone-wallpaper-url-row :focus-visible, .cphone-wallpaper-actions :focus-visible { outline: 2px solid #171719; outline-offset: 2px; }
+@media (max-width: 360px) {
+    #lovers-friend-phone-view .cphone-home-grid > div > div:first-child { width: min(53px, 100%) !important; }
+    #lovers-friend-phone-view .cphone-home-grid { gap: 20px 6px !important; padding-inline: 16px !important; }
+    .cphone-sms-tabs button { min-width: 90px; }
+}
+
+.cphone-call-shortcuts { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 25px; }
+.cphone-call-shortcut { display: flex; flex: 1; flex-direction: column; align-items: center; gap: 5px; padding: 12px 0; border-radius: 12px; background: #fff; color: #007aff; }
+.cphone-call-shortcut > i { font-size: 20px; }
+.cphone-call-shortcut > span { font-size: 11px; font-weight: 500; }
+#cphone-call-detail-content > .cphone-contact-delete { min-height: 45px; padding: 12px 16px; border: 0; border-radius: 16px; background: #fff; text-align: center; }

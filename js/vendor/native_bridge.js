@@ -697,6 +697,10 @@
     f = A.isNativePlatform() && Y === "android",
     isNativeIos = A.isNativePlatform() && Y === "ios",
     iosNavigationPlugin = m("U2IOSNavigation"),
+    iosHealthPlugin = m("U2Health"),
+    iosMessageNotifications = m("U2MessageNotifications"),
+    iosFilesystem = m("Filesystem"),
+    iosShare = m("Share"),
     we = "u2_silent_messages",
     Oe = 1800,
     M = 256 * 1024,
@@ -705,7 +709,7 @@
     _ = m("U2FileExport"),
     N = m("U2NativeBackup"),
     De = new Set(["https://ceshi2-7s6.pages.dev", "https://u2iisony.pages.dev"]),
-    O = f ? "default" : "unsupported",
+    O = f || isNativeIos ? "default" : "unsupported",
     $ = 0,
     fe = !1;
   function k(t, e = {}, i = {}) {
@@ -959,7 +963,7 @@
     body: n,
     timeoutMs: r = 18e3
   } = {}) {
-    if (!f) throw new Error("Native NetEase requests are only available on Android");
+    if (!f && !isNativeIos) throw new Error("Native NetEase requests require a mobile app");
     let o = new URL(String(t || ""));
     if (o.protocol !== "https:" || !De.has(o.origin) || !o.pathname.startsWith("/api/netease/")) throw new Error("Blocked native NetEase gateway URL");
     let s = Math.max(1e3, Number(r) || 18e3),
@@ -991,22 +995,98 @@
     }), fe = !0);
   }
   async function be(t = "check") {
-    if (!f) return O;
+    if (!f && !isNativeIos) return O;
     let e = await B.checkPermissions();
     return ge(e.display, t);
   }
   async function Ye() {
-    if (!f) return "unsupported";
+    if (!f && !isNativeIos) return "unsupported";
     let t = await B.requestPermissions();
     return ge(t.display, "request");
+  }
+  async function resolveNativeNotificationAvatar(i) {
+    let e = String(i || "");
+    if (!e) return "";
+    let t = window.location,
+      n = !/^[a-z][a-z\d+.-]*:/i.test(e) || t?.origin && e.startsWith(`${t.origin}/`);
+    if (!e.startsWith("blob:") && !n) return e;
+    let r = new AbortController(),
+      a = setTimeout(() => r.abort(), 2e3);
+    try {
+      let o = await (await fetch(e, {
+        signal: r.signal
+      })).blob();
+      return o.size > 2 * 1024 * 1024 ? "" : await new Promise((c, d) => {
+        let u = new FileReader();
+        u.onload = () => c(String(u.result || "")), u.onerror = () => d(u.error), u.readAsDataURL(o);
+      });
+    } catch (s) {
+      return console.warn("[native_bridge] Avatar unavailable:", s), "";
+    } finally {
+      clearTimeout(a);
+    }
+  }
+  async function shareNetEaseQrImage({
+    dataUrl: i
+  } = {}) {
+    if (!isNativeIos) return "unavailable";
+    let e = String(i || "").match(/^data:image\/png;base64,([a-z0-9+/=]+)$/i);
+    if (!e || e[1].length > 2 * 1024 * 1024) throw new Error("二维码图片无效");
+    let t = `netease-login-qr-${Date.now()}-${Math.random().toString(36).slice(2)}.png`;
+    try {
+      let n = await iosFilesystem.writeFile({
+        path: t,
+        data: e[1],
+        directory: "CACHE"
+      });
+      return await iosShare.share({
+        files: [n.uri],
+        title: "网易云登录二维码"
+      }), "shared";
+    } catch (n) {
+      if (/cancel/i.test(String(n?.message || n))) return "cancelled";
+      throw n;
+    } finally {
+      await iosFilesystem.deleteFile({
+        path: t,
+        directory: "CACHE"
+      }).catch(() => {});
+    }
+  }
+  async function getHealthAvailability() {
+    return isNativeIos ? iosHealthPlugin.getAvailability() : {
+      available: !1
+    };
+  }
+  async function requestHealthReadAuthorization() {
+    if (!isNativeIos) throw new Error("健康导入仅支持 iOS");
+    return iosHealthPlugin.requestReadAuthorization();
+  }
+  async function readHealthMenstrualChanges(i = {}) {
+    if (!isNativeIos) throw new Error("健康导入仅支持 iOS");
+    return iosHealthPlugin.readMenstrualChanges(i);
   }
   async function Je({
     title: t,
     body: e,
     tag: i,
     data: n,
-    silent: r = !1
+    silent: r = !1,
+    senderId = "",
+    senderName = "",
+    avatarUrl = ""
   } = {}) {
+    if (isNativeIos) {
+      if (O !== "granted") return false;
+      if (senderId && typeof iosMessageNotifications.showMessage === "function" && A.isPluginAvailable?.("U2MessageNotifications") !== false) {
+        try {
+          const shown = await iosMessageNotifications.showMessage({id: Ge(i), title: String(t || "u2phone"), body: String(e || "新消息"), channelId: "", silent: r, senderId: String(senderId), senderName: String(senderName || t || "iMessage"), avatarUrl: await resolveNativeNotificationAvatar(avatarUrl), extra: n || {}});
+          if (shown?.shown === true) return true;
+        } catch (error) { console.warn("[native_bridge] Avatar notification failed:", error); }
+      }
+      await B.schedule({notifications: [{id: Ge(i), title: String(t || "u2phone"), body: String(e || "新消息"), foreground: true, ...(r ? {} : {sound: "default"}), extra: n || {}}]});
+      return true;
+    }
     return !f || O !== "granted" ? !1 : (r && (await Ke()), await B.schedule({
       notifications: [{
         id: Ge(i),
@@ -1025,6 +1105,9 @@
   async function Xe() {
     document.documentElement.classList.toggle("u2-native-android", f);
     document.documentElement.classList.toggle("u2-native-ios", isNativeIos);
+    if (isNativeIos) {
+      await Promise.allSettled([be("startup"), T.addListener("pause", () => k("u2:native-pause", {at: Date.now()})), T.addListener("resume", () => { void be("resume"); k("u2:native-resume", {at: Date.now()}); }), T.addListener("appStateChange", state => k("u2:native-app-state", {isActive: !!state.isActive, at: Date.now()})), B.addListener("localNotificationActionPerformed", event => k("u2:native-notification-action", {notification: event.notification, actionId: event.actionId, inputValue: event.inputValue}))]);
+    }
     if (isNativeIos) await iosNavigationPlugin.addListener('back', () => k('u2:ios-edge-back'));
     f && (await Promise.allSettled([me(), be("startup")]), await T.addListener("backButton", _e), await T.addListener("pause", () => k("u2:native-pause", {
       at: Date.now()
@@ -1064,6 +1147,10 @@
     readStorageBackup: qe,
     deleteStorageBackups: He,
     requestNetEaseGateway: ze,
+    shareNetEaseQrImage,
+    getHealthAvailability,
+    requestHealthReadAuthorization,
+    readHealthMenstrualChanges,
     getNotificationPermission: () => O,
     refreshNotificationPermission: be,
     requestNotificationPermission: Ye,

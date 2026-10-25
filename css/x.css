@@ -5055,3 +5055,59 @@ button.x-dm-translation-bubble {
         margin-left: 0;
     }
 }
+.x-moderation-overlay { z-index: 296; }
+.x-moderation-sheet { display: flex; flex-direction: column; max-height: 88%; padding-bottom: var(--safe-bottom, 0px); overflow: hidden; color: #0f1419; background: #fff; }
+.x-moderation-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px 20px 24px; -webkit-overflow-scrolling: touch; }
+.x-report-target { margin: 0 0 16px; color: #536471; font-size: 14px; overflow-wrap: anywhere; }
+.x-report-types { margin: 0; padding: 0; border: 0; }
+.x-report-types legend { margin-bottom: 8px; font-size: 14px; font-weight: 700; }
+.x-report-types label { display: flex; gap: 12px; align-items: center; min-height: 39px; font-size: 15px; cursor: pointer; }
+.x-report-types input { width: 18px; height: 18px; margin: 0; accent-color: #0f1419; flex-shrink: 0; }
+.x-report-note { display: flex; flex-direction: column; gap: 9px; margin-top: 18px; font-size: 14px; font-weight: 600; }
+.x-report-note textarea { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid #cfd9de; border-radius: 12px; resize: vertical; background: #fff; color: #0f1419; font: inherit; font-size: 15px; line-height: 1.5; }
+.x-report-note textarea:focus { outline: 2px solid #536471; outline-offset: 1px; }
+#x-report-submit { width: 100%; margin-top: 18px; }
+#x-report-submit:disabled { opacity: .5; cursor: wait; }
+.x-report-error { margin: 12px 0 0; color: #b42332; font-size: 13px; overflow-wrap: anywhere; }
+.x-account-suspension { display: flex; flex-direction: column; gap: 4px; margin: 16px 0 10px; padding: 12px 14px; border-radius: 12px; color: #9f2634; background: #fff1f2; font-size: 14px; line-height: 1.5; }
+.x-account-suspension span { font-size: 12px; }
+.x-account-suspension[hidden], .x-official-unread-dot[hidden], .x-report-error[hidden] { display: none; }
+.x-official-inbox-trigger { position: relative; }
+.x-official-unread-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border: 2px solid #fff; border-radius: 50%; background: #f4212e; }
+.x-official-notice-row { display: flex; align-items: center; gap: 13px; width: 100%; padding: 18px 0; border: 0; border-bottom: 1px solid #eff3f4; background: transparent; color: #0f1419; text-align: left; font: inherit; cursor: pointer; }
+.x-official-notice-row:last-child { border-bottom: 0; }
+.x-official-notice-icon { display: grid; place-items: center; width: 41px; height: 41px; flex-shrink: 0; border-radius: 50%; background: #f2f4f5; color: #536471; font-size: 17px; }
+.x-official-notice-row.unread .x-official-notice-icon { color: #0f1419; }
+.x-official-notice-summary { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 6px; }
+.x-official-notice-summary strong { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.x-official-notice-row.unread strong { font-weight: 750; }
+.x-official-notice-summary > span { font-size: 12px; color: #536471; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.x-official-notice-summary time { font-size: 10px; color: #87939b; }
+.x-official-row-unread { width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: #f4212e; }
+.x-official-row-unread[hidden] { display: none; }
+.x-official-notice-chevron { font-size: 10px; color: #a4afb7; }
+.x-official-letter-overlay { position: absolute; inset: 0; z-index: 302; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.44); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .18s ease, visibility .18s ease; }
+.x-official-letter-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+.x-official-letter { position: relative; display: flex; flex-direction: column; width: min(420px, calc(100% - 36px)); max-height: calc(100% - 76px); overflow: hidden; border-radius: 3px; border: 1px solid #e8e8e8; background: #fff; color: #242424; box-shadow: 0 12px 42px rgba(0,0,0,.2); }
+.x-letter-airmail { height: 3px; flex-shrink: 0; background: linear-gradient(90deg, #111 0 48px, #efefef 48px 100%); }
+.x-letter-close { position: absolute; top: 16px; right: 14px; z-index: 1; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #8c8c8c; font-size: 13px; cursor: pointer; }
+.x-letter-content { min-height: 0; padding: 34px 29px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; font-family: Georgia, 'Songti SC', STSong, SimSun, serif; }
+.x-letter-heading { display: flex; gap: 13px; align-items: center; padding-right: 22px; }
+.x-letter-brand { font: 800 33px/1 Arial, sans-serif; }
+.x-letter-heading > span:last-child { display: flex; flex-direction: column; gap: 6px; font-size: 15px; letter-spacing: 3px; }
+.x-letter-heading small { font: 8px/1.4 Arial, sans-serif; letter-spacing: 1.3px; color: #999; }
+.x-letter-rule { height: 1px; margin: 26px 0; background: #e7e7e7; }
+.x-letter-content h2 { margin: 0 0 27px; font-size: 21px; line-height: 1.6; font-weight: 600; letter-spacing: .4px; overflow-wrap: anywhere; }
+.x-letter-salutation { margin: 0 0 14px; font-size: 14px; line-height: 1.8; }
+.x-official-notice-body { margin: 0 0 22px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.95; }
+.x-letter-details { display: grid; grid-template-columns: 56px minmax(0,1fr); gap: 9px 11px; margin: 0; padding: 18px 0; border-top: 1px solid #ededed; border-bottom: 1px solid #ededed; font-size: 12px; line-height: 1.8; }
+.x-letter-details dt { color: #8b8b8b; }
+.x-letter-details dd { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.x-letter-signature { position: relative; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: 29px; min-height: 44px; font-size: 14px; }
+.x-letter-signature time { font-size: 11px; color: #8b8b8b; }
+.x-letter-signature::before { content: 'X'; position: absolute; left: 4px; bottom: 0; display: grid; place-items: center; width: 39px; height: 39px; border: 1px solid #aaa; border-radius: 50%; color: #aaa; transform: rotate(-15deg); font: 700 22px/1 Arial, sans-serif; opacity: .65; }
+.x-official-notice-row:focus-visible, .x-letter-close:focus-visible { outline: 2px solid #536471; outline-offset: 3px; }
+@media (max-width: 350px) { .x-letter-content { padding: 26px 20px; } }
+@media (prefers-reduced-motion: reduce) { .x-official-letter-overlay { transition: none; } }
+#x-dm-profile-body .x-profile-cover-right-actions { gap: 5px; }
+[data-profile-report-id]:disabled { opacity: .55; }

@@ -1495,34 +1495,33 @@ window.imApp.createDefaultProfilePanel = function (friend_5 = {}) {
         }
     );
 };
-window.imApp.normalizeFavoriteUserMessages = function (value_252) {
-    const seenMessageIds = new Set();
-    return (Array.isArray(value_252) ? value_252 : [])
-        .map((item_5, value_255) => {
-            if (!item_5 || typeof item_5 !== 'object') return null;
-            const messageId_2 = String(item_5.messageId || '').trim(),
-                messageText_2 = String(item_5.messageText || '').trim(),
-                reason_2 = String(item_5.reason || '').trim();
-            if (!messageId_2 || !messageText_2 || !reason_2 || seenMessageIds.has(messageId_2))
-                return null;
-            seenMessageIds.add(messageId_2);
-            const createdAt_2 = Math.max(0, Number(item_5.createdAt) || 0),
-                messageTimestamp_2 = Math.max(0, Number(item_5.messageTimestamp) || 0);
-            return {
-                id: String(
-                    item_5.id || 'favorite-' + messageId_2 + '-' + (createdAt_2 || value_255),
-                ),
-                messageId: messageId_2,
-                messageText: messageText_2,
-                messageType: item_5.messageType === 'voice_message' ? 'voice_message' : 'text',
-                messageTimestamp: messageTimestamp_2,
-                reason: reason_2,
-                createdAt: createdAt_2,
-                sourceApiRunId: String(item_5.sourceApiRunId || ''),
-            };
-        })
-        .filter(Boolean)
-        .sort((a, b) => (Number(b.createdAt) || 0) - (Number(a.createdAt) || 0));
+window.imApp.normalizeFavoriteUserMessages = function (apk119Value336) {
+  const apk119Value337 = new Set();
+  return (Array.isArray(apk119Value336) ? apk119Value336 : []).map((apk119Value338, apk119Value339) => {
+    if (!apk119Value338 || typeof apk119Value338 !== "object") return null;
+    const apk119Value340 = String(apk119Value338.messageId || "").trim(),
+      apk119Value341 = String(apk119Value338.messageText || "").trim(),
+      apk119Value342 = String(apk119Value338.reason || "").trim();
+    if (!apk119Value340 || !apk119Value341 || !apk119Value342 || apk119Value337.has(apk119Value340)) return null;
+    apk119Value337.add(apk119Value340);
+    const apk119Value343 = Math.max(0, Number(apk119Value338.createdAt) || 0),
+      apk119Value344 = Math.max(0, Number(apk119Value338.messageTimestamp) || 0);
+    return {
+      id: String(apk119Value338.id || "favorite-" + apk119Value340 + "-" + (apk119Value343 || apk119Value339)),
+      messageId: apk119Value340,
+      messageText: apk119Value341,
+      messageType: apk119Value338.messageType === "file" ? "file" : apk119Value338.messageType === "voice_message" ? "voice_message" : "text",
+      ...(apk119Value338.messageType === "file" && apk119Value338.fileData ? {
+        fileData: {
+          ...apk119Value338.fileData
+        }
+      } : {}),
+      messageTimestamp: apk119Value344,
+      reason: apk119Value342,
+      createdAt: apk119Value343,
+      sourceApiRunId: String(apk119Value338.sourceApiRunId || "")
+    };
+  }).filter(Boolean).sort((apk119Value345, apk119Value346) => (Number(apk119Value346.createdAt) || 0) - (Number(apk119Value345.createdAt) || 0));
 };
 window.imApp.normalizeChatBlockState = function (value_261) {
     const value_262 = value_261 && typeof value_261 === 'object' ? value_261 : {};
@@ -3457,79 +3456,29 @@ window.imApp.stripFakeLinkHtmlForApiContext = function (value_21_2, maxLength = 
         .trim()
         .slice(0, Math.max(1000, Number(maxLength) || 20000));
 };
-window.imApp.formatFakeLinkMessageForApiContext = function (value_90, options_5 = {}) {
-    const normalizedMessage_2 = value_90 || {},
-        fakeLinkData_2 =
-            normalizedMessage_2.fakeLinkData && typeof normalizedMessage_2.fakeLinkData === 'object'
-                ? normalizedMessage_2.fakeLinkData
-                : {},
-        displayUrl_2 = String(
-            fakeLinkData_2.displayUrl ||
-                fakeLinkData_2.canonicalUrl ||
-                normalizedMessage_2.content ||
-                '',
-        ).trim(),
-        platformLabel = String(
-            fakeLinkData_2.siteName || fakeLinkData_2.domain || 'Simulated webpage',
-        ).trim(),
-        title_3 = String(
-            fakeLinkData_2.title || displayUrl_2 || 'Untitled simulated webpage',
-        ).trim(),
-        description_2 = String(fakeLinkData_2.summary || '').trim(),
-        webPage_2 =
-            fakeLinkData_2.webPage && typeof fakeLinkData_2.webPage === 'object'
-                ? fakeLinkData_2.webPage
-                : null,
-        pageHtmlText =
-            webPage_2 && webPage_2.html
-                ? window.imApp.stripFakeLinkHtmlForApiContext(
-                      webPage_2.html,
-                      options_5.maxLinkBodyChars || 20000,
-                  )
-                : '',
-        bodyText_2 = String(
-            fakeLinkData_2.bodyText || fakeLinkData_2.pageText || pageHtmlText || '',
-        ).trim(),
-        webTheme = webPage_2 ? String(webPage_2.theme || '').trim() : '',
-        expandContent = options_5.expandLinkContent !== false,
-        maxBodyChars = Math.max(1000, Number(options_5.maxLinkBodyChars) || 20000),
-        fakeLines = [
-            '[User shared an in-app simulated webpage]',
-            'Site: ' + platformLabel,
-            'Title: ' + title_3,
-            'Displayed URL: ' + displayUrl_2,
-        ];
-    if (description_2) fakeLines.push('Summary: ' + description_2);
-    if (!bodyText_2)
-        return (
-            fakeLines.push(
-                'Body status: User provided no body text; use only title, domain, and summary.',
-            ),
-            fakeLines.join(`
-`)
-        );
-    if (!expandContent)
-        return (
-            fakeLines.push('Page summary: ' + (description_2 || bodyText_2.slice(0, 500))),
-            fakeLines.push(
-                'Body status: this is an older simulated-page record; only its summary is retained this turn.',
-            ),
-            fakeLines.join(`
-`)
-        );
-    const fakeInjectedBody = bodyText_2.slice(0, maxBodyChars);
-    return (
-        fakeLines.push(
-            `Page body:
-` + fakeInjectedBody,
-        ),
-        bodyText_2.length > fakeInjectedBody.length &&
-            fakeLines.push('Body status: long content was truncated.'),
-        fakeLines.join(`
-`)
-    );
+window.imApp.formatFakeLinkMessageForApiContext = function (apk119Value687, apk119Value688 = {}) {
+  const apk119Value689 = apk119Value687 || {},
+    apk119Value690 = apk119Value689.fakeLinkData && typeof apk119Value689.fakeLinkData === "object" ? apk119Value689.fakeLinkData : {},
+    apk119Value691 = String(apk119Value690.displayUrl || apk119Value690.canonicalUrl || apk119Value689.content || "").trim(),
+    apk119Value692 = String(apk119Value690.siteName || apk119Value690.domain || "Webpage").trim(),
+    apk119Value693 = String(apk119Value690.title || apk119Value691 || "Untitled webpage").trim(),
+    apk119Value694 = String(apk119Value690.summary || "").trim(),
+    apk119Value695 = apk119Value690.webPage && typeof apk119Value690.webPage === "object" ? apk119Value690.webPage : null,
+    apk119Value696 = apk119Value695 && apk119Value695.html ? window.imApp.stripFakeLinkHtmlForApiContext(apk119Value695.html, apk119Value688.maxLinkBodyChars || 20000) : "",
+    apk119Value697 = String(apk119Value690.bodyText || apk119Value690.pageText || apk119Value696 || "").trim(),
+    apk119Value698 = apk119Value695 ? String(apk119Value695.theme || "").trim() : "",
+    apk119Value699 = apk119Value688.expandLinkContent !== false,
+    apk119Value700 = Math.max(1000, Number(apk119Value688.maxLinkBodyChars) || 20000),
+    apk119Value701 = ["[" + (apk119Value689.role === "assistant" ? apk119Value689.speaker || apk119Value689.senderName || "Char" : "User") + " shared a webpage]", "Site: " + apk119Value692, "Title: " + apk119Value693, "Displayed URL: " + apk119Value691];
+  if (apk119Value694) apk119Value701.push("Summary: " + apk119Value694);
+  if (!apk119Value697) return apk119Value701.push("Body status: no page body is available; use only title, domain, and summary."), apk119Value701.join("\n");
+  if (!apk119Value699) return apk119Value701.push("Page summary: " + (apk119Value694 || apk119Value697.slice(0, 500))), apk119Value701.push("Body status: this is an older webpage record; only its summary is retained this turn."), apk119Value701.join("\n");
+  const apk119Value702 = apk119Value697.slice(0, apk119Value700);
+  return apk119Value701.push("Page body:\n" + apk119Value702), apk119Value697.length > apk119Value702.length && apk119Value701.push("Body status: long content was truncated."), apk119Value701.join("\n");
 };
 window.imApp.formatMessageForApiContext = function (value_110, value_113, options_6 = {}) {
+    if (value_110?.type === 'file' && value_110.excludedFromContext !== true) return {role: value_110.role, content: window.imChat.formatFileForContext(value_110, options_6)};
+
     const normalizedFriend_4 =
         options_6.friendIsNormalized === true && value_113
             ? value_113
@@ -4095,45 +4044,29 @@ window.imApp.formatMessageForApiContext = function (value_110, value_113, option
         content: value_601,
     };
 };
-window.imApp.buildApiContextMessages = function (value_651, options_7 = {}) {
-    const friendData_653 = window.imApp.normalizeFriendData(value_651 || {}),
-        recentMessages = window.imApp.getRecentContextMessages(friendData_653, {
-            friendIsNormalized: true,
-        });
-    let latestLinkIndex = -1;
-    return (
-        recentMessages.forEach((message_8, index_4) => {
-            if (message_8 && message_8.type === 'fake_link') latestLinkIndex = index_4;
-        }),
-        recentMessages
-            .map((message_9, value_657) => {
-                const formattedMessage = window.imApp.formatMessageForApiContext(
-                    message_9,
-                    friendData_653,
-                    {
-                        ...options_7,
-                        friendIsNormalized: true,
-                        expandLinkContent:
-                            message_9 && message_9.type === 'fake_link'
-                                ? value_657 === latestLinkIndex
-                                : options_7.expandLinkContent,
-                    },
-                );
-                if (!formattedMessage || !options_7.includeContextMetadata) return formattedMessage;
-                return {
-                    ...formattedMessage,
-                    _contextMessageId: String(message_9?.id || ''),
-                    _contextTimestamp: Number(message_9?.timestamp) || 0,
-                };
-            })
-            .filter(
-                (item_17) =>
-                    item_17 &&
-                    item_17.role &&
-                    typeof item_17.content === 'string' &&
-                    item_17.content.trim(),
-            )
-    );
+window.imApp.buildApiContextMessages = function (apk119Value762, apk119Value763 = {}) {
+  const apk119Value764 = window.imApp.normalizeFriendData(apk119Value762 || {}),
+    apk119Value765 = window.imApp.getRecentContextMessages(apk119Value764, {
+      friendIsNormalized: true
+    }),
+    apk119Value766 = window.imChat?.["allocateFileContext"]?.(apk119Value765);
+  let apk119Value767 = -1;
+  return apk119Value765.forEach((apk119Value768, apk119Value769) => {
+    if (apk119Value768 && apk119Value768.type === "fake_link") apk119Value767 = apk119Value769;
+  }), apk119Value765.map((apk119Value770, apk119Value771) => {
+    const apk119Value772 = window.imApp.formatMessageForApiContext(apk119Value770, apk119Value764, {
+      ...apk119Value763,
+      friendIsNormalized: true,
+      maxFileBodyChars: apk119Value766?.["get"](apk119Value770) ?? apk119Value763.maxFileBodyChars,
+      expandLinkContent: apk119Value770 && apk119Value770.type === "fake_link" ? apk119Value771 === apk119Value767 : apk119Value763.expandLinkContent
+    });
+    if (!apk119Value772 || !apk119Value763.includeContextMetadata) return apk119Value772;
+    return {
+      ...apk119Value772,
+      _contextMessageId: String(apk119Value770?.["id"] || ""),
+      _contextTimestamp: Number(apk119Value770?.["timestamp"]) || 0
+    };
+  }).filter(apk119Value773 => apk119Value773 && apk119Value773.role && typeof apk119Value773.content === "string" && apk119Value773.content.trim());
 };
 window.imApp.buildLinkedAccountMemoryContext = function (value_183, options_8 = {}) {
     const normalizedFriend_5 = window.imApp.normalizeFriendData(value_183 || {}),
@@ -4934,6 +4867,8 @@ window.imApp.isGiftContextMessage = function (message) {
     );
 };
 window.imApp.getFriendMessagePreview = function (value_230, apk110New_958) {
+    if (value_230?.type === 'file') return '[文件] ' + (value_230.fileData?.name || '未命名文件');
+
     const targetMessage_4 = value_230 || {};
     if (window.imApp.isGiftContextMessage(targetMessage_4)) return '';
     if (targetMessage_4.type === 'memory_request') return '';
@@ -5789,7 +5724,7 @@ window.imApp.removeFriendMessages = async function (value_996, descriptors, valu
             return index_9 === messages_7.length - sortedRemovalIndexes.length + removalOrder;
         });
     window.imChat?.invalidateFriendConversation &&
-        window.imChat.invalidateFriendConversation(safeFriendId_5);
+        (value_998.preserveConversationRuntime !== true && window.imChat.invalidateFriendConversation(safeFriendId_5));
     targetFriend.messages = targetFriend.messages.filter(
         (__2, index_10) => !removalIndexes.has(index_10),
     );
@@ -5896,7 +5831,7 @@ window.imApp.removeFriendMessages = async function (value_996, descriptors, valu
         count: lastSummaryMessageCount_3,
     };
     window.imApp.syncFriendMessageSummary(targetFriend);
-    window.imApp.clearFriendRuntimeMessageContext(targetFriend);
+    (value_998.preserveConversationRuntime !== true && window.imApp.clearFriendRuntimeMessageContext(targetFriend));
     window.imApp.syncActiveFriendReference(targetFriend);
     window.imApp.syncSettingsFriendReference(targetFriend);
     try {

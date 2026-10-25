@@ -2129,6 +2129,10 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                 !!window.imApp?.isRecallableUserMessage?.(targetMessage);
             recallAction.style.display = canRecall ? 'flex' : 'none';
         }
+        for (const action of ['edit', 'translate', 'speak']) {
+            const button = msgContextMenu.querySelector('[data-action="' + action + '"]');
+            if (button) button.style.display = targetMessage?.type === 'file' ? 'none' : 'flex';
+        }
         if (speakAction) {
             const value_173 =
                     row_5.classList.contains('user-row') &&
@@ -2143,7 +2147,7 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                 canSpeakGroupMessage =
                     activeFriend_2?.type === 'group' &&
                     !!window.u2Tts?.canSpeakMessage?.(activeFriend_2, groupTtsMessage);
-            speakAction.style.display = value_173
+            speakAction.style.display = targetMessage?.type === 'file' || value_173
                 ? 'none'
                 : activeFriend_2?.type === 'group'
                   ? canSpeakGroupMessage

@@ -77,6 +77,10 @@
         pushText(parts_4, message_2.replyTo);
         pushText(parts_4, message_2.translation);
         switch (type_2) {
+            case 'file':
+                pushText(parts_4, message_2.fileData?.name);
+                pushText(parts_4, message_2.fileData?.text);
+                break;
             case 'voice_message':
                 pushText(parts_4, message_2.transcript || message_2.text);
                 break;

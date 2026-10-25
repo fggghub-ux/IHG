@@ -2504,6 +2504,10 @@
                 window.imChat.renderFakeLinkBubble(msg_10, friend_16, container_6, msgTime),
                 handleAction_19(msg_10, friend_16, container_6)
             );
+        if (msg_10.type === 'file') {
+            renderFileBubble(msg_10, friend_16, container_6, msgTime);
+            return handleAction_19(msg_10, friend_16, container_6);
+        }
         if (msg_10.type === 'image')
             return (
                 window.imChat.renderImageBubble(msg_10, friend_16, container_6, msgTime),
@@ -3653,6 +3657,7 @@
                 force: value_586.resetWindow === true,
             });
         markChatHistoryRenderCurrent(friend_25, container_15);
+        window.imChat.restoreCharFakeLinkStatuses?.(friend_25, container_15);
     }
     function scrollToBottom_3(value_599, value_600 = {}) {
         followOnlineChatBottom_2(value_599, value_600);
@@ -6413,47 +6418,27 @@
             });
         });
     }
-    function renderFakeLinkWebPage_2(element_951, value_952 = {}) {
-        if (!element_951) return false;
-        const pagePackage = sanitizeFakeLinkPagePackage_3(value_952);
-        if (!pagePackage.html) return false;
-        if (pagePackage.js) {
-            const buildSandboxDocument = window.imChat?.buildFakeLinkSandboxDocument;
-            if (typeof buildSandboxDocument !== 'function') return false;
-            element_951.innerHTML = '';
-            const frame_2 = document.createElement('iframe');
-            return (
-                (frame_2.className = 'im-fake-link-detail-iframe'),
-                frame_2.setAttribute('sandbox', 'allow-scripts'),
-                frame_2.setAttribute('referrerpolicy', 'no-referrer'),
-                frame_2.setAttribute('title', '链接小剧场'),
-                (frame_2.srcdoc = buildSandboxDocument(pagePackage)),
-                element_951.appendChild(frame_2),
-                true
-            );
-        }
-        const pageId =
-                'fake-link-page-' +
-                Date.now().toString(36) +
-                '-' +
-                Math.random().toString(36).slice(2, 8),
-            scopeSelector_2 = '[data-fake-page-id="' + pageId + '"]';
-        element_951.innerHTML = '';
-        const style_2 = document.createElement('style');
-        style_2.className = 'im-fake-link-web-style';
-        style_2.textContent = scopeFakeLinkCss(pagePackage.css, scopeSelector_2);
-        const root_3 = document.createElement('div');
-        return (
-            (root_3.className = 'im-fake-link-web-root'),
-            root_3.setAttribute('data-fake-page-id', pageId),
-            root_3.setAttribute('data-theme', pagePackage.theme || 'generic'),
-            (root_3.innerHTML = pagePackage.html),
-            element_951.appendChild(style_2),
-            element_951.appendChild(root_3),
-            bindFakeLinkInteractions(root_3, pagePackage.interactions),
-            true
-        );
-    }
+    function renderFakeLinkWebPage_2(apk119Value1351, apk119Value1352 = {}) {
+  if (!apk119Value1351) return false;
+  const apk119Value1353 = sanitizeFakeLinkPagePackage_3(apk119Value1352);
+  if (!apk119Value1353.html) return false;
+  if (apk119Value1353.js) {
+    const apk119Value1358 = window.imChat?.["buildFakeLinkSandboxDocument"];
+    if (typeof apk119Value1358 !== "function") return false;
+    apk119Value1351.innerHTML = "";
+    const apk119Value1359 = document.createElement("iframe");
+    apk119Value1359.className = "im-fake-link-detail-iframe", apk119Value1359.setAttribute("sandbox", "allow-scripts"), apk119Value1359.setAttribute("referrerpolicy", "no-referrer"), apk119Value1359.setAttribute("title", "链接小剧场");
+    if (window.imChat?.["setFakeLinkFrameDocument"]) window.imChat.setFakeLinkFrameDocument(apk119Value1359, apk119Value1353);else apk119Value1359.srcdoc = apk119Value1358(apk119Value1353);
+    return apk119Value1351.appendChild(apk119Value1359), true;
+  }
+  const apk119Value1354 = "fake-link-page-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8),
+    apk119Value1355 = "[data-fake-page-id=\"" + apk119Value1354 + "\"]";
+  apk119Value1351.innerHTML = "";
+  const apk119Value1356 = document.createElement("style");
+  apk119Value1356.className = "im-fake-link-web-style", apk119Value1356.textContent = scopeFakeLinkCss(apk119Value1353.css, apk119Value1355);
+  const apk119Value1357 = document.createElement("div");
+  return apk119Value1357.className = "im-fake-link-web-root", apk119Value1357.setAttribute("data-fake-page-id", apk119Value1354), apk119Value1357.setAttribute("data-theme", apk119Value1353.theme || "generic"), apk119Value1357.innerHTML = apk119Value1353.html, apk119Value1351.appendChild(apk119Value1356), apk119Value1351.appendChild(apk119Value1357), bindFakeLinkInteractions(apk119Value1357, apk119Value1353.interactions), true;
+}
     function normalizeFakeLinkDisplayValue(value_16) {
         const raw = cleanFakeLinkText(value_16, 220);
         if (!raw) return '';
@@ -6473,322 +6458,129 @@
                 .slice(0, 180);
         }
     }
-    function handleAction_94(msg_23 = {}) {
-        const source_4 =
-                msg_23.fakeLinkData && typeof msg_23.fakeLinkData === 'object'
-                    ? msg_23.fakeLinkData
-                    : {},
-            displayUrl_2 = normalizeFakeLinkDisplayValue(
-                source_4.displayUrl || source_4.canonicalUrl || msg_23.content || '',
-            ),
-            domain_3 = cleanFakeLinkText(
-                source_4.domain || displayUrl_2.split(/[/?#]/)[0] || '',
-                120,
-            ),
-            siteName_2 = cleanFakeLinkText(
-                source_4.siteName ||
-                    source_4.platformLabel ||
-                    source_4.author ||
-                    domain_3 ||
-                    '假网页',
-                80,
-            ),
-            title_2 = cleanFakeLinkText(
-                source_4.title || msg_23.title || domain_3 || '假网页',
-                180,
-            ),
-            summary_2 = cleanFakeLinkText(source_4.summary || source_4.description || '', 800),
-            bodyText_2 = cleanFakeLinkText(source_4.bodyText || source_4.content || '', 50000),
-            rawWebPage =
-                source_4.webPage && typeof source_4.webPage === 'object' ? source_4.webPage : null,
-            webPage_3 = rawWebPage ? normalizeFakeLinkWebPageForRender(rawWebPage) : null;
-        return {
-            domain: domain_3,
-            displayUrl: displayUrl_2,
-            siteName: siteName_2,
-            title: title_2,
-            summary: summary_2,
-            bodyText: bodyText_2,
-            webPage: webPage_3 && webPage_3.html ? webPage_3 : null,
-            prompt: cleanFakeLinkText(source_4.prompt || '', 1000),
-            generatedBy: cleanFakeLinkText(source_4.generatedBy || 'manual', 40),
-            createdAt: Number(source_4.createdAt || msg_23.timestamp) || Date.now(),
-        };
-    }
+    function handleAction_94(apk119Value1367 = {}) {
+  const apk119Value1368 = apk119Value1367.fakeLinkData && typeof apk119Value1367.fakeLinkData === "object" ? apk119Value1367.fakeLinkData : {},
+    apk119Value1369 = normalizeFakeLinkDisplayValue(apk119Value1368.displayUrl || apk119Value1368.canonicalUrl || apk119Value1367.content || ""),
+    apk119Value1370 = cleanFakeLinkText(apk119Value1368.domain || apk119Value1369.split(/[/?#]/)[0] || "", 120),
+    apk119Value1371 = cleanFakeLinkText(apk119Value1368.siteName || apk119Value1368.platformLabel || apk119Value1368.author || apk119Value1370 || "假网页", 80),
+    apk119Value1372 = cleanFakeLinkText(apk119Value1368.title || apk119Value1367.title || apk119Value1370 || "假网页", 180),
+    apk119Value1373 = cleanFakeLinkText(apk119Value1368.summary || apk119Value1368.description || "", 800),
+    apk119Value1374 = cleanFakeLinkText(apk119Value1368.bodyText || apk119Value1368.content || "", 50000),
+    apk119Value1375 = apk119Value1368.webPage && typeof apk119Value1368.webPage === "object" ? apk119Value1368.webPage : null,
+    apk119Value1376 = apk119Value1375 ? normalizeFakeLinkWebPageForRender(apk119Value1375) : null;
+  return {
+    domain: apk119Value1370,
+    displayUrl: apk119Value1369,
+    siteName: apk119Value1371,
+    title: apk119Value1372,
+    summary: apk119Value1373,
+    bodyText: apk119Value1374,
+    webPage: apk119Value1376 && apk119Value1376.html ? apk119Value1376 : null,
+    translation: window.imChat?.["normalizeFakeLinkTranslation"]?.(apk119Value1368.translation) || null,
+    prompt: cleanFakeLinkText(apk119Value1368.prompt || "", 1000),
+    generatedBy: cleanFakeLinkText(apk119Value1368.generatedBy || "manual", 40),
+    createdAt: Number(apk119Value1368.createdAt || apk119Value1367.timestamp) || Date.now()
+  };
+}
     function handleAction_95() {
-        let overlay_4 = document.getElementById('im-fake-link-detail-overlay');
-        const host_2 = document.getElementById('app') || document.body;
-        if (overlay_4) {
-            if (overlay_4.parentNode !== host_2) host_2.appendChild(overlay_4);
-            return overlay_4;
-        }
-        overlay_4 = document.createElement('div');
-        overlay_4.id = 'im-fake-link-detail-overlay';
-        overlay_4.className =
-            'bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay im-fake-link-detail-overlay';
-        overlay_4.style.display = 'none';
-        overlay_4.innerHTML = [
-            '<div class="bottom-sheet wb-centered-modal-card im-fake-link-detail-sheet">',
-            '  <div class="im-fake-link-browser-bar">',
-            '    <button type="button" class="im-fake-link-browser-close" aria-label="关闭"><i class="fas fa-chevron-left"></i></button>',
-            '    <div class="im-fake-link-address"></div>',
-            '    <span></span>',
-            '  </div>',
-            '  <article class="im-fake-link-page">',
-            '    <div class="im-fake-link-page-legacy">',
-            '      <div class="im-fake-link-page-site"></div>',
-            '      <h1 class="im-fake-link-page-title"></h1>',
-            '      <p class="im-fake-link-page-summary"></p>',
-            '      <div class="im-fake-link-page-body"></div>',
-            '    </div>',
-            '    <div class="im-fake-link-web-host" hidden></div>',
-            '  </article>',
-            '</div>',
-        ].join('');
-        const closeOverlay = () => {
-            if (window.closeView) window.closeView(overlay_4);
-            else overlay_4.style.display = 'none';
-        };
-        return (
-            overlay_4.addEventListener('click', (event_12) => {
-                (event_12.target === overlay_4 ||
-                    event_12.target.closest('.im-fake-link-browser-close')) &&
-                    closeOverlay();
-            }),
-            host_2.appendChild(overlay_4),
-            overlay_4
-        );
+  let apk119Value1377 = document.getElementById("im-fake-link-detail-overlay");
+  const apk119Value1378 = document.getElementById("app") || document.body;
+  if (apk119Value1377) {
+    if (apk119Value1377.parentNode !== apk119Value1378) apk119Value1378.appendChild(apk119Value1377);
+    return apk119Value1377;
+  }
+  apk119Value1377 = document.createElement("div"), apk119Value1377.id = "im-fake-link-detail-overlay", apk119Value1377.className = "bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay im-fake-link-detail-overlay", apk119Value1377.style.display = "none", apk119Value1377.inert = true, apk119Value1377.setAttribute("aria-hidden", "true"), apk119Value1377.innerHTML = ["<div class=\"bottom-sheet wb-centered-modal-card im-fake-link-detail-sheet\">", "  <div class=\"im-fake-link-browser-bar\">", "    <button type=\"button\" class=\"im-fake-link-browser-close\" aria-label=\"关闭\"><i class=\"fas fa-chevron-left\"></i></button>", "    <div class=\"im-fake-link-address\"></div>", "    <button type=\"button\" class=\"im-fake-link-browser-translate\" aria-label=\"切换中文翻译\" title=\"切换中文翻译\" aria-pressed=\"false\"><i class=\"fas fa-language\" aria-hidden=\"true\"></i></button>", "  </div>", "  <article class=\"im-fake-link-page\"></article>", "</div>"].join("");
+  const apk119Value1379 = () => {
+    clearTimeout(apk119Value1377._fakeLinkDetail?.["prewarmTimer"]), apk119Value1377.inert = true, apk119Value1377.setAttribute("aria-hidden", "true");
+  };
+  apk119Value1377.addEventListener("u2:view-closing", apk119Value1379);
+  const apk119Value1380 = () => {
+    apk119Value1379();
+    if (window.closeView) window.closeView(apk119Value1377);else apk119Value1377.classList.remove("active"), apk119Value1377.style.display = "none";
+  };
+  return apk119Value1377.addEventListener("click", apk119Value1381 => {
+    if (apk119Value1381.target === apk119Value1377 || apk119Value1381.target.closest(".im-fake-link-browser-close")) apk119Value1380();else apk119Value1381.target.closest(".im-fake-link-browser-translate") && apk119Value1377._fakeLinkDetail?.["data"]["translation"] && switchFakeLinkDetailLanguage(apk119Value1377, !apk119Value1377._fakeLinkDetail.translated);
+  }), apk119Value1378.appendChild(apk119Value1377), apk119Value1377;
+}
+    function handleAction_96(apk119Value1404 = {}, apk119Value1405 = null) {
+  const apk119Value1406 = handleAction_95();
+  let apk119Value1407 = apk119Value1406._fakeLinkDetail;
+  if (!apk119Value1407 || apk119Value1407.message !== apk119Value1404 || apk119Value1407.source !== apk119Value1404.fakeLinkData) {
+    clearTimeout(apk119Value1407?.["prewarmTimer"]);
+    const apk119Value1408 = handleAction_94(apk119Value1404);
+    apk119Value1406.querySelector(".im-fake-link-address").textContent = apk119Value1408.displayUrl || apk119Value1408.domain || "", apk119Value1406.querySelector(".im-fake-link-page").replaceChildren(), apk119Value1407 = apk119Value1406._fakeLinkDetail = {
+      data: apk119Value1408,
+      message: apk119Value1404,
+      source: apk119Value1404.fakeLinkData,
+      translated: false,
+      panes: new Map()
+    };
+  }
+  switchFakeLinkDetailLanguage(apk119Value1406, false), apk119Value1406.inert = false, apk119Value1406.setAttribute("aria-hidden", "false"), apk119Value1406.style.display = "flex";
+  if (window.openView) window.openView(apk119Value1406);else apk119Value1406.classList.add("active");
+  apk119Value1407.data.translation && !apk119Value1407.panes.has("zh") && (clearTimeout(apk119Value1407.prewarmTimer), apk119Value1407.prewarmTimer = setTimeout(() => {
+    if (apk119Value1406._fakeLinkDetail === apk119Value1407 && apk119Value1406.classList.contains("active")) ensureFakeLinkLanguagePane(apk119Value1406, apk119Value1407, "zh");
+  }, 80));
+}
+    function renderFakeLinkBubble_2(apk119Value1409, apk119Value1410, apk119Value1411, apk119Value1412 = Date.now()) {
+  const apk119Value1413 = apk119Value1409.role === "user",
+    apk119Value1414 = !apk119Value1413 && apk119Value1410.type === "group",
+    apk119Value1415 = apk119Value1414 && window.imChat.getGroupMessageSpeaker ? window.imChat.getGroupMessageSpeaker(apk119Value1410, apk119Value1409) : null,
+    apk119Value1416 = apk119Value1414 ? apk119Value1415 && apk119Value1415.nickname || apk119Value1409.speaker || apk119Value1409.senderName || "Group member" : null,
+    apk119Value1417 = apk119Value1415 && apk119Value1415.avatarUrl || apk119Value1409.senderAvatarUrl || null,
+    apk119Value1418 = handleAction_18(apk119Value1411, apk119Value1442 => !apk119Value1442.classList.contains("chat-timestamp") && !apk119Value1442.classList.contains("typing-row"));
+  let apk119Value1419 = false,
+    apk119Value1420 = false;
+  if (apk119Value1418) {
+    if (apk119Value1413 && apk119Value1418.classList.contains("user-row")) apk119Value1419 = true, apk119Value1418.classList.add("has-next");else {
+      if (!apk119Value1413 && apk119Value1418.classList.contains("ai-row")) {
+        const apk119Value1443 = apk119Value1418.getAttribute("data-speaker") || null;
+        if (apk119Value1414 && apk119Value1443 === apk119Value1416) apk119Value1419 = true, apk119Value1420 = true, apk119Value1418.classList.add("has-next");else !apk119Value1414 && !apk119Value1443 && (apk119Value1419 = true, apk119Value1418.classList.add("has-next"));
+      }
     }
-    function handleAction_96(value_979 = {}, value_980 = null) {
-        const overlay_5 = handleAction_95(),
-            data = handleAction_94(value_979),
-            address_2 = overlay_5.querySelector('.im-fake-link-address'),
-            site = overlay_5.querySelector('.im-fake-link-page-site'),
-            title_3 = overlay_5.querySelector('.im-fake-link-page-title'),
-            summary_3 = overlay_5.querySelector('.im-fake-link-page-summary'),
-            body_2 = overlay_5.querySelector('.im-fake-link-page-body'),
-            pageEl = overlay_5.querySelector('.im-fake-link-page'),
-            legacy = overlay_5.querySelector('.im-fake-link-page-legacy'),
-            webHost = overlay_5.querySelector('.im-fake-link-web-host');
-        let useWebPage = false;
-        if (data.webPage && data.webPage.html && webHost)
-            try {
-                useWebPage = renderFakeLinkWebPage_2(webHost, data.webPage);
-            } catch (error_6) {
-                console.warn(
-                    '[iMessage fake link] detail render failed, falling back to text view',
-                    error_6,
-                );
-                useWebPage = false;
-            }
-        if (!useWebPage && webHost) webHost.innerHTML = '';
-        if (pageEl) pageEl.classList.toggle('is-webpage', useWebPage);
-        if (legacy) legacy.hidden = useWebPage;
-        if (webHost) webHost.hidden = !useWebPage;
-        if (address_2) address_2.textContent = data.displayUrl || data.domain || 'fake.local';
-        if (site) site.textContent = data.siteName || data.domain || '假网页';
-        if (title_3) title_3.textContent = data.title || data.siteName || '假网页';
-        summary_3 &&
-            ((summary_3.textContent = data.summary || ''),
-            (summary_3.style.display = summary_3.textContent ? 'block' : 'none'));
-        body_2 &&
-            (body_2.textContent = data.bodyText || data.summary || '这个假网页暂时没有正文内容。');
-        overlay_5.style.display = 'flex';
-        if (window.openView) window.openView(overlay_5);
-        else overlay_5.classList.add('active');
-    }
-    function renderFakeLinkBubble_2(msg_24, value_986, element_529, value_531 = Date.now()) {
-        const value_989 = msg_24.role === 'user',
-            value_990 = !value_989 && value_986.type === 'group',
-            value_537 =
-                value_990 && window.imChat.getGroupMessageSpeaker
-                    ? window.imChat.getGroupMessageSpeaker(value_986, msg_24)
-                    : null,
-            value_992 = value_990
-                ? (value_537 && value_537.nickname) ||
-                  msg_24.speaker ||
-                  msg_24.senderName ||
-                  'Group member'
-                : null,
-            value_539 = (value_537 && value_537.avatarUrl) || msg_24.senderAvatarUrl || null,
-            handleAction_18_994 = handleAction_18(
-                element_529,
-                (element_566) =>
-                    !element_566.classList.contains('chat-timestamp') &&
-                    !element_566.classList.contains('typing-row'),
-            );
-        let enabled_995 = false,
-            enabled_996 = false;
-        if (handleAction_18_994) {
-            if (value_989 && handleAction_18_994.classList.contains('user-row')) {
-                enabled_995 = true;
-                handleAction_18_994.classList.add('has-next');
-            } else {
-                if (!value_989 && handleAction_18_994.classList.contains('ai-row')) {
-                    const value_1017 = handleAction_18_994.getAttribute('data-speaker') || null;
-                    if (value_990 && value_1017 === value_992) {
-                        enabled_995 = true;
-                        enabled_996 = true;
-                        handleAction_18_994.classList.add('has-next');
-                    } else
-                        !value_990 &&
-                            !value_1017 &&
-                            ((enabled_995 = true), handleAction_18_994.classList.add('has-next'));
-                }
-            }
-        }
-        const fakeLinkData_2 = handleAction_94(msg_24),
-            displayUrl_3 = fakeLinkData_2.displayUrl,
-            host_3 = fakeLinkData_2.domain || displayUrl_3,
-            platformLabel_2 = fakeLinkData_2.siteName || '假网页',
-            pageTheme = fakeLinkData_2.webPage?.theme || '',
-            cardColor = pageTheme === 'xiaohongshu' ? '#ff2442' : '#3a3a3c',
-            title_4 = fakeLinkData_2.title || platformLabel_2 || '假网页',
-            summary_4 = fakeLinkData_2.summary || fakeLinkData_2.bodyText.slice(0, 120),
-            text_1005 = '',
-            text_1006 = '',
-            statusLabel = '站内假网页',
-            value_1008 = text_1006
-                ? '<img src="' + escapeHtml(text_1006) + '" alt="">'
-                : '<i class="fas fa-link"></i>',
-            effectiveStatusLabel = fakeLinkData_2.webPage
-                ? fakeLinkData_2.generatedBy === 'ai'
-                    ? 'AI 仿真网页'
-                    : '站内仿真网页'
-                : statusLabel,
-            value_1010 =
-                `
-            <div class="chat-link-card" role="link" tabindex="0" style="--link-card-color:` +
-                escapeHtml(cardColor) +
-                `;">
-                <div class="chat-link-card-cover">` +
-                value_1008 +
-                `</div>
-                <div class="chat-link-card-body">
-                    <div class="chat-link-card-platform">` +
-                escapeHtml(platformLabel_2) +
-                `</div>
-                    <div class="chat-link-card-title">` +
-                escapeHtml(title_4) +
-                `</div>
-                    ` +
-                (text_1005 || summary_4
-                    ? '<div class="chat-link-card-summary">' +
-                      escapeHtml(
-                          text_1005
-                              ? '' + text_1005 + (summary_4 ? ' · ' + summary_4 : '')
-                              : summary_4,
-                      ) +
-                      '</div>'
-                    : '') +
-                `
-                    <div class="chat-link-card-footer">
-                        <span>` +
-                escapeHtml(host_3 || displayUrl_3) +
-                `</span>
-                        <strong>` +
-                escapeHtml(effectiveStatusLabel) +
-                `</strong>
-                    </div>
-                </div>
-            </div>
-        `,
-            value_1011 =
-                '<div class="chat-bubble ' +
-                (value_989 ? 'user-bubble' : 'ai-bubble') +
-                ' im-card-bubble">' +
-                value_1010 +
-                '</div>';
-        let value_561 = value_1011;
-        if (value_990) {
-            value_561 =
-                `
-                <div class="group-ai-bubble-wrap">
-                    ` +
-                (enabled_996
-                    ? ''
-                    : '<div class="group-ai-speaker-name">' + escapeHtml(value_992) + '</div>') +
-                `
-                    <div class="group-ai-bubble-row">
-                        ` + `
-                        ` +
-                value_1011 +
-                `
-                    </div>
-                </div>
-            `;
-        }
-        const row_19 = document.createElement('div');
-        row_19.className =
-            'chat-row ' +
-            (value_989 ? 'user-row' : 'ai-row') +
-            ' ' +
-            (enabled_995 ? 'has-prev' : '') +
-            ' ' +
-            (value_990 ? 'group-ai-row' : '') +
-            ' ' +
-            (value_990 && enabled_996 ? 'group-ai-row-continuous' : '');
-        row_19.setAttribute('data-timestamp', value_531);
-        row_19.setAttribute('data-message-id', window.imChat.ensureMessageId(msg_24, 'link'));
-        if (value_992) row_19.setAttribute('data-speaker', value_992);
-        handleAction_22(row_19, value_986, msg_24);
-        handleAction_20(row_19, value_986, msg_24);
-        const handleAction_7_563 = buildMessageHeaderHtml(
-            value_989,
-            value_986,
-            value_531,
-            value_992,
-            value_539,
-            enabled_995,
-            msg_24,
-        );
-        row_19.innerHTML =
-            `
-            <div class="chat-checkbox-wrapper" style="display:` +
-            (window.imData.batchSelectMode ? 'flex' : 'none') +
-            `;width:40px;justify-content:center;align-items:flex-end;padding-bottom:10px;flex-shrink:0;cursor:pointer;transition:all 0.2s;">
-                <i class="far fa-circle chat-checkbox" data-timestamp="` +
-            value_531 +
-            `" style="color:#c7c7cc;font-size:22px;"></i>
-            </div>
-            <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
-                ` +
-            handleAction_7_563 +
-            `
-                <div style="display:flex;justify-content:` +
-            (value_989 ? 'flex-end' : 'flex-start') +
-            `;align-items:flex-end;width:100%;">
-                    ` +
-            value_561 +
-            `
-                </div>
-            </div>
-        `;
-        const card_4 = row_19.querySelector('.chat-link-card'),
-            openFakeLink_3 = (event_1020) => {
-                event_1020 && (event_1020.preventDefault(), event_1020.stopPropagation());
-                handleAction_96(msg_24, value_986);
-            };
-        card_4 &&
-            (card_4.addEventListener('click', openFakeLink_3),
-            card_4.addEventListener('keydown', (event_13) => {
-                if (event_13.key === 'Enter' || event_13.key === ' ') openFakeLink_3(event_13);
-            }));
-        const coverImage = row_19.querySelector('.chat-link-card-cover img');
-        coverImage &&
-            coverImage.addEventListener(
-                'error',
-                () => {
-                    const cover = coverImage.closest('.chat-link-card-cover');
-                    if (cover) cover.innerHTML = '<i class="fas fa-link"></i>';
-                },
-                {
-                    once: true,
-                },
-            );
-        element_529.appendChild(row_19);
-        window.imChat.scrollToBottom(element_529);
-    }
+  }
+  const apk119Value1421 = handleAction_94(apk119Value1409),
+    apk119Value1422 = apk119Value1421.displayUrl,
+    apk119Value1423 = apk119Value1421.domain || apk119Value1422,
+    apk119Value1424 = apk119Value1421.siteName || "假网页",
+    apk119Value1425 = apk119Value1421.webPage?.["theme"] || "",
+    apk119Value1426 = apk119Value1425 === "xiaohongshu" ? "#ff2442" : "#3a3a3c",
+    apk119Value1427 = apk119Value1421.title || apk119Value1424 || "假网页",
+    apk119Value1428 = apk119Value1421.summary || apk119Value1421.bodyText.slice(0, 120),
+    apk119Value1429 = "",
+    apk119Value1430 = "",
+    apk119Value1431 = "站内假网页",
+    apk119Value1432 = apk119Value1430 ? "<img src=\"" + escapeHtml(apk119Value1430) + "\" alt=\"\">" : "<i class=\"fas fa-link\"></i>",
+    apk119Value1433 = !apk119Value1413 ? "点击查看" : apk119Value1421.webPage ? apk119Value1421.generatedBy === "ai" ? "AI 仿真网页" : "站内仿真网页" : apk119Value1431,
+    apk119Value1434 = "\n            <div class=\"chat-link-card\" role=\"link\" tabindex=\"0\" style=\"--link-card-color:" + escapeHtml(apk119Value1426) + ";\">\n                <div class=\"chat-link-card-cover\">" + apk119Value1432 + "</div>\n                <div class=\"chat-link-card-body\">\n                    <div class=\"chat-link-card-platform\">" + escapeHtml(apk119Value1424) + "</div>\n                    <div class=\"chat-link-card-title\">" + escapeHtml(apk119Value1427) + "</div>\n                    " + (apk119Value1429 || apk119Value1428 ? "<div class=\"chat-link-card-summary\">" + escapeHtml(apk119Value1429 ? "" + (apk119Value1428 ? " · " + apk119Value1428 : "") : apk119Value1428) + "</div>" : "") + "\n                    <div class=\"chat-link-card-footer\">\n                        <span>" + escapeHtml(apk119Value1423 || apk119Value1422) + "</span>\n                        <strong>" + escapeHtml(apk119Value1433) + "</strong>\n                    </div>\n                </div>\n            </div>\n        ",
+    apk119Value1435 = "<div class=\"chat-bubble " + (apk119Value1413 ? "user-bubble" : "ai-bubble") + " im-card-bubble im-link-bubble\">" + apk119Value1434 + "</div>";
+  let apk119Value1436 = apk119Value1435;
+  if (apk119Value1414) {
+    const apk119Value1444 = String(apk119Value1416).trim().charAt(0) || "?",
+      apk119Value1445 = apk119Value1417 ? "<img src=\"" + escapeHtml(apk119Value1417) + "\" onerror=\"this.src='assets/moren-thumb.jpg'\" loading=\"lazy\" decoding=\"async\" style=\"width:28px;height:28px;border-radius:50%;object-fit:cover;\">" : "<div class=\"chat-avatar-small\">" + escapeHtml(apk119Value1444) + "</div>";
+    apk119Value1436 = "\n                <div class=\"group-ai-bubble-wrap\">\n                    " + (apk119Value1420 ? "" : "<div class=\"group-ai-speaker-name\">" + escapeHtml(apk119Value1416) + "</div>") + "\n                    <div class=\"group-ai-bubble-row\">\n                        <div class=\"group-ai-avatar-slot\">" + (apk119Value1420 ? "<div class=\"group-ai-avatar-placeholder\"></div>" : apk119Value1445) + "</div>\n                        " + apk119Value1435 + "\n                    </div>\n                </div>\n            ";
+  }
+  const apk119Value1437 = document.createElement("div");
+  apk119Value1437.className = "chat-row " + (apk119Value1413 ? "user-row" : "ai-row") + " " + (apk119Value1419 ? "has-prev" : "") + " " + (apk119Value1414 ? "group-ai-row" : "") + " " + (apk119Value1414 && apk119Value1420 ? "group-ai-row-continuous" : ""), apk119Value1437.setAttribute("data-timestamp", apk119Value1412), apk119Value1437.setAttribute("data-message-id", window.imChat.ensureMessageId(apk119Value1409, "link"));
+  if (apk119Value1416) apk119Value1437.setAttribute("data-speaker", apk119Value1416);
+  handleAction_22(apk119Value1437, apk119Value1410, apk119Value1409), handleAction_20(apk119Value1437, apk119Value1410, apk119Value1409);
+  const apk119Value1438 = buildMessageHeaderHtml(apk119Value1413, apk119Value1410, apk119Value1412, apk119Value1416, apk119Value1417, apk119Value1419, apk119Value1409);
+  apk119Value1437.innerHTML = "\n            <div class=\"chat-checkbox-wrapper\" style=\"display:" + (window.imData.batchSelectMode ? "flex" : "none") + ";width:40px;justify-content:center;align-items:flex-end;padding-bottom:10px;flex-shrink:0;cursor:pointer;transition:all 0.2s;\">\n                <i class=\"far fa-circle chat-checkbox\" data-timestamp=\"" + apk119Value1412 + "\" style=\"color:#c7c7cc;font-size:22px;\"></i>\n            </div>\n            <div style=\"flex:1;display:flex;flex-direction:column;min-width:0;\">\n                " + apk119Value1438 + "\n                <div style=\"display:flex;justify-content:" + (apk119Value1413 ? "flex-end" : "flex-start") + ";align-items:flex-end;width:100%;\">\n                    " + apk119Value1436 + "\n                </div>\n            </div>\n        ";
+  const apk119Value1439 = apk119Value1437.querySelector(".chat-link-card"),
+    apk119Value1440 = apk119Value1446 => {
+      apk119Value1446 && (apk119Value1446.preventDefault(), apk119Value1446.stopPropagation()), handleAction_96(apk119Value1409, apk119Value1410);
+    };
+  apk119Value1439 && (apk119Value1439.addEventListener("click", apk119Value1440), apk119Value1439.addEventListener("keydown", apk119Value1447 => {
+    if (apk119Value1447.key === "Enter" || apk119Value1447.key === " ") apk119Value1440(apk119Value1447);
+  }));
+  const apk119Value1441 = apk119Value1437.querySelector(".chat-link-card-cover img");
+  apk119Value1441 && apk119Value1441.addEventListener("error", () => {
+    const apk119Value1448 = apk119Value1441.closest(".chat-link-card-cover");
+    if (apk119Value1448) apk119Value1448.innerHTML = "<i class=\"fas fa-link\"></i>";
+  }, {
+    once: true
+  }), apk119Value1411.appendChild(apk119Value1437), window.imChat.scrollToBottom(apk119Value1411);
+}
     function getOfflineMeetingSummaryText(msg_25 = {}) {
         const explicitSummary = String(msg_25.summary || '').trim();
         if (explicitSummary) return explicitSummary;
@@ -6984,6 +6776,7 @@
     window.imChat.renderImageBubble = renderImageBubble_2;
     window.imChat.renderLocationBubble = renderLocationBubble_2;
     window.imChat.renderFakeLinkBubble = renderFakeLinkBubble_2;
+    window.imChat.renderFileBubble = renderFileBubble;
     window.imChat.sanitizeFakeLinkPagePackage = sanitizeFakeLinkPagePackage_3;
     window.imChat.renderFakeLinkWebPage = renderFakeLinkWebPage_2;
     window.imChat.stripFakeLinkHtmlToPlainText = stripFakeLinkHtmlToPlainText_3;
@@ -7175,4 +6968,91 @@
     window.imChat.renderHtmlBubble = renderHtmlBubble_2;
     window.addEventListener('account-updated', apk110New_25);
     window.addEventListener('user-state-updated', apk110New_25);
+function renderFileBubble(apk119Value1269, apk119Value1270, apk119Value1271, apk119Value1272 = Date.now()) {
+  const apk119Value1273 = apk119Value1269.role === "user",
+    apk119Value1274 = !apk119Value1273 && apk119Value1270?.["type"] === "group",
+    apk119Value1275 = apk119Value1274 ? resolveGroupBubbleIdentity(apk119Value1270, apk119Value1269) : null,
+    apk119Value1276 = apk119Value1275?.["name"] || null,
+    apk119Value1277 = apk119Value1275?.["avatarUrl"] || null,
+    apk119Value1278 = handleAction_18(apk119Value1271, apk119Value1286 => !apk119Value1286.classList.contains("chat-timestamp") && !apk119Value1286.classList.contains("typing-row"));
+  let apk119Value1279 = false,
+    apk119Value1280 = false;
+  if (apk119Value1278) {
+    if (apk119Value1273 && apk119Value1278.classList.contains("user-row")) apk119Value1279 = true, apk119Value1278.classList.add("has-next");else {
+      if (!apk119Value1273 && apk119Value1278.classList.contains("ai-row")) {
+        const apk119Value1287 = apk119Value1278.getAttribute("data-speaker") || null;
+        (!apk119Value1274 || apk119Value1287 === apk119Value1276) && (apk119Value1279 = true, apk119Value1280 = apk119Value1274, apk119Value1278.classList.add("has-next"));
+      }
+    }
+  }
+  const apk119Value1281 = document.createElement("div");
+  apk119Value1281.className = "chat-row " + (apk119Value1273 ? "user-row" : "ai-row") + " " + (apk119Value1279 ? "has-prev" : "") + " " + (apk119Value1274 ? "group-ai-row" : "") + " " + (apk119Value1274 && apk119Value1280 ? "group-ai-row-continuous" : ""), apk119Value1281.setAttribute("data-timestamp", apk119Value1272), apk119Value1281.setAttribute("data-message-id", window.imChat.ensureMessageId(apk119Value1269, "file"));
+  if (apk119Value1276) apk119Value1281.setAttribute("data-speaker", apk119Value1276);
+  handleAction_22(apk119Value1281, apk119Value1270, apk119Value1269), handleAction_20(apk119Value1281, apk119Value1270, apk119Value1269);
+  const apk119Value1282 = "<div class=\"chat-bubble " + (apk119Value1273 ? "user-bubble" : "ai-bubble") + " im-card-bubble im-file-card\" role=\"button\" tabindex=\"0\" aria-label=\"查看文件：" + escapeHtml(apk119Value1269.fileData?.["name"] || "文件") + "\">" + window.imChat.buildFileCardHtml(apk119Value1269) + "</div>";
+  let apk119Value1283 = apk119Value1282;
+  if (apk119Value1274) {
+    const apk119Value1288 = String(apk119Value1276 || "?").trim().charAt(0) || "?",
+      apk119Value1289 = apk119Value1277 ? "<img src=\"" + escapeHtml(apk119Value1277) + "\" onerror=\"this.src='assets/moren-thumb.jpg'\" loading=\"lazy\" decoding=\"async\" style=\"width:28px;height:28px;border-radius:50%;object-fit:cover;\">" : "<div class=\"chat-avatar-small\">" + escapeHtml(apk119Value1288) + "</div>";
+    apk119Value1283 = "<div class=\"group-ai-bubble-wrap\">\n                " + (apk119Value1280 ? "" : "<div class=\"group-ai-speaker-name\">" + escapeHtml(apk119Value1276) + "</div>") + "\n                <div class=\"group-ai-bubble-row\"><div class=\"group-ai-avatar-slot\">" + (apk119Value1280 ? "<div class=\"group-ai-avatar-placeholder\"></div>" : apk119Value1289) + "</div>" + apk119Value1282 + "</div>\n            </div>";
+  }
+  const apk119Value1284 = buildMessageHeaderHtml(apk119Value1273, apk119Value1270, apk119Value1272, apk119Value1276, apk119Value1277, apk119Value1279, apk119Value1269);
+  apk119Value1281.innerHTML = "\n            <div class=\"chat-checkbox-wrapper\" style=\"display:" + (window.imData.batchSelectMode ? "flex" : "none") + ";width:40px;justify-content:center;align-items:flex-end;padding-bottom:10px;flex-shrink:0;cursor:pointer;transition:all .2s;\">\n                <i class=\"far fa-circle chat-checkbox\" data-timestamp=\"" + apk119Value1272 + "\" style=\"color:#c7c7cc;font-size:22px;\"></i>\n            </div>\n            <div style=\"flex:1;display:flex;flex-direction:column;min-width:0;\">\n                " + apk119Value1284 + "\n                <div style=\"display:flex;justify-content:" + (apk119Value1273 ? "flex-end" : "flex-start") + ";align-items:flex-end;width:100%;\">" + apk119Value1283 + "</div>\n            </div>";
+  const apk119Value1285 = apk119Value1281.querySelector(".im-file-card");
+  apk119Value1285?.["addEventListener"]("click", () => {
+    if (!window.imData.batchSelectMode) window.imChat.openFileDetail(apk119Value1269);
+  }), apk119Value1285?.["addEventListener"]("keydown", apk119Value1290 => {
+    if (apk119Value1290.key !== "Enter" && apk119Value1290.key !== " ") return;
+    apk119Value1290.preventDefault();
+    if (!window.imData.batchSelectMode) window.imChat.openFileDetail(apk119Value1269);
+  }), apk119Value1271.appendChild(apk119Value1281), window.imChat.scrollToBottom(apk119Value1271);
+}
+function renderFakeLinkDetailPane(apk119Value1382, apk119Value1383) {
+  apk119Value1382.innerHTML = "<div class=\"im-fake-link-page-legacy\"><div class=\"im-fake-link-page-site\"></div><h1 class=\"im-fake-link-page-title\"></h1><p class=\"im-fake-link-page-summary\"></p><div class=\"im-fake-link-page-body\"></div></div><div class=\"im-fake-link-web-host\" hidden></div>";
+  const apk119Value1384 = apk119Value1382.querySelector(".im-fake-link-page-legacy"),
+    apk119Value1385 = apk119Value1382.querySelector(".im-fake-link-web-host");
+  let apk119Value1386 = false;
+  if (apk119Value1383.webPage && apk119Value1383.webPage.html && apk119Value1385) try {
+    apk119Value1386 = renderFakeLinkWebPage_2(apk119Value1385, apk119Value1383.webPage);
+  } catch (apk119Value1388) {
+    console.warn("[iMessage fake link] detail render failed, falling back to text view", apk119Value1388), apk119Value1386 = false;
+  }
+  if (!apk119Value1386 && apk119Value1385) apk119Value1385.innerHTML = "";
+  apk119Value1382.classList.toggle("is-webpage", apk119Value1386), apk119Value1382.classList.toggle("is-framed", !!apk119Value1385.querySelector("iframe")), apk119Value1384.hidden = apk119Value1386, apk119Value1385.hidden = !apk119Value1386, apk119Value1382.querySelector(".im-fake-link-page-site").textContent = apk119Value1383.siteName || apk119Value1383.domain || "", apk119Value1382.querySelector(".im-fake-link-page-title").textContent = apk119Value1383.title || apk119Value1383.siteName || "";
+  const apk119Value1387 = apk119Value1382.querySelector(".im-fake-link-page-summary");
+  apk119Value1387.textContent = apk119Value1383.summary || "", apk119Value1387.hidden = !apk119Value1387.textContent, apk119Value1382.querySelector(".im-fake-link-page-body").textContent = apk119Value1383.bodyText || apk119Value1383.summary || "此链接暂无正文。";
+}
+function ensureFakeLinkLanguagePane(apk119Value1389, apk119Value1390, apk119Value1391) {
+  let apk119Value1392 = apk119Value1390.panes.get(apk119Value1391);
+  if (!apk119Value1392) {
+    apk119Value1392 = document.createElement("div"), apk119Value1392.className = "im-fake-link-language-pane", apk119Value1392.dataset.language = apk119Value1391, apk119Value1392.setAttribute("aria-hidden", "true"), apk119Value1392.inert = true, apk119Value1389.querySelector(".im-fake-link-page").appendChild(apk119Value1392), renderFakeLinkDetailPane(apk119Value1392, apk119Value1391 === "zh" ? apk119Value1390.data.translation : apk119Value1390.data), apk119Value1390.panes.set(apk119Value1391, apk119Value1392);
+    const apk119Value1393 = apk119Value1392.querySelector("iframe");
+    apk119Value1392._fakeLinkReady = !apk119Value1393, apk119Value1393?.["addEventListener"]("load", () => {
+      apk119Value1392._fakeLinkReady = true;
+      if (apk119Value1389._fakeLinkDetail === apk119Value1390 && apk119Value1390.requested === apk119Value1391) switchFakeLinkDetailLanguage(apk119Value1389, apk119Value1391 === "zh");
+    }, {
+      once: true
+    });
+  }
+  return apk119Value1392;
+}
+function switchFakeLinkDetailLanguage(apk119Value1394, apk119Value1395) {
+  const apk119Value1396 = apk119Value1394._fakeLinkDetail;
+  if (!apk119Value1396) return;
+  apk119Value1395 = !!(apk119Value1395 && apk119Value1396.data.translation);
+  const apk119Value1397 = apk119Value1395 ? "zh" : "original";
+  apk119Value1396.requested = apk119Value1397;
+  const apk119Value1398 = ensureFakeLinkLanguagePane(apk119Value1394, apk119Value1396, apk119Value1397),
+    apk119Value1399 = apk119Value1394.querySelector(".im-fake-link-browser-translate");
+  if (apk119Value1395 && !apk119Value1398._fakeLinkReady) {
+    apk119Value1399.setAttribute("aria-busy", "true"), apk119Value1399.disabled = true;
+    return;
+  }
+  apk119Value1396.panes.forEach((apk119Value1401, apk119Value1402) => {
+    const apk119Value1403 = apk119Value1402 === apk119Value1397;
+    apk119Value1401.classList.toggle("is-active", apk119Value1403), apk119Value1401.setAttribute("aria-hidden", String(!apk119Value1403)), apk119Value1401.inert = !apk119Value1403;
+  }), apk119Value1396.translated = apk119Value1395, apk119Value1399.setAttribute("aria-busy", "false"), apk119Value1399.disabled = !apk119Value1396.data.translation, apk119Value1399.setAttribute("aria-pressed", String(apk119Value1395));
+  const apk119Value1400 = !apk119Value1396.data.translation ? "此链接暂无中文翻译" : apk119Value1395 ? "查看原文" : "查看中文翻译";
+  apk119Value1399.setAttribute("aria-label", apk119Value1400), apk119Value1399.title = apk119Value1400;
+}
 });

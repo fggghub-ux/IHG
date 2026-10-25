@@ -6970,6 +6970,8 @@
                             showToast(
                                 '通知权限未开启，请到安卓系统设置 → 应用 → u2phone → 通知中允许',
                             );
+                        else if (enabled_4 && !result_4.enabled && window.u2NativeBridge?.isNativeIOS?.())
+                            showToast('通知权限未开启，请到 iPhone 设置 → 通知 → u2phone 中允许通知');
                         else
                             result_4.permission === 'denied'
                                 ? showToast('系统通知权限被拒绝，请在浏览器设置中开启')

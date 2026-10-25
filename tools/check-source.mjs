@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 function list(dir) {
@@ -25,7 +26,11 @@ for (const f of list(root).filter((f) => f.endsWith('.js'))) {
         });
         count++;
     } catch (e) {
-        errors.push(e.message);
+        if (path.relative(root, f).startsWith('js/vendor/file-preview/')) {
+            const moduleCheck = spawnSync(process.execPath, ['--input-type=module', '--check'], {input: fs.readFileSync(f, 'utf8'), encoding: 'utf8'});
+            if (moduleCheck.status === 0) count++;
+            else errors.push(moduleCheck.stderr || e.message);
+        } else errors.push(e.message);
     }
 }
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

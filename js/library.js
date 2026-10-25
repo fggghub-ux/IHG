@@ -98,6 +98,8 @@
         neteaseQrImage: '',
         neteaseQrExpiresAt: 0,
         neteaseQrPollPending: false,
+        neteaseQrGeneration: 0,
+        neteaseQrNativePaused: false,
         pendingPlayStatTrackId: null,
         isSeeking: false,
         navDragging: false,
@@ -271,52 +273,33 @@
         }
     }
     function handleAction_23() {
-        const metaNameU2NeteaseGatewayElement = document.querySelector(
-                'meta[name="u2-netease-gateway"]',
-            ),
-            value_184 = window.u2NativeBridge?.isNativeAndroid?.() === true,
-            trim_185 = String(
-                (value_184 ? metaNameU2NeteaseGatewayElement?.dataset?.android : '') ||
-                    metaNameU2NeteaseGatewayElement?.content ||
-                    'auto',
-            ).trim();
-        if (!trim_185 || trim_185.toLowerCase() === 'auto') {
-            if (location.protocol === 'file:') return 'http://localhost:3001';
-            if (!['http:', 'https:'].includes(location.protocol)) return '';
-            const toLowerCase_186 = String(location.hostname || '').toLowerCase(),
-                map_187 = toLowerCase_186.split('.').map(Number),
-                value_188 =
-                    map_187.length === 4 &&
-                    map_187.every(
-                        (value_190) =>
-                            Number.isInteger(value_190) && value_190 >= 0 && value_190 <= 255,
-                    ) &&
-                    (map_187[0] === 10 ||
-                        (map_187[0] === 172 && map_187[1] >= 16 && map_187[1] <= 31) ||
-                        (map_187[0] === 192 && map_187[1] === 168)),
-                value_189 =
-                    location.protocol === 'http:' &&
-                    location.port &&
-                    location.port !== '3001' &&
-                    (['localhost', '127.0.0.1', '[::1]'].includes(toLowerCase_186) || value_188);
-            if (value_189) {
-                const value_191 = new URL(location.origin);
-                return ((value_191.port = '3001'), value_191.href.replace(/\/+$/, ''));
-            }
-            return location.origin.replace(/\/+$/, '');
-        }
-        try {
-            const value_192 = new URL(trim_185, location.href),
-                includes_193 = ['localhost', '127.0.0.1'].includes(value_192.hostname),
-                value_194 =
-                    location.protocol === 'http:' &&
-                    !['localhost', '127.0.0.1'].includes(location.hostname);
-            if (includes_193 && value_194) value_192.hostname = location.hostname;
-            return value_192.href.replace(/\/+$/, '');
-        } catch (value_195) {
-            return trim_185.replace(/\/+$/, '');
-        }
+  const apk119Value278 = document.querySelector("meta[name=\"u2-netease-gateway\"]"),
+    apk119Value279 = window.u2NativeBridge?.["isNativeAndroid"]?.() === true,
+    apk119Value280 = window.u2NativeBridge?.["isNativeIOS"]?.() === true,
+    apk119Value281 = String((apk119Value280 ? apk119Value278?.["dataset"]?.["ios"] : "") || (apk119Value279 ? apk119Value278?.["dataset"]?.["android"] : "") || apk119Value278?.["content"] || "auto").trim();
+  if (!apk119Value281 || apk119Value281.toLowerCase() === "auto") {
+    if (location.protocol === "file:") return "http://localhost:3001";
+    if (!["http:", "https:"].includes(location.protocol)) return "";
+    const apk119Value282 = String(location.hostname || "").toLowerCase(),
+      apk119Value283 = apk119Value282.split(".").map(Number),
+      apk119Value284 = apk119Value283.length === 4 && apk119Value283.every(apk119Value286 => Number.isInteger(apk119Value286) && apk119Value286 >= 0 && apk119Value286 <= 255) && (apk119Value283[0] === 10 || apk119Value283[0] === 172 && apk119Value283[1] >= 16 && apk119Value283[1] <= 31 || apk119Value283[0] === 192 && apk119Value283[1] === 168),
+      apk119Value285 = location.protocol === "http:" && location.port && location.port !== "3001" && (["localhost", "127.0.0.1", "[::1]"].includes(apk119Value282) || apk119Value284);
+    if (apk119Value285) {
+      const apk119Value287 = new URL(location.origin);
+      return apk119Value287.port = "3001", apk119Value287.href.replace(/\/+$/, "");
     }
+    return location.origin.replace(/\/+$/, "");
+  }
+  try {
+    const apk119Value288 = new URL(apk119Value281, location.href),
+      apk119Value289 = ["localhost", "127.0.0.1"].includes(apk119Value288.hostname),
+      apk119Value290 = location.protocol === "http:" && !["localhost", "127.0.0.1"].includes(location.hostname);
+    if (apk119Value289 && apk119Value290) apk119Value288.hostname = location.hostname;
+    return apk119Value288.href.replace(/\/+$/, "");
+  } catch (apk119Value291) {
+    return apk119Value281.replace(/\/+$/, "");
+  }
+}
     function handleAction_24(value_196) {
         const buffer_2 = handleAction_23();
         if (
@@ -361,80 +344,72 @@
     function handleAction_27(track_2) {
         return track_2?.source === source_6 && /^\d+$/.test(String(track_2.neteaseId || ''));
     }
-    async function handleAction_28(value_203, value_204 = {}) {
-        const value_205 = window.u2NativeBridge?.isNativeAndroid?.() === true,
-            controller = new AbortController(),
-            setTimeout_206 = setTimeout(
-                () => controller.abort(),
-                Number(value_204.timeoutMs) || count_10,
-            ),
-            headers_2 = {
-                Accept: 'application/json',
-                ...(value_204.headers || {}),
-            };
-        if (value_204.auth !== false) {
-            const handleAction_25_208 = handleAction_25();
-            if (!handleAction_25_208) {
-                const value_209 = new Error('请先扫码登录网易云音乐');
-                value_209.code = 'SESSION_REQUIRED';
-                throw value_209;
-            }
-            headers_2['X-Netease-Session'] = handleAction_25_208;
-        }
-        if (value_204.body !== undefined) headers_2['Content-Type'] = 'application/json';
-        try {
-            const url_5 = '' + handleAction_23() + value_203;
-            let status_3, value_212;
-            if (value_205) {
-                const requestNetEaseGateway_213 = window.u2NativeBridge?.requestNetEaseGateway;
-                if (typeof requestNetEaseGateway_213 !== 'function')
-                    throw new Error('安卓原生网络模块尚未就绪，请重启应用');
-                const value_214 = await requestNetEaseGateway_213({
-                    url: url_5,
-                    method: value_204.method || 'GET',
-                    headers: headers_2,
-                    body: value_204.body,
-                    timeoutMs: Number(value_204.timeoutMs) || count_10,
-                });
-                status_3 = Number(value_214?.status) || 0;
-                value_212 = value_214?.data;
-                if (typeof value_212 === 'string')
-                    try {
-                        value_212 = JSON.parse(value_212);
-                    } catch (value_215) {
-                        value_212 = {};
-                    }
-                if (!value_212 || typeof value_212 !== 'object') value_212 = {};
-            } else {
-                const value_216 = await fetch(url_5, {
-                    method: value_204.method || 'GET',
-                    headers: headers_2,
-                    body: value_204.body === undefined ? undefined : JSON.stringify(value_204.body),
-                    signal: controller.signal,
-                    mode: 'cors',
-                    credentials: 'omit',
-                });
-                status_3 = value_216.status;
-                try {
-                    value_212 = await value_216.json();
-                } catch (value_217) {
-                    value_212 = {};
-                }
-            }
-            if (status_3 < 200 || status_3 >= 300) {
-                const value_218 = new Error(
-                    value_212?.error?.message || '网易云网关请求失败 (' + status_3 + ')',
-                );
-                value_218.code = value_212?.error?.code || 'GATEWAY_ERROR';
-                value_218.status = status_3;
-                status_3 === 401 && (await handleAction_26(''), handleAction_127());
-                throw value_218;
-            }
-            return value_212;
-        } finally {
-            clearTimeout(setTimeout_206);
-        }
+    async function handleAction_28(apk119Value299, apk119Value300 = {}) {
+  const apk119Value301 = window.u2NativeBridge?.["isNativeAndroid"]?.() === true,
+    apk119Value302 = window.u2NativeBridge?.["isNativeIOS"]?.() === true,
+    apk119Value303 = new AbortController(),
+    apk119Value304 = setTimeout(() => apk119Value303.abort(), Number(apk119Value300.timeoutMs) || count_10),
+    apk119Value305 = {
+      Accept: "application/json",
+      ...(apk119Value300.headers || {})
+    };
+  if (apk119Value300.auth !== false) {
+    const apk119Value306 = handleAction_25();
+    if (!apk119Value306) {
+      const apk119Value307 = new Error("请先扫码登录网易云音乐");
+      apk119Value307.code = "SESSION_REQUIRED";
+      throw apk119Value307;
     }
+    apk119Value305["X-Netease-Session"] = apk119Value306;
+  }
+  if (apk119Value300.body !== undefined) apk119Value305["Content-Type"] = "application/json";
+  try {
+    const apk119Value308 = "" + handleAction_23() + apk119Value299;
+    let apk119Value309, apk119Value310;
+    if (apk119Value301 || apk119Value302) {
+      const apk119Value311 = window.u2NativeBridge?.["requestNetEaseGateway"];
+      if (typeof apk119Value311 !== "function") throw new Error("原生网络模块尚未就绪，请重启应用");
+      const apk119Value312 = await apk119Value311({
+        url: apk119Value308,
+        method: apk119Value300.method || "GET",
+        headers: apk119Value305,
+        body: apk119Value300.body,
+        timeoutMs: Number(apk119Value300.timeoutMs) || count_10
+      });
+      apk119Value309 = Number(apk119Value312?.["status"]) || 0, apk119Value310 = apk119Value312?.["data"];
+      if (typeof apk119Value310 === "string") try {
+        apk119Value310 = JSON.parse(apk119Value310);
+      } catch (apk119Value313) {
+        apk119Value310 = {};
+      }
+      if (!apk119Value310 || typeof apk119Value310 !== "object") apk119Value310 = {};
+    } else {
+      const apk119Value314 = await fetch(apk119Value308, {
+        method: apk119Value300.method || "GET",
+        headers: apk119Value305,
+        body: apk119Value300.body === undefined ? undefined : JSON.stringify(apk119Value300.body),
+        signal: apk119Value303.signal,
+        mode: "cors",
+        credentials: "omit"
+      });
+      apk119Value309 = apk119Value314.status;
+      try {
+        apk119Value310 = await apk119Value314.json();
+      } catch (apk119Value315) {
+        apk119Value310 = {};
+      }
+    }
+    if (apk119Value309 < 200 || apk119Value309 >= 300) {
+      const apk119Value316 = new Error(apk119Value310?.["error"]?.["message"] || "网易云网关请求失败 (" + apk119Value309 + ")");
+      apk119Value316.code = apk119Value310?.["error"]?.["code"] || "GATEWAY_ERROR", apk119Value316.status = apk119Value309;
+      apk119Value309 === 401 && (await handleAction_26(""), handleAction_127());
+      throw apk119Value316;
+    }
+    return apk119Value310;
+  } finally {
+    clearTimeout(apk119Value304);
+  }
+}
     function safeImageSource(value_5) {
         const source_2 = String(value_5 || '').trim();
         if (/^https?:\/\//i.test(source_2)) return safeHttpUrl(source_2);
@@ -3518,13 +3493,8 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             (dom.netease_qr_check.disabled = !value_866 || state.neteaseQrPollPending));
     }
     function handleAction_131() {
-        handleAction_129();
-        state.neteaseQrKey = '';
-        state.neteaseQrImage = '';
-        state.neteaseQrExpiresAt = 0;
-        state.neteaseQrPollPending = false;
-        handleAction_130();
-    }
+  handleAction_129(), state.neteaseQrGeneration += 1, state.neteaseQrKey = "", state.neteaseQrImage = "", state.neteaseQrExpiresAt = 0, state.neteaseQrPollPending = false, handleAction_130();
+}
     function handleAction_132() {
         return state.neteaseQrExpiresAt > 0 && Date.now() >= state.neteaseQrExpiresAt;
     }
@@ -3567,184 +3537,119 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
         };
     }
     async function handleAction_136() {
-        if (!state.neteaseQrImage || !state.neteaseQrKey) {
-            toast('请先生成网易云登录二维码');
-            return;
-        }
-        if (handleAction_132()) {
-            handleAction_133();
-            return;
-        }
-        try {
-            const { blob: blob_3, file: file_8, name: download_2 } = handleAction_135();
-            if (
-                window.u2NativeBridge?.isNativeAndroid?.() &&
-                typeof window.u2NativeBridge?.exportFile === 'function'
-            ) {
-                const value_882 = await window.u2NativeBridge.exportFile({
-                    blob: file_8 || blob_3,
-                    fileName: download_2,
-                    title: '网易云登录二维码',
-                });
-                if (value_882 !== 'cancelled')
-                    toast('保存后请在网易云音乐“扫一扫”中从相册选择二维码');
-                return;
-            }
-            const value_880 = file_8
-                ? {
-                      files: [file_8],
-                      title: '网易云登录二维码',
-                  }
-                : null;
-            if (
-                value_880 &&
-                typeof navigator.share === 'function' &&
-                typeof navigator.canShare === 'function' &&
-                navigator.canShare(value_880)
-            )
-                try {
-                    await navigator.share(value_880);
-                    toast('保存后请在网易云音乐“扫一扫”中从相册选择二维码');
-                    return;
-                } catch (value_883) {
-                    if (value_883?.name === 'AbortError') return;
-                }
-            const element_881 = document.createElement('a');
-            element_881.href = state.neteaseQrImage;
-            element_881.download = download_2;
-            element_881.target = '_blank';
-            element_881.rel = 'noopener';
-            document.body.appendChild(element_881);
-            element_881.click();
-            element_881.remove();
-            toast('已发起保存；若没有下载，请长按二维码图片保存');
-        } catch (value_884) {
-            console.error('[Library] NetEase QR save failed:', value_884);
-            toast('无法自动保存，请长按二维码图片保存');
-        }
+  if (!state.neteaseQrImage || !state.neteaseQrKey) {
+    toast("请先生成网易云登录二维码");
+    return;
+  }
+  if (handleAction_132()) {
+    handleAction_133();
+    return;
+  }
+  try {
+    const {
+      blob: apk119Value1032,
+      file: apk119Value1033,
+      name: apk119Value1034
+    } = handleAction_135();
+    if (window.u2NativeBridge?.["isNativeIOS"]?.()) {
+      if (typeof window.u2NativeBridge.shareNetEaseQrImage !== "function") throw new Error("请更新 IPA 后保存二维码");
+      const apk119Value1037 = await window.u2NativeBridge.shareNetEaseQrImage({
+        dataUrl: state.neteaseQrImage
+      });
+      if (apk119Value1037 !== "cancelled") toast("保存后请在网易云音乐“扫一扫”中从相册选择二维码");
+      return;
     }
+    if (window.u2NativeBridge?.["isNativeAndroid"]?.() && typeof window.u2NativeBridge?.["exportFile"] === "function") {
+      const apk119Value1038 = await window.u2NativeBridge.exportFile({
+        blob: apk119Value1033 || apk119Value1032,
+        fileName: apk119Value1034,
+        title: "网易云登录二维码"
+      });
+      if (apk119Value1038 !== "cancelled") toast("保存后请在网易云音乐“扫一扫”中从相册选择二维码");
+      return;
+    }
+    const apk119Value1035 = apk119Value1033 ? {
+      files: [apk119Value1033],
+      title: "网易云登录二维码"
+    } : null;
+    if (apk119Value1035 && typeof navigator.share === "function" && typeof navigator.canShare === "function" && navigator.canShare(apk119Value1035)) try {
+      await navigator.share(apk119Value1035), toast("保存后请在网易云音乐“扫一扫”中从相册选择二维码");
+      return;
+    } catch (apk119Value1039) {
+      if (apk119Value1039?.["name"] === "AbortError") return;
+    }
+    const apk119Value1036 = document.createElement("a");
+    apk119Value1036.href = state.neteaseQrImage, apk119Value1036.download = apk119Value1034, apk119Value1036.target = "_blank", apk119Value1036.rel = "noopener", document.body.appendChild(apk119Value1036), apk119Value1036.click(), apk119Value1036.remove(), toast("已发起保存；若没有下载，请长按二维码图片保存");
+  } catch (apk119Value1040) {
+    console.error("[Library] NetEase QR save failed:", apk119Value1040), toast("无法自动保存，请长按二维码图片保存");
+  }
+}
     async function startNetEaseQrLogin_2() {
-        handleAction_131();
-        openModal(dom.netease_login_modal, {
-            focus: false,
-        });
-        dom.netease_qr.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        handleAction_134('正在生成二维码…', '请稍候。');
-        try {
-            const value_885 = await handleAction_28('/api/netease/qr/start', {
-                    method: 'POST',
-                    auth: false,
-                }),
-                neteaseQrImage_2 = safeImageSource(value_885?.qrImage);
-            if (!value_885?.key || !neteaseQrImage_2) throw new Error('二维码生成失败');
-            state.neteaseQrKey = String(value_885.key);
-            state.neteaseQrImage = neteaseQrImage_2;
-            state.neteaseQrExpiresAt = Number(value_885.expiresAt) || Date.now() + 240000;
-            dom.netease_qr.innerHTML =
-                '<img src="' +
-                escapeHtml(neteaseQrImage_2) +
-                '" alt="网易云登录二维码" title="长按保存二维码">';
-            handleAction_130();
-            handleAction_134(
-                '等待扫码',
-                '保存二维码后，打开网易云音乐 App，进入“扫一扫”并从相册选择二维码；确认后返回此页面。',
-            );
-            handleAction_138(600);
-        } catch (value_887) {
-            console.error('[Library] NetEase QR start failed:', value_887);
-            dom.netease_qr.innerHTML = '<i class="fas fa-triangle-exclamation"></i>';
-            handleAction_134('二维码生成失败', handleAction_24(value_887), {
-                retry: true,
-            });
-        }
-    }
-    function handleAction_138(value_888 = 1500) {
-        handleAction_129();
-        if (!state.neteaseQrKey || dom.netease_login_modal?.hidden || document.hidden) return;
-        if (handleAction_132()) return handleAction_133();
-        state.neteaseQrPollTimer = setTimeout(handleAction_139, value_888);
-    }
+  handleAction_131();
+  const apk119Value1041 = state.neteaseQrGeneration;
+  openModal(dom.netease_login_modal, {
+    focus: false
+  }), dom.netease_qr.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i>", handleAction_134("正在生成二维码…", "请稍候。");
+  try {
+    const apk119Value1042 = await handleAction_28("/api/netease/qr/start", {
+      method: "POST",
+      auth: false
+    });
+    if (apk119Value1041 !== state.neteaseQrGeneration || dom.netease_login_modal.hidden) return;
+    const apk119Value1043 = safeImageSource(apk119Value1042?.["qrImage"]);
+    if (!apk119Value1042?.["key"] || !apk119Value1043) throw new Error("二维码生成失败");
+    state.neteaseQrKey = String(apk119Value1042.key), state.neteaseQrImage = apk119Value1043, state.neteaseQrExpiresAt = Number(apk119Value1042.expiresAt) || Date.now() + 240000, dom.netease_qr.innerHTML = "<img src=\"" + escapeHtml(apk119Value1043) + "\" alt=\"网易云登录二维码\" title=\"长按保存二维码\">", handleAction_130(), handleAction_134("等待扫码", "保存二维码后，打开网易云音乐 App，进入“扫一扫”并从相册选择二维码；确认后返回此页面。"), handleAction_138(600);
+  } catch (apk119Value1044) {
+    if (apk119Value1041 !== state.neteaseQrGeneration || dom.netease_login_modal.hidden) return;
+    console.error("[Library] NetEase QR start failed:", apk119Value1044), dom.netease_qr.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i>", handleAction_134("二维码生成失败", handleAction_24(apk119Value1044), {
+      retry: true
+    });
+  }
+}
+    function handleAction_138(apk119Value1045 = 1500) {
+  handleAction_129();
+  if (!state.neteaseQrKey || dom.netease_login_modal?.["hidden"] || document.hidden || state.neteaseQrNativePaused) return;
+  if (handleAction_132()) return handleAction_133();
+  state.neteaseQrPollTimer = setTimeout(handleAction_139, apk119Value1045);
+}
     async function handleAction_139() {
-        const neteaseQrKey_889 = state.neteaseQrKey;
-        if (
-            !neteaseQrKey_889 ||
-            dom.netease_login_modal?.hidden ||
-            document.hidden ||
-            state.neteaseQrPollPending
-        )
-            return;
-        if (handleAction_132()) return handleAction_133();
-        state.neteaseQrPollPending = true;
-        handleAction_130();
-        try {
-            const value_890 = await handleAction_28(
-                '/api/netease/qr/status?key=' + encodeURIComponent(neteaseQrKey_889),
-                {
-                    auth: false,
-                },
-            );
-            if (neteaseQrKey_889 !== state.neteaseQrKey) return;
-            if (value_890.status === 'waiting')
-                return (
-                    handleAction_134(
-                        '等待扫码',
-                        '请保存二维码，并在网易云音乐“扫一扫”中从相册选择。',
-                    ),
-                    handleAction_138()
-                );
-            if (value_890.status === 'scanned')
-                return (
-                    handleAction_134('已扫码', '请在网易云音乐 App 中确认登录，然后返回此页面。'),
-                    handleAction_138()
-                );
-            if (value_890.status === 'expired') return handleAction_133();
-            if (
-                value_890.status !== 'authorized' ||
-                !value_890.sessionToken ||
-                !value_890.profile?.userId
-            )
-                throw new Error('网易云没有返回有效登录状态');
-            handleAction_131();
-            await handleAction_26(value_890.sessionToken);
-            state.neteaseAccount = {
-                profile: value_890.profile,
-                lastSyncAt: 0,
-                syncLabel: '',
-            };
-            await storage().setSetting(text_8, state.neteaseAccount);
-            handleAction_127();
-            handleAction_134('登录成功', '正在同步你的音乐库…');
-            const value_891 = await syncNetEaseAccountLibrary_2({
-                closeLoginModal: true,
-            });
-            !value_891 &&
-                !dom.netease_login_modal.hidden &&
-                handleAction_134(
-                    '登录成功，同步失败',
-                    '账号已经连接，可以关闭窗口后点击刷新重试。',
-                );
-        } catch (value_892) {
-            console.error('[Library] NetEase QR check failed:', value_892);
-            if (
-                neteaseQrKey_889 === state.neteaseQrKey &&
-                !handleAction_132() &&
-                (value_892?.name === 'AbortError' || value_892 instanceof TypeError)
-            ) {
-                handleAction_134(
-                    '连接暂时中断',
-                    '二维码仍然有效，请检查网络后点击“我已确认，立即检查”。',
-                );
-                return;
-            }
-            handleAction_131();
-            handleAction_134('登录失败', handleAction_24(value_892), {
-                retry: true,
-            });
-        } finally {
-            neteaseQrKey_889 === state.neteaseQrKey &&
-                ((state.neteaseQrPollPending = false), handleAction_130());
-        }
+  const apk119Value1046 = state.neteaseQrKey,
+    apk119Value1047 = state.neteaseQrGeneration;
+  if (!apk119Value1046 || dom.netease_login_modal?.["hidden"] || document.hidden || state.neteaseQrNativePaused || state.neteaseQrPollPending) return;
+  if (handleAction_132()) return handleAction_133();
+  state.neteaseQrPollPending = true, handleAction_130();
+  try {
+    const apk119Value1048 = await handleAction_28("/api/netease/qr/status?key=" + encodeURIComponent(apk119Value1046), {
+      auth: false
+    });
+    if (apk119Value1046 !== state.neteaseQrKey || apk119Value1047 !== state.neteaseQrGeneration || dom.netease_login_modal.hidden) return;
+    if (apk119Value1048.status === "waiting") return handleAction_134("等待扫码", "请保存二维码，并在网易云音乐“扫一扫”中从相册选择。"), handleAction_138();
+    if (apk119Value1048.status === "scanned") return handleAction_134("已扫码", "请在网易云音乐 App 中确认登录，然后返回此页面。"), handleAction_138();
+    if (apk119Value1048.status === "expired") return handleAction_133();
+    if (apk119Value1048.status !== "authorized" || !apk119Value1048.sessionToken || !apk119Value1048.profile?.["userId"]) throw new Error("网易云没有返回有效登录状态");
+    handleAction_131(), await handleAction_26(apk119Value1048.sessionToken), state.neteaseAccount = {
+      profile: apk119Value1048.profile,
+      lastSyncAt: 0,
+      syncLabel: ""
+    }, await storage().setSetting(text_8, state.neteaseAccount), handleAction_127(), handleAction_134("登录成功", "正在同步你的音乐库…");
+    const apk119Value1049 = await syncNetEaseAccountLibrary_2({
+      closeLoginModal: true
+    });
+    !apk119Value1049 && !dom.netease_login_modal.hidden && handleAction_134("登录成功，同步失败", "账号已经连接，可以关闭窗口后点击刷新重试。");
+  } catch (apk119Value1050) {
+    if (apk119Value1046 !== state.neteaseQrKey || apk119Value1047 !== state.neteaseQrGeneration || dom.netease_login_modal.hidden) return;
+    console.error("[Library] NetEase QR check failed:", apk119Value1050);
+    if (apk119Value1046 === state.neteaseQrKey && !handleAction_132() && (apk119Value1050?.["name"] === "AbortError" || apk119Value1050 instanceof TypeError)) {
+      handleAction_134("连接暂时中断", "二维码仍然有效，请检查网络后点击“我已确认，立即检查”。");
+      return;
     }
+    handleAction_131(), handleAction_134("登录失败", handleAction_24(apk119Value1050), {
+      retry: true
+    });
+  } finally {
+    apk119Value1046 === state.neteaseQrKey && apk119Value1047 === state.neteaseQrGeneration && (state.neteaseQrPollPending = false, handleAction_130());
+  }
+}
     function handlePageshow() {
         if (document.hidden) {
             handleAction_129();
@@ -5464,6 +5369,8 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             } else handlePageshow();
         });
         window.addEventListener('pageshow', handlePageshow);
+        window.addEventListener('u2:native-pause', pauseNativeNetEaseQr);
+        window.addEventListener('u2:native-resume', resumeNativeNetEaseQr);
     }
     function handleAction_175() {
         setInterval(() => {
@@ -5521,4 +5428,10 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
         window.u2OnStorageReady ||
         ((callback) => document.addEventListener('DOMContentLoaded', callback))
     )(init);
+function pauseNativeNetEaseQr() {
+  state.neteaseQrNativePaused = true, handleAction_129();
+}
+function resumeNativeNetEaseQr() {
+  state.neteaseQrNativePaused = false, handlePageshow();
+}
 })();

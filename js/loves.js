@@ -317,20 +317,6 @@ window.lovesApp = {
                 '',
         ).trim();
     },
-    getFriendPhoneChineseContactName: function (
-        record_2,
-        field = 'name',
-        fallback_2 = '未知联系人',
-    ) {
-        if (!record_2 || typeof record_2 !== 'object') return String(fallback_2 || '未知联系人');
-        const fallbackName = String(fallback_2 || '未知联系人'),
-            translation_4 = this.getFriendPhoneTranslation(record_2, field),
-            original_2 = String(record_2[field] ?? '').trim(),
-            hasChinese = (value_18) => /[\u3400-\u9fff]/.test(String(value_18 || ''));
-        if (hasChinese(translation_4)) return translation_4;
-        if (hasChinese(original_2)) return original_2;
-        return fallbackName;
-    },
     renderFriendPhoneLocalized: function (record_3, field_2, options_2 = {}) {
         const original_3 = this.escapeHTML(record_3?.[field_2] ?? options_2.fallback ?? '').replace(
                 /\n/g,
@@ -436,94 +422,39 @@ window.lovesApp = {
             output
         );
     },
-    validateFriendPhoneLocalizedTree: function (value_76, language_5, value_78 = 'root') {
-        if (this.normalizeFriendPhoneLanguage(language_5) === 'zh') return [];
-        const machineFields = new Set([
-                'id',
-                'batchId',
-                'kind',
-                'sender',
-                'type',
-                'icon',
-                'color',
-                'cardNumber',
-                'loops',
-                'steps',
-                'sleepHours',
-                'sleepMinutes',
-                'heartRate',
-                'weight',
-                'height',
-                'totalAssets',
-                'amount',
-                'isIncome',
-                'reposts',
-                'likes',
-                'url',
-                'avatarUrl',
-                'result',
-                'kda',
-                'winRate',
-            ]),
-            missingPaths = [],
-            isChineseOnlyContactField = (key_3, currentPath) => {
-                if (key_3 === 'contactName' || key_3 === 'userRemark') return true;
-                return (
-                    key_3 === 'name' &&
-                    /^phone\.call\.(?:recentCalls|contacts)\[\d+\]$/.test(currentPath)
-                );
-            },
-            isUnrestrictedLanguageField = (key_4, currentPath_2) => {
-                if (
-                    key_4 === 'name' &&
-                    /^phone\.music\.(?:recent|favorites|top)\[\d+\]$/.test(currentPath_2)
-                )
-                    return true;
-                if (currentPath_2.startsWith('phone.weibo')) return key_4 !== 'text';
-                if (currentPath_2.startsWith('phone.files')) return key_4 !== 'content';
-                if (!currentPath_2.startsWith('phone.game')) return false;
-                return !['desc', 'innerThoughts', 'postGameReflection', 'thoughts'].includes(key_4);
-            },
-            value_83 = (items_87, value_88) => {
-                if (Array.isArray(items_87))
-                    return items_87.forEach((value_89, value_90) =>
-                        value_83(value_89, value_88 + '[' + value_90 + ']'),
-                    );
-                if (!items_87 || typeof items_87 !== 'object') return;
-                Object.entries(items_87).forEach(([key_5, value_92]) => {
-                    if (
-                        key_5.endsWith('TranslationZh') ||
-                        key_5.endsWith('Translation') ||
-                        key_5 === 'translationZh' ||
-                        key_5 === 'translation'
-                    )
-                        return;
-                    if (
-                        typeof value_92 === 'string' &&
-                        value_92.trim() &&
-                        !machineFields.has(key_5) &&
-                        !isChineseOnlyContactField(key_5, value_88) &&
-                        !isUnrestrictedLanguageField(key_5, value_88)
-                    ) {
-                        const trim_93 = String(
-                            items_87[key_5 + 'TranslationZh'] ??
-                                (key_5 === 'text'
-                                    ? (items_87.translationZh ?? items_87.translation)
-                                    : '') ??
-                                '',
-                        ).trim();
-                        if (!trim_93) missingPaths.push(value_88 + '.' + key_5);
-                    } else {
-                        if (value_92 && typeof value_92 === 'object')
-                            value_83(value_92, value_88 + '.' + key_5);
-                    }
-                });
-            };
-        value_83(value_76, value_78);
-        if (missingPaths.length)
-            console.warn('[Loves] 好友手机内容缺少中文翻译，已按原文降级展示：', missingPaths);
-        return missingPaths;
+    validateFriendPhoneLocalizedTree: function (apk119Value96, apk119Value97, apk119Value98 = "root") {
+  if (this.normalizeFriendPhoneLanguage(apk119Value97) === "zh") return [];
+  const apk119Value99 = new Set(["id", "batchId", "kind", "sender", "type", "icon", "color", "cardNumber", "loops", "steps", "sleepHours", "sleepMinutes", "heartRate", "weight", "height", "totalAssets", "amount", "isIncome", "reposts", "likes", "url", "avatarUrl", "result", "kda", "winRate"]),
+    apk119Value100 = [],
+    apk119Value101 = (apk119Value104, apk119Value105) => {
+      if (apk119Value104 === "contactName" || apk119Value104 === "userRemark") return true;
+      return apk119Value104 === "name" && /^phone\.call\.(?:recentCalls|contacts)\[\d+\]$/.test(apk119Value105);
     },
+    apk119Value102 = (apk119Value106, apk119Value107) => {
+      if (apk119Value106 === "name" && /^phone\.music\.(?:recent|favorites|top)\[\d+\]$/.test(apk119Value107)) return true;
+      if (apk119Value107.startsWith("phone.weibo")) return apk119Value106 !== "text";
+      if (apk119Value107.startsWith("phone.files")) return apk119Value106 !== "content";
+      if (!apk119Value107.startsWith("phone.game")) return false;
+      return !["desc", "innerThoughts", "postGameReflection", "thoughts"].includes(apk119Value106);
+    },
+    apk119Value103 = (apk119Value108, apk119Value109) => {
+      if (apk119Value109 === "phone.call" || apk119Value109.startsWith("phone.call.")) return;
+      if (Array.isArray(apk119Value108)) return apk119Value108.forEach((apk119Value110, apk119Value111) => apk119Value103(apk119Value110, apk119Value109 + "[" + apk119Value111 + "]"));
+      if (!apk119Value108 || typeof apk119Value108 !== "object") return;
+      Object.entries(apk119Value108).forEach(([apk119Value112, apk119Value113]) => {
+        if (apk119Value112.endsWith("TranslationZh") || apk119Value112.endsWith("Translation") || apk119Value112 === "translationZh" || apk119Value112 === "translation") return;
+        if (typeof apk119Value113 === "string" && apk119Value113.trim() && !apk119Value99.has(apk119Value112) && !apk119Value101(apk119Value112, apk119Value109) && !apk119Value102(apk119Value112, apk119Value109)) {
+          const apk119Value114 = String(apk119Value108[apk119Value112 + "TranslationZh"] ?? (apk119Value112 === "text" ? apk119Value108.translationZh ?? apk119Value108.translation : "") ?? "").trim();
+          if (!apk119Value114) apk119Value100.push(apk119Value109 + "." + apk119Value112);
+        } else {
+          if (apk119Value113 && typeof apk119Value113 === "object") apk119Value103(apk119Value113, apk119Value109 + "." + apk119Value112);
+        }
+      });
+    };
+  apk119Value103(apk119Value96, apk119Value98);
+  if (apk119Value100.length) console.warn("[Loves] 好友手机内容缺少中文翻译，已按原文降级展示：", apk119Value100);
+  return apk119Value100;
+},
     clearFriendPhoneChineseTranslations: function (value_25) {
         if (Array.isArray(value_25))
             return value_25.forEach((item_4) => this.clearFriendPhoneChineseTranslations(item_4));
@@ -575,141 +506,107 @@ window.lovesApp = {
             };
         });
     },
-    mergeFriendPhoneGeneratedData: function (friend_2, parsed_2, options_3 = {}) {
-        const generatedAt_3 = Number(options_3.generatedAt) || Date.now(),
-            batchId_3 =
-                options_3.batchId ||
-                'phone-' + generatedAt_3 + '-' + Math.random().toString(36).slice(2, 8),
-            language_6 = this.normalizeFriendPhoneLanguage(friend_2?.language || 'zh'),
-            clean = this.stripAndStampFriendPhoneGeneratedTree(parsed_2, generatedAt_3, batchId_3);
-        if (language_6 === 'zh') this.clearFriendPhoneChineseTranslations(clean);
-        if (options_3.skipValidation !== true)
-            this.validateFriendPhoneLocalizedTree(clean, language_6, 'phone');
-        const next_2 = {};
-        if (clean.music) {
-            const normalizeSong = (value_114) => {
-                const options_115 = {
-                    ...(value_114 || {}),
-                };
-                return (
-                    delete options_115.nameTranslationZh,
-                    delete options_115.nameTranslation,
-                    options_115
-                );
-            };
-            next_2.musicData = {
-                ...clean.music,
-                recent: Array.isArray(clean.music.recent)
-                    ? clean.music.recent.map(normalizeSong)
-                    : [],
-                favorites: Array.isArray(clean.music.favorites)
-                    ? clean.music.favorites.map(normalizeSong)
-                    : [],
-                top: Array.isArray(clean.music.top) ? clean.music.top.map(normalizeSong) : [],
-            };
-        }
-        if (clean.health) {
-            const snapshot = {
-                ...clean.health,
-                generatedAt: generatedAt_3,
-                batchId: batchId_3,
-            };
-            next_2.healthData = {
-                ...snapshot,
-                history: [snapshot],
-            };
-        }
-        if (clean.pay) {
-            const snapshot_2 = {
-                ...clean.pay,
-                generatedAt: generatedAt_3,
-                batchId: batchId_3,
-            };
-            next_2.payData = {
-                ...snapshot_2,
-                recentTransactions: Array.isArray(clean.pay.recentTransactions)
-                    ? clean.pay.recentTransactions
-                    : [],
-                snapshots: [snapshot_2],
-            };
-        }
-        if (clean.safari)
-            next_2.safariData = {
-                recentSearches: Array.isArray(clean.safari.recentSearches)
-                    ? clean.safari.recentSearches
-                    : [],
-                privateSearches: Array.isArray(clean.safari.privateSearches)
-                    ? clean.safari.privateSearches
-                    : [],
-            };
-        if (clean.call)
-            next_2.callData = {
-                ...clean.call,
-                recentCalls: Array.isArray(clean.call.recentCalls) ? clean.call.recentCalls : [],
-                contacts: Array.isArray(clean.call.contacts) ? clean.call.contacts : [],
-            };
-        if (clean.files)
-            next_2.filesData = {
-                ...clean.files,
-                tags: Array.isArray(clean.files.tags) ? clean.files.tags : [],
-                recent: Array.isArray(clean.files.recent) ? clean.files.recent : [],
-            };
-        if (clean.game) {
-            const stripTranslations = (value_119, items_120) => {
-                    const options_121 = {
-                        ...(value_119 || {}),
-                    };
-                    return (
-                        items_120.forEach((value_122) => {
-                            delete options_121[value_122 + 'TranslationZh'];
-                            delete options_121[value_122 + 'Translation'];
-                        }),
-                        options_121
-                    );
-                },
-                gameRoot = stripTranslations(clean.game, ['playerName', 'totalHours']);
-            next_2.gameData = {
-                ...gameRoot,
-                recentGames: Array.isArray(clean.game.recentGames)
-                    ? clean.game.recentGames.map((game_2) => {
-                          const normalizedGame = stripTranslations(game_2, [
-                              'name',
-                              'hours',
-                              'rank',
-                              'winRate',
-                          ]);
-                          return {
-                              ...normalizedGame,
-                              matches: Array.isArray(game_2?.matches)
-                                  ? game_2.matches.map((match_2) =>
-                                        stripTranslations(match_2, ['result', 'kda', 'hero']),
-                                    )
-                                  : game_2?.matches,
-                          };
-                      })
-                    : [],
-            };
-        }
-        if (clean.weibo) {
-            const replaceAccount = (fresh) => ({
-                ...(fresh || {}),
-                posts: Array.isArray(fresh?.posts) ? fresh.posts : [],
-                album: Array.isArray(fresh?.album) ? fresh.album : [],
-                liked: Array.isArray(fresh?.liked) ? fresh.liked : [],
-            });
-            next_2.weiboData = {
-                mainAccount: replaceAccount(
-                    clean.weibo.mainAccount || clean.weibo.main || clean.weibo,
-                ),
-                altAccount: replaceAccount(clean.weibo.altAccount || clean.weibo.alt || {}),
-            };
-        }
-        return {
-            next: next_2,
-            generatedAt: generatedAt_3,
-            batchId: batchId_3,
+    mergeFriendPhoneGeneratedData: function (apk119Value132, apk119Value133, apk119Value134 = {}) {
+  const apk119Value135 = Number(apk119Value134.generatedAt) || Date.now(),
+    apk119Value136 = apk119Value134.batchId || "phone-" + apk119Value135 + "-" + Math.random().toString(36).slice(2, 8),
+    apk119Value137 = this.normalizeFriendPhoneLanguage(apk119Value132?.["language"] || "zh"),
+    apk119Value138 = this.stripAndStampFriendPhoneGeneratedTree(apk119Value133, apk119Value135, apk119Value136);
+  if (apk119Value137 === "zh") this.clearFriendPhoneChineseTranslations(apk119Value138);
+  if (apk119Value134.skipValidation !== true) this.validateFriendPhoneLocalizedTree(apk119Value138, apk119Value137, "phone");
+  const apk119Value139 = {};
+  if (apk119Value138.music) {
+    const apk119Value140 = apk119Value141 => {
+      const apk119Value142 = {
+        ...(apk119Value141 || {})
+      };
+      return delete apk119Value142.nameTranslationZh, delete apk119Value142.nameTranslation, apk119Value142;
+    };
+    apk119Value139.musicData = {
+      ...apk119Value138.music,
+      recent: Array.isArray(apk119Value138.music.recent) ? apk119Value138.music.recent.map(apk119Value140) : [],
+      favorites: Array.isArray(apk119Value138.music.favorites) ? apk119Value138.music.favorites.map(apk119Value140) : [],
+      top: Array.isArray(apk119Value138.music.top) ? apk119Value138.music.top.map(apk119Value140) : []
+    };
+  }
+  if (apk119Value138.health) {
+    const apk119Value143 = {
+      ...apk119Value138.health,
+      generatedAt: apk119Value135,
+      batchId: apk119Value136
+    };
+    apk119Value139.healthData = {
+      ...apk119Value143,
+      history: [apk119Value143]
+    };
+  }
+  if (apk119Value138.pay) {
+    const apk119Value144 = {
+      ...apk119Value138.pay,
+      generatedAt: apk119Value135,
+      batchId: apk119Value136
+    };
+    apk119Value139.payData = {
+      ...apk119Value144,
+      recentTransactions: Array.isArray(apk119Value138.pay.recentTransactions) ? apk119Value138.pay.recentTransactions : [],
+      snapshots: [apk119Value144]
+    };
+  }
+  if (apk119Value138.safari) apk119Value139.safariData = {
+    recentSearches: Array.isArray(apk119Value138.safari.recentSearches) ? apk119Value138.safari.recentSearches : [],
+    privateSearches: Array.isArray(apk119Value138.safari.privateSearches) ? apk119Value138.safari.privateSearches : []
+  };
+  apk119Value138.call && (apk119Value139.callData = window.cphoneCallApp ? window.cphoneCallApp.mergeGeneratedData(apk119Value132, apk119Value138.call, {
+    generatedAt: apk119Value135,
+    count: apk119Value134.callCount
+  }) : {
+    ...apk119Value132.callData,
+    recentCalls: [...(apk119Value132.callData?.["recentCalls"] || []), ...(apk119Value138.call.recentCalls || [])],
+    contacts: [...(apk119Value132.callData?.["contacts"] || []), ...(apk119Value138.call.contacts || [])]
+  });
+  if (apk119Value138.files) apk119Value139.filesData = {
+    ...apk119Value138.files,
+    tags: Array.isArray(apk119Value138.files.tags) ? apk119Value138.files.tags : [],
+    recent: Array.isArray(apk119Value138.files.recent) ? apk119Value138.files.recent : []
+  };
+  if (apk119Value138.game) {
+    const apk119Value145 = (apk119Value147, apk119Value148) => {
+        const apk119Value149 = {
+          ...(apk119Value147 || {})
         };
-    },
+        return apk119Value148.forEach(apk119Value150 => {
+          delete apk119Value149[apk119Value150 + "TranslationZh"], delete apk119Value149[apk119Value150 + "Translation"];
+        }), apk119Value149;
+      },
+      apk119Value146 = apk119Value145(apk119Value138.game, ["playerName", "totalHours"]);
+    apk119Value139.gameData = {
+      ...apk119Value146,
+      recentGames: Array.isArray(apk119Value138.game.recentGames) ? apk119Value138.game.recentGames.map(apk119Value151 => {
+        const apk119Value152 = apk119Value145(apk119Value151, ["name", "hours", "rank", "winRate"]);
+        return {
+          ...apk119Value152,
+          matches: Array.isArray(apk119Value151?.["matches"]) ? apk119Value151.matches.map(apk119Value153 => apk119Value145(apk119Value153, ["result", "kda", "hero"])) : apk119Value151?.["matches"]
+        };
+      }) : []
+    };
+  }
+  if (apk119Value138.weibo) {
+    const apk119Value154 = apk119Value155 => ({
+      ...(apk119Value155 || {}),
+      posts: Array.isArray(apk119Value155?.["posts"]) ? apk119Value155.posts : [],
+      album: Array.isArray(apk119Value155?.["album"]) ? apk119Value155.album : [],
+      liked: Array.isArray(apk119Value155?.["liked"]) ? apk119Value155.liked : []
+    });
+    apk119Value139.weiboData = {
+      mainAccount: apk119Value154(apk119Value138.weibo.mainAccount || apk119Value138.weibo.main || apk119Value138.weibo),
+      altAccount: apk119Value154(apk119Value138.weibo.altAccount || apk119Value138.weibo.alt || {})
+    };
+  }
+  return {
+    next: apk119Value139,
+    generatedAt: apk119Value135,
+    batchId: apk119Value136
+  };
+},
     getLocalDateKey: function (value_126 = new Date()) {
         const date_3 = value_126 instanceof Date ? value_126 : new Date(value_126);
         if (Number.isNaN(date_3.getTime())) return this.getLocalDateKey(new Date());
@@ -5801,590 +5698,239 @@ Char 已存：` +
         const genConfirmBtn = document.getElementById('friend-phone-gen-confirm-btn');
         genConfirmBtn &&
             (genConfirmBtn.onclick = async () => {
-                saveGenApps();
-                const genCounts = saveGenCounts(),
-                    selectedApps_2 = getSavedGenApps(),
-                    phoneIncludeRealTime_2 = realTimeToggle_3
-                        ? realTimeToggle_3.checked
-                        : friend_28.phoneIncludeRealTime !== false,
-                    phoneIncludeChatContext_2 = chatContextToggle
-                        ? chatContextToggle.checked
-                        : friend_28.phoneIncludeChatContext !== false;
-                friend_28.phoneIncludeRealTime = phoneIncludeRealTime_2;
-                friend_28.phoneIncludeChatContext = phoneIncludeChatContext_2;
-                const safariSplit = this.splitFriendGenTotal(genCounts.safariTotal),
-                    weiboPostSplit = this.splitFriendGenTotal(genCounts.weiboPostsTotal),
-                    weiboPhotoSplit = this.splitFriendGenTotal(genCounts.weiboPhotosTotal);
-                if (selectedApps_2.length === 0) {
-                    if (window.showToast) window.showToast('请至少选择一个应用');
-                    return;
-                }
-                if (!window.apiConfig || !window.apiConfig.endpoint || !window.apiConfig.apiKey) {
-                    if (window.showToast) window.showToast('请先在系统设置中配置 API');
-                    return;
-                }
-                let text_391 = '';
-                if (window.getGlobalWorldBookContextByPosition) {
-                    text_391 = window.getGlobalWorldBookContextByPosition('system_depth') || '';
-                    const globalWorldBookContextByPosition_407 =
-                        window.getGlobalWorldBookContextByPosition('before_role');
-                    if (globalWorldBookContextByPosition_407)
-                        text_391 +=
-                            `
-` + globalWorldBookContextByPosition_407;
-                }
-                const value_394 = this.getGenerationUserPersona(friend_28),
-                    value_397 = friend_28.persona || '普通角色';
-                let text_398 = '';
-                if (phoneIncludeChatContext_2) {
-                    const messageFriend = await this.ensureFriendPhoneMessagesLoaded(friend_28),
-                        msgs_2 = this.getRecentSingleChatMessages(messageFriend?.messages, 20);
-                    msgs_2.length > 0 &&
-                        (text_398 = msgs_2.map((m_8) => {
-                            const sender_4 = this.isFriendPhoneUserMessage(m_8) ? 'User' : 'Char';
-                            return sender_4 + ': ' + this.getFriendPhoneMessageText(m_8);
-                        }).join(`
-`));
-                }
-                const phoneLanguage = this.normalizeFriendPhoneLanguage(friend_28.language || 'zh'),
-                    friendPhoneLanguageName_399 = this.getFriendPhoneLanguageName(phoneLanguage);
-                let content_6 = `你现在要模拟生成一部手机里不同应用的数据。请严格遵循给定的世界观设定、角色人设和聊天上下文，生成符合角色性格的JSON格式数据。
-`;
-                content_6 +=
-                    `
-【最高优先级语言与翻译协议】
-- 所有 AI 创作的可读字符串原文必须只使用 Char 的默认语言：` +
-                    friendPhoneLanguageName_399 +
-                    ' (' +
-                    phoneLanguage +
-                    `)。
-- 联系人例外：通话记录和通讯录的 name 必须直接使用自然的简体中文姓名，不得使用外文姓名，不需要额外翻译字段。
-- 音乐例外：music 内每首歌的 name 必须使用歌曲真实、正常的官方歌名，保留歌名本来的语言，不受 Char 默认语言限制，不返回 nameTranslationZh。
-- 游戏例外：game 中除 highlights[].desc、innerThoughts、postGameReflection（兼容 thoughts）外，其余字段均不受 Char 默认语言限制，也不需要任何 TranslationZh 字段；仅这四类叙事字段遵循 Char 默认语言并返回中文翻译。
-- 微博例外：weibo 只有帖子正文 text 和评论正文 comments[].text 遵循 Char 默认语言并返回 textTranslationZh；账号名、昵称、签名、作者名、来源、相册描述等其他字段不限制语言，也不返回翻译字段。
-- 文件例外：files 只有文件详情正文 items[].content 遵循 Char 默认语言并返回 contentTranslationZh；标签名与文件标题不限制语言，也不返回翻译字段。
-- 除以上例外，对每个可读字符串字段 field，都必须同时返回 fieldTranslationZh。原文非中文时，fieldTranslationZh 必须是自然准确的简体中文翻译；原文为中文时必须为空字符串。
-- sender、type、icon、数值、布尔值、URL、ID、银行卡号等机器字段不翻译。
-`;
-                content_6 += `
-【最高优先级时间协议】不要返回 time、date、createdAt、timestamp、addedTime、recentCallTime 等记录时间字段，也不要为应用记录编造时间戳；真实生成时间始终由前端写入。
-`;
-                if (phoneIncludeRealTime_2)
-                    content_6 +=
-                        `
-【当前真实时间】` +
-                        this.getCurrentRealTimeContext() +
-                        `
-- 仅将它用于理解当前季节、昼夜、作息、近期事件与内容语境，让生成内容具有自然的时间感知；不要把它复制成 JSON 时间字段。
-`;
-                content_6 += `
-【覆盖规则】本次勾选应用的生成结果会完整覆盖该应用旧数据。请生成一套独立、完整的新内容，不要续写或依赖旧手机数据。
-`;
-                if (text_391)
-                    content_6 +=
-                        `
-【世界书设定】：
-` +
-                        text_391 +
-                        `
-`;
-                content_6 +=
-                    `
-【角色 (Char) 人设】：
-` +
-                    value_397 +
-                    `
-`;
-                content_6 +=
-                    `
-【用户 (User) 人设】：
-` +
-                    value_394 +
-                    `
-`;
-                if (text_398)
-                    content_6 +=
-                        `
-【固定挂载的最近 20 条单聊上下文】：
-` +
-                        text_398 +
-                        `
-`;
-                content_6 += `
-根据选择的应用返回对应的数据。
-`;
-                const options_836 = {
-                        safari:
-                            '[safari]: 严格生成 ' +
-                            safariSplit.primary +
-                            ' 条公开模式的日常搜索，以及 ' +
-                            safariSplit.secondary +
-                            ' 条无痕模式下符合其隐私、疑问或不愿公开心境的搜索内容，共 ' +
-                            genCounts.safariTotal +
-                            ' 条。搜索主题、关键词长度、网页来源和详情表达需要自然多样，不要把无痕内容机械等同于阴暗或猎奇。',
-                        files: '[files]: 生成符合角色人设的文件列表，其中 tags 内必须包含能够体现其性格、癖好、或对 User 的看法的隐私内容（如小说草稿、私密日记、账单等），需生成 2-3 个标签，每个标签 1-3 个新文件，确保文件名不要与历史已有的重复。标签名和文件标题不限制语言且不需要翻译；只有文件详情 content 按 Char 默认语言生成并提供中文翻译。',
-                        call:
-                            '[call]: 严格生成 ' +
-                            genCounts.callTotal +
-                            ' 条通话记录，并生成与记录中联系人对应的详细联系人信息。recentCalls 和 contacts 的 name 必须直接使用自然的简体中文姓名，不要返回外文联系人名；其余内容必须符合角色人设与交际圈。请避免使用不符合 JSON 标准的单引号。',
-                        music:
-                            '[music]: 听歌排行 top 严格生成 ' +
-                            genCounts.musicTop +
-                            ' 首，风格应极大程度体现其人设与心境；歌曲 name 必须使用真实、正常的官方歌名，保留原本语言，不要翻译歌名，也不要返回 nameTranslationZh。每首歌必须包含循环次数（纯数字）和不少于 20 字的细腻心声。recent 和 favorites 保持自然数量，不受排行榜数量限制。',
-                        health: '[health]: 严格符合其人设（如是否运动、熬夜、体型等）生成近期睡眠、步数、身高和体重；dream 写约 30 字的昨夜梦境；stepsThoughts 写约 30 字的跑步或运动时心理活动；heartRate 必须是符合当前状态的纯数字 BPM，heartRateStatus 是与该心率匹配的简短状态。',
-                        pay: '[pay]: 生成符合人设的银行卡总金额和近期不少于 5 条收支记录。',
-                        game:
-                            '[game]: 严格生成 ' +
-                            genCounts.gameTotal +
-                            ' 个符合人设的游戏。只有高光时刻 highlights[].desc、局内心声 innerThoughts、局后复盘 postGameReflection 受 Char 默认语言限制并需要中文翻译；游戏名、玩家名、段位、英雄、结果、时长等其余字段可使用其正常语言，不要返回翻译字段。每局必须包含结果、KDA(如8/2/5)、使用英雄、高光时刻(数组)、内心戏(30字)、复盘(30字)，不得包含时间。格式必须完全符合提供的JSON模板，不要使用特殊字符。',
-                        weibo:
-                            '[weibo]: 生成完整微博资料。只有帖子正文 text 和评论正文 comments[].text 按 Char 默认语言生成并提供中文翻译；账号名、昵称、签名、评论作者名、来源、相册描述等其他字段不限制语言且不需要翻译。大号严格生成 ' +
-                            weiboPostSplit.primary +
-                            ' 条主页帖子和 ' +
-                            weiboPhotoSplit.primary +
-                            ' 张相册照片；小号严格生成 ' +
-                            weiboPostSplit.secondary +
-                            ' 条主页帖子和 ' +
-                            weiboPhotoSplit.secondary +
-                            ' 张相册照片。每条主页帖子尽量生成 2-5 条自然评论；大号和小号的赞过列表各保持 3 条。大号像可被熟人看到的公开主页，小号则贴近隐藏身份，可以写关于 User 的情绪、珍视的记忆、关系思考或只有小号才敢保存的瞬间，但不要让所有内容围绕 User，也不要让小号只有负面情绪。所有帖子必须在主题、篇幅、语气、叙事视角和互动氛围上有真实差异，禁止套用固定开头、固定剧情、编号化文案、同义改写和重复句式；照片描述也要覆盖不同主体、场景、构图、光线和拍摄质感。小号头像 avatarUrl 留空，由系统补充外部图片链接。',
-                    },
-                    requirements_2 = {
-                        safari: `"safari": {
-  "recentSearches": [
-    {"keyword": "搜索关键词1", "keywordTranslationZh": "中文翻译或空字符串", "title": "网页标题1", "titleTranslationZh": "中文翻译或空字符串", "content": "网页内容(如知乎,百度百科等真实浏览器内容50-100字)", "contentTranslationZh": "中文翻译或空字符串"}
-  ],
-  "privateSearches": [
-    {"keyword": "无痕搜索词1", "keywordTranslationZh": "中文翻译或空字符串", "title": "无痕网页标题1", "titleTranslationZh": "中文翻译或空字符串", "content": "隐私搜索详情内容(50-100字)", "contentTranslationZh": "中文翻译或空字符串"}
-  ]
-}`,
-                        files: `"files": {
-  "tags": [
-    {"name": "新标签名称，不限制语言", "color": "#ff3b30", "items": [{"title": "新文件名，不限制语言", "content": "一段极度符合人设的私密内容(50-100字)", "contentTranslationZh": "中文翻译或空字符串"}]}
-  ]
-}`,
-                        call: `"call": {
-  "recentCalls": [
-    {"name": "简体中文联系人名", "type": "incoming/outgoing/missed", "dialogue": "通话内容原文", "dialogueTranslationZh": "中文翻译或空字符串"}
-  ],
-  "contacts": [
-    {"name": "简体中文联系人名", "callReason": "通话原因原文", "callReasonTranslationZh": "中文翻译或空字符串"}
-  ]
-}`,
-                        music: `"music": {
-  "recent": [{"name": "歌曲真实官方歌名（保留原本语言）", "artist": "歌手1", "artistTranslationZh": "中文翻译或空字符串"}],
-  "favorites": [{"name": "歌曲真实官方歌名（保留原本语言）", "artist": "最爱歌手1", "artistTranslationZh": "中文翻译或空字符串"}],
-  "top": [{"name": "歌曲真实官方歌名（保留原本语言）", "artist": "歌手1", "artistTranslationZh": "中文翻译或空字符串", "loops": 156, "thoughts": "听这首歌时的内心情感与心声，要非常符合人设且细腻，不少于30字", "thoughtsTranslationZh": "中文翻译或空字符串"}]
-}`,
-                        health: `"health": {
-  "steps": "步数纯数字",
-  "stepsThoughts": "跑步或运动时的心理活动，约30字",
-  "stepsThoughtsTranslationZh": "中文翻译或空字符串",
-  "sleepHours": "睡眠小时数纯数字",
-  "sleepMinutes": "睡眠分钟数纯数字",
-  "dream": "昨夜梦境内容，约30字",
-  "dreamTranslationZh": "中文翻译或空字符串",
-  "heartRate": "当前心率纯数字BPM",
-  "heartRateStatus": "符合心率与角色状态的简短描述",
-  "heartRateStatusTranslationZh": "中文翻译或空字符串",
-  "weight": "体重",
-  "height": "身高"
-}`,
-                        pay: `"pay": {
-  "totalAssets": "24560.88",
-  "recentTransactions": [
-    {"title": "交易标题原文", "titleTranslationZh": "中文翻译或空字符串", "amount": "-128.00", "isIncome": false}
-  ]
-}`,
-                        game: `"game": {
-  "playerName": "正常游戏内 ID，不限制语言",
-  "totalHours": "200小时",
-  "recentGames": [
-    {"name": "正常游戏名，不限制语言", "hours": "50小时", "rank": "正常段位，不限制语言", "winRate": "65%", "icon": "fas fa-gamepad", "matches": [
-      {"result": "正常对局结果，不限制语言", "kda": "8/2/5", "hero": "正常英雄名，不限制语言", "highlights": [{"desc": "高光描述原文", "descTranslationZh": "中文翻译或空字符串"}], "innerThoughts": "局内心声原文", "innerThoughtsTranslationZh": "中文翻译或空字符串", "postGameReflection": "复盘原文", "postGameReflectionTranslationZh": "中文翻译或空字符串"}
-    ]}
-  ]
-}`,
-                        weibo: `"weibo": {
-  "mainAccount": {
-    "name": "大号昵称，不限制语言",
-    "signature": "符合 Char 公开形象的签名，不限制语言",
-    "posts": [
-      {"text": "自然且各不相同的大号帖子正文", "textTranslationZh": "中文翻译或空字符串", "source": "真实来源，不限制语言", "comments": [{"author": "评论用户名，不限制语言", "text": "贴合该帖语境的评论", "textTranslationZh": "中文翻译或空字符串"}], "reposts": 6, "likes": 128}
-    ],
-    "album": [
-      {"description": "具体且不重复的图片主体、场景、构图和质感描述20-50字，不限制语言"}
-    ],
-    "liked": [
-      {"author": "被赞博主名，不限制语言", "text": "符合大号公开兴趣的赞过帖子", "textTranslationZh": "中文翻译或空字符串", "source": "真实来源，不限制语言", "comments": [], "reposts": 12, "likes": 241}
-    ]
-  },
-  "altAccount": {
-    "name": "符合隐藏身份的小号名，不限制语言",
-    "signature": "符合小号隐秘状态的签名，不限制语言",
-    "avatarUrl": "",
-    "posts": [
-      {"text": "符合隐藏身份且主题自然多样的小号帖子正文", "textTranslationZh": "中文翻译或空字符串", "source": "真实来源，不限制语言", "comments": [{"author": "评论用户名，不限制语言", "text": "贴合该帖语境的评论", "textTranslationZh": "中文翻译或空字符串"}], "reposts": 1, "likes": 19}
-    ],
-    "album": [
-      {"description": "符合小号状态且与其他照片不同的具体画面描述20-50字，不限制语言"}
-    ],
-    "liked": [
-      {"author": "被赞博主名，不限制语言", "text": "符合小号隐秘兴趣的赞过帖子", "textTranslationZh": "中文翻译或空字符串", "source": "真实来源，不限制语言", "comments": [], "reposts": 2, "likes": 33}
-    ]
+  if (genConfirmBtn.disabled) return;
+  saveGenApps();
+  const apk119Value1242 = saveGenCounts(),
+    apk119Value1243 = getSavedGenApps(),
+    apk119Value1244 = realTimeToggle_3 ? realTimeToggle_3.checked : friend_28.phoneIncludeRealTime !== false,
+    apk119Value1245 = chatContextToggle ? chatContextToggle.checked : friend_28.phoneIncludeChatContext !== false;
+  friend_28.phoneIncludeRealTime = apk119Value1244, friend_28.phoneIncludeChatContext = apk119Value1245;
+  const apk119Value1246 = this.splitFriendGenTotal(apk119Value1242.safariTotal),
+    apk119Value1247 = this.splitFriendGenTotal(apk119Value1242.weiboPostsTotal),
+    apk119Value1248 = this.splitFriendGenTotal(apk119Value1242.weiboPhotosTotal);
+  if (apk119Value1243.length === 0) {
+    if (window.showToast) window.showToast("请至少选择一个应用");
+    return;
   }
-}`,
-                    };
-                content_6 += `
-【各应用生成要求】：
-`;
-                selectedApps_2.forEach((value_410) => {
-                    content_6 +=
-                        options_836[value_410] +
-                        `
-`;
-                });
-                content_6 += `
-请包含以下字段（根据选择包含对应的对象）：
-{
-`;
-                let replace_403 = selectedApps_2
-                    .map((key_9_2) => requirements_2[key_9_2])
-                    .join(
-                        `,
-`,
-                    )
-                    .replace(
-                        /"(?:time|date|createdAt|timestamp|addedTime|recentCallTime)"\s*:\s*"[^"]*"\s*,?/g,
-                        '',
-                    );
-                content_6 +=
-                    replace_403 +
-                    `
-}`;
-                content_6 += `
-注意：必须且只能返回合法的 JSON 字符串，不要包含任何多余的文字说明，不要 Markdown 标记。确保 JSON 格式绝对正确，键名和字符串都使用双引号。`;
-                if (window.showToast) window.showToast('正在生成符合设定的数据，请稍候...');
-                const messages_6 = [
-                        {
-                            role: 'system',
-                            content: '你是一个数据生成助手。只能返回合法的 JSON 字符串。',
-                        },
-                        {
-                            role: 'user',
-                            content: content_6,
-                        },
-                    ],
-                    model_2 = window.apiConfig.model || 'gpt-3.5-turbo',
-                    endpoint_4 = window.u2Api.resolveChatCompletionsEndpoint(
-                        window.apiConfig.endpoint,
-                    );
-                fetch(endpoint_4, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: 'Bearer ' + window.apiConfig.apiKey,
-                    },
-                    body: JSON.stringify({
-                        model: model_2,
-                        messages: messages_6,
-                        temperature: 0.7,
-                    }),
-                })
-                    .then(async (response_4) => {
-                        if (!response_4.ok) {
-                            let apiDetail_2 = 'HTTP error! status: ' + response_4.status;
-                            try {
-                                const errorBody = await response_4.text();
-                                console.error('API Error Response Body:', errorBody);
-                                const errorObj = JSON.parse(errorBody);
-                                errorObj.error && errorObj.error.message
-                                    ? (apiDetail_2 = errorObj.error.message)
-                                    : (apiDetail_2 += ' - ' + errorBody);
-                            } catch (value_852) {}
-                            throw Object.assign(new Error(apiDetail_2), {
-                                status: response_4.status,
-                                apiDetail: apiDetail_2,
-                            });
-                        }
-                        return response_4.json();
-                    })
-                    .then((value_412) => {
-                        let resultText_4 = value_412.choices?.[0]?.message?.content || '',
-                            jsonStr_2 = resultText_4;
-                        const match_415 = resultText_4.match(/\{[\s\S]*\}/);
-                        match_415
-                            ? (jsonStr_2 = match_415[0])
-                            : (jsonStr_2 = resultText_4
-                                  .replace(/```json/gi, '')
-                                  .replace(/```/g, '')
-                                  .trim());
-                        try {
-                            const parsed_8 = JSON.parse(jsonStr_2),
-                                missingApps = selectedApps_2.filter(
-                                    (app_5) =>
-                                        !parsed_8?.[app_5] || typeof parsed_8[app_5] !== 'object',
-                                );
-                            if (missingApps.length)
-                                throw new Error('缺少应用数据：' + missingApps.join('、'));
-                            const requireCount = (value_865, value_866, value_867) => {
-                                    if (!Array.isArray(value_865) || value_865.length !== value_866)
-                                        throw new Error(value_867 + ' 数量必须为 ' + value_866);
-                                },
-                                requireRange = (value_868, value_869, value_870, value_871) => {
-                                    if (
-                                        !Array.isArray(value_868) ||
-                                        value_868.length < value_869 ||
-                                        value_868.length > value_870
-                                    )
-                                        throw new Error(
-                                            value_871 +
-                                                ' 数量必须为 ' +
-                                                value_869 +
-                                                '-' +
-                                                value_870,
-                                        );
-                                };
-                            if (parsed_8.music)
-                                requireCount(parsed_8.music.top, genCounts.musicTop, '音乐排行');
-                            parsed_8.safari &&
-                                (requireCount(
-                                    parsed_8.safari.recentSearches,
-                                    safariSplit.primary,
-                                    'Safari 公开搜索',
-                                ),
-                                requireCount(
-                                    parsed_8.safari.privateSearches,
-                                    safariSplit.secondary,
-                                    'Safari 无痕搜索',
-                                ));
-                            if (parsed_8.game)
-                                requireCount(
-                                    parsed_8.game.recentGames,
-                                    genCounts.gameTotal,
-                                    '游戏',
-                                );
-                            if (parsed_8.call)
-                                requireCount(
-                                    parsed_8.call.recentCalls,
-                                    genCounts.callTotal,
-                                    '通话记录',
-                                );
-                            parsed_8.weibo &&
-                                (requireCount(
-                                    parsed_8.weibo.mainAccount?.posts,
-                                    weiboPostSplit.primary,
-                                    '微博大号帖子',
-                                ),
-                                requireCount(
-                                    parsed_8.weibo.altAccount?.posts,
-                                    weiboPostSplit.secondary,
-                                    '微博小号帖子',
-                                ),
-                                requireCount(
-                                    parsed_8.weibo.mainAccount?.album,
-                                    weiboPhotoSplit.primary,
-                                    '微博大号相册',
-                                ),
-                                requireCount(
-                                    parsed_8.weibo.altAccount?.album,
-                                    weiboPhotoSplit.secondary,
-                                    '微博小号相册',
-                                ),
-                                requireCount(parsed_8.weibo.mainAccount?.liked, 3, '微博大号赞过'),
-                                requireCount(parsed_8.weibo.altAccount?.liked, 3, '微博小号赞过'),
-                                (parsed_8.weibo.mainAccount.posts =
-                                    this.normalizeFriendPhoneWeiboPostComments(
-                                        parsed_8.weibo.mainAccount.posts,
-                                        5,
-                                    )),
-                                (parsed_8.weibo.altAccount.posts =
-                                    this.normalizeFriendPhoneWeiboPostComments(
-                                        parsed_8.weibo.altAccount.posts,
-                                        5,
-                                    )));
-                            parsed_8.files &&
-                                (requireRange(parsed_8.files.tags, 2, 3, '文件标签'),
-                                parsed_8.files.tags.forEach((value_872, value_873) =>
-                                    requireRange(
-                                        value_872?.items,
-                                        1,
-                                        3,
-                                        '文件标签 ' + (value_873 + 1),
-                                    ),
-                                ));
-                            if (parsed_8.pay)
-                                requireRange(parsed_8.pay.recentTransactions, 5, 50, '钱包交易');
-                            this.validateFriendPhoneLocalizedTree(
-                                parsed_8,
-                                friend_28.language || 'zh',
-                                'phone',
-                            );
-                            const generationDraft = {};
-                            parsed_8.music &&
-                                (generationDraft.musicData = {
-                                    recent: Array.isArray(parsed_8.music.recent)
-                                        ? parsed_8.music.recent
-                                        : [],
-                                    favorites: Array.isArray(parsed_8.music.favorites)
-                                        ? parsed_8.music.favorites
-                                        : [],
-                                    top: Array.isArray(parsed_8.music.top)
-                                        ? parsed_8.music.top.slice(0, genCounts.musicTop)
-                                        : [],
-                                });
-                            parsed_8.health && (generationDraft.healthData = parsed_8.health);
-                            parsed_8.pay &&
-                                (generationDraft.payData = {
-                                    ...parsed_8.pay,
-                                    recentTransactions: Array.isArray(
-                                        parsed_8.pay.recentTransactions,
-                                    )
-                                        ? parsed_8.pay.recentTransactions
-                                        : [],
-                                });
-                            parsed_8.game &&
-                                (generationDraft.gameData = {
-                                    ...parsed_8.game,
-                                    recentGames: Array.isArray(parsed_8.game.recentGames)
-                                        ? parsed_8.game.recentGames.slice(0, genCounts.gameTotal)
-                                        : [],
-                                });
-                            parsed_8.call &&
-                                (generationDraft.callData = {
-                                    ...parsed_8.call,
-                                    recentCalls: Array.isArray(parsed_8.call.recentCalls)
-                                        ? parsed_8.call.recentCalls.slice(0, genCounts.callTotal)
-                                        : [],
-                                    contacts: Array.isArray(parsed_8.call.contacts)
-                                        ? parsed_8.call.contacts
-                                        : [],
-                                });
-                            parsed_8.safari &&
-                                (generationDraft.safariData = {
-                                    recentSearches: Array.isArray(parsed_8.safari.recentSearches)
-                                        ? parsed_8.safari.recentSearches.slice(
-                                              0,
-                                              safariSplit.primary,
-                                          )
-                                        : [],
-                                    privateSearches: Array.isArray(parsed_8.safari.privateSearches)
-                                        ? parsed_8.safari.privateSearches.slice(
-                                              0,
-                                              safariSplit.secondary,
-                                          )
-                                        : [],
-                                });
-                            parsed_8.files &&
-                                (generationDraft.filesData = {
-                                    ...parsed_8.files,
-                                    tags: Array.isArray(parsed_8.files.tags)
-                                        ? parsed_8.files.tags
-                                        : [],
-                                    recent: Array.isArray(parsed_8.files.recent)
-                                        ? parsed_8.files.recent
-                                        : [],
-                                });
-                            if (parsed_8.weibo) {
-                                const rawWeibo = parsed_8.weibo || {},
-                                    ensureAccount = (rawAccount, accountKey_2) => {
-                                        const isAltAccount = accountKey_2 === 'altAccount',
-                                            normalized_2 = this.normalizeWeiboAccount(
-                                                rawAccount || {},
-                                                friend_28,
-                                                accountKey_2 === 'altAccount' ? 'alt' : 'main',
-                                            ),
-                                            postLimit = isAltAccount
-                                                ? weiboPostSplit.secondary
-                                                : weiboPostSplit.primary,
-                                            photoLimit = isAltAccount
-                                                ? weiboPhotoSplit.secondary
-                                                : weiboPhotoSplit.primary;
-                                        return (
-                                            (normalized_2.posts = normalized_2.posts.slice(
-                                                0,
-                                                postLimit,
-                                            )),
-                                            (normalized_2.album = normalized_2.album.slice(
-                                                0,
-                                                photoLimit,
-                                            )),
-                                            (normalized_2.liked = normalized_2.liked.slice(0, 3)),
-                                            normalized_2
-                                        );
-                                    };
-                                generationDraft.weiboData = {
-                                    mainAccount: ensureAccount(
-                                        rawWeibo.mainAccount || rawWeibo.main || rawWeibo,
-                                        'mainAccount',
-                                    ),
-                                    altAccount: ensureAccount(
-                                        rawWeibo.altAccount || rawWeibo.alt || {},
-                                        'altAccount',
-                                    ),
-                                };
-                            }
-                            const normalizedPayload = {};
-                            if (generationDraft.musicData)
-                                normalizedPayload.music = generationDraft.musicData;
-                            if (generationDraft.healthData)
-                                normalizedPayload.health = generationDraft.healthData;
-                            if (generationDraft.payData)
-                                normalizedPayload.pay = generationDraft.payData;
-                            if (generationDraft.gameData)
-                                normalizedPayload.game = generationDraft.gameData;
-                            if (generationDraft.callData)
-                                normalizedPayload.call = generationDraft.callData;
-                            if (generationDraft.safariData)
-                                normalizedPayload.safari = generationDraft.safariData;
-                            if (generationDraft.filesData)
-                                normalizedPayload.files = generationDraft.filesData;
-                            if (generationDraft.weiboData)
-                                normalizedPayload.weibo = generationDraft.weiboData;
-                            const mergedGeneration = this.mergeFriendPhoneGeneratedData(
-                                friend_28,
-                                normalizedPayload,
-                                {
-                                    generatedAt: Date.now(),
-                                    skipValidation: true,
-                                },
-                            );
-                            Object.assign(friend_28, mergedGeneration.next);
-                            this.persistFriendState(friend_28);
-                            if (window.showToast) window.showToast('生成成功');
-                            window.closeView && window.closeView(settingsSheet);
-                        } catch (value_423) {
-                            console.error(
-                                'JSON Parse error',
-                                value_423,
-                                `
-Original Text:`,
-                                resultText_4,
-                                `
-Extracted:`,
-                                jsonStr_2,
-                            );
-                            if (window.showToast)
-                                window.showToast(
-                                    '生成数据解析失败，AI可能输出了非标准JSON格式，请重试',
-                                );
-                        }
-                    })
-                    ['catch']((err_2) => {
-                        console.error('API Error:', err_2);
-                        let displayMsg = err_2.message || '未知网络错误';
-                        displayMsg.length > 50 &&
-                            (displayMsg = displayMsg.substring(0, 50) + '...');
-                        if (
-                            !window.u2Api?.isRequestError?.(err_2) ||
-                            !window.u2Api.reportError(err_2, {
-                                operation: '手机数据生成',
-                            })
-                        ) {
-                            if (window.showToast) window.showToast('API 请求失败: ' + displayMsg);
-                            else alert('API 请求失败: ' + displayMsg);
-                        }
-                    });
-            });
+  if (!window.apiConfig || !window.apiConfig.endpoint || !window.apiConfig.apiKey) {
+    if (window.showToast) window.showToast("请先在系统设置中配置 API");
+    return;
+  }
+  let apk119Value1249 = null;
+  genConfirmBtn.disabled = true;
+  try {
+    if (apk119Value1243.includes("call")) {
+      if (!window.cphoneCallApp) throw new Error("通话模块尚未就绪，请刷新页面");
+      apk119Value1249 = window.cphoneCallApp.beginJob(friend_28);
+    }
+    let apk119Value1250 = "";
+    if (window.getGlobalWorldBookContextByPosition) {
+      apk119Value1250 = window.getGlobalWorldBookContextByPosition("system_depth") || "";
+      const apk119Value1264 = window.getGlobalWorldBookContextByPosition("before_role");
+      if (apk119Value1264) apk119Value1250 += "\n" + apk119Value1264;
+    }
+    const apk119Value1251 = this.getGenerationUserPersona(friend_28),
+      apk119Value1252 = friend_28.persona || "普通角色";
+    let apk119Value1253 = "";
+    if (apk119Value1245) {
+      const apk119Value1265 = await this.ensureFriendPhoneMessagesLoaded(friend_28),
+        apk119Value1266 = this.getRecentSingleChatMessages(apk119Value1265?.["messages"], 20);
+      apk119Value1266.length > 0 && (apk119Value1253 = apk119Value1266.map(apk119Value1267 => {
+        const apk119Value1268 = this.isFriendPhoneUserMessage(apk119Value1267) ? "User" : "Char";
+        return apk119Value1268 + ": " + this.getFriendPhoneMessageText(apk119Value1267);
+      }).join("\n"));
+    }
+    const apk119Value1254 = this.normalizeFriendPhoneLanguage(friend_28.language || "zh"),
+      apk119Value1255 = this.getFriendPhoneLanguageName(apk119Value1254);
+    let apk119Value1256 = "你现在要模拟生成一部手机里不同应用的数据。请严格遵循给定的世界观设定、角色人设和聊天上下文，生成符合角色性格的JSON格式数据。\n";
+    apk119Value1256 += "\n【最高优先级语言与翻译协议】\n- 所有 AI 创作的可读字符串原文必须只使用 Char 的默认语言：" + apk119Value1255 + " (" + apk119Value1254 + ")。\n- 通话例外：Call 完全遵循下方独立的通话生成协议；已有姓名原样保留，标识和状态等机器字段不翻译。\n- 音乐例外：music 内每首歌的 name 必须使用歌曲真实、正常的官方歌名，保留歌名本来的语言，不受 Char 默认语言限制，不返回 nameTranslationZh。\n- 游戏例外：game 中除 highlights[].desc、innerThoughts、postGameReflection（兼容 thoughts）外，其余字段均不受 Char 默认语言限制，也不需要任何 TranslationZh 字段；仅这四类叙事字段遵循 Char 默认语言并返回中文翻译。\n- 微博例外：weibo 只有帖子正文 text 和评论正文 comments[].text 遵循 Char 默认语言并返回 textTranslationZh；账号名、昵称、签名、作者名、来源、相册描述等其他字段不限制语言，也不返回翻译字段。\n- 文件例外：files 只有文件详情正文 items[].content 遵循 Char 默认语言并返回 contentTranslationZh；标签名与文件标题不限制语言，也不返回翻译字段。\n- 除以上例外，对每个可读字符串字段 field，都必须同时返回 fieldTranslationZh。原文非中文时，fieldTranslationZh 必须是自然准确的简体中文翻译；原文为中文时必须为空字符串。\n- sender、type、icon、数值、布尔值、URL、ID、银行卡号等机器字段不翻译。\n", apk119Value1256 += "\n【最高优先级时间协议】不要返回 time、date、createdAt、timestamp、addedTime、recentCallTime 等记录时间字段，也不要为应用记录编造时间戳；真实生成时间始终由前端写入。\n";
+    if (apk119Value1244) apk119Value1256 += "\n【当前真实时间】" + this.getCurrentRealTimeContext() + "\n- 仅将它用于理解当前季节、昼夜、作息、近期事件与内容语境，让生成内容具有自然的时间感知；不要把它复制成 JSON 时间字段。\n";
+    apk119Value1256 += "\n【覆盖规则】除通话追加保留旧记录外，本次勾选的其他应用完整覆盖该应用旧数据。其他应用请生成一套独立、完整的新内容。\n";
+    if (apk119Value1250) apk119Value1256 += "\n【世界书设定】：\n" + apk119Value1250 + "\n";
+    apk119Value1256 += "\n【角色 (Char) 人设】：\n" + apk119Value1252 + "\n", apk119Value1256 += "\n【用户 (User) 人设】：\n" + apk119Value1251 + "\n";
+    if (apk119Value1253) apk119Value1256 += "\n【固定挂载的最近 20 条单聊上下文】：\n" + apk119Value1253 + "\n";
+    apk119Value1256 += "\n根据选择的应用返回对应的数据。\n";
+    const apk119Value1257 = {
+        safari: "[safari]: 严格生成 " + apk119Value1246.primary + " 条公开模式的日常搜索，以及 " + apk119Value1246.secondary + " 条无痕模式下符合其隐私、疑问或不愿公开心境的搜索内容，共 " + apk119Value1242.safariTotal + " 条。搜索主题、关键词长度、网页来源和详情表达需要自然多样，不要把无痕内容机械等同于阴暗或猎奇。",
+        files: "[files]: 生成符合角色人设的文件列表，其中 tags 内必须包含能够体现其性格、癖好、或对 User 的看法的隐私内容（如小说草稿、私密日记、账单等），需生成 2-3 个标签，每个标签 1-3 个新文件，确保文件名不要与历史已有的重复。标签名和文件标题不限制语言且不需要翻译；只有文件详情 content 按 Char 默认语言生成并提供中文翻译。",
+        call: apk119Value1243.includes("call") ? window.cphoneCallApp.buildGenerationPrompt(friend_28, apk119Value1242.callTotal) : "",
+        music: "[music]: 听歌排行 top 严格生成 " + apk119Value1242.musicTop + " 首，风格应极大程度体现其人设与心境；歌曲 name 必须使用真实、正常的官方歌名，保留原本语言，不要翻译歌名，也不要返回 nameTranslationZh。每首歌必须包含循环次数（纯数字）和不少于 20 字的细腻心声。recent 和 favorites 保持自然数量，不受排行榜数量限制。",
+        health: "[health]: 严格符合其人设（如是否运动、熬夜、体型等）生成近期睡眠、步数、身高和体重；dream 写约 30 字的昨夜梦境；stepsThoughts 写约 30 字的跑步或运动时心理活动；heartRate 必须是符合当前状态的纯数字 BPM，heartRateStatus 是与该心率匹配的简短状态。",
+        pay: "[pay]: 生成符合人设的银行卡总金额和近期不少于 5 条收支记录。",
+        game: "[game]: 严格生成 " + apk119Value1242.gameTotal + " 个符合人设的游戏。只有高光时刻 highlights[].desc、局内心声 innerThoughts、局后复盘 postGameReflection 受 Char 默认语言限制并需要中文翻译；游戏名、玩家名、段位、英雄、结果、时长等其余字段可使用其正常语言，不要返回翻译字段。每局必须包含结果、KDA(如8/2/5)、使用英雄、高光时刻(数组)、内心戏(30字)、复盘(30字)，不得包含时间。格式必须完全符合提供的JSON模板，不要使用特殊字符。",
+        weibo: "[weibo]: 生成完整微博资料。只有帖子正文 text 和评论正文 comments[].text 按 Char 默认语言生成并提供中文翻译；账号名、昵称、签名、评论作者名、来源、相册描述等其他字段不限制语言且不需要翻译。大号严格生成 " + apk119Value1247.primary + " 条主页帖子和 " + apk119Value1248.primary + " 张相册照片；小号严格生成 " + apk119Value1247.secondary + " 条主页帖子和 " + apk119Value1248.secondary + " 张相册照片。每条主页帖子尽量生成 2-5 条自然评论；大号和小号的赞过列表各保持 3 条。大号像可被熟人看到的公开主页，小号则贴近隐藏身份，可以写关于 User 的情绪、珍视的记忆、关系思考或只有小号才敢保存的瞬间，但不要让所有内容围绕 User，也不要让小号只有负面情绪。所有帖子必须在主题、篇幅、语气、叙事视角和互动氛围上有真实差异，禁止套用固定开头、固定剧情、编号化文案、同义改写和重复句式；照片描述也要覆盖不同主体、场景、构图、光线和拍摄质感。小号头像 avatarUrl 留空，由系统补充外部图片链接。"
+      },
+      apk119Value1258 = {
+        safari: "\"safari\": {\n  \"recentSearches\": [\n    {\"keyword\": \"搜索关键词1\", \"keywordTranslationZh\": \"中文翻译或空字符串\", \"title\": \"网页标题1\", \"titleTranslationZh\": \"中文翻译或空字符串\", \"content\": \"网页内容(如知乎,百度百科等真实浏览器内容50-100字)\", \"contentTranslationZh\": \"中文翻译或空字符串\"}\n  ],\n  \"privateSearches\": [\n    {\"keyword\": \"无痕搜索词1\", \"keywordTranslationZh\": \"中文翻译或空字符串\", \"title\": \"无痕网页标题1\", \"titleTranslationZh\": \"中文翻译或空字符串\", \"content\": \"隐私搜索详情内容(50-100字)\", \"contentTranslationZh\": \"中文翻译或空字符串\"}\n  ]\n}",
+        files: "\"files\": {\n  \"tags\": [\n    {\"name\": \"新标签名称，不限制语言\", \"color\": \"#ff3b30\", \"items\": [{\"title\": \"新文件名，不限制语言\", \"content\": \"一段极度符合人设的私密内容(50-100字)\", \"contentTranslationZh\": \"中文翻译或空字符串\"}]}\n  ]\n}",
+        call: "\"call\": {\"contacts\": [], \"recentCalls\": []}",
+        music: "\"music\": {\n  \"recent\": [{\"name\": \"歌曲真实官方歌名（保留原本语言）\", \"artist\": \"歌手1\", \"artistTranslationZh\": \"中文翻译或空字符串\"}],\n  \"favorites\": [{\"name\": \"歌曲真实官方歌名（保留原本语言）\", \"artist\": \"最爱歌手1\", \"artistTranslationZh\": \"中文翻译或空字符串\"}],\n  \"top\": [{\"name\": \"歌曲真实官方歌名（保留原本语言）\", \"artist\": \"歌手1\", \"artistTranslationZh\": \"中文翻译或空字符串\", \"loops\": 156, \"thoughts\": \"听这首歌时的内心情感与心声，要非常符合人设且细腻，不少于30字\", \"thoughtsTranslationZh\": \"中文翻译或空字符串\"}]\n}",
+        health: "\"health\": {\n  \"steps\": \"步数纯数字\",\n  \"stepsThoughts\": \"跑步或运动时的心理活动，约30字\",\n  \"stepsThoughtsTranslationZh\": \"中文翻译或空字符串\",\n  \"sleepHours\": \"睡眠小时数纯数字\",\n  \"sleepMinutes\": \"睡眠分钟数纯数字\",\n  \"dream\": \"昨夜梦境内容，约30字\",\n  \"dreamTranslationZh\": \"中文翻译或空字符串\",\n  \"heartRate\": \"当前心率纯数字BPM\",\n  \"heartRateStatus\": \"符合心率与角色状态的简短描述\",\n  \"heartRateStatusTranslationZh\": \"中文翻译或空字符串\",\n  \"weight\": \"体重\",\n  \"height\": \"身高\"\n}",
+        pay: "\"pay\": {\n  \"totalAssets\": \"24560.88\",\n  \"recentTransactions\": [\n    {\"title\": \"交易标题原文\", \"titleTranslationZh\": \"中文翻译或空字符串\", \"amount\": \"-128.00\", \"isIncome\": false}\n  ]\n}",
+        game: "\"game\": {\n  \"playerName\": \"正常游戏内 ID，不限制语言\",\n  \"totalHours\": \"200小时\",\n  \"recentGames\": [\n    {\"name\": \"正常游戏名，不限制语言\", \"hours\": \"50小时\", \"rank\": \"正常段位，不限制语言\", \"winRate\": \"65%\", \"icon\": \"fas fa-gamepad\", \"matches\": [\n      {\"result\": \"正常对局结果，不限制语言\", \"kda\": \"8/2/5\", \"hero\": \"正常英雄名，不限制语言\", \"highlights\": [{\"desc\": \"高光描述原文\", \"descTranslationZh\": \"中文翻译或空字符串\"}], \"innerThoughts\": \"局内心声原文\", \"innerThoughtsTranslationZh\": \"中文翻译或空字符串\", \"postGameReflection\": \"复盘原文\", \"postGameReflectionTranslationZh\": \"中文翻译或空字符串\"}\n    ]}\n  ]\n}",
+        weibo: "\"weibo\": {\n  \"mainAccount\": {\n    \"name\": \"大号昵称，不限制语言\",\n    \"signature\": \"符合 Char 公开形象的签名，不限制语言\",\n    \"posts\": [\n      {\"text\": \"自然且各不相同的大号帖子正文\", \"textTranslationZh\": \"中文翻译或空字符串\", \"source\": \"真实来源，不限制语言\", \"comments\": [{\"author\": \"评论用户名，不限制语言\", \"text\": \"贴合该帖语境的评论\", \"textTranslationZh\": \"中文翻译或空字符串\"}], \"reposts\": 6, \"likes\": 128}\n    ],\n    \"album\": [\n      {\"description\": \"具体且不重复的图片主体、场景、构图和质感描述20-50字，不限制语言\"}\n    ],\n    \"liked\": [\n      {\"author\": \"被赞博主名，不限制语言\", \"text\": \"符合大号公开兴趣的赞过帖子\", \"textTranslationZh\": \"中文翻译或空字符串\", \"source\": \"真实来源，不限制语言\", \"comments\": [], \"reposts\": 12, \"likes\": 241}\n    ]\n  },\n  \"altAccount\": {\n    \"name\": \"符合隐藏身份的小号名，不限制语言\",\n    \"signature\": \"符合小号隐秘状态的签名，不限制语言\",\n    \"avatarUrl\": \"\",\n    \"posts\": [\n      {\"text\": \"符合隐藏身份且主题自然多样的小号帖子正文\", \"textTranslationZh\": \"中文翻译或空字符串\", \"source\": \"真实来源，不限制语言\", \"comments\": [{\"author\": \"评论用户名，不限制语言\", \"text\": \"贴合该帖语境的评论\", \"textTranslationZh\": \"中文翻译或空字符串\"}], \"reposts\": 1, \"likes\": 19}\n    ],\n    \"album\": [\n      {\"description\": \"符合小号状态且与其他照片不同的具体画面描述20-50字，不限制语言\"}\n    ],\n    \"liked\": [\n      {\"author\": \"被赞博主名，不限制语言\", \"text\": \"符合小号隐秘兴趣的赞过帖子\", \"textTranslationZh\": \"中文翻译或空字符串\", \"source\": \"真实来源，不限制语言\", \"comments\": [], \"reposts\": 2, \"likes\": 33}\n    ]\n  }\n}"
+      };
+    apk119Value1256 += "\n【各应用生成要求】：\n", apk119Value1243.forEach(apk119Value1269 => {
+      apk119Value1256 += apk119Value1257[apk119Value1269] + "\n";
+    }), apk119Value1256 += "\n请包含以下字段（根据选择包含对应的对象）：\n{\n";
+    let apk119Value1259 = apk119Value1243.map(apk119Value1270 => apk119Value1258[apk119Value1270]).join(",\n").replace(/"(?:time|date|createdAt|timestamp|addedTime|recentCallTime)"\s*:\s*"[^"]*"\s*,?/g, "");
+    apk119Value1256 += apk119Value1259 + "\n}", apk119Value1256 += "\n注意：必须且只能返回合法的 JSON 字符串，不要包含任何多余的文字说明，不要 Markdown 标记。确保 JSON 格式绝对正确，键名和字符串都使用双引号。";
+    if (window.showToast) window.showToast("正在生成符合设定的数据，请稍候...");
+    const apk119Value1260 = [{
+        role: "system",
+        content: "你是一个数据生成助手。只能返回合法的 JSON 字符串。"
+      }, {
+        role: "user",
+        content: apk119Value1256
+      }],
+      apk119Value1261 = window.apiConfig.model || "gpt-3.5-turbo",
+      apk119Value1262 = window.u2Api.resolveChatCompletionsEndpoint(window.apiConfig.endpoint),
+      apk119Value1263 = fetch(apk119Value1262, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + window.apiConfig.apiKey
+        },
+        body: JSON.stringify({
+          model: apk119Value1261,
+          messages: apk119Value1260,
+          temperature: 0.7
+        })
+      }).then(async apk119Value1271 => {
+        if (!apk119Value1271.ok) {
+          let apk119Value1272 = "HTTP error! status: " + apk119Value1271.status;
+          try {
+            const apk119Value1273 = await apk119Value1271.text();
+            console.error("API Error Response Body:", apk119Value1273);
+            const apk119Value1274 = JSON.parse(apk119Value1273);
+            apk119Value1274.error && apk119Value1274.error.message ? apk119Value1272 = apk119Value1274.error.message : apk119Value1272 += " - " + apk119Value1273;
+          } catch (apk119Value1275) {}
+          throw Object.assign(new Error(apk119Value1272), {
+            status: apk119Value1271.status,
+            apiDetail: apk119Value1272
+          });
+        }
+        return apk119Value1271.json();
+      }).then(async apk119Value1276 => {
+        let apk119Value1277 = apk119Value1276.choices?.[0]?.["message"]?.["content"] || "",
+          apk119Value1278 = apk119Value1277;
+        const apk119Value1279 = apk119Value1277.match(/\{[\s\S]*\}/);
+        apk119Value1279 ? apk119Value1278 = apk119Value1279[0] : apk119Value1278 = apk119Value1277.replace(/```json/gi, "").replace(/```/g, "").trim();
+        try {
+          const apk119Value1280 = JSON.parse(apk119Value1278),
+            apk119Value1281 = apk119Value1243.filter(apk119Value1288 => !apk119Value1280?.[apk119Value1288] || typeof apk119Value1280[apk119Value1288] !== "object");
+          if (apk119Value1281.length) throw new Error("缺少应用数据：" + apk119Value1281.join("、"));
+          const apk119Value1282 = (apk119Value1289, apk119Value1290, apk119Value1291) => {
+              if (!Array.isArray(apk119Value1289) || apk119Value1289.length !== apk119Value1290) throw new Error(apk119Value1291 + " 数量必须为 " + apk119Value1290);
+            },
+            apk119Value1283 = (apk119Value1292, apk119Value1293, apk119Value1294, apk119Value1295) => {
+              if (!Array.isArray(apk119Value1292) || apk119Value1292.length < apk119Value1293 || apk119Value1292.length > apk119Value1294) throw new Error(apk119Value1295 + " 数量必须为 " + apk119Value1293 + "-" + apk119Value1294);
+            };
+          if (apk119Value1280.music) apk119Value1282(apk119Value1280.music.top, apk119Value1242.musicTop, "音乐排行");
+          apk119Value1280.safari && (apk119Value1282(apk119Value1280.safari.recentSearches, apk119Value1246.primary, "Safari 公开搜索"), apk119Value1282(apk119Value1280.safari.privateSearches, apk119Value1246.secondary, "Safari 无痕搜索"));
+          if (apk119Value1280.game) apk119Value1282(apk119Value1280.game.recentGames, apk119Value1242.gameTotal, "游戏");
+          if (apk119Value1280.call) apk119Value1282(apk119Value1280.call.recentCalls, apk119Value1242.callTotal, "通话记录");
+          apk119Value1280.weibo && (apk119Value1282(apk119Value1280.weibo.mainAccount?.["posts"], apk119Value1247.primary, "微博大号帖子"), apk119Value1282(apk119Value1280.weibo.altAccount?.["posts"], apk119Value1247.secondary, "微博小号帖子"), apk119Value1282(apk119Value1280.weibo.mainAccount?.["album"], apk119Value1248.primary, "微博大号相册"), apk119Value1282(apk119Value1280.weibo.altAccount?.["album"], apk119Value1248.secondary, "微博小号相册"), apk119Value1282(apk119Value1280.weibo.mainAccount?.["liked"], 3, "微博大号赞过"), apk119Value1282(apk119Value1280.weibo.altAccount?.["liked"], 3, "微博小号赞过"), apk119Value1280.weibo.mainAccount.posts = this.normalizeFriendPhoneWeiboPostComments(apk119Value1280.weibo.mainAccount.posts, 5), apk119Value1280.weibo.altAccount.posts = this.normalizeFriendPhoneWeiboPostComments(apk119Value1280.weibo.altAccount.posts, 5));
+          apk119Value1280.files && (apk119Value1283(apk119Value1280.files.tags, 2, 3, "文件标签"), apk119Value1280.files.tags.forEach((apk119Value1296, apk119Value1297) => apk119Value1283(apk119Value1296?.["items"], 1, 3, "文件标签 " + (apk119Value1297 + 1))));
+          if (apk119Value1280.pay) apk119Value1283(apk119Value1280.pay.recentTransactions, 5, 50, "钱包交易");
+          this.validateFriendPhoneLocalizedTree(apk119Value1280, friend_28.language || "zh", "phone");
+          const apk119Value1284 = {};
+          apk119Value1280.music && (apk119Value1284.musicData = {
+            recent: Array.isArray(apk119Value1280.music.recent) ? apk119Value1280.music.recent : [],
+            favorites: Array.isArray(apk119Value1280.music.favorites) ? apk119Value1280.music.favorites : [],
+            top: Array.isArray(apk119Value1280.music.top) ? apk119Value1280.music.top.slice(0, apk119Value1242.musicTop) : []
+          });
+          apk119Value1280.health && (apk119Value1284.healthData = apk119Value1280.health);
+          apk119Value1280.pay && (apk119Value1284.payData = {
+            ...apk119Value1280.pay,
+            recentTransactions: Array.isArray(apk119Value1280.pay.recentTransactions) ? apk119Value1280.pay.recentTransactions : []
+          });
+          apk119Value1280.game && (apk119Value1284.gameData = {
+            ...apk119Value1280.game,
+            recentGames: Array.isArray(apk119Value1280.game.recentGames) ? apk119Value1280.game.recentGames.slice(0, apk119Value1242.gameTotal) : []
+          });
+          apk119Value1280.call && (apk119Value1284.callData = {
+            ...apk119Value1280.call,
+            recentCalls: Array.isArray(apk119Value1280.call.recentCalls) ? apk119Value1280.call.recentCalls.slice(0, apk119Value1242.callTotal) : [],
+            contacts: Array.isArray(apk119Value1280.call.contacts) ? apk119Value1280.call.contacts : []
+          });
+          apk119Value1280.safari && (apk119Value1284.safariData = {
+            recentSearches: Array.isArray(apk119Value1280.safari.recentSearches) ? apk119Value1280.safari.recentSearches.slice(0, apk119Value1246.primary) : [],
+            privateSearches: Array.isArray(apk119Value1280.safari.privateSearches) ? apk119Value1280.safari.privateSearches.slice(0, apk119Value1246.secondary) : []
+          });
+          apk119Value1280.files && (apk119Value1284.filesData = {
+            ...apk119Value1280.files,
+            tags: Array.isArray(apk119Value1280.files.tags) ? apk119Value1280.files.tags : [],
+            recent: Array.isArray(apk119Value1280.files.recent) ? apk119Value1280.files.recent : []
+          });
+          if (apk119Value1280.weibo) {
+            const apk119Value1298 = apk119Value1280.weibo || {},
+              apk119Value1299 = (apk119Value1300, apk119Value1301) => {
+                const apk119Value1302 = apk119Value1301 === "altAccount",
+                  apk119Value1303 = this.normalizeWeiboAccount(apk119Value1300 || {}, friend_28, apk119Value1301 === "altAccount" ? "alt" : "main"),
+                  apk119Value1304 = apk119Value1302 ? apk119Value1247.secondary : apk119Value1247.primary,
+                  apk119Value1305 = apk119Value1302 ? apk119Value1248.secondary : apk119Value1248.primary;
+                return apk119Value1303.posts = apk119Value1303.posts.slice(0, apk119Value1304), apk119Value1303.album = apk119Value1303.album.slice(0, apk119Value1305), apk119Value1303.liked = apk119Value1303.liked.slice(0, 3), apk119Value1303;
+              };
+            apk119Value1284.weiboData = {
+              mainAccount: apk119Value1299(apk119Value1298.mainAccount || apk119Value1298.main || apk119Value1298, "mainAccount"),
+              altAccount: apk119Value1299(apk119Value1298.altAccount || apk119Value1298.alt || {}, "altAccount")
+            };
+          }
+          const apk119Value1285 = {};
+          if (apk119Value1284.musicData) apk119Value1285.music = apk119Value1284.musicData;
+          if (apk119Value1284.healthData) apk119Value1285.health = apk119Value1284.healthData;
+          if (apk119Value1284.payData) apk119Value1285.pay = apk119Value1284.payData;
+          if (apk119Value1284.gameData) apk119Value1285.game = apk119Value1284.gameData;
+          if (apk119Value1284.callData) apk119Value1285.call = apk119Value1284.callData;
+          if (apk119Value1284.safariData) apk119Value1285.safari = apk119Value1284.safariData;
+          if (apk119Value1284.filesData) apk119Value1285.files = apk119Value1284.filesData;
+          if (apk119Value1284.weiboData) apk119Value1285.weibo = apk119Value1284.weiboData;
+          const apk119Value1286 = (window.imData?.["friends"] || []).find(apk119Value1306 => String(apk119Value1306.id) === String(friend_28.id));
+          if (!apk119Value1286) throw new Error("发起生成的角色已被删除，结果未保存");
+          if (apk119Value1285.call) window.cphoneCallApp.normalizeGeneratedData(apk119Value1286, apk119Value1285.call, apk119Value1242.callTotal);
+          const apk119Value1287 = await this.persistFriendState(apk119Value1286, {
+            metaOnly: true,
+            mutate: apk119Value1307 => {
+              const apk119Value1308 = this.mergeFriendPhoneGeneratedData(apk119Value1307, apk119Value1285, {
+                generatedAt: Date.now(),
+                skipValidation: true,
+                callCount: apk119Value1242.callTotal
+              });
+              Object.assign(apk119Value1307, apk119Value1308.next);
+            }
+          });
+          if (!apk119Value1287) throw new Error("应用数据保存失败，已撤销本次生成");
+          if (apk119Value1249) {
+            window.cphoneCallApp.setNotice(apk119Value1249.ownerId, "已新增 " + apk119Value1242.callTotal + " 条通话记录");
+            if (window.cphoneCallApp.ownerId === apk119Value1249.ownerId) window.cphoneCallApp.render();
+          }
+          if (window.showToast) window.showToast("生成成功");
+          window.closeView && String(this.currentFriend?.["id"] || "") === String(friend_28.id) && window.closeView(settingsSheet);
+        } catch (apk119Value1309) {
+          console.error("JSON Parse error", apk119Value1309, "\nOriginal Text:", apk119Value1277, "\nExtracted:", apk119Value1278);
+          if (apk119Value1249) window.cphoneCallApp.setNotice(apk119Value1249.ownerId, apk119Value1309.message || "通话生成失败", true);
+          if (window.showToast) window.showToast("生成失败：" + (apk119Value1309.message || "数据格式无效，请重试"));
+        }
+      })["catch"](apk119Value1310 => {
+        console.error("API Error:", apk119Value1310);
+        if (apk119Value1249) window.cphoneCallApp.setNotice(apk119Value1249.ownerId, apk119Value1310.message || "通话生成失败", true);
+        let apk119Value1311 = apk119Value1310.message || "未知网络错误";
+        apk119Value1311.length > 50 && (apk119Value1311 = apk119Value1311.substring(0, 50) + "...");
+        if (!window.u2Api?.["isRequestError"]?.(apk119Value1310) || !window.u2Api.reportError(apk119Value1310, {
+          operation: "手机数据生成"
+        })) {
+          if (window.showToast) window.showToast("API 请求失败: " + apk119Value1311);else alert("API 请求失败: " + apk119Value1311);
+        }
+      });
+    if (apk119Value1249) await apk119Value1263;
+  } catch (apk119Value1312) {
+    if (apk119Value1249) window.cphoneCallApp.setNotice(apk119Value1249.ownerId, apk119Value1312.message || "生成失败", true);
+    window.showToast?.(apk119Value1312.message || "生成失败，请重试");
+  } finally {
+    window.cphoneCallApp?.["endJob"](apk119Value1249), genConfirmBtn.disabled = false;
+  }
+});
         const imsgBtn = document.getElementById('friend-phone-app-imessage');
         if (imsgBtn)
             imsgBtn.onclick = () => {
@@ -7031,192 +6577,8 @@ Extracted:`,
             musicBackBtn.onclick = () => {
                 if (window.closeView) window.closeView(musicView);
             };
-        const callBtn = document.getElementById('friend-phone-app-call'),
-            callView = document.getElementById('friend-phonecall-view');
-        callBtn &&
-            callView &&
-            (callBtn.onclick = () => {
-                if (window.openView) window.openView(callView);
-                const tabRecent = document.getElementById('friend-call-tab-recent'),
-                    tabContacts = document.getElementById('friend-call-tab-contacts'),
-                    listRecent = document.getElementById('friend-call-list'),
-                    listContacts = document.getElementById('friend-contact-list');
-                tabRecent &&
-                    tabContacts &&
-                    listRecent &&
-                    listContacts &&
-                    ((tabRecent.onclick = () => {
-                        tabRecent.classList.add('active');
-                        tabContacts.classList.remove('active');
-                        tabRecent.style.background = '#fff';
-                        tabRecent.style.color = '#111';
-                        tabRecent.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-                        tabContacts.style.background = 'transparent';
-                        tabContacts.style.color = '#8e8e93';
-                        tabContacts.style.boxShadow = 'none';
-                        listRecent.style.display = 'block';
-                        listContacts.style.display = 'none';
-                    }),
-                    (tabContacts.onclick = () => {
-                        tabContacts.classList.add('active');
-                        tabRecent.classList.remove('active');
-                        tabContacts.style.background = '#fff';
-                        tabContacts.style.color = '#111';
-                        tabContacts.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-                        tabRecent.style.background = 'transparent';
-                        tabRecent.style.color = '#8e8e93';
-                        tabRecent.style.boxShadow = 'none';
-                        listContacts.style.display = 'block';
-                        listRecent.style.display = 'none';
-                    }));
-                if (listRecent && friend_28.callData && friend_28.callData.recentCalls) {
-                    listRecent.innerHTML = friend_28.callData.recentCalls
-                        .map((value_948, value_454) => {
-                            let typeIcon = '';
-                            if (value_948.type === 'missed')
-                                typeIcon =
-                                    '<i class="fas fa-phone-slash" style="color: #ff3b30; font-size: 10px;"></i>';
-                            else
-                                value_948.type === 'outgoing'
-                                    ? (typeIcon =
-                                          '<i class="fas fa-phone" style="color: #8e8e93; font-size: 10px;"></i>')
-                                    : (typeIcon =
-                                          '<i class="fas fa-phone-alt" style="color: #8e8e93; font-size: 10px;"></i>');
-                            return (
-                                `
-                        <div class="call-history-item-new" data-idx="` +
-                                value_454 +
-                                `" style="display: flex; align-items: center; padding: 15px 0; cursor: pointer;">
-                            <div style="flex: 1; display: flex; flex-direction: column; pointer-events: none;">
-                                <div style="font-size: 18px; font-weight: 600; color: ` +
-                                (value_948.type === 'missed' ? '#ff3b30' : '#111') +
-                                ';">' +
-                                this.escapeHTML(this.getFriendPhoneChineseContactName(value_948)) +
-                                `</div>
-                                <div style="font-size: 14px; color: #8e8e93; display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-                                    ` +
-                                typeIcon +
-                                `
-                                    <span>` +
-                                (value_948.type === 'missed' ? '未接来电' : '语音通话') +
-                                `</span>
-                                </div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 15px; pointer-events: none;">
-                                <span style="color: #8e8e93; font-size: 14px;">` +
-                                this.escapeHTML(
-                                    this.formatFriendPhoneGeneratedAt(value_948.generatedAt) ||
-                                        value_948.time ||
-                                        '',
-                                ) +
-                                `</span>
-                                <i class="fas fa-info-circle" style="color: #007aff; font-size: 22px;"></i>
-                            </div>
-                        </div>`
-                            );
-                        })
-                        .join('');
-                    if (listContacts) {
-                        const fallbackContactNames = new Set(),
-                            fallbackContacts = friend_28.callData.recentCalls.reduce(
-                                (items_5, call_2) => {
-                                    const chineseName =
-                                        this.getFriendPhoneChineseContactName(call_2);
-                                    if (!chineseName || fallbackContactNames.has(chineseName))
-                                        return items_5;
-                                    return (
-                                        fallbackContactNames.add(chineseName),
-                                        items_5.push({
-                                            name: chineseName,
-                                            addedTime: '未知时间',
-                                            recentCallTime: '近期',
-                                            callReason: '日常联系',
-                                        }),
-                                        items_5
-                                    );
-                                },
-                                [],
-                            ),
-                            _parsedContacts_2 =
-                                Array.isArray(friend_28.callData.contacts) &&
-                                friend_28.callData.contacts.length
-                                    ? friend_28.callData.contacts
-                                    : fallbackContacts;
-                        friend_28.callData._parsedContacts = _parsedContacts_2;
-                        listContacts.innerHTML = _parsedContacts_2
-                            .map(
-                                (value_458, value_459) =>
-                                    `
-                            <div class="contact-item-new" data-idx="` +
-                                    value_459 +
-                                    `" style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #e5e5ea; cursor: pointer;">
-                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #f2f2f7; display: flex; justify-content: center; align-items: center; color: #8e8e93; margin-right: 15px; font-size: 16px; pointer-events: none;">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div style="flex: 1; font-size: 16px; font-weight: 600; color: #111;">` +
-                                    this.escapeHTML(
-                                        this.getFriendPhoneChineseContactName(value_458),
-                                    ) +
-                                    `</div>
-                                <i class="fas fa-info-circle" style="color: #007aff; font-size: 20px; pointer-events: none;"></i>
-                            </div>
-                        `,
-                            )
-                            .join('');
-                    }
-                    setTimeout(() => {
-                        try {
-                            const items_6 = listRecent.querySelectorAll('.call-history-item-new');
-                            items_6.forEach((value_958) => {
-                                value_958.addEventListener('click', function (event_959) {
-                                    event_959.preventDefault();
-                                    event_959.stopPropagation();
-                                    const attribute_960 = this.getAttribute('data-idx'),
-                                        c = friend_28.callData.recentCalls[attribute_960];
-                                    window.lovesApp.showCallDetailModal(c);
-                                });
-                                window.lovesApp.bindLongPress(value_958, function () {
-                                    const idx_12 = value_958.getAttribute('data-idx'),
-                                        c_2 = friend_28.callData.recentCalls[idx_12];
-                                    window.lovesApp.showDeleteConfirm(
-                                        c_2.name + '的通话记录',
-                                        () => {
-                                            friend_28.callData.recentCalls.splice(idx_12, 1);
-                                            callBtn.onclick();
-                                        },
-                                    );
-                                });
-                            });
-                            if (listContacts && friend_28.callData._parsedContacts) {
-                                const contactItems =
-                                    listContacts.querySelectorAll('.contact-item-new');
-                                contactItems.forEach((value_964) => {
-                                    value_964.addEventListener('click', function (event_965) {
-                                        event_965.preventDefault();
-                                        event_965.stopPropagation();
-                                        const idx_13 = this.getAttribute('data-idx'),
-                                            c_3 = friend_28.callData._parsedContacts[idx_13];
-                                        window.lovesApp.showContactDetailModal(c_3);
-                                    });
-                                });
-                            }
-                        } catch (err_7) {
-                            console.error('Call bind error', err_7);
-                        }
-                    }, 50);
-                } else
-                    listRecent &&
-                        ((listRecent.innerHTML =
-                            '<div style="padding: 30px; text-align: center; color: #8e8e93; font-size: 14px;">暂无通话记录<br><span style="font-size: 12px; margin-top: 5px; display: inline-block;">请在设置中生成</span></div>'),
-                        listContacts &&
-                            (listContacts.innerHTML =
-                                '<div style="padding: 30px; text-align: center; color: #8e8e93; font-size: 14px;">暂无联系人</div>'));
-            });
-        const callBackBtn = document.getElementById('friend-phonecall-back-btn');
-        if (callBackBtn)
-            callBackBtn.onclick = () => {
-                if (window.closeView) window.closeView(callView);
-            };
+        const callButton = document.getElementById("friend-phone-app-call");
+        if (callButton) callButton.onclick = () => window.cphoneCallApp?.open(friend_28);
         const healthBtn = document.getElementById('friend-phone-app-health'),
             healthView = document.getElementById('friend-health-view');
         healthBtn &&
@@ -8050,263 +7412,6 @@ Extracted:`,
             gameBackBtn.onclick = () => {
                 if (window.closeView) window.closeView(gameView);
             };
-    },
-    showContactDetailModal: function (contactData) {
-        try {
-            const oldModals = document.querySelectorAll('#loves-contact-detail-modal');
-            oldModals.forEach((value_545) => value_545.remove());
-            const modal_3 = document.createElement('div');
-            modal_3.id = 'loves-contact-detail-modal';
-            modal_3.style.position = 'fixed';
-            modal_3.style.top = '0';
-            modal_3.style.left = '0';
-            modal_3.style.width = '100%';
-            modal_3.style.height = '100%';
-            modal_3.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
-            modal_3.style.zIndex = '2147483647';
-            modal_3.style.display = 'flex';
-            modal_3.style.flexDirection = 'column';
-            modal_3.style.justifyContent = 'flex-end';
-            const element_538 = document.createElement('div');
-            element_538.style.backgroundColor = '#f2f2f7';
-            element_538.style.borderTopLeftRadius = '24px';
-            element_538.style.borderTopRightRadius = '24px';
-            element_538.style.width = '100%';
-            element_538.style.maxHeight = '85%';
-            element_538.style.display = 'flex';
-            element_538.style.flexDirection = 'column';
-            element_538.style.pointerEvents = 'auto';
-            element_538.style.boxShadow = '0 -4px 20px rgba(0,0,0,0.1)';
-            const element_539 = document.createElement('div');
-            element_539.style.width = '36px';
-            element_539.style.height = '5px';
-            element_539.style.backgroundColor = '#ccc';
-            element_539.style.borderRadius = '3px';
-            element_539.style.margin = '10px auto 15px';
-            const element_540 = document.createElement('div');
-            element_540.style.flex = '1';
-            element_540.style.overflowY = 'auto';
-            element_540.style.padding = '0 20px 20px';
-            const value_541 =
-                    `
-                <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 25px;">
-                    <div style="width: 80px; height: 80px; border-radius: 50%; background: #e5e5ea; display: flex; justify-content: center; align-items: center; color: #8e8e93; font-size: 34px; margin-bottom: 10px; ">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div style="font-size: 24px; font-weight: 600; color: #111;">` +
-                    this.escapeHTML(this.getFriendPhoneChineseContactName(contactData)) +
-                    `</div>
-                </div>
-            `,
-                text_542 = `
-                <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 25px;">
-                    <div style="flex: 1; background: #fff; padding: 12px 0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; color: #007aff;">
-                        <i class="fas fa-comment" style="font-size: 20px;"></i>
-                        <span style="font-size: 11px; font-weight: 500;">信息</span>
-                    </div>
-                    <div style="flex: 1; background: #fff; padding: 12px 0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; color: #007aff;">
-                        <i class="fas fa-phone-alt" style="font-size: 20px;"></i>
-                        <span style="font-size: 11px; font-weight: 500;">电话</span>
-                    </div>
-                    <div style="flex: 1; background: #fff; padding: 12px 0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; color: #007aff;">
-                        <i class="fas fa-video" style="font-size: 20px;"></i>
-                        <span style="font-size: 11px; font-weight: 500;">视频</span>
-                    </div>
-                    <div style="flex: 1; background: #fff; padding: 12px 0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; color: #007aff;">
-                        <i class="fas fa-envelope" style="font-size: 20px;"></i>
-                        <span style="font-size: 11px; font-weight: 500;">邮件</span>
-                    </div>
-                </div>
-            `,
-                value_543 =
-                    `
-                <div style="background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px;">
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <div style="font-size: 13px; color: #8e8e93;">添加为联系人日期</div>
-                        <div style="font-size: 15px; font-weight: 500; color: #111;">` +
-                    this.escapeHTML(
-                        this.formatFriendPhoneGeneratedAt(contactData.generatedAt) || '旧数据',
-                    ) +
-                    `</div>
-                    </div>
-                    <div style="height: 1px; background: #f2f2f7;"></div>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <div style="font-size: 13px; color: #8e8e93;">近期通话时间</div>
-                        <div style="font-size: 15px; font-weight: 500; color: #111;">` +
-                    this.escapeHTML(
-                        this.formatFriendPhoneGeneratedAt(contactData.generatedAt) || '旧数据',
-                    ) +
-                    `</div>
-                    </div>
-                </div>
-            `,
-                value_544 =
-                    `
-                <div style="background: #fff; border-radius: 16px; padding: 16px;">
-                    <div style="font-size: 13px; color: #8e8e93; margin-bottom: 8px;">通话原因</div>
-                    <div style="font-size: 15px; color: #333; line-height: 1.5; word-break: break-word;">
-                        ` +
-                    this.renderFriendPhoneLocalized(contactData, 'callReason', {
-                        fallback: '暂无说明',
-                        id: 'contact-reason',
-                    }) +
-                    `
-                    </div>
-                </div>
-            `;
-            element_540.innerHTML = value_541 + text_542 + value_543 + value_544;
-            element_538.appendChild(element_539);
-            element_538.appendChild(element_540);
-            modal_3.addEventListener('click', (event_546) => {
-                event_546.target === modal_3 &&
-                    ((modal_3.style.opacity = '0'),
-                    (element_538.style.transform = 'translateY(100%)'),
-                    setTimeout(() => modal_3.remove(), 250));
-            });
-            modal_3.style.opacity = '0';
-            modal_3.style.transition = 'opacity 0.25s ease';
-            element_538.style.transform = 'translateY(100%)';
-            element_538.style.transition = 'transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)';
-            modal_3.appendChild(element_538);
-            document.body.appendChild(modal_3);
-            this.bindFriendPhoneTranslationDelegation(modal_3);
-            void modal_3.offsetWidth;
-            modal_3.style.opacity = '1';
-            element_538.style.transform = 'translateY(0)';
-        } catch (e_12) {
-            console.error('Error showing contact detail modal:', e_12);
-        }
-    },
-    showCallDetailModal: function (callData_2) {
-        try {
-            const oldModals_2 = document.querySelectorAll('#loves-call-detail-modal');
-            oldModals_2.forEach((value_572) => value_572.remove());
-            const modal_4 = document.createElement('div');
-            modal_4.id = 'loves-call-detail-modal';
-            modal_4.style.position = 'fixed';
-            modal_4.style.top = '0';
-            modal_4.style.left = '0';
-            modal_4.style.width = '100%';
-            modal_4.style.height = '100%';
-            modal_4.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
-            modal_4.style.zIndex = '2147483647';
-            modal_4.style.display = 'flex';
-            modal_4.style.flexDirection = 'column';
-            modal_4.style.justifyContent = 'flex-end';
-            let text_1066 = '语音通话',
-                text_1067 = '#8e8e93';
-            if (callData_2.type === 'missed') {
-                text_1066 = '未接来电';
-                text_1067 = '#ff3b30';
-            } else
-                callData_2.type === 'outgoing'
-                    ? (text_1066 = '呼出通话')
-                    : (text_1066 = '呼入通话');
-            const fallback_7 = callData_2.dialogue || '无对话记录',
-                element_565 = document.createElement('div');
-            element_565.style.backgroundColor = '#f2f2f7';
-            element_565.style.borderTopLeftRadius = '24px';
-            element_565.style.borderTopRightRadius = '24px';
-            element_565.style.width = '100%';
-            element_565.style.maxHeight = '85%';
-            element_565.style.display = 'flex';
-            element_565.style.flexDirection = 'column';
-            element_565.style.pointerEvents = 'auto';
-            element_565.style.boxShadow = '0 -4px 20px rgba(0,0,0,0.1)';
-            const element_566 = document.createElement('div');
-            element_566.style.width = '36px';
-            element_566.style.height = '5px';
-            element_566.style.backgroundColor = '#ccc';
-            element_566.style.borderRadius = '3px';
-            element_566.style.margin = '10px auto 15px';
-            const element_567 = document.createElement('div');
-            element_567.style.flex = '1';
-            element_567.style.overflowY = 'auto';
-            element_567.style.padding = '0 20px 20px';
-            const value_568 =
-                    `
-                <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 25px;">
-                    <div style="width: 80px; height: 80px; border-radius: 50%; background: #e5e5ea; display: flex; justify-content: center; align-items: center; color: #8e8e93; font-size: 34px; margin-bottom: 10px; ">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div style="font-size: 24px; font-weight: 600; color: #111;">` +
-                    this.escapeHTML(this.getFriendPhoneChineseContactName(callData_2)) +
-                    `</div>
-                </div>
-            `,
-                text_569 = `
-                <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 25px;">
-                    <div style="flex: 1; background: #fff; padding: 12px 0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; color: #007aff;">
-                        <i class="fas fa-comment" style="font-size: 20px;"></i>
-                        <span style="font-size: 11px; font-weight: 500;">信息</span>
-                    </div>
-                    <div style="flex: 1; background: #fff; padding: 12px 0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; color: #007aff;">
-                        <i class="fas fa-phone-alt" style="font-size: 20px;"></i>
-                        <span style="font-size: 11px; font-weight: 500;">电话</span>
-                    </div>
-                    <div style="flex: 1; background: #fff; padding: 12px 0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; color: #007aff;">
-                        <i class="fas fa-video" style="font-size: 20px;"></i>
-                        <span style="font-size: 11px; font-weight: 500;">视频</span>
-                    </div>
-                    <div style="flex: 1; background: #fff; padding: 12px 0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; color: #007aff;">
-                        <i class="fas fa-envelope" style="font-size: 20px;"></i>
-                        <span style="font-size: 11px; font-weight: 500;">邮件</span>
-                    </div>
-                </div>
-            `,
-                value_570 =
-                    `
-                <div style="background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 15px;">
-                    <div style="font-size: 15px; font-weight: 600; color: #111; margin-bottom: 8px;">` +
-                    this.escapeHTML(
-                        this.formatFriendPhoneGeneratedAt(callData_2.generatedAt) ||
-                            callData_2.time ||
-                            '',
-                    ) +
-                    `</div>
-                    <div style="font-size: 14px; color: ` +
-                    text_1067 +
-                    ';">' +
-                    text_1066 +
-                    `</div>
-                </div>
-            `,
-                value_571 =
-                    `
-                <div style="background: #fff; border-radius: 16px; padding: 16px;">
-                    <div style="font-size: 13px; font-weight: 600; color: #8e8e93; margin-bottom: 12px; text-transform: uppercase;">录音转写记录</div>
-                    <div style="font-size: 15px; color: #333; line-height: 1.6; word-break: break-word;">
-                        ` +
-                    this.renderFriendPhoneLocalized(callData_2, 'dialogue', {
-                        fallback: fallback_7,
-                        id: 'call-dialogue',
-                    }) +
-                    `
-                    </div>
-                </div>
-            `;
-            element_567.innerHTML = value_568 + text_569 + value_570 + value_571;
-            element_565.appendChild(element_566);
-            element_565.appendChild(element_567);
-            modal_4.addEventListener('click', (event_573) => {
-                event_573.target === modal_4 &&
-                    ((modal_4.style.opacity = '0'),
-                    (element_565.style.transform = 'translateY(100%)'),
-                    setTimeout(() => modal_4.remove(), 250));
-            });
-            modal_4.style.opacity = '0';
-            modal_4.style.transition = 'opacity 0.25s ease';
-            element_565.style.transform = 'translateY(100%)';
-            element_565.style.transition = 'transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)';
-            modal_4.appendChild(element_565);
-            document.body.appendChild(modal_4);
-            this.bindFriendPhoneTranslationDelegation(modal_4);
-            void modal_4.offsetWidth;
-            modal_4.style.opacity = '1';
-            element_565.style.transform = 'translateY(0)';
-        } catch (e_13) {
-            console.error('Error showing call detail modal:', e_13);
-        }
     },
     showDetailModal: function (innerText_3, innerHTML_2, isGame = false) {
         try {
