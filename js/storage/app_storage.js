@@ -4922,7 +4922,7 @@
             },
             pay: {
                 transactions: [],
-                balance: 1000,
+                balance: 10000,
             },
             spotify: {
                 customName: '',

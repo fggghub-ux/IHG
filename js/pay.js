@@ -9,23 +9,23 @@
             {
                 id: 'bank_1',
                 type: 'bank',
-                name: '招商银行',
+                name: 'AMERICAN EXPRESS',
                 icon: 'fas fa-university',
-                cardType: '储蓄卡',
-                number: '**** **** **** 8888',
-                balance: 1000,
-                logo: '银联',
+                cardType: '',
+                number: '**** **** **** 9898',
+                balance: 10000,
+                logo: '27',
                 styleClass: '',
                 transactions: [],
             },
             {
                 id: 'bank_2',
                 type: 'bank',
-                name: 'VISA 信用卡',
+                name: 'J.P. Morgan',
                 icon: 'fas fa-globe',
-                cardType: 'Credit',
-                number: '**** **** **** 1234',
-                balance: 50000,
+                cardType: '',
+                number: '**** **** **** 8888',
+                balance: 80000,
                 logo: 'VISA',
                 styleClass: 'bank-card-blue',
                 transactions: [],
@@ -46,7 +46,7 @@
             if (data.transactions || data.balance !== undefined) {
                 cards_2[0].transactions = Array.isArray(data.transactions) ? data.transactions : [];
                 const nextBalance = parseFloat(data.balance);
-                cards_2[0].balance = Number.isFinite(nextBalance) ? nextBalance : 1000;
+                cards_2[0].balance = Number.isFinite(nextBalance) ? nextBalance : 10000;
             }
         }
         !cards_2.find((value_16) => value_16.id === currentCardId_3) &&
@@ -203,8 +203,8 @@
             window.showToast &&
                 window.showToast(
                     type_2 === 'income'
-                        ? '已到账 ＄' + balance_2.toFixed(2)
-                        : '已支付 ＄' + balance_2.toFixed(2),
+                        ? 'Received $' + balance_2.toFixed(2)
+                        : 'Payment $' + balance_2.toFixed(2),
                 ),
             true
         );
@@ -362,8 +362,8 @@
                     const unbindBtn = document.createElement('button');
                     unbindBtn.type = 'button';
                     unbindBtn.className = 'pay-family-card-unbind';
-                    unbindBtn.textContent = '解绑';
-                    unbindBtn.setAttribute('aria-label', '解绑' + c_4.name);
+                    unbindBtn.textContent = 'Unbind';
+                    unbindBtn.setAttribute('aria-label', 'Unbind' + c_4.name);
                     unbindBtn.addEventListener('click', (event) => {
                         event.stopPropagation();
                         confirmRemoveFamilyCard(c_4);
@@ -450,7 +450,7 @@
         payBillListElement &&
             ((payBillListElement.innerHTML = ''),
             filteredTxs.length === 0
-                ? (payBillListElement.innerHTML = '<div class="pay-empty-state">暂无交易记录</div>')
+                ? (payBillListElement.innerHTML = '<div class="pay-empty-state">No Transaction Yet</div>')
                 : filteredTxs.forEach((tx_3) => {
                       const element_47 = document.createElement('div');
                       element_47.className = 'pay-bill-item';
@@ -524,7 +524,7 @@
             const newCard = {
                 id: cardId,
                 type: 'family',
-                name: '亲属卡 - ' + (friendName_2 || '好友'),
+                name: 'Family - ' + (friendName_2 || '好友'),
                 icon: 'fas fa-heart',
                 cardType: 'Family Card',
                 number: '**** **** **** ' + Math.floor(1000 + Math.random() * 9000),
@@ -765,23 +765,23 @@
     function confirmRemoveFamilyCard(card_2) {
         const onConfirm_2 = () => {
             if (!removeFamilyCard_2(card_2.id)) return;
-            if (window.showToast) window.showToast('亲属卡已解绑');
+            if (window.showToast) window.showToast('Family card unliked');
         };
         if (typeof window.showCustomModal === 'function')
             window.showCustomModal({
-                title: '解绑亲属卡',
-                message: '解绑后将删除' + card_2.name + '，且无法恢复。',
-                confirmText: '解绑',
-                cancelText: '取消',
+                title: 'Unlink Family Card',
+                message: 'Unlinking will delete' + card_2.name + '，and cannot be undone.',
+                confirmText: 'unlink',
+                cancelText: 'cancel',
                 isDestructive: true,
                 onConfirm: onConfirm_2,
             });
-        else window.confirm('解绑后将删除' + card_2.name + '，且无法恢复。') && onConfirm_2();
+        else window.confirm('Unlinking will delete' + card_2.name + '，and cannot be undone.') && onConfirm_2();
     }
     function handleClick() {
         const bankCards = cards_2.filter((value_108) => value_108.type === 'bank');
         if (bankCards.length === 0 || !transferInModal) {
-            if (window.showToast) window.showToast('暂无可转入的银行卡');
+            if (window.showToast) window.showToast('No bank cards available for transfer');
             return;
         }
         const currentCard_2 = getCurrentCard(),
@@ -1019,7 +1019,7 @@
             event_139.preventDefault();
             const amount_3 = Number(transferInAmountInput?.value);
             if (!Number.isFinite(amount_3) || amount_3 <= 0) {
-                if (window.showToast) window.showToast('请输入大于 0 的转入金额');
+                if (window.showToast) window.showToast('Enter an amount greater than 0');
                 transferInAmountInput?.focus();
                 return;
             }
@@ -1028,12 +1028,12 @@
                     (card_4) => card_4.id === targetCardId && card_4.type === 'bank',
                 );
             if (!targetCard_2) {
-                if (window.showToast) window.showToast('请选择银行卡');
+                if (window.showToast) window.showToast('Select Bank Card');
                 return;
             }
             const success = window.addPayTransaction(
                 amount_3,
-                '账户转入',
+                'Transfer to Account',
                 'income',
                 targetCard_2.id,
             );
