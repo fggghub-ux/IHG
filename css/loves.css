@@ -503,6 +503,7 @@
     min-height: 0;
     overflow: hidden;
     background-color: #727572;
+    background-image: url("../assets/bizhi.jpg");
     background-size: cover;
     background-position: center;
 }
