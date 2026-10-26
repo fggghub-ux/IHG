@@ -5065,7 +5065,7 @@ button.x-dm-translation-bubble {
 .x-report-types input { width: 18px; height: 18px; margin: 0; accent-color: #0f1419; flex-shrink: 0; }
 .x-report-note { display: flex; flex-direction: column; gap: 9px; margin-top: 18px; font-size: 14px; font-weight: 600; }
 .x-report-note textarea { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid #cfd9de; border-radius: 12px; resize: vertical; background: #fff; color: #0f1419; font: inherit; font-size: 15px; line-height: 1.5; }
-.x-report-note textarea:focus { outline: 2px solid #536471; outline-offset: 1px; }
+.x-report-note textarea:focus { outline: none; box-shadow: none; }
 #x-report-submit { width: 100%; margin-top: 18px; }
 #x-report-submit:disabled { opacity: .5; cursor: wait; }
 .x-report-error { margin: 12px 0 0; color: #b42332; font-size: 13px; overflow-wrap: anywhere; }

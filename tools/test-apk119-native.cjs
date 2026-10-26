@@ -18,7 +18,7 @@ function bridge(platform) {
         if (plugin === 'U2Health' && method === 'readMenstrualChanges') return {samples:[],deletedIds:[],anchor:'next',storeId:'health',hasMore:false};
         if (plugin === 'Filesystem' && method === 'writeFile') return {uri:'file:///cache/qr.png'};
         if (plugin === 'Share' && method === 'share' && importMode === 'cancel') throw new Error('User cancelled');
-        if (plugin === 'U2MessageNotifications' && method === 'showMessage') {if (importMode === 'avatarFail') throw new Error('unavailable');return {shown:true};}
+        if (plugin === 'U2MessageNotifications' && method === 'showMessage') {if (importMode === 'avatarFail') throw new Error('unavailable');return {shown:importMode !== 'avatarFalse'};}
         if (plugin === 'U2FileExport')
             switch (method) {
                 case 'beginImport':
@@ -140,6 +140,10 @@ function bridge(platform) {
  await ios.api.requestNetEaseGateway({url:'https://u2iisony.pages.dev/api/netease/qr/start'});assert(ios.calls.some(c=>c.plugin==='CapacitorHttp'&&c.method==='request'));await assert.rejects(()=>ios.api.requestNetEaseGateway({url:'https://example.invalid/api/netease/qr/start'}));
  ios.setMode('valid');assert.equal(await ios.api.showNotification({title:'Test',body:'Body',senderId:'char',senderName:'Name',avatarUrl:'data:image/png;base64,aGVsbG8='}),true);assert(ios.calls.some(c=>c.plugin==='U2MessageNotifications'&&c.method==='showMessage'&&c.args.senderId==='char'));
  ios.setMode('avatarFail');await ios.api.showNotification({title:'Test',senderId:'char'});assert(ios.calls.some(c=>c.plugin==='LocalNotifications'&&c.method==='schedule'&&c.args.notifications[0].foreground===true));assert(ios.listeners['App:pause']&&ios.listeners['App:resume']);
- const android=bridge('android');await android.api.ready();await android.api.showNotification({title:'Test',senderId:'char'});assert(!android.calls.some(c=>c.plugin==='U2MessageNotifications'),'excluded Android message interface must not be called');assert(android.calls.some(c=>c.plugin==='LocalNotifications'&&c.method==='schedule'));
- console.log('PASS iOS Health authorization/read, NetEase native gateway/share/cancel cleanup, sender-avatar notification/fallback, lifecycle events; Android new message interface excluded');
+ const android=bridge('android');await android.api.ready();
+ await android.api.showNotification({title:'Test',senderId:'char',senderName:'Sender',avatarUrl:'data:image/png;base64,aGVsbG8=',silent:true});
+ const avatar=android.calls.find(c=>c.plugin==='U2MessageNotifications'&&c.method==='showMessage');assert.equal(avatar.args.senderName,'Sender');assert.equal(avatar.args.channelId,'u2_silent_messages');assert(avatar.args.avatarUrl.startsWith('data:image/'));assert(!android.calls.some(c=>c.plugin==='LocalNotifications'&&c.method==='schedule'));
+ for(const mode of ['avatarFail','avatarFalse']){android.setMode(mode);const before=android.calls.length;assert.equal(await android.api.showNotification({title:'Test',senderId:'char'}),true);assert(android.calls.slice(before).some(c=>c.plugin==='LocalNotifications'&&c.method==='schedule'));}
+ const before=android.calls.length;await android.api.showNotification({title:'Plain'});assert(!android.calls.slice(before).some(c=>c.plugin==='U2MessageNotifications'));assert(android.calls.slice(before).some(c=>c.method==='schedule'));
+ console.log('PASS iOS Health authorization/read, NetEase native gateway/share/cancel cleanup, sender-avatar notification/fallback, lifecycle events; Android avatar success, false/throw fallback and ordinary notifications');
 })().catch(e=>{console.error(e);process.exitCode=1});

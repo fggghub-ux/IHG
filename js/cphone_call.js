@@ -525,6 +525,7 @@
         return "<p class=\"cphone-call-prose\">" + apk119Value233 + apk119Value3(apk119Value230) + "</p>" + (apk119Value231 ? "<button type=\"button\" class=\"cphone-call-translation-toggle\" data-call-translation aria-expanded=\"false\">查看翻译</button><p class=\"cphone-call-translation\" hidden>" + apk119Value233 + apk119Value3(apk119Value231) + "</p>" : "");
       },
       adaptDetailMarkup(kind, markup) {
+        document.getElementById('cphone-call-detail-content').dataset.detailKind = kind;
         const host = document.createElement('div');
         host.innerHTML = markup;
         const profile = host.querySelector('.cphone-call-profile');

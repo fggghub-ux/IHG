@@ -1087,7 +1087,15 @@
       await B.schedule({notifications: [{id: Ge(i), title: String(t || "u2phone"), body: String(e || "新消息"), foreground: true, ...(r ? {} : {sound: "default"}), extra: n || {}}]});
       return true;
     }
-    return !f || O !== "granted" ? !1 : (r && (await Ke()), await B.schedule({
+    if (!f || O !== "granted") return false;
+    if (r) await Ke();
+    if (senderId && typeof iosMessageNotifications.showMessage === "function" && A.isPluginAvailable?.("U2MessageNotifications") !== false) {
+      try {
+        const shown = await iosMessageNotifications.showMessage({id: Ge(i), title: String(t || "u2phone"), body: String(e || "新消息"), channelId: r ? we : "", silent: r, senderId: String(senderId), senderName: String(senderName || t || "iMessage"), avatarUrl: await resolveNativeNotificationAvatar(avatarUrl), extra: n || {}});
+        if (shown?.shown === true) return true;
+      } catch (error) { console.warn("[native_bridge] Avatar notification failed:", error); }
+    }
+    await B.schedule({
       notifications: [{
         id: Ge(i),
         title: String(t || "u2phone"),
@@ -1097,7 +1105,8 @@
         } : {}),
         extra: n || {}
       }]
-    }), !0);
+    });
+    return true;
   }
   async function me() {
     f && (await le.hide());

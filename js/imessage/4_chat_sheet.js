@@ -13588,8 +13588,8 @@ Persona: ` +
         if (callEntry) callEntry.style.display = activeFriend_58?.type === 'char' ? 'flex' : 'none';
         const grid = sheet_3.querySelector('.attachment-more-icon-grid');
         const order = activeFriend_58?.type === 'group'
-            ? ["regenerate","pay","contact","offline","voice","listen","link","narration","dynamic-action"]
-            : ["call","regenerate","pay","contact","voice","listen","offline","narration","link","dynamic-action"];
+            ? ["file","pay","contact","offline","voice","listen","link","narration","regenerate","dynamic-action"]
+            : ["call","file","pay","contact","voice","listen","offline","narration","link","regenerate","dynamic-action"];
         for (const key of order) {
             const entry = grid?.querySelector('.attachment-more-' + key + '-entry');
             if (entry) grid.appendChild(entry);

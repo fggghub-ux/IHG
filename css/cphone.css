@@ -1249,7 +1249,6 @@
 .cphone-wallpaper-status { margin: 11px 0 0; color: #85858b; font-size: 12px; }
 .cphone-wallpaper-url-row :focus-visible, .cphone-wallpaper-actions :focus-visible { outline: 2px solid #171719; outline-offset: 2px; }
 @media (max-width: 360px) {
-    #lovers-friend-phone-view .cphone-home-grid > div > div:first-child { width: min(53px, 100%) !important; }
     #lovers-friend-phone-view .cphone-home-grid { gap: 20px 6px !important; padding-inline: 16px !important; }
     .cphone-sms-tabs button { min-width: 90px; }
 }
@@ -1259,3 +1258,9 @@
 .cphone-call-shortcut > i { font-size: 20px; }
 .cphone-call-shortcut > span { font-size: 11px; font-weight: 500; }
 #cphone-call-detail-content > .cphone-contact-delete { min-height: 45px; padding: 12px 16px; border: 0; border-radius: 16px; background: #fff; text-align: center; }
+
+/* Record detail spacing matches the pre-1.1.9 15px card gap. */
+#cphone-call-detail-content[data-detail-kind="call"] > .cphone-call-detail-surface { margin-bottom: 0; }
+#cphone-call-detail-content[data-detail-kind="call"] > .cphone-call-detail-surface + .cphone-call-detail-surface,
+#cphone-call-detail-content[data-detail-kind="call"] > .cphone-call-detail-surface + .cphone-call-secondary,
+#cphone-call-detail-content[data-detail-kind="call"] > .cphone-call-detail-surface + .cphone-call-delete { margin-top: 15px; }
