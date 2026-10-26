@@ -85,21 +85,21 @@
       },
       apk119Value74 = [{
         id: "default-stage-style",
-        title: "#黑白舞台造型",
-        category: "Entertainment · Trending",
-        heat: "52.8K",
+        title: "#ParisFashionWeek",
+        category: "Fashion · Trending",
+        heat: "248K",
         movement: "none"
       }, {
         id: "default-topic-host",
-        title: "#超话主持人招募",
-        category: "Community · Trending",
-        heat: "18.2K",
+        title: "#LVMHResults",
+        category: "Business · Trending",
+        heat: "19.8K",
         movement: "none"
       }, {
         id: "default-citywalk",
-        title: "#周末Citywalk",
-        category: "City · Rising",
-        heat: "9.6K",
+        title: "#ChristiesAuction",
+        category: "Art · Rising",
+        heat: "14.6K",
         movement: "none"
       }],
       apk119Value75 = {

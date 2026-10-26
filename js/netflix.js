@@ -1,6 +1,7 @@
 class NetflixApp {
     constructor() {
         this.core = window.NetflixGameCore;
+        this.DEFAULT_CATALOG_VERSION = 'financial-crime-en-v1';
         this.view = document.getElementById('netflix-view');
         this.isOpen = false;
         this.activeTab = 'home';
@@ -47,75 +48,76 @@ class NetflixApp {
                 category: category_3,
                 summary: summary_3,
                 tags: tags_2,
-                coverUrl: 'https://picsum.photos/seed/' + value_7 + '/720/1080?grayscale',
+                coverUrl: new URL(value_7, document.baseURI).href,
                 cast: [],
             }),
             items = [
                 make(
                     'default-night-train',
-                    '雾夜列车',
-                    '悬疑',
-                    '一列不会停站的夜车，载着彼此隐瞒秘密的旅客驶向未知终点。',
-                    'u2-night-train',
-                    ['命运', '群像'],
+                    'Vault Zero',
+                    'Financial Crime',
+                    'A Swiss bank discovers at midnight that dozens of safety deposit boxes have lost their records. No locks were broken, alarms triggered, or entries recorded. The investigation uncovers a fund transfer scheme spanning Zurich and Singapore.',
+                    'assets/netflix/vault.jpg',
+                    ['Bank Heist', 'Financial Fraud'],
                 ),
                 make(
                     'default-summer-letter',
-                    '夏日未寄信',
-                    '恋爱',
-                    '多年后重返海边小镇，一封未寄出的信让旧日关系再次泛起涟漪。',
-                    'u2-summer-letter',
-                    ['重逢', '治愈'],
+                    'Inside Trade',
+                    'Financial Crime',
+                    'You’re a junior Wall Street analyst who uncovers executives laundering billions through shell funds. Exposing them could cost you everything — or your life. Staying silent makes you complicit. Every choice could reshape a financial empire.',
+                    'assets/netflix/inside.jpg',
+                    ['Insider Trading', 'Moral Choices'],
                 ),
                 make(
                     'default-glass-city',
-                    '玻璃城',
-                    '都市',
-                    '光鲜城市的幕后，每个人都在欲望、名声与真心之间作出选择。',
-                    'u2-glass-city',
-                    ['成长', '名利'],
+                    'Crypto Scam',
+                    'Financial Crime',
+                    'The world’s largest crypto exchange collapses overnight, wiping out millions of investors. As its co-founder, you must choose between fleeing, surrendering, or striking back at the mastermind. The truth proves less immutable than the blockchain.',
+                    'assets/netflix/crypto.jpg',
+                    ['Cryptocurrency', 'Ponzi Scheme'],
                 ),
                 make(
                     'default-star-academy',
-                    '星光学院',
-                    '校园',
-                    '新人演员进入竞争激烈的表演学院，在友情、爱情与舞台梦想之间成长。',
-                    'u2-star-academy',
-                    ['养成', '青春'],
+                    'Ponzi Empire',
+                    'Financial Crime',
+                    'A charismatic wealth advisor lures an entire city’s fortune with promises of huge returns. As his trusted assistant, you realize the fund chain is about to collapse. Do you help sustain the scheme or save innocent investors before it falls apart?',
+                    'assets/netflix/ponzi.jpg',
+                    ['Trust Collapse', 'Human Greed'],
                 ),
                 make(
                     'default-ancient-promise',
-                    '长安旧约',
-                    '古风',
-                    '旧朝暗流涌动，一纸婚约把两个立场相反的人推向同一场棋局。',
-                    'u2-ancient-promise',
-                    ['权谋', '情感'],
+                    'Market Leak',
+                    'Financial Crime',
+                    'On the eve of a company’s merger, a message leaks hugely valuable insider information. As an SEC investigator, you have 48 hours to identify the source. The suspects include your mentor, your ex, and an untouchable power broker.',
+                    'assets/netflix/market.jpg',
+                    ['Insider Trading', 'Gray Areas'],
                 ),
                 make(
                     'default-island',
-                    '无人岛来信',
-                    '奇幻',
-                    '每天清晨，海岸都会出现一封来自未来的信。',
-                    'u2-island-letter',
-                    ['探索', '奇幻'],
+                    'Foreign Funds',
+                    'Financial Crime',
+                    'Behind a quiet teahouse in the Pearl River Delta operates an underground bank moving hundreds of billions a year. As an undercover officer inside, you’re caught between gang loyalty and the law. One botched transfer puts both sides after you.',
+                    'assets/netflix/foreign.jpg',
+                    ['Undercover', 'Organized Crime'],
                 ),
                 make(
                     'default-stage',
-                    '未落幕',
-                    '娱乐圈',
-                    '一次意外同台，让沉寂的演员重新站到聚光灯下。',
-                    'u2-stage',
-                    ['事业', '羁绊'],
+                    'Silk Road Funds',
+                    'Financial Crime',
+                    'On a Belt and Road project, funds flow into an underground network through fraudulent trade. As a counselor, you uncover links between executives and a terrorist financing group. Exposing them could trigger a diplomatic crisis.',
+                    'assets/netflix/silk.jpg',
+                    ['Diplomatic', 'Investigation'],
                 ),
             ];
         return {
+            version: this.DEFAULT_CATALOG_VERSION,
             banners: items.slice(0, 3),
             recent: [],
             sections: {
-                为你推荐: items.slice(3, 7),
-                恋爱剧情: [items[1], items[4], items[6]],
-                成长养成: [items[3], items[2], items[5]],
-                悬疑奇幻: [items[0], items[5], items[4]],
+                Recommend: items.slice(3, 7),
+                'Escape Room': [items[1], items[4], items[6]],
+                Inception: [items[3], items[2], items[5]],
+                'Fast & Furious': [items[0], items[5], items[4]],
             },
         };
     }
@@ -171,7 +173,7 @@ class NetflixApp {
     }
     ['normalizeCoverUrl'](url, value_16 = 'netflix') {
         const value_13 = String(url || '').trim();
-        if (/^(https?:\/\/|data:image\/|blob:)/i.test(value_13)) return value_13;
+        if (/^(https?:\/\/|data:image\/|blob:|(?:\.\/)?assets\/)/i.test(value_13)) return value_13;
         return 'https://picsum.photos/seed/' + encodeURIComponent(value_16) + '/720/1080?grayscale';
     }
     ['normalizeCatalog'](rawCatalog) {
@@ -212,6 +214,8 @@ class NetflixApp {
                 ('banners' in rawCatalog || 'recent' in rawCatalog || 'sections' in rawCatalog);
         if (!Object.keys(sections_2).length && !hasExplicitCatalogShape) return fallback;
         return {
+            version: source.version || fallback.version,
+            generatedAt: source.generatedAt || null,
             banners: banners_2,
             recent: recent_2,
             sections: sections_2,
@@ -225,6 +229,9 @@ class NetflixApp {
                 raw = window.appStorage.readDomain('netflix', null);
         } catch (error_2) {
             console.warn('[Netflix] state load failed:', error_2);
+        }
+        if (raw && raw.homeCatalog && !raw.homeCatalog.generatedAt) {
+            raw = { ...raw, homeCatalog: null };
         }
         const normalized = this.core.normalizeState(raw, this.createDefaultCatalog());
         return (
@@ -287,18 +294,18 @@ class NetflixApp {
                 <section class="netflix-panel netflix-profile-panel" data-panel="profile" id="netflix-profile-panel"></section>
             </main>
             <nav class="netflix-bottom-nav" aria-label="Netflix 导航">
-                <button type="button" class="netflix-nav-item is-active" data-tab="home"><i class="fas fa-home"></i><span>首页</span></button>
-                <button type="button" class="netflix-nav-item" data-tab="profile"><i class="fas fa-user-circle"></i><span>我的 Netflix</span></button>
+                <button type="button" class="netflix-nav-item is-active" data-tab="home"><i class="fas fa-home"></i><span>Home</span></button>
+                <button type="button" class="netflix-nav-item" data-tab="profile"><i class="fas fa-user-circle"></i><span>My Netflix</span></button>
             </nav>
 
             <section class="netflix-sheet netflix-search-sheet" id="netflix-search-sheet" aria-hidden="true">
                 <div class="netflix-modal-card netflix-search-card" role="dialog" aria-modal="true" aria-labelledby="netflix-search-title">
                     <button type="button" class="netflix-modal-close" data-action="close-search" aria-label="关闭"><i class="fas fa-times"></i></button>
                     <span class="netflix-eyebrow">DISCOVER</span>
-                    <h2 id="netflix-search-title">生成新的片库</h2>
-                    <p>输入喜欢的题材、人物关系或故事氛围，留空则随机生成。</p>
-                    <textarea id="netflix-search-input" placeholder="例如：豪门成长、娱乐圈、久别重逢"></textarea>
-                    <button type="button" class="netflix-primary-button" data-action="confirm-search" id="netflix-search-confirm">生成片库</button>
+                    <h2 id="netflix-search-title">New Collection</h2>
+                    <p>Enter your preferred genre, character dynamic, or story atmosphere. Leave blank for a random generation.</p>
+                    <textarea id="netflix-search-input" placeholder="e.g.: One Hundred Years of Solitude, The Red and the Black"></textarea>
+                    <button type="button" class="netflix-primary-button" data-action="confirm-search" id="netflix-search-confirm">Generate</button>
                 </div>
             </section>
 
@@ -766,7 +773,7 @@ class NetflixApp {
                                 this.escapeHtml(value_95.summary || '开启一段属于你的互动故事。') +
                                 '</p>\n                            <button type="button" data-catalog-id="' +
                                 this.escapeAttr(value_95.id) +
-                                '"><i class="fas fa-play"></i> 播放</button>\n                        </div>\n                        <div class="netflix-hero-index">0' +
+                                '"><i class="fas fa-play"></i> Play</button>\n                        </div>\n                        <div class="netflix-hero-index">0' +
                                 (value_96 + 1) +
                                 '</div>\n                    </article>',
                         )
@@ -785,7 +792,7 @@ class NetflixApp {
             this.escapeHtml(value_97) +
             '</h2><span>' +
             items_98.length +
-            ` 部</span></header>
+            ` part</span></header>
             <div class="netflix-row-scroll">
                 ` +
             items_98
@@ -874,14 +881,14 @@ class NetflixApp {
             <div class="netflix-profile-stats">
                 <div><strong>` +
             manualCount +
-            `</strong><span>手动存档</span></div>
+            `</strong><span>Manual Save</span></div>
                 <div><strong>` +
             endingCount +
-            `</strong><span>已解锁结局</span></div>
+            `</strong><span>Endings Unlocked</span></div>
             </div>
             <div class="netflix-profile-actions">
-                <button type="button" data-action="open-load"><i class="fas fa-folder-open"></i><span><strong>存档管理</strong><small>自动档与 6 个手动档</small></span><i class="fas fa-chevron-right"></i></button>
-                <button type="button" data-action="show-endings"><i class="fas fa-trophy"></i><span><strong>结局收藏</strong><small>回顾已经抵达的故事终点</small></span><i class="fas fa-chevron-right"></i></button>
+                <button type="button" data-action="open-load"><i class="fas fa-folder-open"></i><span><strong>Save</strong><small>Auto Save & 6 Manual Saves</small></span><i class="fas fa-chevron-right"></i></button>
+                <button type="button" data-action="show-endings"><i class="fas fa-trophy"></i><span><strong>Collection</strong><small>Review Endings Reached</small></span><i class="fas fa-chevron-right"></i></button>
             </div>`;
         const headerAvatar = this.view.querySelector('.netflix-header-avatar');
         if (headerAvatar)
@@ -938,6 +945,7 @@ class NetflixApp {
                     sections: parsed.sections,
                     recent: this.state.homeCatalog.recent,
                 });
+            catalog_122.generatedAt = Date.now();
             if (
                 catalog_122.banners.length < 3 ||
                 Object.values(catalog_122.sections).some((items_5) => items_5.length < 3)
@@ -962,7 +970,7 @@ class NetflixApp {
         } finally {
             this.isSearchBusy = false;
             this.searchConfirm.disabled = false;
-            this.searchConfirm.innerHTML = '生成片库';
+            this.searchConfirm.innerHTML = 'Generate';
         }
     }
     ['createSetupDraft'](value_125) {
@@ -2387,7 +2395,7 @@ class NetflixApp {
     }
     ['renderDeleteStoryButton'](value_291) {
         if (!value_291 || !this.findCatalogItem(value_291)) return '';
-        return '<section class="netflix-hub-delete-section"><button type="button" data-action="delete-title"><i class="fas fa-trash-alt"></i> 从片库删除故事</button><p>存档和已解锁结局会保留。</p></section>';
+        return '<section class="netflix-hub-delete-section"><button type="button" data-action="delete-title"><i class="fas fa-trash-alt"></i> Delete Story</button><p>存档和已解锁结局会保留。</p></section>';
     }
     async ['saveHubBackground']() {
         const map_2 = this.hubDraftOpen ? this.setupDraft : this.state.activeRun;
@@ -3953,7 +3961,7 @@ class NetflixApp {
         this.openSheet(this.infoSheet);
     }
     ['showEndings']() {
-        this.infoTitle.textContent = '结局收藏';
+        this.infoTitle.textContent = 'Ending Collection';
         this.infoBody.innerHTML = this.state.unlockedEndings.length
             ? '<div class="netflix-ending-list">' +
               this.state.unlockedEndings
@@ -3973,7 +3981,7 @@ class NetflixApp {
                   )
                   .join('') +
               '</div>'
-            : '<div class="netflix-empty-state">还没有解锁结局。每一个选择都会把故事推向不同方向。</div>';
+            : '<div class="netflix-empty-state">My muse of desire.</div>';
         this.openSheet(this.infoSheet);
     }
     showWorldBooksInfo() {
