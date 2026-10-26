@@ -5,25 +5,25 @@
         DESKTOP_STATE_KEY = 'desktop',
         WIDGET_DEFAULTS = {
             profile: {
-                color: 'rgba(255, 255, 255, 0.7)',
+                color: 'rgba(255, 255, 255, 0.78)',
             },
             pet: {
                 color: 'rgba(255, 255, 255, 0.7)',
             },
             music: {
-                color: 'rgba(255, 255, 255, 0.7)',
+                color: 'rgba(255, 255, 255, 0.59)',
             },
             couple: {
                 color: 'rgba(255, 255, 255, 0.85)',
             },
             photo: {
-                color: 'rgba(255, 255, 255, 0.7)',
+                color: 'rgba(255, 255, 255, 0.55)',
             },
             notification: {
-                color: 'rgba(255, 255, 255, 0.7)',
+                color: 'rgba(255, 255, 255, 0.57)',
             },
             socialPost: {
-                color: 'rgba(255, 255, 255, 0.96)',
+                color: 'rgba(255, 255, 255, 0.76)',
             },
             html: {
                 color: 'rgba(255, 255, 255, 0.7)',

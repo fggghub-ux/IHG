@@ -472,7 +472,7 @@
                 defaultSize: [4, 3],
                 sizes: [[4, 3]],
                 pixelHeight: 285,
-                defaultColor: 'rgba(255, 255, 255, 0.9)',
+                defaultColor: 'rgba(255, 255, 255, 0.78)',
             },
             pet: {
                 label: 'Pet',
@@ -488,7 +488,7 @@
                 defaultSize: [4, 2],
                 sizes: [[4, 2]],
                 pixelHeight: 185,
-                defaultColor: 'rgba(255, 255, 255, 0.55)',
+                defaultColor: 'rgba(255, 255, 255, 0.59)',
             },
             couple: {
                 label: 'Couple',
@@ -504,7 +504,7 @@
                 defaultSize: [4, 2],
                 sizes: [[4, 2]],
                 pixelHeight: 155,
-                defaultColor: 'rgba(255, 255, 255, 0.78)',
+                defaultColor: 'rgba(255, 255, 255, 0.55)',
             },
             notification: {
                 label: 'Notification',
@@ -512,7 +512,7 @@
                 defaultSize: [4, 1],
                 sizes: [[4, 1]],
                 pixelHeight: 85,
-                defaultColor: 'rgba(255, 255, 255, 0.7)',
+                defaultColor: 'rgba(255, 255, 255, 0.57)',
             },
             socialPost: {
                 label: 'Social Post',
@@ -520,7 +520,7 @@
                 defaultSize: [4, 3],
                 sizes: [[4, 3]],
                 pixelHeight: 285,
-                defaultColor: 'rgba(255, 255, 255, 0.96)',
+                defaultColor: 'rgba(255, 255, 255, 0.76)',
             },
             html: {
                 label: 'HTML',
@@ -1414,7 +1414,7 @@
             (widgets_9[photoId] = {
                 ...createDefaultWidgetConfig('photo'),
                 type: 'photo',
-                color: 'rgba(255, 255, 255, 0.78)',
+                color: 'rgba(255, 255, 255, 0.55)',
                 text: {
                     ...DEFAULT_WIDGET_TEXT,
                     photoTitle: DEFAULT_WIDGET_TEXT.photoTitle,
