@@ -23,7 +23,7 @@
                 <div class="bstage-create-btn">
                     <i class="fas fa-plus"></i>
                 </div>
-                <div class="bstage-team-name">创建</div>
+                <div class="bstage-team-name">Create</div>
             </div>
             <!-- Teams will be injected here -->
         </div>
@@ -57,7 +57,7 @@
             <div class="bstage-icon-btn" id="bstage-chat-back-btn"><i class="fas fa-chevron-left"></i></div>
             <div class="bstage-chat-header-info">
                 <div class="bstage-chat-name" id="bstage-chat-name">Name</div>
-                <div class="bstage-chat-days" id="bstage-chat-days">已一同 1 天</div>
+                <div class="bstage-chat-days" id="bstage-chat-days">Together for 1 day</div>
             </div>
             <div class="bstage-icon-btn" id="bstage-chat-menu-btn"><i class="fas fa-bars"></i></div>
         </div>
@@ -67,7 +67,7 @@
         <div class="bstage-chat-input-area">
             <div class="bstage-reply-preview" id="bstage-chat-reply-preview" style="display:none;">
                 <div class="bstage-reply-preview-content">
-                    <div class="bstage-reply-preview-label">正在回复</div>
+                    <div class="bstage-reply-preview-label">Replying</div>
                     <div class="bstage-reply-preview-text" id="bstage-chat-reply-preview-text"></div>
                 </div>
                 <div class="bstage-reply-preview-close" id="bstage-chat-reply-cancel-btn" role="button" tabindex="0" aria-label="取消回复" title="取消回复">
@@ -94,8 +94,8 @@
         <div class="bstage-header chat-header" style="background-color: transparent;">
             <div class="bstage-icon-btn" id="bstage-fan-chat-back-btn"><i class="fas fa-chevron-left"></i></div>
             <div class="bstage-chat-header-info">
-                <div class="bstage-chat-name" id="bstage-fan-chat-name">粉丝聊天室</div>
-                <div class="bstage-chat-days" id="bstage-fan-chat-subtitle">已订阅 0 人</div>
+                <div class="bstage-chat-name" id="bstage-fan-chat-name">Fan Chatroom</div>
+                <div class="bstage-chat-days" id="bstage-fan-chat-subtitle"> 0 Subscribers</div>
             </div>
             <div class="bstage-icon-btn" id="bstage-fan-chat-menu-btn"><i class="fas fa-bars"></i></div>
         </div>
@@ -105,7 +105,7 @@
         <div class="bstage-chat-input-area">
             <div class="bstage-reply-preview" id="bstage-fan-chat-reply-preview" style="display:none;">
                 <div class="bstage-reply-preview-content">
-                    <div class="bstage-reply-preview-label">正在回复</div>
+                    <div class="bstage-reply-preview-label">Replying</div>
                     <div class="bstage-reply-preview-text" id="bstage-fan-chat-reply-preview-text"></div>
                 </div>
                 <div class="bstage-reply-preview-close" id="bstage-fan-chat-reply-cancel-btn" role="button" tabindex="0" aria-label="取消回复" title="取消回复">
@@ -113,7 +113,7 @@
                 </div>
             </div>
             <div class="bstage-chat-input-wrapper">
-                <input type="text" id="bstage-fan-chat-input" inputmode="text" enterkeyhint="send" autocomplete="off" autocapitalize="sentences" placeholder="对粉丝说点什么..." style="color: #fff; background-color: transparent; border: none; outline: none;">
+                <input type="text" id="bstage-fan-chat-input" inputmode="text" enterkeyhint="send" autocomplete="off" autocapitalize="sentences" placeholder="Say something..." style="color: #fff; background-color: transparent; border: none; outline: none;">
                 <div id="bstage-fan-chat-send-btn" class="bstage-chat-action-btn bstage-chat-send-btn" role="button" tabindex="0" aria-label="发送消息" title="发送消息">
                     <i class="fas fa-paper-plane"></i>
                 </div>
@@ -154,7 +154,7 @@
     globalSettingsModal.innerHTML = `
         <div class="bottom-sheet" style="height: 90%; background: #1c1c1e; color: #fff;">
             <div class="sheet-handle" style="background-color: #444;"></div>
-            <div class="sheet-title" style="color: #fff;">CSS 预设管理</div>
+            <div class="sheet-title" style="color: #fff;">CSS PRESET</div>
             <div class="detail-sheet-content" style="padding-bottom: 20px;">
                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                     <button class="bstage-preset-tab active" data-type="chatCss" style="flex: 1; padding: 8px; background: #fff; color: #000; border-radius: 8px; border: none; font-weight: bold;">聊天界面</button>
@@ -174,7 +174,7 @@
                         <textarea id="bstage-preset-css-input" placeholder="输入 CSS 代码..." style="color: #fff; background-color: transparent; border: none; outline: none; width: 100%; padding: 8px 0; height: 100px;"></textarea>
                     </div>
                 </div>
-                <div class="sheet-action confirm-action" id="bstage-save-preset-btn" style="background-color: #007aff; color: #fff; margin-top: 15px;">保存为新预设</div>
+                <div class="sheet-action confirm-action" id="bstage-save-preset-btn" style="background-color: #007aff; color: #fff; margin-top: 15px;">Save Preset</div>
             </div>
         </div>
     `;
@@ -186,22 +186,22 @@
     searchGenerateModal.innerHTML = `
         <div class="bottom-sheet bstage-search-generate-sheet" style="background: #1c1c1e; color: #fff;">
             <div class="sheet-handle" style="background-color: #444;"></div>
-            <div class="sheet-title" style="color: #fff;">搜索生成团队</div>
+            <div class="sheet-title" style="color: #fff;">SEARCH TEAMS</div>
             <div class="detail-sheet-content bstage-modal-content">
-                <div class="bstage-search-generate-hint">输入想搜索的团队或明星，AI 会按内容生成团队资料和成员设定；留空则随机生成。</div>
+                <div class="bstage-search-generate-hint">Enter a team or star you want to search for, and AI will generate the profile and settings.</div>
                 <div class="bstage-search-form">
-                    <label class="bstage-search-label" for="bstage-search-query-input">搜索内容</label>
-                    <input type="text" id="bstage-search-query-input" class="bstage-search-input" placeholder="例如：韩系男团、清冷女演员、摇滚乐队；留空随机">
+                    <label class="bstage-search-label" for="bstage-search-query-input">Search Content</label>
+                    <input type="text" id="bstage-search-query-input" class="bstage-search-input" placeholder="e.g.:Kim Kardashian,Anne Hathaway">
                 </div>
                 <div class="bstage-search-form">
-                    <label class="bstage-search-label" for="bstage-search-member-count">团队人数</label>
+                    <label class="bstage-search-label" for="bstage-search-member-count">Team Size</label>
                     <input type="number" id="bstage-search-member-count" class="bstage-search-input" value="1" min="1" max="12" step="1" inputmode="numeric">
                 </div>
                 <div id="bstage-search-loading" class="bstage-search-loading" style="display:none;">
                     <i class="fas fa-spinner"></i>
                     <span>正在生成团队...</span>
                 </div>
-                <div class="sheet-action confirm-action bstage-search-confirm-btn" id="bstage-search-confirm-btn" style="background-color: #fff; color: #000;">生成团队</div>
+                <div class="sheet-action confirm-action bstage-search-confirm-btn" id="bstage-search-confirm-btn" style="background-color: #fff; color: #000;">Generate</div>
             </div>
         </div>
     `;
@@ -213,10 +213,10 @@
     createTeamSheet.innerHTML = `
         <div class="bottom-sheet" style="height: 80%; background: #1c1c1e; color: #fff;">
             <div class="sheet-handle" style="background-color: #444;"></div>
-            <div class="sheet-title" style="color: #fff;">创建团队</div>
+            <div class="sheet-title" style="color: #fff;">CREATE TEAM</div>
             <div class="detail-sheet-content">
                 <!-- Team Background -->
-                <div class="sheet-title" style="margin-top: 0; margin-bottom: 10px; color: #aaa; font-size: 14px;">主页背景</div>
+                <div class="sheet-title" style="margin-top: 0; margin-bottom: 10px; color: #aaa; font-size: 14px;">Background</div>
                 <div class="bstage-bg-upload" id="bstage-team-bg-upload" style="background-color: #2c2c2e; border-color: #444; overflow: hidden; position: relative;">
                     <span style="color: #aaa; font-size: 14px; position: relative; z-index: 1;">点击上传背景图</span>
                     <img id="bstage-team-bg-preview" src="" style="width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top: 0; left: 0; z-index: 0;">
@@ -233,26 +233,26 @@
                 <!-- Team Name & Info -->
                 <div class="bstage-form-group" style="background-color: #2c2c2e; border-color: #333;">
                     <div class="bstage-form-item" style="border-bottom-color: #444;">
-                        <label style="color: #aaa;">团队名</label>
+                        <label style="color: #aaa;">Team Name</label>
                         <input type="text" id="bstage-team-name-input" placeholder="输入团队名称" style="color: #fff; background-color: transparent; border: none; outline: none; width: 100%; padding: 4px 0; margin-top: 4px;">
                     </div>
                     <div class="bstage-form-item">
-                        <label style="color: #aaa;">团队信息</label>
+                        <label style="color: #aaa;">Information</label>
                         <textarea id="bstage-team-desc-input" placeholder="输入团队简介..." style="color: #fff; background-color: transparent; border: none; outline: none; width: 100%; padding: 4px 0; margin-top: 4px; min-height: 60px;"></textarea>
                     </div>
                 </div>
 
                 <!-- Add Characters -->
-                <div class="sheet-title" style="margin-top: 20px; margin-bottom: 10px; color: #fff;">添加成员</div>
+                <div class="sheet-title" style="margin-top: 20px; margin-bottom: 10px; color: #fff;">Add Member</div>
                 <div class="bstage-chars-list-preview" id="bstage-chars-preview-list">
                     <!-- Preview of added chars -->
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <div class="bstage-add-char-btn" id="bstage-add-char-btn" style="flex: 1; background-color: #2c2c2e; color: #fff; padding: 10px; border-radius: 12px; font-size: 14px;">+ 手动添加</div>
-                    <div class="bstage-add-char-btn" id="bstage-pull-friend-btn" style="flex: 1; background-color: #2c2c2e; color: #fff; padding: 10px; border-radius: 12px; font-size: 14px;">+ 拉取已有好友</div>
+                    <div class="bstage-add-char-btn" id="bstage-add-char-btn" style="flex: 1; background-color: #2c2c2e; color: #fff; padding: 10px; border-radius: 12px; font-size: 14px;">+ Add Manually</div>
+                    <div class="bstage-add-char-btn" id="bstage-pull-friend-btn" style="flex: 1; background-color: #2c2c2e; color: #fff; padding: 10px; border-radius: 12px; font-size: 14px;">+ Invite Friends</div>
                 </div>
 
-                <div class="sheet-action confirm-action" id="bstage-confirm-create-btn" style="background-color: #fff; color: #000; margin-top: 30px;">完成创建</div>
+                <div class="sheet-action confirm-action" id="bstage-confirm-create-btn" style="background-color: #fff; color: #000; margin-top: 30px;">creation</div>
             </div>
         </div>
     `;
@@ -264,7 +264,7 @@
     addCharSheet.innerHTML = `
         <div class="bottom-sheet" style="background: #1c1c1e; color: #fff;">
             <div class="sheet-handle" style="background-color: #444;"></div>
-            <div class="sheet-title" style="color: #fff;">添加成员</div>
+            <div class="sheet-title" style="color: #fff;">ADD MEMBER</div>
             <div class="detail-sheet-content">
                 <div class="bstage-avatar-upload" id="bstage-char-avatar-upload" style="background-color: #2c2c2e; overflow: hidden; position: relative;">
                     <i class="fas fa-user" style="color: #aaa; position: relative; z-index: 1;"></i>
@@ -273,15 +273,15 @@
                 </div>
                 <div class="bstage-form-group" style="background-color: #2c2c2e; border-color: #333;">
                     <div class="bstage-form-item" style="border-bottom-color: #444;">
-                        <label style="color: #aaa;">名字</label>
+                        <label style="color: #aaa;">Nickname</label>
                         <input type="text" id="bstage-char-name-input" placeholder="成员名字" style="color: #fff; background-color: transparent; border: none; outline: none; width: 100%; padding: 4px 0; margin-top: 4px;">
                     </div>
                     <div class="bstage-form-item">
-                        <label style="color: #aaa;">人设</label>
+                        <label style="color: #aaa;">Persona</label>
                         <input type="text" id="bstage-char-role-input" placeholder="简单的描述" style="color: #fff; background-color: transparent; border: none; outline: none; width: 100%; padding: 4px 0; margin-top: 4px;">
                     </div>
                 </div>
-                <div class="sheet-action confirm-action" id="bstage-confirm-add-char-btn" style="background-color: #fff; color: #000;">添加</div>
+                <div class="sheet-action confirm-action" id="bstage-confirm-add-char-btn" style="background-color: #fff; color: #000;">Add</div>
             </div>
         </div>
     `;
@@ -293,7 +293,7 @@
     pullFriendSheet.innerHTML = `
         <div class="bottom-sheet" style="height: 70%; background: #1c1c1e; color: #fff;">
             <div class="sheet-handle" style="background-color: #444;"></div>
-            <div class="sheet-title" style="color: #fff;">选择好友</div>
+            <div class="sheet-title" style="color: #fff;">SELECT FRIENDS</div>
             <div class="detail-sheet-content" style="flex: 1; overflow-y: auto;">
                 <div id="bstage-friend-list" style="display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px;">
                     <!-- Friend items injected here -->
@@ -311,22 +311,22 @@
             <div class="sheet-title" style="color: #fff;">MEMBERSHIP</div>
             <div class="detail-sheet-content bstage-modal-content">
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #fff;">加入团队会员</h3>
-                    <p style="color: #aaa; font-size: 13px;">享受独家内容与购物特权</p>
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #fff;">Team Membership</h3>
+                    <p style="color: #aaa; font-size: 13px;">enjoy exclusive and shopping benefits</p>
                 </div>
                 
                 <div class="bstage-price-options">
                     <div class="bstage-price-option selected" data-type="year" style="border: 1px solid #fff; border-radius: 12px; margin-bottom: 10px; padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background-color: #2c2c2e;">
-                        <span class="bstage-price-title" style="color: #fff; font-weight: 600;">年卡会员</span>
-                        <span class="bstage-price-amount" style="color: #fff; font-weight: 600;">₩89,000 / 年</span>
+                        <span class="bstage-price-title" style="color: #fff; font-weight: 600;">Annual</span>
+                        <span class="bstage-price-amount" style="color: #fff; font-weight: 600;">₩89,000 / Year</span>
                     </div>
                     <div class="bstage-price-option" data-type="month" style="border: 1px solid transparent; border-radius: 12px; padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background-color: #2c2c2e;">
-                        <span class="bstage-price-title" style="color: #fff; font-weight: 600;">月卡会员</span>
-                        <span class="bstage-price-amount" style="color: #fff; font-weight: 600;">₩8,900 / 月</span>
+                        <span class="bstage-price-title" style="color: #fff; font-weight: 600;">Monthly</span>
+                        <span class="bstage-price-amount" style="color: #fff; font-weight: 600;">₩8,900 / Month</span>
                     </div>
                 </div>
 
-                <div class="sheet-action confirm-action" id="bstage-confirm-sub-btn" style="background-color: #fff; color: #000; margin-top: 20px; border-radius: 25px;">立即订阅</div>
+                <div class="sheet-action confirm-action" id="bstage-confirm-sub-btn" style="background-color: #fff; color: #000; margin-top: 20px; border-radius: 25px;">subscribe now</div>
             </div>
         </div>
     `;
@@ -341,17 +341,17 @@
             <div class="detail-sheet-content bstage-modal-content">
                 <div style="text-align: center; margin-bottom: 20px;">
                     <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #fff;" id="pop-sub-char-name">Subscribe to Character</h3>
-                    <p style="color: #aaa; font-size: 13px;">开启私密聊天之旅</p>
+                    <p style="color: #aaa; font-size: 13px;">start your private chat journey</p>
                 </div>
                 
                 <div class="bstage-price-options">
                     <div class="bstage-price-option selected" style="border: 1px solid #fff; border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center; background-color: #2c2c2e;">
-                        <span class="bstage-price-title" style="color: #fff; font-weight: 600;">月度订阅</span>
-                        <span class="bstage-price-amount" style="color: #fff; font-weight: 600;">₩4,500 / 月</span>
+                        <span class="bstage-price-title" style="color: #fff; font-weight: 600;">Monthly</span>
+                        <span class="bstage-price-amount" style="color: #fff; font-weight: 600;">₩4,500 / Month</span>
                     </div>
                 </div>
 
-                <div class="sheet-action confirm-action" id="bstage-confirm-pop-sub-btn" style="background-color: #fff; color: #000; margin-top: 20px; border-radius: 25px;">确认支付</div>
+                <div class="sheet-action confirm-action" id="bstage-confirm-pop-sub-btn" style="background-color: #fff; color: #000; margin-top: 20px; border-radius: 25px;">confirm payment</div>
             </div>
         </div>
     `;
@@ -371,24 +371,24 @@
                 
                 <div class="bstage-profile-stats-container">
                     <div class="bstage-profile-stat-bubble" style="background-color: #2c2c2e; color: #fff; border: none;">
-                        <span class="bstage-stat-label" style="color: #aaa;">POP 订阅</span>
+                        <span class="bstage-stat-label" style="color: #aaa;">POP Plan</span>
                         <span class="bstage-stat-value" id="bstage-profile-pop-sub-count" style="color: #fff;">0</span>
                     </div>
                     <div class="bstage-profile-stat-bubble" style="background-color: #2c2c2e; color: #fff; border: none;">
-                        <span class="bstage-stat-label" style="color: #aaa;">订阅收益</span>
-                        <span class="bstage-stat-value" id="bstage-profile-sub-revenue" style="color: #fff;">＄0.00</span>
+                        <span class="bstage-stat-label" style="color: #aaa;">Plan Earnings</span>
+                        <span class="bstage-stat-value" id="bstage-profile-sub-revenue" style="color: #fff;">$0.00</span>
                     </div>
                 </div>
 
                 <div class="bstage-profile-actions">
                     <div class="bstage-profile-btn" id="bstage-edit-profile-btn" style="background-color: #2c2c2e; color: #fff; border: none;">
-                        <i class="fas fa-pen"></i> 编辑资料
+                        <i class="fas fa-pen"></i> Edit Profile
                     </div>
                     <div class="bstage-profile-btn" id="bstage-withdraw-revenue-btn" style="background-color: #2c2c2e; color: #fff; border: none;">
-                        <i class="fas fa-wallet"></i> 提现到 Pay
+                        <i class="fas fa-wallet"></i> Withdraw to Pay
                     </div>
                     <div class="bstage-profile-btn" id="bstage-my-orders-btn" style="background-color: #2c2c2e; color: #fff; border: none;">
-                        <i class="fas fa-receipt"></i> 我的订单
+                        <i class="fas fa-receipt"></i> My Orders
                     </div>
                 </div>
             </div>
@@ -401,7 +401,7 @@
     ordersModal.innerHTML = `
         <div class="bottom-sheet" style="height: 70%; background: #1c1c1e; color: #fff;">
             <div class="sheet-handle" style="background-color: #444;"></div>
-            <div class="sheet-title" style="color: #fff;">我的订单</div>
+            <div class="sheet-title" style="color: #fff;">My Orders</div>
             <div class="detail-sheet-content">
                 <div id="bstage-orders-list" style="display: flex; flex-direction: column; gap: 10px; padding: 0 16px 20px;">
                     <!-- Orders Injected Here -->
@@ -416,7 +416,7 @@
     editProfileModal.innerHTML = `
         <div class="bottom-sheet" style="background: #1c1c1e; color: #fff;">
             <div class="sheet-handle" style="background-color: #444;"></div>
-            <div class="sheet-title" style="color: #fff;">编辑资料</div>
+            <div class="sheet-title" style="color: #fff;">EDIT PROFILE</div>
             <div class="detail-sheet-content">
                 <div class="bstage-avatar-upload" id="bstage-edit-profile-avatar-upload" style="background-color: #2c2c2e; overflow: hidden; position: relative;">
                     <i class="fas fa-camera" style="color: #aaa; position: relative; z-index: 1;"></i>
@@ -425,15 +425,15 @@
                 </div>
                 <div class="bstage-form-group" style="background-color: #2c2c2e; border-color: #333;">
                     <div class="bstage-form-item" style="border-bottom-color: #444;">
-                        <label style="color: #aaa;">昵称</label>
+                        <label style="color: #aaa;">Nickname</label>
                         <input type="text" id="bstage-edit-profile-name" placeholder="输入昵称" style="color: #fff; background-color: transparent; border: none; outline: none; width: 100%; padding: 4px 0; margin-top: 4px;">
                     </div>
                     <div class="bstage-form-item">
-                        <label style="color: #aaa;">人设</label>
+                        <label style="color: #aaa;">Persona</label>
                         <input type="text" id="bstage-edit-profile-persona" placeholder="输入你的粉丝人设" style="color: #fff; background-color: transparent; border: none; outline: none; width: 100%; padding: 4px 0; margin-top: 4px;">
                     </div>
                 </div>
-                <div class="sheet-action confirm-action" id="bstage-save-profile-btn" style="background-color: #fff; color: #000;">保存</div>
+                <div class="sheet-action confirm-action" id="bstage-save-profile-btn" style="background-color: #fff; color: #000;">save</div>
             </div>
         </div>
     `;
@@ -453,7 +453,7 @@
                         <input type="text" id="bstage-generate-type-input" placeholder="留空则随机生成" style="color: #fff; background-color: transparent; border: none; outline: none; width: 100%; padding: 4px 0; margin-top: 4px;">
                     </div>
                 </div>
-                <div class="sheet-action confirm-action" id="bstage-generate-type-confirm-btn" style="background-color: #fff; color: #000;">确认生成</div>
+                <div class="sheet-action confirm-action" id="bstage-generate-type-confirm-btn" style="background-color: #fff; color: #000;">confirm generation</div>
             </div>
         </div>
     `;
@@ -464,7 +464,7 @@
     editTeamSheet.innerHTML = `
         <div class="bottom-sheet" style="height: 80%; background: #1c1c1e; color: #fff;">
             <div class="sheet-handle"></div>
-            <div class="sheet-title">编辑团队</div>
+            <div class="sheet-title">EDIT TEAM</div>
             <div class="detail-sheet-content">
                 <!-- Team Avatar -->
                 <div class="bstage-avatar-upload" id="bstage-edit-team-avatar-upload" style="background-color: #2c2c2e; overflow: hidden; position: relative;">
@@ -476,13 +476,13 @@
                 <!-- Team Name -->
                 <div class="bstage-form-group" style="background-color: #2c2c2e; border-color: #333;">
                     <div class="bstage-form-item" style="border-bottom-color: #444;">
-                        <label style="color: #aaa;">团队名</label>
+                        <label style="color: #aaa;">Team Name</label>
                         <input type="text" id="bstage-edit-team-name-input" placeholder="输入团队名称" style="color: #fff; background-color: transparent; border: none; outline: none; width: 100%; padding: 4px 0; margin-top: 4px;">
                     </div>
                 </div>
 
                 <!-- Team Background -->
-                <div class="sheet-title" style="margin-top: 20px; margin-bottom: 10px;">主页背景</div>
+                <div class="sheet-title" style="margin-top: 20px; margin-bottom: 10px;">Background</div>
                 <div class="bstage-bg-upload" id="bstage-edit-team-bg-upload" style="background-color: #2c2c2e; border-color: #444; overflow: hidden; position: relative;">
                     <span style="color: #888; font-size: 14px; position: relative; z-index: 1;">点击上传背景图</span>
                     <img id="bstage-edit-team-bg-preview" src="" style="width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top: 0; left: 0; z-index: 0;">
@@ -490,17 +490,17 @@
                 </div>
 
                 <!-- Manage Members -->
-                <div class="sheet-title" style="margin-top: 20px; margin-bottom: 10px; color: #fff;">成员管理</div>
+                <div class="sheet-title" style="margin-top: 20px; margin-bottom: 10px; color: #fff;">Management</div>
                 <div class="bstage-chars-list-preview" id="bstage-edit-team-members-list">
                     <!-- Members Injected Here -->
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <div class="bstage-add-char-btn" id="bstage-edit-team-add-member-btn" style="flex: 1; background-color: #2c2c2e; color: #fff; padding: 10px; border-radius: 12px; font-size: 14px;">+ 手动添加</div>
-                    <div class="bstage-add-char-btn" id="bstage-edit-team-pull-friend-btn" style="flex: 1; background-color: #2c2c2e; color: #fff; padding: 10px; border-radius: 12px; font-size: 14px;">+ 拉取已有好友</div>
+                    <div class="bstage-add-char-btn" id="bstage-edit-team-add-member-btn" style="flex: 1; background-color: #2c2c2e; color: #fff; padding: 10px; border-radius: 12px; font-size: 14px;">+ Add Manually</div>
+                    <div class="bstage-add-char-btn" id="bstage-edit-team-pull-friend-btn" style="flex: 1; background-color: #2c2c2e; color: #fff; padding: 10px; border-radius: 12px; font-size: 14px;">+ Invite Friends</div>
                 </div>
 
-                <div class="sheet-action confirm-action" id="bstage-confirm-edit-team-btn" style="background-color: #fff; color: #000; margin-top: 30px;">保存修改</div>
-                <div class="sheet-action" id="bstage-delete-team-btn" style="background-color: #ff3b30; color: #fff; margin-top: 10px;">删除团队</div>
+                <div class="sheet-action confirm-action" id="bstage-confirm-edit-team-btn" style="background-color: #fff; color: #000; margin-top: 30px;">save change</div>
+                <div class="sheet-action" id="bstage-delete-team-btn" style="background-color: #ff3b30; color: #fff; margin-top: 10px;">Delete team</div>
             </div>
         </div>
     `;
@@ -563,15 +563,15 @@
                     <h2 style="font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 5px;" id="bstage-detail-name">Name</h2>
                     <div style="font-size: 13px; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px;">
                         <i class="fas fa-heart" style="color: #ff3b30;"></i>
-                        <span id="bstage-detail-days">已一同 1 天</span>
+                        <span id="bstage-detail-days">Together for 1 day</span>
                     </div>
                 </div>
 
                 <!-- Locker Section -->
                 <div style="padding: 0 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span style="font-size: 14px; font-weight: 600; color: #aaa;">置物柜</span>
-                        <span style="font-size: 14px; color: #fff; cursor: pointer;" id="bstage-locker-see-all-btn">看全部</span>
+                        <span style="font-size: 14px; font-weight: 600; color: #aaa;">Locker</span>
+                        <span style="font-size: 14px; color: #fff; cursor: pointer;" id="bstage-locker-see-all-btn">View All</span>
                     </div>
                     <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px;" id="bstage-locker-preview-list">
                         <!-- Preview Photos -->
@@ -582,19 +582,19 @@
                 <div class="bstage-settings-list">
                     <div class="bstage-setting-item" id="bstage-setting-nickname">
                         <div class="bstage-setting-icon"><i class="fas fa-user"></i></div>
-                        <div class="bstage-setting-label">昵称设置</div>
+                        <div class="bstage-setting-label">Nickname</div>
                     </div>
                     <div class="bstage-setting-item">
                         <div class="bstage-setting-icon"><i class="fas fa-image"></i></div>
-                        <div class="bstage-setting-label" id="bstage-setting-bg" style="flex:1;">背景设定</div>
-                        <div class="bstage-setting-right-action" id="bstage-reset-bg-btn" style="color: #aaa;">重置</div>
+                        <div class="bstage-setting-label" id="bstage-setting-bg" style="flex:1;">Background</div>
+                        <div class="bstage-setting-right-action" id="bstage-reset-bg-btn" style="color: #aaa;">reset</div>
                         <input type="file" id="bstage-chat-bg-input" accept="image/*" style="display:none;">
                     </div>
 
                     <!-- CSS Presets Settings -->
                     <div class="bstage-setting-item">
                         <div class="bstage-setting-icon"><i class="fas fa-paint-brush"></i></div>
-                        <div class="bstage-setting-label" style="flex:1;">界面 CSS</div>
+                        <div class="bstage-setting-label" style="flex:1;">Chat CSS</div>
                         <select id="bstage-chat-css-select" style="background: #2c2c2e; color: #fff; border: 1px solid #444; border-radius: 4px; padding: 4px; width: 120px; outline: none;">
                             <option value="">默认</option>
                         </select>
@@ -602,7 +602,7 @@
                     
                     <div class="bstage-setting-item">
                         <div class="bstage-setting-icon"><i class="fas fa-crop-alt"></i></div>
-                        <div class="bstage-setting-label" style="flex:1;">头像框 CSS</div>
+                        <div class="bstage-setting-label" style="flex:1;">Frame CSS</div>
                         <select id="bstage-frame-css-select" style="background: #2c2c2e; color: #fff; border: 1px solid #444; border-radius: 4px; padding: 4px; width: 120px; outline: none;">
                             <option value="">默认</option>
                         </select>
@@ -610,7 +610,7 @@
                     
                     <div class="bstage-setting-item">
                         <div class="bstage-setting-icon"><i class="fas fa-comment-dots"></i></div>
-                        <div class="bstage-setting-label" style="flex:1;">气泡 CSS</div>
+                        <div class="bstage-setting-label" style="flex:1;">Bubble CSS</div>
                         <select id="bstage-bubble-css-select" style="background: #2c2c2e; color: #fff; border: 1px solid #444; border-radius: 4px; padding: 4px; width: 120px; outline: none;">
                             <option value="">默认</option>
                         </select>
@@ -619,7 +619,7 @@
                     <!-- Context Setting -->
                     <div class="bstage-setting-item">
                         <div class="bstage-setting-icon"><i class="fas fa-history"></i></div>
-                        <div class="bstage-setting-label" style="flex: 1;">上下文携带</div>
+                        <div class="bstage-setting-label" style="flex: 1;">Context</div>
                         <input type="number" id="bstage-context-count" value="50" style="width: 50px; background: transparent; border: 1px solid #444; color: #fff; text-align: center; border-radius: 4px; margin-right: 10px;">
                         <div class="bstage-switch active" id="bstage-context-switch">
                             <div class="bstage-switch-knob"></div>
@@ -629,7 +629,7 @@
                     <!-- Translation Switch -->
                     <div class="bstage-setting-item">
                         <div class="bstage-setting-icon"><i class="fas fa-language"></i></div>
-                        <div class="bstage-setting-label" style="flex: 1;">实时翻译</div>
+                        <div class="bstage-setting-label" style="flex: 1;">Translate</div>
                         <div class="bstage-switch" id="bstage-trans-switch">
                             <div class="bstage-switch-knob"></div>
                         </div>
@@ -638,7 +638,7 @@
                     <!-- Other Fans Messages Setting -->
                     <div class="bstage-setting-item">
                         <div class="bstage-setting-icon"><i class="fas fa-comments"></i></div>
-                        <div class="bstage-setting-label" style="flex: 1;">查看其他人消息</div>
+                        <div class="bstage-setting-label" style="flex: 1;">View Others'</div>
                         <div class="bstage-switch" id="bstage-other-fans-switch">
                             <div class="bstage-switch-knob"></div>
                         </div>
@@ -648,7 +648,7 @@
                     <div class="bstage-setting-item" style="flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px;">
                         <div style="width: 100%; display: flex; align-items: center;">
                             <div class="bstage-setting-icon"><i class="fas fa-robot"></i></div>
-                            <div class="bstage-setting-label" style="flex: 1;">自主活动</div>
+                            <div class="bstage-setting-label" style="flex: 1;">Independent</div>
                             <div class="bstage-switch" id="bstage-auto-activity-switch">
                                 <div class="bstage-switch-knob"></div>
                             </div>
@@ -670,7 +670,7 @@
 
                     <div class="bstage-setting-item" style="color: #ff3b30;" id="bstage-chat-exit-btn">
                         <div class="bstage-setting-icon" style="color: #ff3b30 !important;"><i class="fas fa-sign-out-alt"></i></div>
-                        <div class="bstage-setting-label" style="color: #ff3b30 !important;">退出</div>
+                        <div class="bstage-setting-label" style="color: #ff3b30 !important;">Exit</div>
                     </div>
                 </div>
             </div>
@@ -690,24 +690,24 @@
                         <img id="bstage-fan-detail-avatar" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
                         <i class="fas fa-user-friends" id="bstage-fan-detail-avatar-icon" style="font-size: 28px; color: #aaa;"></i>
                     </div>
-                    <h2 style="font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 5px;" id="bstage-fan-detail-name">粉丝聊天室</h2>
+                    <h2 style="font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 5px;" id="bstage-fan-detail-name">Fan Chatroom</h2>
                     <div style="font-size: 13px; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px;">
                         <i class="fas fa-heart" style="color: #ff3b30;"></i>
-                        <span id="bstage-fan-detail-subscribers">已订阅 0 人</span>
+                        <span id="bstage-fan-detail-subscribers"> 0 Subscribers</span>
                     </div>
                 </div>
 
                 <div class="bstage-settings-list">
                     <div class="bstage-setting-item">
                         <div class="bstage-setting-icon"><i class="fas fa-image"></i></div>
-                        <div class="bstage-setting-label" id="bstage-fan-setting-bg" style="flex:1;">背景设定</div>
-                        <div class="bstage-setting-right-action" id="bstage-fan-reset-bg-btn" style="color: #aaa;">重置</div>
+                        <div class="bstage-setting-label" id="bstage-fan-setting-bg" style="flex:1;">Background</div>
+                        <div class="bstage-setting-right-action" id="bstage-fan-reset-bg-btn" style="color: #aaa;">reset</div>
                         <input type="file" id="bstage-fan-chat-bg-input" accept="image/*" style="display:none;">
                     </div>
 
                     <div class="bstage-setting-item">
                         <div class="bstage-setting-icon"><i class="fas fa-paint-brush"></i></div>
-                        <div class="bstage-setting-label" style="flex:1;">界面 CSS</div>
+                        <div class="bstage-setting-label" style="flex:1;">Chat CSS</div>
                         <select id="bstage-fan-chat-css-select" style="background: #2c2c2e; color: #fff; border: 1px solid #444; border-radius: 4px; padding: 4px; width: 120px; outline: none;">
                             <option value="">默认</option>
                         </select>
@@ -715,7 +715,7 @@
 
                     <div class="bstage-setting-item">
                         <div class="bstage-setting-icon"><i class="fas fa-comment-dots"></i></div>
-                        <div class="bstage-setting-label" style="flex:1;">气泡 CSS</div>
+                        <div class="bstage-setting-label" style="flex:1;">Bubble CSS</div>
                         <select id="bstage-fan-bubble-css-select" style="background: #2c2c2e; color: #fff; border: 1px solid #444; border-radius: 4px; padding: 4px; width: 120px; outline: none;">
                             <option value="">默认</option>
                         </select>
@@ -723,7 +723,7 @@
 
                     <div class="bstage-setting-item">
                         <div class="bstage-setting-icon"><i class="fas fa-history"></i></div>
-                        <div class="bstage-setting-label" style="flex: 1;">上下文携带</div>
+                        <div class="bstage-setting-label" style="flex: 1;">Context</div>
                         <input type="number" id="bstage-fan-context-count" value="50" style="width: 50px; background: transparent; border: 1px solid #444; color: #fff; text-align: center; border-radius: 4px; margin-right: 10px;">
                         <div class="bstage-switch active" id="bstage-fan-context-switch">
                             <div class="bstage-switch-knob"></div>
@@ -732,7 +732,7 @@
 
                     <div class="bstage-setting-item">
                         <div class="bstage-setting-icon"><i class="fas fa-language"></i></div>
-                        <div class="bstage-setting-label" style="flex: 1;">实时翻译</div>
+                        <div class="bstage-setting-label" style="flex: 1;">Translate</div>
                         <div class="bstage-switch" id="bstage-fan-trans-switch">
                             <div class="bstage-switch-knob"></div>
                         </div>
@@ -740,7 +740,7 @@
 
                     <div class="bstage-setting-item" style="color: #ff3b30;" id="bstage-fan-chat-clear-btn">
                         <div class="bstage-setting-icon" style="color: #ff3b30 !important;"><i class="fas fa-trash-alt"></i></div>
-                        <div class="bstage-setting-label" style="color: #ff3b30 !important;">清空聊天</div>
+                        <div class="bstage-setting-label" style="color: #ff3b30 !important;">Clear chat</div>
                     </div>
                 </div>
             </div>
@@ -754,7 +754,7 @@
     lockerModal.innerHTML = `
         <div class="bottom-sheet" style="height: 90%; background: #1c1c1e; color: #fff;">
             <div class="sheet-handle" style="background-color: #444;"></div>
-            <div class="sheet-title" style="color: #fff;">置物柜</div>
+            <div class="sheet-title" style="color: #fff;">LOCKER</div>
             <div class="detail-sheet-content bstage-modal-content">
                 <div class="bstage-locker-grid" id="bstage-locker-grid">
                     <!-- Photos + Add Button -->
@@ -796,7 +796,7 @@
 
                     <!-- Comments Section -->
                     <div class="bstage-comments-section">
-                        <div class="bstage-comments-header" id="bstage-vid-comments-header">评论 (0)</div>
+                        <div class="bstage-comments-header" id="bstage-vid-comments-header">Comment (0)</div>
                         <div class="bstage-comment-list" id="bstage-vid-comments-list">
                             <!-- Comments injected here -->
                         </div>
@@ -812,7 +812,7 @@
                         </div>
                     </div>
                     <div class="bstage-user-avatar-small" id="bstage-comment-user-avatar"></div>
-                    <input type="text" class="bstage-comment-input" id="bstage-vid-comment-input" inputmode="text" enterkeyhint="send" autocomplete="off" autocapitalize="sentences" placeholder="添加评论..." style="color: #fff; background-color: transparent; border: none; outline: none; flex: 1;">
+                    <input type="text" class="bstage-comment-input" id="bstage-vid-comment-input" inputmode="text" enterkeyhint="send" autocomplete="off" autocapitalize="sentences" placeholder="Add comment..." style="color: #fff; background-color: transparent; border: none; outline: none; flex: 1;">
                     <i class="fas fa-paper-plane bstage-comment-send-btn disabled" id="bstage-vid-comment-send-btn" style="color: #aaa;"></i>
                 </div>
             </div>
@@ -843,7 +843,7 @@
                         
                         <div style="width:100%; height:1px; background-color:#222; margin-bottom:24px;"></div>
 
-                        <div class="bstage-shop-detail-desc-title" style="font-size:16px; font-weight:600; margin-bottom:12px;">商品详情</div>
+                        <div class="bstage-shop-detail-desc-title" style="font-size:16px; font-weight:600; margin-bottom:12px;">DETAILS</div>
                         <div class="bstage-shop-detail-desc" id="bstage-shop-detail-desc" style="font-size:14px; color:#ccc; line-height:1.6; white-space: pre-wrap;">
                             Description...
                         </div>
@@ -852,7 +852,7 @@
 
                 <!-- Buy Bar -->
                 <div class="bstage-shop-buy-bar" style="padding:16px 20px; border-top:1px solid #222; background-color:#000;">
-                    <div class="bstage-shop-buy-btn" style="width:100%; background-color:#fff; color:#000; font-weight:700; font-size:16px; height:50px; border-radius:25px; display:flex; justify-content:center; align-items:center; cursor:pointer;">立即购买</div>
+                    <div class="bstage-shop-buy-btn" style="width:100%; background-color:#fff; color:#000; font-weight:700; font-size:16px; height:50px; border-radius:25px; display:flex; justify-content:center; align-items:center; cursor:pointer;">Buy Now</div>
                 </div>
             </div>
         </div>
@@ -1083,27 +1083,27 @@
             date_2.getDate() === yesterday.getDate() &&
             date_2.getMonth() === yesterday.getMonth() &&
             date_2.getFullYear() === yesterday.getFullYear();
-        if (value_144) return '今天 ' + value_143;
+        if (value_144) return 'Today ' + value_143;
         else {
-            if (value_146) return '昨天 ' + value_143;
+            if (value_146) return 'Yesterday ' + value_143;
             else {
                 const items_147 = [
-                    '星期日',
-                    '星期一',
-                    '星期二',
-                    '星期三',
-                    '星期四',
-                    '星期五',
-                    '星期六',
+                    'Sunday',
+                    'Monday',
+                    'Tuesday',
+                    'Wednesday',
+                    'Thursday',
+                    'Friday',
+                    'Saturday',
                 ];
                 return floor_142 < 7
                     ? items_147[date_2.getDay()] + ' ' + value_143
                     : date_2.getFullYear() +
-                          '年' +
+                          'Year' +
                           (date_2.getMonth() + 1) +
-                          '月' +
+                          'Month' +
                           date_2.getDate() +
-                          '日 ' +
+                          'Day ' +
                           value_143;
             }
         }
@@ -1766,7 +1766,7 @@
             ((inputEl.value = ''), (inputEl.placeholder = placeholder_2 || '留空则随机生成'));
         bstageGenerateTypeConfirmBtnElement_252 &&
             (bstageGenerateTypeConfirmBtnElement_252.classList.remove('is-loading'),
-            (bstageGenerateTypeConfirmBtnElement_252.textContent = '确认生成'));
+            (bstageGenerateTypeConfirmBtnElement_252.textContent = 'confirm generation'));
         window.openView(generateTypeSheet);
         setTimeout(() => {
             if (inputEl)
@@ -1782,7 +1782,7 @@
         if (confirmBtn && confirmBtn.classList.contains('is-loading')) return;
         const readOnly_3 = !!inputEl_2?.readOnly;
         confirmBtn &&
-            (confirmBtn.classList.add('is-loading'), (confirmBtn.textContent = '生成中...'));
+            (confirmBtn.classList.add('is-loading'), (confirmBtn.textContent = 'Generating...'));
         inputEl_2 && ((inputEl_2.readOnly = true), inputEl_2.setAttribute('aria-busy', 'true'));
         try {
             await currentGenerateTypeAction(inputEl_2 ? inputEl_2.value.trim() : '');
@@ -1791,7 +1791,7 @@
             inputEl_2 &&
                 ((inputEl_2.readOnly = readOnly_3), inputEl_2.removeAttribute('aria-busy'));
             confirmBtn &&
-                (confirmBtn.classList.remove('is-loading'), (confirmBtn.textContent = '确认生成'));
+                (confirmBtn.classList.remove('is-loading'), (confirmBtn.textContent = 'confirm generation'));
         }
     }
     function checkAndAddDateBubble(member_5, contentContainer_2, timestamp_5) {
@@ -2171,7 +2171,7 @@
             const value_304 =
                 Math.floor((Date.now() - currentChatMember.subStartDate) / 86400000) + 1;
             document.getElementById('bstage-detail-days').textContent =
-                '已一同 ' + value_304 + ' 天';
+                'Together for ' + value_304 + ' day';
             const avatar_3 = document.getElementById('bstage-detail-avatar'),
                 avatarText = document.getElementById('bstage-detail-avatar-text'),
                 avatarContainer = document.getElementById('bstage-detail-avatar-container');
@@ -2302,7 +2302,7 @@
         const list_2 = bstagePresets_2[currentPresetTab] || [];
         if (list_2.length === 0) {
             container_2.innerHTML =
-                '<div style="color: #888; text-align: center; padding: 10px;">暂无预设</div>';
+                '<div style="color: #888; text-align: center; padding: 10px;">No Presets Yet</div>';
             return;
         }
         list_2.forEach((preset) => {
@@ -2542,7 +2542,7 @@
                 bstageChatContentElement &&
                     (bstageChatContentElement.innerHTML =
                         '<div style="text-align:center; color:#666; padding:20px; font-size:13px;">聊天记录已清空</div>');
-                window.showToast('聊天记录已清空');
+                window.showToast('Chat History Cleared');
                 window.closeView(chatDetailSheet);
             }
         });
@@ -2552,7 +2552,7 @@
             if (!currentChatMember) return;
             if (
                 confirm(
-                    '确定要清空与 ' + currentChatMember.name + ' 的聊天记录吗？此操作不可恢复。',
+                    'Confirm clearing the chat history with ' + currentChatMember.name + '？',
                 )
             ) {
                 currentChatMember.chatHistory = [];
@@ -2560,8 +2560,8 @@
                 const bstageChatContentElement_339 = document.getElementById('bstage-chat-content');
                 bstageChatContentElement_339 &&
                     (bstageChatContentElement_339.innerHTML =
-                        '<div style="text-align:center; color:#666; padding:20px; font-size:13px;">聊天记录已清空</div>');
-                window.showToast('聊天记录已清空');
+                        '<div style="text-align:center; color:#666; padding:20px; font-size:13px;">Chat History Cleared</div>');
+                window.showToast('Chat History Cleared');
                 window.closeView(chatDetailSheet);
             }
         });
@@ -2631,7 +2631,7 @@
     });
     document.getElementById('bstage-setting-nickname').addEventListener('click', () => {
         if (!currentChatMember) return;
-        const newName = prompt('请输入新的备注名:', currentChatMember.name);
+        const newName = prompt('Enter a new note:', currentChatMember.name);
         if (newName && newName.trim() !== '') {
             currentChatMember.name = newName.trim();
             document.getElementById('bstage-detail-name').textContent = currentChatMember.name;
@@ -2691,12 +2691,12 @@
         reader.readAsDataURL(file);
     });
     document.getElementById('bstage-fan-chat-clear-btn').addEventListener('click', () => {
-        if (!confirm('确定要清空粉丝聊天室记录吗？此操作不可恢复。')) return;
+        if (!confirm('Confirm clearing the fan chat room?')) return;
         bstageFanChatHistory_2 = [];
         renderFanChatHistory();
         updateFanSubscriberLabels();
         saveBstageData();
-        window.showToast('粉丝聊天室已清空');
+        window.showToast('Fan Chatroom Cleared');
         window.closeView(fanChatDetailSheet);
     });
     document.getElementById('bstage-locker-see-all-btn').addEventListener('click', () => {
@@ -2758,7 +2758,7 @@
         });
         chatPhotos_2.length === 0 &&
             (container_3.innerHTML =
-                '<div style="color: #888; font-size: 13px; padding: 10px 0;">暂无照片</div>');
+                '<div style="color: #888; font-size: 13px; padding: 10px 0;">no photos yet</div>');
     }
     const createBtn = document.getElementById('bstage-create-team-btn');
     createBtn.addEventListener('click', () => {
@@ -2787,7 +2787,7 @@
             bstageSearchMemberCountElement = document.getElementById('bstage-search-member-count');
         confirmBtn_2 &&
             (confirmBtn_2.classList.toggle('is-loading', readOnly_2),
-            (confirmBtn_2.textContent = readOnly_2 ? '生成中...' : '生成团队'));
+            (confirmBtn_2.textContent = readOnly_2 ? 'Generating...' : 'Generate Team'));
         if (loading) loading.style.display = readOnly_2 ? 'flex' : 'none';
         if (bstageSearchQueryInputElement) bstageSearchQueryInputElement.readOnly = readOnly_2;
         if (bstageSearchMemberCountElement) bstageSearchMemberCountElement.readOnly = readOnly_2;
@@ -2999,7 +2999,7 @@
             });
             if (validFriends.length === 0) {
                 listContainer.innerHTML =
-                    '<div style="text-align:center; padding:20px; color:#aaa;">暂无可拉取的好友</div>';
+                    '<div style="text-align:center; padding:20px; color:#aaa;">No Friends Available to Invite</div>';
                 return;
             }
             listContainer.innerHTML = '';
@@ -3043,12 +3043,12 @@
                         ? ((avatarDisplay.src = src_3), (avatarDisplay.style.display = 'block'))
                         : ((avatarDisplay.src = ''), (avatarDisplay.style.display = 'none'));
                     const title_4 = document.querySelector('#bstage-add-char-sheet .sheet-title');
-                    if (title_4) title_4.textContent = '确认成员信息';
+                    if (title_4) title_4.textContent = 'MEMBER INFORMATION';
                     const bstageConfirmAddCharBtnElement = document.getElementById(
                         'bstage-confirm-add-char-btn',
                     );
                     if (bstageConfirmAddCharBtnElement)
-                        bstageConfirmAddCharBtnElement.textContent = '添加';
+                        bstageConfirmAddCharBtnElement.textContent = 'Add';
                     window.closeView(pullFriendSheet);
                     window.openView(addCharSheet);
                 });
@@ -3071,12 +3071,12 @@
             '#bstage-add-char-sheet .sheet-title',
         );
         if (bstageAddCharSheetSheetTitleElement_411)
-            bstageAddCharSheetSheetTitleElement_411.textContent = '添加成员';
+            bstageAddCharSheetSheetTitleElement_411.textContent = 'ADD MEMBER';
         const bstageConfirmAddCharBtnElement_412 = document.getElementById(
             'bstage-confirm-add-char-btn',
         );
         if (bstageConfirmAddCharBtnElement_412)
-            bstageConfirmAddCharBtnElement_412.textContent = '添加';
+            bstageConfirmAddCharBtnElement_412.textContent = 'Add';
         window.openView(addCharSheet);
     });
     document.getElementById('bstage-confirm-add-char-btn').addEventListener('click', () => {
@@ -3101,7 +3101,7 @@
                           .querySelector('.bstage-nav-item[data-tab="pop"]')
                           .classList.contains('active') && renderTeamPop(currentTeam))
                     : renderTempMembers();
-                window.showToast('已更新成员: ' + name_6);
+                window.showToast('Updated member: ' + name_6);
                 message_14 = null;
             } else {
                 const newChar = {
@@ -3124,7 +3124,7 @@
                       document
                           .querySelector('.bstage-nav-item[data-tab="pop"]')
                           .classList.contains('active') && renderTeamPop(currentTeam),
-                      window.showToast('已添加成员: ' + name_6))
+                      window.showToast('Member added: ' + name_6))
                     : (tempMembers.push(newChar), renderTempMembers());
             }
             window.closeView(addCharSheet);
@@ -3162,12 +3162,12 @@
                     '#bstage-add-char-sheet .sheet-title',
                 );
                 if (bstageAddCharSheetSheetTitleElement_421)
-                    bstageAddCharSheetSheetTitleElement_421.textContent = '编辑成员';
+                    bstageAddCharSheetSheetTitleElement_421.textContent = 'EDIT MEMBER';
                 const bstageConfirmAddCharBtnElement_422 = document.getElementById(
                     'bstage-confirm-add-char-btn',
                 );
                 if (bstageConfirmAddCharBtnElement_422)
-                    bstageConfirmAddCharBtnElement_422.textContent = '保存';
+                    bstageConfirmAddCharBtnElement_422.textContent = 'save';
                 window.openView(addCharSheet);
             });
             container_4.appendChild(element_419);
@@ -3300,12 +3300,12 @@
                     '#bstage-add-char-sheet .sheet-title',
                 );
                 if (bstageAddCharSheetSheetTitleElement_437)
-                    bstageAddCharSheetSheetTitleElement_437.textContent = '编辑成员';
+                    bstageAddCharSheetSheetTitleElement_437.textContent = 'EDIT MEMBER';
                 const bstageConfirmAddCharBtnElement_438 = document.getElementById(
                     'bstage-confirm-add-char-btn',
                 );
                 if (bstageConfirmAddCharBtnElement_438)
-                    bstageConfirmAddCharBtnElement_438.textContent = '保存';
+                    bstageConfirmAddCharBtnElement_438.textContent = 'save';
                 window.openView(addCharSheet);
             });
             container_6.appendChild(element_435);
@@ -3322,12 +3322,12 @@
                 '#bstage-add-char-sheet .sheet-title',
             );
             if (bstageAddCharSheetSheetTitleElement_440)
-                bstageAddCharSheetSheetTitleElement_440.textContent = '添加成员';
+                bstageAddCharSheetSheetTitleElement_440.textContent = 'ADD MEMBER';
             const bstageConfirmAddCharBtnElement_441 = document.getElementById(
                 'bstage-confirm-add-char-btn',
             );
             if (bstageConfirmAddCharBtnElement_441)
-                bstageConfirmAddCharBtnElement_441.textContent = '添加';
+                bstageConfirmAddCharBtnElement_441.textContent = 'Add';
             window.openView(addCharSheet);
         } else event_439.target.id === 'bstage-edit-team-pull-friend-btn' && handleClick_3();
     });
@@ -3364,7 +3364,7 @@
                 .classList.contains('active') && handleAction_85(currentTeam),
             (isEditingTeam = false),
             window.closeView(editTeamSheet),
-            window.showToast('团队信息已更新'));
+            window.showToast('Team information updated'));
     });
     document.getElementById('bstage-delete-team-btn').addEventListener('click', () => {
         if (!currentTeam) return;
@@ -3372,7 +3372,7 @@
             window.showToast('User 团队为固定团队，不能删除');
             return;
         }
-        confirm('确定要删除这个团队吗？') &&
+        confirm('Delete this team?') &&
             ((teams_2 = teams_2.filter((t_2) => t_2.id !== currentTeam.id)),
             (currentTeam = null),
             saveBstageData(),
@@ -3380,12 +3380,12 @@
             (document.getElementById('bstage-bottom-nav').style.display = 'none'),
             (document.getElementById('bstage-content-area').innerHTML = `
                 <div style="height: 100%; display: flex; justify-content: center; align-items: center; color: #333; font-size: 14px;">
-                    请选择或创建一个团队
+                    Please select or create a team
                 </div>
             `),
             (isEditingTeam = false),
             window.closeView(editTeamSheet),
-            window.showToast('团队已删除'));
+            window.showToast('Team deleted'));
     });
     editTeamSheet.querySelector('.sheet-handle').addEventListener('click', () => {
         isEditingTeam = false;
@@ -3499,8 +3499,8 @@
             (isUserTeam_44_462
                 ? 'User Space'
                 : value_460.isSubscribed
-                  ? '会员已订阅'
-                  : '订阅会员') +
+                  ? 'User Space'
+                  : 'Subscribe') +
             `</span>
                         <i class="fas fa-chevron-right" style="font-size: 12px;"></i>
                     </div>
@@ -3552,21 +3552,21 @@
                       if (m.isSubscribed && m.subStartDate) {
                           const value_475 =
                               Math.floor((Date.now() - m.subStartDate) / 86400000) + 1;
-                          text_470 = '已一同 ' + value_475 + ' 天';
+                          text_470 = 'Together for ' + value_475 + ' day';
                       }
                   }
                   let actionHtml = '';
                   if (isUserSelfMember)
                       actionHtml =
-                          '<div class="bstage-pop-status">粉丝聊天室 <i class="fas fa-chevron-right"></i></div>';
+                          '<div class="bstage-pop-status">Fan Chatroom <i class="fas fa-chevron-right"></i></div>';
                   else
                       m.isSubscribed
                           ? enabled_469
                               ? (actionHtml =
-                                    '<div class="bstage-pop-sub-btn renew" style="background-color: #ffcc00; color: #000;">续费(缓冲)</div>')
+                                    '<div class="bstage-pop-sub-btn renew" style="background-color: #ffcc00; color: #000;">Renew</div>')
                               : (actionHtml =
-                                    '<div class="bstage-pop-status">订阅中 <i class="fas fa-chevron-right"></i></div>')
-                          : (actionHtml = '<div class="bstage-pop-sub-btn">订阅</div>');
+                                    '<div class="bstage-pop-status">Subscribed <i class="fas fa-chevron-right"></i></div>')
+                          : (actionHtml = '<div class="bstage-pop-sub-btn">Subscribe</div>');
                   const roleClass = isUserSelfMember
                       ? 'bstage-pop-role bstage-fan-subscriber-label'
                       : 'bstage-pop-role';
@@ -3606,7 +3606,7 @@
                                       event_476.stopPropagation();
                                       currentPopSubMember = m;
                                       document.getElementById('pop-sub-char-name').textContent =
-                                          '续订 ' + m.name;
+                                          'Renew ' + m.name;
                                       window.openView(popSubModal);
                                   });
                               item_9.addEventListener('click', (e_15) => {
@@ -3619,7 +3619,7 @@
                                       event_478.stopPropagation();
                                       currentPopSubMember = m;
                                       document.getElementById('pop-sub-char-name').textContent =
-                                          '订阅 ' + m.name;
+                                          'Subscribe ' + m.name;
                                       window.openView(popSubModal);
                                   });
                           }
@@ -3628,7 +3628,7 @@
                   container_7.appendChild(item_9);
               })
             : (container_7.innerHTML =
-                  '<div style="text-align:center; color:#666; padding:20px;">暂无成员</div>');
+                  '<div style="text-align:center; color:#666; padding:20px;">No Members Yet</div>');
     }
     document.getElementById('bstage-confirm-pop-sub-btn').addEventListener('click', () => {
         if (currentPopSubMember) {
@@ -3638,22 +3638,22 @@
             currentPopSubMember.subExpiryDate &&
             subStartDate_2 > currentPopSubMember.subExpiryDate
                 ? ((currentPopSubMember.subExpiryDate += subExpiryDate_2),
-                  window.showToast('成功续订 ' + currentPopSubMember.name + '！'))
+                  window.showToast('Renewed ' + currentPopSubMember.name + '！'))
                 : ((currentPopSubMember.isSubscribed = true),
                   (currentPopSubMember.subStartDate = subStartDate_2),
                   (currentPopSubMember.subExpiryDate = subStartDate_2 + subExpiryDate_2),
-                  window.showToast('成功订阅 ' + currentPopSubMember.name + '！'));
+                  window.showToast('Subscribed ' + currentPopSubMember.name + '！'));
             const priceEl = popSubModal.querySelector('.selected .bstage-price-amount');
             bstageOrders_2.unshift({
                 id: Date.now(),
-                title: '订阅 ' + currentPopSubMember.name,
-                price: priceEl ? priceEl.textContent : '₩4,500 / 月',
+                title: 'Subscribe ' + currentPopSubMember.name,
+                price: priceEl ? priceEl.textContent : '₩4,500 / Month',
                 date: new Date().toLocaleDateString(),
                 type: 'POP',
             });
             if (currentTeam) renderTeamPop(currentTeam);
             saveBstageData();
-            window.showToast('成功订阅 ' + currentPopSubMember.name + '！');
+            window.showToast('Subscribed ' + currentPopSubMember.name + '！');
             window.closeView(popSubModal);
         }
     });
@@ -3689,7 +3689,7 @@
                 `
                 <div class="bstage-msg-status">
                     <div class="bstage-msg-status-text">` +
-                escapeHtml(msg_8.status || '已读') +
+                escapeHtml(msg_8.status || 'read') +
                 `</div>
                     <div class="bstage-msg-time">` +
                 escapeHtml(msg_8.time || getCurrentChatTimeText(msg_8.timestamp)) +
@@ -3777,7 +3777,7 @@
         currentChatMember = member_10;
         document.getElementById('bstage-chat-name').textContent = member_10.name;
         const value_493 = Math.floor((Date.now() - member_10.subStartDate) / 86400000) + 1;
-        document.getElementById('bstage-chat-days').textContent = '已一同 ' + value_493 + ' 天';
+        document.getElementById('bstage-chat-days').textContent = 'Together for ' + value_493 + ' Day';
         const bstageChatViewElement_494 = document.getElementById('bstage-chat-view');
         member_10.chatBg
             ? (bstageChatViewElement_494.style.backgroundImage = "url('" + member_10.chatBg + "')")
@@ -3799,14 +3799,14 @@
                     isUser: false,
                     type: 'text',
                     text: "Hello! I'm " + member_10.name + '.',
-                    trans: '你好！我是' + member_10.name + '。',
+                    trans: "Hellow! I'm " + member_10.name + '.',
                     timestamp: Date.now(),
                 },
                 {
                     isUser: false,
                     type: 'text',
                     text: 'Thanks for subscribing!',
-                    trans: '谢谢你的订阅！',
+                    trans: 'Thanks for subscribing！',
                     timestamp: Date.now() + 100,
                 },
             ]),
@@ -3874,7 +3874,7 @@
                     text: text_4,
                     time: time_2,
                     timestamp: timestamp_2,
-                    status: '未读',
+                    status: 'unread',
                     replyTo: pendingChatReply
                         ? {
                               ...pendingChatReply,
@@ -4223,12 +4223,12 @@ After Role Rules:
                 userMsgCountSinceLastReply = 0;
                 const statusTexts = contentContainer_3.querySelectorAll('.bstage-msg-status-text');
                 statusTexts.forEach((el) => {
-                    if (el.innerHTML === '未读') el.innerHTML = '已读';
+                    if (el.innerHTML === 'unread') el.innerHTML = 'read';
                 });
             }
             member_11.chatHistory &&
                 member_11.chatHistory.forEach((h) => {
-                    if (h.isUser && h.status === '未读') h.status = '已读';
+                    if (h.isUser && h.status === 'unread') h.status = 'read';
                 });
             function openImagePreview(src_4, textContent_4) {
                 const overlay_2 = document.createElement('div');
@@ -4430,7 +4430,7 @@ After Role Rules:
                 return (
                     items_585.length === 0
                         ? (gridHtml =
-                              '<div style="grid-column:span 2;text-align:center;padding:20px;color:#666;">暂无商品</div>')
+                              '<div style="grid-column:span 2;text-align:center;padding:20px;color:#666;">No Products Yet</div>')
                         : items_585.forEach((value_587) => {
                               const img_4 =
                                   value_587.img ||
@@ -4479,7 +4479,7 @@ After Role Rules:
                         '" data-cat="' +
                         value_593 +
                         '">' +
-                        value_593 +
+                        (value_593 === '全部' ? 'All' : value_593) +
                         '</div>';
                 });
                 const text_590 = `
@@ -4487,25 +4487,14 @@ After Role Rules:
                     <i class="fas fa-plus"></i>
                 </div>
             `,
-                    value_591 = team_11.shopBanner
-                        ? "background-image: url('" + team_11.shopBanner + "');"
-                        : 'background-color:#222;',
-                    value_592 = team_11.shopBanner
-                        ? ''
-                        : `
-                <div style="width:100%;height:100%;background-color:#222;display:flex;justify-content:center;align-items:center;opacity:0.5;">
-                    <i class="fas fa-star" style="font-size:40px;color:#444;"></i>
-                </div>
-            `;
+                    value_591 = "background-image: url('" +
+                        (team_11.shopBanner || 'assets/bstage/shop-banner-default.jpg') + "');";
                 contentArea.innerHTML =
                     `
                 <div class="bstage-shop-view">
                     <div class="bstage-shop-banner" id="bstage-shop-banner-edit" style="` +
                     value_591 +
                     `; cursor: pointer; position: relative;">
-                        ` +
-                    value_592 +
-                    `
                         <div class="bstage-shop-banner-text">OFFICIAL SHOP</div>
                         <input type="file" id="bstage-shop-banner-input" accept="image/*" style="display:none;">
                     </div>
@@ -4551,7 +4540,7 @@ After Role Rules:
                             reader_3.onload = (ev) => {
                                 team_11.shopBanner = ev.target.result;
                                 renderView();
-                                window.showToast('Shop 背景已更新');
+                                window.showToast('Shop cover updated');
                             };
                             reader_3.readAsDataURL(file_3);
                         }
@@ -4562,9 +4551,9 @@ After Role Rules:
                 magicBtn &&
                     magicBtn.addEventListener('click', () => {
                         openGenerateTypeSheet({
-                            title: '生成商品',
-                            label: '想看什么类型的商品',
-                            placeholder: '例如：应援棒、签售周边、冬季套装；留空则随机',
+                            title: 'GENERATE PRODUCT',
+                            label: 'Browse products',
+                            placeholder: 'e.g.: perfume, custom silk scarf, exclusive jewelry',
                             onConfirm: (request) =>
                                 triggerShopApi(team_11, activeCategory, request),
                         });
@@ -4709,7 +4698,7 @@ After Role Rules:
                     const name_9 = stripGeneratedText(item_12 && item_12.name, 'New Item'),
                         itemCategory = stripGeneratedText(
                             item_12 && item_12.category,
-                            category_2 === '全部' ? requestType || '周边' : category_2,
+                            category_2 === '全部' ? requestType || 'Rim' : category_2,
                         );
                     if (itemCategory && !team_12.shopCategories.includes(itemCategory))
                         team_12.shopCategories.push(itemCategory);
@@ -4728,7 +4717,7 @@ After Role Rules:
                 }),
                 saveBstageData(),
                 renderShop(team_12),
-                window.showToast('已生成 ' + result_617.length + ' 个商品'));
+                window.showToast(' ' + result_617.length + ' Proucts generated'));
         } catch (value_621) {
             console.error(value_621);
             if (
@@ -4773,7 +4762,7 @@ After Role Rules:
                     '" data-series="' +
                     value_630 +
                     '">' +
-                    value_630 +
+                    (value_630 === '全部' ? 'ALL' : value_630) +
                     text_632 +
                     '</div>';
             });
@@ -4797,7 +4786,7 @@ After Role Rules:
                       );
             filteredVideos.length === 0
                 ? (videosHtml =
-                      '<div style="text-align:center; color:#666; padding:20px;">暂无视频</div>')
+                      '<div style="text-align:center; color:#666; padding:20px;">No Videos Yet</div>')
                 : filteredVideos.forEach((value_633) => {
                       if (!value_633.thumb)
                           value_633.thumb = handleAction_47(
@@ -4932,9 +4921,9 @@ After Role Rules:
             magicBtn_2 &&
                 magicBtn_2.addEventListener('click', () => {
                     openGenerateTypeSheet({
-                        title: '生成视频内容',
-                        label: '想看什么类型的视频内容',
-                        placeholder: '例如：练习室、旅行 vlog、后台花絮；留空则随机',
+                        title: 'GENERATE VIDEO',
+                        label: 'Browse videos',
+                        placeholder: 'e.g.: brand event, skincare vlog, flight diary',
                         onConfirm: (request_2) =>
                             triggerContentApi(team_13, activeSeries, request_2),
                     });
@@ -4995,33 +4984,32 @@ After Role Rules:
               });
         const textContent_6 =
             video_3.description ||
-            '这是 ' +
+            ' ' +
                 currentTeam.name +
-                ` 的精彩视频内容。
-请大家多多支持，不要忘记点赞评论哦！`;
+                ` Vlog | \nCity walk`;
         document.getElementById('bstage-vid-description').textContent = textContent_6;
         !video_3.comments &&
             (video_3.comments = [
                 {
                     id: 1,
-                    name: 'User123',
-                    text: '太棒了！😍',
+                    name: 'angela_llx',
+                    text: 'My gorgeous bsf',
                     time: '1m ago',
                     avatar: null,
                     avatarEmoji: getStableEmojiAvatar('video-comment-User123'),
                 },
                 {
                     id: 2,
-                    name: 'K-Pop Fan',
-                    text: 'Love this team!!!',
+                    name: '1_hsjm',
+                    text: 'Living angel😍😍',
                     time: '5m ago',
                     avatar: null,
                     avatarEmoji: getStableEmojiAvatar('video-comment-K-Pop Fan'),
                 },
                 {
                     id: 3,
-                    name: 'Stan',
-                    text: '❤️❤️❤️',
+                    name: 'ngrxce',
+                    text: 'so prettyyyy',
                     time: '1h ago',
                     avatar: null,
                     avatarEmoji: getStableEmojiAvatar('video-comment-Stan'),
@@ -5073,7 +5061,7 @@ After Role Rules:
                 currentVideo.thumb = hasCover ? newCover : null;
                 document.getElementById('bstage-vid-detail-title').textContent = value_656;
                 document.getElementById('bstage-vid-description').textContent =
-                    description_2 || '这是 ' + currentTeam.name + ' 的精彩视频内容...';
+                    description_2 || ' ' + currentTeam.name + ' Vlog 丨 ...';
                 const bstageVideoPlayerPlaceholderElement = videoDetailModal.querySelector(
                     '.bstage-video-player-placeholder',
                 );
@@ -5127,9 +5115,9 @@ After Role Rules:
     document.getElementById('bstage-video-detail-magic-btn').addEventListener('click', () => {
         currentVideo &&
             openGenerateTypeSheet({
-                title: '生成视频详情',
-                label: '想看什么类型的视频细节',
-                placeholder: '例如：后台互动、开箱、舞台花絮；留空则随机',
+                title: 'GENERATE VIDEO',
+                label: 'Browse videos',
+                placeholder: 'e.g.: brand event, skincare vlog, flight diary',
                 onConfirm: (request_3) => triggerVideoDetailApi(currentVideo, request_3),
             });
     });
@@ -5708,7 +5696,7 @@ User 评论：` +
                 }),
                 saveBstageData(),
                 handleAction_89(team_14),
-                window.showToast('已生成 ' + result_722.length + ' 个视频'));
+                window.showToast(' ' + result_722.length + ' Videos generated'));
         } catch (value_726) {
             console.error(value_726);
             if (
@@ -5748,10 +5736,10 @@ User 评论：` +
             `
             <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #666; background-color: #000; gap: 20px;">
                 <i class="fas fa-lock" style="font-size: 40px; opacity: 0.5;"></i>
-                <div>需要订阅会员才能查看 ` +
+                <div>Subscribe to view ` +
             value_732 +
             `</div>
-                <div class="bstage-pop-sub-btn" id="bstage-locked-sub-btn" style="background-color: #007aff; color: #fff; padding: 10px 24px;">去订阅</div>
+                <div class="bstage-pop-sub-btn" id="bstage-locked-sub-btn" style="background-color: #007aff; color: #fff; padding: 10px 24px;">subscribe</div>
             </div>
         `;
         document.getElementById('bstage-locked-sub-btn').addEventListener('click', openSubModal);
@@ -5782,7 +5770,7 @@ User 评论：` +
                 date: new Date().toLocaleDateString(),
                 type: 'Membership',
             });
-            window.showToast('订阅成功！您现在可以访问 Content 和 Shop。');
+            window.showToast('Subscription successful!');
             document
                 .querySelector('.bstage-nav-item[data-tab="home"]')
                 .classList.contains('active') && handleAction_85(currentTeam);
@@ -5866,7 +5854,7 @@ User 评论：` +
             isUserTeam_2(currentTeam) && (currentTeam = getBstageUserTeam());
         }
         window.closeView(editProfileModal);
-        window.showToast('资料已更新');
+        window.showToast('Profile updated');
     });
     document.getElementById('bstage-my-orders-btn').addEventListener('click', () => {
         renderOrders();
@@ -5883,7 +5871,7 @@ User 评论：` +
             window.showToast('Pay 暂不可用，请稍后重试');
             return;
         }
-        const success = window.addPayTransaction(amount, 'b.stage POP 订阅收益', 'income');
+        const success = window.addPayTransaction(amount, 'Subscription', 'income');
         if (!success) {
             window.showToast('提现失败，请稍后重试');
             return;
@@ -5904,7 +5892,7 @@ User 评论：` +
         container_9.innerHTML = '';
         if (bstageOrders_2.length === 0) {
             container_9.innerHTML =
-                '<div style="text-align: center; color: #888; padding: 20px;">暂无订单记录</div>';
+                '<div style="text-align: center; color: #888; padding: 20px;">No Order History Yet</div>';
             return;
         }
         bstageOrders_2.forEach((value_747) => {
@@ -5990,7 +5978,7 @@ User 评论：` +
         return String(count_4);
     }
     function handleAction_105() {
-        return '已订阅 ' + formatBstageSubscriberCount(getFanSubscriberCount()) + ' 人';
+        return ' ' + formatBstageSubscriberCount(getFanSubscriberCount()) + ' Subscribers';
     }
     function getBstageTotalRevenueCny() {
         return getFanSubscriberCount() * BSTAGE_POP_MONTHLY_KRW * BSTAGE_KRW_TO_CNY;
@@ -6003,7 +5991,7 @@ User 评论：` +
         return Math.max(0, getBstageTotalRevenueCny() - getBstageWithdrawnRevenueCny());
     }
     function handleAction_106(value_13) {
-        return '＄' + Math.max(0, Number(value_13) || 0).toFixed(2);
+        return '$' + Math.max(0, Number(value_13) || 0).toFixed(2);
     }
     function updateBstageProfileStats() {
         const subCountEl = document.getElementById('bstage-profile-pop-sub-count'),
@@ -6097,7 +6085,7 @@ User 评论：` +
             detailName = document.getElementById('bstage-fan-detail-name'),
             bstageFanDetailAvatarElement = document.getElementById('bstage-fan-detail-avatar'),
             avatarIcon_2 = document.getElementById('bstage-fan-detail-avatar-icon');
-        if (detailName) detailName.textContent = value_769 + ' 的粉丝聊天室';
+        if (detailName) detailName.textContent = value_769 + " 's Fan Chatroom";
         bstageFanDetailAvatarElement &&
             avatarIcon_2 &&
             (src_7
@@ -6219,7 +6207,7 @@ User 团队 Shop 周边商品：
             element_796.innerHTML =
                 `
                 <div class="bstage-msg-status">
-                    <div class="bstage-msg-status-text">已发送</div>
+                    <div class="bstage-msg-status-text">sent</div>
                     <div class="bstage-msg-time">` +
                 escapeHtml(msg_16.time || getCurrentChatTimeText(msg_16.timestamp)) +
                 `</div>
@@ -6286,7 +6274,7 @@ User 团队 Shop 周边商品：
         syncFanChatTranslationState();
         if (!Array.isArray(bstageFanChatHistory_2)) bstageFanChatHistory_2 = [];
         bstageFanChatHistory_2.length === 0
-            ? (content_7.innerHTML = '<div class="bstage-system-notice">粉丝聊天室已开启</div>')
+            ? (content_7.innerHTML = '<div class="bstage-system-notice">Fan chatroom is on</div>')
             : bstageFanChatHistory_2.forEach((msg_17) => appendFanChatMessage(msg_17, content_7));
         updateFanSubscriberLabels();
         setTimeout(() => {
