@@ -32,7 +32,7 @@
         <div class="bstage-content-area" id="bstage-content-area">
             <!-- Default Empty State or Team View -->
             <div style="height: 100%; display: flex; justify-content: center; align-items: center; color: #333; font-size: 14px;">
-                请选择或创建一个团队
+                Please select or create a team
             </div>
         </div>
 
@@ -199,7 +199,7 @@
                 </div>
                 <div id="bstage-search-loading" class="bstage-search-loading" style="display:none;">
                     <i class="fas fa-spinner"></i>
-                    <span>正在生成团队...</span>
+                    <span>Generating...</span>
                 </div>
                 <div class="sheet-action confirm-action bstage-search-confirm-btn" id="bstage-search-confirm-btn" style="background-color: #fff; color: #000;">Generate</div>
             </div>
@@ -5360,7 +5360,7 @@ After Role Rules:
         const list_3 = document.getElementById('bstage-vid-comments-list'),
             count_3 = currentVideo.comments.length;
         document.getElementById('bstage-vid-comments-header').textContent =
-            '评论 (' + count_3 + ')';
+            'Comment (' + count_3 + ')';
         list_3.innerHTML = '';
         currentVideo.comments.forEach((c) => {
             const item_13 = document.createElement('div');
@@ -5770,10 +5770,12 @@ User 评论：` +
                 date: new Date().toLocaleDateString(),
                 type: 'Membership',
             });
+            saveBstageData();
+            handleAction_84(value_80 || 'home', {
+                immediate: true,
+                force: true,
+            });
             window.showToast('Subscription successful!');
-            document
-                .querySelector('.bstage-nav-item[data-tab="home"]')
-                .classList.contains('active') && handleAction_85(currentTeam);
         }
         window.closeView(subModal);
     });
