@@ -100,7 +100,7 @@
                 String,
             ),
         );
-        if (!ids.size) return 'Not mounted';
+        if (!ids.size) return 'Not Mounted';
         const books = typeof window.getWorldBooks === 'function' ? window.getWorldBooks() : [];
         const names = (Array.isArray(books) ? books : [])
             .filter((book) => book && ids.has(String(book.id)))
@@ -121,7 +121,7 @@
         sheet_2.id = 'tk-profile-settings-sheet';
         sheet_2.className = 'bottom-sheet-overlay detail-sheet-overlay';
         sheet_2.innerHTML =
-            '<div class="bottom-sheet tk-settings-sheet tk-settings-shop-sheet" role="dialog" aria-modal="true" aria-labelledby="tk-settings-title">\n <div class="sheet-handle" aria-hidden="true"></div><div class="sheet-title" id="tk-settings-title">SETTINGS</div>\n <div class="detail-sheet-content" style="padding:16px"><div class="settings-group fully-rounded" style="margin:0"><button type="button" class="settings-item tk-settings-row" id="tk-bind-worldbook-btn">\n                                <span class="settings-icon" style="background-color:#1c1c1e" aria-hidden="true"><i class="fas fa-book"></i></span>\n                                <span class="tk-settings-copy"><span class="tk-settings-row-title">World books</span></span><span id="tk-bound-worldbook-label" class="tk-settings-book-status">Not mounted</span>\n                                <svg class="tk-settings-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>\n                            </button>\n<button type="button" class="settings-item tk-settings-row" data-tk-clear="videos">\n                                <span class="tk-settings-icon" aria-hidden="true"><svg viewBox="3 5 18 14"><rect x="3" y="5" width="12" height="14" rx="3"/><path d="m15 10 6-4v12l-6-4Z"/></svg></span>\n                                <span class="tk-settings-copy"><span class="tk-settings-row-title">清理全部视频</span><span class="tk-settings-description">推荐、关注和自己发布的视频</span></span>\n                                <svg class="tk-settings-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>\n                            </button>\n<button type="button" class="settings-item tk-settings-row" data-tk-clear="dms">\n                                <span class="tk-settings-icon" aria-hidden="true"><svg viewBox="3 3 18 18"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8A8.5 8.5 0 0 1 12.5 20a8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/></svg></span>\n                                <span class="tk-settings-copy"><span class="tk-settings-row-title">清理全部私信</span><span class="tk-settings-description">清空私信会话，保留角色联系人</span></span>\n                                <svg class="tk-settings-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>\n                            </button>\n<button type="button" class="settings-item tk-settings-row tk-settings-row-destructive" data-tk-clear="all">\n                                <span class="tk-settings-icon" aria-hidden="true"><i class="fas fa-trash-alt"></i></span>\n                                <span class="tk-settings-copy"><span class="tk-settings-row-title">清空 TikTok 所有数据</span><span class="tk-settings-description">重置 TikTok，不影响其他应用</span></span>\n                                <svg class="tk-settings-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>\n                            </button></div></div></div>';
+            '<div class="bottom-sheet tk-settings-sheet tk-settings-shop-sheet" role="dialog" aria-modal="true" aria-labelledby="tk-settings-title">\n <div class="sheet-handle" aria-hidden="true"></div><div class="sheet-title" id="tk-settings-title">TIKTOK SETTINGS</div>\n <div class="detail-sheet-content" style="padding:16px"><div class="settings-group fully-rounded" style="margin:0"><button type="button" class="settings-item tk-settings-row" id="tk-bind-worldbook-btn">\n                                <span class="settings-icon" style="background-color:#1c1c1e" aria-hidden="true"><i class="fas fa-book"></i></span>\n                                <span class="tk-settings-copy"><span class="tk-settings-row-title">挂载世界书</span></span><span id="tk-bound-worldbook-label" class="tk-settings-book-status">Not Mounted</span>\n                                <svg class="tk-settings-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>\n                            </button>\n<button type="button" class="settings-item tk-settings-row" data-tk-clear="videos">\n                                <span class="tk-settings-icon" aria-hidden="true"><svg viewBox="3 5 18 14"><rect x="3" y="5" width="12" height="14" rx="3"/><path d="m15 10 6-4v12l-6-4Z"/></svg></span>\n                                <span class="tk-settings-copy"><span class="tk-settings-row-title">清理全部视频</span><span class="tk-settings-description">推荐、关注和自己发布的视频</span></span>\n                                <svg class="tk-settings-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>\n                            </button>\n<button type="button" class="settings-item tk-settings-row" data-tk-clear="dms">\n                                <span class="tk-settings-icon" aria-hidden="true"><svg viewBox="3 3 18 18"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8A8.5 8.5 0 0 1 12.5 20a8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9a8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/></svg></span>\n                                <span class="tk-settings-copy"><span class="tk-settings-row-title">清理全部私信</span><span class="tk-settings-description">清空私信会话，保留角色联系人</span></span>\n                                <svg class="tk-settings-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>\n                            </button>\n<button type="button" class="settings-item tk-settings-row tk-settings-row-destructive" data-tk-clear="all">\n                                <span class="tk-settings-icon" aria-hidden="true"><i class="fas fa-trash-alt"></i></span>\n                                <span class="tk-settings-copy"><span class="tk-settings-row-title">清空 TikTok 所有数据</span><span class="tk-settings-description">重置 TikTok，不影响其他应用</span></span>\n                                <svg class="tk-settings-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>\n                            </button></div></div></div>';
         (document.getElementById('tiktok-view') || document.body).appendChild(sheet_2);
         sheet_2.addEventListener('click', (event) => {
                 if (event.target === sheet_2) window.closeView(sheet_2);
@@ -205,7 +205,7 @@
     }
     function tkFormatVisitorTime(value_5) {
         const time = Number(value_5);
-        if (!Number.isFinite(time) || time <= 0) return '刚刚访问';
+        if (!Number.isFinite(time) || time <= 0) return 'Just visited';
         return new Date(time).toLocaleString('zh-CN', {
             month: '2-digit',
             day: '2-digit',
@@ -241,7 +241,7 @@
             (sheet_3.innerHTML = `
             <div class="bottom-sheet tk-visitors-sheet">
                 <div class="sheet-handle"></div>
-                <div class="sheet-title">主页访客</div>
+                <div class="sheet-title">PROFILE VISITORS</div>
                 <div class="detail-sheet-content tk-visitors-list" id="tk-profile-visitors-list"></div>
             </div>
         `),
@@ -267,7 +267,7 @@
                     <div>
                         <div class="tk-visitor-name" id="tk-visitor-thought-name">Visitor</div>
                         <div class="tk-visitor-meta" id="tk-visitor-thought-handle">@visitor</div>
-                        <div class="tk-visitor-meta tk-visitor-thought-time" id="tk-visitor-thought-time">刚刚访问</div>
+                        <div class="tk-visitor-meta tk-visitor-thought-time" id="tk-visitor-thought-time">Just visited</div>
                     </div>
                 </div>
                 <div class="tk-visitor-thought-text" id="tk-visitor-thought-text"></div>
@@ -368,7 +368,7 @@
             list = handleAction_4_44.querySelector('#tk-profile-visitors-list'),
             handleAction_7_45 = handleAction_7();
         !handleAction_7_45.length
-            ? (list.innerHTML = '<div class="tk-visitors-empty">暂无访客</div>')
+            ? (list.innerHTML = '<div class="tk-visitors-empty">No Visitors</div>')
             : ((list.innerHTML = handleAction_7_45
                   .map(
                       (visitor_5) =>
@@ -500,17 +500,17 @@
     function handleAction_8(value_63) {
         if (!subProfileFollowBtn || !value_63) return;
         if (value_63.isFollowed && value_63.isFollower) {
-            subProfileFollowBtn.textContent = '互相关注';
+            subProfileFollowBtn.textContent = 'Following';
             subProfileFollowBtn.className = 'tk-btn-secondary';
         } else {
             if (value_63.isFollowed) {
-                subProfileFollowBtn.textContent = '已关注';
+                subProfileFollowBtn.textContent = 'Following';
                 subProfileFollowBtn.className = 'tk-btn-secondary';
             } else
                 value_63.isFollower
-                    ? ((subProfileFollowBtn.textContent = '回关'),
+                    ? ((subProfileFollowBtn.textContent = 'Follow'),
                       (subProfileFollowBtn.className = 'tk-btn-primary'))
-                    : ((subProfileFollowBtn.textContent = '关注'),
+                    : ((subProfileFollowBtn.textContent = 'Follow'),
                       (subProfileFollowBtn.className = 'tk-btn-primary'));
         }
     }
@@ -547,7 +547,7 @@
         _value5();
         subProfileName.textContent = char_6.name || 'User';
         subProfileHandle.textContent = '@' + (char_6.handle || currentTkSubProfileCharId_2);
-        subProfileBio.textContent = char_6.bio || '暂无简介';
+        subProfileBio.textContent = char_6.bio || 'No introduction yet';
         char_6.status
             ? ((subProfileStatusBubble.style.display = 'block'),
               (subProfileStatusBubble.textContent = char_6.status))
@@ -577,7 +577,7 @@
                 _value23.isFollowed = !_value23.isFollowed;
                 if (window.tkPersistState) window.tkPersistState();
                 handleAction_8(_value23);
-                _value23.isFollowed ? window.showToast('已关注') : window.showToast('已取消关注');
+                _value23.isFollowed ? window.showToast('Following') : window.showToast('Unfollowed');
                 if (window.tkRenderHome) window.tkRenderHome();
                 if (window.tkRenderChat) window.tkRenderChat();
             }
@@ -823,8 +823,8 @@
     window.tkRenderProfile = function () {
         const p = tkState.profile;
         if (nameEl) nameEl.textContent = p.name || 'User';
-        if (handleEl) handleEl.textContent = '@' + (p.handle || 'user123');
-        if (bioEl) bioEl.textContent = p.bio || '点击添加个人简介';
+        if (handleEl) handleEl.textContent = '@' + (p.handle || 'user');
+        if (bioEl) bioEl.textContent = p.bio || 'Add bio';
         if (p.status)
             statusBubble &&
                 ((statusBubble.style.display = 'block'), (statusBubble.textContent = p.status));
@@ -859,9 +859,9 @@
             event_105.stopPropagation();
             if (window.showCustomModal)
                 window.showCustomModal({
-                    title: '设置状态',
+                    title: 'STATUS',
                     type: 'prompt',
-                    placeholder: '输入你的当前状态...',
+                    placeholder: 'Enter Your Current Status',
                     defaultValue: tkState.profile.status,
                     onConfirm: (val) => {
                         tkState.profile.status = val;
@@ -871,7 +871,7 @@
                     },
                 });
             else {
-                const status_2 = prompt('输入你的当前状态:', tkState.profile.status);
+                const status_2 = prompt('Enter Your Current Status:', tkState.profile.status);
                 if (status_2 !== null) {
                     tkState.profile.status = status_2;
                     if (window.tkPersistState) window.tkPersistState();
@@ -898,7 +898,7 @@
                     if (window.tkPersistState) window.tkPersistState();
                     window.tkRenderProfile();
                     if (window.tkRenderChat) window.tkRenderChat();
-                    window.showToast('头像已更新');
+                    window.showToast('Updated');
                 };
                 value_110.readAsDataURL(value_109);
             }
@@ -957,7 +957,7 @@
                 const elFollowers = document.getElementById('tk-edit-followers');
                 const elLikes = document.getElementById('tk-edit-likes');
                 tkState.profile.name = elName ? elName.value.trim() : 'User';
-                tkState.profile.handle = elHandle_2 ? elHandle_2.value.trim() : 'user123';
+                tkState.profile.handle = elHandle_2 ? elHandle_2.value.trim() : 'user';
                 tkState.profile.bio = elBio ? elBio.value.trim() : '';
                 tkState.profile.persona = elPersona ? elPersona.value.trim() : '';
                 if (elFollowing) tkState.profile.following = elFollowing.value || 0;
@@ -968,7 +968,7 @@
                 window.tkRenderProfile();
                 const createActionSheet = document.getElementById('tk-edit-profile-sheet');
                 if (createActionSheet) window.closeView(createActionSheet);
-                window.showToast('资料已保存');
+                window.showToast('Profile saved');
             }
             if (e_2.target.closest('#tk-profile-tab .tk-btn-icon')) {
                 const sheet_7 = document.getElementById('tk-upload-desc-input');
@@ -1038,13 +1038,13 @@
             }
         }));
     visitorsBtn &&
-        ((visitorsBtn.title = '主页访客'),
+        ((visitorsBtn.title = 'PROFILE VISITORS'),
         visitorsBtn.addEventListener('click', (_value57) => {
             _value57.stopPropagation();
             if (window.tkOpenProfileVisitorsSheet) window.tkOpenProfileVisitorsSheet();
         }));
     profileSettingsBtn &&
-        ((profileSettingsBtn.title = 'TikTok 设置'),
+        ((profileSettingsBtn.title = 'TIKTOK SETTINGS'),
         profileSettingsBtn.addEventListener('click', (_value58) => {
             _value58.stopPropagation();
             const _value59 = tkEnsureProfileSettingsSheet();
@@ -1096,7 +1096,7 @@
                 empty: document.createElement('div'),
             }),
             (_value62.empty.className = 'tk-grid-empty'),
-            (_value62.empty.textContent = '暂无内容'),
+            (_value62.empty.textContent = 'No content yet'),
             _value2.set(_value61, _value62),
             _value61.replaceChildren(),
             _value61.addEventListener('click', (v_6) => {

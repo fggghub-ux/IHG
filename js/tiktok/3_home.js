@@ -879,9 +879,9 @@
         video = null,
     } = {}) {
         tkState.activity = {
-            newFollowers: tkState.activity?.newFollowers || '暂无新粉丝',
-            likesSaves: tkState.activity?.likesSaves || '互动消息',
-            commentsMentions: tkState.activity?.commentsMentions || '互动消息',
+            newFollowers: tkState.activity?.newFollowers || 'No new followers yet',
+            likesSaves: tkState.activity?.likesSaves || 'Interactions',
+            commentsMentions: tkState.activity?.commentsMentions || 'Interactions',
             followers: Array.isArray(tkState.activity?.followers) ? tkState.activity.followers : [],
             likes: Array.isArray(tkState.activity?.likes) ? tkState.activity.likes : [],
             saves: Array.isArray(tkState.activity?.saves) ? tkState.activity.saves : [],
@@ -958,7 +958,7 @@
             return;
         }
         if (window.showToast)
-            window.showToast(isAuto_2 ? 'AI 正在生成视频互动...' : 'AI 正在生成互动数据...');
+            window.showToast(isAuto_2 ? 'Generating video interaction...' : 'Generating engagement data...');
         const followedChars = (tkState.chars || []).filter((c_3) => c_3.isFollowed).slice(0, 6);
         const value_45 = followedChars.length
             ? followedChars
@@ -1362,7 +1362,7 @@
                     tkFullscreenVideoViewElement.dataset.videoId === targetVideo.id &&
                     window.tkOpenFullscreenVideo(targetVideo.id);
                 window.closeView(document.getElementById('tk-edit-single-video-sheet'));
-                window.showToast('已保存修改');
+                window.showToast('Changes saved');
             }
         });
     function tkGetFeedCards() {
@@ -1422,7 +1422,7 @@
         if (!tabs.length) return;
         tabs.forEach((tab) => tab.classList.remove('active'));
         const recommendTab =
-            tabs.find((tab_2) => String(tab_2.textContent || '').includes('推荐')) ||
+            tabs.find((tab_2) => String(tab_2.textContent || '').includes('For You')) ||
             tabs[1] ||
             tabs[0];
         recommendTab.classList.add('active');
@@ -1459,7 +1459,7 @@
     window.tkRenderHome = function (value_94 = {}) {
         if (!feedContainer) return;
         const activeTabEl = document.querySelector('.tk-topbar-tab.active');
-        const _value40 = activeTabEl && activeTabEl.textContent === '关注';
+        const _value40 = activeTabEl && activeTabEl.textContent === 'Following';
         let displayVideos = [];
         _value40
             ? (displayVideos = tkState.videos.filter((v) => {
@@ -1478,9 +1478,9 @@
             isActiveTabFollowing([]);
             _value40
                 ? (feedContainer.innerHTML =
-                      '<div class="tk-empty-feed"><p style="color: #999; font-size: 14px;">暂无关注的内容，快去探索吧</p></div>')
+                      '<div class="tk-empty-feed"><p style="color: #999; font-size: 14px;">No followed content yet, go explore.</p></div>')
                 : (feedContainer.innerHTML =
-                      '\n                    <div class="tk-empty-feed">\n                        <div class="tk-magic-btn-large" id="tk-api-generate-btn-empty" onclick="window.tkTriggerApiGenerate(event)">\n                            <i class="fas fa-search"></i>\n                            <span>生成内容</span>\n                        </div>\n                        <p style="color: #999; font-size: 13px; margin-top: 10px;">点击搜索生成 TikTok 视频流</p>\n                    </div>\n                ');
+                      '\n                    <div class="tk-empty-feed">\n                        <div class="tk-magic-btn-large" id="tk-api-generate-btn-empty" onclick="window.tkTriggerApiGenerate(event)">\n                            <i class="fas fa-search"></i>\n                            <span>Generate Content</span>\n                        </div>\n                        <p style="color: #999; font-size: 13px; margin-top: 10px;">search generated tiktok videos.</p>\n                    </div>\n                ');
             document.getElementById('tk-home-tab').dataset.tkRendered = 'true';
             return;
         }
@@ -1581,7 +1581,7 @@
                         !video_12.bgImage &&
                         !video_12.bgColor &&
                         (cardContentHtml +=
-                            '\n                    <div style="background: #111111; color: #ffffff; padding: 20px 24px; border-radius: 20px; max-width: 85%; margin: 0 auto; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 16px; line-height: 1.6; word-break: break-word; font-weight: 500; position: relative; z-index: 2; transform: translateY(-5vh);">\n                        暂无内容\n                    </div>\n                ');
+                            '\n                    <div style="background: #111111; color: #ffffff; padding: 20px 24px; border-radius: 20px; max-width: 85%; margin: 0 auto; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 16px; line-height: 1.6; word-break: break-word; font-weight: 500; position: relative; z-index: 2; transform: translateY(-5vh);">\n                        No content yet\n                    </div>\n                ');
             }
             _value48.innerHTML =
                 '\n                <div class="tk-video-text-content" style="' +
@@ -1749,7 +1749,7 @@
             window.tkPersistStateAfterPaint?.({
                 dirtyTabs: ['tk-profile-tab'],
             });
-            window.showToast(video_16.isSaved ? '已收藏' : '已取消收藏');
+            window.showToast(video_16.isSaved ? 'Saved' : 'Removed from favorites');
         } else {
             if (value_306 === 'generate-image') window.tkOpenVideoImageGenerator?.(video_16.id);
             else {
@@ -1769,7 +1769,7 @@
                     window.openView(document.getElementById('tk-edit-single-video-sheet'));
                 } else {
                     if (value_306 === 'delete') {
-                        if (confirm('确定要彻底删除这个视频吗？')) {
+                        if (confirm('Are you sure you want to delete the video?')) {
                             const vId = window.currentShareVideoId;
                             tkState.videos = tkState.videos.filter((v_5) => v_5.id !== vId);
                             tkState.profile &&
@@ -1803,7 +1803,7 @@
                                 tkFullscreenVideoViewElement_309.classList.contains('active') &&
                                 tkFullscreenVideoViewElement_309.dataset.videoId === vId &&
                                 tkFullscreenVideoViewElement_309.classList.remove('active');
-                            window.showToast('已删除');
+                            window.showToast('Delete.');
                         }
                     }
                 }
@@ -2082,7 +2082,7 @@
                     handle: value_351,
                     avatar: video_19.authorAvatar || null,
                     status: '',
-                    persona: '谢谢你的关注',
+                    persona: 'Thanks for following.',
                     isFollowed: false,
                 }),
                 window.tkOpenSubProfile && window.tkOpenSubProfile(value_351));
@@ -2147,7 +2147,7 @@
                 handle: value_365,
                 avatar: result_369.authorAvatar || null,
                 status: '刚刚发布了视频',
-                persona: '谢谢你的关注',
+                persona: 'Thanks for following.',
                 isFollowed: false,
                 isFollower: false,
             };
@@ -2155,7 +2155,7 @@
         }
         tkGetChar_367.isFollowed = true;
         const activeTabEl_2 = document.querySelector('.tk-topbar-tab.active');
-        if (activeTabEl_2?.textContent !== '关注') {
+        if (activeTabEl_2?.textContent !== 'Following') {
             const sheet = tkGetFeedCards(),
                 handleAction_20_372 = handleAction_20(sheet),
                 videoId_373 = sheet[handleAction_20_372]?.dataset.videoId,
@@ -2180,7 +2180,7 @@
         }
         handleAction_23();
         window.tkPersistStateAfterPaint?.();
-        window.showToast?.('已关注');
+        window.showToast?.('Following');
     };
     window.tkHandleLike = function (value_381, el_3, event_3) {
         if (event_3) event_3.stopPropagation();
@@ -2283,7 +2283,7 @@
             video_23.comments.forEach((c_6) => {
                 if (c_6.replies) totalComments += c_6.replies.length;
             });
-        title_3.textContent = '评论 (' + window.tkFormatCount(totalComments) + ')';
+        title_3.textContent = 'Comments (' + window.tkFormatCount(totalComments) + ')';
         list.innerHTML = '';
         if (video_23.comments && video_23.comments.length > 0) {
             const documentFragment_136 = document.createDocumentFragment();
@@ -2300,7 +2300,7 @@
                     value_144 = tkCleanTranslation(c_7.translationZh)
                         ? '<span class="tk-comment-translate-btn" data-translation-target="' +
                           tkEscapeAttr(value_412) +
-                          '">翻译</span>'
+                          '">Translate</span>'
                         : '',
                     value_145 = authorAvatar_142
                         ? "<img referrerpolicy=\"no-referrer\" src=\"" +
@@ -2343,14 +2343,14 @@
                     handleAction_2(c_7.translationZh, value_412) +
                     `
                         <div class="tk-comment-meta">
-                            <span>刚刚</span>
+                            <span>1s ago</span>
                             <span onclick="window.tkReplyToComment('` +
                     c_7.id +
                     "', '" +
                     c_7.id +
                     "', '" +
                     tkEscapeAttr(authorName_5) +
-                    `', event)">回复</span>
+                    `', event)">Reply</span>
                             ` +
                     value_144 +
                     `
@@ -2370,9 +2370,9 @@
                           `', event)" style="font-size: 12px; color: #888; margin-top: 8px; font-weight: 500;">
                             <span id="expand-text-` +
                           c_7.id +
-                          '">展开 ' +
+                          '">View ' +
                           window.tkFormatCount(c_7.replies.length) +
-                          ` 条回复 <i class="fas fa-chevron-down" style="font-size:10px;"></i></span>
+                          ` replies <i class="fas fa-chevron-down" style="font-size:10px;"></i></span>
                         </div>
                         `
                         : '') +
@@ -2430,7 +2430,7 @@
                             value_156 = tkCleanTranslation(reply.translationZh)
                                 ? '<span class="tk-comment-translate-btn" data-translation-target="' +
                                   tkEscapeAttr(value_424) +
-                                  '">翻译</span>'
+                                  '">Translate</span>'
                                 : '';
                         rItem.innerHTML =
                             `
@@ -2456,14 +2456,14 @@
                             handleAction_2(reply.translationZh, value_424) +
                             `
                                 <div class="tk-comment-meta tk-reply-meta">
-                                    <span>刚刚</span>
+                                    <span>1s ago</span>
                                     <span onclick="window.tkReplyToComment('` +
                             c_7.id +
                             "', '" +
                             reply.id +
                             "', '" +
                             tkEscapeAttr(rName) +
-                            `', event)" style="cursor:pointer;">回复</span>
+                            `', event)" style="cursor:pointer;">Reply</span>
                                     ` +
                             value_156 +
                             `
@@ -2490,7 +2490,7 @@
             list.appendChild(documentFragment_136);
         } else
             list.innerHTML =
-                '<div style="text-align:center; padding: 40px; color: #999; font-size: 13px;">暂无评论，快来抢沙发吧</div>';
+                '<div style="text-align:center; padding: 40px; color: #999; font-size: 13px;">Comments will appear here</div>';
     }
     window.tkOpenComments = function (value_158, event_159) {
         if (event_159) event_159.stopPropagation();
@@ -2507,7 +2507,7 @@
         const tkCommentInputElement = sheetOverlay.querySelector('#tk-comment-input');
         tkCommentInputElement &&
             ((tkCommentInputElement.value = ''),
-            (tkCommentInputElement.placeholder = '留下你的精彩评论'));
+            (tkCommentInputElement.placeholder = 'Add comment...'));
         window.openView(sheetOverlay);
         !sheetOverlay.dataset.boundClose &&
             ((sheetOverlay.dataset.boundClose = 'true'),
@@ -2551,7 +2551,7 @@
                             parentCmt.replies.push({
                                 id: 'reply_' + parentCmt.id + '_' + Date.now(),
                                 authorId: 'profile',
-                                authorName: window.userState ? window.userState.name : '我',
+                                authorName: window.userState ? window.userState.name : 'Profile',
                                 authorAvatar: null,
                                 text: text_3,
                                 likes: 0,
@@ -2567,7 +2567,7 @@
                                     );
                                     elementById_449 &&
                                         (elementById_449.innerHTML =
-                                            '收起 <i class="fas fa-chevron-up" style="font-size:10px;"></i>');
+                                            'Hide <i class="fas fa-chevron-up" style="font-size:10px;"></i>');
                                 }
                             }, 50);
                         }
@@ -2575,7 +2575,7 @@
                         vid_5.comments.unshift({
                             id: 'cmt_' + Date.now(),
                             authorId: 'profile',
-                            authorName: window.userState ? window.userState.name : '我',
+                            authorName: window.userState ? window.userState.name : 'Profile',
                             authorAvatar: null,
                             text: text_3,
                             likes: 0,
@@ -2595,10 +2595,10 @@
                             text_3,
                         );
                     newInputEl.value = '';
-                    newInputEl.placeholder = '留下你的精彩评论';
+                    newInputEl.placeholder = 'Add comment...';
                     value_26 = null;
                     window.currentReplyTargetId = null;
-                    window.showToast('评论已发送');
+                    window.showToast('Comment sent');
                 };
             sendBtnRef.addEventListener('click', handleClick);
             newInputEl.onkeydown = (event_179) => {
@@ -2626,7 +2626,7 @@
         window.currentReplyTargetId = targetCommentId || rootCommentId;
         const inputEl = document.getElementById('tk-comment-input');
         inputEl &&
-            ((inputEl.placeholder = '回复 @' + value_453),
+            ((inputEl.placeholder = 'Reply @' + value_453),
             (inputEl.value = '@' + value_453 + ' '),
             inputEl.focus());
     };
@@ -2655,14 +2655,14 @@
         if (container.style.display === 'none') {
             container.style.display = 'block';
             elementById_468.innerHTML =
-                '收起 <i class="fas fa-chevron-up" style="font-size:10px;"></i>';
+                'Hide <i class="fas fa-chevron-up" style="font-size:10px;"></i>';
         } else {
             container.style.display = 'none';
             const count_2 = container.children.length;
             elementById_468.innerHTML =
-                '展开 ' +
+                'View ' +
                 count_2 +
-                ' 条回复 <i class="fas fa-chevron-down" style="font-size:10px;"></i>';
+                ' replies <i class="fas fa-chevron-down" style="font-size:10px;"></i>';
         }
     };
     window.tkToggleCommentTranslation = function (event_10) {
@@ -2674,7 +2674,7 @@
         if (!translationEl) return;
         const isHidden = translationEl.style.display === 'none' || !translationEl.style.display;
         translationEl.style.display = isHidden ? 'block' : 'none';
-        button.textContent = isHidden ? '收起翻译' : '翻译';
+        button.textContent = isHidden ? 'Collapse translation' : 'Translate';
     };
     window.tkOpenShare = function (currentShareVideoId_2, event_181) {
         if (event_181) event_181.stopPropagation();
@@ -2686,7 +2686,7 @@
         const followedChars_2 = tkState.chars.filter((c_8) => c_8.isFollowed);
         followedChars_2.length === 0
             ? (shareList.innerHTML =
-                  '<div style="padding: 10px 15px; color: #999; font-size: 13px;">暂无好友可转发</div>')
+                  '<div style="padding: 10px 15px; color: #999; font-size: 13px;">No friends to forward to</div>')
             : followedChars_2.forEach((char_10) => {
                   const item_2 = document.createElement('div');
                   item_2.className = 'tk-share-friend-item';
@@ -2710,7 +2710,7 @@
                       `</span>
                 `;
                   item_2.addEventListener('click', () => {
-                      window.showToast('已转发给 ' + (char_10.name || char_10.handle));
+                      window.showToast('Shared with ' + (char_10.name || char_10.handle));
                       window.closeView(document.getElementById('tk-share-sheet'));
                       let dm = tkState.dms.find((d) => d.charId === char_10.id);
                       !dm &&
@@ -2721,7 +2721,7 @@
                           tkState.dms.push(dm));
                       dm.messages.push({
                           sender: 'user',
-                          text: '[分享了视频]',
+                          text: '[Shared a Video]',
                           sharedVideoId: window.currentShareVideoId,
                       });
                       const { video: video_25 } = window.findVideoGlobal(
@@ -2733,7 +2733,7 @@
                               'share-count-' + video_25.id,
                           );
                           shareCountEl &&
-                              ((shareCountEl.innerHTML = '已分享'),
+                              ((shareCountEl.innerHTML = 'Shared'),
                               (shareCountEl.style.color = '#ffb300'),
                               (shareCountEl.previousElementSibling.style.color = '#ffb300'));
                       }
@@ -2752,7 +2752,7 @@
         const actionsRow = document.querySelector('.tk-share-actions-row');
         actionsRow &&
             (actionsRow.innerHTML =
-                '\n                <button type="button" class="tk-share-action-item" onclick="window.tkHandleShareAction(\'generate-image\')">\n                    <div class="tk-share-action-icon"><i class="fas fa-wand-magic-sparkles"></i></div>\n                    <span>生图</span>\n                </button>\n                <div class="tk-share-action-item" onclick="window.tkHandleShareAction(\'save\')">\n                    <div class="tk-share-action-icon"><i class="fas fa-bookmark" id="tk-share-save-icon"></i></div>\n                    <span>收藏</span>\n                </div>\n                <div class="tk-share-action-item" onclick="window.tkHandleShareAction(\'edit\')">\n                    <div class="tk-share-action-icon"><i class="fas fa-pen"></i></div>\n                    <span>编辑</span>\n                </div>\n                <div class="tk-share-action-item" onclick="window.tkHandleShareAction(\'delete\')">\n                    <div class="tk-share-action-icon" style="color: #ff3b30;"><i class="fas fa-trash-alt"></i></div>\n                    <span style="color: #ff3b30;">删除</span>\n                </div>\n                <div class="tk-share-action-item" onclick="window.showToast(\'链接已复制\'); window.closeView(document.getElementById(\'tk-share-sheet\'));">\n                    <div class="tk-share-action-icon"><i class="fas fa-link"></i></div>\n                    <span>复制链接</span>\n                </div>\n            ');
+                '\n                <button type="button" class="tk-share-action-item" onclick="window.tkHandleShareAction(\'generate-image\')">\n                    <div class="tk-share-action-icon"><i class="fas fa-wand-magic-sparkles"></i></div>\n                    <span>Image</span>\n                </button>\n                <div class="tk-share-action-item" onclick="window.tkHandleShareAction(\'save\')">\n                    <div class="tk-share-action-icon"><i class="fas fa-bookmark" id="tk-share-save-icon"></i></div>\n                    <span>Saved</span>\n                </div>\n                <div class="tk-share-action-item" onclick="window.tkHandleShareAction(\'edit\')">\n                    <div class="tk-share-action-icon"><i class="fas fa-pen"></i></div>\n                    <span>Edit post</span>\n                </div>\n                <div class="tk-share-action-item" onclick="window.tkHandleShareAction(\'delete\')">\n                    <div class="tk-share-action-icon" style="color: #ff3b30;"><i class="fas fa-trash-alt"></i></div>\n                    <span style="color: #ff3b30;">Delete</span>\n                </div>\n                <div class="tk-share-action-item" onclick="window.showToast(\'Link copied\'); window.closeView(document.getElementById(\'tk-share-sheet\'));">\n                    <div class="tk-share-action-icon"><i class="fas fa-link"></i></div>\n                    <span>Copy link</span>\n                </div>\n            ');
         if (shareSheet && !shareSheet.dataset.boundActions) {
             shareSheet.dataset.boundActions = 'true';
             shareSheet.addEventListener('click', (event_488) => {
@@ -2812,7 +2812,7 @@
                   gridEl.appendChild(element_193);
               })
             : (gridEl.innerHTML =
-                  '<div style="grid-column: span 3; padding: 40px 0; text-align: center; color: #999; font-size: 13px;">暂无相关视频</div>');
+                  '<div style="grid-column: span 3; padding: 40px 0; text-align: center; color: #999; font-size: 13px;">No Related Videos Yet</div>');
         window.openView(hashtagView);
         !hashtagView.dataset.boundClose &&
             ((hashtagView.dataset.boundClose = 'true'),
@@ -2860,7 +2860,7 @@
                   gridEl_2.appendChild(element_199);
               })
             : (gridEl_2.innerHTML =
-                  '<div style="grid-column: span 3; padding: 40px 0; text-align: center; color: #999; font-size: 13px;">暂无相关视频</div>');
+                  '<div style="grid-column: span 3; padding: 40px 0; text-align: center; color: #999; font-size: 13px;">No Related Videos Yet</div>');
         window.openView(musicView);
         !musicView.dataset.boundClose &&
             ((musicView.dataset.boundClose = 'true'),
@@ -2905,7 +2905,7 @@
         _value55.className = 'bottom-sheet-overlay detail-sheet-overlay';
         _value55.id = 'tk-search-generate-sheet';
         _value55.innerHTML =
-            '\n            <div class="bottom-sheet tk-search-generate-sheet">\n                <div class="sheet-handle"></div>\n                <div class="sheet-title">搜索生成视频</div>\n                <div class="detail-sheet-content tk-search-generate-content">\n                    <div class="tk-search-generate-box">\n                        <i class="fas fa-search"></i>\n                        <input id="tk-search-generate-input" type="text" enterkeyhint="done" placeholder="想看什么？留空随机生成">\n                    </div>\n                    <label class="tk-search-generate-count" for="tk-search-generate-count-input">\n                        <span>生成数量</span>\n                        <input id="tk-search-generate-count-input" type="number" min="1" max="10" step="1" value="3" inputmode="numeric" enterkeyhint="done" aria-label="生成视频数量">\n                    </label>\n                    <button type="button" class="sheet-action confirm-action" id="tk-search-generate-confirm">生成</button>\n                    <button type="button" class="sheet-action" id="tk-search-generate-cancel">取消</button>\n                </div>\n            </div>\n        ';
+            '\n            <div class="bottom-sheet tk-search-generate-sheet">\n                <div class="sheet-handle"></div>\n                <div class="sheet-title">SEARCH VIDEOS</div>\n                <div class="detail-sheet-content tk-search-generate-content">\n                    <div class="tk-search-generate-box">\n                        <i class="fas fa-search"></i>\n                        <input id="tk-search-generate-input" type="text" enterkeyhint="done" placeholder="Think about how to profit from what you love.">\n                    </div>\n                    <label class="tk-search-generate-count" for="tk-search-generate-count-input">\n                        <span>Quantity</span>\n                        <input id="tk-search-generate-count-input" type="number" min="1" max="10" step="1" value="3" inputmode="numeric" enterkeyhint="done" aria-label="生成视频数量">\n                    </label>\n                    <button type="button" class="sheet-action confirm-action" id="tk-search-generate-confirm">Generate</button>\n                    <button type="button" class="sheet-action" id="tk-search-generate-cancel">Cancel</button>\n                </div>\n            </div>\n        ';
         document.getElementById('tiktok-view')?.appendChild(_value55);
         let _value56 = [];
         let _value57 = 0;
@@ -2976,9 +2976,9 @@
         const input = sheet_4.querySelector('#tk-search-generate-input');
         const countInput_2 = sheet_4.querySelector('#tk-search-generate-count-input');
         if (input) input.value = '';
-        if (input) input.placeholder = _value65.placeholder || '想看什么？留空随机生成';
+        if (input) input.placeholder = _value65.placeholder || 'Think about how to profit from what you love.';
         if (countInput_2) countInput_2.value = '3';
-        sheet_4.querySelector('.sheet-title').textContent = _value65.title || '搜索生成视频';
+        sheet_4.querySelector('.sheet-title').textContent = _value65.title || 'SEARCH VIDEOS';
         sheet_3 = {
             onGenerate:
                 _value65.onGenerate ||
@@ -3025,7 +3025,7 @@
             userPersonaContext +
             '\n';
         try {
-            window.showToast(topic ? '正在按搜索生成内容...' : '正在随机生成内容...');
+            window.showToast(topic ? 'Searching to generate content...' : 'Generating content randomly...');
             const value_528 = await window.tkFetch('videos', tkResolveApiEndpoint(), {
                 method: 'POST',
                 headers: {
@@ -3089,7 +3089,7 @@
                   requestAnimationFrame(() => {
                       if (feedContainer) feedContainer.scrollTop = 0;
                   }));
-            window.showToast('已生成内容');
+            window.showToast('Content Generated');
         } catch (error_4) {
             if (error_4?.name === 'AbortError') return;
             console.error('Search Gen Error:', error_4);

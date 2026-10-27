@@ -56,23 +56,23 @@
     }
     function tkDmRelationshipLabel(char_3) {
         if (!char_3) return '';
-        if (char_3.isFollowed && char_3.isFollower) return '互相关注';
-        if (char_3.isFollower && !char_3.isFollowed) return '对方是陌生人';
+        if (char_3.isFollowed && char_3.isFollower) return 'mutual follow';
+        if (char_3.isFollower && !char_3.isFollowed) return 'Strange';
         return '';
     }
     function tkDmRenderActivitySummary() {
         const items = document.querySelectorAll('#tk-activity-list > .tk-activity-item');
         if (!items || items.length < 3) return;
         const activity_2 = {
-            newFollowers: '暂无新粉丝',
-            likesSaves: '互动消息',
-            commentsMentions: '互动消息',
+            newFollowers: 'No new followers yet',
+            likesSaves: 'Interactions',
+            commentsMentions: 'Interactions',
             ...(tkState.activity && typeof tkState.activity === 'object' ? tkState.activity : {}),
         };
         [activity_2.newFollowers, activity_2.likesSaves, activity_2.commentsMentions].forEach(
             (text_2, index) => {
                 const desc_2 = items[index]?.querySelector('.tk-activity-desc');
-                if (desc_2) desc_2.textContent = text_2 || '互动消息';
+                if (desc_2) desc_2.textContent = text_2 || 'Interactions';
             },
         );
     }
@@ -99,7 +99,7 @@
                     .join(' · '),
             ) +
             `</div>
-                <button type="button" class="tk-dm-profile-home-btn" id="tk-dm-profile-home-btn">主页</button>
+                <button type="button" class="tk-dm-profile-home-btn" id="tk-dm-profile-home-btn">Follow</button>
             </div>
         `
         );
@@ -157,7 +157,7 @@
         }
         enabled = true;
         tkDmSetGenerateButtonLoading(true);
-        if (window.showToast) window.showToast('正在生成 TikTok 私信...');
+        if (window.showToast) window.showToast('Generating TikTok DMs...');
         const userPersonaParts = [
             tkState.profile?.persona ? 'TikTok profile persona: ' + tkState.profile.persona : '',
             tkState.profile?.bio ? 'TikTok profile bio: ' + tkState.profile.bio : '',
@@ -252,7 +252,7 @@
                         name: name_2,
                         handle: handle_2,
                         avatar: avatar_3,
-                        status: user.status || '刚刚发来私信',
+                        status: user.status || 'Just Sent You a DM',
                         persona: user.persona || 'TikTok 私信联系人：' + name_2,
                         isFollower: true,
                         isFollowed: false,
@@ -275,7 +275,7 @@
             if (!created.length) throw new Error('No valid DM threads in API response');
             if (window.tkPersistState) window.tkPersistState();
             if (window.tkRenderChat) window.tkRenderChat();
-            if (window.showToast) window.showToast('收到 ' + created.length + ' 位新联系人私信');
+            if (window.showToast) window.showToast('Received ' + created.length + ' DMs');
         } catch (error_2) {
             if (error_2?.name === 'AbortError') return;
             console.error('TikTok incoming DM generation failed:', error_2);
@@ -322,7 +322,7 @@
                 ? '<div class="tk-follow-bubble">' + tkState.profile.status + '</div>'
                 : '') +
             `
-            <div class="tk-follow-name">我的状态</div>
+            <div class="tk-follow-name">My Status</div>
         `;
         element.addEventListener('click', () => {
             window.tkRenderProfile &&
@@ -367,7 +367,7 @@
                     lastMsg =
                         dm_2.messages.length > 0
                             ? dm_2.messages[dm_2.messages.length - 1].text
-                            : relationLabel || '开始聊天吧',
+                            : relationLabel || 'start chatting',
                     tkDmResolveAvatar_53 = tkDmResolveAvatar(char_6),
                     value_54 = tkDmResolveAvatar_53
                         ? "<img referrerpolicy=\"no-referrer\" src=\"" + tkDmResolveAvatar_53 + '">'
@@ -400,7 +400,7 @@
             }),
             tkState.dms.length === 0 &&
                 (dmsContainer.innerHTML =
-                    '<div style="padding: 20px; text-align: center; color: #999; font-size: 13px;">暂无消息记录</div>'));
+                    '<div style="padding: 20px; text-align: center; color: #999; font-size: 13px;">No message history yet</div>'));
         document.getElementById('tk-chat-tab').dataset.tkRendered = 'true';
     };
     const importSheet = document.getElementById('tk-import-char-sheet');
@@ -426,7 +426,7 @@
         createNewBtn.className = 'tk-import-item';
         createNewBtn.innerHTML = `
             <div class="tk-avatar-small" style="background: #333; color: white;"><i class="fas fa-plus"></i></div>
-            <div style="flex: 1; font-weight: 600; color: #111;">创建新角色</div>
+            <div style="flex: 1; font-weight: 600; color: #111;">Create character</div>
         `;
         createNewBtn.addEventListener('click', () => {
             window.closeView(importSheet);
@@ -441,7 +441,7 @@
             separator.style.color = '#888';
             separator.style.marginTop = '10px';
             separator.style.marginBottom = '5px';
-            separator.textContent = '从信息应用导入:';
+            separator.textContent = 'Import from messages:';
             importList.appendChild(separator);
             imFriends.forEach((friend) => {
                 const alreadyExists = tkState.chars.some(
@@ -472,7 +472,7 @@
                     </div>
                     ` +
                     (alreadyExists
-                        ? '<div style="font-size:12px; color:#999;">已添加</div>'
+                        ? '<div style="font-size:12px; color:#999;">Added</div>'
                         : '<i class="fas fa-download" style="color:#111;"></i>') +
                     `
                 `;
@@ -503,7 +503,7 @@
                             '_' +
                             Math.floor(Math.random() * 100),
                         avatar: friend.avatarUrl,
-                        status: friend.signature || '刚来到 TikTok',
+                        status: friend.signature || 'Just arrived TikTok',
                         persona: friend.persona || '',
                         isFollowed: true,
                         isFollower: true,
@@ -512,7 +512,7 @@
                     window.tkSaveChar(charData);
                     window.tkRenderChat();
                     window.closeView(importSheet);
-                    window.showToast('导入成功');
+                    window.showToast('Import successful');
                 });
                 importList.appendChild(item_2);
             });
@@ -523,7 +523,7 @@
         editingCharId = charId_3;
         const title_2 = document.getElementById('tk-char-sheet-title');
         if (charId_3) {
-            if (title_2) title_2.textContent = '编辑角色';
+            if (title_2) title_2.textContent = 'EDIT CHARACTER';
             const char_7 = window.tkGetChar(charId_3);
             if (char_7) {
                 if (charNameInput) charNameInput.value = char_7.name || '';
@@ -537,7 +537,7 @@
                 if (deleteCharBtn) deleteCharBtn.style.display = 'block';
             }
         } else {
-            if (title_2) title_2.textContent = '添加新角色';
+            if (title_2) title_2.textContent = 'ADD NEW CHARACTER';
             if (charNameInput) charNameInput.value = '';
             if (charStatusInput) charStatusInput.value = '';
             if (charPersonaInput) charPersonaInput.value = '';
@@ -618,17 +618,17 @@
             if (window.tkPersistState) window.tkPersistState();
             window.tkRenderChat();
             window.closeView(editCharSheet);
-            window.showToast('已保存');
+            window.showToast('Saved');
         });
     deleteCharBtn &&
         deleteCharBtn.addEventListener('click', () => {
             if (editingCharId) {
-                if (confirm('确定删除此角色吗？')) {
+                if (confirm('Delete this character?')) {
                     tkState.chars = tkState.chars.filter((c_4) => c_4.id !== editingCharId);
                     if (window.tkPersistState) window.tkPersistState();
                     window.tkRenderChat();
                     window.closeView(editCharSheet);
-                    window.showToast('已删除');
+                    window.showToast('Delete');
                 }
             }
         });
@@ -660,7 +660,7 @@
         }),
         btnClearHistory &&
             btnClearHistory.addEventListener('click', () => {
-                if (currentChatCharId && confirm('确定清空聊天记录吗？')) {
+                if (currentChatCharId && confirm('Are you sure you want to clear?')) {
                     const dm = tkState.dms.find((d) => d.charId === currentChatCharId);
                     if (dm) {
                         dm.messages = [];
@@ -669,12 +669,12 @@
                         if (window.tkRenderChat) window.tkRenderChat();
                     }
                     window.closeView(chatSettingsSheet);
-                    if (window.showToast) window.showToast('已清空聊天记录');
+                    if (window.showToast) window.showToast('Chat cleared');
                 }
             }),
         btnBlock &&
             btnBlock.addEventListener('click', () => {
-                if (currentChatCharId && confirm('确定拉黑此用户吗？')) {
+                if (currentChatCharId && confirm('Block this user?')) {
                     tkState.chars = tkState.chars.filter((c_5) => c_5.id !== currentChatCharId);
                     tkState.dms = tkState.dms.filter((d_2) => d_2.charId !== currentChatCharId);
                     if (window.tkPersistState) window.tkPersistState();
@@ -682,12 +682,12 @@
                     window.closeView(chatView);
                     if (window.tkRenderChat) window.tkRenderChat();
                     currentChatCharId = null;
-                    if (window.showToast) window.showToast('已拉黑该用户');
+                    if (window.showToast) window.showToast('User blocked');
                 }
             }),
         btnDelete &&
             btnDelete.addEventListener('click', () => {
-                if (currentChatCharId && confirm('确定删除此好友吗？')) {
+                if (currentChatCharId && confirm('Remove this friend?')) {
                     tkState.chars = tkState.chars.filter((c_6) => c_6.id !== currentChatCharId);
                     tkState.dms = tkState.dms.filter((d_3) => d_3.charId !== currentChatCharId);
                     if (window.tkPersistState) window.tkPersistState();
@@ -695,7 +695,7 @@
                     window.closeView(chatView);
                     if (window.tkRenderChat) window.tkRenderChat();
                     currentChatCharId = null;
-                    if (window.showToast) window.showToast('已删除好友');
+                    if (window.showToast) window.showToast('Friend removed');
                 }
             }));
     const wtBubble = document.getElementById('tk-watch-together-bubble');
@@ -709,12 +709,12 @@
         sheet.innerHTML = `
             <div class="bottom-sheet tk-wt-confirm-sheet">
                 <div class="sheet-handle"></div>
-                <div class="sheet-title">一起看</div>
+                <div class="sheet-title">WATCH TOGETHER</div>
                 <div class="detail-sheet-content tk-wt-confirm-content">
-                    <div class="tk-wt-confirm-copy">是否邀请 <span id="tk-wt-confirm-name">TA</span> 一起看视频？</div>
+                    <div class="tk-wt-confirm-copy">Invite <span id="tk-wt-confirm-name">TA</span> to watch the video?</div>
                     <div class="tk-wt-confirm-actions">
-                        <div class="sheet-action" id="tk-wt-confirm-cancel">取消</div>
-                        <div class="sheet-action confirm-action" id="tk-wt-confirm-submit">邀请</div>
+                        <div class="sheet-action" id="tk-wt-confirm-cancel">cancel</div>
+                        <div class="sheet-action confirm-action" id="tk-wt-confirm-submit">invite</div>
                     </div>
                 </div>
             </div>
@@ -745,7 +745,7 @@
         wtChatHistory = [];
         wtChatContainer &&
             (wtChatContainer.innerHTML =
-                '<div style="text-align: center; color: rgba(0,0,0,0.5); font-size: 10px; margin-top: 5px;">点击对方头像可以进行互动</div>');
+                '<div style="text-align: center; color: rgba(0,0,0,0.5); font-size: 10px; margin-top: 5px;">Tap the avatar to interact</div>');
         if (wtUserAvatar)
             wtUserAvatar.src =
                 tkState.profile.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=User';
@@ -761,7 +761,7 @@
         if (wtCloseBtn) wtCloseBtn.className = 'fas fa-times';
         window.closeView(chatView);
         document.querySelector('.tk-bottom-nav .tk-nav-item[data-target="tk-home-tab"]')?.click();
-        if (window.showToast) window.showToast('已连接 ' + (char_8.name || char_8.handle));
+        if (window.showToast) window.showToast('Connected with ' + (char_8.name || char_8.handle));
     };
     window.tkOpenWatchTogetherConfirm = function () {
         const snapshotCharId = currentChatCharId || window.currentWtCharId;
@@ -859,7 +859,7 @@
             if (wtChatHistory.length === 0) {
                 if (wtHistoryContent)
                     wtHistoryContent.innerHTML =
-                        '<div style="text-align: center; color: #999; margin-top: 20px;">暂无聊天记录</div>';
+                        '<div style="text-align: center; color: #999; margin-top: 20px;">No Chat History Yet</div>';
             } else {
                 wtChatHistory.forEach((msg_2) => {
                     const isSelf = msg_2.sender === 'user',
@@ -906,7 +906,7 @@
         console.log('[一起看] 触发 API 调用逻辑');
         if (isWtGenerating) {
             console.log('[一起看] 拦截: 正在生成中');
-            if (window.showToast) window.showToast('对方正在回复中...');
+            if (window.showToast) window.showToast('Replying...');
             return;
         }
         let charId_8 = window.currentWtCharId;
@@ -934,7 +934,7 @@
         }
         console.log('[一起看] 准备调用 API, Char:', char_12.name);
         isWtGenerating = true;
-        if (window.showToast) window.showToast('准备互动中...');
+        if (window.showToast) window.showToast('Preparing Interaction...');
         let currentVideo = null;
         try {
             const tkFullscreenVideoViewElement = document.getElementById(
@@ -1078,7 +1078,7 @@
         msgDiv_2.style.borderRadius = '12px 12px 12px 2px';
         msgDiv_2.style.fontSize = '12px';
         msgDiv_2.style.maxWidth = '85%';
-        msgDiv_2.textContent = '正在回复中...';
+        msgDiv_2.textContent = 'Replying...';
         element_119.appendChild(msgDiv_2);
         wtChatContainer.appendChild(element_119);
         wtChatContainer.scrollTop = wtChatContainer.scrollHeight;
@@ -1251,7 +1251,7 @@
             tkState.dms.push(dm_3));
         dm_3.messages.push({
             sender: 'system',
-            text: '一起看视频已结束',
+            text: 'Watch together has ended',
             timestamp: new Date().toLocaleTimeString('zh-CN', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -1382,7 +1382,7 @@
             result_167.summary &&
                 (window.autoSaveSummaryToWorldBook
                     ? window.autoSaveSummaryToWorldBook(
-                          '和' + value_156.name + '的一起看记录 (' + value_158 + ')',
+                          'Watch Together History with ' + value_156.name + ' (' + value_158 + ')',
                           result_167.summary,
                       )
                     : window.showToast('总结完成，但未保存'));
@@ -1451,7 +1451,7 @@
         if (!dm_5 || dm_5.messages.length === 0) {
             const empty = document.createElement('div');
             empty.className = 'tk-dm-empty-state';
-            empty.textContent = '打个招呼吧';
+            empty.textContent = 'Say hi';
             messagesContainer.appendChild(empty);
             return;
         }
@@ -1682,7 +1682,7 @@
         chatMicBtn.addEventListener('click', async () => {
             if (!currentChatCharId) return;
             if (isChatGenerating) {
-                if (window.showToast) window.showToast('对方正在输入中...');
+                if (window.showToast) window.showToast('He is typing...');
                 return;
             }
             if (!window.apiConfig || !window.apiConfig.endpoint || !window.apiConfig.apiKey) {
@@ -1699,7 +1699,7 @@
                     messages: [],
                 }),
                 tkState.dms.push(dm_7));
-            window.showToast('对方正在输入...');
+            window.showToast('He is typing...');
             const recentMsgs = dm_7.messages.slice(-15);
             let text_213 = '历史聊天记录:\n';
             let text_214 = '';

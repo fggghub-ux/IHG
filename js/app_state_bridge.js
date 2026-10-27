@@ -29,10 +29,10 @@
             tiktok: {
                 profile: {
                     name: 'User',
-                    handle: 'user123',
+                    handle: 'user',
                     avatar: null,
-                    status: '',
-                    bio: '',
+                    status: 'No Signa...',
+                    bio: 'Add bio',
                     persona: '',
                     following: 0,
                     followers: 0,
