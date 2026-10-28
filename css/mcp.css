@@ -542,7 +542,6 @@
     border: 1px solid #e2e2e7; border-radius: 14px; outline: 0;
     background: #f6f6f8; color: #111; font: -webkit-small-control;
 }
-.mcp-token-card > input:focus { border-color: #aaaab0; background: #f6f6f8; }
 .mcp-token-card > input::placeholder {
     font: -webkit-small-control; font-size: inherit; color: #757575; opacity: 1;
 }
