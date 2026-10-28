@@ -5784,6 +5784,8 @@
             ].join(','),
             THEME_FONT_SURFACE_CANDIDATE_SELECTOR = [
                 '#u2-login-screen',
+                '.mcp-page',
+                '.mcp-token-dialog',
                 '.app-view',
                 '.settings-view',
                 '.edit-view',
@@ -5797,6 +5799,8 @@
                 '.toast-bubble',
             ].join(','),
             THEME_FONT_ACTIVE_SURFACE_SELECTOR = [
+                '.mcp-page.active',
+                '.mcp-token-dialog.active',
                 '.app-view.active',
                 '.settings-view.active',
                 '.edit-view.active',
@@ -5810,6 +5814,8 @@
                 '.toast-bubble.show',
             ].join(','),
             THEME_FONT_INACTIVE_SURFACE_SELECTOR = [
+                '.mcp-page:not(.active)',
+                '.mcp-token-dialog:not(.active)',
                 '#u2-login-screen.is-hidden',
                 '.app-view:not(.active)',
                 '.settings-view:not(.active)',

@@ -149,7 +149,7 @@
         <link rel="stylesheet" href="css/call.css?v=20260917-call-history-v8&repair=20261003" />
         <link
             rel="stylesheet"
-            href="css/mcp.css?v=20260906-relay-ui-v1&android-input=20260906-v1&repair=20261003&presets=20261028"
+            href="css/mcp.css?v=20260906-relay-ui-v1&android-input=20260906-v1&repair=20261003&presets=20261029"
         />
         <link
             rel="stylesheet"
@@ -2417,7 +2417,7 @@
                         </section>
                         <section class="mcp-page" id="mcp-presets-page" data-mcp-page="presets" hidden>
                             <div class="mcp-page-scroll">
-                                <div class="mcp-page-heading"><span class="mcp-eyebrow">MCP PRESETS</span><h1>MCP</h1><span class="mcp-count" id="mcp-preset-count">0 项预设</span></div>
+                                <div class="mcp-page-heading"><span class="mcp-eyebrow">MCP PRESETS</span><h1>预设</h1><span class="mcp-count" id="mcp-preset-count">0 项预设</span></div>
                                 <div class="mcp-server-list" id="mcp-preset-list"></div>
                             </div>
                         </section>
@@ -2430,7 +2430,7 @@
                                 role="tab"
                                 aria-selected="true"
                                 data-mcp-tab="servers"
-                                ><i class="fas fa-server"></i><span>服务器</span></button
+                                ><i class="fas fa-server"></i><span>服务<br />器</span></button
                             ><button
                                 type="button"
                                 role="tab"
@@ -2478,7 +2478,7 @@
                                     enterkeyhint="next"
                                     autocomplete="off"
                                 />
-                                <div class="mcp-url-heading"><label for="mcp-url-input">Streamable HTTP 地址</label><span id="mcp-token-link" hidden><button type="button" id="mcp-token-link-btn" aria-label="获取 Token 地址"><i class="fas fa-link"></i></button><span>获取Token</span></span></div>
+                                <div class="mcp-url-heading"><label for="mcp-url-input">Streamable HTTP 地址</label><button type="button" id="mcp-token-link" hidden><i class="fas fa-link" aria-hidden="true"></i><span>获取Token</span></button></div>
                                 <input
                                     type="url"
                                     id="mcp-url-input"
@@ -2569,6 +2569,14 @@
                             <button type="button" class="mcp-delete-button" id="mcp-preset-delete" hidden>删除 MCP 预设</button>
                         </form>
                     </div>
+                </div>
+                <div class="mcp-token-dialog" id="mcp-token-dialog" role="dialog" aria-modal="true" aria-labelledby="mcp-token-title" aria-hidden="true" inert>
+                    <form class="mcp-token-card" id="mcp-token-form" novalidate>
+                        <label id="mcp-token-title" for="mcp-token-url">添加 Token 获取地址</label>
+                        <input type="text" id="mcp-token-url" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="2048" />
+                        <p id="mcp-token-error" role="status" hidden></p>
+                        <div class="mcp-token-actions"><button type="button" id="mcp-token-cancel">Cancel</button><button type="submit">OK</button></div>
+                    </form>
                 </div>
                 <div
                     class="mcp-detail"
@@ -20174,7 +20182,7 @@
         <!-- 引入核心 UI 管理与设置模块脚本 -->
         <script src="js/ui.js?v=20260811-no-glass-v1&toast-full-message=20260822-v1&notification-banner-v3=&repair=20261003&shop-moments=20261010-v1&apk-sync=118-selective-20261022"></script>
         <script src="js/ui_translation.js?v=20260807-global-ui-zh-v1&repair=20261003"></script>
-        <script src="js/settings.js?voice-shell=20261024-v1&v=20261007-107-r1&settings=20261010-r1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&home-avatar-migration=20261023-v1&app-icons=20261024-v2&chat-ui=20261024-v2&apk-sync=119-selective-20261026"></script>
+        <script src="js/settings.js?voice-shell=20261024-v1&v=20261007-107-r1&settings=20261010-r1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&home-avatar-migration=20261023-v1&app-icons=20261024-v2&chat-ui=20261024-v2&apk-sync=119-selective-20261026&mcp-fonts=20261029"></script>
         <script src="js/imessage/official_accounts.js?v=20260828-youtu-preview-stable-v5&api-error-dialog=20260923-v1&official-css-generation=20260928-v1&ihg=20260929-106-r1&repair=20261003&settings=20261010-r1&apk-sync=111-selective"></script>
         <script src="js/vendor/mcp_client_sdk.js?v=20260901-mobile-mcp-v3&repair=20261003"></script>
         <script src="js/mcp_relay_config.js?v=20260906-relay-v2&repair=20261003"></script>
@@ -20207,7 +20215,7 @@
         <script src="js/cycle_health.js?v=119"></script>
         <script src="js/cycle.js?v=20261007-107-r1&apk-sync=119-selective-20261026"></script>
         <script src="js/call.js?v=20260917-call-history-v8&api-error-dialog=20260923-v1&repair=20261003"></script>
-        <script src="js/mcp.js?v=20260906-relay-ui-v1&android-input=20260906-v1&storage-persistence=20260907-v1&repair=20261003&presets=20261028"></script>
+        <script src="js/mcp.js?v=20260906-relay-ui-v1&android-input=20260906-v1&storage-persistence=20260907-v1&repair=20261003&presets=20261029"></script>
         <script src="js/diary.js?v=20260913-diary-v6-prompt-toggle-scroll&api-error-dialog=20260923-v1&repair=20261003&home-avatar-migration=20261023-v1"></script>
         <script src="js/ao3.js?v=20260904-ao3-cp-search-v12&persona=20260920-v4&api-error-dialog=20260923-v2&repair=20261003&apk-sync=113-selective-20261022"></script>
         <script src="js/home_desktop.js?v=20261007-107-r1&settings=20261010-r1&app-positions=20261024-v1&apk-sync=119-selective-20261026&widget-opacity=20261027-v1"></script>

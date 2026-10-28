@@ -46,31 +46,40 @@
         options.test_btn.querySelector('i').hidden = !preset;
         options.test_btn.querySelector('span').textContent = preset ? '测试并发现工具' : '保存预设配置';
         handleAction_12(preset ? '已新建配置，需补充地址或授权信息' : '已新建预设，需填写配置信息');
-        if (preset) void fillPresetAuthorization(modalGeneration);
-    }
-    async function fillPresetAuthorization(generation) {
-        const initialUrl = options.url_input.value;
-        try {
-            const copied = (await navigator.clipboard?.readText?.())?.trim();
-            if (!copied || generation !== modalGeneration || options.modal.hidden || presetMode !== 'use') return;
-            // Only recognize token-like clipboard text. Never replace an edited value.
-            const token = copied.replace(/^(?:Bearer\s+|(?:MCP_TOKEN|TOKEN)\s*[:=]\s*)/i, '').replace(/^['"]|['"]$/g, '');
-            if (!/^[A-Za-z0-9._~+\/-]{8,}={0,2}$/.test(token)) return;
-            if (selectedPreset?.id === 'amap' && options.url_input.value === initialUrl && initialUrl.endsWith('?key=')) {
-                options.url_input.value = initialUrl + encodeURIComponent(token);
-            } else if (options.auth_input.value === 'bearer' && !options.bearer_input.value) {
-                options.bearer_input.value = token;
-            }
-        } catch (_) { /* Clipboard permission denial leaves the form available for manual input. */ }
     }
     function editTokenLink() {
         if (presetMode === 'use' && tokenUrl) {
             window.open(tokenUrl, '_blank', 'noopener,noreferrer');
             return;
         }
-        const input = window.prompt('Token 获取地址', tokenUrl);
-        if (input === null) return;
+        options.token_url.value = tokenUrl;
+        options.token_error.hidden = true;
+        options.modal.inert = true;
+        options.modal.setAttribute('aria-hidden', 'true');
+        options.token_dialog.classList.add('active');
+        options.token_dialog.inert = false;
+        options.token_dialog.setAttribute('aria-hidden', 'false');
+        setTimeout(() => {
+            if (options.token_dialog.classList.contains('active')) options.token_url.focus({ preventScroll: true });
+        }, 80);
+    }
+    function closeTokenDialog() {
+        if (!options.token_dialog.classList.contains('active')) return;
+        options.token_url.blur();
+        options.token_dialog.classList.remove('active');
+        options.token_dialog.inert = true;
+        options.token_dialog.setAttribute('aria-hidden', 'true');
+        options.modal.inert = false;
+        options.modal.setAttribute('aria-hidden', 'false');
+        options.token_form.reset();
+        options.token_link.focus({ preventScroll: true });
+    }
+    function saveTokenLink(event) {
+        event.preventDefault();
         try {
+            const input = options.token_url.value;
+            if (!input.trim()) throw new Error();
+            if (/^[a-z][a-z0-9+.-]*:/i.test(input.trim()) && !/^https?:\/\//i.test(input.trim())) throw new Error();
             const url = new URL(/^https?:\/\//i.test(input.trim()) ? input.trim() : 'https://' + input.trim());
             if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new Error();
             if (presetMode === 'use' && selectedPreset && !builtinPresets.includes(selectedPreset)) {
@@ -81,7 +90,11 @@
                 localStorage.setItem(presetStorageKey, JSON.stringify(presets));
             }
             tokenUrl = url.href;
-        } catch (_) { handleAction_27('请输入有效的 Token 获取地址', true); }
+            closeTokenDialog();
+        } catch (_) {
+            options.token_error.textContent = '请输入有效的 Token 获取地址';
+            options.token_error.hidden = false;
+        }
     }
     function savePreset() {
         const config = handleAction_39();
@@ -146,7 +159,11 @@
             'preset-list',
             'preset-delete',
             'token-link',
-            'token-link-btn',
+            'token-dialog',
+            'token-form',
+            'token-url',
+            'token-error',
+            'token-cancel',
             'modal',
             'modal-title',
             'modal-cancel',
@@ -642,6 +659,7 @@
     }
     function handleModal_cancelClick() {
         if (options.modal.hidden) return;
+        closeTokenDialog();
         handleAction_32(options.modal);
         options.modal.hidden = true;
         modalGeneration++;
@@ -828,7 +846,23 @@ Streamable HTTP
         options.add_btn.addEventListener('click', () =>
             activeTab_2 === 'tools' ? refresh_2() : activeTab_2 === 'presets' ? openPreset() : handleAction_37(),
         );
-        options.token_link_btn.addEventListener('click', editTokenLink);
+        options.token_link.addEventListener('click', editTokenLink);
+        options.token_form.addEventListener('submit', saveTokenLink);
+        options.token_cancel.addEventListener('click', closeTokenDialog);
+        options.token_dialog.addEventListener('mousedown', (event) => {
+            if (event.target === options.token_dialog) closeTokenDialog();
+        });
+        options.token_dialog.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') { event.preventDefault(); closeTokenDialog(); }
+            if (event.key === 'Tab') {
+                const fields = Array.from(options.token_form.querySelectorAll('input, button'));
+                const next = fields.indexOf(document.activeElement) + (event.shiftKey ? -1 : 1);
+                if (next < 0 || next >= fields.length) {
+                    event.preventDefault();
+                    fields[next < 0 ? fields.length - 1 : 0].focus();
+                }
+            }
+        });
         options.preset_delete.addEventListener('click', deletePreset);
         options.modal_form.addEventListener('submit', (event) => { event.preventDefault(); void handleModal_saveClick(); });
         options.modal_cancel.addEventListener('click', handleModal_cancelClick);
