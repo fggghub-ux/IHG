@@ -383,13 +383,13 @@
         return async function value_141(value_139, value_140) {
             const handleAction_40_142 = handleAction_40();
             if (!handleAction_40_142) {
-                const value_150 = new Error('U2 中转尚未配置，请先使用浏览器直连');
+                const value_150 = new Error('LHV 中转尚未配置，请先使用浏览器直连');
                 value_150.code = 'MCP_RELAY_NOT_CONFIGURED';
                 throw value_150;
             }
             const handleAction_41_143 = handleAction_41();
             if (!handleAction_41_143) {
-                const value_151 = new Error('登录后才能使用 U2 中转');
+                const value_151 = new Error('登录后才能使用 LHV 中转');
                 value_151.code = 'MCP_RELAY_LOGIN_REQUIRED';
                 throw value_151;
             }
@@ -436,7 +436,7 @@
                 throw value_154;
             }
             if (value_148.status === 401 && value_148.headers.get('X-U2-MCP-Relay-Error')) {
-                const value_155 = new Error('U2 登录已失效，请重新登录后再使用中转');
+                const value_155 = new Error('LHV 登录已失效，请重新登录后再使用中转');
                 value_155.code = 'MCP_RELAY_LOGIN_REQUIRED';
                 value_155.status = 401;
                 throw value_155;
@@ -509,18 +509,18 @@
             status_2 = handleAction_46(value_164),
             value_167 =
                 status_2 === 401
-                    ? 'U2 登录已失效，请重新登录后再使用中转'
+                    ? 'LHV 登录已失效，请重新登录后再使用中转'
                     : status_2 === 403
-                      ? 'U2 中转拒绝了这个目标地址'
+                      ? 'LHV 中转拒绝了这个目标地址'
                       : status_2 === 429
-                        ? 'U2 中转请求过于频繁，请稍后再试'
+                        ? 'LHV 中转请求过于频繁，请稍后再试'
                         : status_2 === 502 || status_2 === 504
-                          ? 'U2 中转暂时无法连接目标 MCP 服务器'
+                          ? 'LHV 中转暂时无法连接目标 MCP 服务器'
                           : /(?:failed to fetch|networkerror|network request failed|load failed)/i.test(
                                   string_165,
                               )
-                            ? '无法连接 U2 中转服务器'
-                            : string_165 || 'U2 中转连接失败',
+                            ? '无法连接 LHV 中转服务器'
+                            : string_165 || 'LHV 中转连接失败',
             value_168 = new Error(value_167);
         return (
             (value_168.code = status_2 === 401 ? 'MCP_RELAY_LOGIN_REQUIRED' : 'MCP_RELAY_FAILED'),
@@ -1399,6 +1399,7 @@
         getServers: getServers_2,
         getEnabledMcpServers: getEnabledMcpServers_2,
         saveServer: saveServer_2,
+        validateServer: handleAction_22,
         deleteServer: deleteServer_2,
         discoverTools: discoverTools_2,
         callTool: callTool_2,

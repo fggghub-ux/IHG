@@ -437,7 +437,10 @@
     box-shadow: 0 13px 34px rgba(16, 16, 19, 0.13);
 }
 .mcp-tab-pill[data-active-tab='tools'] {
-    --slider-left: 50%;
+    --slider-left: calc(5px + (100% - 10px) / 3);
+}
+.mcp-tab-pill[data-active-tab='presets'] {
+    --slider-left: calc(5px + (100% - 10px) * 2 / 3);
 }
 .mcp-tab-slider {
     position: absolute;
@@ -445,7 +448,7 @@
     top: 5px;
     bottom: 5px;
     left: var(--slider-left);
-    width: calc((100% - 10px) / 2);
+    width: calc((100% - 10px) / 3);
     border-radius: 999px;
     background: #111113;
     transition: left 0.28s;
@@ -454,6 +457,8 @@
     position: relative;
     z-index: 1;
     min-width: 86px;
+    flex: 1 1 0;
+    white-space: nowrap;
     padding: 0 13px;
     border: 0;
     border-radius: 999px;
@@ -467,10 +472,12 @@
     font-weight: 700;
 }
 .mcp-tab-pill[data-active-tab='servers'] [data-mcp-tab='servers'],
-.mcp-tab-pill[data-active-tab='tools'] [data-mcp-tab='tools'] {
+.mcp-tab-pill[data-active-tab='tools'] [data-mcp-tab='tools'],
+.mcp-tab-pill[data-active-tab='presets'] [data-mcp-tab='presets'] {
     color: #fff;
 }
 .mcp-nav-action {
+    flex-shrink: 0;
     width: 58px;
     height: 58px;
     padding: 0;
@@ -480,6 +487,36 @@
     color: #171719;
     box-shadow: 0 13px 34px rgba(16, 16, 19, 0.13);
     font-size: 17px;
+}
+.mcp-preset-card .mcp-server-copy > span {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+}
+.mcp-url-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+#mcp-token-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--mcp-muted);
+    font-size: 10px;
+}
+#mcp-token-link[hidden], #mcp-preset-delete[hidden], #mcp-test-btn i[hidden] { display: none; }
+#mcp-token-link-btn {
+    border: 0;
+    padding: 5px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+}
+@media (max-width: 400px) {
+    .mcp-tab-pill button { min-width: 70px; padding-inline: 8px; }
 }
 .mcp-modal,
 .mcp-detail,

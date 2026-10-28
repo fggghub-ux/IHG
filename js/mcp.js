@@ -1,6 +1,119 @@
 (function () {
     'use strict';
 
+    const presetStorageKey = 'lhv_mcp_presets_v1';
+    const builtinPresets = [
+        { id: 'mcd', title: '麦当劳', name: '麦当劳 China MCP', description: '官方 HTTP 服务，复制 MCP_TOKEN 后点击可尝试自动接入。', url: 'https://mcp.mcd.cn', tokenUrl: 'https://open.mcd.cn/mcp' },
+        { id: 'luckin', title: '瑞幸咖啡', name: '瑞幸咖啡 MCP', description: '官方 HTTP 服务，复制 TOKEN 后点击可尝试自动填入。', url: 'https://gwmcp.lkcoffee.com/order/user/mcp', tokenUrl: 'https://open.lkcoffee.com/mcp' },
+        { id: 'amap', title: '高德地图', name: '高德地图 MCP', description: '补全地址末尾的 KEY，可用于地图、路线、天气等生活服务。', url: 'https://mcp.amap.com/mcp?key=', tokenUrl: 'https://lbs.amap.com/api/mcp-server/create-project-and-key' },
+        { id: 'todoist', title: 'Todoist', name: 'Todoist MCP', description: '官方远程服务，打开入口后按 TODOIST 账号授权。', url: 'https://ai.todoist.net/mcp', tokenUrl: 'https://www.todoist.com/zh-CN/help/todoist/todoist-and-ai/connect-todoist-to-an-ai-assistant-xMSzFfHng' },
+        { id: 'notion', title: 'Notion', name: 'Notion MCP', description: '官方远程服务，打开入口后按 NOTION 账号授权。', url: 'https://mcp.notion.com/mcp', tokenUrl: 'https://developers.notion.com/guides/mcp/overview' },
+        { id: 'calendar', title: 'Google Calendar', name: 'Google Calendar MCP', description: '官方 WORKSPACE MCP，使用 GOOGLE 账号授权日历。', url: 'https://calendarmcp.googleapis.com/mcp/v1', tokenUrl: 'https://developers.google.com/workspace/calendar/api/guides/configure-mcp-server' },
+        { id: 'gmail', title: 'Gmail', name: 'Gmail MCP', description: '官方 WORKSPACE MCP，使用 GOOGLE 账号授权邮件。', url: 'https://gmailmcp.googleapis.com/mcp/v1', tokenUrl: 'https://developers.google.com/workspace/gmail/api/guides/configure-mcp-server' },
+        { id: 'feishu', title: '飞书', name: '飞书 MCP', description: '需在飞书开放平台创建专属 MCP 服务链接，再粘贴到服务器地址。', url: 'https://open.feishu.cn/page/mcp', tokenUrl: 'https://open.feishu.cn/page/mcp' },
+    ];
+    let presetMode = '', selectedPreset = null, tokenUrl = '', modalGeneration = 0;
+    function customPresets() {
+        const data = JSON.parse(localStorage.getItem(presetStorageKey) || '[]');
+        if (!Array.isArray(data)) throw new Error('预设配置读取失败');
+        return data;
+    }
+    function renderPresets() {
+        try {
+            const presets = [...builtinPresets, ...customPresets()];
+            options.preset_count.textContent = presets.length + ' 项预设';
+            options.preset_list.replaceChildren();
+            presets.forEach((preset) => {
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'mcp-server-card mcp-preset-card';
+                card.innerHTML = '<span class="mcp-server-icon"><i class="fas fa-cloud"></i></span><span class="mcp-server-copy"><strong></strong><span></span></span><span class="mcp-server-trailing"><i class="fas fa-chevron-right"></i></span>';
+                card.querySelector('strong').textContent = preset.title || preset.name;
+                card.querySelector('.mcp-server-copy > span').textContent = preset.description || preset.url.toUpperCase();
+                card.addEventListener('click', () => openPreset(preset));
+                options.preset_list.append(card);
+            });
+        } catch (error) { handleAction_12(error.message); }
+    }
+    function openPreset(preset = null) {
+        handleAction_37(preset ? { ...preset, id: undefined, auth: preset.auth || { type: 'bearer', token: '' } } : null);
+        presetMode = preset ? 'use' : 'create';
+        selectedPreset = preset;
+        tokenUrl = preset?.tokenUrl || '';
+        options.modal_title.textContent = preset ? '编辑远程 MCP' : '添加 MCP 预设';
+        options.token_link.hidden = false;
+        options.preset_delete.hidden = !preset || builtinPresets.includes(preset);
+        options.test_btn.querySelector('i').hidden = !preset;
+        options.test_btn.querySelector('span').textContent = preset ? '测试并发现工具' : '保存预设配置';
+        handleAction_12(preset ? '已新建配置，需补充地址或授权信息' : '已新建预设，需填写配置信息');
+        if (preset) void fillPresetAuthorization(modalGeneration);
+    }
+    async function fillPresetAuthorization(generation) {
+        const initialUrl = options.url_input.value;
+        try {
+            const copied = (await navigator.clipboard?.readText?.())?.trim();
+            if (!copied || generation !== modalGeneration || options.modal.hidden || presetMode !== 'use') return;
+            // Only recognize token-like clipboard text. Never replace an edited value.
+            const token = copied.replace(/^(?:Bearer\s+|(?:MCP_TOKEN|TOKEN)\s*[:=]\s*)/i, '').replace(/^['"]|['"]$/g, '');
+            if (!/^[A-Za-z0-9._~+\/-]{8,}={0,2}$/.test(token)) return;
+            if (selectedPreset?.id === 'amap' && options.url_input.value === initialUrl && initialUrl.endsWith('?key=')) {
+                options.url_input.value = initialUrl + encodeURIComponent(token);
+            } else if (options.auth_input.value === 'bearer' && !options.bearer_input.value) {
+                options.bearer_input.value = token;
+            }
+        } catch (_) { /* Clipboard permission denial leaves the form available for manual input. */ }
+    }
+    function editTokenLink() {
+        if (presetMode === 'use' && tokenUrl) {
+            window.open(tokenUrl, '_blank', 'noopener,noreferrer');
+            return;
+        }
+        const input = window.prompt('Token 获取地址', tokenUrl);
+        if (input === null) return;
+        try {
+            const url = new URL(/^https?:\/\//i.test(input.trim()) ? input.trim() : 'https://' + input.trim());
+            if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new Error();
+            if (presetMode === 'use' && selectedPreset && !builtinPresets.includes(selectedPreset)) {
+                const presets = customPresets();
+                const item = presets.find((p) => p.id === selectedPreset.id);
+                if (!item) throw new Error();
+                item.tokenUrl = url.href;
+                localStorage.setItem(presetStorageKey, JSON.stringify(presets));
+            }
+            tokenUrl = url.href;
+        } catch (_) { handleAction_27('请输入有效的 Token 获取地址', true); }
+    }
+    function savePreset() {
+        const config = handleAction_39();
+        if (!config) return;
+        try {
+            // Templates may intentionally omit credentials; actual server saves validate them.
+            window.mcpIntegration.validateServer({ ...config, auth: { type: 'none' } });
+            const presets = customPresets();
+            presets.push({ ...config, id: 'preset_' + (globalThis.crypto?.randomUUID?.() || Date.now() + '_' + Math.random().toString(36).slice(2)), tokenUrl });
+            localStorage.setItem(presetStorageKey, JSON.stringify(presets));
+            handleModal_cancelClick();
+            renderPresets();
+            handleAction_12('预设已保存到本机');
+        } catch (error) { handleAction_27(error.message || '保存失败', true); }
+    }
+    function deletePreset() {
+        if (enabled_4 || !selectedPreset || builtinPresets.includes(selectedPreset)) return;
+        if (!window.confirm('删除“' + selectedPreset.name + '”预设？')) return;
+        try {
+            localStorage.setItem(presetStorageKey, JSON.stringify(customPresets().filter((p) => p.id !== selectedPreset.id)));
+            handleModal_cancelClick();
+            renderPresets();
+        } catch (error) { handleAction_27(error.message || '删除失败', true); }
+    }
+    function validatePresetEndpoint(config) {
+        if (presetMode !== 'use') return;
+        window.mcpIntegration.validateServer(config);
+        const url = new URL(config.url);
+        if (url.searchParams.has('key') && !url.searchParams.get('key')?.trim()) throw new Error('请补全地址末尾的 KEY');
+        if (url.hostname === 'open.feishu.cn' && url.pathname.replace(/\/$/, '') === '/page/mcp') throw new Error('请填写飞书生成的专属 MCP 服务链接');
+    }
+
     let activeTab_2 = 'servers',
         text_2 = '',
         text_3 = '',
@@ -28,6 +141,12 @@
             'add-btn',
             'servers-page',
             'tools-page',
+            'presets-page',
+            'preset-count',
+            'preset-list',
+            'preset-delete',
+            'token-link',
+            'token-link-btn',
             'modal',
             'modal-title',
             'modal-cancel',
@@ -139,7 +258,7 @@
             element_68.textContent = value_60.name;
             const element_69 = document.createElement('span');
             element_69.textContent =
-                (value_60.connectionMode === 'relay' ? 'U2 中转' : '浏览器直连') +
+                (value_60.connectionMode === 'relay' ? 'LHV 中转' : '浏览器直连') +
                 ' · ' +
                 handleAction_15(value_60.url);
             const element_70 = document.createElement('span');
@@ -235,11 +354,12 @@
     function handleAction_17() {
         handleAction_14();
         handleAction_16();
+        renderPresets();
         if (text_3 && !options.detail.hidden) handleAction_44();
     }
     function handleAction_18(value_95) {
-        activeTab_2 = value_95 === 'tools' ? 'tools' : 'servers';
-        [options.servers_page, options.tools_page].forEach((element_96) => {
+        activeTab_2 = ['tools', 'presets'].includes(value_95) ? value_95 : 'servers';
+        [options.servers_page, options.tools_page, options.presets_page].forEach((element_96) => {
             const value_97 = element_96.dataset.mcpPage === activeTab_2;
             element_96.hidden = !value_97;
             element_96.classList.toggle('active', value_97);
@@ -253,13 +373,13 @@
             activeTab_2 === 'tools' ? 'fas fa-rotate' : 'fas fa-plus';
         options.add_btn.setAttribute(
             'aria-label',
-            activeTab_2 === 'tools' ? '刷新 MCP 工具' : '添加远程 MCP 服务器',
+            activeTab_2 === 'tools' ? '刷新 MCP 工具' : activeTab_2 === 'presets' ? '添加 MCP 预设' : '添加远程 MCP 服务器',
         );
     }
     function handleAction_19(value_99) {
         const value_100 = window.mcpIntegration?.getRelayAvailability?.() || {};
-        if (!value_100.configured) return value_99.message + '；U2 中转尚未配置';
-        if (!value_100.loggedIn) return value_99.message + '；登录后可选择 U2 中转';
+        if (!value_100.configured) return value_99.message + '；LHV 中转尚未配置';
+        if (!value_100.loggedIn) return value_99.message + '；登录后可选择 LHV 中转';
         return value_99.message;
     }
     function handleAction_20(value_101 = false) {
@@ -487,6 +607,14 @@
         handleAction_30();
     }
     function handleAction_37(value_136 = null) {
+        modalGeneration++;
+        presetMode = '';
+        selectedPreset = null;
+        tokenUrl = '';
+        options.token_link.hidden = true;
+        options.preset_delete.hidden = true;
+        options.test_btn.querySelector('i').hidden = false;
+        options.test_btn.querySelector('span').textContent = '测试并发现工具';
         text_2 = value_136?.id || '';
         options.modal_title.textContent = value_136 ? '编辑远程 MCP' : '添加远程 MCP';
         options.modal_form.reset();
@@ -516,6 +644,9 @@
         if (options.modal.hidden) return;
         handleAction_32(options.modal);
         options.modal.hidden = true;
+        modalGeneration++;
+        presetMode = '';
+        selectedPreset = null;
         text_2 = '';
         handleAction_26(false);
     }
@@ -551,34 +682,47 @@
         };
     }
     async function handleModal_saveClick() {
+        if (enabled_4) return;
+        if (presetMode === 'create') return savePreset();
         const handleAction_39_140 = handleAction_39();
         if (!handleAction_39_140 || enabled_4) return;
         enabled_4 = true;
+        const generation = modalGeneration;
         try {
+            validatePresetEndpoint(handleAction_39_140);
+            const fromPreset = presetMode === 'use';
             await window.mcpIntegration.saveServer(handleAction_39_140);
+            if (generation !== modalGeneration) return;
             handleModal_cancelClick();
             handleAction_17();
+            if (fromPreset) handleAction_12('配置已保存到本机');
         } catch (value_141) {
-            handleAction_27(value_141.message || '保存失败', true);
+            if (generation === modalGeneration) handleAction_27(value_141.message || '保存失败', true);
         } finally {
             enabled_4 = false;
         }
     }
     async function handleTest_btnClick() {
+        if (enabled_4) return;
+        if (presetMode === 'create') return savePreset();
         const handleAction_39_142 = handleAction_39();
         if (!handleAction_39_142 || enabled_4) return;
         enabled_4 = true;
         options.test_btn.disabled = true;
+        const generation = modalGeneration;
         handleAction_27('正在连接并发现工具…');
         try {
+            validatePresetEndpoint(handleAction_39_142);
             const value_143 = await window.mcpIntegration.saveServer(handleAction_39_142);
+            if (generation !== modalGeneration) return;
             text_2 = value_143.id;
             const value_144 = await handleAction_22(value_143.id);
+            if (generation !== modalGeneration) return;
             handleAction_27('连接成功，发现 ' + value_144.length + ' 项工具');
             handleAction_17();
             handleAuth_inputChange();
         } catch (value_145) {
-            handleAction_27(value_145.message || '测试失败', true);
+            if (generation === modalGeneration) handleAction_27(value_145.message || '测试失败', true);
         } finally {
             enabled_4 = false;
             options.test_btn.disabled = false;
@@ -632,7 +776,7 @@
         options.detail_status.append(element_152, element_153);
         options.detail_command.textContent =
             '连接：' +
-            (result_147.connectionMode === 'relay' ? 'U2 中转' : '浏览器直连') +
+            (result_147.connectionMode === 'relay' ? 'LHV 中转' : '浏览器直连') +
             `
 Streamable HTTP
 ` +
@@ -682,8 +826,11 @@ Streamable HTTP
             value_164.addEventListener('click', () => handleAction_18(value_164.dataset.mcpTab)),
         );
         options.add_btn.addEventListener('click', () =>
-            activeTab_2 === 'tools' ? refresh_2() : handleAction_37(),
+            activeTab_2 === 'tools' ? refresh_2() : activeTab_2 === 'presets' ? openPreset() : handleAction_37(),
         );
+        options.token_link_btn.addEventListener('click', editTokenLink);
+        options.preset_delete.addEventListener('click', deletePreset);
+        options.modal_form.addEventListener('submit', (event) => { event.preventDefault(); void handleModal_saveClick(); });
         options.modal_cancel.addEventListener('click', handleModal_cancelClick);
         options.modal_save.addEventListener('click', handleModal_saveClick);
         options.test_btn.addEventListener('click', handleTest_btnClick);

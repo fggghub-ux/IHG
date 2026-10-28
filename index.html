@@ -149,7 +149,7 @@
         <link rel="stylesheet" href="css/call.css?v=20260917-call-history-v8&repair=20261003" />
         <link
             rel="stylesheet"
-            href="css/mcp.css?v=20260906-relay-ui-v1&android-input=20260906-v1&repair=20261003"
+            href="css/mcp.css?v=20260906-relay-ui-v1&android-input=20260906-v1&repair=20261003&presets=20261028"
         />
         <link
             rel="stylesheet"
@@ -2415,6 +2415,12 @@
                                 <div class="mcp-tool-list" id="mcp-tool-list" hidden></div>
                             </div>
                         </section>
+                        <section class="mcp-page" id="mcp-presets-page" data-mcp-page="presets" hidden>
+                            <div class="mcp-page-scroll">
+                                <div class="mcp-page-heading"><span class="mcp-eyebrow">MCP PRESETS</span><h1>MCP</h1><span class="mcp-count" id="mcp-preset-count">0 项预设</span></div>
+                                <div class="mcp-server-list" id="mcp-preset-list"></div>
+                            </div>
+                        </section>
                     </main>
                     <nav class="mcp-floating-nav" aria-label="MCP 主要页面">
                         <div class="mcp-tab-pill" role="tablist" data-active-tab="servers"
@@ -2431,7 +2437,7 @@
                                 aria-selected="false"
                                 data-mcp-tab="tools"
                                 ><i class="fas fa-wand-magic-sparkles"></i><span>工具</span></button
-                            ></div
+                            ><button type="button" role="tab" aria-selected="false" data-mcp-tab="presets"><i class="fas fa-link"></i><span>预设</span></button></div
                         >
                         <button
                             type="button"
@@ -2461,7 +2467,7 @@
                         >
                         <form class="mcp-modal-form" id="mcp-modal-form">
                             <section class="mcp-form-card mcp-remote-fields">
-                                <label for="mcp-name-input">显示名称</label
+                                <label for="mcp-name-input">配置名称</label
                                 ><input
                                     type="text"
                                     id="mcp-name-input"
@@ -2472,8 +2478,8 @@
                                     enterkeyhint="next"
                                     autocomplete="off"
                                 />
-                                <label for="mcp-url-input">Streamable HTTP 地址</label
-                                ><input
+                                <div class="mcp-url-heading"><label for="mcp-url-input">Streamable HTTP 地址</label><span id="mcp-token-link" hidden><button type="button" id="mcp-token-link-btn" aria-label="获取 Token 地址"><i class="fas fa-link"></i></button><span>获取Token</span></span></div>
+                                <input
                                     type="url"
                                     id="mcp-url-input"
                                     maxlength="2048"
@@ -2487,7 +2493,7 @@
                                 />
                                 <p id="mcp-url-help"
                                     >默认由浏览器直连 Streamable HTTP 端点；若网络、CORS 或 Mixed
-                                    Content 阻止直连，可在失败后选择 U2 中转。</p
+                                    Content 阻止直连，可在失败后选择 LHV 中转。</p
                                 >
                             </section>
                             <section class="mcp-form-card mcp-remote-fields">
@@ -2533,7 +2539,7 @@
                                         spellcheck="false"
                                         placeholder="只保存在当前设备"
                                 /></div>
-                                <p>凭证不会上传保存到 U2 数据库，普通备份也不会包含它们。</p>
+                                <p>凭证不会上传保存到 LHV 数据库，普通备份也不会包含它们。</p>
                             </section>
                             <section class="mcp-form-card">
                                 <label for="mcp-approval-input">工具权限</label
@@ -2560,6 +2566,7 @@
                                 ><i class="fas fa-bolt"></i><span>测试并发现工具</span></button
                             >
                             <p class="mcp-form-status" id="mcp-form-status" role="status"></p>
+                            <button type="button" class="mcp-delete-button" id="mcp-preset-delete" hidden>删除 MCP 预设</button>
                         </form>
                     </div>
                 </div>
@@ -2621,10 +2628,10 @@
                 >
                     <div class="mcp-relay-card">
                         <span>直连失败</span>
-                        <h2 id="mcp-relay-title">使用 U2 中转？</h2>
+                        <h2 id="mcp-relay-title">使用 LHV 中转？</h2>
                         <p
-                            >中转会把这台 MCP 的地址、请求内容和目标认证信息发送到 U2
-                            中转服务器。认证信息只随请求转发，不会保存到 U2 数据库。</p
+                            >中转会把这台 MCP 的地址、请求内容和目标认证信息发送到 LHV
+                            中转服务器。认证信息只随请求转发，不会保存到 LHV 数据库。</p
                         >
                         <button type="button" id="mcp-relay-accept">使用中转并重试</button>
                         <button type="button" id="mcp-relay-cancel">保持浏览器直连</button>
@@ -20171,7 +20178,7 @@
         <script src="js/imessage/official_accounts.js?v=20260828-youtu-preview-stable-v5&api-error-dialog=20260923-v1&official-css-generation=20260928-v1&ihg=20260929-106-r1&repair=20261003&settings=20261010-r1&apk-sync=111-selective"></script>
         <script src="js/vendor/mcp_client_sdk.js?v=20260901-mobile-mcp-v3&repair=20261003"></script>
         <script src="js/mcp_relay_config.js?v=20260906-relay-v2&repair=20261003"></script>
-        <script src="js/imessage/mcp_integration.js?v=20260906-relay-v3&version-compat=20260907-v1&storage-persistence=20260907-v1&repair=20261003"></script>
+        <script src="js/imessage/mcp_integration.js?v=20260906-relay-v3&version-compat=20260907-v1&storage-persistence=20260907-v1&repair=20261003&presets=20261028"></script>
         <script src="js/imessage/mcp_chat_config.js?v=20260901-mobile-mcp-v3&mcp-tool-history=20260906-v1&repair=20261003"></script>
         <script src="js/library.js?v=20260911-netease-android-v1&player-performance=20260817-v1&open-performance=20260801-v1&vendor-lazy=20260803-v1&startup-queue=20260804-v1&reader-comments=20260817-v3&reader-selection=20260819-v1&reader-touch-compat=20260830-v1&netease-pagination=20260912-v1&together-listening-invite=20260916-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=119-selective-20261026"></script>
         <script src="js/loves.js?loves-ui=20261024-v1&v=20261007-107-r1&cphone=20261010-r2&chat-ui=20261024-v2&apk-sync=119-selective-20261026"></script>
@@ -20200,7 +20207,7 @@
         <script src="js/cycle_health.js?v=119"></script>
         <script src="js/cycle.js?v=20261007-107-r1&apk-sync=119-selective-20261026"></script>
         <script src="js/call.js?v=20260917-call-history-v8&api-error-dialog=20260923-v1&repair=20261003"></script>
-        <script src="js/mcp.js?v=20260906-relay-ui-v1&android-input=20260906-v1&storage-persistence=20260907-v1&repair=20261003"></script>
+        <script src="js/mcp.js?v=20260906-relay-ui-v1&android-input=20260906-v1&storage-persistence=20260907-v1&repair=20261003&presets=20261028"></script>
         <script src="js/diary.js?v=20260913-diary-v6-prompt-toggle-scroll&api-error-dialog=20260923-v1&repair=20261003&home-avatar-migration=20261023-v1"></script>
         <script src="js/ao3.js?v=20260904-ao3-cp-search-v12&persona=20260920-v4&api-error-dialog=20260923-v2&repair=20261003&apk-sync=113-selective-20261022"></script>
         <script src="js/home_desktop.js?v=20261007-107-r1&settings=20261010-r1&app-positions=20261024-v1&apk-sync=119-selective-20261026&widget-opacity=20261027-v1"></script>
