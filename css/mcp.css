@@ -540,13 +540,16 @@
 .mcp-token-card > input {
     width: 100%; min-width: 0; height: 38px; box-sizing: border-box; padding: 0 13px;
     border: 1px solid #e2e2e7; border-radius: 14px; outline: 0;
-    background: #f6f6f8; color: #111; font-family: inherit; font-size: 13px; font-weight: 500;
+    background: #f6f6f8; color: #111; font: -webkit-small-control;
 }
-.mcp-token-card > input:focus { border-color: #aaaab0; background: #fff; }
+.mcp-token-card > input:focus { border-color: #aaaab0; background: #f6f6f8; }
+.mcp-token-card > input::placeholder {
+    font: -webkit-small-control; font-size: inherit; color: #757575; opacity: 1;
+}
 .mcp-token-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
 .mcp-token-actions button {
-    min-height: 34px; padding: 7px 15px; border: 0; border-radius: 11px;
-    background: #f2f2f2; color: #333; font: inherit; font-size: 14px; cursor: pointer;
+    min-height: 30px; padding: 6px 12px; border: 0; border-radius: 11px;
+    background: #f2f2f2; color: #333; font: inherit; font-size: 12px; cursor: pointer;
 }
 .mcp-token-actions button:last-child { background: #292929; color: #fff; }
 #mcp-token-error { color: #c6322d; font-size: 10px; margin: 8px 0 0; }

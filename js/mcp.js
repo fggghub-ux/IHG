@@ -42,6 +42,7 @@
         tokenUrl = preset?.tokenUrl || '';
         options.modal_title.textContent = preset ? '编辑远程 MCP' : '添加 MCP 预设';
         options.token_link.hidden = false;
+        options.token_link.querySelector('span').textContent = preset ? '获取Token' : '添加地址';
         options.preset_delete.hidden = !preset || builtinPresets.includes(preset);
         options.test_btn.querySelector('i').hidden = !preset;
         options.test_btn.querySelector('span').textContent = preset ? '测试并发现工具' : '保存预设配置';
