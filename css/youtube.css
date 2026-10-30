@@ -3000,3 +3000,14 @@
         gap: 6px;
     }
 }
+
+.yt-header-help-btn {
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+.yt-header-help-btn:focus-visible {
+    border-radius: 50%;
+    outline: 2px solid currentColor;
+    outline-offset: -4px;
+}

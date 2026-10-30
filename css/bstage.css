@@ -2215,3 +2215,19 @@
     height: 100%;
     min-height: 0;
 }
+
+.bstage-header-help-btn {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+}
+.bstage-header-help-btn:focus-visible {
+    border-radius: 50%;
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+}

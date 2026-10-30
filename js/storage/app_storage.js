@@ -2086,41 +2086,57 @@
         return cloneDeep(await getAllRecords(STORES.libraryTracks));
     }
     async function saveLibraryPlaylistBundle(playlist, tracks = [], options = {}) {
-        const playlistRecord = sanitizeLibraryRecord(playlist);
-        if (!playlistRecord.id) throw new Error('Library playlist id is required.');
-        const trackRecords = (Array.isArray(tracks) ? tracks : [])
-            .map(sanitizeLibraryRecord)
-            .filter((track) => track.id);
-        await withStore([STORES.libraryPlaylists, STORES.libraryTracks], 'readwrite', (stores) => {
-            const playlistStore = stores[STORES.libraryPlaylists];
-            const trackStore = stores[STORES.libraryTracks];
-            const writeBundle = () => {
-                playlistStore.put(playlistRecord);
-                trackRecords.forEach((track) => trackStore.put(track));
-            };
-            if (options.replaceTracks) {
-                const keepIds = new Set(trackRecords.map((track) => track.id));
-                const existingKeysRequest = trackStore
-                    .index('playlistId')
-                    .getAllKeys(playlistRecord.id);
-                existingKeysRequest.onsuccess = () => {
-                    (Array.isArray(existingKeysRequest.result)
-                        ? existingKeysRequest.result
-                        : []
-                    ).forEach((trackId) => {
-                        if (!keepIds.has(trackId)) trackStore.delete(trackId);
-                    });
-                    writeBundle();
-                };
-                return;
-            }
-            writeBundle();
+  let playlistRecord = sanitizeLibraryRecord(playlist);
+  if (!playlistRecord.id) throw new Error('Library playlist id is required.');
+  let missingPlaylist = false;
+  const trackRecords = (Array.isArray(tracks) ? tracks : []).map(sanitizeLibraryRecord).filter(track => track.id);
+  await withStore([STORES.libraryPlaylists, STORES.libraryTracks], 'readwrite', stores => {
+    const playlistStore = stores[STORES.libraryPlaylists];
+    const trackStore = stores[STORES.libraryTracks];
+    const putBundle = () => {
+      playlistStore.put(playlistRecord);
+      trackRecords.forEach(track => trackStore.put(track));
+    };
+    const writeBundle = () => {
+      if (!options.patchPlaylist && !options.preserveCustomCover) return putBundle();
+      const existingRequest = playlistStore.get(playlistRecord.id);
+      existingRequest.onsuccess = () => {
+        const existing = existingRequest.result;
+        if (options.patchPlaylist) {
+          if (!existing) {
+            missingPlaylist = true;
+            return;
+          }
+          playlistRecord = {
+            ...existing,
+            ...playlistRecord
+          };
+        }
+        if (options.preserveCustomCover && existing) {
+          playlistRecord.customCoverUrl = String(existing.customCoverUrl || '');
+        }
+        putBundle();
+      };
+    };
+    if (options.replaceTracks) {
+      const keepIds = new Set(trackRecords.map(track => track.id));
+      const existingKeysRequest = trackStore.index('playlistId').getAllKeys(playlistRecord.id);
+      existingKeysRequest.onsuccess = () => {
+        (Array.isArray(existingKeysRequest.result) ? existingKeysRequest.result : []).forEach(trackId => {
+          if (!keepIds.has(trackId)) trackStore.delete(trackId);
         });
-        return {
-            playlist: cloneDeep(playlistRecord),
-            tracks: cloneDeep(trackRecords),
-        };
+        writeBundle();
+      };
+      return;
     }
+    writeBundle();
+  });
+  if (missingPlaylist) throw new Error('Library playlist no longer exists.');
+  return {
+    playlist: cloneDeep(playlistRecord),
+    tracks: cloneDeep(trackRecords)
+  };
+}
     async function saveLibraryTrack(track) {
         const record = sanitizeLibraryRecord(track);
         if (!record.id) throw new Error('Library track id is required.');
@@ -5171,6 +5187,7 @@
                                     Math.min(2, parseFloat(safe.apiConfig.frequencyPenalty)),
                                 )
                               : 0,
+                          streamEnabled: safe.apiConfig.streamEnabled === true,
                       }
                     : {
                           provider: 'openai-compatible',
@@ -5179,6 +5196,7 @@
                           model: '',
                           temperature: 0.7,
                           frequencyPenalty: 0,
+                          streamEnabled: false,
                       },
             vectorMemoryConfig: (() => {
                 const source =

@@ -3940,152 +3940,101 @@
         if (result_2 === 'failed') throw new Error('图片保存失败，请稍后重试');
         return result_2;
     }
-    function getGeneratedImageRerollInput(msg_15, friend_28) {
-        const currentConfig =
-                friend_28?.imagePromptConfig && typeof friend_28.imagePromptConfig === 'object'
-                    ? friend_28.imagePromptConfig
-                    : {},
-            savedConfig =
-                msg_15?.imageGenerationConfig && typeof msg_15.imageGenerationConfig === 'object'
-                    ? msg_15.imageGenerationConfig
-                    : null,
-            scenePrompt = String(
-                msg_15?.imageGenerationPrompt || msg_15?.description || msg_15?.text || '',
-            ).trim(),
-            basePrompt_2 = savedConfig
-                ? String(savedConfig.basePrompt || '').trim()
-                : String(currentConfig.basePrompt || currentConfig.lastPrompt || '').trim(),
-            prompt_3 = scenePrompt;
-        return {
-            prompt: prompt_3,
-            config: {
-                basePrompt: basePrompt_2,
-                charAppearance: String(
-                    savedConfig?.charAppearance ?? currentConfig.charAppearance ?? '',
-                ).trim(),
-                userAppearance: String(
-                    savedConfig?.userAppearance ?? currentConfig.userAppearance ?? '',
-                ).trim(),
-                artistPrompt: String(
-                    savedConfig?.artistPrompt ?? currentConfig.artistPrompt ?? '',
-                ).trim(),
-                negativePrompt: String(
-                    savedConfig?.negativePrompt ?? currentConfig.negativePrompt ?? '',
-                ).trim(),
-                includeCharAppearance: savedConfig?.includeCharAppearance !== false,
-                includeUserAppearance: savedConfig?.includeUserAppearance !== false,
-                useReferenceFace: savedConfig
-                    ? savedConfig.useReferenceFace === true
-                    : msg_15?.faceReferenceUsed === true,
-                useCharReferenceFace: savedConfig
-                    ? savedConfig.useCharReferenceFace === true ||
-                      (savedConfig.useCharReferenceFace == null &&
-                          savedConfig.useReferenceFace === true)
-                    : msg_15?.charFaceReferenceUsed === true || msg_15?.faceReferenceUsed === true,
-                useUserReferenceFace: savedConfig
-                    ? savedConfig.useUserReferenceFace === true
-                    : msg_15?.userFaceReferenceUsed === true,
-            },
-        };
+    function getGeneratedImageRerollInput(apk120Value941, apk120Value942) {
+  const apk120Value943 = apk120Value942?.imagePromptConfig && typeof apk120Value942.imagePromptConfig === "object" ? apk120Value942.imagePromptConfig : {},
+    apk120Value944 = apk120Value941?.imageGenerationConfig && typeof apk120Value941.imageGenerationConfig === 'object' ? apk120Value941.imageGenerationConfig : null,
+    apk120Value945 = String(apk120Value941?.imageGenerationPrompt || apk120Value941?.description || apk120Value941?.text || '').trim(),
+    apk120Value946 = apk120Value941?.imageSource === "generated" && apk120Value941?.imageGenerationPrompt && (!apk120Value944 || !Object.prototype.hasOwnProperty.call(apk120Value944, "basePrompt")),
+    apk120Value947 = apk120Value946 ? '' : apk120Value944 ? String(apk120Value944.basePrompt || '').trim() : String(apk120Value943.basePrompt || apk120Value943.lastPrompt || '').trim(),
+    apk120Value948 = apk120Value945;
+  return {
+    'prompt': apk120Value948,
+    'config': {
+      'basePrompt': apk120Value947,
+      'charAppearance': String(apk120Value944?.charAppearance ?? apk120Value943.charAppearance ?? '').trim(),
+      'userAppearance': String(apk120Value944?.userAppearance ?? apk120Value943.userAppearance ?? '').trim(),
+      'artistPrompt': String(apk120Value944?.artistPrompt ?? apk120Value943.artistPrompt ?? '').trim(),
+      'negativePrompt': String(apk120Value944?.negativePrompt ?? apk120Value943.negativePrompt ?? '').trim(),
+      'includeCharAppearance': apk120Value944?.includeCharAppearance !== ![],
+      'includeUserAppearance': apk120Value944 ? apk120Value944.includeUserAppearance !== ![] : apk120Value941?.imageSource === "generated" || apk120Value941?.userFaceReferenceUsed === !![],
+      'useReferenceFace': apk120Value944 ? apk120Value944.useReferenceFace === !![] : apk120Value941?.faceReferenceUsed === !![],
+      'useCharReferenceFace': apk120Value944 ? apk120Value944.useCharReferenceFace === !![] || apk120Value944.useCharReferenceFace == null && apk120Value944.useReferenceFace === !![] : apk120Value941?.charFaceReferenceUsed === !![] || apk120Value941?.faceReferenceUsed === !![] && apk120Value941?.userFaceReferenceUsed !== !![],
+      'useUserReferenceFace': apk120Value944 ? apk120Value944.useUserReferenceFace === !![] : apk120Value941?.userFaceReferenceUsed === !![]
     }
-    async function rerollGeneratedChatImage(msg_16, friend_29) {
-        if (!msg_16 || msg_16.imageSource !== 'generated' || !friend_29?.id)
-            throw new Error('这张图片不支持重新生成');
-        const liveFriend =
-                window.imApp?.getFriendById?.(friend_29.id) ||
-                (window.imData?.friends || []).find(
-                    (item_3) => String(item_3.id) === String(friend_29.id),
-                ) ||
-                friend_29,
-            { prompt: prompt_2, config: config_2 } = getGeneratedImageRerollInput(
-                msg_16,
-                liveFriend,
-            );
-        if (!prompt_2) throw new Error('这张图片没有可复用的生成提示词');
-        const referenceImage_2 = await window.imChat.resolveImageReferenceFaces(
-                liveFriend,
-                {
-                    charPresent: config_2.useCharReferenceFace,
-                    userPresent: config_2.useUserReferenceFace,
-                },
-                {
-                    requireChar: config_2.useCharReferenceFace,
-                    requireUser: config_2.useUserReferenceFace,
-                },
-            ),
-            result_3 = await window.imChat.generateChatImage(prompt_2, liveFriend, {
-                referenceImages: referenceImage_2,
-                basePrompt: config_2.basePrompt,
-                charAppearance: config_2.charAppearance,
-                userAppearance: config_2.userAppearance,
-                artistPrompt: config_2.artistPrompt,
-                negativePrompt: config_2.negativePrompt,
-                includeCharAppearance: config_2.includeCharAppearance,
-                includeUserAppearance: config_2.includeUserAppearance,
-            }),
-            trim_676 = String(msg_16.contentAssetId || '').trim(),
-            descriptor_5 = {
-                id: msg_16.id || null,
-                timestamp: msg_16.timestamp || null,
-            },
-            saved_4 = await window.imApp.updateFriendMessage(
-                friend_29.id,
-                descriptor_5,
-                (targetMsg_3) => {
-                    targetMsg_3.content = result_3.imageUrl;
-                    targetMsg_3.contentAssetId = '';
-                    targetMsg_3.imageSource = 'generated';
-                    targetMsg_3.imageProvider = result_3.provider || '';
-                    targetMsg_3.imageModel = result_3.model || '';
-                    targetMsg_3.imageSize = result_3.size || '';
-                    targetMsg_3.faceReferenceUsed = !!result_3.faceReferenceUsed;
-                    targetMsg_3.charFaceReferenceUsed = !!result_3.charFaceReferenceUsed;
-                    targetMsg_3.userFaceReferenceUsed = !!result_3.userFaceReferenceUsed;
-                    targetMsg_3.imageGenerationPrompt = prompt_2;
-                    targetMsg_3.imageGenerationConfig = config_2;
-                    targetMsg_3.imageGenerationCompiledPrompt = result_3.compiledPrompt || '';
-                    targetMsg_3.imageRerollCount =
-                        Math.max(0, Number(targetMsg_3.imageRerollCount) || 0) + 1;
-                    targetMsg_3.imageRerolledAt = Date.now();
-                },
-                {
-                    silent: true,
-                },
-            );
-        if (!saved_4) throw new Error('新图片保存失败');
-        const updatedFriend_4 = window.imApp?.getFriendById?.(friend_29.id) || liveFriend,
-            updatedMessage_2 =
-                (updatedFriend_4.messages || []).find((item_4) => {
-                    if (descriptor_5.id && item_4?.id)
-                        return String(item_4.id) === String(descriptor_5.id);
-                    return (
-                        descriptor_5.timestamp &&
-                        String(item_4?.timestamp || '') === String(descriptor_5.timestamp)
-                    );
-                }) || msg_16,
-            trim_681 = String(updatedMessage_2.contentAssetId || '').trim();
-        trim_676 &&
-            trim_676 !== trim_681 &&
-            (await window.appStorage?.markAssetOrphaned?.(trim_676)['catch'](() => undefined));
-        const page = document.getElementById('chat-interface-' + friend_29.id),
-            container_16 = page?.querySelector('.ins-chat-messages');
-        if (container_16) {
-            const row_13 = Array.from(container_16.querySelectorAll('.chat-row')).find((item_5) => {
-                    if (descriptor_5.id && item_5.dataset.messageId)
-                        return String(item_5.dataset.messageId) === String(descriptor_5.id);
-                    return (
-                        descriptor_5.timestamp &&
-                        String(item_5.dataset.timestamp || '') === String(descriptor_5.timestamp)
-                    );
-                }),
-                image = row_13?.querySelector('.chat-image-bubble-img');
-            if (image && updatedMessage_2.content) image.src = updatedMessage_2.content;
-        }
-        return {
-            updatedFriend: updatedFriend_4,
-            updatedMessage: updatedMessage_2,
-        };
+  };
+}
+    async function rerollGeneratedChatImage(apk120Value949, apk120Value950, apk120Value951 = null) {
+  if (!canGenerateChatImage120(apk120Value949) || apk120Value950?.id == null) throw new Error('这张图片不支持重新生成');
+  const apk120Value952 = String(apk120Value950.id);
+  if (imageGenerationJobs120.has(apk120Value952) || window.imChat.isChatImageGenerationRunning?.(apk120Value950.id)) throw new Error("这段聊天已有图片正在生成");
+  imageGenerationJobs120.add(apk120Value952);
+  try {
+    const apk120Value953 = window.imApp?.getFriendById?.(apk120Value950.id) || (window.imData?.friends || []).find(apk120Value969 => String(apk120Value969.id) === String(apk120Value950.id));
+    if (!apk120Value953) throw new Error('原聊天已不存在，请重新进入聊天');
+    const apk120Value954 = {
+      'id': apk120Value949.id || null,
+      'timestamp': apk120Value949.timestamp || null
+    };
+    await window.imApp.ensureFriendMessagesLoaded?.(apk120Value953);
+    const apk120Value955 = (apk120Value953.messages || []).find(apk120Value970 => apk120Value954.id ? String(apk120Value970.id) === String(apk120Value954.id) : String(apk120Value970.timestamp) === String(apk120Value954.timestamp));
+    if (!canGenerateChatImage120(apk120Value955)) throw new Error("原图片消息已删除或不再支持生成");
+    const apk120Value956 = getImageSpeaker120(apk120Value955, apk120Value953),
+      apk120Value957 = apk120Value951 || getGeneratedImageRerollInput(apk120Value955, apk120Value956),
+      apk120Value958 = String(apk120Value957.prompt || '').trim(),
+      apk120Value959 = {
+        ...apk120Value957.config
+      };
+    apk120Value959.useCharReferenceFace = apk120Value959.includeCharAppearance !== ![] && apk120Value959.useCharReferenceFace === !![], apk120Value959.useUserReferenceFace = apk120Value959.includeUserAppearance !== ![] && apk120Value959.useUserReferenceFace === !![], apk120Value959.useReferenceFace = apk120Value959.useCharReferenceFace;
+    if (!apk120Value958) throw new Error("请填写画面提示词");
+    const apk120Value960 = await window.imChat.resolveImageReferenceFaces(apk120Value956, {
+        'charPresent': apk120Value959.useCharReferenceFace,
+        'userPresent': apk120Value959.useUserReferenceFace
+      }, {
+        'requireChar': apk120Value959.useCharReferenceFace,
+        'requireUser': apk120Value959.useUserReferenceFace
+      }),
+      apk120Value961 = await window.imChat.generateChatImage(apk120Value958, apk120Value953, {
+        'referenceImages': apk120Value960,
+        'basePrompt': apk120Value959.basePrompt,
+        'charAppearance': apk120Value959.charAppearance,
+        'userAppearance': apk120Value959.userAppearance,
+        'artistPrompt': apk120Value959.artistPrompt,
+        'negativePrompt': apk120Value959.negativePrompt,
+        'includeCharAppearance': apk120Value959.includeCharAppearance,
+        'includeUserAppearance': apk120Value959.includeUserAppearance
+      }),
+      apk120Value962 = String(apk120Value955.contentAssetId || '').trim(),
+      apk120Value963 = await window.imApp.updateFriendMessage(apk120Value950.id, apk120Value954, apk120Value971 => {
+        apk120Value971.content = apk120Value961.imageUrl, apk120Value971.contentAssetId = '', apk120Value971.imageSource = "generated", apk120Value971.imageProvider = apk120Value961.provider || '', apk120Value971.imageModel = apk120Value961.model || '', apk120Value971.imageSize = apk120Value961.size || '', apk120Value971.faceReferenceUsed = !!apk120Value961.faceReferenceUsed, apk120Value971.charFaceReferenceUsed = !!apk120Value961.charFaceReferenceUsed, apk120Value971.userFaceReferenceUsed = !!apk120Value961.userFaceReferenceUsed, apk120Value971.imageGenerationPrompt = apk120Value958, apk120Value971.imageGenerationConfig = apk120Value959, apk120Value971.imageGenerationCompiledPrompt = apk120Value961.compiledPrompt || '', apk120Value971.imageRerollCount = Math.max(0x0, Number(apk120Value971.imageRerollCount) || 0x0) + 0x1, apk120Value971.imageRerolledAt = Date.now();
+      }, {
+        'silent': !![]
+      });
+    if (!apk120Value963) throw new Error("新图片保存失败");
+    const apk120Value964 = window.imApp?.getFriendById?.(apk120Value950.id) || apk120Value953,
+      apk120Value965 = (apk120Value964.messages || []).find(apk120Value972 => {
+        if (apk120Value954.id && apk120Value972?.id) return String(apk120Value972.id) === String(apk120Value954.id);
+        return apk120Value954.timestamp && String(apk120Value972?.timestamp || '') === String(apk120Value954.timestamp);
+      }) || apk120Value949,
+      apk120Value966 = String(apk120Value965.contentAssetId || '').trim();
+    apk120Value962 && apk120Value962 !== apk120Value966 && (await window.appStorage?.markAssetOrphaned?.(apk120Value962)["catch"](() => undefined));
+    const apk120Value967 = document.getElementById("chat-interface-" + apk120Value950.id),
+      apk120Value968 = apk120Value967?.querySelector(".ins-chat-messages");
+    if (apk120Value968) {
+      const apk120Value973 = Array.from(apk120Value968.querySelectorAll('.chat-row')).find(apk120Value975 => {
+          if (apk120Value954.id && apk120Value975.dataset.messageId) return String(apk120Value975.dataset.messageId) === String(apk120Value954.id);
+          return apk120Value954.timestamp && String(apk120Value975.dataset.timestamp || '') === String(apk120Value954.timestamp);
+        }),
+        apk120Value974 = apk120Value973?.querySelector('.chat-image-bubble-img');
+      if (apk120Value974 && apk120Value965.content) apk120Value974.src = apk120Value965.content;
     }
+    return {
+      'updatedFriend': apk120Value964,
+      'updatedMessage': apk120Value965
+    };
+  } finally {
+    imageGenerationJobs120['delete'](apk120Value952);
+  }
+}
     function handleAction_77(error_2) {
         let reason_2 = String(error_2?.message || error_2 || '').trim();
         if (error_2?.name === 'AbortError' || /abort|timeout|超时/i.test(reason_2))
@@ -4115,256 +4064,128 @@
         if (!value_280.assetId || !window.appStorage?.getAssetUrl) return '';
         return (await window.appStorage.getAssetUrl(value_280.assetId)) || '';
     }
-    function openChatImageDetail(msg_17, friend_30, timestamp_9, senderName_2, value_281 = 0) {
-        let overlay_3 = document.getElementById('chat-image-detail-overlay');
-        !overlay_3 &&
-            ((overlay_3 = document.createElement('div')),
-            (overlay_3.id = 'chat-image-detail-overlay'),
-            (overlay_3.className = 'chat-image-detail-overlay'),
-            (overlay_3.innerHTML =
-                '\n                <div class="chat-image-detail-card">\n                    <div class="chat-image-detail-header">\n                        <div class="chat-image-detail-heading">\n                            <div class="chat-image-detail-sender"></div>\n                            <div class="chat-image-detail-time"></div>\n                        </div>\n                        <div class="chat-image-detail-actions">\n                            <button type="button" class="chat-image-detail-reroll"><i class="fas fa-redo"></i> 重 roll</button>\n                            <button type="button" class="chat-image-detail-save">保存</button>\n                            <button type="button" class="chat-image-detail-close" aria-label="关闭"><i class="fas fa-times"></i></button>\n                        </div>\n                    </div>\n                    <div class="chat-image-detail-media">\n                        <button type="button" class="chat-image-detail-prev" aria-label="上一张图片">‹</button>\n                        <img class="chat-image-detail-img" src="" alt="">\n                        <button type="button" class="chat-image-detail-next" aria-label="下一张图片">›</button>\n                        <span class="chat-image-detail-counter" aria-live="polite"></span>\n                    </div>\n                    <div class="chat-image-detail-reroll-error" role="alert" aria-live="assertive"></div>\n                    <div class="chat-image-detail-copy">\n                        <div class="chat-image-detail-label">图片详情</div>\n                        <div class="chat-image-detail-desc" style="font-size:15px; color:#222; line-height:1.55; white-space:pre-wrap; word-break:break-word;"></div>\n                    </div>\n                </div>\n            '),
-            document.body.appendChild(overlay_3),
-            overlay_3.addEventListener('click', (event_9) => {
-                (event_9.target === overlay_3 ||
-                    event_9.target.closest('.chat-image-detail-close')) &&
-                    (overlay_3.style.display = 'none');
-            }));
-        const imageEl = overlay_3.querySelector('.chat-image-detail-img');
-        const chatImageDetailCardElement = overlay_3.querySelector('.chat-image-detail-card');
-        const chatImageDetailHeaderElement = overlay_3.querySelector('.chat-image-detail-header');
-        const chatImageDetailMediaElement = overlay_3.querySelector('.chat-image-detail-media');
-        const chatImageDetailCopyElement = overlay_3.querySelector('.chat-image-detail-copy');
-        const senderEl = overlay_3.querySelector('.chat-image-detail-sender');
-        const timeEl = overlay_3.querySelector('.chat-image-detail-time');
-        const descEl = overlay_3.querySelector('.chat-image-detail-desc');
-        const rerollErrorEl = overlay_3.querySelector('.chat-image-detail-reroll-error');
-        const rerollButton = overlay_3.querySelector('.chat-image-detail-reroll');
-        const saveButton = overlay_3.querySelector('.chat-image-detail-save');
-        const chatImageDetailPrevElement = overlay_3.querySelector('.chat-image-detail-prev');
-        const chatImageDetailNextElement = overlay_3.querySelector('.chat-image-detail-next');
-        const chatImageDetailCounterElement = overlay_3.querySelector('.chat-image-detail-counter');
-        const date_3 = new Date(
-            getChatDisplayTimestamp(friend_30, timestamp_9 || msg_17.timestamp || Date.now()),
-        );
-        const textContent_4 =
-            formatBubbleTime(
-                      getChatDisplayTimestamp(
-                          friend_30,
-                          timestamp_9 || msg_17.timestamp || Date.now(),
-                      ),
-                  );
-        const imageUrl_3 = msg_17.content || window.imChat.CHAT_IMAGE_PLACEHOLDER_URL || '';
-        const value_284 = 1 + (Array.isArray(msg_17.albumImages) ? msg_17.albumImages.length : 0);
-        let imageUrl_3_2 = Math.min(value_284 - 1, Math.max(0, Number(value_281) || 0));
-        const isGeneratedImage =
-            msg_17.imageSource === 'generated' &&
-            imageUrl_3 !== (window.imChat.CHAT_IMAGE_PLACEHOLDER_URL || '');
-        const messageKey_2 = String(msg_17.id || timestamp_9 || msg_17.timestamp || '');
-        let detailImageKey_2 = messageKey_2 + ':' + imageUrl_3_2;
-        const value_699 = () => {
-                if (
-                    !imageEl?.naturalWidth ||
-                    !imageEl?.naturalHeight ||
-                    !chatImageDetailCardElement ||
-                    !chatImageDetailMediaElement
-                )
-                    return;
-                const value_702 = window.visualViewport?.height || window.innerHeight,
-                    min_703 = Math.min(value_702 * 0.86, 680),
-                    value_704 = rerollErrorEl ? window.getComputedStyle(rerollErrorEl) : null,
-                    value_705 =
-                        value_704?.display !== 'none'
-                            ? rerollErrorEl.offsetHeight + (parseFloat(value_704.marginTop) || 0)
-                            : 0,
-                    value_706 =
-                        (chatImageDetailHeaderElement?.offsetHeight || 0) +
-                        (chatImageDetailCopyElement?.offsetHeight || 0) +
-                        value_705,
-                    max_707 = Math.max(64, Math.floor(min_703 - value_706)),
-                    max_708 = Math.max(
-                        1,
-                        Math.floor(chatImageDetailCardElement.getBoundingClientRect().width),
-                    ),
-                    min_709 = Math.min(
-                        max_708 / imageEl.naturalWidth,
-                        max_707 / imageEl.naturalHeight,
-                    ),
-                    max_710 = Math.max(1, Math.floor(imageEl.naturalWidth * min_709)),
-                    max_711 = Math.max(1, Math.floor(imageEl.naturalHeight * min_709));
-                chatImageDetailMediaElement.style.width = max_710 + 'px';
-                chatImageDetailMediaElement.style.height = max_711 + 'px';
-                chatImageDetailMediaElement.style.aspectRatio =
-                    imageEl.naturalWidth + ' / ' + imageEl.naturalHeight;
-            };
-        const onload_2 = () => {
-                window.requestAnimationFrame(() => {
-                    if (imageEl?.dataset.detailImageKey === detailImageKey_2) value_699();
-                });
-            };
-        overlay_3.dataset.messageKey = messageKey_2;
-        imageEl && (imageEl.onload = onload_2);
-        const value_286 = async (value_289) => {
-            if (value_289 < 0 || value_289 >= value_284) return;
-            imageUrl_3_2 = value_289;
-            detailImageKey_2 = messageKey_2 + ':' + imageUrl_3_2;
-            chatImageDetailCounterElement &&
-                ((chatImageDetailCounterElement.style.display = value_284 > 1 ? '' : 'none'),
-                (chatImageDetailCounterElement.textContent = imageUrl_3_2 + 1 + '/' + value_284));
-            chatImageDetailPrevElement &&
-                ((chatImageDetailPrevElement.style.display = value_284 > 1 ? '' : 'none'),
-                (chatImageDetailPrevElement.disabled = imageUrl_3_2 === 0));
-            chatImageDetailNextElement &&
-                ((chatImageDetailNextElement.style.display = value_284 > 1 ? '' : 'none'),
-                (chatImageDetailNextElement.disabled = imageUrl_3_2 === value_284 - 1));
-            chatImageDetailMediaElement?.style.removeProperty('width');
-            chatImageDetailMediaElement?.style.removeProperty('height');
-            chatImageDetailMediaElement?.style.removeProperty('aspect-ratio');
-            imageEl.dataset.detailImageKey = detailImageKey_2;
-            imageEl.alt = '第 ' + (imageUrl_3_2 + 1) + ' 张图片';
-            imageEl.removeAttribute('src');
-            try {
-                const src_2 = await handleAction_27(msg_17, imageUrl_3_2);
-                if (
-                    imageEl.dataset.detailImageKey === detailImageKey_2 &&
-                    overlay_3.style.display !== 'none'
-                ) {
-                    if (src_2) imageEl.src = src_2;
-                    else window.showToast?.('图片加载失败');
-                }
-            } catch (value_291) {
-                if (imageEl.dataset.detailImageKey === detailImageKey_2)
-                    window.showToast?.('图片加载失败');
-            }
-        };
-        chatImageDetailPrevElement.onclick = () => {
-            void value_286(imageUrl_3_2 - 1);
-        };
-        chatImageDetailNextElement.onclick = () => {
-            void value_286(imageUrl_3_2 + 1);
-        };
-        let value_287 = null;
-        const value_288 = (value_292, value_293) => {
-            if (!value_287 || value_284 < 2) return;
-            const value_294 = value_292 - value_287.x,
-                value_296 = value_293 - value_287.y;
-            value_287 = null;
-            Math.abs(value_294) > 32 &&
-                Math.abs(value_294) > Math.abs(value_296) * 1.15 &&
-                void value_286(imageUrl_3_2 + (value_294 < 0 ? 1 : -1));
-        };
-        chatImageDetailMediaElement.onpointerdown = (event_297) => {
-            if (event_297.pointerType !== 'touch')
-                value_287 = {
-                    x: event_297.clientX,
-                    y: event_297.clientY,
-                };
-        };
-        chatImageDetailMediaElement.onpointerup = (event_298) => {
-            if (event_298.pointerType !== 'touch') value_288(event_298.clientX, event_298.clientY);
-        };
-        chatImageDetailMediaElement.onpointercancel = () => {
-            value_287 = null;
-        };
-        chatImageDetailMediaElement.ontouchstart = (event_299) => {
-            const value_300 = event_299.touches?.[0];
-            if (value_300)
-                value_287 = {
-                    x: value_300.clientX,
-                    y: value_300.clientY,
-                };
-        };
-        chatImageDetailMediaElement.ontouchend = (value_301) => {
-            const value_302 = value_301.changedTouches?.[0];
-            if (value_302) value_288(value_302.clientX, value_302.clientY);
-        };
-        chatImageDetailMediaElement.ontouchcancel = () => {
-            value_287 = null;
-        };
-        overlay_3.onkeydown = (event_303) => {
-            event_303.key === 'ArrowLeft' &&
-                (event_303.preventDefault(), void value_286(imageUrl_3_2 - 1));
-            event_303.key === 'ArrowRight' &&
-                (event_303.preventDefault(), void value_286(imageUrl_3_2 + 1));
-            if (event_303.key === 'Escape') overlay_3.style.display = 'none';
-        };
-        if (senderEl)
-            senderEl.textContent =
-                senderName_2 || friend_30?.nickname || friend_30?.realName || '图片';
-        if (timeEl) timeEl.textContent = textContent_4;
-        if (descEl) descEl.textContent = msg_17.text || msg_17.description || '暂无图片描述';
-        rerollErrorEl && ((rerollErrorEl.style.display = 'none'), (rerollErrorEl.textContent = ''));
-        saveButton &&
-            ((saveButton.style.display = isGeneratedImage ? 'inline-flex' : 'none'),
-            (saveButton.disabled = false),
-            (saveButton.textContent = '保存'),
-            (saveButton.onclick = async () => {
-                if (!isGeneratedImage || saveButton.disabled) return;
-                const originalText = saveButton.textContent;
-                saveButton.disabled = true;
-                saveButton.textContent = '保存中…';
-                try {
-                    const result_4 = await saveGeneratedChatImage(
-                        imageUrl_3,
-                        timestamp_9 || msg_17.timestamp,
-                    );
-                    if (result_4 === 'downloaded' || result_4 === 'shared')
-                        window.showToast?.('图片已保存');
-                } catch (error_3) {
-                    window.showToast?.(error_3?.message || '图片保存失败，请稍后重试');
-                } finally {
-                    saveButton.disabled = false;
-                    saveButton.textContent = originalText;
-                }
-            }));
-        rerollButton &&
-            ((rerollButton.style.display = isGeneratedImage ? 'inline-flex' : 'none'),
-            (rerollButton.disabled = false),
-            (rerollButton.innerHTML = '<i class="fas fa-redo"></i> 重 roll'),
-            (rerollButton.onclick = async () => {
-                if (!isGeneratedImage || rerollButton.disabled) return;
-                rerollButton.disabled = true;
-                if (saveButton) saveButton.disabled = true;
-                rerollErrorEl &&
-                    ((rerollErrorEl.style.display = 'none'), (rerollErrorEl.textContent = ''));
-                rerollButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中…';
-                try {
-                    const { updatedFriend: updatedFriend_5, updatedMessage: updatedMessage_3 } =
-                        await rerollGeneratedChatImage(msg_17, friend_30);
-                    window.showToast?.('图片已重新生成');
-                    overlay_3.dataset.messageKey === messageKey_2 &&
-                        overlay_3.style.display !== 'none' &&
-                        openChatImageDetail(
-                            updatedMessage_3,
-                            updatedFriend_5,
-                            updatedMessage_3.timestamp,
-                            senderName_2,
-                        );
-                } catch (error_4) {
-                    console.error('[iMessage] Image reroll failed:', error_4);
-                    const textContent_5 = handleAction_77(error_4);
-                    if (
-                        window.u2Api?.isRequestError?.(error_4) &&
-                        window.u2Api.reportError(error_4, {
-                            operation: '图片重新生成',
-                        })
-                    ) {
-                    } else
-                        rerollErrorEl
-                            ? ((rerollErrorEl.textContent = textContent_5),
-                              (rerollErrorEl.style.display = 'block'),
-                              onload_2())
-                            : window.alert(textContent_5);
-                } finally {
-                    rerollButton.disabled = false;
-                    rerollButton.innerHTML = '<i class="fas fa-redo"></i> 重 roll';
-                    if (saveButton) saveButton.disabled = false;
-                }
-            }));
-        overlay_3.style.display = 'flex';
-        overlay_3.tabIndex = -1;
-        overlay_3.focus();
-        void value_286(imageUrl_3_2);
+    function openChatImageDetail(apk120Value1004, apk120Value1005, apk120Value1006, apk120Value1007, apk120Value1008 = 0x0) {
+  let apk120Value1009 = document.getElementById("chat-image-detail-overlay");
+  !apk120Value1009 && (apk120Value1009 = document.createElement("div"), apk120Value1009.id = "chat-image-detail-overlay", apk120Value1009.className = 'chat-image-detail-overlay', apk120Value1009.innerHTML = "\n                <div class=\"chat-image-detail-card\">\n                    <div class=\"chat-image-detail-header\">\n                        <div class=\"chat-image-detail-heading\">\n                            <div class=\"chat-image-detail-sender\"></div>\n                            <div class=\"chat-image-detail-time\"></div>\n                        </div>\n                        <div class=\"chat-image-detail-actions\">\n                            <button type=\"button\" class=\"chat-image-detail-reroll\"><i class=\"fas fa-redo\"></i> 重 roll</button>\n                            <button type=\"button\" class=\"chat-image-detail-save\">保存</button>\n                            <button type=\"button\" class=\"chat-image-detail-close\" aria-label=\"关闭\"><i class=\"fas fa-times\"></i></button>\n                        </div>\n                    </div>\n                    <div class=\"chat-image-detail-media\">\n                        <button type=\"button\" class=\"chat-image-detail-prev\" aria-label=\"上一张图片\">‹</button>\n                        <img class=\"chat-image-detail-img\" src=\"\" alt=\"\">\n                        <button type=\"button\" class=\"chat-image-detail-next\" aria-label=\"下一张图片\">›</button>\n                        <span class=\"chat-image-detail-counter\" aria-live=\"polite\"></span>\n                    </div>\n                    <div class=\"chat-image-detail-reroll-error\" role=\"alert\" aria-live=\"assertive\"></div>\n                    <div class=\"chat-image-detail-copy\">\n                        <div class=\"chat-image-detail-label\">图片详情</div>\n                        <div class=\"chat-image-detail-desc\" style=\"font-size:15px; color:#222; line-height:1.55; white-space:pre-wrap; word-break:break-word;\"></div>\n                    </div>\n                </div>\n            ", document.body.appendChild(apk120Value1009), apk120Value1009.addEventListener('click', apk120Value1038 => {
+    (apk120Value1038.target === apk120Value1009 || apk120Value1038.target.closest('.chat-image-detail-close')) && (apk120Value1009.style.display = 'none');
+  }));
+  const apk120Value1010 = apk120Value1009.querySelector(".chat-image-detail-img"),
+    apk120Value1011 = apk120Value1009.querySelector(".chat-image-detail-card"),
+    apk120Value1012 = apk120Value1009.querySelector('.chat-image-detail-header'),
+    apk120Value1013 = apk120Value1009.querySelector(".chat-image-detail-media"),
+    apk120Value1014 = apk120Value1009.querySelector(".chat-image-detail-copy"),
+    apk120Value1015 = apk120Value1009.querySelector('.chat-image-detail-sender'),
+    apk120Value1016 = apk120Value1009.querySelector(".chat-image-detail-time"),
+    apk120Value1017 = apk120Value1009.querySelector(".chat-image-detail-desc"),
+    apk120Value1018 = apk120Value1009.querySelector(".chat-image-detail-reroll-error"),
+    apk120Value1019 = apk120Value1009.querySelector(".chat-image-detail-reroll"),
+    apk120Value1020 = apk120Value1009.querySelector('.chat-image-detail-save'),
+    apk120Value1021 = apk120Value1009.querySelector(".chat-image-detail-prev"),
+    apk120Value1022 = apk120Value1009.querySelector('.chat-image-detail-next'),
+    apk120Value1023 = apk120Value1009.querySelector(".chat-image-detail-counter"),
+    apk120Value1024 = new Date(getChatDisplayTimestamp(apk120Value1005, apk120Value1006 || apk120Value1004.timestamp || Date.now())),
+    apk120Value1025 = typeof window.formatChatBubbleTime === "function" ? window.formatChatBubbleTime(getChatDisplayTimestamp(apk120Value1005, apk120Value1006 || apk120Value1004.timestamp || Date.now())) : apk120Value1024.getHours() + ':' + apk120Value1024.getMinutes().toString().padStart(0x2, '0'),
+    apk120Value1026 = apk120Value1004.content || window.imChat.CHAT_IMAGE_PLACEHOLDER_URL || '',
+    apk120Value1027 = 0x1 + (Array.isArray(apk120Value1004.albumImages) ? apk120Value1004.albumImages.length : 0x0);
+  let apk120Value1028 = Math.min(apk120Value1027 - 0x1, Math.max(0x0, Number(apk120Value1008) || 0x0));
+  const apk120Value1029 = apk120Value1004.imageSource === "generated" && !isImagePlaceholder120(apk120Value1004),
+    apk120Value1030 = canGenerateChatImage120(apk120Value1004),
+    apk120Value1031 = String(apk120Value1004.id || apk120Value1006 || apk120Value1004.timestamp || '');
+  let apk120Value1032 = apk120Value1031 + ':' + apk120Value1028;
+  const apk120Value1033 = () => {
+      if (!apk120Value1010?.naturalWidth || !apk120Value1010?.naturalHeight || !apk120Value1011 || !apk120Value1013) return;
+      const apk120Value1039 = window.visualViewport?.height || window.innerHeight,
+        apk120Value1040 = Math.min(apk120Value1039 * 0.86, 0x2a8),
+        apk120Value1041 = apk120Value1018 ? window.getComputedStyle(apk120Value1018) : null,
+        apk120Value1042 = apk120Value1041?.display !== "none" ? apk120Value1018.offsetHeight + (parseFloat(apk120Value1041.marginTop) || 0x0) : 0x0,
+        apk120Value1043 = (apk120Value1012?.offsetHeight || 0x0) + (apk120Value1014?.offsetHeight || 0x0) + apk120Value1042,
+        apk120Value1044 = Math.max(0x40, Math.floor(apk120Value1040 - apk120Value1043)),
+        apk120Value1045 = Math.max(0x1, Math.floor(apk120Value1011.getBoundingClientRect().width)),
+        apk120Value1046 = Math.min(apk120Value1045 / apk120Value1010.naturalWidth, apk120Value1044 / apk120Value1010.naturalHeight),
+        apk120Value1047 = Math.max(0x1, Math.floor(apk120Value1010.naturalWidth * apk120Value1046)),
+        apk120Value1048 = Math.max(0x1, Math.floor(apk120Value1010.naturalHeight * apk120Value1046));
+      apk120Value1013.style.width = apk120Value1047 + 'px', apk120Value1013.style.height = apk120Value1048 + 'px', apk120Value1013.style.aspectRatio = apk120Value1010.naturalWidth + " / " + apk120Value1010.naturalHeight;
+    },
+    apk120Value1034 = () => {
+      window.requestAnimationFrame(() => {
+        if (apk120Value1010?.dataset.detailImageKey === apk120Value1032) apk120Value1033();
+      });
+    };
+  apk120Value1009.dataset.messageKey = apk120Value1031;
+  apk120Value1010 && (apk120Value1010.onload = apk120Value1034);
+  const apk120Value1035 = async apk120Value1049 => {
+    if (apk120Value1049 < 0x0 || apk120Value1049 >= apk120Value1027) return;
+    apk120Value1028 = apk120Value1049, apk120Value1032 = apk120Value1031 + ':' + apk120Value1028;
+    apk120Value1023 && (apk120Value1023.style.display = apk120Value1027 > 0x1 ? '' : 'none', apk120Value1023.textContent = apk120Value1028 + 0x1 + '/' + apk120Value1027);
+    apk120Value1021 && (apk120Value1021.style.display = apk120Value1027 > 0x1 ? '' : 'none', apk120Value1021.disabled = apk120Value1028 === 0x0);
+    apk120Value1022 && (apk120Value1022.style.display = apk120Value1027 > 0x1 ? '' : "none", apk120Value1022.disabled = apk120Value1028 === apk120Value1027 - 0x1);
+    apk120Value1013?.style.removeProperty("width"), apk120Value1013?.style.removeProperty("height"), apk120Value1013?.style.removeProperty("aspect-ratio"), apk120Value1010.dataset.detailImageKey = apk120Value1032, apk120Value1010.alt = '第\x20' + (apk120Value1028 + 0x1) + " 张图片", apk120Value1010.removeAttribute("src");
+    try {
+      const apk120Value1050 = await handleAction_27(apk120Value1004, apk120Value1028);
+      if (apk120Value1010.dataset.detailImageKey === apk120Value1032 && apk120Value1009.style.display !== 'none') {
+        if (apk120Value1050) apk120Value1010.src = apk120Value1050;else window.showToast?.("图片加载失败");
+      }
+    } catch (apk120Value1051) {
+      if (apk120Value1010.dataset.detailImageKey === apk120Value1032) window.showToast?.('图片加载失败');
     }
+  };
+  apk120Value1021.onclick = () => {
+    void apk120Value1035(apk120Value1028 - 0x1);
+  }, apk120Value1022.onclick = () => {
+    void apk120Value1035(apk120Value1028 + 0x1);
+  };
+  let apk120Value1036 = null;
+  const apk120Value1037 = (apk120Value1052, apk120Value1053) => {
+    if (!apk120Value1036 || apk120Value1027 < 0x2) return;
+    const apk120Value1054 = apk120Value1052 - apk120Value1036.x,
+      apk120Value1055 = apk120Value1053 - apk120Value1036.y;
+    apk120Value1036 = null, Math.abs(apk120Value1054) > 0x20 && Math.abs(apk120Value1054) > Math.abs(apk120Value1055) * 1.15 && void apk120Value1035(apk120Value1028 + (apk120Value1054 < 0x0 ? 0x1 : -0x1));
+  };
+  apk120Value1013.onpointerdown = apk120Value1056 => {
+    if (apk120Value1056.pointerType !== "touch") apk120Value1036 = {
+      'x': apk120Value1056.clientX,
+      'y': apk120Value1056.clientY
+    };
+  }, apk120Value1013.onpointerup = apk120Value1057 => {
+    if (apk120Value1057.pointerType !== "touch") apk120Value1037(apk120Value1057.clientX, apk120Value1057.clientY);
+  }, apk120Value1013.onpointercancel = () => {
+    apk120Value1036 = null;
+  }, apk120Value1013.ontouchstart = apk120Value1058 => {
+    const apk120Value1059 = apk120Value1058.touches?.[0x0];
+    if (apk120Value1059) apk120Value1036 = {
+      'x': apk120Value1059.clientX,
+      'y': apk120Value1059.clientY
+    };
+  }, apk120Value1013.ontouchend = apk120Value1060 => {
+    const apk120Value1061 = apk120Value1060.changedTouches?.[0x0];
+    if (apk120Value1061) apk120Value1037(apk120Value1061.clientX, apk120Value1061.clientY);
+  }, apk120Value1013.ontouchcancel = () => {
+    apk120Value1036 = null;
+  }, apk120Value1009.onkeydown = apk120Value1062 => {
+    apk120Value1062.key === "ArrowLeft" && (apk120Value1062.preventDefault(), void apk120Value1035(apk120Value1028 - 0x1));
+    apk120Value1062.key === "ArrowRight" && (apk120Value1062.preventDefault(), void apk120Value1035(apk120Value1028 + 0x1));
+    if (apk120Value1062.key === "Escape") apk120Value1009.style.display = "none";
+  };
+  if (apk120Value1015) apk120Value1015.textContent = apk120Value1007 || apk120Value1005?.nickname || apk120Value1005?.realName || '图片';
+  if (apk120Value1016) apk120Value1016.textContent = apk120Value1025;
+  if (apk120Value1017) apk120Value1017.textContent = apk120Value1004.text || apk120Value1004.description || "暂无图片描述";
+  apk120Value1018 && (apk120Value1018.style.display = "none", apk120Value1018.textContent = ''), apk120Value1020 && (apk120Value1020.style.display = apk120Value1029 ? 'inline-flex' : 'none', apk120Value1020.disabled = ![], apk120Value1020.textContent = '保存', apk120Value1020.onclick = async () => {
+    if (!apk120Value1029 || apk120Value1020.disabled) return;
+    const apk120Value1063 = apk120Value1020.textContent;
+    apk120Value1020.disabled = !![], apk120Value1020.textContent = '保存中…';
+    try {
+      const apk120Value1064 = await saveGeneratedChatImage(await handleAction_27(apk120Value1004, apk120Value1028), apk120Value1006 || apk120Value1004.timestamp);
+      if (apk120Value1064 === 'downloaded' || apk120Value1064 === "shared") window.showToast?.("图片已保存");
+    } catch (apk120Value1065) {
+      window.showToast?.(apk120Value1065?.message || "图片保存失败，请稍后重试");
+    } finally {
+      apk120Value1020.disabled = ![], apk120Value1020.textContent = apk120Value1063;
+    }
+  }), apk120Value1019 && (apk120Value1019.style.display = apk120Value1030 ? "inline-flex" : "none", apk120Value1019.disabled = ![], apk120Value1019.innerHTML = apk120Value1029 ? "<i class=\"fas fa-redo\"></i> 重 roll" : "<i class=\"fas fa-magic\"></i> 生成图片", apk120Value1019.onclick = () => {
+    if (!apk120Value1030 || apk120Value1019.disabled) return;
+    openChatImagePrompt120(apk120Value1004, apk120Value1005, apk120Value1006, apk120Value1007);
+  }), apk120Value1009.style.display = "flex", apk120Value1009.tabIndex = -0x1, apk120Value1009.focus(), void apk120Value1035(apk120Value1028);
+}
     /* PhotoStack by Wren036 (https://github.com/Wren036/PhotoStack).
        https://polyformproject.org/licenses/noncommercial/1.0.0/
        Adapted from fggghub-ux/PhotoStack README, “展开 / 收起动画”:
@@ -7055,4 +6876,90 @@ function switchFakeLinkDetailLanguage(apk119Value1394, apk119Value1395) {
   const apk119Value1400 = !apk119Value1396.data.translation ? "此链接暂无中文翻译" : apk119Value1395 ? "查看原文" : "查看中文翻译";
   apk119Value1399.setAttribute("aria-label", apk119Value1400), apk119Value1399.title = apk119Value1400;
 }
+function isImagePlaceholder120(apk120Value929) {
+  if (!apk120Value929?.content) return !apk120Value929?.contentAssetId;
+  const apk120Value930 = String(apk120Value929.content).split(/[?#]/)[0x0].replace(/^\.?\//, '');
+  return [window.imChat.CHAT_IMAGE_PLACEHOLDER_URL, "assets/imessage/chat-image-placeholder.jpg", 'assets/imessage/chat-image-placeholder-512.jpg'].includes(apk120Value930);
+}
+function canGenerateChatImage120(apk120Value931) {
+  if (!apk120Value931 || apk120Value931.type !== "image" || apk120Value931.albumImages?.length) return ![];
+  return apk120Value931.imageSource === "generated" || apk120Value931.role === "assistant" && apk120Value931.imageSource !== "real" && isImagePlaceholder120(apk120Value931);
+}
+function getImageSpeaker120(apk120Value932, apk120Value933) {
+  if (apk120Value933?.type !== "group") return apk120Value933;
+  const apk120Value934 = [apk120Value932.speakerMemberId, apk120Value932.senderMemberId].find(apk120Value937 => apk120Value937 != null && String(apk120Value937).trim());
+  if (apk120Value934 != null) return (window.imData?.friends || []).find(apk120Value938 => (apk120Value938.type === "char" || apk120Value938.type === 'npc') && String(apk120Value938.id) === String(apk120Value934).trim()) || null;
+  const apk120Value935 = String(apk120Value932.speaker || apk120Value932.senderName || '').trim().toLowerCase();
+  if (!apk120Value935) return null;
+  const apk120Value936 = (window.imChat.getGroupMemberFriends?.(apk120Value933) || []).filter(apk120Value939 => [apk120Value939.nickname, apk120Value939.realName].some(apk120Value940 => String(apk120Value940 || '').trim().toLowerCase() === apk120Value935));
+  return apk120Value936.length === 0x1 ? apk120Value936[0x0] : null;
+}
+function openChatImagePrompt120(apk120Value976, apk120Value977, apk120Value978, apk120Value979) {
+  const apk120Value980 = window.imApp?.showCustomModal || window.showCustomModal;
+  if (!apk120Value980) {
+    window.showToast?.("无法打开生图提示词窗口，请刷新后重试");
+    return;
+  }
+  const apk120Value981 = window.imApp?.getFriendById?.(apk120Value977.id) || apk120Value977,
+    apk120Value982 = getGeneratedImageRerollInput(apk120Value976, getImageSpeaker120(apk120Value976, apk120Value981)),
+    apk120Value983 = document.getElementById("chat-image-detail-overlay"),
+    apk120Value984 = (apk120Value985 = apk120Value981, apk120Value986 = apk120Value976) => {
+      const apk120Value987 = window.imApp?.getFriendById?.(apk120Value985.id) || apk120Value985,
+        apk120Value988 = (apk120Value987.messages || []).find(apk120Value989 => apk120Value986.id ? String(apk120Value989.id) === String(apk120Value986.id) : String(apk120Value989.timestamp) === String(apk120Value986.timestamp));
+      if (apk120Value988) openChatImageDetail(apk120Value988, apk120Value987, apk120Value978, apk120Value979);
+    };
+  if (apk120Value983) apk120Value983.style.display = "none";
+  apk120Value980({
+    'type': 'prompt',
+    'ownerId': "chat-image-" + apk120Value977.id + '-' + (apk120Value976.id || apk120Value978),
+    'title': apk120Value976.imageSource === "generated" && !isImagePlaceholder120(apk120Value976) ? "图片重 roll" : "生成图片",
+    'textareaLabel': '画面提示词',
+    'placeholder': "描述这张图片的主体、动作、场景和构图",
+    'defaultValue': apk120Value982.prompt,
+    'secondaryTextarea': {
+      'label': "正向提示词",
+      'placeholder': "基础正向提示词（选填）",
+      'defaultValue': apk120Value982.config.basePrompt
+    },
+    'multiline': !![],
+    'autoFocus': ![],
+    'confirmText': '开始生成',
+    'confirmTone': "dark",
+    'generationPrompt': {
+      ...apk120Value982.config,
+      'showSubjects': !![],
+      'showPresets': ![],
+      'showAutoGenerate': ![]
+    },
+    'onCancel': () => apk120Value984(),
+    'onConfirm': async (apk120Value990, apk120Value991 = {}) => {
+      apk120Value991.setPromptError?.('');
+      const apk120Value992 = {
+        'prompt': String(apk120Value990 || '').trim(),
+        'config': {
+          ...apk120Value982.config,
+          'basePrompt': String(apk120Value991.secondaryValue ?? '').trim(),
+          ...Object.fromEntries(["charAppearance", "userAppearance", "artistPrompt", "negativePrompt"].map(apk120Value993 => [apk120Value993, String(apk120Value991[apk120Value993] ?? '').trim()])),
+          ...Object.fromEntries(["includeCharAppearance", "includeUserAppearance", "useCharReferenceFace", "useUserReferenceFace"].map(apk120Value994 => [apk120Value994, apk120Value991[apk120Value994] === !![]]))
+        }
+      };
+      try {
+        const {
+          updatedFriend: apk120Value995,
+          updatedMessage: apk120Value996
+        } = await rerollGeneratedChatImage(apk120Value976, apk120Value977, apk120Value992);
+        window.showToast?.("图片已生成");
+        if (apk120Value991.isCurrent?.() !== ![]) apk120Value984(apk120Value995, apk120Value996);
+        return !![];
+      } catch (apk120Value997) {
+        console.error('[iMessage]\x20Image\x20reroll\x20failed:', apk120Value997);
+        const apk120Value998 = handleAction_77(apk120Value997);
+        return apk120Value991.setPromptError?.(apk120Value998), window.u2Api?.isRequestError?.(apk120Value997) && window.u2Api.reportError?.(apk120Value997, {
+          'operation': "图片重新生成"
+        }), ![];
+      }
+    }
+  });
+}
+const imageGenerationJobs120 = new Set();
 });

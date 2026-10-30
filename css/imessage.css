@@ -20371,3 +20371,37 @@ button.moment-private-chat-bubble.has-translation {
 .im-file-body input[data-name]:focus,
 .im-file-body select:focus,
 .im-file-body textarea:focus { outline: none; box-shadow: none; }
+
+
+
+.im-image-subjects {
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f2f2f7;
+    font-size: 13px;
+}
+
+
+.im-image-subjects > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+}
+
+
+.im-image-subjects > div + div { margin-top: 12px; }
+
+.im-image-subjects label { display: flex; align-items: center; gap: 6px; }
+
+.im-image-subjects input { width: 18px; height: 18px; accent-color: #111; }
+
+
+.im-image-generation-error {
+    margin: 0 0 14px;
+    color: #c93428;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}

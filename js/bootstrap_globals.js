@@ -14,6 +14,7 @@
             model: '',
             temperature: 0.7,
             frequencyPenalty: 0,
+            streamEnabled: false,
         },
         VECTOR_MEMORY_PROVIDERS_2 = Object.freeze({
             siliconflow: {
@@ -610,21 +611,20 @@
         }
         return parsed_2.toString();
     }
-    function sanitizeApiConfig_2(value_148) {
-        const config_4 = value_148 && typeof value_148 === 'object' ? value_148 : {},
-            temperature_2 = Number.parseFloat(config_4.temperature),
-            float_150 = Number.parseFloat(config_4.frequencyPenalty);
-        return {
-            provider: normalizeApiProvider_2(config_4.provider),
-            endpoint: String(config_4.endpoint || '').trim(),
-            apiKey: String(config_4.apiKey || '').trim(),
-            model: String(config_4.model || '').trim(),
-            temperature: Number.isFinite(temperature_2)
-                ? Math.max(0, Math.min(2, temperature_2))
-                : 0.7,
-            frequencyPenalty: Number.isFinite(float_150) ? Math.max(-2, Math.min(2, float_150)) : 0,
-        };
-    }
+    function sanitizeApiConfig_2(apk120Value170) {
+  const apk120Value171 = apk120Value170 && typeof apk120Value170 === "object" ? apk120Value170 : {},
+    apk120Value172 = Number.parseFloat(apk120Value171.temperature),
+    apk120Value173 = Number.parseFloat(apk120Value171.frequencyPenalty);
+  return {
+    'provider': normalizeApiProvider_2(apk120Value171.provider),
+    'endpoint': String(apk120Value171.endpoint || '').trim(),
+    'apiKey': String(apk120Value171.apiKey || '').trim(),
+    'model': String(apk120Value171.model || '').trim(),
+    'temperature': Number.isFinite(apk120Value172) ? Math.max(0x0, Math.min(0x2, apk120Value172)) : 0.7,
+    'frequencyPenalty': Number.isFinite(apk120Value173) ? Math.max(-0x2, Math.min(0x2, apk120Value173)) : 0x0,
+    'streamEnabled': apk120Value171.streamEnabled === !![]
+  };
+}
     function validateApiConfig_2(value_6, options_2 = {}) {
         const config = sanitizeApiConfig_2(value_6);
         parseHttpUrl_2(config.endpoint);
@@ -632,36 +632,21 @@
         if (options_2.requireModel !== false && !config.model) throw new Error('请填写模型名称');
         return config;
     }
-    function buildApiHeaders_2(config_5, extraHeaders = {}) {
-        const endpoint_5 = String(config_5?.endpoint || ''),
-            provider_11 = normalizeApiProvider_2(
-                config_5?.provider || detectApiProviderFromEndpoint_2(endpoint_5),
-            ),
-            headers_2 = new Headers({
-                'Content-Type': 'application/json',
-                ...extraHeaders,
-            });
-        if (isGeminiProvider(provider_11))
-            headers_2.set('x-goog-api-key', String(config_5?.apiKey || ''));
-        else {
-            if (isAnthropicProvider(provider_11)) {
-                headers_2.set('x-api-key', String(config_5?.apiKey || ''));
-                headers_2.set('anthropic-version', '2023-06-01');
-            } else
-                /\.openai\.azure\.com(?=\/|$)/i.test(endpoint_5)
-                    ? headers_2.set('api-key', String(config_5?.apiKey || ''))
-                    : headers_2.set('Authorization', 'Bearer ' + String(config_5?.apiKey || ''));
-        }
-        const float_157 = Number.parseFloat(config_5?.frequencyPenalty),
-            value_158 = Number.isFinite(float_157) ? Math.max(-2, Math.min(2, float_157)) : 0;
-        return (
-            !isGeminiProvider(provider_11) &&
-                !isAnthropicProvider(provider_11) &&
-                value_158 !== 0 &&
-                headers_2.set(text_33, String(value_158)),
-            Object.fromEntries(headers_2.entries())
-        );
-    }
+    function buildApiHeaders_2(apk120Value177, apk120Value178 = {}) {
+  const apk120Value179 = String(apk120Value177?.endpoint || ''),
+    apk120Value180 = normalizeApiProvider_2(apk120Value177?.provider || detectApiProviderFromEndpoint_2(apk120Value179)),
+    apk120Value181 = new Headers({
+      'Content-Type': 'application/json',
+      ...apk120Value178
+    });
+  apk120Value181.set("X-U2-Stream-Enabled", apk120Value177?.streamEnabled === !![] ? '1' : '0');
+  if (isGeminiProvider(apk120Value180)) apk120Value181.set('x-goog-api-key', String(apk120Value177?.apiKey || ''));else {
+    if (isAnthropicProvider(apk120Value180)) apk120Value181.set('x-api-key', String(apk120Value177?.apiKey || '')), apk120Value181.set("anthropic-version", '2023-06-01');else /\.openai\.azure\.com(?=\/|$)/i.test(apk120Value179) ? apk120Value181.set("api-key", String(apk120Value177?.apiKey || '')) : apk120Value181.set("Authorization", 'Bearer\x20' + String(apk120Value177?.apiKey || ''));
+  }
+  const apk120Value182 = Number.parseFloat(apk120Value177?.frequencyPenalty),
+    apk120Value183 = Number.isFinite(apk120Value182) ? Math.max(-0x2, Math.min(0x2, apk120Value182)) : 0x0;
+  return !isGeminiProvider(apk120Value180) && !isAnthropicProvider(apk120Value180) && apk120Value183 !== 0x0 && apk120Value181.set(text_33, String(apk120Value183)), Object.fromEntries(apk120Value181.entries());
+}
     async function readApiError_2(value_159) {
         let rawBody_2 = '';
         try {
@@ -706,61 +691,55 @@
     });
     const originalFetch = window.fetch,
         text_33 = 'X-U2-Frequency-Penalty';
-    function fetchChatCompletion_2(value_165, value_166 = {}) {
-        const value_167 = value_166 && typeof value_166 === 'object' ? value_166 : {},
-            body_168 = value_167.body;
-        if (!body_168 || typeof body_168 !== 'object' || Array.isArray(body_168))
-            return window.fetch(value_165, value_167);
-        const value_169 =
-                value_167.apiConfig && typeof value_167.apiConfig === 'object'
-                    ? sanitizeApiConfig_2(value_167.apiConfig)
-                    : null,
-            value_170 =
-                value_167.headers instanceof Headers
-                    ? new Headers(value_167.headers)
-                    : new Headers(
-                          value_167.headers || (value_169 ? buildApiHeaders_2(value_169) : {}),
-                      ),
-            silentErrors_2 = value_170.get(INTERNAL_SILENT_ERROR_HEADER_2) === '1',
-            showGlobalErrors_2 = value_170.get(INTERNAL_GLOBAL_ERROR_HEADER_2) === '1',
-            value_173 = value_169 ? value_169.frequencyPenalty : value_170.get(text_33);
-        value_170['delete'](INTERNAL_SILENT_ERROR_HEADER_2);
-        value_170['delete'](INTERNAL_GLOBAL_ERROR_HEADER_2);
-        value_170['delete'](text_33);
-        let requestUrl = String(value_165 || '');
-        if (/\.openai\.azure\.com(?=\/|$)/i.test(requestUrl)) {
-            const bearer_2 =
-                String(value_170.get('Authorization') || '').match(/^Bearer\s+(.+)$/i)?.[1] || '';
-            if (bearer_2 && !value_170.has('api-key')) value_170.set('api-key', bearer_2);
-            value_170['delete']('Authorization');
-        }
-        const value_175 = value_169?.provider || '';
-        !isGeminiProvider(value_175) &&
-            !isAnthropicProvider(value_175) &&
-            handleAction_54(requestUrl, value_170, body_168, value_173);
-        const nativeAdapter_2 = createNativeRequestAdapter(
-            requestUrl,
-            value_170,
-            body_168,
-            value_175,
-        );
-        if (nativeAdapter_2) requestUrl = nativeAdapter_2.url;
-        const options_177 = {
-            ...value_167,
-        };
-        return (
-            delete options_177.apiConfig,
-            (options_177.headers = value_170),
-            (options_177.body = JSON.stringify(nativeAdapter_2 ? nativeAdapter_2.body : body_168)),
-            handleAction_55([requestUrl, options_177], {
-                nativeAdapter: nativeAdapter_2,
-                silentErrors: silentErrors_2,
-                showGlobalErrors: showGlobalErrors_2,
-                isAiApiRequest: true,
-                signal: options_177.signal,
-            })
-        );
-    }
+    const API_STREAM_HEADER_120 = 'X-U2-Stream-Enabled';
+function applyApiStreamMode_120(apk120Value190, apk120Value191, apk120Value192, apk120Value193, apk120Value194) {
+  if (!apk120Value192 || !Array.isArray(apk120Value192.messages) || !apk120Value192.messages.some(Boolean)) return null;
+  if (typeof apk120Value194 === 'boolean') return apk120Value192.stream = apk120Value194, apk120Value194;
+  const apk120Value195 = apk120Value191.get(API_STREAM_HEADER_120);
+  if (apk120Value193 || apk120Value195 !== null) return apk120Value192.stream = apk120Value193 ? apk120Value193.streamEnabled === !![] : apk120Value195 === '1', apk120Value192.stream;
+  const apk120Value196 = window.getApiConfig?.();
+  if (apk120Value196?.endpoint && String(apk120Value192.model || '') === apk120Value196.model) try {
+    const apk120Value197 = new Headers(buildApiHeaders_2(apk120Value196)),
+      apk120Value198 = ["Authorization", 'api-key', "x-api-key", "x-goog-api-key"].every(apk120Value199 => (apk120Value197.get(apk120Value199) || '') === (apk120Value191.get(apk120Value199) || ''));
+    if (apk120Value198 && normalizeApiEndpoint_2(apk120Value196.endpoint, apk120Value196.provider) === apk120Value190) return apk120Value192.stream = apk120Value196.streamEnabled === !![], apk120Value192.stream;
+  } catch (apk120Value200) {}
+  return null;
+}
+    function fetchChatCompletion_2(apk120Value201, apk120Value202 = {}) {
+  const apk120Value203 = apk120Value202 && typeof apk120Value202 === "object" ? apk120Value202 : {},
+    apk120Value204 = apk120Value203.body && typeof apk120Value203.body === 'object' && !Array.isArray(apk120Value203.body) ? {
+      ...apk120Value203.body
+    } : apk120Value203.body;
+  if (!apk120Value204 || typeof apk120Value204 !== "object" || Array.isArray(apk120Value204)) return window.fetch(apk120Value201, apk120Value203);
+  const apk120Value205 = apk120Value203.apiConfig && typeof apk120Value203.apiConfig === "object" ? sanitizeApiConfig_2(apk120Value203.apiConfig) : null,
+    apk120Value206 = apk120Value203.headers instanceof Headers ? new Headers(apk120Value203.headers) : new Headers(apk120Value203.headers || (apk120Value205 ? buildApiHeaders_2(apk120Value205) : {})),
+    apk120Value207 = apk120Value206.get(INTERNAL_SILENT_ERROR_HEADER_2) === '1',
+    apk120Value208 = apk120Value206.get(INTERNAL_GLOBAL_ERROR_HEADER_2) === '1',
+    apk120Value209 = apk120Value205 ? apk120Value205.frequencyPenalty : apk120Value206.get(text_33),
+    apk120Value210 = apk120Value204.stream === !![];
+  applyApiStreamMode_120(String(apk120Value201 || ''), apk120Value206, apk120Value204, apk120Value205, apk120Value203.streamOverride), apk120Value206['delete'](API_STREAM_HEADER_120), apk120Value206["delete"](INTERNAL_SILENT_ERROR_HEADER_2), apk120Value206["delete"](INTERNAL_GLOBAL_ERROR_HEADER_2), apk120Value206["delete"](text_33);
+  let apk120Value211 = String(apk120Value201 || '');
+  if (/\.openai\.azure\.com(?=\/|$)/i.test(apk120Value211)) {
+    const apk120Value215 = String(apk120Value206.get("Authorization") || '').match(/^Bearer\s+(.+)$/i)?.[0x1] || '';
+    if (apk120Value215 && !apk120Value206.has('api-key')) apk120Value206.set("api-key", apk120Value215);
+    apk120Value206["delete"]("Authorization");
+  }
+  const apk120Value212 = apk120Value205?.provider || '';
+  !isGeminiProvider(apk120Value212) && !isAnthropicProvider(apk120Value212) && handleAction_54(apk120Value211, apk120Value206, apk120Value204, apk120Value209);
+  const apk120Value213 = createNativeRequestAdapter(apk120Value211, apk120Value206, apk120Value204, apk120Value212);
+  if (apk120Value213) apk120Value211 = apk120Value213.url;
+  const apk120Value214 = {
+    ...apk120Value203
+  };
+  return delete apk120Value214.apiConfig, delete apk120Value214.streamOverride, apk120Value214.headers = apk120Value206, apk120Value214.body = JSON.stringify(apk120Value213 ? apk120Value213.body : apk120Value204), handleAction_55([apk120Value211, apk120Value214], {
+    'nativeAdapter': apk120Value213,
+    'responseStream': apk120Value210,
+    'silentErrors': apk120Value207,
+    'showGlobalErrors': apk120Value208,
+    'isAiApiRequest': !![],
+    'signal': apk120Value214.signal
+  });
+}
     function createHttpError_2(value_179, value_180, value_181 = 'API 请求失败') {
         const value_182 = new Error(
             String(value_180?.message || value_181 + '（HTTP ' + value_179.status + '）'),
@@ -1103,211 +1082,165 @@
             );
         }, []);
     }
-    function handleAction_43(body_3) {
-        const filter_241 = getApiRequestMessages(body_3).filter((message_246) => {
-                const toLowerCase_247 = String(message_246?.role || '').toLowerCase();
-                return toLowerCase_247 !== 'system' && toLowerCase_247 !== 'developer';
-            }),
-            contents_2 = handleAction_42(filter_241, (message_248) => {
-                const toLowerCase_249 = String(message_248?.role || '').toLowerCase(),
-                    parts_2 = [],
-                    text_4 = getMessageText(message_248?.content).trim();
-                if (text_4 && toLowerCase_249 !== 'tool')
-                    parts_2.push({
-                        text: text_4,
-                    });
-                toLowerCase_249 === 'assistant' &&
-                    Array.isArray(message_248?.tool_calls) &&
-                    message_248.tool_calls.forEach((value_252) => {
-                        const name_2 = String(value_252?.['function']?.name || '').trim();
-                        if (!name_2) return;
-                        let args_3 = {};
-                        try {
-                            args_3 =
-                                typeof value_252['function'].arguments === 'string'
-                                    ? JSON.parse(value_252['function'].arguments || '{}')
-                                    : value_252['function'].arguments || {};
-                        } catch (value_255) {}
-                        parts_2.push({
-                            functionCall: {
-                                name: name_2,
-                                args: args_3,
-                            },
-                        });
-                    });
-                if (toLowerCase_249 === 'tool') {
-                    let result_4 = message_248?.content ?? '';
-                    try {
-                        result_4 = JSON.parse(String(result_4));
-                    } catch (value_257) {}
-                    parts_2.push({
-                        functionResponse: {
-                            name: String(message_248?.name || 'mcp_tool'),
-                            response: {
-                                result: result_4,
-                            },
-                        },
-                    });
-                }
-                if (!parts_2.length) return null;
-                return {
-                    role: toLowerCase_249 === 'assistant' ? 'model' : 'user',
-                    parts: parts_2,
-                };
-            });
-        if (!contents_2.length)
-            contents_2.push({
-                role: 'user',
-                parts: [
-                    {
-                        text: '',
-                    },
-                ],
-            });
-        const generationConfig_2 = {};
-        if (Number.isFinite(Number(body_3?.temperature)))
-            generationConfig_2.temperature = Number(body_3.temperature);
-        const maxTokens = Number(body_3?.max_completion_tokens ?? body_3?.max_tokens);
-        if (Number.isFinite(maxTokens) && maxTokens > 0)
-            generationConfig_2.maxOutputTokens = Math.round(maxTokens);
-        if (body_3?.response_format?.type === 'json_object')
-            generationConfig_2.responseMimeType = 'application/json';
-        const nativeBody = {
-                contents: contents_2,
-            },
-            systemInstruction_245 = getSystemInstruction(getApiRequestMessages(body_3));
-        if (systemInstruction_245)
-            nativeBody.systemInstruction = {
-                parts: [
-                    {
-                        text: systemInstruction_245,
-                    },
-                ],
-            };
-        Array.isArray(body_3?.tools) &&
-            body_3.tools.length &&
-            ((nativeBody.tools = [
-                {
-                    functionDeclarations: body_3.tools
-                        .map((value_258) => ({
-                            name: String(value_258?.['function']?.name || '').slice(0, 64),
-                            description: String(value_258?.['function']?.description || '').slice(
-                                0,
-                                4096,
-                            ),
-                            parameters: value_258?.['function']?.parameters || {
-                                type: 'object',
-                                properties: {},
-                            },
-                        }))
-                        .filter((value_259) => value_259.name),
-                },
-            ]),
-            (nativeBody.toolConfig = {
-                functionCallingConfig: {
-                    mode: body_3.tool_choice === 'none' ? 'NONE' : 'AUTO',
-                },
-            }));
-        if (Object.keys(generationConfig_2).length)
-            nativeBody.generationConfig = generationConfig_2;
-        return nativeBody;
+    function handleAction_43(apk120Value280) {
+  const apk120Value281 = getApiRequestMessages(apk120Value280).filter(apk120Value287 => {
+      const apk120Value288 = String(apk120Value287?.role || '').toLowerCase();
+      return apk120Value288 !== 'system' && apk120Value288 !== "developer";
+    }),
+    apk120Value282 = handleAction_42(apk120Value281, apk120Value289 => {
+      const apk120Value290 = String(apk120Value289?.role || '').toLowerCase(),
+        apk120Value291 = [],
+        apk120Value292 = getMessageText(apk120Value289?.content).trim();
+      if (apk120Value292 && apk120Value290 !== "tool") apk120Value291.push({
+        'text': apk120Value292
+      });
+      apk120Value290 === "assistant" && Array.isArray(apk120Value289?.tool_calls) && apk120Value289.tool_calls.forEach(apk120Value293 => {
+        const apk120Value294 = String(apk120Value293?.['function']?.name || '').trim();
+        if (!apk120Value294) return;
+        let apk120Value295 = {};
+        try {
+          apk120Value295 = typeof apk120Value293["function"].arguments === "string" ? JSON.parse(apk120Value293["function"].arguments || '{}') : apk120Value293["function"].arguments || {};
+        } catch (apk120Value296) {}
+        apk120Value291.push({
+          'functionCall': {
+            'name': apk120Value294,
+            'args': apk120Value295
+          }
+        });
+      });
+      if (apk120Value290 === "tool") {
+        let apk120Value297 = apk120Value289?.content ?? '';
+        try {
+          apk120Value297 = JSON.parse(String(apk120Value297));
+        } catch (apk120Value298) {}
+        apk120Value291.push({
+          'functionResponse': {
+            'name': String(apk120Value289?.name || "mcp_tool"),
+            'response': {
+              'result': apk120Value297
+            }
+          }
+        });
+      }
+      if (!apk120Value291.length) return null;
+      return {
+        'role': apk120Value290 === 'assistant' ? "model" : "user",
+        'parts': apk120Value291
+      };
+    });
+  if (!apk120Value282.length) apk120Value282.push({
+    'role': "user",
+    'parts': [{
+      'text': ''
+    }]
+  });
+  const apk120Value283 = {};
+  if (Number.isFinite(Number(apk120Value280?.temperature))) apk120Value283.temperature = Number(apk120Value280.temperature);
+  const apk120Value284 = Number(apk120Value280?.max_completion_tokens ?? apk120Value280?.max_tokens);
+  if (Number.isFinite(apk120Value284) && apk120Value284 > 0x0) apk120Value283.maxOutputTokens = Math.round(apk120Value284);
+  if (apk120Value280?.response_format?.type === "json_object") apk120Value283.responseMimeType = "application/json";
+  const apk120Value285 = {
+      'contents': apk120Value282
+    },
+    apk120Value286 = getSystemInstruction(getApiRequestMessages(apk120Value280));
+  if (apk120Value286) apk120Value285.systemInstruction = {
+    'parts': [{
+      'text': apk120Value286
+    }]
+  };
+  Array.isArray(apk120Value280?.tools) && apk120Value280.tools.length && (apk120Value285.tools = [{
+    'functionDeclarations': apk120Value280.tools.map(apk120Value299 => ({
+      'name': String(apk120Value299?.['function']?.name || '').slice(0x0, 0x40),
+      'description': String(apk120Value299?.['function']?.description || '').slice(0x0, 0x1000),
+      'parameters': apk120Value299?.["function"]?.parameters || {
+        'type': "object",
+        'properties': {}
+      }
+    })).filter(apk120Value300 => apk120Value300.name)
+  }], apk120Value285.toolConfig = {
+    'functionCallingConfig': {
+      'mode': apk120Value280.tool_choice === "none" ? "NONE" : "AUTO"
     }
-    function handleAction_44(body_4) {
-        const filter_261 = getApiRequestMessages(body_4).filter((message_266) => {
-                const toLowerCase_267 = String(message_266?.role || '').toLowerCase();
-                return toLowerCase_267 !== 'system' && toLowerCase_267 !== 'developer';
-            }),
-            handleAction_42_262 = handleAction_42(filter_261, (message_268) => {
-                const toLowerCase_269 = String(message_268?.role || '').toLowerCase(),
-                    parts_3 = [],
-                    text_5 = getMessageText(message_268?.content).trim();
-                if (text_5 && toLowerCase_269 !== 'tool')
-                    parts_3.push({
-                        type: 'text',
-                        text: text_5,
-                    });
-                toLowerCase_269 === 'assistant' &&
-                    Array.isArray(message_268?.tool_calls) &&
-                    message_268.tool_calls.forEach((value_272) => {
-                        const name_3 = String(value_272?.['function']?.name || '').trim();
-                        if (!name_3) return;
-                        let input_2 = {};
-                        try {
-                            input_2 =
-                                typeof value_272['function'].arguments === 'string'
-                                    ? JSON.parse(value_272['function'].arguments || '{}')
-                                    : value_272['function'].arguments || {};
-                        } catch (value_275) {}
-                        parts_3.push({
-                            type: 'tool_use',
-                            id: String(value_272.id || 'tool-' + Date.now()),
-                            name: name_3,
-                            input: input_2,
-                        });
-                    });
-                toLowerCase_269 === 'tool' &&
-                    parts_3.push({
-                        type: 'tool_result',
-                        tool_use_id: String(message_268?.tool_call_id || ''),
-                        content: String(message_268?.content || ''),
-                        is_error: /"isError"\s*:\s*true/.test(String(message_268?.content || '')),
-                    });
-                if (!parts_3.length) return null;
-                return {
-                    role: toLowerCase_269 === 'assistant' ? 'assistant' : 'user',
-                    parts: parts_3,
-                };
-            });
-        if (!handleAction_42_262.length)
-            handleAction_42_262.push({
-                role: 'user',
-                parts: [
-                    {
-                        type: 'text',
-                        text: '',
-                    },
-                ],
-            });
-        const maxTokens_2 = Number(body_4?.max_tokens ?? body_4?.max_completion_tokens),
-            nativeBody_2 = {
-                model: String(body_4?.model || '').trim(),
-                max_tokens:
-                    Number.isFinite(maxTokens_2) && maxTokens_2 > 0
-                        ? Math.round(maxTokens_2)
-                        : 2048,
-                messages: handleAction_42_262.map((message_276) => {
-                    const every_277 = message_276.parts.every((part_2) => part_2?.type === 'text');
-                    return {
-                        role: message_276.role,
-                        content: every_277
-                            ? message_276.parts.map((part_3) => String(part_3.text || '')).join(`
-`)
-                            : message_276.parts,
-                    };
-                }),
-            };
-        if (Number.isFinite(Number(body_4?.temperature)))
-            nativeBody_2.temperature = Number(body_4.temperature);
-        const system_2 = getSystemInstruction(getApiRequestMessages(body_4));
-        if (system_2) nativeBody_2.system = system_2;
-        if (Array.isArray(body_4?.tools) && body_4.tools.length) {
-            nativeBody_2.tools = body_4.tools
-                .map((value_280) => ({
-                    name: String(value_280?.['function']?.name || '').slice(0, 64),
-                    description: String(value_280?.['function']?.description || '').slice(0, 4096),
-                    input_schema: value_280?.['function']?.parameters || {
-                        type: 'object',
-                        properties: {},
-                    },
-                }))
-                .filter((value_281) => value_281.name);
-            if (body_4.tool_choice !== 'none')
-                nativeBody_2.tool_choice = {
-                    type: 'auto',
-                };
-        }
-        return nativeBody_2;
-    }
+  });
+  if (Object.keys(apk120Value283).length) apk120Value285.generationConfig = apk120Value283;
+  return apk120Value285;
+}
+    function handleAction_44(apk120Value301) {
+  const apk120Value302 = getApiRequestMessages(apk120Value301).filter(apk120Value307 => {
+      const apk120Value308 = String(apk120Value307?.role || '').toLowerCase();
+      return apk120Value308 !== "system" && apk120Value308 !== 'developer';
+    }),
+    apk120Value303 = handleAction_42(apk120Value302, apk120Value309 => {
+      const apk120Value310 = String(apk120Value309?.role || '').toLowerCase(),
+        apk120Value311 = [],
+        apk120Value312 = getMessageText(apk120Value309?.content).trim();
+      if (apk120Value312 && apk120Value310 !== "tool") apk120Value311.push({
+        'type': "text",
+        'text': apk120Value312
+      });
+      apk120Value310 === "assistant" && Array.isArray(apk120Value309?.tool_calls) && apk120Value309.tool_calls.forEach(apk120Value313 => {
+        const apk120Value314 = String(apk120Value313?.["function"]?.name || '').trim();
+        if (!apk120Value314) return;
+        let apk120Value315 = {};
+        try {
+          apk120Value315 = typeof apk120Value313["function"].arguments === "string" ? JSON.parse(apk120Value313["function"].arguments || '{}') : apk120Value313["function"].arguments || {};
+        } catch (apk120Value316) {}
+        apk120Value311.push({
+          'type': 'tool_use',
+          'id': String(apk120Value313.id || "tool-" + Date.now()),
+          'name': apk120Value314,
+          'input': apk120Value315
+        });
+      });
+      apk120Value310 === "tool" && apk120Value311.push({
+        'type': "tool_result",
+        'tool_use_id': String(apk120Value309?.tool_call_id || ''),
+        'content': String(apk120Value309?.content || ''),
+        'is_error': /"isError"\s*:\s*true/.test(String(apk120Value309?.content || ''))
+      });
+      if (!apk120Value311.length) return null;
+      return {
+        'role': apk120Value310 === 'assistant' ? "assistant" : "user",
+        'parts': apk120Value311
+      };
+    });
+  if (!apk120Value303.length) apk120Value303.push({
+    'role': "user",
+    'parts': [{
+      'type': 'text',
+      'text': ''
+    }]
+  });
+  const apk120Value304 = Number(apk120Value301?.max_tokens ?? apk120Value301?.max_completion_tokens),
+    apk120Value305 = {
+      'model': String(apk120Value301?.model || '').trim(),
+      'max_tokens': Number.isFinite(apk120Value304) && apk120Value304 > 0x0 ? Math.round(apk120Value304) : 0x800,
+      'messages': apk120Value303.map(apk120Value317 => {
+        const apk120Value318 = apk120Value317.parts.every(apk120Value319 => apk120Value319?.type === "text");
+        return {
+          'role': apk120Value317.role,
+          'content': apk120Value318 ? apk120Value317.parts.map(apk120Value320 => String(apk120Value320.text || '')).join('\x0a') : apk120Value317.parts
+        };
+      })
+    };
+  if (Number.isFinite(Number(apk120Value301?.temperature))) apk120Value305.temperature = Number(apk120Value301.temperature);
+  const apk120Value306 = getSystemInstruction(getApiRequestMessages(apk120Value301));
+  if (apk120Value306) apk120Value305.system = apk120Value306;
+  if (Array.isArray(apk120Value301?.tools) && apk120Value301.tools.length) {
+    apk120Value305.tools = apk120Value301.tools.map(apk120Value321 => ({
+      'name': String(apk120Value321?.["function"]?.name || '').slice(0x0, 0x40),
+      'description': String(apk120Value321?.["function"]?.description || '').slice(0x0, 0x1000),
+      'input_schema': apk120Value321?.["function"]?.parameters || {
+        'type': "object",
+        'properties': {}
+      }
+    })).filter(apk120Value322 => apk120Value322.name);
+    if (apk120Value301.tool_choice !== "none") apk120Value305.tool_choice = {
+      'type': 'auto'
+    };
+  }
+  return apk120Value305;
+}
     function getNativeApiKey(headers_3) {
         const bearer =
             String(headers_3.get('Authorization') || '').match(/^Bearer\s+(.+)$/i)?.[1] || '';
@@ -1315,23 +1248,12 @@
             headers_3.get('x-goog-api-key') || headers_3.get('x-api-key') || bearer,
         ).trim();
     }
-    function resolveGeminiRequestUrl(value_283, model_2) {
-        const parsed_4 = parseHttpUrl_2(value_283),
-            version =
-                String(parsed_4.pathname || '').match(
-                    /^(.*\/v\d+(?:beta|alpha)?\d*)(?:\/|$)/i,
-                )?.[1] || '/v1beta',
-            normalizedModel = String(model_2 || '')
-                .trim()
-                .replace(/^models\//i, '');
-        return (
-            (parsed_4.pathname =
-                version + '/models/' + encodeURIComponent(normalizedModel) + ':generateContent'),
-            (parsed_4.search = ''),
-            (parsed_4.hash = ''),
-            parsed_4.toString()
-        );
-    }
+    function resolveGeminiRequestUrl(apk120Value325, apk120Value326, apk120Value327 = ![]) {
+  const apk120Value328 = parseHttpUrl_2(apk120Value325),
+    apk120Value329 = String(apk120Value328.pathname || '').match(/^(.*\/v\d+(?:beta|alpha)?\d*)(?:\/|$)/i)?.[0x1] || "/v1beta",
+    apk120Value330 = String(apk120Value326 || '').trim().replace(/^models\//i, '');
+  return apk120Value328.pathname = apk120Value329 + '/models/' + encodeURIComponent(apk120Value330) + ':' + (apk120Value327 ? "streamGenerateContent" : "generateContent"), apk120Value328.search = apk120Value327 ? "?alt=sse" : '', apk120Value328.hash = '', apk120Value328.toString();
+}
     function handleAction_46(value_288) {
         const parsed_5 = parseHttpUrl_2(value_288),
             version_2 = String(parsed_5.pathname || '').match(/^(.*\/v\d+)(?:\/|$)/i)?.[1] || '/v1';
@@ -1342,47 +1264,30 @@
             parsed_5.toString()
         );
     }
-    function createNativeRequestAdapter(requestUrl_2, requestHeaders, body_5, value_294 = '') {
-        const provider_12 = value_294
-            ? normalizeApiProvider_2(value_294)
-            : detectApiProviderFromEndpoint_2(requestUrl_2);
-        if (!isGeminiProvider(provider_12) && !isAnthropicProvider(provider_12)) return null;
-        if (!body_5 || typeof body_5 !== 'object' || Array.isArray(body_5)) return null;
-        const apiKey_2 = getNativeApiKey(requestHeaders);
-        if (!apiKey_2 || !String(body_5.model || '').trim()) return null;
-        if (isGeminiProvider(provider_12))
-            return (
-                requestHeaders.set('x-goog-api-key', apiKey_2),
-                requestHeaders['delete']('Authorization'),
-                requestHeaders['delete']('x-api-key'),
-                requestHeaders['delete']('anthropic-version'),
-                {
-                    provider: provider_12,
-                    stream: body_5.stream === true,
-                    model: String(body_5.model)
-                        .trim()
-                        .replace(/^models\//i, ''),
-                    url: resolveGeminiRequestUrl(requestUrl_2, body_5.model),
-                    body: handleAction_43(body_5),
-                }
-            );
-        return (
-            requestHeaders.set('x-api-key', apiKey_2),
-            requestHeaders.set(
-                'anthropic-version',
-                requestHeaders.get('anthropic-version') || '2023-06-01',
-            ),
-            requestHeaders['delete']('Authorization'),
-            requestHeaders['delete']('x-goog-api-key'),
-            {
-                provider: provider_12,
-                stream: body_5.stream === true,
-                model: String(body_5.model).trim(),
-                url: handleAction_46(requestUrl_2),
-                body: handleAction_44(body_5),
-            }
-        );
+    function createNativeRequestAdapter(apk120Value334, apk120Value335, apk120Value336, apk120Value337 = '') {
+  const apk120Value338 = apk120Value337 ? normalizeApiProvider_2(apk120Value337) : apk120Value335.has("x-goog-api-key") ? "gemini" : apk120Value335.has("x-api-key") ? "anthropic" : detectApiProviderFromEndpoint_2(apk120Value334);
+  if (!isGeminiProvider(apk120Value338) && !isAnthropicProvider(apk120Value338)) return null;
+  if (!apk120Value336 || typeof apk120Value336 !== "object" || Array.isArray(apk120Value336)) return null;
+  const apk120Value339 = getNativeApiKey(apk120Value335);
+  if (!apk120Value339 || !String(apk120Value336.model || '').trim()) return null;
+  if (isGeminiProvider(apk120Value338)) return apk120Value335.set('x-goog-api-key', apk120Value339), apk120Value335["delete"]("Authorization"), apk120Value335["delete"]("x-api-key"), apk120Value335["delete"]("anthropic-version"), {
+    'provider': apk120Value338,
+    'stream': apk120Value336.stream === !![],
+    'model': String(apk120Value336.model).trim().replace(/^models\//i, ''),
+    'url': resolveGeminiRequestUrl(apk120Value334, apk120Value336.model, apk120Value336.stream === !![]),
+    'body': handleAction_43(apk120Value336)
+  };
+  return apk120Value335.set("x-api-key", apk120Value339), apk120Value335.set("anthropic-version", apk120Value335.get("anthropic-version") || "2023-06-01"), apk120Value335["delete"]('Authorization'), apk120Value335["delete"]("x-goog-api-key"), {
+    'provider': apk120Value338,
+    'stream': apk120Value336.stream === !![],
+    'model': String(apk120Value336.model).trim(),
+    'url': handleAction_46(apk120Value334),
+    'body': {
+      ...handleAction_44(apk120Value336),
+      'stream': apk120Value336.stream === !![]
     }
+  };
+}
     function mapFinishReason(value_8) {
         const reason_2 = String(value_8 || '').toUpperCase();
         if (reason_2 === 'STOP' || reason_2 === 'END_TURN') return 'stop';
@@ -1493,71 +1398,55 @@
             },
         };
     }
-    function createCompatibleNativeResponse(response_2, adapter, data_2) {
-        const payload = normalizeNativeResponse(adapter.provider, data_2, adapter.model),
-            headers_4 = new Headers(response_2.headers);
-        if (!adapter.stream)
-            return (
-                headers_4.set('Content-Type', 'application/json'),
-                new Response(JSON.stringify(payload), {
-                    status: response_2.status,
-                    statusText: response_2.statusText,
-                    headers: headers_4,
-                })
-            );
-        const choice = payload.choices[0] || {},
-            content_6 = String(choice?.message?.content || ''),
-            chunk = {
-                id: payload.id,
-                object: 'chat.completion.chunk',
-                created: payload.created,
-                model: payload.model,
-                choices: [
-                    {
-                        index: 0,
-                        delta: {
-                            content: content_6,
-                        },
-                        finish_reason: null,
-                    },
-                ],
-            },
-            finalChunk = {
-                id: payload.id,
-                object: 'chat.completion.chunk',
-                created: payload.created,
-                model: payload.model,
-                choices: [
-                    {
-                        index: 0,
-                        delta: {},
-                        finish_reason: choice.finish_reason || 'stop',
-                    },
-                ],
-                usage: payload.usage,
-            };
-        return (
-            headers_4.set('Content-Type', 'text/event-stream; charset=utf-8'),
-            new Response(
-                'data: ' +
-                    JSON.stringify(chunk) +
-                    `
-
-data: ` +
-                    JSON.stringify(finalChunk) +
-                    `
-
-data: [DONE]
-
-`,
-                {
-                    status: response_2.status,
-                    statusText: response_2.statusText,
-                    headers: headers_4,
-                },
-            )
-        );
-    }
+    function createCompatibleNativeResponse(apk120Value368, apk120Value369, apk120Value370) {
+  const apk120Value371 = normalizeNativeResponse(apk120Value369.provider, apk120Value370, apk120Value369.model),
+    apk120Value372 = new Headers(apk120Value368.headers);
+  apk120Value372["delete"]("Content-Length"), apk120Value372['delete']('Content-Encoding');
+  if (!apk120Value369.stream) return apk120Value372.set("Content-Type", "application/json"), new Response(JSON.stringify(apk120Value371), {
+    'status': apk120Value368.status,
+    'statusText': apk120Value368.statusText,
+    'headers': apk120Value372
+  });
+  const apk120Value373 = apk120Value371.choices[0x0] || {},
+    apk120Value374 = String(apk120Value373?.message?.content || ''),
+    apk120Value375 = {
+      'id': apk120Value371.id,
+      'object': "chat.completion.chunk",
+      'created': apk120Value371.created,
+      'model': apk120Value371.model,
+      'choices': [{
+        'index': 0x0,
+        'delta': {
+          ...apk120Value373.message,
+          'content': apk120Value374,
+          ...(apk120Value373.message?.tool_calls ? {
+            'tool_calls': apk120Value373.message.tool_calls.map((apk120Value377, apk120Value378) => ({
+              ...apk120Value377,
+              'index': apk120Value378
+            }))
+          } : {})
+        },
+        'finish_reason': null
+      }]
+    },
+    apk120Value376 = {
+      'id': apk120Value371.id,
+      'object': "chat.completion.chunk",
+      'created': apk120Value371.created,
+      'model': apk120Value371.model,
+      'choices': [{
+        'index': 0x0,
+        'delta': {},
+        'finish_reason': apk120Value373.finish_reason || "stop"
+      }],
+      'usage': apk120Value371.usage
+    };
+  return apk120Value372.set('Content-Type', "text/event-stream; charset=utf-8"), new Response("data: " + JSON.stringify(apk120Value375) + "\n\ndata: " + JSON.stringify(apk120Value376) + "\n\ndata: [DONE]\n\n", {
+    'status': apk120Value368.status,
+    'statusText': apk120Value368.statusText,
+    'headers': apk120Value372
+  });
+}
     async function handleAction_51(value_326, value_327) {
         let body_6 = value_327.body;
         body_6 === undefined &&
@@ -1627,158 +1516,118 @@ data: [DONE]
         if (!Number.isFinite(frequency_penalty_2) || frequency_penalty_2 === 0) return false;
         return ((value_340.frequency_penalty = frequency_penalty_2), true);
     }
-    async function handleAction_55(networkArgs, value_346 = {}) {
-        const {
-            nativeAdapter = null,
-            silentErrors = false,
-            showGlobalErrors = false,
-            isAiApiRequest = false,
-            signal = null,
-        } = value_346;
-        try {
-            const response_3 = await originalFetch(...networkArgs);
-            if (response_3.ok && nativeAdapter)
-                try {
-                    const nativeData = await response_3.json();
-                    return createCompatibleNativeResponse(response_3, nativeAdapter, nativeData);
-                } catch (value_351) {
-                    return response_3;
-                }
-            if (response_3.ok) return response_3;
-            if (silentErrors || !showGlobalErrors || !isAiApiRequest) return response_3;
-            const clonedResponse = response_3.clone();
-            let rawBody_3 = '';
-            try {
-                rawBody_3 = await clonedResponse.text();
-            } catch (value_352) {
-                rawBody_3 = '[无法读取接口返回内容]';
-            }
-            return (
-                setTimeout(
-                    () =>
-                        reportError_2(
-                            createHttpError_2(response_3, {
-                                rawBody: rawBody_3,
-                            }),
-                            {
-                                operation: 'API 请求',
-                            },
-                        ),
-                    0,
-                ),
-                response_3
-            );
-        } catch (value_353) {
-            const value_354 = value_353?.name === 'AbortError' || signal?.aborted === true;
-            !silentErrors &&
-                showGlobalErrors &&
-                !value_354 &&
-                isAiApiRequest &&
-                setTimeout(
-                    () =>
-                        reportError_2(value_353, {
-                            operation: 'API 请求',
-                        }),
-                    0,
-                );
-            throw value_353;
-        }
+    async function handleAction_55(apk120Value398, apk120Value399 = {}) {
+  const {
+    nativeAdapter = null,
+    responseStream = ![],
+    silentErrors = ![],
+    showGlobalErrors = ![],
+    isAiApiRequest = ![],
+    signal = null
+  } = apk120Value399;
+  try {
+    const apk120Value400 = await originalFetch(...apk120Value398);
+    if (apk120Value400.ok && isAiApiRequest && /text\/event-stream/i.test(apk120Value400.headers.get("Content-Type") || '')) {
+      if (!window.u2ApiStream) throw new Error('流式传输模块未加载，请刷新页面重试');
+      return await window.u2ApiStream.adaptResponse(apk120Value400, {
+        'provider': nativeAdapter?.provider,
+        'model': nativeAdapter?.model,
+        'responseStream': responseStream,
+        'signal': signal
+      });
     }
-    window.fetch = async function (...args_2) {
-        const url_2 = args_2[0],
-            requestInit = args_2[1] && typeof args_2[1] === 'object' ? args_2[1] : {},
-            headers_5 =
-                requestInit.headers instanceof Headers
-                    ? requestInit.headers
-                    : new Headers(
-                          requestInit.headers ||
-                              (url_2 instanceof Request ? url_2.headers : undefined),
-                      ),
-            silentErrors_3 = headers_5.get(INTERNAL_SILENT_ERROR_HEADER_2) === '1',
-            showGlobalErrors_3 = headers_5.get(INTERNAL_GLOBAL_ERROR_HEADER_2) === '1',
-            result_361 = headers_5.get(text_33);
-        headers_5['delete'](INTERNAL_SILENT_ERROR_HEADER_2);
-        headers_5['delete'](INTERNAL_GLOBAL_ERROR_HEADER_2);
-        headers_5['delete'](text_33);
-        let requestUrl_3 = '';
-        try {
-            requestUrl_3 = String(url_2 instanceof Request ? url_2.url : url_2 || '');
-        } catch (value_368) {
-            requestUrl_3 = '';
-        }
-        const isAiApiRequest_2 = /\/(?:chat\/completions|models)(?:[/?#]|$)/i.test(requestUrl_3);
-        if (isAiApiRequest_2 && /\.openai\.azure\.com(?=\/|$)/i.test(requestUrl_3)) {
-            const bearer_3 =
-                String(headers_5.get('Authorization') || '').match(/^Bearer\s+(.+)$/i)?.[1] || '';
-            if (bearer_3 && !headers_5.has('api-key')) headers_5.set('api-key', bearer_3);
-            headers_5['delete']('Authorization');
-        }
-        let nativeAdapter_3 = null,
-            requestBody = null,
-            enabled_366 = false;
-        if (
-            isAiApiRequest_2 &&
-            String(
-                requestInit.method || (url_2 instanceof Request ? url_2.method : 'GET'),
-            ).toUpperCase() === 'POST'
-        ) {
-            requestBody = await handleAction_51(url_2, requestInit);
-            const handleAction_54_370 = handleAction_54(
-                requestUrl_3,
-                headers_5,
-                requestBody,
-                result_361,
-            );
-            enabled_366 = handleAction_54_370;
-            nativeAdapter_3 = createNativeRequestAdapter(requestUrl_3, headers_5, requestBody);
-            if (nativeAdapter_3) requestUrl_3 = nativeAdapter_3.url;
-        }
-        let value_367;
-        return (
-            url_2 instanceof Request
-                ? (value_367 = nativeAdapter_3
-                      ? [
-                            new Request(requestUrl_3, {
-                                method: requestInit.method || url_2.method,
-                                headers: headers_5,
-                                body: JSON.stringify(nativeAdapter_3.body),
-                                signal: requestInit.signal || url_2.signal,
-                            }),
-                        ]
-                      : [
-                            new Request(url_2, {
-                                ...requestInit,
-                                headers: headers_5,
-                                ...(enabled_366
-                                    ? {
-                                          body: JSON.stringify(requestBody),
-                                      }
-                                    : {}),
-                            }),
-                        ])
-                : (value_367 = [
-                      nativeAdapter_3 ? requestUrl_3 : url_2,
-                      {
-                          ...requestInit,
-                          headers: headers_5,
-                          ...(nativeAdapter_3
-                              ? {
-                                    body: JSON.stringify(nativeAdapter_3.body),
-                                }
-                              : enabled_366
-                                ? {
-                                      body: JSON.stringify(requestBody),
-                                  }
-                                : {}),
-                      },
-                  ]),
-            handleAction_55(value_367, {
-                nativeAdapter: nativeAdapter_3,
-                silentErrors: silentErrors_3,
-                showGlobalErrors: showGlobalErrors_3,
-                isAiApiRequest: isAiApiRequest_2,
-                signal: requestInit.signal,
-            })
-        );
-    };
+    if (apk120Value400.ok && nativeAdapter) {
+      const apk120Value403 = await apk120Value400.json();
+      return createCompatibleNativeResponse(apk120Value400, {
+        ...nativeAdapter,
+        'stream': responseStream
+      }, apk120Value403);
+    }
+    if (apk120Value400.ok) return apk120Value400;
+    if (silentErrors || !showGlobalErrors || !isAiApiRequest) return apk120Value400;
+    const apk120Value401 = apk120Value400.clone();
+    let apk120Value402 = '';
+    try {
+      apk120Value402 = await apk120Value401.text();
+    } catch (apk120Value404) {
+      apk120Value402 = "[无法读取接口返回内容]";
+    }
+    return setTimeout(() => reportError_2(createHttpError_2(apk120Value400, {
+      'rawBody': apk120Value402
+    }), {
+      'operation': "API 请求"
+    }), 0x0), apk120Value400;
+  } catch (apk120Value405) {
+    const apk120Value406 = apk120Value405?.name === 'AbortError' || signal?.aborted === !![];
+    !silentErrors && showGlobalErrors && !apk120Value406 && isAiApiRequest && setTimeout(() => reportError_2(apk120Value405, {
+      'operation': "API 请求"
+    }), 0x0);
+    throw apk120Value405;
+  }
+}
+    window.fetch = async function (...apk120Value407) {
+  const apk120Value408 = apk120Value407[0x0],
+    apk120Value409 = apk120Value407[0x1] && typeof apk120Value407[0x1] === 'object' ? apk120Value407[0x1] : {},
+    apk120Value410 = apk120Value409.headers instanceof Headers ? new Headers(apk120Value409.headers) : new Headers(apk120Value409.headers || (apk120Value408 instanceof Request ? apk120Value408.headers : undefined)),
+    apk120Value411 = apk120Value410.get(INTERNAL_SILENT_ERROR_HEADER_2) === '1',
+    apk120Value412 = apk120Value410.get(INTERNAL_GLOBAL_ERROR_HEADER_2) === '1',
+    apk120Value413 = apk120Value410.get(text_33);
+  apk120Value410['delete'](INTERNAL_SILENT_ERROR_HEADER_2), apk120Value410['delete'](INTERNAL_GLOBAL_ERROR_HEADER_2), apk120Value410["delete"](text_33);
+  let apk120Value414 = '';
+  try {
+    apk120Value414 = String(apk120Value408 instanceof Request ? apk120Value408.url : apk120Value408 || '');
+  } catch (apk120Value422) {
+    apk120Value414 = '';
+  }
+  const apk120Value415 = /\/(?:chat\/completions|models)(?:[/?#]|$)/i.test(apk120Value414);
+  if (apk120Value415 && /\.openai\.azure\.com(?=\/|$)/i.test(apk120Value414)) {
+    const apk120Value423 = String(apk120Value410.get("Authorization") || '').match(/^Bearer\s+(.+)$/i)?.[0x1] || '';
+    if (apk120Value423 && !apk120Value410.has("api-key")) apk120Value410.set("api-key", apk120Value423);
+    apk120Value410['delete']("Authorization");
+  }
+  let apk120Value416 = null,
+    apk120Value417 = null,
+    apk120Value418 = ![],
+    apk120Value419 = ![];
+  if (apk120Value415 && String(apk120Value409.method || (apk120Value408 instanceof Request ? apk120Value408.method : "GET")).toUpperCase() === "POST") {
+    apk120Value417 = await handleAction_51(apk120Value408, apk120Value409), apk120Value419 = apk120Value417?.stream === !![];
+    const apk120Value424 = applyApiStreamMode_120(apk120Value414, apk120Value410, apk120Value417, apk120Value409.apiConfig ? sanitizeApiConfig_2(apk120Value409.apiConfig) : null, apk120Value409.streamOverride),
+      apk120Value425 = handleAction_54(apk120Value414, apk120Value410, apk120Value417, apk120Value413);
+    apk120Value418 = apk120Value425 || apk120Value424 !== null, apk120Value416 = createNativeRequestAdapter(apk120Value414, apk120Value410, apk120Value417);
+    if (apk120Value416) apk120Value414 = apk120Value416.url;
+  }
+  apk120Value410["delete"](API_STREAM_HEADER_120);
+  const apk120Value420 = {
+    ...apk120Value409
+  };
+  delete apk120Value420.apiConfig, delete apk120Value420.streamOverride;
+  let apk120Value421;
+  return apk120Value408 instanceof Request ? apk120Value421 = apk120Value416 ? [new Request(apk120Value414, {
+    'method': apk120Value409.method || apk120Value408.method,
+    'headers': apk120Value410,
+    'body': JSON.stringify(apk120Value416.body),
+    'signal': apk120Value409.signal || apk120Value408.signal
+  })] : [new Request(apk120Value408, {
+    ...apk120Value420,
+    'headers': apk120Value410,
+    ...(apk120Value418 ? {
+      'body': JSON.stringify(apk120Value417)
+    } : {})
+  })] : apk120Value421 = [apk120Value416 ? apk120Value414 : apk120Value408, {
+    ...apk120Value420,
+    'headers': apk120Value410,
+    ...(apk120Value416 ? {
+      'body': JSON.stringify(apk120Value416.body)
+    } : apk120Value418 ? {
+      'body': JSON.stringify(apk120Value417)
+    } : {})
+  }], handleAction_55(apk120Value421, {
+    'nativeAdapter': apk120Value416,
+    'responseStream': apk120Value419,
+    'silentErrors': apk120Value411,
+    'showGlobalErrors': apk120Value412,
+    'isAiApiRequest': apk120Value415,
+    'signal': apk120Value409.signal || (apk120Value408 instanceof Request ? apk120Value408.signal : undefined)
+  });
+};
 })();

@@ -2979,13 +2979,7 @@
             if (result_544?.type !== 'char') return;
             window.imApp.openUserPhoneAccessSettings?.(result_544.id);
         });
-    chatSettingsMomentsBtn &&
-        chatSettingsMomentsBtn.addEventListener('click', () => {
-            if (!window.imData.currentSettingsFriend) return;
-            if (chatSettingsSheet) closeView_2(chatSettingsSheet);
-            if (window.imApp.openUserMoments)
-                window.imApp.openUserMoments(window.imData.currentSettingsFriend.id);
-        });
+    chatSettingsMomentsBtn?.addEventListener('click', () => window.openChatTutorial120());
     const chatSettingsProfileTriggerElement = document.getElementById(
         'chat-settings-profile-trigger',
     );
@@ -4140,7 +4134,7 @@
                 apiKey: selectedPreset.apiKey || '',
                 model: selectedPreset.model || '',
                 temperature: selectedPreset.temperature ?? selectedPreset.temp ?? 0.7,
-                frequencyPenalty: selectedPreset.frequencyPenalty ?? 0,
+                frequencyPenalty: selectedPreset.frequencyPenalty ?? 0, streamEnabled: selectedPreset.streamEnabled === true,
                 presetId: string_738,
             };
         const current = window.getApiConfig ? window.getApiConfig() : window.apiConfig || {};

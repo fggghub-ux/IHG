@@ -123,131 +123,10 @@
         return document.getElementById(id_2);
     }
     function handleAction_22() {
-        [
-            'library-view',
-            'library-back-btn',
-            'library-header-action',
-            'library-main',
-            'library-books-page',
-            'library-music-page',
-            'library-overview-page',
-            'library-book-upload-btn',
-            'library-book-file-input',
-            'library-book-count',
-            'library-book-grid',
-            'library-books-empty',
-            'library-import-netease-btn',
-            'library-netease-account',
-            'library-netease-avatar',
-            'library-netease-name',
-            'library-netease-status',
-            'library-netease-sync-progress',
-            'library-netease-login-btn',
-            'library-netease-refresh-btn',
-            'library-netease-logout-btn',
-            'library-add-track-btn',
-            'library-music-add-btn',
-            'library-playlist-count',
-            'library-playlist-list',
-            'library-music-empty',
-            'library-floating-nav',
-            'library-mini-player',
-            'library-mini-open',
-            'library-mini-art',
-            'library-mini-title',
-            'library-mini-artist',
-            'library-mini-mode',
-            'library-mini-play',
-            'library-mini-next',
-            'library-mini-progress',
-            'library-reader-view',
-            'library-reader-back',
-            'library-reader-title',
-            'library-reader-progress-label',
-            'library-reader-settings',
-            'library-reader-toc-button',
-            'library-reader-together',
-            'library-reader-toc',
-            'library-reader-toc-close',
-            'library-reader-toc-list',
-            'library-reader-scroll',
-            'library-reader-content',
-            'library-reader-loading',
-            'library-reader-panel',
-            'library-playlist-view',
-            'library-reader-comment-action',
-            'library-reader-comments-backdrop',
-            'library-reader-comments-close',
-            'library-reader-comments-quote',
-            'library-reader-comments-list',
-            'library-playlist-back',
-            'library-playlist-delete',
-            'library-playlist-cover',
-            'library-playlist-title',
-            'library-playlist-meta',
-            'library-play-all',
-            'library-track-list',
-            'library-player-view',
-            'library-player-close',
-            'library-player-wash',
-            'library-player-art',
-            'library-player-title',
-            'library-player-stage',
-            'library-player-artist',
-            'library-player-progress',
-            'library-player-current',
-            'library-player-duration',
-            'library-player-prev',
-            'library-player-play',
-            'library-player-next',
-            'library-player-mode',
-            'library-lyrics',
-            'library-import-modal',
-            'library-netease-login-modal',
-            'library-netease-qr',
-            'library-netease-qr-status',
-            'library-netease-qr-message',
-            'library-netease-qr-save',
-            'library-netease-qr-check',
-            'library-netease-qr-retry',
-            'library-import-form',
-            'library-netease-input',
-            'library-track-modal',
-            'library-track-form',
-            'library-track-name',
-            'library-track-artist',
-            'library-track-url',
-            'library-track-cover-url',
-            'library-track-lyric-url',
-            'library-book-detail-modal',
-            'library-book-detail-cover',
-            'library-book-detail-name',
-            'library-book-detail-author',
-            'library-book-detail-progress',
-            'library-book-detail-progress-bar',
-            'library-book-detail-synopsis',
-            'library-book-detail-start',
-            'library-book-detail-edit',
-            'library-book-detail-delete',
-            'library-book-detail-actions',
-            'library-book-edit-form',
-            'library-book-edit-title',
-            'library-book-edit-author',
-            'library-book-edit-cover-url',
-            'library-book-edit-synopsis',
-            'library-book-edit-cancel',
-            'library-char-picker-modal',
-            'library-char-picker-list',
-            'library-char-picker-empty',
-            'library-today-reading',
-            'library-today-listening',
-            'library-week-total',
-            'library-week-chart',
-            'library-ranking-list',
-        ].forEach((id_3) => {
-            dom[id_3.replace(/^library-/, '').replace(/-/g, '_')] = $(id_3);
-        });
-    }
+  ['library-view', 'library-back-btn', "library-header-action", "library-main", "library-books-page", 'library-music-page', "library-overview-page", "library-book-upload-btn", "library-book-file-input", "library-book-count", "library-book-grid", "library-books-empty", "library-import-netease-btn", 'library-netease-account', "library-netease-avatar", "library-netease-name", 'library-netease-status', 'library-netease-sync-progress', 'library-netease-login-btn', "library-netease-refresh-btn", 'library-netease-logout-btn', 'library-add-track-btn', "library-music-add-btn", "library-playlist-count", "library-playlist-list", 'library-music-empty', "library-floating-nav", 'library-mini-player', "library-mini-open", "library-mini-art", "library-mini-title", 'library-mini-artist', "library-mini-mode", "library-mini-play", "library-mini-next", "library-mini-progress", 'library-reader-view', 'library-reader-back', 'library-reader-title', 'library-reader-progress-label', "library-reader-settings", "library-reader-toc-button", "library-reader-together", "library-reader-toc", "library-reader-toc-close", "library-reader-toc-list", "library-reader-scroll", "library-reader-content", "library-reader-loading", "library-reader-panel", "library-playlist-view", "library-reader-comment-action", "library-reader-comments-backdrop", 'library-reader-comments-close', "library-reader-comments-quote", 'library-reader-comments-list', "library-playlist-back", "library-playlist-delete", "library-playlist-cover", 'library-playlist-cover-edit', "library-playlist-cover-modal", "library-playlist-cover-form", 'library-playlist-cover-url', "library-playlist-cover-save", "library-playlist-cover-reset", "library-playlist-title", "library-playlist-meta", 'library-play-all', "library-track-list", "library-player-view", "library-player-close", "library-player-wash", "library-player-art", "library-player-title", "library-player-stage", "library-player-artist", "library-player-progress", "library-player-current", "library-player-duration", "library-player-prev", "library-player-play", "library-player-next", "library-player-mode", 'library-lyrics', "library-import-modal", "library-netease-login-modal", "library-netease-qr", "library-netease-qr-status", "library-netease-qr-message", "library-netease-qr-save", "library-netease-qr-check", 'library-netease-qr-retry', "library-import-form", "library-netease-input", "library-track-modal", "library-track-form", 'library-track-name', "library-track-artist", "library-track-url", "library-track-cover-url", "library-track-lyric-url", 'library-book-detail-modal', 'library-book-detail-cover', "library-book-detail-name", 'library-book-detail-author', 'library-book-detail-progress', 'library-book-detail-progress-bar', "library-book-detail-synopsis", "library-book-detail-start", 'library-book-detail-edit', "library-book-detail-delete", "library-book-detail-actions", 'library-book-edit-form', 'library-book-edit-title', "library-book-edit-author", 'library-book-edit-cover-url', "library-book-edit-synopsis", "library-book-edit-cancel", "library-char-picker-modal", 'library-char-picker-list', "library-char-picker-empty", 'library-today-reading', "library-today-listening", "library-week-total", "library-week-chart", "library-ranking-list"].forEach(apk120Value276 => {
+    dom[apk120Value276.replace(/^library-/, '').replace(/-/g, '_')] = $(apk120Value276);
+  });
+}
     function storage() {
         if (!window.appStorage) throw new Error('App storage is unavailable.');
         return window.appStorage;
@@ -542,54 +421,23 @@
         return state.playlists.find((playlist_2) => playlist_2.id === playlistId_2) || null;
     }
     async function handleAction_38() {
-        const repo = storage();
-        const [value_270, playlists_2, tracks_2, stats_2, preferences_2, value_275, value_276] =
-            await Promise.all([
-                repo.loadLibraryBooks(),
-                repo.loadLibraryPlaylists(),
-                repo.loadLibraryTracks(),
-                repo.loadLibraryDailyStats(),
-                repo.getSetting('libraryPreferences', DEFAULT_PREFERENCES),
-                repo.getSetting(text_8, null),
-                repo.getPrivateSession(text_7),
-            ]);
-        state.books = (Array.isArray(value_270) ? value_270 : []).map((book_2) => ({
-            ...book_2,
-            author: String(book_2?.author || '').trim() || '未知作者',
-            synopsis: String(book_2?.synopsis || '').trim() || '暂无简介',
-            coverUrl: safeHttpUrl(book_2?.coverUrl),
-        }));
-        state.tracks = (Array.isArray(tracks_2) ? tracks_2 : []).map(
-            normalizeNetEaseTrackResources,
-        );
-        state.playlists = (Array.isArray(playlists_2) ? playlists_2 : []).map((playlist_3) => {
-            if (playlist_3?.source !== 'netease') return playlist_3;
-            const firstCover = (playlist_3.trackIds || [])
-                .map(
-                    (trackId_3) =>
-                        state.tracks.find((track_6) => track_6.id === trackId_3)?.coverUrl || '',
-                )
-                .find(Boolean);
-            return firstCover
-                ? {
-                      ...playlist_3,
-                      coverUrl: firstCover,
-                  }
-                : playlist_3;
-        });
-        state.stats = Array.isArray(stats_2) ? stats_2 : [];
-        state.preferences = {
-            ...DEFAULT_PREFERENCES,
-            ...(preferences_2 || {}),
-        };
-        if (!PLAYBACK_MODES.includes(state.preferences.playbackMode))
-            state.preferences.playbackMode = DEFAULT_PREFERENCES.playbackMode;
-        state.neteaseAccount = value_275 && typeof value_275 === 'object' ? value_275 : null;
-        state.neteaseSessionToken = String(value_276 || '');
-        state.activeTab = TABS.includes(state.preferences.activeTab)
-            ? state.preferences.activeTab
-            : 'books';
-    }
+  const apk120Value380 = storage(),
+    [apk120Value381, apk120Value382, apk120Value383, apk120Value384, apk120Value385, apk120Value386, apk120Value387] = await Promise.all([apk120Value380.loadLibraryBooks(), apk120Value380.loadLibraryPlaylists(), apk120Value380.loadLibraryTracks(), apk120Value380.loadLibraryDailyStats(), apk120Value380.getSetting("libraryPreferences", DEFAULT_PREFERENCES), apk120Value380.getSetting(text_8, null), apk120Value380.getPrivateSession(text_7)]);
+  state.books = (Array.isArray(apk120Value381) ? apk120Value381 : []).map(apk120Value388 => ({
+    ...apk120Value388,
+    'author': String(apk120Value388?.author || '').trim() || '未知作者',
+    'synopsis': String(apk120Value388?.synopsis || '').trim() || '暂无简介',
+    'coverUrl': safeHttpUrl(apk120Value388?.coverUrl)
+  })), state.tracks = (Array.isArray(apk120Value383) ? apk120Value383 : []).map(normalizeNetEaseTrackResources), state.playlists = (Array.isArray(apk120Value382) ? apk120Value382 : []).map(apk120Value389 => ({
+    ...apk120Value389,
+    'customCoverUrl': safeHttpUrl(apk120Value389?.customCoverUrl)
+  })), state.stats = Array.isArray(apk120Value384) ? apk120Value384 : [], state.preferences = {
+    ...DEFAULT_PREFERENCES,
+    ...(apk120Value385 || {})
+  };
+  if (!PLAYBACK_MODES.includes(state.preferences.playbackMode)) state.preferences.playbackMode = DEFAULT_PREFERENCES.playbackMode;
+  state.neteaseAccount = apk120Value386 && typeof apk120Value386 === "object" ? apk120Value386 : null, state.neteaseSessionToken = String(apk120Value387 || ''), state.activeTab = TABS.includes(state.preferences.activeTab) ? state.preferences.activeTab : "books";
+}
     async function savePreferences() {
         state.preferences.activeTab = state.activeTab;
         await storage().setSetting('libraryPreferences', state.preferences);
@@ -3030,47 +2878,16 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
         state.togetherPicker = null;
     }
     function renderTogetherListeningPlaylists() {
-        const picker_2 = ensureTogetherListeningPicker(),
-            list = picker_2.querySelector('.library-together-playlist-list'),
-            empty = picker_2.querySelector('.library-together-empty'),
-            sort_782 = [...state.playlists].sort(
-                (value_783, value_784) =>
-                    Number(value_784.updatedAt || 0) - Number(value_783.updatedAt || 0),
-            );
-        empty.hidden = sort_782.length > 0;
-        list.hidden = sort_782.length === 0;
-        list.innerHTML = sort_782
-            .map((playlist_5) => {
-                const tracks_3 = playlistTracks(playlist_5),
-                    cover_2 = safeImageSource(
-                        playlist_5.coverUrl ||
-                            tracks_3.find((track_9) => track_9?.coverUrl)?.coverUrl,
-                    ),
-                    playableCount = tracks_3.filter(isPlayableTrack).length;
-                return (
-                    '<button class="library-together-playlist-item" type="button" data-together-playlist-id="' +
-                    escapeHtml(playlist_5.id) +
-                    `">
-                <span class="library-together-picker-art">` +
-                    (cover_2
-                        ? '<img src="' +
-                          escapeHtml(cover_2) +
-                          '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">'
-                        : '<i class="fas fa-music"></i>') +
-                    `</span>
-                <span class="library-together-picker-copy"><strong>` +
-                    escapeHtml(playlist_5.name || '未命名歌单') +
-                    '</strong><small>' +
-                    tracks_3.length +
-                    ' 首歌曲 · ' +
-                    playableCount +
-                    ` 首可播放</small></span>
-                <i class="fas fa-chevron-right"></i>
-            </button>`
-                );
-            })
-            .join('');
-    }
+  const apk120Value932 = ensureTogetherListeningPicker(),
+    apk120Value933 = apk120Value932.querySelector(".library-together-playlist-list"),
+    apk120Value934 = apk120Value932.querySelector(".library-together-empty"),
+    apk120Value935 = [...state.playlists].sort((apk120Value936, apk120Value937) => Number(apk120Value937.updatedAt || 0x0) - Number(apk120Value936.updatedAt || 0x0));
+  apk120Value934.hidden = apk120Value935.length > 0x0, apk120Value933.hidden = apk120Value935.length === 0x0, apk120Value933.innerHTML = apk120Value935.map(apk120Value938 => {
+    const apk120Value939 = playlistTracks(apk120Value938),
+      apk120Value940 = apk120Value939.filter(isPlayableTrack).length;
+    return "<button class=\"library-together-playlist-item\" type=\"button\" data-together-playlist-id=\"" + escapeHtml(apk120Value938.id) + '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22library-together-picker-art\x22>' + playlistCoverHtml120(apk120Value938) + "</span>\n                <span class=\"library-together-picker-copy\"><strong>" + escapeHtml(apk120Value938.name || "未命名歌单") + "</strong><small>" + apk120Value939.length + '\x20首歌曲\x20·\x20' + apk120Value940 + " 首可播放</small></span>\n                <i class=\"fas fa-chevron-right\"></i>\n            </button>";
+  }).join('');
+}
     function renderTogetherListeningTracks() {
         const picker_3 = ensureTogetherListeningPicker(),
             pickerState = state.togetherPicker;
@@ -3585,24 +3402,24 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
   }
 }
     async function startNetEaseQrLogin_2() {
-  handleAction_131();
-  const apk119Value1041 = state.neteaseQrGeneration;
   openModal(dom.netease_login_modal, {
-    focus: false
-  }), dom.netease_qr.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i>", handleAction_134("正在生成二维码…", "请稍候。");
+    'focus': ![]
+  });
+  const apk120Value1045 = state.neteaseQrGeneration;
+  dom.netease_qr.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i>", handleAction_134("正在生成二维码…", "请稍候。");
   try {
-    const apk119Value1042 = await handleAction_28("/api/netease/qr/start", {
-      method: "POST",
-      auth: false
+    const apk120Value1046 = await handleAction_28("/api/netease/qr/start", {
+      'method': "POST",
+      'auth': ![]
     });
-    if (apk119Value1041 !== state.neteaseQrGeneration || dom.netease_login_modal.hidden) return;
-    const apk119Value1043 = safeImageSource(apk119Value1042?.["qrImage"]);
-    if (!apk119Value1042?.["key"] || !apk119Value1043) throw new Error("二维码生成失败");
-    state.neteaseQrKey = String(apk119Value1042.key), state.neteaseQrImage = apk119Value1043, state.neteaseQrExpiresAt = Number(apk119Value1042.expiresAt) || Date.now() + 240000, dom.netease_qr.innerHTML = "<img src=\"" + escapeHtml(apk119Value1043) + "\" alt=\"网易云登录二维码\" title=\"长按保存二维码\">", handleAction_130(), handleAction_134("等待扫码", "保存二维码后，打开网易云音乐 App，进入“扫一扫”并从相册选择二维码；确认后返回此页面。"), handleAction_138(600);
-  } catch (apk119Value1044) {
-    if (apk119Value1041 !== state.neteaseQrGeneration || dom.netease_login_modal.hidden) return;
-    console.error("[Library] NetEase QR start failed:", apk119Value1044), dom.netease_qr.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i>", handleAction_134("二维码生成失败", handleAction_24(apk119Value1044), {
-      retry: true
+    if (apk120Value1045 !== state.neteaseQrGeneration || dom.netease_login_modal.hidden) return;
+    const apk120Value1047 = safeImageSource(apk120Value1046?.qrImage);
+    if (!apk120Value1046?.key || !apk120Value1047) throw new Error("二维码生成失败");
+    state.neteaseQrKey = String(apk120Value1046.key), state.neteaseQrImage = apk120Value1047, state.neteaseQrExpiresAt = Number(apk120Value1046.expiresAt) || Date.now() + 0x4 * 0x3c * 0x3e8, dom.netease_qr.innerHTML = '<img\x20src=\x22' + escapeHtml(apk120Value1047) + '\x22\x20alt=\x22网易云登录二维码\x22\x20title=\x22长按保存二维码\x22>', handleAction_130(), handleAction_134("等待扫码", "保存二维码后，打开网易云音乐 App，进入“扫一扫”并从相册选择二维码；确认后返回此页面。"), handleAction_138(0x258);
+  } catch (apk120Value1048) {
+    if (apk120Value1045 !== state.neteaseQrGeneration || dom.netease_login_modal.hidden) return;
+    console.error("[Library] NetEase QR start failed:", apk120Value1048), dom.netease_qr.innerHTML = '<i\x20class=\x22fas\x20fa-triangle-exclamation\x22></i>', handleAction_134('二维码生成失败', handleAction_24(apk120Value1048), {
+      'retry': !![]
     });
   }
 }
@@ -3714,145 +3531,99 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
         } while (!max_908 || count_910 < max_908);
         return items_907;
     }
-    function handleAction_144(value_913, items_914, value_915, value_916, value_917) {
-        const isLikedPlaylist_2 = String(value_913.id) === String(value_917),
-            value_919 = isLikedPlaylist_2
-                ? 'netease_account_liked_' + value_915
-                : 'netease_account_playlist_' + value_913.id,
-            playlist_920 = getPlaylist(value_919),
-            value_921 = new Map(
-                (value_916 || []).map((value_925, value_926) => [String(value_925), value_926]),
-            ),
-            items_922 =
-                isLikedPlaylist_2 && value_921.size
-                    ? items_914
-                          .filter((value_927) => value_921.has(String(value_927.id)))
-                          .sort(
-                              (value_928, value_929) =>
-                                  value_921.get(String(value_928.id)) -
-                                  value_921.get(String(value_929.id)),
-                          )
-                    : items_914,
-            updatedAt_3 = Date.now(),
-            tracks_6 = items_922.map((value_930) => ({
-                id: 'netease_account_track_' + value_913.id + '_' + value_930.id,
-                playlistId: value_919,
-                source: source_6,
-                sourcePlaylistId: String(value_913.id),
-                accountUserId: String(value_915),
-                neteaseId: String(value_930.id),
-                name: String(value_930.name || '未知歌曲').slice(0, 120),
-                artist: String(value_930.artist || '未知歌手').slice(0, 120),
-                album: String(value_930.album || '').slice(0, 120),
-                coverUrl: safeHttpUrl(value_930.coverUrl),
-                mediaUrl: '',
-                lyricUrl: '',
-                durationMs: Number(value_930.durationMs) || 0,
-                fee: Number(value_930.fee) || 0,
-                maxBitrate: Number(value_930.maxBitrate) || 0,
-                available: value_930.available !== false,
-                unavailableReason: String(value_930.reason || ''),
-                liked: value_921.has(String(value_930.id)),
-                createdAt: playlist_920?.createdAt || updatedAt_3,
-                updatedAt: updatedAt_3,
-            }));
-        return {
-            playlist: {
-                id: value_919,
-                source: source_6,
-                sourceId: String(value_913.id),
-                accountUserId: String(value_915),
-                isLikedPlaylist: isLikedPlaylist_2,
-                name: isLikedPlaylist_2
-                    ? '我喜欢的音乐'
-                    : String(value_913.name || '未命名歌单').slice(0, 120),
-                coverUrl:
-                    safeHttpUrl(value_913.coverUrl) ||
-                    tracks_6.find((track_16) => track_16.coverUrl)?.coverUrl ||
-                    '',
-                trackIds: tracks_6.map((value_932) => value_932.id),
-                createdAt: playlist_920?.createdAt || updatedAt_3,
-                updatedAt: updatedAt_3,
-            },
-            tracks: tracks_6,
-        };
+    function handleAction_144(apk120Value1075, apk120Value1076, apk120Value1077, apk120Value1078, apk120Value1079) {
+  const apk120Value1080 = String(apk120Value1075.id) === String(apk120Value1079),
+    apk120Value1081 = apk120Value1080 ? "netease_account_liked_" + apk120Value1077 : "netease_account_playlist_" + apk120Value1075.id,
+    apk120Value1082 = getPlaylist(apk120Value1081),
+    apk120Value1083 = new Map((apk120Value1078 || []).map((apk120Value1087, apk120Value1088) => [String(apk120Value1087), apk120Value1088])),
+    apk120Value1084 = apk120Value1080 && apk120Value1083.size ? apk120Value1076.filter(apk120Value1089 => apk120Value1083.has(String(apk120Value1089.id))).sort((apk120Value1090, apk120Value1091) => apk120Value1083.get(String(apk120Value1090.id)) - apk120Value1083.get(String(apk120Value1091.id))) : apk120Value1076,
+    apk120Value1085 = Date.now(),
+    apk120Value1086 = apk120Value1084.map(apk120Value1092 => ({
+      'id': "netease_account_track_" + apk120Value1075.id + '_' + apk120Value1092.id,
+      'playlistId': apk120Value1081,
+      'source': source_6,
+      'sourcePlaylistId': String(apk120Value1075.id),
+      'accountUserId': String(apk120Value1077),
+      'neteaseId': String(apk120Value1092.id),
+      'name': String(apk120Value1092.name || "未知歌曲").slice(0x0, 0x78),
+      'artist': String(apk120Value1092.artist || "未知歌手").slice(0x0, 0x78),
+      'album': String(apk120Value1092.album || '').slice(0x0, 0x78),
+      'coverUrl': safeHttpUrl(apk120Value1092.coverUrl),
+      'mediaUrl': '',
+      'lyricUrl': '',
+      'durationMs': Number(apk120Value1092.durationMs) || 0x0,
+      'fee': Number(apk120Value1092.fee) || 0x0,
+      'maxBitrate': Number(apk120Value1092.maxBitrate) || 0x0,
+      'available': apk120Value1092.available !== ![],
+      'unavailableReason': String(apk120Value1092.reason || ''),
+      'liked': apk120Value1083.has(String(apk120Value1092.id)),
+      'createdAt': apk120Value1082?.createdAt || apk120Value1085,
+      'updatedAt': apk120Value1085
+    }));
+  return {
+    'playlist': {
+      'id': apk120Value1081,
+      'source': source_6,
+      'sourceId': String(apk120Value1075.id),
+      'accountUserId': String(apk120Value1077),
+      'isLikedPlaylist': apk120Value1080,
+      'name': apk120Value1080 ? "我喜欢的音乐" : String(apk120Value1075.name || "未命名歌单").slice(0x0, 0x78),
+      'coverUrl': safeHttpUrl(apk120Value1075.coverUrl) || apk120Value1086.find(apk120Value1093 => apk120Value1093.coverUrl)?.coverUrl || '',
+      'customCoverUrl': safeHttpUrl(apk120Value1082?.customCoverUrl),
+      'trackIds': apk120Value1086.map(apk120Value1094 => apk120Value1094.id),
+      'createdAt': apk120Value1082?.createdAt || apk120Value1085,
+      'updatedAt': apk120Value1085
+    },
+    'tracks': apk120Value1086
+  };
+}
+    async function syncNetEaseAccountLibrary_2(apk120Value1095 = {}) {
+  if (state.neteaseSyncing) return ![];
+  if (!handleAction_25()) return toast("请先扫码登录网易云音乐"), startNetEaseQrLogin_2(), ![];
+  state.neteaseSyncing = !![], handleAction_128(0x0, 0x1, "正在读取网易云账号…");
+  try {
+    const apk120Value1096 = await handleAction_28('/api/netease/me'),
+      apk120Value1097 = apk120Value1096?.profile;
+    if (!apk120Value1097?.userId) throw new Error("网易云登录已失效，请重新扫码");
+    const apk120Value1098 = String(apk120Value1097.userId),
+      [apk120Value1099, apk120Value1100] = await Promise.all([handleAction_142(apk120Value1098), handleAction_28("/api/netease/liked?uid=" + encodeURIComponent(apk120Value1098))]),
+      apk120Value1101 = Array.isArray(apk120Value1100.ids) ? apk120Value1100.ids.map(String) : [],
+      apk120Value1102 = apk120Value1099.find(apk120Value1108 => String(apk120Value1108.creatorUserId) === apk120Value1098) || null,
+      apk120Value1103 = Math.max(0x1, apk120Value1099.length);
+    let apk120Value1104 = 0x0;
+    const apk120Value1105 = await handleAction_141(apk120Value1099, 0x3, async apk120Value1109 => {
+        const apk120Value1110 = await handleAction_143(apk120Value1109);
+        return apk120Value1104 += 0x1, handleAction_128(apk120Value1104, apk120Value1103, "正在同步 " + apk120Value1104 + '/' + apk120Value1103), handleAction_144(apk120Value1109, apk120Value1110, apk120Value1098, apk120Value1101, apk120Value1102?.id || '');
+      }),
+      apk120Value1106 = new Set(apk120Value1105.map(apk120Value1111 => apk120Value1111.playlist.id));
+    for (const apk120Value1112 of apk120Value1105) {
+      await storage().saveLibraryPlaylistBundle(apk120Value1112.playlist, apk120Value1112.tracks, {
+        'replaceTracks': !![],
+        'preserveCustomCover': !![]
+      });
     }
-    async function syncNetEaseAccountLibrary_2(value_933 = {}) {
-        if (state.neteaseSyncing) return false;
-        if (!handleAction_25())
-            return (toast('请先扫码登录网易云音乐'), startNetEaseQrLogin_2(), false);
-        state.neteaseSyncing = true;
-        handleAction_128(0, 1, '正在读取网易云账号…');
-        try {
-            const value_934 = await handleAction_28('/api/netease/me'),
-                profile_2 = value_934?.profile;
-            if (!profile_2?.userId) throw new Error('网易云登录已失效，请重新扫码');
-            const string_936 = String(profile_2.userId),
-                [value_937, value_938] = await Promise.all([
-                    handleAction_142(string_936),
-                    handleAction_28('/api/netease/liked?uid=' + encodeURIComponent(string_936)),
-                ]),
-                value_939 = Array.isArray(value_938.ids) ? value_938.ids.map(String) : [],
-                value_940 =
-                    value_937.find((value_946) => String(value_946.creatorUserId) === string_936) ||
-                    null,
-                max_941 = Math.max(1, value_937.length);
-            let count_942 = 0;
-            const items_943 = await handleAction_141(value_937, 3, async (value_947) => {
-                    const value_948 = await handleAction_143(value_947);
-                    return (
-                        (count_942 += 1),
-                        handleAction_128(
-                            count_942,
-                            max_941,
-                            '正在同步 ' + count_942 + '/' + max_941,
-                        ),
-                        handleAction_144(
-                            value_947,
-                            value_948,
-                            string_936,
-                            value_939,
-                            value_940?.id || '',
-                        )
-                    );
-                }),
-                value_944 = new Set(items_943.map((value_949) => value_949.playlist.id));
-            for (const value_950 of items_943) {
-                await storage().saveLibraryPlaylistBundle(value_950.playlist, value_950.tracks, {
-                    replaceTracks: true,
-                });
-            }
-            const filter_945 = state.playlists.filter(
-                (value_951) => value_951.source === source_6 && !value_944.has(value_951.id),
-            );
-            for (const playlist_11 of filter_945)
-                await storage().deleteLibraryPlaylist(playlist_11.id);
-            state.playlists = await storage().loadLibraryPlaylists();
-            state.tracks = (await storage().loadLibraryTracks()).map(
-                normalizeNetEaseTrackResources,
-            );
-            state.neteaseAccount = {
-                profile: profile_2,
-                lastSyncAt: Date.now(),
-                syncLabel: '',
-            };
-            await storage().setSetting(text_8, state.neteaseAccount);
-            handleAction_147();
-            toast('已同步 ' + items_943.length + ' 个网易云歌单');
-            if (value_933.closeLoginModal) closeAllModals();
-            return true;
-        } catch (value_953) {
-            return (
-                console.error('[Library] NetEase account sync failed:', value_953),
-                toast(handleAction_24(value_953)),
-                false
-            );
-        } finally {
-            state.neteaseSyncing = false;
-            if (state.neteaseAccount) state.neteaseAccount.syncLabel = '';
-            handleAction_127();
-        }
+    const apk120Value1107 = state.playlists.filter(apk120Value1113 => apk120Value1113.source === source_6 && !apk120Value1106.has(apk120Value1113.id));
+    for (const apk120Value1114 of apk120Value1107) await storage().deleteLibraryPlaylist(apk120Value1114.id);
+    state.playlists = await storage().loadLibraryPlaylists(), state.tracks = (await storage().loadLibraryTracks()).map(normalizeNetEaseTrackResources), state.neteaseAccount = {
+      'profile': apk120Value1097,
+      'lastSyncAt': Date.now(),
+      'syncLabel': ''
+    }, await storage().setSetting(text_8, state.neteaseAccount), handleAction_147();
+    if (state.currentPlaylist) {
+      const apk120Value1115 = getPlaylist(state.currentPlaylist.id);
+      if (apk120Value1115) openPlaylist(apk120Value1115);else closePlaylist();
     }
+    toast("已同步 " + apk120Value1105.length + '\x20个网易云歌单');
+    if (apk120Value1095.closeLoginModal) closeAllModals();
+    return !![];
+  } catch (apk120Value1116) {
+    return console.error("[Library] NetEase account sync failed:", apk120Value1116), toast(handleAction_24(apk120Value1116)), ![];
+  } finally {
+    state.neteaseSyncing = ![];
+    if (state.neteaseAccount) state.neteaseAccount.syncLabel = '';
+    handleAction_127();
+  }
+}
     async function logoutNetEaseAccount_2() {
         handleAction_131();
         handleAction_27(state.currentTrack) &&
@@ -3871,98 +3642,24 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
         toast('已退出网易云登录，本地歌单仍会保留');
     }
     function handleAction_147() {
-        const sorted_2 = [...state.playlists].sort(
-            (value_955, value_956) =>
-                Number(value_956.updatedAt || 0) - Number(value_955.updatedAt || 0),
-        );
-        dom.playlist_count.textContent =
-            sorted_2.length + ' ' + (sorted_2.length === 1 ? 'PLAYLIST' : 'PLAYLISTS');
-        dom.music_empty.hidden = sorted_2.length > 0;
-        dom.playlist_list.hidden = sorted_2.length === 0;
-        dom.playlist_list.innerHTML = sorted_2
-            .map((playlist_12) => {
-                const count_2 = Array.isArray(playlist_12.trackIds)
-                        ? playlist_12.trackIds.length
-                        : 0,
-                    safeHttpUrl_959 = safeHttpUrl(playlist_12.coverUrl);
-                return (
-                    `
-                <button class="library-playlist-card" type="button" data-playlist-id="` +
-                    escapeHtml(playlist_12.id) +
-                    `">
-                    <span class="library-playlist-cover">` +
-                    (safeHttpUrl_959
-                        ? '<img src="' +
-                          escapeHtml(safeHttpUrl_959) +
-                          '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">'
-                        : '<i class="fas fa-music"></i>') +
-                    `</span>
-                    <span><strong>` +
-                    escapeHtml(playlist_12.name || '未命名歌单') +
-                    '</strong><small>' +
-                    count_2 +
-                    ' 首歌曲 · ' +
-                    escapeHtml(
-                        [source_6, 'netease'].includes(playlist_12.source)
-                            ? '网易云音乐'
-                            : 'Library',
-                    ) +
-                    `</small></span>
-                    <i class="fas fa-chevron-right"></i>
-                </button>`
-                );
-            })
-            .join('');
-    }
+  const apk120Value1117 = [...state.playlists].sort((apk120Value1118, apk120Value1119) => Number(apk120Value1119.updatedAt || 0x0) - Number(apk120Value1118.updatedAt || 0x0));
+  dom.playlist_count.textContent = apk120Value1117.length + '\x20' + (apk120Value1117.length === 0x1 ? "PLAYLIST" : "PLAYLISTS"), dom.music_empty.hidden = apk120Value1117.length > 0x0, dom.playlist_list.hidden = apk120Value1117.length === 0x0, dom.playlist_list.innerHTML = apk120Value1117.map(apk120Value1120 => {
+    const apk120Value1121 = Array.isArray(apk120Value1120.trackIds) ? apk120Value1120.trackIds.length : 0x0;
+    return "\n                <button class=\"library-playlist-card\" type=\"button\" data-playlist-id=\"" + escapeHtml(apk120Value1120.id) + '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22library-playlist-cover\x22>' + playlistCoverHtml120(apk120Value1120) + '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span><strong>' + escapeHtml(apk120Value1120.name || "未命名歌单") + "</strong><small>" + apk120Value1121 + '\x20首歌曲\x20·\x20' + escapeHtml([source_6, "netease"].includes(apk120Value1120.source) ? "网易云音乐" : "Library") + "</small></span>\n                    <i class=\"fas fa-chevron-right\"></i>\n                </button>";
+  }).join('');
+}
     function playlistTracks(playlist_13) {
         return (playlist_13?.trackIds || []).map(getTrack).filter(Boolean);
     }
-    function openPlaylist(currentPlaylist_2) {
-        if (!currentPlaylist_2) return;
-        state.currentPlaylist = currentPlaylist_2;
-        const playlistTracks_962 = playlistTracks(currentPlaylist_2);
-        dom.playlist_title.textContent = currentPlaylist_2.name || '未命名歌单';
-        dom.playlist_meta.textContent =
-            playlistTracks_962.length +
-            ' 首歌曲' +
-            ([source_6, 'netease'].includes(currentPlaylist_2.source) ? ' · 网易云音乐' : '');
-        setArtwork(dom.playlist_cover, currentPlaylist_2.coverUrl);
-        dom.track_list.innerHTML = playlistTracks_962
-            .map((track_17, value_964) => {
-                const handleAction_112_965 = isPlayableTrack(track_17);
-                return (
-                    `
-            <button class="library-track-row` +
-                    (handleAction_112_965 ? '' : ' unavailable') +
-                    '" type="button" data-track-id="' +
-                    escapeHtml(track_17.id) +
-                    `">
-                <span class="library-track-art">` +
-                    (safeHttpUrl(track_17.coverUrl)
-                        ? '<img src="' +
-                          escapeHtml(safeHttpUrl(track_17.coverUrl)) +
-                          '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">'
-                        : '<i class="fas fa-music"></i>') +
-                    `</span>
-                <span><strong>` +
-                    escapeHtml(track_17.name || '未知歌曲') +
-                    '</strong><small>' +
-                    escapeHtml(track_17.artist || '未知歌手') +
-                    `</small></span>
-                <span>` +
-                    (handleAction_112_965
-                        ? String(value_964 + 1).padStart(2, '0')
-                        : handleAction_27(track_17) && !handleAction_25()
-                          ? '需登录'
-                          : '不可播放') +
-                    `</span>
-            </button>`
-                );
-            })
-            .join('');
-        dom.playlist_view.classList.add('active');
-        dom.playlist_view.setAttribute('aria-hidden', 'false');
-    }
+    function openPlaylist(apk120Value1123) {
+  if (!apk120Value1123) return;
+  state.currentPlaylist = apk120Value1123;
+  const apk120Value1124 = playlistTracks(apk120Value1123);
+  dom.playlist_title.textContent = apk120Value1123.name || "未命名歌单", dom.playlist_meta.textContent = apk120Value1124.length + " 首歌曲" + ([source_6, "netease"].includes(apk120Value1123.source) ? " · 网易云音乐" : ''), dom.playlist_cover.innerHTML = playlistCoverHtml120(apk120Value1123), dom.track_list.innerHTML = apk120Value1124.map((apk120Value1125, apk120Value1126) => {
+    const apk120Value1127 = isPlayableTrack(apk120Value1125);
+    return '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22library-track-row' + (apk120Value1127 ? '' : '\x20unavailable') + '\x22\x20type=\x22button\x22\x20data-track-id=\x22' + escapeHtml(apk120Value1125.id) + "\">\n                <span class=\"library-track-art\">" + (safeHttpUrl(apk120Value1125.coverUrl) ? '<img\x20src=\x22' + escapeHtml(safeHttpUrl(apk120Value1125.coverUrl)) + "\" alt=\"\" loading=\"lazy\" decoding=\"async\" referrerpolicy=\"no-referrer\">" : '<i\x20class=\x22fas\x20fa-music\x22></i>') + "</span>\n                <span><strong>" + escapeHtml(apk120Value1125.name || '未知歌曲') + '</strong><small>' + escapeHtml(apk120Value1125.artist || "未知歌手") + "</small></span>\n                <span>" + (apk120Value1127 ? String(apk120Value1126 + 0x1).padStart(0x2, '0') : handleAction_27(apk120Value1125) && !handleAction_25() ? "需登录" : "不可播放") + "</span>\n            </button>";
+  }).join(''), dom.playlist_view.classList.add("active"), dom.playlist_view.setAttribute('aria-hidden', 'false');
+}
     function closePlaylist() {
         dom.playlist_view.classList.remove('active');
         dom.playlist_view.setAttribute('aria-hidden', 'true');
@@ -3993,18 +3690,11 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             requestAnimationFrame(() => modal.querySelector('input, textarea')?.focus());
     }
     function closeAllModals() {
-        [
-            dom.import_modal,
-            dom.track_modal,
-            dom.book_detail_modal,
-            dom.char_picker_modal,
-            dom.netease_login_modal,
-        ].forEach((modal_2) => {
-            if (modal_2) modal_2.hidden = true;
-        });
-        handleAction_131();
-        if (dom.book_edit_form) setBookDetailEditing(false);
-    }
+  [dom.import_modal, dom.track_modal, dom.book_detail_modal, dom.char_picker_modal, dom.netease_login_modal, dom.playlist_cover_modal].forEach(apk120Value1142 => {
+    if (apk120Value1142) apk120Value1142.hidden = !![];
+  }), handleAction_131();
+  if (dom.book_edit_form) setBookDetailEditing(![]);
+}
     async function handleTrack_formSubmit(event_970) {
         event_970.preventDefault();
         const name_3 = dom.track_name.value.trim(),
@@ -4261,82 +3951,63 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             );
         throw value_1022 || new Error('网易云歌单接口请求失败');
     }
-    async function importNetEasePlaylist_2(value_1033) {
-        const sourceId_2 = await handleAction_153(value_1033);
-        let rows_2;
-        try {
-            rows_2 = await fetchNetEasePlaylistRows(sourceId_2);
-        } catch (value_1041) {
-            if (value_1041?.name === 'AbortError') throw value_1041;
-            throw new Error(
-                '网易云歌单读取失败' + (value_1041?.message ? '：' + value_1041.message : ''),
-            );
-        }
-        if (!Array.isArray(rows_2) || rows_2.length === 0)
-            throw new Error('歌单为空、未公开或暂时无法解析');
-        const updatedAt_4 = Date.now(),
-            value_1037 = 'netease_playlist_' + sourceId_2,
-            tracks_7 = rows_2.map((row_2, value_1043) => {
-                const sourceUrl_2 = safeHttpUrl(row_2?.url),
-                    songId_2 = String(
-                        row_2?.id || extractNetEaseResourceId(sourceUrl_2) || '',
-                    ).trim(),
-                    coverUrl_3 = safeHttpUrl(row_2?.pic || row_2?.cover),
-                    lyricUrl_3 = safeHttpUrl(row_2?.lrc || row_2?.lyric),
-                    handleAction_30_1048 = extractNetEaseResourceId(coverUrl_3),
-                    lyricId_2 = extractNetEaseResourceId(lyricUrl_3) || songId_2,
-                    id_12 = songId_2
-                        ? 'netease_track_' + sourceId_2 + '_' + songId_2
-                        : 'netease_track_' + sourceId_2 + '_' + value_1043;
-                return normalizeNetEaseTrackResources({
-                    id: id_12,
-                    playlistId: value_1037,
-                    source: 'netease',
-                    neteaseId: songId_2 || '',
-                    neteasePicId: handleAction_30_1048 || '',
-                    neteaseLyricId: lyricId_2 || '',
-                    name: String(row_2?.name || row_2?.title || '歌曲 ' + (value_1043 + 1)).slice(
-                        0,
-                        120,
-                    ),
-                    artist: String(row_2?.artist || row_2?.author || '未知歌手').slice(0, 120),
-                    mediaUrl: sourceUrl_2,
-                    coverUrl: coverUrl_3,
-                    lyricUrl: lyricUrl_3,
-                    available: !!sourceUrl_2,
-                    createdAt: updatedAt_4,
-                    updatedAt: updatedAt_4,
-                });
-            });
-        if (!tracks_7.some((track_19) => track_19.available))
-            throw new Error('歌单中没有可播放的歌曲');
-        const playlist_1039 = getPlaylist(value_1037),
-            playlist_16 = {
-                id: value_1037,
-                source: 'netease',
-                sourceId: sourceId_2,
-                sourceUrl: 'https://music.163.com/playlist?id=' + sourceId_2,
-                name: playlist_1039?.name || handleAction_150(value_1033, sourceId_2),
-                coverUrl: tracks_7.find((track_20) => track_20.coverUrl)?.coverUrl || '',
-                trackIds: tracks_7.map((value_1053) => value_1053.id),
-                createdAt: playlist_1039?.createdAt || updatedAt_4,
-                updatedAt: updatedAt_4,
-            };
-        return (
-            await storage().saveLibraryPlaylistBundle(playlist_16, tracks_7, {
-                replaceTracks: true,
-            }),
-            (state.playlists = state.playlists.filter(
-                (value_1054) => value_1054.id !== playlist_16.id,
-            )),
-            state.playlists.push(playlist_16),
-            (state.tracks = state.tracks
-                .filter((track_21) => track_21.playlistId !== playlist_16.id)
-                .concat(tracks_7)),
-            handleAction_147(),
-            playlist_16
-        );
-    }
+    async function importNetEasePlaylist_2(apk120Value1209) {
+  const apk120Value1210 = await handleAction_153(apk120Value1209);
+  let apk120Value1211;
+  try {
+    apk120Value1211 = await fetchNetEasePlaylistRows(apk120Value1210);
+  } catch (apk120Value1218) {
+    if (apk120Value1218?.name === 'AbortError') throw apk120Value1218;
+    throw new Error("网易云歌单读取失败" + (apk120Value1218?.message ? '：' + apk120Value1218.message : ''));
+  }
+  if (!Array.isArray(apk120Value1211) || apk120Value1211.length === 0x0) throw new Error("歌单为空、未公开或暂时无法解析");
+  const apk120Value1212 = Date.now(),
+    apk120Value1213 = 'netease_playlist_' + apk120Value1210,
+    apk120Value1214 = apk120Value1211.map((apk120Value1219, apk120Value1220) => {
+      const apk120Value1221 = safeHttpUrl(apk120Value1219?.url),
+        apk120Value1222 = String(apk120Value1219?.id || extractNetEaseResourceId(apk120Value1221) || '').trim(),
+        apk120Value1223 = safeHttpUrl(apk120Value1219?.pic || apk120Value1219?.cover),
+        apk120Value1224 = safeHttpUrl(apk120Value1219?.lrc || apk120Value1219?.lyric),
+        apk120Value1225 = extractNetEaseResourceId(apk120Value1223),
+        apk120Value1226 = extractNetEaseResourceId(apk120Value1224) || apk120Value1222,
+        apk120Value1227 = apk120Value1222 ? "netease_track_" + apk120Value1210 + '_' + apk120Value1222 : "netease_track_" + apk120Value1210 + '_' + apk120Value1220;
+      return normalizeNetEaseTrackResources({
+        'id': apk120Value1227,
+        'playlistId': apk120Value1213,
+        'source': 'netease',
+        'neteaseId': apk120Value1222 || '',
+        'neteasePicId': apk120Value1225 || '',
+        'neteaseLyricId': apk120Value1226 || '',
+        'name': String(apk120Value1219?.name || apk120Value1219?.title || "歌曲 " + (apk120Value1220 + 0x1)).slice(0x0, 0x78),
+        'artist': String(apk120Value1219?.artist || apk120Value1219?.author || "未知歌手").slice(0x0, 0x78),
+        'mediaUrl': apk120Value1221,
+        'coverUrl': apk120Value1223,
+        'lyricUrl': apk120Value1224,
+        'available': !!apk120Value1221,
+        'createdAt': apk120Value1212,
+        'updatedAt': apk120Value1212
+      });
+    });
+  if (!apk120Value1214.some(apk120Value1228 => apk120Value1228.available)) throw new Error("歌单中没有可播放的歌曲");
+  const apk120Value1215 = getPlaylist(apk120Value1213),
+    apk120Value1216 = {
+      'id': apk120Value1213,
+      'source': 'netease',
+      'sourceId': apk120Value1210,
+      'sourceUrl': "https://music.163.com/playlist?id=" + apk120Value1210,
+      'name': apk120Value1215?.name || handleAction_150(apk120Value1209, apk120Value1210),
+      'coverUrl': apk120Value1214.find(apk120Value1229 => apk120Value1229.coverUrl)?.coverUrl || '',
+      'customCoverUrl': safeHttpUrl(apk120Value1215?.customCoverUrl),
+      'trackIds': apk120Value1214.map(apk120Value1230 => apk120Value1230.id),
+      'createdAt': apk120Value1215?.createdAt || apk120Value1212,
+      'updatedAt': apk120Value1212
+    },
+    apk120Value1217 = await storage().saveLibraryPlaylistBundle(apk120Value1216, apk120Value1214, {
+      'replaceTracks': !![],
+      'preserveCustomCover': !![]
+    });
+  return state.playlists = state.playlists.filter(apk120Value1231 => apk120Value1231.id !== apk120Value1216.id), state.playlists.push(apk120Value1217.playlist), state.tracks = state.tracks.filter(apk120Value1232 => apk120Value1232.playlistId !== apk120Value1216.id).concat(apk120Value1214), handleAction_147(), apk120Value1217.playlist;
+}
     async function handleImport_formSubmit(event_1056) {
         event_1056?.preventDefault();
         const input_2 = dom.netease_input.value.trim(),
@@ -5020,358 +4691,175 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
         });
     }
     function handleAction_174() {
-        $('app-phone-btn')?.addEventListener('click', () => openApp());
-        dom.back_btn.addEventListener('click', close_2);
-        dom.header_action.addEventListener('click', () => {
-            if (state.activeTab === 'books') dom.book_file_input.click();
-            else {
-                if (state.activeTab === 'music') openModal(dom.track_modal);
-            }
-        });
-        dom.book_upload_btn.addEventListener('click', () => dom.book_file_input.click());
-        dom.books_empty.addEventListener('click', (event_11) => {
-            if (event_11.target.closest('[data-library-action="upload-book"]'))
-                dom.book_file_input.click();
-        });
-        dom.book_file_input.addEventListener('change', () =>
-            importBook(dom.book_file_input.files?.[0]),
-        );
-        dom.book_grid.addEventListener('click', (event_12) => {
-            const card = event_12.target.closest('[data-book-id]');
-            const action_4 = event_12.target.closest('[data-book-action]')?.dataset.bookAction;
-            if (!card || !action_4) return;
-            const book_14 = state.books.find((item_13) => item_13.id === card.dataset.bookId);
-            if (action_4 === 'details') openBookDetail(book_14);
-        });
-        dom.book_detail_start.addEventListener('click', () => {
-            const book_15 = state.detailBook;
-            if (!book_15) return;
-            closeAllModals();
-            openReaderAsync(book_15);
-        });
-        dom.book_detail_edit.addEventListener('click', () => setBookDetailEditing(true));
-        dom.book_detail_delete.addEventListener('click', () => requestDeleteBook(state.detailBook));
-        dom.book_edit_cancel.addEventListener('click', () => {
-            renderBookDetail();
-            setBookDetailEditing(false);
-        });
-        dom.book_edit_form.addEventListener('submit', handleBook_edit_formSubmit);
-        dom.reader_back.addEventListener('click', closeReader);
-        dom.reader_comment_action.addEventListener('pointerdown', (event_1172) =>
-            event_1172.preventDefault(),
-        );
-        dom.reader_comment_action.addEventListener('click', handleReader_comment_actionClick);
-        dom.reader_comments_close.addEventListener('click', handleReader_comments_closeClick);
-        dom.reader_comments_backdrop.addEventListener('click', (event_1173) => {
-            if (event_1173.target === dom.reader_comments_backdrop)
-                handleReader_comments_closeClick();
-        });
-        dom.reader_content.addEventListener('click', (event_1174) => {
-            const closest_1175 = event_1174.target.closest('[data-library-annotation-id]');
-            if (!closest_1175) return;
-            event_1174.preventDefault();
-            event_1174.stopPropagation();
-            const togetherListeningEventTimer_2 = handleAction_69().find(
-                (value_1177) =>
-                    String(value_1177.id) === String(closest_1175.dataset.libraryAnnotationId),
-            );
-            if (togetherListeningEventTimer_2) handleAction_77(togetherListeningEventTimer_2);
-        });
-        dom.reader_content.addEventListener('keydown', (event_1178) => {
-            if (event_1178.key !== 'Enter' && event_1178.key !== ' ') return;
-            const closest_1179 = event_1178.target.closest('[data-library-annotation-id]');
-            if (!closest_1179) return;
-            event_1178.preventDefault();
-            const togetherListeningEventTimer_3 = handleAction_69().find(
-                (value_1181) =>
-                    String(value_1181.id) === String(closest_1179.dataset.libraryAnnotationId),
-            );
-            if (togetherListeningEventTimer_3) handleAction_77(togetherListeningEventTimer_3);
-        });
-        dom.reader_together.addEventListener('click', () => {
-            if (state.together) stopTogether();
-            else openCharPicker();
-        });
-        dom.char_picker_list.addEventListener('click', (event_13) => {
-            const button_6 = event_13.target.closest('[data-library-char-id]');
-            if (!button_6) return;
-            const friend_11 = (window.imData?.friends || []).find(
-                (item_14) => String(item_14.id) === String(button_6.dataset.libraryCharId),
-            );
-            startTogether(friend_11);
-        });
-        $('imessage-view')?.addEventListener(
-            'click',
-            (event_14) => {
-                if (!state.together) return;
-                if (event_14.target.closest('.chat-back-btn')) {
-                    event_14.preventDefault();
-                    event_14.stopImmediatePropagation();
-                    collapseTogetherPopup();
-                    return;
-                }
-                event_14.target.closest('.chat-call-btn, .chat-menu-btn') &&
-                    (event_14.preventDefault(),
-                    event_14.stopImmediatePropagation(),
-                    toast('一起看模式下暂不支持电话和聊天设置'));
-            },
-            true,
-        );
-        dom.reader_settings.addEventListener('click', () => {
-            dom.reader_toc.hidden = true;
-            dom.reader_panel.hidden = !dom.reader_panel.hidden;
-        });
-        dom.reader_toc_button.addEventListener('click', () => {
-            dom.reader_panel.hidden = true;
-            dom.reader_toc.hidden = !dom.reader_toc.hidden;
-        });
-        dom.reader_toc_close.addEventListener('click', () => {
-            dom.reader_toc.hidden = true;
-        });
-        dom.reader_toc_list.addEventListener('click', (event_15) => {
-            const button_7 = event_15.target.closest('[data-chapter-offset]');
-            if (!button_7) return;
-            const textLength_2 = Math.max(1, state.readerContent?.text?.length || 1);
-            const offset_5 = clampReaderValue(
-                    Number(button_7.dataset.chapterOffset) || 0,
-                    0,
-                    textLength_2,
-                );
-            dom.reader_toc.hidden = true;
-            restoreReaderProgress(offset_5 / textLength_2);
-            updateReaderProgress(true, state.readerPage);
-            markReaderActivity();
-        });
-        dom.reader_panel.addEventListener('click', (event_16) => {
-            const font = event_16.target.closest('[data-reader-font]');
-            const line_8 = event_16.target.closest('[data-reader-line]');
-            const theme_2 = event_16.target.closest('[data-reader-theme]');
-            const progress_7 = state.currentBook ? Number(state.currentBook.progress) || 0 : 0;
-            if (font)
-                state.preferences.readerFontSize =
-                    (Number(state.preferences.readerFontSize) || 18) +
-                    Number(font.dataset.readerFont);
-            if (line_8)
-                state.preferences.readerLineHeight =
-                    (Number(state.preferences.readerLineHeight) || 1.85) +
-                    Number(line_8.dataset.readerLine) * 0.15;
-            if (theme_2) state.preferences.readerTheme = theme_2.dataset.readerTheme;
-            handleAction_58();
-            if (state.currentBook) requestAnimationFrame(() => restoreReaderProgress(progress_7));
-            else updateReaderProgress(false);
-            savePreferences()['catch'](console.error);
-        });
-        dom.reader_scroll.addEventListener('pointerdown', handleReader_scrollPointerdown, {
-            passive: true,
-        });
-        dom.reader_scroll.addEventListener('pointerup', handleReader_scrollPointerup, {
-            passive: true,
-        });
-        dom.reader_scroll.addEventListener('pointercancel', handleReader_scrollPointercancel, {
-            passive: true,
-        });
-        dom.reader_scroll.addEventListener('touchstart', handleReader_scrollTouchstart, {
-            passive: true,
-        });
-        dom.reader_scroll.addEventListener('touchend', handleReader_scrollTouchend, {
-            passive: true,
-        });
-        dom.reader_scroll.addEventListener('touchcancel', handleReader_scrollTouchcancel, {
-            passive: true,
-        });
-        ['pointerdown', 'touchstart'].forEach((eventName) =>
-            dom.reader_view.addEventListener(eventName, markReaderActivity, {
-                passive: true,
-            }),
-        );
-        document.addEventListener('selectionchange', () => requestAnimationFrame(handleAction_76));
-        document.addEventListener('keydown', handleKeydown);
-        window.addEventListener('resize', repaginateReaderAtCurrentProgress);
-        window.addEventListener('resize', () => saveReaderProgress_2());
-        dom.import_netease_btn.addEventListener('click', () => openModal(dom.import_modal));
-        dom.netease_login_btn.addEventListener('click', startNetEaseQrLogin_2);
-        dom.netease_refresh_btn.addEventListener('click', () => syncNetEaseAccountLibrary_2());
-        dom.netease_logout_btn.addEventListener('click', () =>
-            logoutNetEaseAccount_2()['catch'](console.error),
-        );
-        dom.netease_qr_retry.addEventListener('click', startNetEaseQrLogin_2);
-        dom.netease_qr_save.addEventListener('click', () =>
-            handleAction_136()['catch'](console.error),
-        );
-        dom.netease_qr_check.addEventListener('click', () => {
-            handleAction_129();
-            void handleAction_139();
-        });
-        dom.music_add_btn.addEventListener('click', () => openModal(dom.track_modal));
-        dom.add_track_btn.addEventListener('click', () => openModal(dom.track_modal));
-        dom.import_form.addEventListener('submit', handleImport_formSubmit);
-        dom.track_form.addEventListener('submit', handleTrack_formSubmit);
-        dom.view
-            .querySelectorAll('[data-close-library-modal]')
-            .forEach((button_8) => button_8.addEventListener('click', closeAllModals));
-        [dom.import_modal, dom.track_modal, dom.book_detail_modal, dom.char_picker_modal].forEach(
-            (modal_3) =>
-                modal_3.addEventListener('click', (event_17) => {
-                    if (event_17.target === modal_3) closeAllModals();
-                }),
-        );
-        dom.playlist_list.addEventListener('click', (event_18) => {
-            const card_2 = event_18.target.closest('[data-playlist-id]');
-            if (card_2) openPlaylist(getPlaylist(card_2.dataset.playlistId));
-        });
-        dom.playlist_back.addEventListener('click', closePlaylist);
-        dom.playlist_delete.addEventListener('click', () =>
-            requestDeletePlaylist(state.currentPlaylist),
-        );
-        dom.play_all.addEventListener('click', () => {
-            const tracks_8 = playlistTracks(state.currentPlaylist).filter(isPlayableTrack);
-            if (tracks_8.length)
-                playTrack(
-                    tracks_8[0],
-                    tracks_8.map((track_31) => track_31.id),
-                );
-            else toast('歌单中没有可播放的歌曲');
-        });
-        dom.track_list.addEventListener('click', (event_19) => {
-            const row_5 = event_19.target.closest('[data-track-id]');
-            if (!row_5) return;
-            const tracks_9 = playlistTracks(state.currentPlaylist);
-            playTrack(
-                getTrack(row_5.dataset.trackId),
-                tracks_9.map((track_32) => track_32.id),
-            );
-        });
-        dom.mini_open.addEventListener('click', openPlayer);
-        dom.mini_mode.addEventListener('click', cyclePlaybackMode);
-        dom.mini_play.addEventListener('click', togglePlayback);
-        dom.mini_next.addEventListener('click', () => playQueueDirection(1));
-        dom.player_close.addEventListener('click', handlePlayer_closeClick);
-        dom.player_art.addEventListener('click', () => setPlayerLyricsMode(true));
-        dom.lyrics.addEventListener('click', () => setPlayerLyricsMode(false));
-        dom.player_play.addEventListener('click', togglePlayback);
-        dom.player_mode.addEventListener('click', cyclePlaybackMode);
-        dom.player_prev.addEventListener('click', () => playQueueDirection(-1));
-        dom.player_next.addEventListener('click', () => playQueueDirection(1));
-        dom.player_progress.addEventListener('pointerdown', () => {
-            state.isSeeking = true;
-        });
-        dom.player_progress.addEventListener('input', () => {
-            if (!Number.isFinite(audio.duration)) return;
-            const next_3 = (Number(dom.player_progress.value) / 1000) * audio.duration;
-            dom.player_current.textContent = formatClock(next_3);
-        });
-        dom.player_progress.addEventListener('change', () => {
-            if (Number.isFinite(audio.duration))
-                audio.currentTime = (Number(dom.player_progress.value) / 1000) * audio.duration;
-            state.lastMediaTime = audio.currentTime;
-            state.isSeeking = false;
-        });
-        dom.view.querySelectorAll('[data-range]').forEach((button_9) =>
-            button_9.addEventListener('click', () => {
-                state.preferences.rankingRange = button_9.dataset.range;
-                savePreferences()['catch'](console.error);
-                handleAction_172();
-            }),
-        );
-        handleAction_173();
-        audio.addEventListener('play', () => {
-            updatePlayerUi();
-            emitTogetherListeningChange(true);
-            if (state.currentTrack && state.pendingPlayStatTrackId === state.currentTrack.id) {
-                const itemId_2 = state.currentTrack.id;
-                state.pendingPlayStatTrackId = null;
-                storage()
-                    .incrementLibraryDailyStat({
-                        date: localDateKey(),
-                        kind: 'play',
-                        itemId: itemId_2,
-                        count: 1,
-                    })
-                    ['catch']((error_20) => {
-                        console.error('[Library] Play count update failed:', error_20);
-                    });
-            }
-        });
-        audio.addEventListener('pause', () => {
-            updatePlayerUi();
-            emitTogetherListeningChange(true);
-            handleAction_170()['catch'](console.error);
-        });
-        audio.addEventListener('loadedmetadata', () => {
-            state.lastMediaTime = audio.currentTime || 0;
-            updatePlayerUi();
-            emitTogetherListeningChange(true);
-        });
-        audio.addEventListener('seeking', () => {
-            state.isSeeking = true;
-        });
-        audio.addEventListener('seeked', () => {
-            state.lastMediaTime = audio.currentTime || 0;
-            state.isSeeking = false;
-            updateLyrics(audio.currentTime || 0);
-            emitTogetherListeningChange(true);
-        });
-        audio.addEventListener('timeupdate', () => {
-            const lastMediaTime_2 = Number(audio.currentTime) || 0;
-            const pendingListeningSeconds_2 = lastMediaTime_2 - state.lastMediaTime;
-            if (
-                !state.isSeeking &&
-                !audio.paused &&
-                pendingListeningSeconds_2 > 0 &&
-                pendingListeningSeconds_2 <= 5
-            ) {
-                state.pendingListeningSeconds += pendingListeningSeconds_2;
-                if (state.pendingListeningSeconds >= 15) handleAction_170()['catch'](console.error);
-            }
-            state.lastMediaTime = lastMediaTime_2;
-            handleAction_169();
-            updateLyrics(lastMediaTime_2);
-            emitTogetherListeningChange(false);
-        });
-        audio.addEventListener('ended', handleTrackEnded);
-        audio.addEventListener('error', () => {
-            if (!state.currentTrack || !audio.src) return;
-            if (state.playbackStartingAttemptId === state.playbackAttemptId) return;
-            if (
-                handleAction_27(state.currentTrack) &&
-                state.neteasePlaybackRetryCount < 1 &&
-                handleAction_25()
-            ) {
-                state.neteasePlaybackRetryCount += 1;
-                readerChunkHtmlCache_3['delete'](String(state.currentTrack.neteaseId));
-                handleAction_166(state.currentTrack);
-                return;
-            }
-            toast('当前歌曲暂时无法播放');
-            updatePlayerUi();
-            emitTogetherListeningChange(true);
-        });
-        window.addEventListener('pagehide', () => {
-            handleAction_129();
-            if (state.currentBook)
-                updateReaderProgress(true, null, {
-                    immediate: true,
-                });
-            else flushReaderProgressSave()['catch'](console.error);
-            handleAction_91()['catch'](console.error);
-            handleAction_170()['catch'](console.error);
-        });
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                handleAction_129();
-                if (state.currentBook)
-                    updateReaderProgress(true, null, {
-                        immediate: true,
-                    });
-                else flushReaderProgressSave()['catch'](console.error);
-                handleAction_91()['catch'](console.error);
-                handleAction_170()['catch'](console.error);
-            } else handlePageshow();
-        });
-        window.addEventListener('pageshow', handlePageshow);
-        window.addEventListener('u2:native-pause', pauseNativeNetEaseQr);
-        window.addEventListener('u2:native-resume', resumeNativeNetEaseQr);
+  $("app-phone-btn")?.addEventListener("click", () => openApp()), dom.back_btn.addEventListener("click", close_2), dom.header_action.addEventListener("click", () => {
+    if (state.activeTab === "books") dom.book_file_input.click();else {
+      if (state.activeTab === "music") openModal(dom.track_modal);
     }
+  }), dom.book_upload_btn.addEventListener("click", () => dom.book_file_input.click()), dom.books_empty.addEventListener('click', apk120Value1399 => {
+    if (apk120Value1399.target.closest('[data-library-action=\x22upload-book\x22]')) dom.book_file_input.click();
+  }), dom.book_file_input.addEventListener("change", () => importBook(dom.book_file_input.files?.[0x0])), dom.book_grid.addEventListener("click", apk120Value1400 => {
+    const apk120Value1401 = apk120Value1400.target.closest("[data-book-id]"),
+      apk120Value1402 = apk120Value1400.target.closest("[data-book-action]")?.dataset.bookAction;
+    if (!apk120Value1401 || !apk120Value1402) return;
+    const apk120Value1403 = state.books.find(apk120Value1404 => apk120Value1404.id === apk120Value1401.dataset.bookId);
+    if (apk120Value1402 === 'details') openBookDetail(apk120Value1403);
+  }), dom.book_detail_start.addEventListener("click", () => {
+    const apk120Value1405 = state.detailBook;
+    if (!apk120Value1405) return;
+    closeAllModals(), openReaderAsync(apk120Value1405);
+  }), dom.book_detail_edit.addEventListener("click", () => setBookDetailEditing(!![])), dom.book_detail_delete.addEventListener("click", () => requestDeleteBook(state.detailBook)), dom.book_edit_cancel.addEventListener('click', () => {
+    renderBookDetail(), setBookDetailEditing(![]);
+  }), dom.book_edit_form.addEventListener("submit", handleBook_edit_formSubmit), dom.reader_back.addEventListener("click", closeReader), dom.reader_comment_action.addEventListener('pointerdown', apk120Value1406 => apk120Value1406.preventDefault()), dom.reader_comment_action.addEventListener("click", handleReader_comment_actionClick), dom.reader_comments_close.addEventListener("click", handleReader_comments_closeClick), dom.reader_comments_backdrop.addEventListener("click", apk120Value1407 => {
+    if (apk120Value1407.target === dom.reader_comments_backdrop) handleReader_comments_closeClick();
+  }), dom.reader_content.addEventListener("click", apk120Value1408 => {
+    const apk120Value1409 = apk120Value1408.target.closest("[data-library-annotation-id]");
+    if (!apk120Value1409) return;
+    apk120Value1408.preventDefault(), apk120Value1408.stopPropagation();
+    const apk120Value1410 = handleAction_69().find(apk120Value1411 => String(apk120Value1411.id) === String(apk120Value1409.dataset.libraryAnnotationId));
+    if (apk120Value1410) handleAction_77(apk120Value1410);
+  }), dom.reader_content.addEventListener("keydown", apk120Value1412 => {
+    if (apk120Value1412.key !== "Enter" && apk120Value1412.key !== '\x20') return;
+    const apk120Value1413 = apk120Value1412.target.closest("[data-library-annotation-id]");
+    if (!apk120Value1413) return;
+    apk120Value1412.preventDefault();
+    const apk120Value1414 = handleAction_69().find(apk120Value1415 => String(apk120Value1415.id) === String(apk120Value1413.dataset.libraryAnnotationId));
+    if (apk120Value1414) handleAction_77(apk120Value1414);
+  }), dom.reader_together.addEventListener("click", () => {
+    if (state.together) stopTogether();else openCharPicker();
+  }), dom.char_picker_list.addEventListener("click", apk120Value1416 => {
+    const apk120Value1417 = apk120Value1416.target.closest('[data-library-char-id]');
+    if (!apk120Value1417) return;
+    const apk120Value1418 = (window.imData?.friends || []).find(apk120Value1419 => String(apk120Value1419.id) === String(apk120Value1417.dataset.libraryCharId));
+    startTogether(apk120Value1418);
+  }), $("imessage-view")?.addEventListener("click", apk120Value1420 => {
+    if (!state.together) return;
+    if (apk120Value1420.target.closest('.chat-back-btn')) {
+      apk120Value1420.preventDefault(), apk120Value1420.stopImmediatePropagation(), collapseTogetherPopup();
+      return;
+    }
+    apk120Value1420.target.closest(".chat-call-btn, .chat-menu-btn") && (apk120Value1420.preventDefault(), apk120Value1420.stopImmediatePropagation(), toast("一起看模式下暂不支持电话和聊天设置"));
+  }, !![]), dom.reader_settings.addEventListener("click", () => {
+    dom.reader_toc.hidden = !![], dom.reader_panel.hidden = !dom.reader_panel.hidden;
+  }), dom.reader_toc_button.addEventListener("click", () => {
+    dom.reader_panel.hidden = !![], dom.reader_toc.hidden = !dom.reader_toc.hidden;
+  }), dom.reader_toc_close.addEventListener("click", () => {
+    dom.reader_toc.hidden = !![];
+  }), dom.reader_toc_list.addEventListener('click', apk120Value1421 => {
+    const apk120Value1422 = apk120Value1421.target.closest("[data-chapter-offset]");
+    if (!apk120Value1422) return;
+    const apk120Value1423 = Math.max(0x1, state.readerContent?.text?.length || 0x1),
+      apk120Value1424 = clampReaderValue(Number(apk120Value1422.dataset.chapterOffset) || 0x0, 0x0, apk120Value1423);
+    dom.reader_toc.hidden = !![], restoreReaderProgress(apk120Value1424 / apk120Value1423), updateReaderProgress(!![], state.readerPage), markReaderActivity();
+  }), dom.reader_panel.addEventListener('click', apk120Value1425 => {
+    const apk120Value1426 = apk120Value1425.target.closest("[data-reader-font]"),
+      apk120Value1427 = apk120Value1425.target.closest("[data-reader-line]"),
+      apk120Value1428 = apk120Value1425.target.closest("[data-reader-theme]"),
+      apk120Value1429 = state.currentBook ? Number(state.currentBook.progress) || 0x0 : 0x0;
+    if (apk120Value1426) state.preferences.readerFontSize = (Number(state.preferences.readerFontSize) || 0x12) + Number(apk120Value1426.dataset.readerFont);
+    if (apk120Value1427) state.preferences.readerLineHeight = (Number(state.preferences.readerLineHeight) || 1.85) + Number(apk120Value1427.dataset.readerLine) * 0.15;
+    if (apk120Value1428) state.preferences.readerTheme = apk120Value1428.dataset.readerTheme;
+    handleAction_58();
+    if (state.currentBook) requestAnimationFrame(() => restoreReaderProgress(apk120Value1429));else updateReaderProgress(![]);
+    savePreferences()["catch"](console.error);
+  }), dom.reader_scroll.addEventListener("pointerdown", handleReader_scrollPointerdown, {
+    'passive': !![]
+  }), dom.reader_scroll.addEventListener('pointerup', handleReader_scrollPointerup, {
+    'passive': !![]
+  }), dom.reader_scroll.addEventListener('pointercancel', handleReader_scrollPointercancel, {
+    'passive': !![]
+  }), dom.reader_scroll.addEventListener("touchstart", handleReader_scrollTouchstart, {
+    'passive': !![]
+  }), dom.reader_scroll.addEventListener("touchend", handleReader_scrollTouchend, {
+    'passive': !![]
+  }), dom.reader_scroll.addEventListener('touchcancel', handleReader_scrollTouchcancel, {
+    'passive': !![]
+  }), ["pointerdown", "touchstart"].forEach(apk120Value1430 => dom.reader_view.addEventListener(apk120Value1430, markReaderActivity, {
+    'passive': !![]
+  })), document.addEventListener('selectionchange', () => requestAnimationFrame(handleAction_76)), document.addEventListener("keydown", handleKeydown), window.addEventListener("resize", repaginateReaderAtCurrentProgress), window.addEventListener("resize", () => saveReaderProgress_2()), dom.import_netease_btn.addEventListener("click", () => openModal(dom.import_modal)), dom.netease_login_btn.addEventListener("click", startNetEaseQrLogin_2), dom.netease_refresh_btn.addEventListener("click", () => syncNetEaseAccountLibrary_2()), dom.netease_logout_btn.addEventListener('click', () => logoutNetEaseAccount_2()["catch"](console.error)), dom.netease_qr_retry.addEventListener("click", startNetEaseQrLogin_2), dom.netease_qr_save.addEventListener("click", () => handleAction_136()["catch"](console.error)), dom.netease_qr_check.addEventListener("click", () => {
+    handleAction_129(), void handleAction_139();
+  }), dom.music_add_btn.addEventListener("click", () => openModal(dom.track_modal)), dom.add_track_btn.addEventListener("click", () => openModal(dom.track_modal)), dom.import_form.addEventListener('submit', handleImport_formSubmit), dom.track_form.addEventListener('submit', handleTrack_formSubmit), dom.view.querySelectorAll("[data-close-library-modal]").forEach(apk120Value1431 => apk120Value1431.addEventListener("click", closeAllModals)), [dom.import_modal, dom.track_modal, dom.book_detail_modal, dom.char_picker_modal, dom.playlist_cover_modal].forEach(apk120Value1432 => apk120Value1432.addEventListener("click", apk120Value1433 => {
+    if (apk120Value1433.target === apk120Value1432) closeAllModals();
+  })), dom.playlist_list.addEventListener("click", apk120Value1434 => {
+    const apk120Value1435 = apk120Value1434.target.closest("[data-playlist-id]");
+    if (apk120Value1435) openPlaylist(getPlaylist(apk120Value1435.dataset.playlistId));
+  }), dom.playlist_back.addEventListener("click", closePlaylist), dom.playlist_cover_edit.addEventListener("click", openPlaylistCover120), dom.playlist_cover_form.addEventListener("submit", savePlaylistCover120), dom.playlist_cover_reset.addEventListener("click", apk120Value1436 => {
+    void savePlaylistCover120(apk120Value1436, !![]);
+  }), dom.playlist_delete.addEventListener("click", () => requestDeletePlaylist(state.currentPlaylist)), dom.play_all.addEventListener("click", () => {
+    const apk120Value1437 = playlistTracks(state.currentPlaylist).filter(isPlayableTrack);
+    if (apk120Value1437.length) playTrack(apk120Value1437[0x0], apk120Value1437.map(apk120Value1438 => apk120Value1438.id));else toast("歌单中没有可播放的歌曲");
+  }), dom.track_list.addEventListener("click", apk120Value1439 => {
+    const apk120Value1440 = apk120Value1439.target.closest('[data-track-id]');
+    if (!apk120Value1440) return;
+    const apk120Value1441 = playlistTracks(state.currentPlaylist);
+    playTrack(getTrack(apk120Value1440.dataset.trackId), apk120Value1441.map(apk120Value1442 => apk120Value1442.id));
+  }), dom.mini_open.addEventListener("click", openPlayer), dom.mini_mode.addEventListener('click', cyclePlaybackMode), dom.mini_play.addEventListener("click", togglePlayback), dom.mini_next.addEventListener("click", () => playQueueDirection(0x1)), dom.player_close.addEventListener("click", handlePlayer_closeClick), dom.player_art.addEventListener("click", () => setPlayerLyricsMode(!![])), dom.lyrics.addEventListener('click', () => setPlayerLyricsMode(![])), dom.player_play.addEventListener("click", togglePlayback), dom.player_mode.addEventListener("click", cyclePlaybackMode), dom.player_prev.addEventListener('click', () => playQueueDirection(-0x1)), dom.player_next.addEventListener("click", () => playQueueDirection(0x1)), dom.player_progress.addEventListener("pointerdown", () => {
+    state.isSeeking = !![];
+  }), dom.player_progress.addEventListener("input", () => {
+    if (!Number.isFinite(audio.duration)) return;
+    const apk120Value1443 = Number(dom.player_progress.value) / 0x3e8 * audio.duration;
+    dom.player_current.textContent = formatClock(apk120Value1443);
+  }), dom.player_progress.addEventListener("change", () => {
+    if (Number.isFinite(audio.duration)) audio.currentTime = Number(dom.player_progress.value) / 0x3e8 * audio.duration;
+    state.lastMediaTime = audio.currentTime, state.isSeeking = ![];
+  }), dom.view.querySelectorAll("[data-range]").forEach(apk120Value1444 => apk120Value1444.addEventListener("click", () => {
+    state.preferences.rankingRange = apk120Value1444.dataset.range, savePreferences()["catch"](console.error), handleAction_172();
+  })), handleAction_173(), audio.addEventListener("play", () => {
+    updatePlayerUi(), emitTogetherListeningChange(!![]);
+    if (state.currentTrack && state.pendingPlayStatTrackId === state.currentTrack.id) {
+      const apk120Value1445 = state.currentTrack.id;
+      state.pendingPlayStatTrackId = null, storage().incrementLibraryDailyStat({
+        'date': localDateKey(),
+        'kind': "play",
+        'itemId': apk120Value1445,
+        'count': 0x1
+      })["catch"](apk120Value1446 => {
+        console.error("[Library] Play count update failed:", apk120Value1446);
+      });
+    }
+  }), audio.addEventListener("pause", () => {
+    updatePlayerUi(), emitTogetherListeningChange(!![]), handleAction_170()["catch"](console.error);
+  }), audio.addEventListener("loadedmetadata", () => {
+    state.lastMediaTime = audio.currentTime || 0x0, updatePlayerUi(), emitTogetherListeningChange(!![]);
+  }), audio.addEventListener('seeking', () => {
+    state.isSeeking = !![];
+  }), audio.addEventListener("seeked", () => {
+    state.lastMediaTime = audio.currentTime || 0x0, state.isSeeking = ![], updateLyrics(audio.currentTime || 0x0), emitTogetherListeningChange(!![]);
+  }), audio.addEventListener('timeupdate', () => {
+    const apk120Value1447 = Number(audio.currentTime) || 0x0,
+      apk120Value1448 = apk120Value1447 - state.lastMediaTime;
+    if (!state.isSeeking && !audio.paused && apk120Value1448 > 0x0 && apk120Value1448 <= 0x5) {
+      state.pendingListeningSeconds += apk120Value1448;
+      if (state.pendingListeningSeconds >= 0xf) handleAction_170()["catch"](console.error);
+    }
+    state.lastMediaTime = apk120Value1447, handleAction_169(), updateLyrics(apk120Value1447), emitTogetherListeningChange(![]);
+  }), audio.addEventListener('ended', handleTrackEnded), audio.addEventListener("error", () => {
+  if (!state.currentTrack || !audio.src) return;
+  if (state.playbackStartingAttemptId === state.playbackAttemptId) return;
+  if (handleAction_27(state.currentTrack) && state.neteasePlaybackRetryCount < 1 && handleAction_25()) {
+    state.neteasePlaybackRetryCount += 1;
+    readerChunkHtmlCache_3['delete'](String(state.currentTrack.neteaseId));
+    handleAction_166(state.currentTrack);
+    return;
+  }
+  toast('当前歌曲暂时无法播放');
+  updatePlayerUi();
+  emitTogetherListeningChange(true);
+}), window.addEventListener("pagehide", () => {
+    handleAction_129();
+    if (state.currentBook) updateReaderProgress(!![], null, {
+      'immediate': !![]
+    });else flushReaderProgressSave()["catch"](console.error);
+    handleAction_91()["catch"](console.error), handleAction_170()["catch"](console.error);
+  }), document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      handleAction_129();
+      if (state.currentBook) updateReaderProgress(!![], null, {
+        'immediate': !![]
+      });else flushReaderProgressSave()["catch"](console.error);
+      handleAction_91()["catch"](console.error), handleAction_170()['catch'](console.error);
+    } else handlePageshow();
+  }), window.addEventListener('pageshow', handlePageshow), window.addEventListener("u2:native-pause", pauseNativeNetEaseQr), window.addEventListener("u2:native-resume", resumeNativeNetEaseQr);
+}
     function handleAction_175() {
         setInterval(() => {
             const readingActive =
@@ -5433,5 +4921,47 @@ function pauseNativeNetEaseQr() {
 }
 function resumeNativeNetEaseQr() {
   state.neteaseQrNativePaused = false, handlePageshow();
+}
+function resolvePlaylistCover120(apk120Value375) {
+  return safeHttpUrl(apk120Value375?.customCoverUrl) || safeHttpUrl(apk120Value375?.coverUrl) || playlistTracks(apk120Value375).map(apk120Value376 => safeHttpUrl(apk120Value376.coverUrl)).find(Boolean) || '';
+}
+function playlistCoverHtml120(apk120Value377) {
+  const apk120Value378 = resolvePlaylistCover120(apk120Value377),
+    apk120Value379 = "<i class=\"fas fa-music library-playlist-cover-fallback\" aria-hidden=\"true\"></i>";
+  return apk120Value378 ? apk120Value379 + "<img class=\"library-playlist-cover-image\" src=\"" + escapeHtml(apk120Value378) + '\x22\x20alt=\x22\x22\x20loading=\x22lazy\x22\x20decoding=\x22async\x22\x20referrerpolicy=\x22no-referrer\x22\x20onerror=\x22this.remove()\x22>' : apk120Value379;
+}
+function openPlaylistCover120() {
+  const apk120Value1128 = getPlaylist(state.currentPlaylist?.id);
+  if (!apk120Value1128) return;
+  dom.playlist_cover_form.dataset.playlistId = apk120Value1128.id, dom.playlist_cover_url.value = safeHttpUrl(apk120Value1128.customCoverUrl), openModal(dom.playlist_cover_modal);
+}
+async function savePlaylistCover120(apk120Value1129, apk120Value1130 = ![]) {
+  apk120Value1129?.preventDefault();
+  if (dom.playlist_cover_save.disabled) return;
+  const apk120Value1131 = getPlaylist(dom.playlist_cover_form.dataset.playlistId);
+  if (!apk120Value1131) return;
+  const apk120Value1132 = apk120Value1130 ? '' : dom.playlist_cover_url.value.trim(),
+    apk120Value1133 = safeHttpUrl(apk120Value1132);
+  if (apk120Value1132 && !apk120Value1133) return toast("封面 URL 无效，请填写 HTTP 或 HTTPS 图片链接");
+  dom.playlist_cover_save.disabled = !![], dom.playlist_cover_reset.disabled = !![];
+  try {
+    const apk120Value1134 = await storage().saveLibraryPlaylistBundle({
+        'id': apk120Value1131.id,
+        'customCoverUrl': apk120Value1133,
+        'updatedAt': Date.now()
+      }, [], {
+        'patchPlaylist': !![]
+      }),
+      apk120Value1135 = apk120Value1134.playlist;
+    state.playlists = state.playlists.map(apk120Value1136 => apk120Value1136.id === apk120Value1135.id ? apk120Value1135 : apk120Value1136), handleAction_147();
+    if (state.currentPlaylist?.id === apk120Value1135.id) openPlaylist(apk120Value1135);
+    if (state.togetherPicker) renderTogetherListeningPlaylists();
+    if (dom.playlist_cover_form.dataset.playlistId === apk120Value1135.id && !dom.playlist_cover_modal.hidden) closeAllModals();
+    toast(apk120Value1133 ? '歌单封面已保存' : "已恢复默认歌单封面");
+  } catch (apk120Value1137) {
+    console.error('[Library]\x20Playlist\x20cover\x20save\x20failed:', apk120Value1137), toast("歌单封面保存失败，请重试");
+  } finally {
+    dom.playlist_cover_save.disabled = ![], dom.playlist_cover_reset.disabled = ![];
+  }
 }
 })();

@@ -129,7 +129,7 @@
             apiKey: '',
             model: '',
             temperature: 0.7,
-            frequencyPenalty: 0,
+            frequencyPenalty: 0, streamEnabled: false,
         },
         vectorMemoryConfig_2 = window.getVectorMemoryConfig
             ? window.getVectorMemoryConfig()
@@ -521,6 +521,7 @@
             apiModelSearch: document.getElementById('api-model-search-input'),
             apiModelList: document.getElementById('api-model-list'),
             apiTemp: document.getElementById('api-temp-input'),
+            apiStream: document.getElementById('api-stream-enabled'),
             apiFrequencyPenalty: document.getElementById('api-frequency-penalty-input'),
             vectorMemoryEnabled: document.getElementById('vector-memory-enabled-toggle'),
             vectorMemoryProvider: document.getElementById('vector-memory-provider-select'),
@@ -7096,9 +7097,10 @@
                     (value_841.endpoint || '') === (apiConfig_2.endpoint || '') &&
                     (value_841.apiKey || '') === (apiConfig_2.apiKey || '') &&
                     (value_841.model || '') === (apiConfig_2.model || '') &&
-                    String(value_841.temp ?? 0.7) === String(apiConfig_2.temperature ?? 0.7) &&
+                    String(value_841.temperature ?? value_841.temp ?? 0.7) === String(apiConfig_2.temperature ?? 0.7) &&
                     String(value_841.frequencyPenalty ?? 0) ===
-                        String(apiConfig_2.frequencyPenalty ?? 0),
+                        String(apiConfig_2.frequencyPenalty ?? 0) &&
+                    (value_841.streamEnabled === true) === (apiConfig_2.streamEnabled === true),
             );
             return match_3 ? String(match_3.id) : '';
         }
@@ -7524,7 +7526,7 @@
                 apiKey: preset_16.apiKey || '',
                 model: preset_16.model || '',
                 temperature: preset_16.temp ?? 0.7,
-                frequencyPenalty: preset_16.frequencyPenalty ?? 0,
+                frequencyPenalty: preset_16.frequencyPenalty ?? 0, streamEnabled: preset_16.streamEnabled === true,
             };
             tempApiConfig = {
                 ...apiConfig_2,
@@ -7538,6 +7540,7 @@
             if (UI.inputs.apiKey) UI.inputs.apiKey.value = apiConfig_2.apiKey;
             if (UI.inputs.apiModel) syncSelectValue(UI.inputs.apiModel, apiConfig_2.model || '');
             if (UI.inputs.apiTemp) UI.inputs.apiTemp.value = apiConfig_2.temperature;
+            if (UI.inputs.apiStream) UI.inputs.apiStream.checked = apiConfig_2.streamEnabled === true;
             if (UI.inputs.apiFrequencyPenalty)
                 UI.inputs.apiFrequencyPenalty.value = apiConfig_2.frequencyPenalty ?? 0;
             saveGlobalData();
@@ -7818,7 +7821,7 @@
                     apiKey: UI.inputs.apiKey?.value,
                     model: UI.inputs.apiModel?.value,
                     temperature: UI.inputs.apiTemp?.value,
-                    frequencyPenalty: UI.inputs.apiFrequencyPenalty?.value,
+                    frequencyPenalty: UI.inputs.apiFrequencyPenalty?.value, streamEnabled: UI.inputs.apiStream?.checked === true,
                 },
                 {
                     requireModel: requireModel_2,
@@ -7851,7 +7854,7 @@
                     apiKey: apiConfig_2.apiKey || '',
                     model: apiConfig_2.model || '',
                     temperature: apiConfig_2.temperature ?? 0.7,
-                    frequencyPenalty: apiConfig_2.frequencyPenalty ?? 0,
+                    frequencyPenalty: apiConfig_2.frequencyPenalty ?? 0, streamEnabled: apiConfig_2.streamEnabled === true,
                 };
                 syncApiProviderPresentation({
                     provider: tempApiConfig.provider,
@@ -7860,6 +7863,7 @@
                 UI.inputs.apiKey.value = tempApiConfig.apiKey || '';
                 syncSelectValue(UI.inputs.apiModel, tempApiConfig.model || '');
                 UI.inputs.apiTemp.value = tempApiConfig.temperature ?? 0.7;
+                if (UI.inputs.apiStream) UI.inputs.apiStream.checked = tempApiConfig.streamEnabled === true;
                 if (UI.inputs.apiFrequencyPenalty)
                     UI.inputs.apiFrequencyPenalty.value = tempApiConfig.frequencyPenalty ?? 0;
                 handleU2BackgroundActivitySettingsChanged();
@@ -8841,7 +8845,7 @@
                     : 0.7,
                 frequencyPenalty: Number.isFinite(float_1069)
                     ? Math.max(-2, Math.min(2, float_1069))
-                    : 0,
+                    : 0, streamEnabled: UI.inputs.apiStream?.checked === true,
             };
         }
         async function handleAction_194(source_4, value_1071 = {}) {
@@ -8862,7 +8866,7 @@
                         : 0.7,
                     frequencyPenalty: Number.isFinite(number_1072)
                         ? Math.max(-2, Math.min(2, number_1072))
-                        : 0,
+                        : 0, streamEnabled: source_4.streamEnabled === true,
                 };
             tempApiConfig = {
                 ...apiConfig_4,
@@ -8879,6 +8883,7 @@
             if (UI.inputs.apiKey) UI.inputs.apiKey.value = apiConfig_4.apiKey;
             if (UI.inputs.apiModel) syncSelectValue(UI.inputs.apiModel, apiConfig_4.model);
             if (UI.inputs.apiTemp) UI.inputs.apiTemp.value = String(apiConfig_4.temperature);
+            if (UI.inputs.apiStream) UI.inputs.apiStream.checked = apiConfig_4.streamEnabled === true;
             if (UI.inputs.apiFrequencyPenalty)
                 UI.inputs.apiFrequencyPenalty.value = String(apiConfig_4.frequencyPenalty);
             if (value_1071.persist !== false) {

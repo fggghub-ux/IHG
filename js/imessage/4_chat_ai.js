@@ -4824,7 +4824,7 @@ Inside the tag, output only a JSON array shaped like [{"memberId":"exact member 
                       provider: String(value_2183_2.provider || ''),
                       temperature: value_2183_2.temperature ?? value_2183_2.temp ?? 0.35,
                       frequencyPenalty:
-                          value_2183_2.frequencyPenalty ?? value_2183_2.frequency_penalty,
+                          value_2183_2.frequencyPenalty ?? value_2183_2.frequency_penalty, streamEnabled: value_2183_2.streamEnabled === true,
                   }
                 : null,
             privateFindings: access_2.privateFindings.filter(
@@ -11035,6 +11035,7 @@ if (currentItem_4.kind === 'contact_card') {
                     ) {
                         const options_3496 = {};
                         options_3496.scroll = true;
+                        options_3496.resetWindow = true;
                         window.imChat.rerenderChatContainer?.(
                             getLiveFriendById(friend_31.id) || value_3484,
                             value_2909_3489,

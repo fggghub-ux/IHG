@@ -2710,6 +2710,7 @@ window.imApp.normalizeFriendData = function (friend_8) {
         }
     }
     normalized_2.offlineStreamEnabled = normalized_2.offlineStreamEnabled !== false;
+    normalized_2.offlineApiPresetId = String(normalized_2.offlineApiPresetId || '').trim();
     normalized_2.offlineEpisodeMode = normalized_2.offlineEpisodeMode === true;
     normalized_2.offlineAutoImageGeneration =
         !isGroupChat_2 && normalized_2.offlineAutoImageGeneration === true;
@@ -8081,20 +8082,20 @@ window.addEventListener('pagehide', () => {
     let currentModalGenerationPrompt = null;
     let count_478 = 0;
     let disabled_3 = false;
-    function handleAction_480(disabled_2) {
-        disabled_3 = disabled_2;
-        modalPromptConfirmBtn &&
-            (modalPromptConfirmBtn.setAttribute('aria-disabled', String(disabled_2)),
-            (modalPromptConfirmBtn.style.pointerEvents = disabled_2 ? 'none' : ''));
-        modalCancelBtn &&
-            (modalCancelBtn.setAttribute('aria-disabled', String(disabled_2)),
-            (modalCancelBtn.style.pointerEvents = disabled_2 ? 'none' : ''));
-        if (modalImageComposerUploadBtn) modalImageComposerUploadBtn.disabled = disabled_2;
-        if (modalImageComposerRemoveBtn) modalImageComposerRemoveBtn.disabled = disabled_2;
-        modalImageComposerListElement?.querySelectorAll('button').forEach((value_498) => {
-            value_498.disabled = disabled_2;
-        });
-    }
+    const imageSubjects120=document.getElementById('modal-generation-subjects'), imagePromptError120=document.getElementById('modal-prompt-error');
+    imageSubjects120?.addEventListener('change', syncImageSubjects120);
+    function handleAction_480(apk120Value1806) {
+  disabled_3 = apk120Value1806;
+  modalPromptConfirmBtn && (modalPromptConfirmBtn.setAttribute("aria-disabled", String(apk120Value1806)), modalPromptConfirmBtn.style.pointerEvents = apk120Value1806 ? "none" : '');
+  modalCancelBtn && (modalCancelBtn.setAttribute("aria-disabled", String(apk120Value1806)), modalCancelBtn.style.pointerEvents = apk120Value1806 ? 'none' : '');
+  if (modalImageComposerUploadBtn) modalImageComposerUploadBtn.disabled = apk120Value1806;
+  if (modalImageComposerRemoveBtn) modalImageComposerRemoveBtn.disabled = apk120Value1806;
+  modalImageComposerListElement?.querySelectorAll('button').forEach(apk120Value1807 => {
+    apk120Value1807.disabled = apk120Value1806;
+  }), currentModalGenerationPrompt?.showSubjects && (modalPromptContent?.querySelectorAll("input, textarea, select, button").forEach(apk120Value1808 => {
+    apk120Value1808.disabled = apk120Value1806;
+  }), syncImageSubjects120());
+}
     function renderModalImageComposer(value_499) {
         value_477 = value_499 || null;
         const items_500 = Array.isArray(value_499?.images) ? value_499.images : [],
@@ -8231,6 +8232,12 @@ window.addEventListener('pagehide', () => {
                 (/Mac/.test(navigator.userAgent + navigator.platform) &&
                     navigator.maxTouchPoints > 1));
         customModalOverlay.classList.toggle('is-ipad-image-generation', isIPadComposer);
+        if (imagePromptError120) { imagePromptError120.textContent = ''; imagePromptError120.hidden = true; }
+        if (imageSubjects120) {
+            imageSubjects120.hidden = options_35.generationPrompt?.showSubjects !== true;
+            imageSubjects120.querySelectorAll('input').forEach(input => { input.checked = options_35.generationPrompt?.[input.name] === true; });
+            syncImageSubjects120();
+        }
         if (options_35.type === 'prompt') {
             const useTextarea = options_35.multiline === true;
             const value_1461 =
@@ -8271,7 +8278,7 @@ window.addEventListener('pagehide', () => {
                     ? 'block'
                     : 'none';
             if (apk110New_1581)
-                apk110New_1581.style.display = options_35.generationPrompt ? 'flex' : 'none';
+                apk110New_1581.style.display = options_35.generationPrompt && options_35.generationPrompt.showPresets !== false ? 'flex' : 'none';
             if (modalGenerationPresetSelect) {
                 modalGenerationPresetSelect.replaceChildren();
                 const currentOption = document.createElement('option');
@@ -8386,49 +8393,37 @@ window.addEventListener('pagehide', () => {
         }
     }
     function handleAction_483() {
-        const value_515 = count_478;
-        const promptValue_2 =
-            modalTextareaGroup?.style.display === 'block'
-                ? modalTextarea?.value || ''
-                : modalInput?.value || '';
-        return {
-            promptValue: promptValue_2,
-            secondaryValue:
-                modalSecondaryTextareaGroupElement?.style.display === 'block'
-                    ? modalSecondaryTextareaElement?.value || ''
-                    : null,
-            toggleChecked: !!modalToggleInput?.checked,
-            referenceImage: apk110New_1594?.char?.imageUrl || '',
-            uploadedImage: value_477?.imageUrl || '',
-            uploadedFileName: value_477?.fileName || '',
-            uploadedImages: Array.isArray(value_477?.images) ? value_477.images.slice() : [],
-            setImageStatus: (value_517) => {
-                if (count_478 === value_515 && value_477) {
-                    value_477.status = String(value_517 || '');
-                    if (modalImageComposerStatus)
-                        modalImageComposerStatus.textContent =
-                            value_477.status ||
-                            (value_477.images?.length
-                                ? '已选择 ' + value_477.images.length + ' 张图片（最多 9 张）'
-                                : '未选择图片时发送虚拟图片');
-                }
-            },
-            isCurrent: () =>
-                count_478 === value_515 && customModalOverlay.classList.contains('active'),
-            charAppearance: modalGenerationCharAppearance?.value || '',
-            userAppearance: modalGenerationUserAppearance?.value || '',
-            artistPrompt: modalGenerationArtistPrompt?.value || '',
-            negativePrompt: modalGenerationNegativePrompt?.value || '',
-            activePresetId: modalGenerationPresetSelect?.value || '',
-            autoGenerate:
-                currentModalGenerationPrompt?.showAutoGenerate === false
-                    ? currentModalGenerationPrompt.autoGenerate === true
-                    : modalAutoImageGenerationToggle?.checked === true,
-            presets: Array.isArray(currentModalGenerationPrompt?.presets)
-                ? currentModalGenerationPrompt.presets
-                : [],
-        };
-    }
+  const apk120Value1847 = count_478,
+    apk120Value1848 = modalTextareaGroup?.style.display === 'block' ? modalTextarea?.value || '' : modalInput?.value || '';
+  return {
+    'promptValue': apk120Value1848,
+    'secondaryValue': modalSecondaryTextareaGroupElement?.style.display === 'block' ? modalSecondaryTextareaElement?.value || '' : null,
+    'toggleChecked': !!modalToggleInput?.checked,
+    'referenceImage': apk110New_1594?.char?.imageUrl || '',
+    'uploadedImage': value_477?.imageUrl || '',
+    'uploadedFileName': value_477?.fileName || '',
+    'uploadedImages': Array.isArray(value_477?.images) ? value_477.images.slice() : [],
+    'setImageStatus': apk120Value1849 => {
+      if (count_478 === apk120Value1847 && value_477) {
+        value_477.status = String(apk120Value1849 || '');
+        if (modalImageComposerStatus) modalImageComposerStatus.textContent = value_477.status || (value_477.images?.length ? '已选择\x20' + value_477.images.length + " 张图片（最多 9 张）" : "未选择图片时发送虚拟图片");
+      }
+    },
+    'isCurrent': () => count_478 === apk120Value1847 && customModalOverlay.classList.contains('active'),
+    'setPromptError': apk120Value1850 => {
+      if (count_478 !== apk120Value1847 || !imagePromptError120) return;
+      imagePromptError120.textContent = String(apk120Value1850 || ''), imagePromptError120.hidden = !apk120Value1850;
+    },
+    ...(currentModalGenerationPrompt?.showSubjects ? Object.fromEntries(Array.from(imageSubjects120?.querySelectorAll("input") || [], apk120Value1851 => [apk120Value1851.name, apk120Value1851.checked])) : {}),
+    'charAppearance': modalGenerationCharAppearance?.value || '',
+    'userAppearance': modalGenerationUserAppearance?.value || '',
+    'artistPrompt': modalGenerationArtistPrompt?.value || '',
+    'negativePrompt': modalGenerationNegativePrompt?.value || '',
+    'activePresetId': modalGenerationPresetSelect?.value || '',
+    'autoGenerate': currentModalGenerationPrompt?.showAutoGenerate === ![] ? currentModalGenerationPrompt.autoGenerate === !![] : modalAutoImageGenerationToggle?.checked === !![],
+    'presets': Array.isArray(currentModalGenerationPrompt?.presets) ? currentModalGenerationPrompt.presets : []
+  };
+}
     function closeCustomModal_3(value_518 = true) {
         if (!customModalOverlay) return;
         const onCancel = currentModalCancelCallback;
@@ -8717,7 +8712,7 @@ window.addEventListener('pagehide', () => {
             });
         if (settingsBtn)
             settingsBtn.addEventListener('click', () => {
-                if (window.showToast) window.showToast('Settings clicked');
+                window.openImessageTutorial120();
             });
     }
     function handleAction_1417() {
@@ -11460,4 +11455,11 @@ window.addEventListener('pagehide', () => {
     setTimeout(() => {
         if (window.imApp.applyAllSavedCss) window.imApp.applyAllSavedCss();
     }, 100);
+function syncImageSubjects120() {
+  imageSubjects120?.querySelectorAll("[data-image-reference]").forEach(apk120Value1809 => {
+    const apk120Value1810 = imageSubjects120.querySelector('[data-image-subject=\x22' + apk120Value1809.dataset.imageReference + '\x22]');
+    if (!apk120Value1810?.checked) apk120Value1809.checked = ![];
+    apk120Value1809.disabled = disabled_3 || !apk120Value1810?.checked;
+  });
+}
 });

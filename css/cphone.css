@@ -1264,3 +1264,7 @@
 #cphone-call-detail-content[data-detail-kind="call"] > .cphone-call-detail-surface + .cphone-call-detail-surface,
 #cphone-call-detail-content[data-detail-kind="call"] > .cphone-call-detail-surface + .cphone-call-secondary,
 #cphone-call-detail-content[data-detail-kind="call"] > .cphone-call-detail-surface + .cphone-call-delete { margin-top: 15px; }
+
+.cphone-help-button { position: absolute; top: calc(var(--safe-top) + 12px); right: 18px; z-index: 10; font-size: 15px; }
+
+#cphone-settings-help-btn { top: calc(var(--safe-top) + 8px); right: 20px; }

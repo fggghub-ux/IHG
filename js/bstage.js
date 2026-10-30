@@ -11,7 +11,8 @@
             <div class="bstage-logo" id="bstage-back-btn">b.stage</div>
             <div class="bstage-header-right">
                 <i class="fas fa-search bstage-icon-btn" id="bstage-search-generate-btn"></i>
-                <i class="fas fa-cog bstage-icon-btn" id="bstage-global-settings-btn"></i>
+                <button type="button" class="bstage-icon-btn bstage-header-help-btn" id="bstage-help-btn" aria-label="b.stage 使用教程" title="b.stage 使用教程"><i class="fas fa-question" aria-hidden="true"></i></button>
+<i class="fas fa-cog bstage-icon-btn" id="bstage-global-settings-btn"></i>
                 <div class="bstage-avatar-placeholder" id="bstage-header-profile-container"><i class="fas fa-user"></i></div>
             </div>
         </div>

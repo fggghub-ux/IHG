@@ -6534,9 +6534,7 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                 );
             };
         const value_297 = async (messages_13, streamingBubble = null, options_8 = {}) => {
-                const currentApiConfig_3 = window.getApiConfig
-                    ? window.getApiConfig()
-                    : window.apiConfig || {};
+                const currentApiConfig_3 = resolveOfflineApiConfig120(window.imData.currentActiveFriend);
                 if (!currentApiConfig_3.endpoint || !currentApiConfig_3.apiKey)
                     throw new Error('API config missing');
                 const signal_2 = options_8.signal || null,
@@ -6645,6 +6643,7 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                         method: 'POST',
                         headers: window.u2Api.buildApiHeaders(currentApiConfig_3),
                         apiConfig: currentApiConfig_3,
+                        streamOverride: value_468,
                         body: value_1386 ? requestBody : JSON.stringify(requestBody),
                         signal: signal_2 || undefined,
                     });
@@ -7090,7 +7089,7 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                         apiKey: selectedPreset.apiKey || '',
                         model: selectedPreset.model || '',
                         temperature: selectedPreset.temperature ?? selectedPreset.temp ?? 0.7,
-                        frequencyPenalty: selectedPreset.frequencyPenalty ?? 0,
+                        frequencyPenalty: selectedPreset.frequencyPenalty ?? 0, streamEnabled: selectedPreset.streamEnabled === true,
                         presetId: selectedId,
                     };
                 const current = window.getApiConfig
@@ -10642,6 +10641,7 @@ Persona: ` +
                         if (promptPresetSelect) promptPresetSelect.value = '';
                         if (deletePromptPresetBtn) deletePromptPresetBtn.disabled = true;
                     };
+            installOfflineApiPreset120(activeFriend_46, listEl);
             const promptPresetCard = document.createElement('section');
             promptPresetCard.className = 'offline-theme-card offline-prompt-preset-card';
             const promptPresetHeading = document.createElement('div');
@@ -11562,13 +11562,7 @@ Persona: ` +
                         const lastCurrentMessage = value_221_2212[value_221_2212.length - 1];
                         if (lastCurrentMessage?.role !== 'user') return;
                     }
-                    const currentApiConfig_4 = window.getApiConfig
-                        ? window.getApiConfig()
-                        : window.apiConfig || {};
-                    if (!currentApiConfig_4.endpoint || !currentApiConfig_4.apiKey) {
-                        if (window.showToast) window.showToast('请先配置 API');
-                        return;
-                    }
+                    try { resolveOfflineApiConfig120(activeFriend_49); } catch (error) { window.showToast?.(error.message); return; }
                     {
                         offlineChatInputElement_2134.value = '';
                         enabled_2137 = true;
@@ -13628,4 +13622,82 @@ Persona: ` +
     window.imChat.openAttachmentSheet = openAttachmentSheet_3;
     window.imChat.showBannerNotification = showBannerNotification_3;
     window.imChat.hideBannerNotification = hideBannerNotification_3;
+function resolveOfflineApiConfig120(apk120Value104) {
+  const apk120Value105 = String(apk120Value104?.offlineApiPresetId || '').trim(),
+    apk120Value106 = typeof window.getApiPresets === "function" ? window.getApiPresets() : [],
+    apk120Value107 = apk120Value105 ? apk120Value106.find(apk120Value110 => String(apk120Value110?.id) === apk120Value105) : null,
+    apk120Value108 = apk120Value107 || (window.getApiConfig ? window.getApiConfig() : window.apiConfig || {}),
+    apk120Value109 = {
+      ...apk120Value108,
+      'provider': apk120Value108.provider || "openai-compatible",
+      'endpoint': String(apk120Value108.endpoint || '').trim(),
+      'apiKey': String(apk120Value108.apiKey || '').trim(),
+      'model': String(apk120Value108.model || '').trim(),
+      'temperature': apk120Value108.temperature ?? apk120Value108.temp ?? 0.7,
+      'frequencyPenalty': apk120Value108.frequencyPenalty ?? 0x0,
+      'streamEnabled': apk120Value108.streamEnabled === !![]
+    };
+  if (!apk120Value109.endpoint || !apk120Value109.apiKey || !apk120Value109.model) throw new Error(apk120Value107 ? "线下 API 预设“" + (apk120Value107.name || "未命名预设") + '”配置不完整，请检查接口地址、密钥和模型' : "请先配置 API 接口地址、密钥和模型，或选择有效的线下 API 预设");
+  return apk120Value109;
+}
+function getOfflineRequestConfig120(apk120Value111) {
+  return {
+    'apiConfig': resolveOfflineApiConfig120(apk120Value111),
+    'stream': apk120Value111?.offlineStreamEnabled !== ![]
+  };
+}
+function installOfflineApiPreset120(apk120Value2487, apk120Value2486) {
+  const apk120Value2500 = document.createElement("section");
+  apk120Value2500.className = "offline-theme-card offline-api-preset-card", apk120Value2500.innerHTML = "<div class=\"offline-theme-heading\"><div><strong>API 预设</strong><span>OFFLINE API</span></div><p>仅用于当前角色或群聊的线下对话，流式传输由上方独立开关控制。</p></div>";
+  const apk120Value2501 = document.createElement("select");
+  apk120Value2501.id = "offline-chat-api-preset-select", apk120Value2501.className = 'offline-theme-preset-select', apk120Value2501.setAttribute("aria-label", "选择当前线下聊天的 API 预设");
+  const apk120Value2502 = () => {
+    const apk120Value2531 = typeof window.getApiPresets === "function" ? window.getApiPresets() : [];
+    apk120Value2501.replaceChildren();
+    const apk120Value2532 = document.createElement("option");
+    apk120Value2532.value = '', apk120Value2532.textContent = "跟随当前 API", apk120Value2501.appendChild(apk120Value2532), apk120Value2531.forEach(apk120Value2535 => {
+      const apk120Value2536 = document.createElement('option');
+      apk120Value2536.value = String(apk120Value2535.id), apk120Value2536.textContent = String(apk120Value2535.name || apk120Value2535.model || '未命名预设'), apk120Value2501.appendChild(apk120Value2536);
+    });
+    const apk120Value2533 = String(apk120Value2487.offlineApiPresetId || ''),
+      apk120Value2534 = apk120Value2531.some(apk120Value2537 => String(apk120Value2537.id) === apk120Value2533);
+    apk120Value2501.value = apk120Value2534 ? apk120Value2533 : '', apk120Value2533 && !apk120Value2534 && commitSheetFriendChange(apk120Value2487.id, apk120Value2538 => {
+      apk120Value2538.offlineApiPresetId = '';
+    }, {
+      'silent': !![],
+      'metaOnly': !![]
+    });
+  };
+  apk120Value2501.addEventListener("change", async () => {
+    const apk120Value2539 = String(apk120Value2487.offlineApiPresetId || ''),
+      apk120Value2540 = apk120Value2501.value;
+    if (apk120Value2540) try {
+      resolveOfflineApiConfig120({
+        ...apk120Value2487,
+        'offlineApiPresetId': apk120Value2540
+      });
+    } catch (apk120Value2541) {
+      apk120Value2501.value = apk120Value2539, window.showToast?.(apk120Value2541.message);
+      return;
+    }
+    apk120Value2501.disabled = !![];
+    try {
+      const apk120Value2542 = await commitSheetFriendChange(apk120Value2487.id, apk120Value2543 => {
+        apk120Value2543.offlineApiPresetId = apk120Value2540;
+      }, {
+        'silent': !![],
+        'metaOnly': !![]
+      });
+      if (!apk120Value2542) throw new Error('线下\x20API\x20预设保存失败');
+      apk120Value2487.offlineApiPresetId = apk120Value2540;
+    } catch (apk120Value2544) {
+      apk120Value2487.offlineApiPresetId = apk120Value2539, apk120Value2501.value = apk120Value2539, window.showToast?.(apk120Value2544.message);
+    } finally {
+      apk120Value2501.disabled = ![];
+    }
+  });
+  const apk120Value2503 = document.createElement('div');
+  apk120Value2503.className = 'offline-theme-preset-controls', apk120Value2503.appendChild(apk120Value2501), apk120Value2500.appendChild(apk120Value2503), apk120Value2501.addEventListener('u2:refresh-api-presets', apk120Value2502), apk120Value2502(), apk120Value2486.appendChild(apk120Value2500);
+}
+window.addEventListener('u2:api-presets-updated',()=>document.getElementById('offline-chat-api-preset-select')?.dispatchEvent(new Event('u2:refresh-api-presets')));
 });
