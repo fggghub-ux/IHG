@@ -695,13 +695,13 @@ const {execFileSync} = require('node:child_process');
             await page.waitForTimeout(400);
             await check('More order and moved call', () => {
                 const s = window.imData.attachmentSheet;
-                const keys = [...s.querySelectorAll('.attachment-more-icon-grid > div')]
+                const keys = [...s.querySelectorAll('.attachment-more-icon-grid > *')]
                     .map((e) => e.className.match(/attachment-more-([\w-]+)-entry/)?.[1])
                     .filter(Boolean);
                 const i = s.querySelector('.attachment-more-call-icon');
                 return (
                     (keys.join(',') ===
-                        'call,regenerate,pay,contact,voice,listen,offline,narration,link,dynamic-action' &&
+                        'call,file,pay,contact,voice,listen,offline,narration,link,regenerate,dynamic-action' &&
                         getComputedStyle(i).backgroundColor === 'rgb(52, 199, 89)' &&
                         getComputedStyle(s.querySelector('.attachment-more-listen-icon'))
                             .backgroundColor === 'rgb(0, 0, 0)') || {

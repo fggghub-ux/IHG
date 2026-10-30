@@ -4227,6 +4227,18 @@
                     </form>
                 </div>
 
+                <div class="library-modal-backdrop" id="library-playlist-cover-modal" hidden>
+                    <form class="library-modal-card" id="library-playlist-cover-form" role="dialog" aria-modal="true" aria-labelledby="library-playlist-cover-heading">
+                        <div class="library-modal-heading"><div><small>PLAYLIST COVER</small><h2 id="library-playlist-cover-heading">更换歌单封面</h2></div><button type="button" data-close-library-modal aria-label="关闭"><i class="fas fa-times"></i></button></div>
+                        <label>封面 URL<input id="library-playlist-cover-url" type="url" inputmode="url" placeholder="https://example.com/cover.jpg"></label>
+                        <p>填写 HTTP 或 HTTPS 图片链接。清空后保存可恢复默认封面。</p>
+                        <div class="library-playlist-cover-actions">
+                            <button class="library-secondary-button" type="button" id="library-playlist-cover-reset">恢复默认</button>
+                            <button class="library-primary-button" type="submit" id="library-playlist-cover-save">保存封面</button>
+                        </div>
+                    </form>
+                </div>
+
                 <div class="library-modal-backdrop" id="library-track-modal" hidden>
                     <form class="library-modal-card" id="library-track-form">
                         <div class="library-modal-heading"
@@ -20240,17 +20252,6 @@
         <script src="js/home_widget_panel_enhance.js?v=20260830-widget-image-flush-v1&couple-text=20260911-v1&repair=20261003&settings=20261010-r1&apk-sync=111-selective&widget-opacity=20261027-v1"></script>
         <!-- 引入主逻辑脚本 -->
         <script src="script.js?v=20260725-modal-owner-v1&home-swipe=20260801-scrollend-v2&performance=20260801-v1&splash-notice-handshake=20260813-v1&reader-selection=20260819-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1"></script>
-    <script src="js/app_tutorials.js?v=120"></script>
-<div class="library-modal-backdrop" id="library-playlist-cover-modal" hidden>
-                <form class="library-modal-card" id="library-playlist-cover-form" role="dialog" aria-modal="true" aria-labelledby="library-playlist-cover-heading">
-                    <div class="library-modal-heading"><div><small>PLAYLIST COVER</small><h2 id="library-playlist-cover-heading">更换歌单封面</h2></div><button type="button" data-close-library-modal aria-label="关闭"><i class="fas fa-times"></i></button></div>
-                    <label>封面 URL<input id="library-playlist-cover-url" type="url" inputmode="url" placeholder="https://example.com/cover.jpg"></label>
-                    <p>填写 HTTP 或 HTTPS 图片链接。清空后保存可恢复默认封面。</p>
-                    <div class="library-playlist-cover-actions">
-                        <button class="library-secondary-button" type="button" id="library-playlist-cover-reset">恢复默认</button>
-                        <button class="library-primary-button" type="submit" id="library-playlist-cover-save">保存封面</button>
-                    </div>
-                </form>
-            </div>
-</body>
+        <script src="js/app_tutorials.js?v=120"></script>
+    </body>
 </html>
