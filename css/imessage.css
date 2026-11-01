@@ -18514,8 +18514,8 @@ button.moment-private-chat-bubble.has-translation {
     cursor: pointer;
 }
 
-/* Blue gift cards adapted to the compact WeChat gift proportions. */
-.chat-row .chat-bubble.gift-message-bubble {
+/* Lover invitations retain their compact card presentation. */
+.chat-row .chat-bubble.loves-invitation-bubble {
     width: 213px !important;
     min-width: 213px !important;
     max-width: 213px !important;
@@ -18524,7 +18524,7 @@ button.moment-private-chat-bubble.has-translation {
     overflow: visible !important;
 }
 
-.gift-message-card {
+.loves-invitation-card {
     position: relative;
     width: 213px;
     height: 85px;
@@ -18537,18 +18537,98 @@ button.moment-private-chat-bubble.has-translation {
     cursor: pointer;
 }
 
-.gift-message-card.is-received { background: linear-gradient(135deg, #798db9 0%, #657ba8 100%); }
-.gift-message-card::after { content:''; position:absolute; top:19px; width:0; height:0; background:none; transform:none; z-index:0; }
-.user-row .gift-message-card::after { right:-10px; border-top:8px solid transparent; border-bottom:8px solid transparent; border-left:10px solid #23478f; }
-.ai-row .gift-message-card::after { left:-10px; border-top:8px solid transparent; border-bottom:8px solid transparent; border-right:10px solid #3159a9; }
-.user-row .gift-message-card.is-received::after { border-left-color:#657ba8; }
-.ai-row .gift-message-card.is-received::after { border-right-color:#798db9; }
-.gift-message-main { position:relative; z-index:1; height:64px; display:flex; align-items:center; gap:12px; padding:8px 13px 5px; box-sizing:border-box; }
-.gift-message-bow { width:40px; height:46px; flex:0 0 40px; color:#f7ecd0; }
-.gift-message-copy { min-width:0; flex:1; }
-.gift-message-title { font-size:14px; font-weight:650; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.gift-message-status { margin-top:4px; font-size:11px; color:rgba(255,255,255,.78); }
-.gift-message-footer { position:relative; z-index:1; height:21px; padding:3px 13px 0; box-sizing:border-box; border-top:1px solid rgba(255,255,255,.16); font-size:10px; color:rgba(255,255,255,.68); }
+.loves-invitation-card.is-received { background: linear-gradient(135deg, #798db9 0%, #657ba8 100%); }
+.loves-invitation-card::after { content:''; position:absolute; top:19px; width:0; height:0; background:none; transform:none; z-index:0; }
+.user-row .loves-invitation-card::after { right:-10px; border-top:8px solid transparent; border-bottom:8px solid transparent; border-left:10px solid #23478f; }
+.ai-row .loves-invitation-card::after { left:-10px; border-top:8px solid transparent; border-bottom:8px solid transparent; border-right:10px solid #3159a9; }
+.user-row .loves-invitation-card.is-received::after { border-left-color:#657ba8; }
+.ai-row .loves-invitation-card.is-received::after { border-right-color:#798db9; }
+.loves-invitation-card .gift-message-main { position:relative; z-index:1; height:64px; display:flex; align-items:center; gap:12px; padding:8px 13px 5px; box-sizing:border-box; }
+.loves-invitation-card .gift-message-bow { width:40px; height:46px; flex:0 0 40px; color:#f7ecd0; }
+.loves-invitation-card .gift-message-copy { min-width:0; flex:1; }
+.loves-invitation-card .gift-message-title { font-size:14px; font-weight:650; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.loves-invitation-card .gift-message-status { margin-top:4px; font-size:11px; color:rgba(255,255,255,.78); }
+.loves-invitation-card .gift-message-footer { position:relative; z-index:1; height:21px; padding:3px 13px 0; box-sizing:border-box; border-top:1px solid rgba(255,255,255,.16); font-size:10px; color:rgba(255,255,255,.68); }
+
+/* App Store & iTunes gift card adapted from the supplied reference.
+   Gift status stays in message data; both directions always use this one UI. */
+.chat-row .chat-bubble.gift-message-bubble:not(.loves-invitation-bubble) {
+    width: 220px !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    overflow: visible !important;
+}
+
+.gift-message-card:not(.loves-invitation-card) {
+  width: 220px;
+  max-width: 100%;
+  height: 138px;
+  padding: 0;
+  margin: 2px 0;
+  display: block;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  /* 涟漪蔚蓝水波渐变 */
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(255, 255, 255, 0.22) 0%, transparent 55%),
+    repeating-radial-gradient(circle at 50% 45%, transparent 0, transparent 4px, rgba(255, 255, 255, 0.08) 5px, transparent 8px),
+    linear-gradient(135deg, #44b6fc 0%, #0c84f8 50%, #0364e8 100%);
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 12px 28px rgba(3, 100, 232, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.75);
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+.gift-message-card:not(.loves-invitation-card):active {
+  transform: scale(0.97);
+}
+
+/* Centered logo from the reference. */
+.gift-message-card:not(.loves-invitation-card)::before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  width: 66px;
+  height: 78px;
+
+  /* Reference SVG logo. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'%3E%3Cpath fill='%23ffffff' d='M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 2px 8px rgba(0, 40, 120, 0.2));
+}
+
+/* Real text also keeps the existing Copy action usable. */
+.gift-message-card:not(.loves-invitation-card) .gift-message-label {
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  text-align: center;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+  letter-spacing: -0.3px;
+  line-height: 1;
+  text-shadow: 0 1px 4px rgba(0, 40, 120, 0.35);
+}
 
 .gift-detail-overlay { position:absolute; inset:0; z-index:260; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.28); box-sizing:border-box; }
 .gift-detail-card { width:min(88%, 348px); border-radius:30px; background:rgba(255,255,255,.98); padding:22px 18px 20px; box-sizing:border-box; box-shadow:0 16px 40px rgba(0,0,0,.12); }

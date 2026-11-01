@@ -184,22 +184,6 @@
             decorateMessageRowAvatar(row_3, friend_5, message_4);
             apk110New_23(row_3, friend_5, message_4);
         }
-        if (message_4?.role === 'assistant') {
-            value_127
-                ?.querySelectorAll?.('.gift-message-card[data-gift-timestamp]')
-                .forEach((card) => {
-                    const giftTime = Number(card.dataset.giftTimestamp) || 0;
-                    if ((Number(message_4.timestamp) || 0) <= giftTime) return;
-                    card.classList.add('is-received');
-                    const copy = card.querySelector('.gift-message-copy');
-                    if (copy && !copy.querySelector('.gift-message-status')) {
-                        copy.insertAdjacentHTML(
-                            'beforeend',
-                            '<div class="gift-message-status">Received</div>',
-                        );
-                    }
-                });
-        }
         return true;
     }
     function apk110New_23(apk110New_155, apk110New_156, apk110New_157) {
@@ -2626,29 +2610,6 @@
                 msg_10.speakerMemberId || msg_10.senderMemberId || null,
                 msg_10,
             );
-            const acceptedGift = findGiftAcceptedByAssistant(msg_10, friend_16);
-            if (acceptedGift) {
-                const acceptanceId = `gift-accepted-${acceptedGift.id || acceptedGift.timestamp}`;
-                const alreadyRendered = Array.from(
-                    container_6.querySelectorAll('.chat-row[data-message-id]'),
-                ).some((row) => String(row.dataset.messageId || '') === acceptanceId);
-                if (!alreadyRendered) {
-                    window.imChat.renderGiftBubble(
-                        {
-                            ...acceptedGift,
-                            id: acceptanceId,
-                            role: 'assistant',
-                            giftStatus: 'received',
-                            status: 'received',
-                            syntheticGiftAcceptance: true,
-                            timestamp: msgTime,
-                        },
-                        friend_16,
-                        container_6,
-                        msgTime,
-                    );
-                }
-            }
             return handleAction_19(msg_10, friend_16, container_6);
         }
         return false;
@@ -2660,40 +2621,11 @@
             raw.match(/Gift Received:\s*([^。\n<]+)/i)?.[1] ||
             'Gift';
         const legacyValue = raw.match(/(?:Value|Price)\s*\$\s*([\d.]+)/i)?.[1];
-        const legacyReceived = msg?.type === 'html' && /Gift Received/i.test(raw);
         return {
             name: String(msg?.giftName || legacyName || 'Gift').trim(),
             value: Math.max(0, Number(msg?.giftValue ?? legacyValue) || 0),
             description: String(msg?.giftDescription || msg?.description || '').trim(),
-            status:
-                legacyReceived || msg?.giftStatus === 'received' || msg?.status === 'received'
-                    ? 'received'
-                    : 'pending',
         };
-    }
-    function findGiftAcceptedByAssistant(assistantMessage, friend) {
-        if (!assistantMessage || assistantMessage.role !== 'assistant') return null;
-        const messages = Array.isArray(friend?.messages) ? friend.messages : [];
-        let assistantIndex = messages.findIndex((message) => message === assistantMessage);
-        if (assistantIndex < 0 && assistantMessage.id != null) {
-            assistantIndex = messages.findIndex(
-                (message) => String(message?.id || '') === String(assistantMessage.id),
-            );
-        }
-        if (assistantIndex < 0) {
-            assistantIndex = messages.findIndex(
-                (message) => Number(message?.timestamp) === Number(assistantMessage.timestamp),
-            );
-        }
-        if (assistantIndex < 0) return null;
-        for (let index = assistantIndex - 1; index >= 0; index -= 1) {
-            const candidate = messages[index];
-            if (!candidate || candidate.role === 'system' || candidate.type === 'hidden_context')
-                continue;
-            if (candidate.role === 'assistant') return null;
-            if (candidate.type === 'gift' && candidate.role === 'user') return candidate;
-        }
-        return null;
     }
     function openGiftDetailOverlay(msg, friend, anchor) {
         const page = anchor?.closest?.('.active-chat-interface');
@@ -2727,7 +2659,7 @@
         };
         overlay.addEventListener('click', close);
     }
-    // Invitations share the gift presentation, but keep their own immutable state.
+    // Lover invitations retain their existing presentation and immutable state.
     function getLovesInvitationStatus(message) {
         const content = String(message?.content || message?.text || '');
         const explicit = content.match(/data-loves-invitation=["'](pending|received)["']/)?.[1];
@@ -2737,17 +2669,18 @@
         return /邀请已接受|我接受了你的邀请|TA 已接受|我已经接受/.test(content + ' ' + (message.text || ''))
             ? 'received' : 'pending';
     }
-    function buildGiftStyleCardHtml(received, timestamp, invitationStatus = null) {
+    function buildLovesInvitationCardHtml(status) {
+        const received = status === 'received';
+        const invitationStatus = received ? 'received' : 'pending';
         const bowSvg =
             '<svg class="gift-message-bow" viewBox="0 0 52 58" fill="none" aria-hidden="true"><path d="M25.8 27.5C16 16.1 7.4 15.1 5 20.3c-2.8 6.2 7.5 11.3 20.8 7.2Zm.4 0C36 16.1 44.6 15.1 47 20.3c2.8 6.2-7.5 11.3-20.8 7.2ZM26 27.5V56M13 31l13-3.5L7.5 48M39 31l-13-3.5L44.5 48M26 27.5V3" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
         return `
-            <div class="gift-message-card im-card-content${received ? ' is-received' : ''}${invitationStatus ? ' loves-invitation-card' : ''}" ${invitationStatus ? `data-loves-invitation="${invitationStatus}"` : `data-gift-timestamp="${timestamp}" role="button" tabindex="0"`}>
-                <div class="gift-message-main">${bowSvg}<div class="gift-message-copy"><div class="gift-message-title">${invitationStatus ? 'Lover Invitation' : 'A Gift For You'}</div>${received ? '<div class="gift-message-status">Received</div>' : ''}</div></div>
-                <div class="gift-message-footer">${invitationStatus ? 'Lover' : 'Gift'}</div>
+            <div class="gift-message-card im-card-content loves-invitation-card${received ? ' is-received' : ''}" data-loves-invitation="${invitationStatus}">
+                <div class="gift-message-main">${bowSvg}<div class="gift-message-copy"><div class="gift-message-title">Lover Invitation</div>${received ? '<div class="gift-message-status">Received</div>' : ''}</div></div>
+                <div class="gift-message-footer">Lover</div>
             </div>`;
     }
-    window.imChat.buildLovesInvitationCardHtml = status =>
-        buildGiftStyleCardHtml(status === 'received', null, status === 'received' ? 'received' : 'pending');
+    window.imChat.buildLovesInvitationCardHtml = buildLovesInvitationCardHtml;
 
     function renderGiftBubble(msg, friend, container, timestamp = Date.now(), invitationStatus = null) {
         const isUser = msg.role === 'user';
@@ -2765,8 +2698,9 @@
         row.dataset.timestamp = String(timestamp);
         row.dataset.messageId = window.imChat.ensureMessageId(msg, invitationStatus ? 'html' : 'gift');
         handleAction_20(row, friend, msg);
-        const data = invitationStatus ? {status: invitationStatus} : normalizeGiftMessage(msg);
-        const card = buildGiftStyleCardHtml(data.status === 'received', timestamp, invitationStatus);
+        const card = invitationStatus
+            ? buildLovesInvitationCardHtml(invitationStatus)
+            : `<div class="gift-message-card im-card-content" data-gift-timestamp="${timestamp}" role="button" tabindex="0" aria-label="Gift: ${escapeHtml(normalizeGiftMessage(msg).name)}"><span class="gift-message-label">App Store &amp; iTunes</span></div>`;
         const headerHtml = buildMessageHeaderHtml(
             isUser,
             friend,
@@ -2776,7 +2710,7 @@
             hasPrev,
             msg,
         );
-        row.innerHTML = `<div class="chat-checkbox-wrapper" style="display:${window.imData.batchSelectMode ? 'flex' : 'none'};width:40px;justify-content:center;align-items:flex-end;padding-bottom:10px;flex-shrink:0;"><i class="far fa-circle chat-checkbox" data-timestamp="${timestamp}" style="color:#c7c7cc;font-size:22px;"></i></div><div style="flex:1;display:flex;flex-direction:column;min-width:0;">${headerHtml}<div style="display:flex;justify-content:${isUser ? 'flex-end' : 'flex-start'};align-items:flex-end;width:100%;"><div class="chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'} im-card-bubble gift-message-bubble">${card}</div></div></div>`;
+        row.innerHTML = `<div class="chat-checkbox-wrapper" style="display:${window.imData.batchSelectMode ? 'flex' : 'none'};width:40px;justify-content:center;align-items:flex-end;padding-bottom:10px;flex-shrink:0;"><i class="far fa-circle chat-checkbox" data-timestamp="${timestamp}" style="color:#c7c7cc;font-size:22px;"></i></div><div style="flex:1;display:flex;flex-direction:column;min-width:0;">${headerHtml}<div style="display:flex;justify-content:${isUser ? 'flex-end' : 'flex-start'};align-items:flex-end;width:100%;"><div class="chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'} im-card-bubble gift-message-bubble${invitationStatus ? ' loves-invitation-bubble' : ''}">${card}</div></div></div>`;
         const cardEl = row.querySelector('.gift-message-card');
         if (!invitationStatus) cardEl?.addEventListener('click', (event) => {
             event.preventDefault();

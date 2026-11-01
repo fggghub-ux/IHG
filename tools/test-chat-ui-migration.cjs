@@ -263,7 +263,7 @@ const {execFileSync} = require('node:child_process');
                 const result=a.left>=b.right+5 && b.width<=220 && b.width>100 || {avatar:a.toJSON(),card:b.toJSON()};
                 host.remove();return result;
             });
-            await check('Loves cards share gift geometry in both directions and all avatar modes', async () => {
+            await check('Loves cards retain their original geometry in both directions and all avatar modes', async () => {
                 const pane=document.getElementById('chat-interface-ui-char');
                 const host=document.createElement('div');host.className='ins-chat-messages';pane.appendChild(host);
                 const snapshot=()=>{
@@ -274,13 +274,10 @@ const {execFileSync} = require('node:child_process');
                 for(const mode of ['none','one','two'])for(const role of ['user','assistant'])for(const status of ['pending','received']) {
                     const f={...window.imApp.getFriendById('ui-char'),showAvatar:mode!=='none',avatarDisplayMode:mode==='none'?'one':mode};
                     const base={id:'loves-geometry',role,timestamp:Date.now()};
-                    host.replaceChildren();window.imChat.renderMessageBubble({...base,type:'gift',giftStatus:status},f,host);
-                    await Promise.all(host.getAnimations({subtree:true}).filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})));
-                    const gift=snapshot();
                     host.replaceChildren();window.imChat.renderMessageBubble({...base,type:'html',content:window.imChat.buildLovesInvitationCardHtml(status)},f,host);
                     await Promise.all(host.getAnimations({subtree:true}).filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})));
                     const loves=snapshot(),card=host.querySelector('.loves-invitation-card');
-                    if(JSON.stringify(gift)!==JSON.stringify(loves)||card.hasAttribute('data-gift-timestamp')||card.querySelector('.gift-message-title').textContent!=='Lover Invitation'||card.querySelector('.gift-message-footer').textContent!=='Lover'||!!card.querySelector('.gift-message-status')!==(status==='received')){host.remove();return {mode,role,status,gift,loves};}
+                    if(loves.width!==213||loves.height!==85||card.hasAttribute('data-gift-timestamp')||card.querySelector('.gift-message-title').textContent!=='Lover Invitation'||card.querySelector('.gift-message-footer').textContent!=='Lover'||!!card.querySelector('.gift-message-status')!==(status==='received')){host.remove();return {mode,role,status,loves};}
                 }
                 host.remove();return true;
             });
