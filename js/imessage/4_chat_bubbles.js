@@ -4250,7 +4250,8 @@
                 ? pose(visibleOuter) : pose(card));
             if (expanding) cards.forEach((card, index) => { card.style.zIndex = originalZ[index]; });
             following.forEach(item => { item.delta = item.top - item.node.getBoundingClientRect().top; });
-            const duration = matchMedia('(prefers-reduced-motion: reduce)').matches
+            const duration = !document.documentElement.classList.contains('app-ipad-layout') &&
+                matchMedia('(prefers-reduced-motion: reduce)').matches
                 ? 0 : 280 + 45 * (cards.length - 1);
             const ease = progress => 1 - (1 - progress) * (1 - progress);
             const lerp = (a, b, p) => a + (b - a) * p;

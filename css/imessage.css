@@ -19746,7 +19746,7 @@ button.moment-private-chat-bubble.has-translation {
 .im-chat-char .ins-chat-messages {
     padding-top: calc(110px + env(safe-area-inset-top, 0px));
     gap: 3px;
-    padding-bottom: calc(var(--im-chat-input-space) + 22px);
+    padding-bottom: calc(var(--im-chat-input-space) + var(--im-chat-reply-space, 0px) + 22px);
 }
 .im-chat-char .chat-timestamp {
     margin: 16px 0 6px;

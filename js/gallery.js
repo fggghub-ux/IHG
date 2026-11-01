@@ -88,8 +88,8 @@
             ]),
         );
         return (Array.isArray(value_83) ? value_83 : [])
-            .filter((message) => message?.type === 'image' && handleAction_16(message.content))
-            .map((contact, value_87) => {
+            .filter((message) => message?.type === 'image')
+            .flatMap((contact, value_87) => {
                 const friendId_2 = String(contact.friendId || ''),
                     value_88 = value_85.get(friendId_2) || null,
                     friendName_2 = handleAction_17(value_88),
@@ -115,30 +115,38 @@
                           ' ' +
                           handleAction_20(timestamp_2)
                         : '日期未知';
-                return {
-                    source: 'chat',
-                    key: key_2,
-                    id: String(contact.id || ''),
-                    friendId: friendId_2,
-                    friendName: friendName_2,
-                    friendType: String(value_88?.type || ''),
-                    senderId: String(contact.senderId || ''),
-                    senderName: senderName_2,
-                    description: description_2,
-                    timestamp: timestamp_2,
-                    dateKey: handleAction_18(timestamp_2),
-                    url: handleAction_16(contact.content),
-                    assetId: String(contact.contentAssetId || ''),
-                    searchText: (
-                        description_2 +
-                        ' ' +
-                        friendName_2 +
-                        ' ' +
-                        senderName_2 +
-                        ' ' +
-                        value_94
-                    ).toLocaleLowerCase('zh-CN'),
-                };
+                const photos = [{url: contact.content, assetId: contact.contentAssetId},
+                    ...(Array.isArray(contact.albumImages) ? contact.albumImages : [])];
+                return photos.flatMap((photo, photoIndex) => {
+                    const url = handleAction_16(photo?.url);
+                    if (!url) return [];
+                    return [{
+                        source: 'chat',
+                        key: key_2 + ':' + photoIndex,
+                        id: String(contact.id || ''),
+                        photoIndex,
+                        photoCount: photos.length,
+                        friendId: friendId_2,
+                        friendName: friendName_2,
+                        friendType: String(value_88?.type || ''),
+                        senderId: String(contact.senderId || ''),
+                        senderName: senderName_2,
+                        description: description_2,
+                        timestamp: timestamp_2,
+                        dateKey: handleAction_18(timestamp_2),
+                        url,
+                        assetId: String(photo.assetId || ''),
+                        searchText: (
+                            description_2 +
+                            ' ' +
+                            friendName_2 +
+                            ' ' +
+                            senderName_2 +
+                            ' ' +
+                            value_94
+                        ).toLocaleLowerCase('zh-CN'),
+                    }];
+                });
             })
             .sort((message_95, message_96) => message_96.timestamp - message_95.timestamp);
     }
@@ -826,7 +834,7 @@
             (value_2.deleteConfirmCopy.textContent =
                 value_208.source === 'album'
                     ? '此照片将从 ' + value_208.friendName + ' 的独立相册中删除，且无法恢复。'
-                    : '此照片及其消息会从对应' +
+                    : (value_208.photoCount > 1 ? '此照片所在的整条多图消息（共 ' + value_208.photoCount + ' 张照片）会从对应' : '此照片及其消息会从对应') +
                       (value_208.friendType === 'group' ? '群聊' : '单聊') +
                       '中删除，且无法恢复。');
         if (value_2.deleteStatus) value_2.deleteStatus.textContent = '';
@@ -905,7 +913,7 @@
         );
         if (!value_218) throw new Error('gallery_chat_delete_failed');
         handleAction_55(contact_217);
-        items = items.filter((value_219) => value_219.key !== contact_217.key);
+        items = items.filter((value_219) => !(value_219.friendId === contact_217.friendId && value_219.id === contact_217.id));
         handleAction_41();
     }
     async function handleAction_57(message_220) {
@@ -957,7 +965,7 @@
                 (contact_235.photoId && value_236.id === contact_235.photoId) ||
                 (contact_235.assetId && value_236.assetId === contact_235.assetId) ||
                 (contact_235.url && value_236.url === contact_235.url) ||
-                (contact_235.id &&
+                (!contact_235.assetId && !contact_235.url && contact_235.id &&
                     value_236.sourceFriendId === contact_235.friendId &&
                     value_236.sourceMessageId === contact_235.id),
         );
@@ -982,7 +990,10 @@
         }
         const slice_239 = [
             {
-                id: window.galleryData?.createPhotoId?.(handleAction_58_238.id, contact_237),
+                id: window.galleryData?.createPhotoId?.(handleAction_58_238.id, {
+                    assetId: contact_237.assetId, url: contact_237.url,
+                    sourceMessageId: contact_237.id + ':' + contact_237.photoIndex,
+                }),
                 url: contact_237.url,
                 assetId: contact_237.assetId,
                 description: String(contact_237.description || '')

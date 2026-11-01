@@ -1153,6 +1153,27 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                     true,
                 );
             const replyCancelBtn = page_9.querySelector('.reply-cancel-btn');
+            if (friend_6.type === 'char') {
+                const preview = page_9.querySelector('.reply-preview-container');
+                const messages = page_9.querySelector('.ins-chat-messages');
+                let replySpace = 0;
+                let replyFrame = 0;
+                const updateReplySpace = () => {
+                    replyFrame = 0;
+                    if (!page_9.isConnected) { replyResize.disconnect(); return; }
+                    const height = preview.getBoundingClientRect().height;
+                    const space = height ? height + parseFloat(getComputedStyle(preview).marginBottom || 0) : 0;
+                    if (space === replySpace) return;
+                    const following = messages.scrollHeight - messages.scrollTop - messages.clientHeight <= 2;
+                    replySpace = space;
+                    page_9.style.setProperty('--im-chat-reply-space', space + 'px');
+                    if (following) messages.scrollTop = messages.scrollHeight;
+                };
+                const replyResize = new ResizeObserver(() => {
+                    if (!replyFrame) replyFrame = requestAnimationFrame(updateReplySpace);
+                });
+                replyResize.observe(preview);
+            }
             replyCancelBtn &&
                 replyCancelBtn.addEventListener('click', () => {
                     window.imData.currentReplyText = null;

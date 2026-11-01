@@ -122,6 +122,23 @@
     line-height: 1.6;
 }
 
+.app-guide-section-action {
+    min-height: 36px;
+    margin-top: 14px;
+    padding: 8px 12px;
+    border: 1px solid #d8dbdc;
+    border-radius: 5px;
+    background: #f8f9f9;
+    color: #25282a;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.app-guide-section-action:active { background: #ecefef; }
+.app-guide-section-action:focus-visible { outline: 2px solid #17191a; outline-offset: 2px; }
+
 .app-guide-note {
     margin-top: 2px;
     padding: 14px;

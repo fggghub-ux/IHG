@@ -61,6 +61,14 @@
                 }
                 element_14.appendChild(element_16);
             });
+            if (value_12.action?.label && typeof value_12.action.onClick === 'function') {
+                const button = handleAction_3(element_14, 'button', 'app-guide-section-action', value_12.action.label);
+                button.type = 'button';
+                button.addEventListener('click', () => {
+                    closeAppGuideModal_2();
+                    value_12.action.onClick();
+                });
+            }
             appGuideContentElement.appendChild(element_14);
         });
         if (note && typeof note === 'object') {
@@ -109,8 +117,9 @@
                 closeAppGuideModal_2();
             } else {
                 if (event_20.key === 'Tab') {
-                    const value_21 = appGuideCloseElement,
-                        value_22 = appGuideDoneElement;
+                    const buttons = [...appGuideModalElement.querySelectorAll('button:not(:disabled)')];
+                    const value_21 = buttons[0],
+                        value_22 = buttons[buttons.length - 1];
                     if (
                         event_20.shiftKey &&
                         (document.activeElement === value_21 ||

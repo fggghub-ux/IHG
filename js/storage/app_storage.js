@@ -4336,16 +4336,22 @@
                 (row) =>
                     row &&
                     row.type === 'image' &&
-                    (String(row.content || '').trim() || String(row.contentAssetId || '').trim()),
+                    (String(row.content || '').trim() || String(row.contentAssetId || '').trim() ||
+                        row.albumImages?.some(image => image?.url || image?.assetId)),
             );
             const hydrated = await Promise.all(
-                imageRows.map(async (row) => ({
-                    ...(await hydrateMessageAssets(denormalizeMessageRecord(row))),
-                    friendId: String(row.friendId || ''),
-                })),
+                imageRows.map(async (row) => {
+                    const message = await hydrateMessageAssets(denormalizeMessageRecord(row));
+                    message.albumImages = await Promise.all(message.albumImages.map(async image => {
+                        if (image.url || !image.assetId) return image;
+                        try { return {...image, url: await getAssetUrl(image.assetId)}; }
+                        catch { return image; }
+                    }));
+                    return {...message, friendId: String(row.friendId || '')};
+                }),
             );
             return hydrated
-                .filter((message) => String(message.content || '').trim())
+                .filter((message) => String(message.content || '').trim() || message.albumImages.some(image => image.url))
                 .sort((left, right) => {
                     const timeDifference =
                         (Number(right.timestamp) || 0) - (Number(left.timestamp) || 0);
