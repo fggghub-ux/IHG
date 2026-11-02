@@ -1245,6 +1245,19 @@
             });
         }
     }
+    // A group receipt belongs to the selected recipient, while payer/payee data
+    // continues to describe the original transfer for details and accounting.
+    function attachGroupTransferReceiptIdentity(friend, source, receipt) {
+        if (friend?.type !== 'group' || receipt?.role !== 'assistant') return;
+        const recipient = window.imChat.normalizeGroupSpeaker(
+            friend, source.payeeName || source.receiverName || source.targetName,
+            source.targetMemberId || null,
+        );
+        if (!recipient) return;
+        receipt.speaker = recipient.nickname || recipient.realName;
+        receipt.speakerMemberId = recipient.id;
+        receipt.senderAvatarUrl = recipient.avatarUrl || '';
+    }
     async function claimIncomingTransfer_2(value_202, message_203, value_204 = {}) {
         if (!value_202 || !message_203 || message_203.claimed) return;
         if (
@@ -1334,6 +1347,7 @@
               typeof value_204.cotSummary === 'string' &&
                   value_204.cotSummary.trim() &&
                   (receiveMsg.cotSummary = value_204.cotSummary.trim()));
+        attachGroupTransferReceiptIdentity(value_202, message_203, receiveMsg);
         window.imApp.captureGroupUserIdentity?.(value_202, receiveMsg);
         let saved_2 = false;
         if (window.imApp.updateFriendMessage && window.imApp.appendFriendMessage) {
@@ -1569,6 +1583,7 @@
                   value_231.cotSummary.trim() &&
                   (rejectMsg.cotSummary = value_231.cotSummary.trim()));
         window.imApp.captureGroupUserIdentity?.(value_229, rejectMsg);
+        attachGroupTransferReceiptIdentity(value_229, message_230, rejectMsg);
         let saved_3 = false;
         if (window.imApp.updateFriendMessage && window.imApp.appendFriendMessage) {
             const value_248 = await window.imApp.updateFriendMessage(

@@ -4824,12 +4824,15 @@
             ' ',
         );
         if (
-            friend.type === 'group' ||
             String(msg.payKind || '').startsWith('family_card_') ||
             msg.paymentAction === 'family_card' ||
             msg.paymentAction === 'family_card_increase' ||
             familyCardText.includes('亲属卡')
         ) {
+            return renderGroupOrFamilyTransferBubble(msg, friend, container, timestamp);
+        }
+        if (friend.type === 'group' && (msg.targetName === 'Payment' ||
+            msg.cardTitle === '收款通知' || msg.cardTitle === '支付凭证')) {
             return renderGroupOrFamilyTransferBubble(msg, friend, container, timestamp);
         }
         const isUser = msg.role === 'user';
@@ -4923,18 +4926,20 @@
                 `;
         } else {
             const appleLogoSvg = `<svg class="pay-transfer-apple-mark" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.05 12.54c-.03-3.04 2.48-4.5 2.59-4.57-1.42-2.08-3.63-2.36-4.42-2.39-1.86-.2-3.67 1.11-4.62 1.11-.97 0-2.43-1.09-4.01-1.06-2.03.03-3.93 1.21-4.97 3.05-2.14 3.7-.54 9.14 1.5 12.13 1.02 1.46 2.2 3.09 3.78 3.03 1.54-.06 2.12-.97 3.98-.97 1.84 0 2.39.97 4 .93 1.66-.03 2.71-1.47 3.69-2.95 1.18-1.67 1.65-3.32 1.67-3.4-.04-.01-3.16-1.2-3.19-4.81ZM14 3.61A5.37 5.37 0 0 0 15.23 0a5.46 5.46 0 0 0-3.53 1.72 5.09 5.09 0 0 0-1.26 3.47A4.52 4.52 0 0 0 14 3.61Z"></path></svg>`;
-            const statusIconSvg =
-                status === 'claimed'
-                    ? `<svg class="pay-transfer-status-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 6.8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`
-                    : `<svg class="pay-transfer-status-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+            const stateLabel = status === 'claimed' ? 'Completed' : status === 'rejected' ? 'Returned' : 'Pending';
+            const groupParties = friend.type === 'group'
+                ? `<div class="cash-transfer-parties">${escapeHtml(parties.payerName)} transferred to ${escapeHtml(parties.payeeName)}</div>`
+                : '';
+            const amountFontSize = Math.min(25, Math.max(12, 25 * 8 / amountText.length));
             const contentHtml = `
-                    <div class="pay-transfer-card im-card-content${extraClass}">
+                    <div class="pay-transfer-card cash-transfer-card im-card-content${extraClass}">
                         <div class="pay-transfer-card-top">
                             <div class="pay-transfer-card-brand">${appleLogoSvg}<span>Apple Cash</span></div>
+                            ${groupParties}
                         </div>
                         <div class="pay-transfer-card-bottom">
-                            <div class="pay-transfer-card-amount">${amountText}</div>
-                            <div class="pay-transfer-card-status" aria-label="${status}">${statusIconSvg}</div>
+                            <div class="pay-transfer-card-amount" style="--cash-amount-size:${amountFontSize}px">${amountText}</div>
+                            <div class="pay-transfer-card-status" aria-label="${status}">${stateLabel}</div>
                         </div>
                     </div>
                 `;
@@ -4979,7 +4984,7 @@
         // 允许用户向AI转账时，以及AI向用户转账时，都可以点击打开弹窗
         if (!isOfficialReceipt && !isFamilyCard) {
             const clickableBubble =
-                row.querySelector('.chat-bubble.pay-transfer-bubble apple-cash-bubble') ||
+                row.querySelector('.chat-bubble.pay-transfer-bubble.apple-cash-bubble') ||
                 row.querySelector('.pay-transfer-card');
             if (clickableBubble) {
                 clickableBubble.style.cursor = 'pointer';
@@ -5021,6 +5026,25 @@
             }
         }
 
+        const amountNode = row.querySelector('.cash-transfer-card .pay-transfer-card-amount');
+        let amountObserver = null;
+        const fitAmount = () => {
+            if (!amountNode || !row.isConnected || amountNode.clientWidth <= 0) return false;
+            if (amountNode.scrollWidth > amountNode.clientWidth) {
+                const size = parseFloat(getComputedStyle(amountNode).fontSize);
+                amountNode.style.fontSize = `${Math.floor(size * (amountNode.clientWidth - 0.5) / amountNode.scrollWidth * 100) / 100}px`;
+            }
+            amountObserver?.disconnect();
+            return true;
+        };
+        if (amountNode && !fitAmount()) {
+            // Chat history can be mounted while its page is still hidden.
+            if (typeof ResizeObserver === 'function') {
+                amountObserver = new ResizeObserver(fitAmount);
+                amountObserver.observe(amountNode);
+            } else requestAnimationFrame(fitAmount);
+        }
+        decorateMessageRowAvatar(row, friend, msg);
         window.imChat.scrollToBottom(container);
     }
     function renderMomentForwardBubble_2(msg_20, value_400, element_401, value_402 = Date.now()) {

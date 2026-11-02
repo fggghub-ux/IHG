@@ -991,13 +991,13 @@ const {execFileSync} = require('node:child_process');
                 window.imChat.rerenderChatContainer(a.getFriendById('ui-group'),p.querySelector('.ins-chat-messages'),{scroll:false});
                 return !p.querySelector('.user-row > .im-message-avatar') && !!p.querySelector('.ai-row > .im-message-avatar');
             });
-            await check('group transfer card and detail keep the original UI', async () => {
+            await check('group transfer shares the Cash card and keeps the original detail UI', async () => {
                 const a=window.imApp;
                 await a.appendFriendMessage('ui-group',{id:'group-transfer',role:'assistant',type:'pay_transfer',payKind:'char_to_user_pending',amount:42,description:'Group test',timestamp:Date.now()},{silent:true});
                 await window.imChat.openChatTab(a.getFriendById('ui-group'));
                 const p=document.getElementById('chat-interface-ui-group');
                 p._openTransferDetailOverlay(a.getFriendById('ui-group').messages.find(m=>m.id==='group-transfer'));
-                const ok=!p.classList.contains('im-chat-char')&&!p.querySelector('.apple-cash-bubble')&&!!p.querySelector('.pay-transfer-card-icon')&&!!p.querySelector('.pay-transfer-detail-action-text')&&p.querySelector('.pay-transfer-detail-amount').textContent==='$42.00';
+                const ok=!p.classList.contains('im-chat-char')&&!!p.querySelector('.apple-cash-bubble .cash-transfer-card')&&!p.querySelector('.cash-transfer-card .pay-transfer-card-icon')&&!!p.querySelector('.pay-transfer-detail-action-text')&&p.querySelector('.pay-transfer-detail-amount').textContent==='$42.00';
                 p._closeTransferDetailOverlay();return ok;
             });
             await page.evaluate(() => {
