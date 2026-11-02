@@ -2878,6 +2878,30 @@
             balance: Number.isFinite(balance) ? balance : null,
         };
     }
+    // Location data must survive message storage, reloads and lightweight exports.
+    // Older records kept only the original [位置] text; recover that text without changing it.
+    function persistentLocationFields(record) {
+        if (record.type !== 'location') return {};
+        const legacy = /^\[位置\]\s?([\s\S]*)$/.exec(String(record.content || record.text || ''));
+        const parts = legacy ? legacy[1].split(' — ') : [];
+        const splitTranslation = (text) => {
+            const match = /^(.*)（([^（）]*)）$/.exec(text);
+            return match ? {text: match[1], translation: match[2]} : {text, translation: ''};
+        };
+        const name = splitTranslation(parts.shift() || '');
+        const address = splitTranslation(parts.join(' — '));
+        const read = (key, alias, fallback, limit) => String(
+            Object.prototype.hasOwnProperty.call(record, key)
+                ? record[key] ?? ''
+                : record[alias] || fallback || '',
+        ).slice(0, limit);
+        return {
+            locationName: read('locationName', 'name', name.text, 80),
+            locationAddress: read('locationAddress', 'address', address.text, 160),
+            locationNameTranslation: read('locationNameTranslation', 'nameTranslation', record.locationName || record.name ? '' : name.translation, 80),
+            locationAddressTranslation: read('locationAddressTranslation', 'addressTranslation', record.locationAddress || record.address ? '' : address.translation, 160),
+        };
+    }
     function normalizeMessageRecord(friendId, msg, index) {
         const safe = msg || {};
         const resolvedOrder = resolveMessageOrder(safe, index);
@@ -2901,6 +2925,7 @@
             order: resolvedOrder,
             role: safe.role || 'assistant',
             type: safe.type || 'text',
+            ...persistentLocationFields(safe),
             ...(safe.type === 'file' ? {fileData: sanitizePersistentValue(cloneDeep(safe.fileData || {}))} : {}),
             deliveryStatus: safe.deliveryStatus === 'blocked' ? 'blocked' : '',
             excludedFromContext: safe.excludedFromContext === true,
@@ -3258,6 +3283,7 @@
             id: row.id,
             role: row.role,
             type: row.type,
+            ...persistentLocationFields(row),
             ...(row.type === 'file' ? {fileData: cloneDeep(row.fileData || {})} : {}),
             deliveryStatus: row.deliveryStatus === 'blocked' ? 'blocked' : '',
             excludedFromContext: row.excludedFromContext === true,
@@ -6025,6 +6051,10 @@
             'decidedAt',
             'excludedFromContext',
             'deliveryStatus',
+            'locationName',
+            'locationAddress',
+            'locationNameTranslation',
+            'locationAddressTranslation',
             'stickerName',
             'contactName',
             'contactRealName',
