@@ -4934,7 +4934,7 @@
             const contentHtml = `
                     <div class="pay-transfer-card cash-transfer-card im-card-content${extraClass}">
                         <div class="pay-transfer-card-top">
-                            <div class="pay-transfer-card-brand">${appleLogoSvg}<span>Apple Cash</span></div>
+                            <div class="pay-transfer-card-brand">${appleLogoSvg}<span>Pay</span></div>
                             ${groupParties}
                         </div>
                         <div class="pay-transfer-card-bottom">

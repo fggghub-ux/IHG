@@ -1057,11 +1057,17 @@
                     familyCardText.includes('亲属卡');
             if (transferDetailName) transferDetailName.textContent = value_183;
             if (transferDetailAmount) transferDetailAmount.textContent = '$' + value_187.toFixed(2);
-            if (transferDetailDesc) transferDetailDesc.textContent = textContent_2;
+            const hasNote = !!textContent_2 && !['转账', '转账说明'].includes(textContent_2);
+            if (transferDetailDesc) {
+                transferDetailDesc.textContent = isFamilyCard ? textContent_2 : '';
+                transferDetailDesc.style.display = isFamilyCard ? 'block' : 'none';
+            }
+            const detailsLabel = transferDetailSummary?.previousElementSibling;
+            if (detailsLabel) detailsLabel.textContent = isFamilyCard ? '转账详情' : 'Details';
             if (transferDetailSummary)
                 transferDetailSummary.textContent = isFamilyCard
                     ? '备注：' + textContent_2
-                    : value_183 + ' 向 ' + payeeName_3 + ' 转账，备注：' + textContent_2;
+                    : hasNote ? 'Note：' + textContent_2 : '';
             const transferDetailActionText = page.querySelector(
                 '.pay-transfer-detail-action-text',
             );
@@ -1075,8 +1081,8 @@
                             transferDetailActionText.textContent = '已退还';
                         else
                             canCurrentUserClaim_2
-                                ? (transferDetailActionText.textContent = '向你转账')
-                                : (transferDetailActionText.textContent = '转账给 ' + payeeName_3);
+                                ? (transferDetailActionText.textContent = 'Transferred to ' + payeeName_3)
+                                : (transferDetailActionText.textContent = 'Transferred to ' + payeeName_3);
                     }
                 }
             }
@@ -1355,7 +1361,7 @@
                 value_202.id,
                 {
                     id: id_214 || null,
-                    timestamp: message_203.timestamp || null,
+                    timestamp: id_214 ? null : message_203.timestamp || null,
                 },
                 (message_221) => {
                     if (!message_221) return;
@@ -1590,7 +1596,7 @@
                 value_229.id,
                 {
                     id: id_242 || null,
-                    timestamp: message_230.timestamp || null,
+                    timestamp: id_242 ? null : message_230.timestamp || null,
                 },
                 (message_249) => {
                     if (!message_249) return;

@@ -2122,6 +2122,9 @@ if (value_1579 === 'contact_card') return handleAction_81_2(value_1578);
                         paymentAction_3 = 'family_card_reject';
                     return {
                         kind: 'payment',
+                        speaker: String(value_1578.speaker || '').trim(),
+                        speakerMemberId: String(value_1578.speakerMemberId || '').trim(),
+                        sourceMessageId: String(value_1578.sourceMessageId || '').trim(),
                         paymentAction: paymentAction_3,
                         amount: amount_4,
                         description:
@@ -8094,6 +8097,19 @@ These linked friend conversations belong only to ` +
                               })
                               .join('\n\n')
                         : 'None';
+                const pendingGroupTransfers = (friend_31.messages || [])
+                    .filter(message => message.type === 'pay_transfer' && message.payKind === 'user_to_char' && !message.claimed)
+                    .map(message => ({ sourceMessageId: message.id, amount: Number(message.amount),
+                        payerName: message.payerName || message.senderName,
+                        payeeName: message.payeeName || message.receiverName || message.targetName,
+                        targetMemberId: message.targetMemberId || '' }));
+                addOnlinePromptSection('features',
+                    'Group transfer actions: only a real pending transfer in the following inventory can be received or returned. ' +
+                    'When its named recipient decides to accept or return it, include a payment object inside <chat_json> in addition to normal dialogue. ' +
+                    'Saying received or returned in text alone does not perform the action. Do not use red_packet for transfers. ' +
+                    'Payment object: {"type":"payment","speaker":"exact recipient name","speakerMemberId":"recipient ID","paymentAction":"receive|reject","sourceMessageId":"exact transfer message ID","amount":1000,"description":"optional note"}. ' +
+                    'Use the exact ID and amount from this inventory; only that recipient may act. Omit payment if choosing to leave it pending. ' +
+                    'Never create an acceptance for a mere verbal mention or an already processed transfer.\n' + JSON.stringify(pendingGroupTransfers));
                 text_2764 = handleAction_2705(friend_31, groupMembers_3, pendingOfflineHandoff_2);
                 addOnlinePromptSection(
                     'priority',
@@ -10219,6 +10235,9 @@ if (value_3364 === 'contact_card') return handleAction_81_2(currentItem_3);
                                 paymentAction_4 = 'family_card_reject';
                             return {
                                 kind: 'payment',
+                                speaker: String(currentItem_3.speaker || '').trim(),
+                                speakerMemberId: String(currentItem_3.speakerMemberId || '').trim(),
+                                sourceMessageId: String(currentItem_3.sourceMessageId || '').trim(),
                                 paymentAction: paymentAction_4,
                                 amount: amount_6,
                                 description:
@@ -11161,6 +11180,7 @@ if (currentItem_4.kind === 'contact_card') {
                                 ? window.imChat.getSafeGroupSpeaker(
                                       activeFriend_7,
                                       currentItem_4.speaker || lastGroupSpeaker,
+                                      currentItem_4.speakerMemberId || null,
                                   )
                                 : activeFriend_7,
                         paymentSpeakerName_2 =
@@ -11263,7 +11283,15 @@ if (currentItem_4.kind === 'contact_card') {
                                                   m.type === 'pay_transfer' &&
                                                   m.payKind === 'user_to_char' &&
                                                   !m.claimed &&
-                                                  Number(m.amount) === amount_2,
+                                                  Number(m.amount) === amount_2 &&
+                                                  (activeFriend_7.type !== 'group' || (
+                                                      (!currentItem_4.speakerMemberId || String(paymentSpeaker?.id) === currentItem_4.speakerMemberId) &&
+                                                      (!currentItem_4.speaker || [paymentSpeaker?.nickname, paymentSpeaker?.realName].includes(currentItem_4.speaker)) &&
+                                                      (!currentItem_4.sourceMessageId || String(m.id) === currentItem_4.sourceMessageId) &&
+                                                      (m.targetMemberId
+                                                          ? String(m.targetMemberId) === String(paymentSpeaker?.id)
+                                                          : String(m.payeeName || m.receiverName || m.targetName) === paymentSpeakerName_2)
+                                                  )),
                                           )
                                     : null;
                                 if (pendingMsg) {

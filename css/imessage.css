@@ -20021,11 +20021,6 @@ button.moment-private-chat-bubble.has-translation {
     width: 100%;
     min-height: 0;
     color: #111;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-}
-.apple-cash-bubble .cash-transfer-card,
-.apple-cash-bubble .cash-transfer-card * {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif !important;
 }
 .apple-cash-bubble .pay-transfer-card-top { display: block; margin: 0; }
 .apple-cash-bubble .pay-transfer-card-brand {
@@ -20477,4 +20472,15 @@ button.moment-private-chat-bubble.has-translation {
     line-height: 1.5;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+}
+
+/* These fixed-size cards need their full width inside the message preview. */
+#msg-context-bubble-clone:has(.cash-transfer-card, .gift-message-card:not(.loves-invitation-card)) {
+    width: max-content;
+    max-width: 100% !important;
+}
+#msg-context-bubble-clone:has(.cash-transfer-card, .gift-message-card:not(.loves-invitation-card)) .msg-context-row-clone {
+    width: max-content;
+    max-width: none;
+    padding: 0 !important;
 }
