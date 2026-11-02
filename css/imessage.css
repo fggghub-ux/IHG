@@ -20021,6 +20021,11 @@ button.moment-private-chat-bubble.has-translation {
     width: 100%;
     min-height: 0;
     color: #111;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+}
+.apple-cash-bubble .cash-transfer-card,
+.apple-cash-bubble .cash-transfer-card * {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif !important;
 }
 .apple-cash-bubble .pay-transfer-card-top { display: block; margin: 0; }
 .apple-cash-bubble .pay-transfer-card-brand {
