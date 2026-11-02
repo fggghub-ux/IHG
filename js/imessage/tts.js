@@ -730,12 +730,13 @@
         if (!audioUrl_2) throw new Error('MiniMax TTS 未返回音频');
         return audioUrl_2;
     }
-    async function playAudioUrl_2(value_12, value_13 = false) {
+    async function playAudioUrl_2(value_12, value_13 = false, onAudio = null) {
         if (!value_12) throw new Error('没有可播放的音频');
         currentAudio && (currentAudio.pause(), (currentAudio = null));
         const value_14 = new Audio(value_12);
         value_14.preload = 'auto';
         currentAudio = value_14;
+        if (typeof onAudio === 'function') onAudio(value_14);
         try {
             const value_15 = value_13
                 ? new Promise((value_16) => {
@@ -762,6 +763,12 @@
             const details = cleanString(error_5?.message, 300);
             throw new Error('音频播放失败' + (details ? '：' + details : ''));
         }
+    }
+    async function resumeAudio(audio) {
+        if (!audio) return;
+        if (currentAudio && currentAudio !== audio) currentAudio.pause();
+        currentAudio = audio;
+        await audio.play();
     }
     function escapeXml(value_12_2) {
         return String(value_12_2 || '').replace(
@@ -1434,7 +1441,7 @@ GET ` +
             voiceId: options_2_2.voiceId || voiceSettings_13_2.voiceId,
         });
         if (options_2_2.canPlay && !options_2_2.canPlay()) return null;
-        return (await playAudioUrl_2(audioUrl_3, options_2_2.awaitEnd === true), audioUrl_3);
+        return (await playAudioUrl_2(audioUrl_3, options_2_2.awaitEnd === true, options_2_2.onAudio), audioUrl_3);
     }
     async function speakTextCached_2(text_11, friend_4 = null, cacheOwner = null, options_3 = {}) {
         const voiceSettings_14 = resolveFriendTtsSettings_3(friend_4);
@@ -1448,14 +1455,14 @@ GET ` +
         if (cacheOwner?.ttsAudioCache?.key === cacheKey && cacheOwner.ttsAudioCache.url) {
             if (options_3.canPlay && !options_3.canPlay()) return null;
             return (
-                await playAudioUrl_2(cacheOwner.ttsAudioCache.url, options_3.awaitEnd === true),
+                await playAudioUrl_2(cacheOwner.ttsAudioCache.url, options_3.awaitEnd === true, options_3.onAudio),
                 cacheOwner.ttsAudioCache.url
             );
         }
         if (cacheOwner?.ttsAudioPromise) {
             const cached = await cacheOwner.ttsAudioPromise;
             if (options_3.canPlay && !options_3.canPlay()) return null;
-            if (cached) await playAudioUrl_2(cached, options_3.awaitEnd === true);
+            if (cached) await playAudioUrl_2(cached, options_3.awaitEnd === true, options_3.onAudio);
             return cached;
         }
         const handleAction_4_71 = handleAction_4(text_11, friend_4, {
@@ -1685,6 +1692,7 @@ GET ` +
         speakTextCached: speakTextCached_2,
         prepareSpeech: prepareSpeech_2,
         playAudioUrl: playAudioUrl_2,
+        resumeAudio,
         stopPlayback() {
             currentAudio && (currentAudio.pause(), (currentAudio = null));
         },

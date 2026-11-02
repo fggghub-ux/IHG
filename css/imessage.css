@@ -5368,9 +5368,7 @@ button.group-private-chat-detail-bubble {
     line-height: 19px;
 }
 
-.chat-row .voice-message-bubble {
-    max-width: min(70%, 240px) !important;
-}
+
 
 .pay-transfer-bubble {
     max-width: min(62%, 218px);
@@ -7215,129 +7213,6 @@ button.group-private-chat-detail-bubble {
 }
 .ai-row.has-next .ai-bubble:not(.im-card-bubble) {
     border-bottom-left-radius: 4px;
-}
-
-.voice-message-bubble {
-    min-width: 0;
-    max-width: 70%;
-    padding: 10px 14px;
-
-    overflow: visible;
-}
-
-.chat-row .voice-message-bubble.has-voice-actions {
-    max-width: min(85%, 240px) !important;
-}
-
-/* Collapse markup indentation instead of rendering blank text lines. */
-.im-text-bubble-shell.voice-message-bubble {
-    white-space: normal;
-}
-
-.voice-message-bubble-main {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    min-width: 0;
-}
-
-.voice-message-actions {
-    display: flex;
-    align-items: center;
-    gap: 1px;
-    margin-left: auto;
-    flex-shrink: 0;
-}
-
-.voice-message-action {
-    width: 22px;
-    height: 22px;
-    flex: 0 0 22px;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: none;
-    color: inherit;
-    opacity: .65;
-    font-size: 11px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    touch-action: manipulation;
-}
-
-.voice-message-action:active { opacity: 1; }
-.voice-message-action:focus-visible { outline: 2px solid #007aff; outline-offset: 1px; }
-.voice-message-action:disabled { opacity: .35; cursor: wait; }
-.voice-message-action-spinner { animation: voice-message-action-spin .8s linear infinite; }
-@keyframes voice-message-action-spin { to { transform: rotate(360deg); } }
-
-.voice-message-bubble-inner {
-    width: auto;
-    flex: 1 1 auto;
-    min-width: 0;
-    min-height: 0;
-    border: 0;
-    padding: 0;
-    border-radius: 0;
-    background: transparent;
-    color: inherit;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font: inherit;
-    text-align: left;
-}
-
-.ai-bubble .voice-message-bubble-inner {
-    background: transparent;
-}
-
-.voice-message-wave {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    min-width: 0;
-}
-
-.voice-message-wave span {
-    display: block;
-    width: 3px;
-    border-radius: 999px;
-    background: currentColor;
-    opacity: 0.82;
-}
-
-.voice-message-wave span:nth-child(1) {
-    height: 7px;
-    opacity: 0.4;
-}
-.voice-message-wave span:nth-child(2) {
-    height: 14px;
-    opacity: 0.62;
-}
-.voice-message-wave span:nth-child(3) {
-    height: 22px;
-    opacity: 0.92;
-}
-.voice-message-wave span:nth-child(4) {
-    height: 11px;
-    opacity: 0.58;
-}
-.voice-message-wave span:nth-child(5) {
-    height: 18px;
-    opacity: 0.76;
-}
-
-.voice-message-duration {
-    font-size: 12px;
-    line-height: 1;
-    white-space: nowrap;
-    opacity: 0.76;
-    font-weight: 700;
-    letter-spacing: 0;
 }
 
 .voice-message-transcript {
@@ -18238,7 +18113,6 @@ button.moment-private-chat-bubble.has-translation {
 /* Keep non-Pay card shells intrinsic when a generic bubble theme sets fixed
    heights. Pay cards keep their own sizing so existing themes can control it. */
 #imessage-view .active-chat-interface .chat-row .chat-bubble.im-card-bubble:is(
-    .voice-message-bubble,
     .group-red-packet-bubble,
     .group-poll-bubble,
     .im-contact-card-bubble,
@@ -18254,7 +18128,6 @@ button.moment-private-chat-bubble.has-translation {
 }
 
 #imessage-view .active-chat-interface .chat-row :is(
-    .voice-message-bubble-inner,
     .group-red-packet-card,
     .im-contact-card-profile,
     .voice-call-record-card,
@@ -18916,34 +18789,6 @@ button.moment-private-chat-bubble.has-translation {
     font-size: 12px;
     line-height: 1.45;
 }
-.voice-message-bubble-inner:focus-visible { outline: 2px solid #007aff; outline-offset: 2px; }
-.voice-message-play {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 28px;
-    flex: 0 0 24px;
-    padding: 0;
-    border: 0;
-    border-radius: 6px;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    font-size: 14px;
-    cursor: pointer;
-    touch-action: manipulation;
-}
-.voice-message-play:disabled { opacity: 0.55; cursor: wait; }
-.voice-message-play:focus-visible { outline: 2px solid #007aff; outline-offset: 2px; }
-.voice-message-playback-status {
-    display: block;
-    margin-top: 3px;
-    font-size: 11px;
-    line-height: 1.35;
-    color: #6b6b70;
-}
-.voice-message-playback-status:empty { display: none; }
 #chat-contact-type-select,
 #npc-chat-contact-type-select {
     margin-left: auto;
@@ -19401,27 +19246,6 @@ button.moment-private-chat-bubble.has-translation {
     z-index: 1;
     gap: 3px !important;
     padding-right: 7px !important;
-}
-.im-chat-char .user-row .voice-message-bubble,
-#msg-context-bubble-clone[data-chat-type="char"] .msg-context-row-clone.user-row .voice-message-bubble {
-    max-width: min(77%, 240px) !important;
-    padding: 8px 12px !important;
-    align-self: flex-end !important;
-    box-sizing: border-box !important;
-    width: max-content !important;
-    min-width: 0 !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    flex: 0 0 auto !important;
-}
-.im-chat-char .user-row .voice-message-bubble-inner,
-#msg-context-bubble-clone[data-chat-type="char"] .user-row .voice-message-bubble-inner {
-    width: max-content !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    flex: 0 0 auto !important;
 }
 .active-chat-interface.im-chat-char {
     --im-chat-message-top-space: 110px;
@@ -20049,15 +19873,7 @@ button.moment-private-chat-bubble.has-translation {
         width: 42px !important;
     }
 }
-.im-chat-char .user-row .voice-message-bubble {
-    max-width: min(70%, 240px) !important;
-    width: max-content !important;
-    min-width: 0 !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    flex: 0 0 auto !important;
-}
+
 #msg-context-bubble-clone {
     padding: 10px;
     box-sizing: border-box;

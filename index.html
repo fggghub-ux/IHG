@@ -100,8 +100,9 @@
         <link rel="stylesheet" href="css/worldbook.css?v=20261007-107-r1&apk-sync=113-selective-20261022" />
         <link rel="stylesheet" href="css/app_guide_modal.css?v=20261007-107-r1&repair=20261101-local-ui-v1" />
         <link rel="stylesheet" href="css/online_prompts.css?v=20260905-v6&repair=20261003&apk-sync=117-selective-20261022&ui-fixes=20261024-v1" />
-        <link rel="stylesheet" href="css/imessage.css?loves-ui=20261024-v1&album-ui=20261024-v2&v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&home-avatar-migration=20261023-v1&ipad-home-title=20261023-v1&chats-migration=20261023-v1&chat-ui=20261024-v2&chat-repair=20261024-v4&chats-scroll-toast=20261025-v1&chats-search-scroll=20261025-v2&offline-ui=20261025-v1&chats-return-nav=20261025-v1&apk-sync=119-selective-20261026&ui-fix=20261026-1&apk120=20261030-v1&repair=20261101-local-ui-v1&chats-spacing=20261101-v1&location-ui=20261103-v2" />
+        <link rel="stylesheet" href="css/imessage.css?loves-ui=20261024-v1&album-ui=20261024-v2&v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&home-avatar-migration=20261023-v1&ipad-home-title=20261023-v1&chats-migration=20261023-v1&chat-ui=20261024-v2&chat-repair=20261024-v4&chats-scroll-toast=20261025-v1&chats-search-scroll=20261025-v2&offline-ui=20261025-v1&chats-return-nav=20261025-v1&apk-sync=119-selective-20261026&ui-fix=20261026-1&apk120=20261030-v1&repair=20261101-local-ui-v1&chats-spacing=20261101-v1&location-ui=20261103-v2&voice-ui=20261103-v1" />
         <link rel="stylesheet" href="css/imessage-location.css?location-ui=20261103-v2&font=20261103-v3" />
+        <link rel="stylesheet" href="css/imessage-voice.css?voice-ui=20261103-v1" />
         <link rel="stylesheet" href="css/offline-feed.css?v=20261025-v1">
         <link rel="stylesheet" href="css/pay.css?v=20260923-gallery-layout-v1&repair=20261003" />
         <link
@@ -12492,6 +12493,15 @@
                         style="max-width: 75%; word-break: break-word;"
                     ></div>
 
+                    <!-- Voice-only first page; the existing menu pages follow unchanged. -->
+                    <div id="msg-context-voice-actions">
+                        <div class="msg-menu-item" data-action="voice-saved"><span>Saved</span><i class="far fa-bookmark"></i></div>
+                        <div class="msg-menu-item" data-action="voice-reroll"><span>Reroll</span><i class="fas fa-rotate-left"></i></div>
+                        <div class="msg-menu-item" data-action="voice-download"><span>Download</span><i class="fas fa-download"></i></div>
+                        <div class="msg-menu-item" data-action="voice-tts"><span>TTS</span><i class="fas fa-volume-up"></i></div>
+                        <div class="msg-menu-item" data-action="voice-more"><span>More...</span><i class="fas fa-ellipsis-h"></i></div>
+                    </div>
+
                     <!-- Menu Options (iMessage style) -->
                     <div
                         id="msg-context-actions"
@@ -20180,11 +20190,12 @@
         <script src="js/imessage/4_chat_common.js?v=image-assets-20260803-v1&auto-image=20260807-v1&startup-queue=20260804-v1&auto-face-lock=20260813-v1&prompt-parts=20260819-v1&repair=20261003&apk-sync=111-selective"></script>
         <script src="js/imessage/4_chat_status.js?v=20260821-status-memory-request-v1&template-avatar=20260821-v1&template-history-fallback=20260821-v1&paging=20260801-button-only-v1&startup-queue=20260804-v1&status-refresh=20260821-v1&offline-html-template-sanitize=20260822-v1&status-css-snapshot=20260822-v1&imessage-performance=20260825-v1&mcp-chat-settings=20260901-v2&repair=20261003&chat-ui=20261024-v2"></script>
         <script src="js/imessage/4_chat_payment.js?v=20260725-single-chat-cot-v1&startup-queue=20260804-v1&group-identity-css-v1&group-member-resolution=20260812-v1&repair=20261003&apk-sync=117-selective-20261022&chat-ui=20261024-v2&chat-repair=20261024-v3"></script>
-        <script src="js/imessage/voice_message_audio.js?v=20261015-apk111&apk-sync=113-selective-20261022"></script>
-        <script src="js/imessage/4_chat_bubbles.js?loves-ui=20261024-v1&album-ui=20261024-v2&voice-shell=20261024-v1&v=20261007-107-r1&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&apk-patch=20261022-1&ui-fixes=20261024-v1&chat-ui=20261024-v2&chat-repair=20261024-v3&apk-sync=119-selective-20261026&apk120=20261030-v1&repair=20261101-local-ui-v1&location-ui=20261103-v2"></script>
+        <script src="js/imessage/voice_message_audio.js?v=20261015-apk111&apk-sync=113-selective-20261022&voice-ui=20261103-v1"></script>
+        <script src="js/imessage/voice_message_ui.js?voice-ui=20261103-v1"></script>
+        <script src="js/imessage/4_chat_bubbles.js?loves-ui=20261024-v1&album-ui=20261024-v2&voice-shell=20261024-v1&v=20261007-107-r1&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&apk-patch=20261022-1&ui-fixes=20261024-v1&chat-ui=20261024-v2&chat-repair=20261024-v3&apk-sync=119-selective-20261026&apk120=20261030-v1&repair=20261101-local-ui-v1&location-ui=20261103-v2&voice-ui=20261103-v1"></script>
         <script src="js/imessage/chat_search.js?v=20260718-chat-history-search-v2&keyboard-guard=20260801-v1&startup-queue=20260804-v1&location-timezone=20260825-v1&location-translation=20260825-v1&history-index=20260907-v1&group-chat-search=20260924-v3&repair=20261003&chat-ui=20261024-v2&apk-sync=119-selective-20261026"></script>
         <script src="js/imessage/chat_favorites.js?v=20260723-chat-favorites-v3&startup-queue=20260804-v1&repair=20261003&chat-ui=20261024-v2&apk-sync=119-selective-20261026"></script>
-        <script src="js/imessage/tts.js?v=20261007-107-r1&apk-sync=111-selective"></script>
+        <script src="js/imessage/tts.js?v=20261007-107-r1&apk-sync=111-selective&voice-ui=20261103-v1"></script>
         <script src="js/imessage/4_chat_ai.js?v=20261007-107-r1&settings=20261010-r1&chat-ui=20261024-v2&apk-sync=119-selective-20261026&apk120=20261030-v1"></script>
         <script src="js/imessage/offline_regex.js?v=20260705-offline-regex-v1&html-template=20260822-v3&offline-text-replacement=20260913-v1&repair=20261003"></script>
         <script src="js/imessage/offline_reasoning.js?v=20260718-offline-cot-v1&custom-cot=20260823-v1&repair=20261003"></script>
@@ -20194,10 +20205,10 @@
         <script src="js/imessage/4_chat_file.js?v=119"></script>
         <script src="js/imessage/4_chat_link.js?v=20260726-light-link-theatre-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&picsum-cdn=20260815-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=119-selective-20261026"></script>
         <script src="js/imessage/4_chat_list.js?chat-runtime-performance=20260803-v1&startup-queue=20260804-v1&theme-surfaces=20260814-v1&imessage-performance=20260825-v2&mobile-latest=20260825-v1&mobile-performance=20260825-v1&official=20260827-v1&history-index=20260907-v1&chat-observer-lifecycle=20260920-v1&group-chat-search=20260924-v1&repair=20261003&settings=20261010-r1&apk-sync=111-selective&home-avatar-migration=20261023-v1&chats-migration=20261023-v1&ui-fixes=20261024-v1&gift-update=20261024-v1&chat-repair=20261024-v3&chats-return-nav=20261025-v1"></script>
-        <script src="js/imessage/4_chat_interface.js?v=20261007-107-r1&settings=20261010-r1&apk-ui=111-rebuild-20261016&chat-ui=20261024-v2&chats-return-nav=20261025-v1&apk-sync=119-selective-20261026&repair=20261101-local-ui-v1"></script>
+        <script src="js/imessage/4_chat_interface.js?v=20261007-107-r1&settings=20261010-r1&apk-ui=111-rebuild-20261016&chat-ui=20261024-v2&chats-return-nav=20261025-v1&apk-sync=119-selective-20261026&repair=20261101-local-ui-v1&voice-ui=20261103-v1"></script>
         <script src="js/imessage/4_chat_voice_call.js?v=20261009-restored-repairs&apk-sync=111-selective"></script>
         <script src="js/imessage/video_call.js?v=20261020-ipad-call-keyboard&apk-sync=111-selective"></script>
-        <script src="js/imessage/4_chat_main.js?v=20261007-107-r1&apk-sync=119-selective-20261026"></script>
+        <script src="js/imessage/4_chat_main.js?v=20261007-107-r1&apk-sync=119-selective-20261026&voice-ui=20261103-v1"></script>
         <script src="js/imessage/online_prompt_settings.js?v=20260905-v6&repair=20261003&apk-sync=117-selective-20261022"></script>
         <script src="js/imessage/5_settings.js?v=20261009-original-layout-clear&apk-sync=118-selective-20261022&ui-fixes=20261024-v1&chat-ui=20261024-v2&chat-defaults=20261025-v1&apk120=20261030-v1"></script>
         <script src="js/imessage/6_moments.js?v=20260718-moments-target-reply-v1&auto-translation=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&current-account-avatar-v1&moment-visibility=20260811-v1&relationship-engagement=20260811-v1&char-batch=20260825-v1&comment-threads=20260825-v3&private-chat-labels=20260825-v1&moment-private-chats=20260825-v4&interaction-render=20260911-v1&api-error-dialog=20260923-v1&moments-home=20260923-v2&repair=20261003&shop-moments=20261010-v1&apk-sync=113-selective-20261022&home-avatar-migration=20261023-v1&chat-ui=20261024-v2"></script>

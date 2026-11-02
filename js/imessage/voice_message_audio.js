@@ -117,7 +117,7 @@
                 value_38.id,
                 {
                     id: handleAction_1_40.id || null,
-                    timestamp: handleAction_1_40.timestamp || null,
+                    timestamp: handleAction_1_40.id ? null : handleAction_1_40.timestamp || null,
                 },
                 (value_47) => {
                     if (!value_47 || handleAction(value_47) !== handleAction_42)

@@ -1,0 +1,22 @@
+/* Voice controls live inside the existing private/group bubble shells. */
+.voice-message-bubble-main { display: flex; align-items: center; gap: 12px; width: 100%; height: 32px; flex: 0 0 32px; min-width: 0; }
+.voice-message-bubble .voice-message-play { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 28px; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: #000; color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.18); cursor: pointer; }
+.voice-message-bubble .voice-message-play i { display: block; font-size: 15px; line-height: 1; }
+.voice-message-bubble .voice-message-play .fa-play { margin-left: 2px; }
+.voice-message-bubble.user-bubble .voice-message-play { background: #fff; color: #a0a0a0; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+.voice-message-play:active { transform: scale(.94); }
+.voice-message-play:disabled { cursor: wait; opacity: .6; }
+.voice-message-play:focus-visible, .voice-message-bubble-inner:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.voice-message-bubble-inner { display: flex; align-items: center; justify-content: space-between; width: 100%; flex: 1 1 auto; min-width: 0; height: 32px; gap: 14px; padding: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; text-align: left; }
+.voice-message-wave { display: flex; align-items: center; justify-content: space-between; flex: 1 1 auto; min-width: 0; height: 24px; gap: 1.4px; color: #555558; }
+.voice-message-wave span { display: block; flex: 0 0 2.4px; width: 2.4px; border-radius: 999px; opacity: 1; background: linear-gradient(to right, #c9c9cc clamp(0%, calc((var(--voice-progress, 0) - var(--voice-bar-start)) * 2400%), 100%), currentColor 0); }
+.user-bubble .voice-message-wave { color: #fff; }
+.voice-message-duration { flex: 0 0 32px; min-width: 32px; white-space: nowrap; text-align: right; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; font-size: 13.5px; font-weight: 600; letter-spacing: -.2px; line-height: 1; color: #555558; opacity: 1; }
+.user-bubble .voice-message-duration { color: #fff; }
+.voice-message-action-spinner { animation: voice-message-action-spin .8s linear infinite; }
+@keyframes voice-message-action-spin { to { transform: rotate(360deg); } }
+#msg-context-voice-actions { display: none; background: #fff; border-radius: 14px; flex-direction: column; overflow: hidden; min-width: 200px; flex-shrink: 0; }
+#msg-context-voice-actions i { font-size: 16px; color: #8e8e93; }
+#msg-context-voice-actions .msg-menu-item:last-child { border-bottom: none; }
+#msg-context-bubble-clone:has(.voice-message-bubble) { width: max-content; max-width: 100% !important; }
+#msg-context-bubble-clone:has(.voice-message-bubble) .msg-context-row-clone { width: max-content; max-width: none; padding: 0 !important; }

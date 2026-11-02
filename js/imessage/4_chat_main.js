@@ -251,7 +251,38 @@
         msgContextMenu.addEventListener('click', async (e_7) => {
             const menuItem = e_7.target.closest('.msg-menu-item');
             if (menuItem) {
-                const action = menuItem.getAttribute('data-action');
+                let action = menuItem.getAttribute('data-action');
+                if (action.startsWith('voice-')) {
+                    e_7.preventDefault(); e_7.stopPropagation();
+                    if (action === 'voice-saved') return;
+                    if (action === 'voice-more') {
+                        document.getElementById('msg-context-voice-actions').style.display = 'none';
+                        document.getElementById('msg-context-actions').style.display = 'flex';
+                        requestAnimationFrame(() => window.imChat.fitContextMenuToViewport?.());
+                        return;
+                    }
+                    const friend = window.imApp.getFriendById(window.imData.currentActiveFriend?.id) || window.imData.currentActiveFriend;
+                    const id = window.imData.currentActiveRow?.getAttribute('data-message-id');
+                    const message = friend?.messages?.find(m => String(m.id) === String(id));
+                    if (!message || message.role !== 'assistant') return;
+                    if (action === 'voice-tts') action = 'speak';
+                    else {
+                        if (menuItem.dataset.busy === 'true') return;
+                        menuItem.dataset.busy = 'true'; menuItem.setAttribute('aria-busy', 'true');
+                        try {
+                            if (action === 'voice-reroll') {
+                                await window.imVoiceMessageUI.regenerate(friend, message);
+                                window.showToast?.('语音已重新生成');
+                            } else if (action === 'voice-download') {
+                                await window.imVoiceMessageAudio.download(friend, message);
+                                await window.imVoiceMessageUI.inspect(friend, message);
+                            }
+                        } catch (error) {
+                            window.imVoiceMessageUI.reportError(error);
+                        } finally { delete menuItem.dataset.busy; menuItem.removeAttribute('aria-busy'); }
+                        return;
+                    }
+                }
                 if (['edit', 'translate', 'speak'].includes(action)) {
                     const rowId = window.imData.currentActiveRow?.getAttribute('data-message-id');
                     const message = (window.imData.currentActiveFriend?.messages || []).find(item => String(item.id) === String(rowId));
@@ -491,11 +522,8 @@
                                         ) || window.imData.currentActiveFriend,
                                     msg_2 = (liveFriend_4.messages || []).find((message_52) => {
                                         if (!message_52) return false;
-                                        if (
-                                            messageId_4 &&
-                                            String(message_52.id) === String(messageId_4)
-                                        )
-                                            return true;
+                                        if (messageId_4)
+                                            return String(message_52.id) === String(messageId_4);
                                         return (
                                             ts_3 && String(message_52.timestamp) === String(ts_3)
                                         );
@@ -514,9 +542,10 @@
                                 ) {
                                     window.imChat.closeContextMenu();
                                     try {
-                                        const result = await window.imVoiceMessageAudio.play(
+                                        const result = await window.imVoiceMessageUI.play(
                                             liveFriend_4,
                                             msg_2,
+                                            {restart: true},
                                         );
                                         if (result?.readyForTap)
                                             window.showToast?.('语音已准备好，请再次点击播放');

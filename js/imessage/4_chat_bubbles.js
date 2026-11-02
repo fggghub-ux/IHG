@@ -5130,7 +5130,7 @@
         window.imChat.scrollToBottom(element_401);
     }
     function renderVoiceMessageBubble_2(msg_21, friend_33, element_805, timestamp_11 = Date.now()) {
-        if (msg_21.role === 'user' && friend_33.type !== 'group') return renderUserVoiceMessageBubble(msg_21, friend_33, element_805, timestamp_11);
+        if (msg_21.role === 'user') return renderUserVoiceMessageBubble(msg_21, friend_33, element_805, timestamp_11);
         const value_418 = msg_21.role !== 'assistant';
         const handleAction_18_808 = handleAction_18(
             element_805,
@@ -5189,30 +5189,14 @@
         handleAction_22(row_17, friend_33, msg_21);
         handleAction_20(row_17, friend_33, msg_21);
         const transcript_2 = String(msg_21.transcript || msg_21.text || '').trim();
-        const calculatedDuration = Math.min(18, Math.max(3, Math.ceil(transcript_2.length / 3)));
-        const duration_2 = Math.min(18, Math.max(3, Number(msg_21.duration) || calculatedDuration));
         const safeTranscript = escapeHtml(transcript_2 || '暂无转文字');
         const cleanTranslation = String(msg_21.translation || '').trim();
         const value_432 =
             formatBubbleTime(getChatDisplayTimestamp(friend_33, timestamp_11));
         const text_433 = '';
-        const value_823 = !value_418 && window.imVoiceMessageAudio?.canManage?.(friend_33, msg_21);
-        const apk111New_1110 = value_823
-            ? '\n            <div class="voice-message-actions" role="group" aria-label="语音操作">\n                <button type="button" class="voice-message-action" data-voice-action="regenerate" title="重新生成语音" aria-label="重新生成语音"><i class="fas fa-redo-alt" aria-hidden="true"></i></button>\n                <button type="button" class="voice-message-action" data-voice-action="download" title="下载语音" aria-label="下载语音"><i class="fas fa-download" aria-hidden="true"></i></button>\n            </div>\n        '
-            : '';
         const apk111New_1111 =
-            `
-            <div class="voice-message-bubble-main">
-                ${value_823 ? '<button type="button" class="voice-message-play" aria-label="生成或播放语音" title="生成或播放语音"><i class="fas fa-play" aria-hidden="true"></i></button>' : ''}
-                <button type="button" class="voice-message-bubble-inner" aria-expanded="false" aria-label="展开语音转文字">
-                    <span class="voice-message-wave" aria-hidden="true">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </span>
-                    <span class="voice-message-duration">` +
-            duration_2 +
-            's</span>\n                </button>\n                ' +
-            apk111New_1110 +
-            '\n            </div>\n            <span class="voice-message-playback-status" role="status" aria-live="polite"></span>\n            <div class="voice-message-transcript" hidden>' +
+            window.imVoiceMessageUI.controls(friend_33, msg_21) +
+            '<div class="voice-message-transcript" hidden>' +
             safeTranscript +
             '</div>\n            ' +
             (cleanTranslation && msg_21.showTranslation
@@ -5233,7 +5217,6 @@
             ((!friend_33.type || friend_33.type === 'char') && !value_418
                 ? ' im-text-bubble-shell voice-message-bubble'
                 : ' im-card-bubble voice-message-bubble') +
-            (value_823 ? ' has-voice-actions' : '') +
             '">' +
             apk111New_1111 +
             '</div>';
@@ -5273,101 +5256,7 @@
             '\n                </div>\n            </div>\n        ';
         const toggle_3 = row_17.querySelector('.voice-message-bubble-inner');
         const transcriptEl = row_17.querySelector('.voice-message-transcript');
-        const apk111New_1117 = Array.from(row_17.querySelectorAll('.voice-message-action'));
-        const apk111New_1118 = (apk111New_1124) => {
-                row_17.querySelectorAll('.voice-message-play').forEach((button) => {
-                    button.disabled = apk111New_1124;
-                });
-                apk111New_1117.forEach((apk111New_1125) => {
-                    apk111New_1125.disabled = apk111New_1124;
-                });
-                row_17
-                    .querySelector('.voice-message-actions')
-                    ?.setAttribute('aria-busy', apk111New_1124 ? 'true' : 'false');
-            };
-        apk111New_1117.forEach((apk111New_1126) =>
-            apk111New_1126.addEventListener('click', async (apk111New_1127) => {
-                apk111New_1127.preventDefault();
-                apk111New_1127.stopPropagation();
-                if (apk111New_1126.disabled) return;
-                const apk111New_1128 = apk111New_1126.querySelector('i'),
-                    apk111New_1129 = apk111New_1128?.className || '',
-                    apk111New_1130 = apk111New_1126.getAttribute('aria-label') || '';
-                if (apk111New_1128)
-                    apk111New_1128.className = 'fas fa-spinner voice-message-action-spinner';
-                apk111New_1126.setAttribute(
-                    'aria-label',
-                    apk111New_1126.dataset.voiceAction === 'regenerate'
-                        ? '正在重新生成语音'
-                        : '正在准备语音下载',
-                );
-                apk111New_1118(true);
-                try {
-                    if (apk111New_1126.dataset.voiceAction === 'regenerate') {
-                        await window.imVoiceMessageAudio.regenerate(friend_33, msg_21);
-                        const status = row_17.querySelector('.voice-message-playback-status');
-                        if (status) status.textContent = '语音已准备好，再点播放';
-                        window.showToast?.('语音已重新生成并保存');
-                    } else {
-                        const apk111New_1131 = await window.imVoiceMessageAudio.download(
-                            friend_33,
-                            msg_21,
-                        );
-                        if (apk111New_1131 === 'downloaded' || apk111New_1131 === 'shared')
-                            window.showToast?.('语音已保存');
-                    }
-                } catch (apk111New_1132) {
-                    console.error('Voice message action failed', apk111New_1132);
-                    (!window.u2Api?.isRequestError?.(apk111New_1132) ||
-                        !window.u2Api.reportError(apk111New_1132, {
-                            operation: '语音生成',
-                        })) &&
-                        window.showToast &&
-                        window.showToast(
-                            window.u2Tts?.getUserErrorMessage?.(apk111New_1132) ||
-                                apk111New_1132?.message ||
-                                '语音操作失败',
-                        );
-                } finally {
-                    if (apk111New_1128) apk111New_1128.className = apk111New_1129;
-                    apk111New_1126.setAttribute('aria-label', apk111New_1130);
-                    apk111New_1118(false);
-                }
-            }),
-        );
-        const playButton = row_17.querySelector('.voice-message-play');
-        const playbackStatus = row_17.querySelector('.voice-message-playback-status');
-        playButton?.addEventListener('click', async (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            if (playButton.disabled) return;
-            const ready = window.imVoiceMessageAudio.isReady?.(friend_33, msg_21);
-            playbackStatus.textContent = ready ? '' : '正在准备语音…';
-            playButton.querySelector('i').className = 'fas fa-spinner voice-message-action-spinner';
-            apk111New_1118(true);
-            try {
-                const result = await window.imVoiceMessageAudio.play(friend_33, msg_21);
-                playbackStatus.textContent = result?.readyForTap ? '语音已准备好，再点播放' : '';
-            } catch (error) {
-                playbackStatus.textContent = '';
-                console.error('Voice message playback failed', error);
-                if (
-                    !window.u2Api?.isRequestError?.(error) ||
-                    !window.u2Api.reportError(error, { operation: '语音生成' })
-                )
-                    window.showToast?.(
-                        window.u2Tts?.getUserErrorMessage?.(error) || '语音播放失败',
-                    );
-            } finally {
-                playButton.querySelector('i').className = 'fas fa-play';
-                const label = window.imVoiceMessageAudio.isReady?.(friend_33, msg_21)
-                    ? '播放语音'
-                    : '生成或播放语音';
-                playButton.setAttribute('aria-label', label);
-                playButton.title = label;
-                apk111New_1118(false);
-            }
-        });
+        window.imVoiceMessageUI.bind(row_17, friend_33, msg_21);
         toggle_3 &&
             transcriptEl &&
             toggle_3.addEventListener('click', (event) => {
@@ -5434,21 +5323,13 @@
         handleAction_20(row, friend, msg);
 
         const transcript = String(msg.transcript || msg.text || '').trim();
-        const calculatedDuration = Math.min(18, Math.max(3, Math.ceil(transcript.length / 3)));
-        const duration = Math.min(18, Math.max(3, Number(msg.duration) || calculatedDuration));
         const safeTranscript = escapeHtml(transcript || '暂无转文字');
         const cleanTranslation = String(msg.translation || '').trim();
         const timeStr = formatBubbleTime(timestamp);
         const metaHtml = '';
 
         const contentHtml = `
-                <button type="button" class="voice-message-bubble-inner" aria-expanded="false">
-                    <span class="voice-message-mic"><i class="fas fa-microphone-alt"></i></span>
-                    <span class="voice-message-wave" aria-hidden="true">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </span>
-                    <span class="voice-message-duration">${duration}s</span>
-                </button>
+                ${window.imVoiceMessageUI.controls(friend, msg)}
                 <div class="voice-message-transcript" hidden>${safeTranscript}</div>
                 ${cleanTranslation && msg.showTranslation ? `<div class="msg-translation" style="margin-top: 6px; padding-top: 6px; border-top: 1px solid ${isUser ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}; font-size: 13px; color: ${isUser ? 'rgba(255,255,255,0.7)' : '#8e8e93'}; line-height: 1.4; word-wrap: break-word; white-space: normal;">${escapeHtml(cleanTranslation)}</div>` : ''}
                 ${metaHtml}
@@ -5490,37 +5371,8 @@
                 </div>
             `;
 
-        const voiceBubble = row.querySelector('.voice-message-bubble');
+        window.imVoiceMessageUI.bind(row, friend, msg);
         const voiceInner = row.querySelector('.voice-message-bubble-inner');
-        if (voiceBubble) {
-            const forcedBubbleStyle = {
-                display: 'inline-flex',
-                flexDirection: 'column',
-                width: 'max-content',
-                minWidth: '0',
-                maxWidth: 'min(77%, 240px)',
-                height: 'auto',
-                minHeight: '0',
-                maxHeight: 'none',
-                aspectRatio: 'auto',
-                flex: '0 0 auto',
-                padding: '8px 12px',
-                boxSizing: 'border-box',
-            };
-            Object.entries(forcedBubbleStyle).forEach(([property, value]) => {
-                const cssProperty = property.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
-                voiceBubble.style.setProperty(cssProperty, value, 'important');
-            });
-        }
-        if (voiceInner) {
-            voiceInner.style.setProperty('display', 'inline-flex', 'important');
-            voiceInner.style.setProperty('width', 'max-content', 'important');
-            voiceInner.style.setProperty('height', 'auto', 'important');
-            voiceInner.style.setProperty('min-height', '0', 'important');
-            voiceInner.style.setProperty('max-height', 'none', 'important');
-            voiceInner.style.setProperty('aspect-ratio', 'auto', 'important');
-        }
-
         const toggle = voiceInner;
         const transcriptEl = row.querySelector('.voice-message-transcript');
         if (toggle && transcriptEl) {
@@ -5549,6 +5401,7 @@
                             transcript,
                             ttsFriend,
                             cacheOwner,
+                            {onAudio: audio => window.imVoiceMessageUI.observe(friend, msg, audio)},
                         );
                         if (
                             audioUrl &&
@@ -5561,7 +5414,7 @@
                                 friend.id,
                                 {
                                     id: msg.id || row.getAttribute('data-message-id') || null,
-                                    timestamp: row.getAttribute('data-timestamp') || timestamp || null,
+                                    timestamp: msg.id ? null : row.getAttribute('data-timestamp') || timestamp || null,
                                 },
                                 (targetMsg) => {
                                     if (targetMsg) targetMsg.ttsAudioUrl = audioUrl;

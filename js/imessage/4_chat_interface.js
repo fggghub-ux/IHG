@@ -2020,7 +2020,9 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
             ),
             availableHeight = Math.max(120, safeBottom - safeTop),
             visibleActions =
-                moreActions && getComputedStyle(moreActions).display !== 'none'
+                document.getElementById('msg-context-voice-actions')?.style.display === 'flex'
+                    ? document.getElementById('msg-context-voice-actions')
+                    : moreActions && getComputedStyle(moreActions).display !== 'none'
                     ? moreActions
                     : mainActions,
             gap_2 = parseFloat(getComputedStyle(msgContextMenu_2).gap) || 6,
@@ -2176,6 +2178,12 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                       : 'none'
                   : 'flex';
         }
+        const voiceActions = document.getElementById('msg-context-voice-actions');
+        const isVoice = targetMessage?.type === 'voice_message' || !!row_5.querySelector('.voice-message-bubble');
+        msgContextMenu.dataset.voiceMenu = isVoice ? 'true' : 'false';
+        if (voiceActions) voiceActions.style.display = isVoice ? 'flex' : 'none';
+        if (isVoice && mainActions_2) mainActions_2.style.display = 'none';
+        if (isVoice && activeFriend_2?.type !== 'group' && speakAction) speakAction.style.display = 'none';
         msgContextOverlayElement.style.display = 'flex';
         msgContextOverlayElement.style.opacity = '1';
         const menuWidth = Math.min(screenRect_2.width - 32, 300);
