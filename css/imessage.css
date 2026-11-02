@@ -16265,53 +16265,135 @@ button.moment-private-chat-bubble.has-translation {
 }
 
 .location-message-bubble {
-    width: 200.6px; min-width: 0; max-width: 100%; height: 246.5px;
-    min-height: 0; display: flex; flex-direction: column; padding: 0;
-    overflow: hidden; border-radius: 17px; border: 1px solid rgba(0,0,0,.08);
-    outline: none; background: #fff; color: #111; cursor: pointer;
-    box-shadow: 0 8.5px 23.8px rgba(0,0,0,.1), 0 1.7px 5.1px rgba(0,0,0,.04);
+    width: min(72vw, 280px);
+    min-width: 0;
+    max-width: 100%;
+    height: 176px;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 14px;
+    border: 0;
+    outline: 1px solid #e5e5e5;
+    background: #fff;
+    color: #111;
+    box-shadow: none;
+    cursor: pointer;
 }
-.location-message-bubble:focus-visible { outline: 2px solid #333; outline-offset: 2px; }
-.location-map-art {
-    position: relative; overflow: hidden; background: #f2ede4 url('../assets/imessage/location-map.svg') center / 100% 100% no-repeat;
-    --location-pin-x: 58.475%;
+
+.location-message-bubble:focus-visible {
+    outline: 2px solid #333;
+    outline-offset: 2px;
 }
-.location-message-map { height: 170px; flex: 0 0 170px; }
-.location-composer-map, .location-detail-map {
-    background-image: url('../assets/imessage/location-map-wide.svg');
-    --location-pin-x: 55.556%;
+
+.location-message-map {
+    position: relative;
+    height: 120px;
+    min-height: 0;
+    flex: 0 0 120px;
+    overflow: hidden;
+    background-color: #f1f1f1;
+    background-image:
+        linear-gradient(32deg, transparent 45%, #fff 46%, #fff 51%, transparent 52%),
+        linear-gradient(
+            145deg,
+            transparent 37%,
+            rgba(255, 255, 255, 0.94) 38%,
+            rgba(255, 255, 255, 0.94) 43%,
+            transparent 44%
+        ),
+        linear-gradient(90deg, rgba(30, 30, 30, 0.045) 1px, transparent 1px),
+        linear-gradient(rgba(30, 30, 30, 0.045) 1px, transparent 1px);
+    background-size:
+        auto,
+        auto,
+        27px 27px,
+        27px 27px;
 }
-.location-composer-map { height: 136px; --location-marker-size: 28px; }
-.location-map-marker {
-    position: absolute; left: var(--location-pin-x); top: 55%; transform: translate(-50%,-50%);
-    width: var(--location-marker-size, 23.8px); height: var(--location-marker-size, 23.8px); border: 1.7px solid #fff; border-radius: 50%;
-    box-sizing: border-box; background: linear-gradient(#ff3b6a, #e6005c);
-    box-shadow: 0 2.55px 3.4px rgba(0,0,0,.18);
+
+.location-message-road {
+    position: absolute;
+    height: 7px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: none;
 }
-.location-map-marker::before { content: ''; position: absolute; width: 25.2%; height: 25.2%; border-radius: 50%; background: #fff; top: 50%; left: 50%; transform: translate(-50%,-50%); }
-.location-map-marker::after { content: ''; position: absolute; width: 18%; height: 18%; border-radius: 50%; background: #e6005c; left: 50%; top: calc(100% + 2px); transform: translateX(-50%); }
-.location-map-label {
-    position: absolute; left: var(--location-pin-x); top: 67%; transform: translateX(-50%);
-    max-width: 76%; box-sizing: border-box; overflow: hidden; text-overflow: ellipsis;
-    white-space: nowrap; padding: 1.7px 5.95px; border-radius: 999px;
-    color: #111; background: rgba(255,255,255,.94); backdrop-filter: blur(10px);
-    border: 1px solid rgba(0,0,0,.05); box-shadow: 0 1.7px 5.1px rgba(0,0,0,.12);
-    font-size: 8.5px; font-weight: 600; letter-spacing: -.085px;
+
+.location-message-road.road-a {
+    width: 150%;
+    left: -25%;
+    top: 42%;
+    transform: rotate(-11deg);
 }
+
+.location-message-road.road-b {
+    width: 100%;
+    left: 30%;
+    top: 66%;
+    transform: rotate(31deg);
+}
+
+.location-message-pin {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -62%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #333;
+    color: #f7f7f7;
+    font-size: 19px;
+    box-shadow: none;
+}
+
 .location-message-copy {
-    position: relative; flex: 1 1 auto; min-height: 0; padding: 9px 11.9px;
-    border-top: 1px solid rgba(0,0,0,.04); background: #fff;
-    display: flex; flex-direction: column; gap: 6px; box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    flex: 1 1 auto;
+    height: 56px;
+    min-height: 0;
+    box-sizing: border-box;
+    padding: 4px 12px;
+    overflow: hidden;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fff;
 }
-.location-message-copy strong, .location-message-copy > span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
-.location-message-copy strong { color: #000; font-size: 15.3px; font-weight: 600; letter-spacing: -.255px; }
-.location-message-copy > span { color: #6c6c70; font-size: 12.325px; font-weight: 600; letter-spacing: -.17px; }
-.location-maps-brand { display: flex; align-items: center; gap: 2.55px; color: #6c6c70; font-size: 11.05px; font-weight: 600; line-height: 1; letter-spacing: -.17px; }
-.location-maps-brand svg { width: 8.925px; height: 11.9px; fill: currentColor; flex-shrink: 0; }
-.location-message-bubble .location-message-copy, .location-message-bubble .location-message-copy *, .location-map-label {
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+
+.location-message-copy strong,
+.location-message-copy span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
-@media (max-width: 360px) { .im-contact-card-bubble { width: min(250px, 68vw); } }
+
+.location-message-copy strong {
+    color: #111;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+.location-message-copy span {
+    color: #666;
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+@media (max-width: 360px) {
+    .im-contact-card-bubble { width: min(250px, 68vw); }
+    .location-message-bubble { width: min(280px, 68vw); }
+    .location-message-copy { padding: 3px 10px; }
+    .location-message-copy strong { font-size: 12px; }
+    .location-message-copy span { font-size: 10px; }
+    .location-message-pin { width: 26px; height: 26px; font-size: 15px; }
+}
 
 .location-detail-overlay {
     position: fixed;
@@ -16360,8 +16442,70 @@ button.moment-private-chat-bubble.has-translation {
     cursor: pointer;
 }
 
-.location-detail-map { height: 230px; --location-marker-size: 32px; }
-.location-detail-map .location-map-label { font-size: 11.5px; padding: 2.3px 8px; }
+.location-detail-map {
+    position: relative;
+    height: 230px;
+    overflow: hidden;
+    background-color: #f1f1f1;
+    background-image:
+        linear-gradient(28deg, transparent 43%, #fff 44%, #fff 49%, transparent 50%),
+        linear-gradient(
+            142deg,
+            transparent 37%,
+            rgba(255, 255, 255, 0.96) 38%,
+            rgba(255, 255, 255, 0.96) 43%,
+            transparent 44%
+        ),
+        linear-gradient(90deg, rgba(30, 30, 30, 0.045) 1px, transparent 1px),
+        linear-gradient(rgba(30, 30, 30, 0.045) 1px, transparent 1px);
+    background-size:
+        auto,
+        auto,
+        34px 34px,
+        34px 34px;
+}
+
+.location-detail-road {
+    position: absolute;
+    height: 9px;
+    border-radius: 999px;
+    background: #fff;
+}
+
+.location-detail-road.road-a {
+    width: 145%;
+    left: -22%;
+    top: 39%;
+    transform: rotate(-10deg);
+}
+.location-detail-road.road-b {
+    width: 95%;
+    left: 29%;
+    top: 68%;
+    transform: rotate(30deg);
+}
+.location-detail-road.road-c {
+    width: 70%;
+    left: -16%;
+    top: 74%;
+    transform: rotate(53deg);
+}
+
+.location-detail-pin {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -60%);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #222;
+    color: #fff;
+    font-size: 24px;
+}
 
 .location-detail-copy {
     min-height: 78px;
@@ -18330,9 +18474,9 @@ button.moment-private-chat-bubble.has-translation {
 }
 
 #imessage-view .active-chat-interface .chat-row .location-message-bubble {
-    height: 246.5px !important;
+    height: 176px !important;
     min-height: 0 !important;
-    max-height: 246.5px;
+    max-height: 176px;
     aspect-ratio: auto !important;
     flex-grow: 0 !important;
     flex-shrink: 1 !important;
@@ -18563,6 +18707,7 @@ button.moment-private-chat-bubble.has-translation {
     .im-contact-card-topline i,
     .im-contact-card-name-row strong,
     .offline-invite-card-heading strong,
+    .location-message-copy strong,
     .group-red-packet-title,
     .group-red-packet-amount
 ) {
@@ -18576,6 +18721,7 @@ button.moment-private-chat-bubble.has-translation {
     .offline-invite-card-summary,
     .offline-invite-card-place,
     .offline-invite-card-footer,
+    .location-message-copy span,
     .group-red-packet-status
 ) {
     color: #636366 !important;
@@ -20334,11 +20480,11 @@ button.moment-private-chat-bubble.has-translation {
 }
 
 /* These fixed-size cards need their full width inside the message preview. */
-#msg-context-bubble-clone:has(.cash-transfer-card, .gift-message-card:not(.loves-invitation-card), .location-message-bubble) {
+#msg-context-bubble-clone:has(.cash-transfer-card, .gift-message-card:not(.loves-invitation-card)) {
     width: max-content;
     max-width: 100% !important;
 }
-#msg-context-bubble-clone:has(.cash-transfer-card, .gift-message-card:not(.loves-invitation-card), .location-message-bubble) .msg-context-row-clone {
+#msg-context-bubble-clone:has(.cash-transfer-card, .gift-message-card:not(.loves-invitation-card)) .msg-context-row-clone {
     width: max-content;
     max-width: none;
     padding: 0 !important;

@@ -829,7 +829,10 @@ The prompt must describe the same current moment with characters, action, settin
                 'position:absolute;inset:0;z-index:90;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
             element_392.innerHTML = `
                 <div style="width:min(100%,360px);background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.24);">
-                    <div class="location-composer-map location-map-art" aria-hidden="true"><span class="location-map-marker"></span></div>
+                    <div style="height:136px;position:relative;overflow:hidden;background-color:#d8d8d8;background-image:linear-gradient(32deg,transparent 45%,rgba(245,245,245,.92) 46%,rgba(245,245,245,.92) 51%,transparent 52%),linear-gradient(145deg,transparent 37%,rgba(238,238,238,.86) 38%,rgba(238,238,238,.86) 43%,transparent 44%),linear-gradient(90deg,rgba(60,60,60,.08) 1px,transparent 1px),linear-gradient(rgba(60,60,60,.08) 1px,transparent 1px);background-size:auto,auto,28px 28px,28px 28px;">
+                        <span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-58%);width:42px;height:42px;border-radius:50% 50% 50% 8px;background:#333;rotate:-45deg;box-shadow:0 5px 13px rgba(0,0,0,.24);"></span>
+                        <span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-76%);width:13px;height:13px;border-radius:50%;background:#fff;"></span>
+                    </div>
                     <div style="padding:18px;display:flex;flex-direction:column;gap:12px;">
                         <div style="font-size:18px;font-weight:800;color:#242424;">发送位置</div>
                         <input class="location-composer-name" maxlength="80" placeholder="地点名（必填）" style="height:44px;border:1px solid #cecece;border-radius:12px;background:#fafafa;color:#242424;padding:0 12px;font-size:15px;outline:none;box-sizing:border-box;">
