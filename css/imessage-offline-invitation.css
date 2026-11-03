@@ -180,6 +180,9 @@
     background: #f7f7f8;
     color: #111;
 }
+#offline-chat-view .offline-invitation-opening + .offline-chat-bubble {
+    margin-top: 0;
+}
 .offline-opening-glass {
     display: grid;
     grid-template-columns: 40px minmax(0, 1fr) fit-content(50%);
@@ -219,7 +222,7 @@
     border-left: 2.4px solid #007aff;
     border-bottom: 2.4px solid #007aff;
     transform: rotate(45deg);
-    margin-left: 11px;
+    margin-left: 0;
 }
 .offline-opening-copy { display: contents; }
 .offline-opening-copy strong {
