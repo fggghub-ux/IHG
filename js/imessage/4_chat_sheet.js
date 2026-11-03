@@ -5677,16 +5677,7 @@ The prompt must describe the same current moment with characters, action, settin
                 const element_398 = document.createElement('div');
                 element_398.className = 'offline-invitation-opening';
                 element_398.innerHTML =
-                    '<small>本次见面 · 邀请约定</small><strong>' +
-                    escapeSheetHtml(meetingSummary_2_2.title || '线下见面') +
-                    '</strong><p>' +
-                    escapeSheetHtml(meetingSummary_2_2.invitationText || '') +
-                    '</p>' +
-                    (meetingSummary_2_2.place
-                        ? '<span><i class="fas fa-location-dot" aria-hidden="true"></i> ' +
-                          escapeSheetHtml(meetingSummary_2_2.place) +
-                          '</span>'
-                        : '');
+                    window.imOfflineInvitationUI.openingMarkup(meetingSummary_2_2);
                 documentFragment.appendChild(element_398);
             }
             const messages_9 = value_221(value_1194),

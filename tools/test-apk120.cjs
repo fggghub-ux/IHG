@@ -441,7 +441,7 @@ const {
         document.getElementById('custom-modal-overlay')?.classList.remove('active');
       }
     });
-    await check('Char model output displays invitation immediately and decline persists', async () => {
+    await check('Char model output displays invitation immediately', async () => {
       document.getElementById('imessage-view').classList.add('active');
       const f = window.imApp.getFriendById('120-char');
       await window.imChat.openChatTab(f);
@@ -490,17 +490,20 @@ const {
           hasPrompt
         };
         card.click();
-        document.querySelector('[data-offline-invite-action="decline"]').click();
-        for (let n = 0; n < 50; n++) {
-          await new Promise(r => setTimeout(r, 20));
-          if (window.imApp.getFriendById(f.id).messages.find(x => x.type === 'offline_invite')?.inviteStatus === 'declined') return true;
-        }
-        return window.imApp.getFriendById(f.id).messages.filter(x => x.type === 'offline_invite');
+        return true;
       } finally {
         window.getApiConfig = old;
         window.u2Api = u;
       }
     });
+    const declineThumb = await page.locator('.offline-invite-slider-thumb').boundingBox();
+    await page.mouse.move(declineThumb.x + 24, declineThumb.y + 24);
+    await page.mouse.down();
+    await page.mouse.move(declineThumb.x, declineThumb.y + 24, {steps: 8});
+    await page.waitForFunction(() => window.imApp.getFriendById('120-char').messages.find(m => m.type === 'offline_invite')?.inviteStatus === 'declined');
+    await page.mouse.up();
+    await check('Sliding left and holding persists the model invitation decline', () =>
+      window.imApp.getFriendById('120-char').messages.find(m => m.type === 'offline_invite')?.inviteStatus === 'declined');
     await check('Invitation accept opens offline session, selector saves and refreshes when presets change', async () => {
       const id = '120-char',
         m = {

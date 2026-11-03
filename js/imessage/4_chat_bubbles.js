@@ -1265,38 +1265,14 @@
             value_116 = value_115.inviteStatus || 'pending',
             element_871 = document.createElement('div');
         element_871.className = 'offline-invite-detail-overlay';
-        element_871.innerHTML =
-            `<div class="offline-invite-detail" role="dialog" aria-modal="true" aria-label="线下邀请">
-            <button type="button" class="offline-invite-close" aria-label="关闭">×</button>
-            <div class="offline-invite-detail-icon"><i class="fas fa-location-dot" aria-hidden="true"></i></div>
-            <small>线下邀请</small>
-            <h2>` +
-            escapeHtml(value_115.title || '见面邀请') +
-            `</h2>
-            <p>` +
-            escapeHtml(value_115.invitationText || '') +
-            `</p>
-            ` +
-            (value_115.place
-                ? '<div class="offline-invite-place"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>' +
-                  escapeHtml(value_115.place) +
-                  '</div>'
-                : '') +
-            `
-            ` +
-            (value_116 === 'pending'
-                ? '<div class="offline-invite-detail-actions"><button type="button" data-offline-invite-action="accept">接受邀请</button><button type="button" data-offline-invite-action="decline">婉拒</button></div>'
-                : '<div class="offline-invite-resolved">' +
-                  ({
-                      accepted: '已接受',
-                      declined: '已婉拒',
-                      superseded: '邀请已失效',
-                  }[value_116] || '邀请已结束') +
-                  '</div>') +
-            `
-        </div>`;
+        element_871.innerHTML = window.imOfflineInvitationUI.detailMarkup(value_115, value_116);
         (document.getElementById('app') || document.body).appendChild(element_871);
-        const value_872_2 = () => element_871.remove(),
+        let disposeSlider = () => {};
+        const value_872_2 = () => {
+                disposeSlider();
+                document.removeEventListener('keydown', closeOnEscape);
+                element_871.remove();
+            },
             value_118 = () => {
                 const value_120 = window.imApp?.getFriendById?.(value_113.id) || value_113,
                     querySelector_121 = document.querySelector(
@@ -1309,25 +1285,22 @@
                         scroll: false,
                     });
             };
-        element_871.addEventListener('click', async (event_122) => {
-            if (
-                event_122.target === element_871 ||
-                event_122.target.closest('.offline-invite-close')
-            )
-                return value_872_2();
-            const closest_123 = event_122.target.closest('[data-offline-invite-action]');
-            if (!closest_123 || closest_123.disabled) return;
-            closest_123.disabled = true;
-            const offlineInviteAction_124 = closest_123.dataset.offlineInviteAction;
+        const closeOnEscape = (event) => {
+            if (event.key === 'Escape') value_872_2();
+        };
+        document.addEventListener('keydown', closeOnEscape);
+        element_871.addEventListener('click', (event) => {
+            if (event.target === element_871) value_872_2();
+        });
+        disposeSlider = window.imOfflineInvitationUI.bindSlider(element_871, async (offlineInviteAction_124) => {
             if (offlineInviteAction_124 === 'accept') {
                 const value_130 = await window.imChat.acceptOfflineInvitation?.(
                     value_113.id,
                     message_112.id,
                 );
                 if (!value_130) {
-                    closest_123.disabled = false;
                     window.showToast?.('进入线下失败，请重试');
-                    return;
+                    return false;
                 }
                 value_118();
                 value_872_2();
@@ -1347,7 +1320,7 @@
                     value_113.id,
                     {
                         id: message_112.id,
-                        timestamp: message_112.timestamp,
+                        timestamp: message_112.id ? null : message_112.timestamp,
                     },
                     (value_132) => {
                         if (
@@ -1368,9 +1341,8 @@
                         (value_133) => String(value_133.id) === String(message_112.id),
                     );
             if (!value_128 || result_129?.inviteStatus !== 'declined') {
-                closest_123.disabled = false;
                 window.showToast?.('邀请状态保存失败');
-                return;
+                return false;
             }
             value_118();
             value_872_2();
@@ -1398,14 +1370,7 @@
             'data-message-id',
             window.imChat.ensureMessageId(value_266_2, 'offline-invite'),
         );
-        const value_141 =
-                {
-                    pending: '查看邀请',
-                    accepted: '已接受',
-                    declined: '已婉拒',
-                    superseded: '邀请已失效',
-                }[value_266_2.inviteStatus] || '查看邀请',
-            handleAction_24_275_2 = buildMessageHeaderHtml(
+        const handleAction_24_275_2 = buildMessageHeaderHtml(
                 false,
                 value_267_2,
                 value_269_3,
@@ -1424,22 +1389,7 @@
             handleAction_24_275_2 +
             `<div style="display:flex;justify-content:flex-start;align-items:flex-end;width:100%;">
             <div class="chat-bubble ai-bubble im-card-bubble offline-invite-card" role="button" tabindex="0" aria-label="查看线下邀请">
-                <div class="offline-invite-card-heading"><span><i class="fas fa-location-dot" aria-hidden="true"></i></span><div><small>MEET OFFLINE</small><strong>` +
-            escapeHtml(value_266_2.title || '见面邀请') +
-            `</strong></div></div>
-                <div class="offline-invite-card-summary">` +
-            escapeHtml(value_266_2.invitationText || '') +
-            `</div>
-                ` +
-            (value_266_2.place
-                ? '<div class="offline-invite-card-place">' +
-                  escapeHtml(value_266_2.place) +
-                  '</div>'
-                : '') +
-            `
-                <div class="offline-invite-card-footer"><span>` +
-            value_141 +
-            `</span><i class="fas fa-chevron-right" aria-hidden="true"></i></div>
+                ` + window.imOfflineInvitationUI.faceMarkup(value_267_2) + `
             </div></div></div>`;
         const offlineInviteCardElement = element_140.querySelector('.offline-invite-card'),
             value_143 = (event_145) => {

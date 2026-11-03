@@ -1,0 +1,197 @@
+/* Invitation-only presentation, adapted from the supplied Face ID/header/slider UI. */
+.offline-invite-card {
+    position: relative;
+    display: block !important;
+    width: 152.5px !important;
+    height: 152.5px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+    flex: 0 0 auto !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(0, 0, 0, .08) !important;
+    border-radius: 19.8px !important;
+    background: linear-gradient(145deg, #fff 0%, #f6f6f9 45%, #e5e5eb 100%) !important;
+    color: #111 !important;
+    box-shadow: 0 9px 24px rgba(0, 0, 0, .12), inset 0 0 0 1px rgba(0, 122, 255, .2) !important;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.offline-invite-card::before, .offline-invite-card::after { display: none !important; }
+.offline-invite-card:active { transform: scale(.97); }
+.offline-invite-face {
+    position: absolute;
+    top: 18.3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 65.6px !important;
+    height: 65.6px !important;
+    max-width: none !important;
+    border-radius: 0 !important;
+    filter: drop-shadow(0 2px 6px rgba(0, 122, 255, .25));
+}
+.offline-invite-face-copy {
+    position: absolute;
+    bottom: 13.7px;
+    left: 8px;
+    right: 8px;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif !important;
+    font-size: 12.2px !important;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -.23px;
+}
+.offline-invite-face-copy span { display: block; font-family: inherit !important; }
+.offline-invite-face-copy span:last-child {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+.offline-invite-detail-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, .28);
+}
+.offline-invite-detail {
+    width: 100%;
+    max-width: 320px;
+    max-height: calc(100dvh - 40px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, .96);
+    padding: 20px 18px;
+    box-sizing: border-box;
+    color: #111;
+}
+.offline-invite-detail-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.offline-invite-detail-icon {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: #e5e5ea;
+    color: #000;
+}
+.offline-invite-detail-icon svg { width: 16px; height: 22px; }
+.offline-invite-detail-place { min-width: 0; font-size: 17px; font-weight: 700; overflow-wrap: anywhere; }
+.offline-invite-detail h2 { margin: 8px 0 28px; font-size: 34px; line-height: 1.1; font-weight: 800; text-align: center; overflow-wrap: anywhere; }
+.offline-invite-details { border-radius: 18px; background: #f7f7fa; padding: 12px 14px; }
+.offline-invite-details-label { color: #8e8e93; font-size: 12px; margin-bottom: 6px; }
+.offline-invite-details p { margin: 0; color: #222; font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.offline-invite-resolved { margin-top: 24px; color: #8e8e93; font-size: 13px; text-align: center; }
+.offline-invite-slider {
+    position: relative;
+    height: 62px;
+    margin-top: 24px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, .65);
+    background: rgba(255, 255, 255, .65);
+    -webkit-backdrop-filter: blur(24px) saturate(175%);
+    backdrop-filter: blur(24px) saturate(175%);
+    box-shadow: inset 0 1px 1.2px rgba(255,255,255,.85), 0 8px 26px rgba(0,0,0,.05), 0 1px 3px rgba(0,0,0,.02);
+    user-select: none;
+    -webkit-user-select: none;
+    box-sizing: border-box;
+}
+.offline-invite-slider-thumb, .offline-invite-slider-lock {
+    position: absolute;
+    top: 6px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
+}
+.offline-invite-slider-thumb {
+    left: var(--invitation-thumb-x, 30px);
+    z-index: 2;
+    padding: 0;
+    border: 1px solid rgba(0,0,0,.04);
+    background: #fff;
+    color: #007aff;
+    box-shadow: 0 3px 8px rgba(0,0,0,.15);
+    touch-action: none;
+    cursor: grab;
+    transition: left .18s ease, background-color .15s, color .15s;
+}
+.offline-invite-slider-thumb svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.offline-invite-slider-lock {
+    right: 6px;
+    background: rgba(120,120,128,.25);
+    color: #8e8e93;
+    border: 1px solid rgba(255,255,255,.15);
+    box-shadow: 0 2px 6px rgba(0,0,0,.1);
+    transition: background-color .15s, color .15s;
+}
+.offline-invite-slider-lock svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.invitation-lock-open { display: none; }
+.offline-invite-slider-label {
+    position: absolute;
+    inset: 0 60px 0 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.35;
+    letter-spacing: .3px;
+    color: #8e8e93;
+    pointer-events: none;
+    text-align: center;
+    white-space: nowrap;
+}
+@media (max-width: 350px) {
+    .offline-invite-slider-label { font-size: 12.5px; }
+}
+.offline-invite-slider.is-dragging .offline-invite-slider-thumb { transition: background-color .15s, color .15s; cursor: grabbing; }
+.offline-invite-slider.is-declining .offline-invite-slider-thumb { background: #ff3b30; color: #fff; }
+.offline-invite-slider.is-declining .offline-invite-slider-label { left: 64px; font-size: 12px; letter-spacing: 0; white-space: normal; flex-wrap: wrap; align-content: center; column-gap: 4px; }
+.offline-invite-slider.is-declining .offline-invite-slider-label span { white-space: nowrap; }
+.offline-invite-slider.is-unlocked .offline-invite-slider-thumb { opacity: 0; }
+.offline-invite-slider.is-unlocked .offline-invite-slider-lock { background: #007aff; color: #fff; box-shadow: 0 4px 14px rgba(0,122,255,.38); animation: offline-invite-unlock .18s ease; }
+.offline-invite-slider.is-unlocked .invitation-lock-closed { display: none; }
+.offline-invite-slider.is-unlocked .invitation-lock-open { display: block; }
+@keyframes offline-invite-unlock { 50% { transform: scale(1.08); } }
+
+.offline-invitation-opening {
+    display: flex;
+    width: calc(100% - 28px);
+    max-width: 480px;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 14px 20px;
+    min-height: 76px;
+    padding: 14px;
+    box-sizing: border-box;
+    border-radius: 24px;
+    background: rgba(255,255,255,.65);
+    border: 1px solid rgba(255,255,255,.65);
+    -webkit-backdrop-filter: blur(24px) saturate(175%);
+    backdrop-filter: blur(24px) saturate(175%);
+    box-shadow: inset 0 1px 1.2px rgba(255,255,255,.85), 0 8px 26px rgba(0,0,0,.05), 0 1px 3px rgba(0,0,0,.02);
+    color: #111;
+}
+.offline-opening-chevron { width: 9px; height: 9px; flex: 0 0 9px; margin: 0 10px 0 8px; border-left: 2.4px solid #007aff; border-bottom: 2.4px solid #007aff; transform: rotate(45deg); }
+.offline-opening-copy { flex: 1; min-width: 0; }
+.offline-opening-copy strong { display: block; font-size: 20px; font-weight: 800; line-height: 1.15; letter-spacing: -.4px; overflow-wrap: anywhere; }
+.offline-opening-copy p { margin: 5px 0 0; font-size: 11px; font-weight: 400; line-height: 1.2; letter-spacing: .1px; color: #8e8e93; white-space: pre-wrap; overflow-wrap: anywhere; }
+.offline-opening-dots { display: flex; align-self: flex-start; gap: 6px; padding-top: 7px; }
+.offline-opening-dots i { width: 7px; height: 7px; border-radius: 50%; background: #8e8e93; opacity: .6; }
+.offline-opening-place { display: flex; align-items: center; justify-content: center; gap: 5px; flex: 0 1 auto; max-width: 32%; min-width: 0; min-height: 28px; padding: 4px 12px; box-sizing: border-box; border-radius: 999px; background: #007aff; color: #fff; box-shadow: 0 2px 8px rgba(0,122,255,.35); font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
+.offline-opening-place svg { width: 9px; height: 12px; flex: 0 0 9px; }

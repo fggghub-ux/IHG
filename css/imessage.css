@@ -5640,212 +5640,6 @@ button.group-private-chat-detail-bubble {
     transform: scale(0.985);
 }
 
-.offline-invite-card {
-    width: min(70vw, 252px);
-    max-width: 100%;
-    padding: 14px;
-    overflow: hidden;
-    border: 1px solid #d5d8d4;
-    border-radius: 14px;
-    background: #fff;
-    color: #111;
-    cursor: pointer;
-    box-shadow: none;
-    -webkit-tap-highlight-color: transparent;
-}
-.offline-invite-card-heading {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-}
-.offline-invite-card-heading > span {
-    width: 31px;
-    height: 31px;
-    flex: 0 0 auto;
-    display: grid;
-    place-items: center;
-    border-radius: 8px;
-    background: #263f34;
-    color: #fff;
-    font-size: 13px;
-}
-.offline-invite-card-heading div {
-    min-width: 0;
-}
-.offline-invite-card-heading small,
-.offline-invite-card-heading strong {
-    display: block;
-}
-.offline-invite-card-heading small {
-    color: #8a8a8a;
-    font-size: 7px;
-    font-weight: 750;
-    letter-spacing: 1.1px;
-}
-.offline-invite-card-heading strong {
-    margin-top: 2px;
-    font-size: 14px;
-    line-height: 1.2;
-    overflow-wrap: anywhere;
-}
-.offline-invite-card-summary {
-    margin-top: 14px;
-    color: #595959;
-    font-size: 11px;
-    line-height: 1.5;
-    overflow-wrap: anywhere;
-}
-.offline-invite-card-place {
-    margin-top: 8px;
-    color: #718276;
-    font-size: 10px;
-    overflow-wrap: anywhere;
-}
-.offline-invite-card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 13px;
-    padding-top: 11px;
-    border-top: 1px solid #e3e3e3;
-    color: #333;
-    font-size: 10px;
-    font-weight: 750;
-}
-.offline-invite-card-footer i {
-    font-size: 8px;
-}
-.offline-invite-card:active {
-    transform: scale(0.985);
-}
-.offline-invite-detail-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1200;
-    display: grid;
-    place-items: center;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.45);
-    box-sizing: border-box;
-}
-.offline-invite-detail {
-    position: relative;
-    width: min(100%, 390px);
-    padding: 28px 22px 22px;
-    border-radius: 22px;
-    background: #fff;
-    color: #191919;
-    box-sizing: border-box;
-    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.2);
-}
-.offline-invite-close {
-    position: absolute;
-    right: 15px;
-    top: 11px;
-    border: 0;
-    background: transparent;
-    color: #777;
-    font-size: 26px;
-    cursor: pointer;
-}
-.offline-invite-detail-icon {
-    width: 42px;
-    height: 42px;
-    display: grid;
-    place-items: center;
-    border-radius: 12px;
-    background: #e7f0e9;
-    color: #263f34;
-}
-.offline-invite-detail > small {
-    display: block;
-    margin-top: 14px;
-    color: #718276;
-    font-size: 11px;
-}
-.offline-invite-detail h2 {
-    margin: 4px 0 12px;
-    font-size: 20px;
-}
-.offline-invite-detail p {
-    margin: 0;
-    color: #454545;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-}
-.offline-invite-place {
-    margin-top: 13px;
-    color: #718276;
-    font-size: 13px;
-}
-.offline-invite-place i {
-    margin-right: 7px;
-}
-.offline-invite-detail-actions {
-    display: flex;
-    gap: 9px;
-    margin-top: 24px;
-}
-.offline-invite-detail-actions button {
-    flex: 1;
-    min-height: 42px;
-    border: 0;
-    border-radius: 11px;
-    font-size: 14px;
-    font-weight: 650;
-    cursor: pointer;
-}
-.offline-invite-detail-actions button:first-child {
-    background: #263f34;
-    color: #fff;
-}
-.offline-invite-detail-actions button:last-child {
-    background: #f0f0f0;
-    color: #444;
-}
-.offline-invite-detail-actions button:disabled {
-    opacity: 0.55;
-}
-.offline-invite-resolved {
-    margin-top: 23px;
-    color: #718276;
-    font-size: 13px;
-}
-.offline-invitation-opening {
-    margin: 16px 14px 20px;
-    padding: 16px;
-    border: 1px solid rgba(87, 118, 96, 0.18);
-    border-radius: 16px;
-    background: #f3f8f4;
-    color: #263f34;
-}
-.offline-invitation-opening small,
-.offline-invitation-opening strong {
-    display: block;
-}
-.offline-invitation-opening small {
-    font-size: 11px;
-    color: #718276;
-}
-.offline-invitation-opening strong {
-    margin-top: 5px;
-    font-size: 15px;
-}
-.offline-invitation-opening p {
-    margin: 10px 0 0;
-    font-size: 13px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-}
-.offline-invitation-opening span {
-    display: block;
-    margin-top: 10px;
-    font-size: 12px;
-    color: #718276;
-}
-
 .user-phone-access-detail-overlay {
     z-index: 1090;
 }
@@ -18116,7 +17910,6 @@ button.moment-private-chat-bubble.has-translation {
     .group-red-packet-bubble,
     .group-poll-bubble,
     .im-contact-card-bubble,
-    .offline-invite-card,
     .voice-call-record-bubble
 ) {
     height: auto !important;
@@ -18130,11 +17923,7 @@ button.moment-private-chat-bubble.has-translation {
 #imessage-view .active-chat-interface .chat-row :is(
     .group-red-packet-card,
     .im-contact-card-profile,
-    .voice-call-record-card,
-    .offline-invite-card-heading,
-    .offline-invite-card-summary,
-    .offline-invite-card-place,
-    .offline-invite-card-footer
+    .voice-call-record-card
 ) {
     height: auto !important;
     min-height: 0 !important;
@@ -18153,20 +17942,6 @@ button.moment-private-chat-bubble.has-translation {
 }
 
 
-
-#imessage-view .active-chat-interface .chat-row .offline-invite-card {
-    max-height: min(65vh, 240px);
-    overflow: hidden;
-}
-
-#imessage-view .active-chat-interface .chat-row :is(
-    .offline-invite-card-summary
-) {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
-    overflow: hidden;
-}
 
 .offline-regex-add {
     display: flex;
@@ -18325,7 +18100,6 @@ button.moment-private-chat-bubble.has-translation {
    the colors chosen for ordinary incoming and outgoing chat bubbles. */
 #imessage-view .active-chat-interface .chat-row .chat-bubble.im-card-bubble:is(
     .im-contact-card-bubble,
-    .offline-invite-card,
     .location-message-bubble,
     .user-phone-access-card,
     .moment-forward-bubble
@@ -18376,7 +18150,6 @@ button.moment-private-chat-bubble.has-translation {
 #imessage-view .active-chat-interface .chat-row :is(
     .im-contact-card-topline i,
     .im-contact-card-name-row strong,
-    .offline-invite-card-heading strong,
     .group-red-packet-title,
     .group-red-packet-amount
 ) {
@@ -18387,9 +18160,6 @@ button.moment-private-chat-bubble.has-translation {
     .im-contact-card-topline,
     .im-contact-card-copy small,
     .im-contact-card-copy p,
-    .offline-invite-card-summary,
-    .offline-invite-card-place,
-    .offline-invite-card-footer,
     .group-red-packet-status
 ) {
     color: #636366 !important;
@@ -18406,11 +18176,6 @@ button.moment-private-chat-bubble.has-translation {
 #imessage-view .active-chat-interface .chat-row .im-contact-card-avatar-fallback {
     background: #f2f2f2 !important;
     color: #111 !important;
-}
-
-#imessage-view .active-chat-interface .chat-row .offline-invite-card-heading > span {
-    background: #111 !important;
-    color: #fff !important;
 }
 
 /* iMessage image generation composer */
