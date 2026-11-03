@@ -15,19 +15,19 @@
         return 'accepted'; // Previously issued cards were already active; retain that state.
     }
     const labels = {
-        pending: ['Give Family Card', 'Pending'],
-        accepted: ['Family Card Accepted', 'Accepted'],
-        rejected: ['Family Card Returned', 'Returned'],
-        unbound: ['Family Card Unlinked', 'Unlinked'],
+        pending: 'Pending',
+        accepted: 'Accepted',
+        rejected: 'Returned',
+        unbound: 'Unlinked',
     };
     const canClaim = message => message?.role === 'assistant' &&
         message.payKind === 'family_card_incoming' && status(message) === 'pending';
     function markup(message) {
-        const state = status(message), [title, label] = labels[state];
+        const state = status(message), label = labels[state];
         const amount = '$' + (Number(message.amount) || 0).toFixed(2);
         return `<div class="family-invitation-card im-card-content" data-family-status="${state}">
-            <div class="family-invitation-brand"><img src="assets/imessage/family-card-apple.svg" alt=""><span>${title}</span></div>
-            <div class="family-invitation-bottom"><strong class="family-invitation-amount" style="--family-amount-size:${Math.min(15, 150 / amount.length)}px">${amount}</strong><span class="family-invitation-status">${label}</span><span class="family-invitation-limit">Limit</span></div>
+            <div class="family-invitation-brand"><svg class="family-invitation-apple" viewBox="0 0 24 28" aria-hidden="true"><path fill="currentColor" d="M16.9 14.3c0-3 2.5-4.5 2.6-4.6-1.4-2-3.5-2.3-4.2-2.3-1.8-.2-3.5 1.1-4.4 1.1-.9 0-2.3-1.1-3.8-1.1-2 0-3.8 1.2-4.8 3-2.1 3.6-.5 8.9 1.5 11.8 1 1.4 2.2 3 3.8 2.9 1.5-.1 2.1-1 3.9-1 1.8 0 2.3 1 3.9.9 1.6 0 2.7-1.4 3.6-2.8 1.2-1.7 1.7-3.4 1.7-3.5-.1 0-3.8-1.5-3.8-4.4zM14.2 5.5c.8-1.1 1.4-2.6 1.2-4-1.3.1-2.8.9-3.7 2-.8.9-1.6 2.5-1.4 3.9 1.4.1 2.9-.7 3.9-1.9z"/></svg><span>Family Card</span></div>
+            <strong class="family-invitation-amount">${amount}</strong><span class="family-invitation-status">${label}</span><span class="family-invitation-limit">Monthly Limit</span>
         </div>`;
     }
     function refresh(friendId) {
