@@ -31,7 +31,7 @@
                 '<span class="offline-invite-slider-label" aria-live="polite">slide to unlock</span>' +
                 '<span class="offline-invite-slider-lock" aria-hidden="true">' + lock + '</span>' +
                 '<button type="button" class="offline-invite-slider-thumb" aria-label="滑动回应邀请">' + arrow + '</button></div>' :
-                '<div class="offline-invite-resolved">' + ({ accepted: '已接受', declined: '已婉拒', superseded: '邀请已失效' }[status] || '邀请已结束') + '</div>') + '</div>';
+                '<div class="offline-invite-resolved">' + ({ accepted: 'Accepted', declined: 'Declined', superseded: '邀请已失效' }[status] || '邀请已结束') + '</div>') + '</div>';
     }
     function bindSlider(overlay, respond) {
         const track = overlay.querySelector('.offline-invite-slider');
