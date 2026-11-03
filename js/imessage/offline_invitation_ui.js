@@ -11,11 +11,14 @@
             '<div class="offline-invite-face-copy"><span>Face ID</span><span>Date with ' + escape(name) + '</span></div>';
     }
     function openingMarkup(invitation) {
-        return '<span class="offline-opening-chevron" aria-hidden="true"></span>' +
+        return '<div class="offline-opening-glass">' +
+            '<span class="offline-opening-back" aria-hidden="true"><span class="offline-opening-chevron"></span></span>' +
             '<div class="offline-opening-copy"><strong>' + escape(invitation.title || '线下见面') +
             '</strong><p>' + escape(invitation.invitationText || '') + '</p></div>' +
+            '<div class="offline-opening-actions">' +
             '<span class="offline-opening-dots" aria-hidden="true"><i></i><i></i></span>' +
-            (invitation.place ? '<span class="offline-opening-place">' + pin + escape(invitation.place) + '</span>' : '');
+            '<span class="offline-opening-place">' + pin + '<span>' + escape(invitation.place || '') +
+            '</span></span></div></div>';
     }
     function detailMarkup(invitation, status) {
         return '<div class="offline-invite-detail" role="dialog" aria-modal="true" aria-label="线下邀请">' +

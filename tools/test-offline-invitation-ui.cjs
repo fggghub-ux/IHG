@@ -133,11 +133,30 @@ const fs = require('node:fs'), path = require('node:path'), http = require('node
             await page.waitForSelector('#offline-chat-view .offline-invitation-opening');
             const opening=await page.locator('.offline-invitation-opening').evaluate(e=>({title:e.querySelector('strong').textContent,summary:e.querySelector('p').textContent,place:e.querySelector('.offline-opening-place').textContent,font:getComputedStyle(e.querySelector('strong')).fontFamily,parentFont:getComputedStyle(e.parentElement).fontFamily,pin:getComputedStyle(e.querySelector('.offline-opening-place svg')).color,dots:e.querySelectorAll('.offline-opening-dots i').length,images:e.querySelectorAll('img').length,text:e.textContent,r:e.getBoundingClientRect().toJSON(),header:document.querySelector('#offline-chat-view .offline-chat-header').getBoundingClientRect().toJSON(),overflow:e.scrollWidth>e.clientWidth}));
             assert.equal(opening.title,'晚饭');assert.equal(opening.summary,'带你出去吃点东西 散散心');assert.equal(opening.place,'尔湾');assert.equal(opening.font,opening.parentFont);assert.equal(opening.pin,'rgb(255, 255, 255)');assert.equal(opening.dots,2);assert.equal(opening.images,0);assert.ok(!opening.text.includes('本次见面')&&!opening.text.includes('Update'));assert.ok(!opening.overflow);assert.ok(opening.r.top>=opening.header.bottom);assert.equal(await page.evaluate(()=>window.__acceptCalls),1);
+            // Regression: the source header's dots precede the blue place capsule on the same top edge.
+            const layout=await page.locator('.offline-invitation-opening').evaluate(e=>{
+                const glass=e.querySelector('.offline-opening-glass'),place=e.querySelector('.offline-opening-place'),dots=e.querySelector('.offline-opening-dots');
+                const g=getComputedStyle(glass),p=getComputedStyle(place),r=e.getBoundingClientRect(),b=place.getBoundingClientRect(),d=dots.getBoundingClientRect(),caption=e.querySelector('p').getBoundingClientRect();
+                return {placeBlue:p.backgroundColor,placeWhite:p.color,placeWidth:b.width,dotsBefore:d.right<b.left,dotsTop:Math.abs(d.top-b.top),inside:b.right<=r.right&&b.left>=r.left&&caption.right<=r.right,blur:g.backdropFilter,bg:g.backgroundColor,border:g.borderTopColor,shadow:g.boxShadow,backCircle:getComputedStyle(e.querySelector('.offline-opening-back')).backgroundColor};
+            });
+            assert.equal(layout.placeBlue,'rgb(0, 122, 255)');assert.equal(layout.placeWhite,'rgb(255, 255, 255)');assert.ok(layout.placeWidth>=54);assert.ok(layout.dotsBefore);assert.ok(layout.dotsTop<1);assert.ok(layout.inside);assert.equal(layout.bg,'rgba(255, 255, 255, 0.65)');assert.equal(layout.border,'rgba(255, 255, 255, 0.65)');assert.match(layout.blur,/blur\(24px\) saturate\(1.75\)/);assert.match(layout.shadow,/inset/);assert.equal(layout.backCircle,'rgb(242, 242, 247)');
             await page.waitForTimeout(400);await shot(page,'opening-'+width);
             await page.locator('.offline-opening-chevron').click();assert.equal(await page.locator('#offline-chat-view').isVisible(),true);
             const saved = await page.evaluate(()=>{const f=window.imApp.getFriendById('invite-ui');return {session:f.offlineCurrentSessionId,context:f.offlineInvitationContext};});assert.ok(saved.session);assert.equal(saved.context.title,'晚饭');assert.equal(saved.context.invitationText,'带你出去吃点东西 散散心');assert.equal(saved.context.place,'尔湾');
             // A second invitation during a meeting reuses the existing session/context behavior.
             await fixture(page,{id:'invite',title:'Another dinner'});await detail(page);await start(page,'right');await page.mouse.up();await page.waitForFunction(()=>window.imApp.getFriendById('invite-ui').messages[0].inviteStatus==='accepted');assert.equal(await page.evaluate(()=>window.imApp.getFriendById('invite-ui').offlineCurrentSessionId),saved.session);assert.deepEqual(await page.evaluate(()=>window.imApp.getFriendById('invite-ui').offlineInvitationContext),saved.context);
+            // The model protocol permits an empty place. Do not erase the capsule or invent a venue.
+            // Also exercise long saved data through accept -> offline render, rather than only markup.
+            for(const place of ['', '很长的约定地点<&>'.repeat(8)]) {
+                await fixture(page,{place,title:'见个面',invitationText:'有时间的话 我们见一面吧'});
+                await page.evaluate(()=>window.imApp.commitFriendChange('invite-ui',f=>{f.offlineMeetingActive=false;f.offlineCurrentSessionId='';f.offlineInvitationContext=null;}));
+                await detail(page);assert.equal(await page.locator('.offline-invite-detail-place').textContent(),place);
+                await start(page,'right');await page.mouse.up();await page.waitForSelector('#offline-chat-view .offline-invitation-opening');await page.waitForTimeout(400);
+                assert.equal(await page.locator('.offline-opening-place').textContent(),place);assert.equal(await page.locator('.offline-opening-place svg').isVisible(),true);
+                assert.ok(await page.locator('.offline-invitation-opening').evaluate(e=>{const r=e.getBoundingClientRect(),p=e.querySelector('.offline-opening-place').getBoundingClientRect();return e.scrollWidth<=e.clientWidth&&p.right<=r.right&&p.left>=r.left;}));
+                assert.equal(await page.evaluate(()=>window.imApp.getFriendById('invite-ui').offlineInvitationContext.place),place);
+                await shot(page,(place?'long-place-':'empty-place-')+width);
+            }
             if(width===390)await require('./test-offline-invitation-actions.cjs')({page,context,fixture,detail,start,points,status,shot});
             await context.close();console.log('PASS',width,'three avatar layouts; detail data; left release/move/cancel/close; real touch hold; unlock and existing/new session behavior');
         }
