@@ -5,6 +5,7 @@
     let currentCardId_3 = 'bank_1',
         currentFilter = 'all',
         outgoingFamilyCards_2 = [],
+        appliedFamilyGrants = [],
         cards_2 = [
             {
                 id: 'bank_1',
@@ -36,6 +37,7 @@
         return raw && typeof raw === 'object' ? raw : {};
     }
     function applyPaySnapshot(data = {}) {
+        appliedFamilyGrants = Array.isArray(data.appliedFamilyGrants) ? data.appliedFamilyGrants : [];
         outgoingFamilyCards_2 = Array.isArray(data.outgoingFamilyCards)
             ? data.outgoingFamilyCards
             : [];
@@ -61,7 +63,9 @@
     }
     window.getPayBalance = getPayBalance_2;
     window.getPayCards = function () {
-        return (applyPaySnapshot(getPayStoreSnapshot()), cards_2);
+        applyPaySnapshot(getPayStoreSnapshot());
+        reconcileReceivedFamilyCards();
+        return cards_2;
     };
     const familySpendNoticesInFlight = new Set();
     async function deliverFamilySpendNotice(transaction) {
@@ -215,6 +219,7 @@
                 cards: cards_2,
                 currentCardId: currentCardId_3,
                 outgoingFamilyCards: outgoingFamilyCards_2,
+                appliedFamilyGrants,
             });
             return;
         }
@@ -383,7 +388,7 @@
             option_4.textContent = '我赠送的亲属卡';
             transferInTargetEl_2.appendChild(option_4);
             const filter_31 = outgoingFamilyCards_2.filter(
-                (value_37) => value_37.status !== 'unbound',
+                (value_37) => !['unbound', 'rejected'].includes(value_37.status),
             );
             if (filter_31.length === 0) {
                 const option_5 = document.createElement('div');
@@ -430,6 +435,7 @@
         }
     }
     function renderPayUI() {
+        reconcileReceivedFamilyCards();
         payUiRendered = true;
         const currentCard = getCurrentCard();
         if (mainCardEl && currentCard) {
@@ -508,6 +514,31 @@
         .catch((error) =>
             console.warn('Pending family card notices could not be delivered:', error),
         );
+    // Replays accepted incoming grants exactly once after chat/Pay hydration or interrupted saves.
+    function reconcileReceivedFamilyCards() {
+        let changed = false;
+        for (const friend of window.imData?.friends || []) {
+            for (const message of friend.messages || []) {
+                if (message.role !== 'assistant' || message.payKind !== 'family_card_incoming' || message.familyCardStatus !== 'accepted') continue;
+                const grantId = String(friend.id) + ':' + String(message.id);
+                if (appliedFamilyGrants.includes(grantId)) continue;
+                const limit = Number(message.amount);
+                if (!Number.isFinite(limit) || !(limit > 0)) continue;
+                const id = 'family_' + friend.id;
+                // A family card is credit, never a bank transfer or an income transaction.
+                if (!cards_2.some(card => card.id === id)) cards_2.push({
+                    id, type:'family', name:'Family - ' + (friend.nickname || friend.realName || '好友'),
+                    icon:'fas fa-heart', cardType:'Family Card', number:'**** **** **** ' + Math.floor(1000 + Math.random() * 9000),
+                    balance:limit, logo:'Pay', styleClass:'family-card', transactions:[],
+                });
+                appliedFamilyGrants.push(grantId);
+                changed = true;
+            }
+        }
+        if (changed) savePayData();
+        return changed;
+    }
+    window.reconcileReceivedFamilyCards = () => { applyPaySnapshot(getPayStoreSnapshot()); renderPayUI(); };
     window.addOrUpdateFamilyCard = function (friendId_2, friendName_2, amount_2) {
         const cardId = 'family_' + friendId_2;
         let existingCard = cards_2.find((c_5) => c_5.id === cardId);
@@ -549,7 +580,7 @@
         return (
             handleAction_9(),
             outgoingFamilyCards_2
-                .filter((value_60) => value_60.status !== 'unbound')
+                .filter((value_60) => !['unbound', 'rejected'].includes(value_60.status))
                 .map((value_61) => ({
                     ...value_61,
                 }))
@@ -562,7 +593,7 @@
             .forEach((value_64) => {
                 value_64.messages.forEach((message_65) => {
                     if (
-                        !message_65 ||
+                        !message_65 || message_65.role !== 'user' ||
                         ![
                             'family_card_pending',
                             'family_card_accepted',

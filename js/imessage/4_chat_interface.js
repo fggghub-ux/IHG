@@ -2081,7 +2081,7 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
             isCardBubble =
                 bubble.classList.contains('im-card-bubble') ||
                 !!bubble.querySelector(
-                    '.chat-link-card, .chat-fake-link-card, .pay-transfer-card, .voice-call-record-card',
+                    '.chat-link-card, .chat-fake-link-card, .cash-transfer-card, .family-invitation-card, .voice-call-record-card',
                 ),
             msgContextBubbleCloneElement_274 = document.getElementById('msg-context-bubble-clone');
         if (msgContextBubbleCloneElement_274) {

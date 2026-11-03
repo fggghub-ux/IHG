@@ -1042,48 +1042,31 @@
                     canCurrentUserClaim: canCurrentUserClaim_2,
                 } = model,
                 value_187 = Number(targetMsg_5.amount) || 0,
-                textContent_2 = window.imDataUtils.normalizeCurrencySymbols(targetMsg_5.description || '转账'),
-                familyCardText =
-                    (targetMsg_5.paymentAction || '') +
-                    ' ' +
-                    (targetMsg_5.cardTitle || '') +
-                    ' ' +
-                    (targetMsg_5.description || '') +
-                    ' ' +
-                    (targetMsg_5.content || ''),
-                isFamilyCard =
-                    targetMsg_5.paymentAction === 'family_card' ||
-                    targetMsg_5.paymentAction === 'family_card_increase' ||
-                    familyCardText.includes('亲属卡');
+                textContent_2 = window.imDataUtils.normalizeCurrencySymbols(targetMsg_5.description || '转账');
             if (transferDetailName) transferDetailName.textContent = value_183;
             if (transferDetailAmount) transferDetailAmount.textContent = '$' + value_187.toFixed(2);
             const hasNote = !!textContent_2 && !['转账', '转账说明'].includes(textContent_2);
             if (transferDetailDesc) {
-                transferDetailDesc.textContent = isFamilyCard ? textContent_2 : '';
-                transferDetailDesc.style.display = isFamilyCard ? 'block' : 'none';
+                transferDetailDesc.textContent = '';
+                transferDetailDesc.style.display = 'none';
             }
             const detailsLabel = transferDetailSummary?.previousElementSibling;
-            if (detailsLabel) detailsLabel.textContent = isFamilyCard ? '转账详情' : 'Details';
+            if (detailsLabel) detailsLabel.textContent = 'Details';
             if (transferDetailSummary)
-                transferDetailSummary.textContent = isFamilyCard
-                    ? '备注：' + textContent_2
-                    : hasNote ? 'Note：' + textContent_2 : '';
+                transferDetailSummary.textContent = hasNote ? 'Note：' + textContent_2 : '';
             const transferDetailActionText = page.querySelector(
                 '.pay-transfer-detail-action-text',
             );
             if (transferDetailActionText) {
-                if (isFamilyCard) transferDetailActionText.textContent = '';
+                if (status_3 === 'claimed')
+                    transferDetailActionText.textContent = payeeName_3 + '已收款';
                 else {
-                    if (status_3 === 'claimed')
-                        transferDetailActionText.textContent = payeeName_3 + '已收款';
-                    else {
-                        if (status_3 === 'rejected')
-                            transferDetailActionText.textContent = '已退还';
-                        else
-                            canCurrentUserClaim_2
-                                ? (transferDetailActionText.textContent = 'Transferred to ' + payeeName_3)
-                                : (transferDetailActionText.textContent = 'Transferred to ' + payeeName_3);
-                    }
+                    if (status_3 === 'rejected')
+                        transferDetailActionText.textContent = '已退还';
+                    else
+                        canCurrentUserClaim_2
+                            ? (transferDetailActionText.textContent = 'Transferred to ' + payeeName_3)
+                            : (transferDetailActionText.textContent = 'Transferred to ' + payeeName_3);
                 }
             }
             transferDetailAvatar &&
@@ -1128,11 +1111,6 @@
 
             const amount = Number(targetMsg.amount) || 0;
             const description = window.imDataUtils.normalizeCurrencySymbols(targetMsg.description || '转账');
-            const familyCardText = `${targetMsg.paymentAction || ''} ${targetMsg.cardTitle || ''} ${targetMsg.description || ''} ${targetMsg.content || ''}`;
-            const isFamilyCard = targetMsg.paymentAction === 'family_card'
-                || targetMsg.paymentAction === 'family_card_increase'
-                || familyCardText.includes('亲属卡');
-
             if (transferDetailName) transferDetailName.textContent = payerName;
             if (transferDetailAmount) transferDetailAmount.textContent = `$${amount.toFixed(2)}`;
             const visibleDescription = String(description || '').trim();
@@ -1212,7 +1190,7 @@
 
                 if (!validKinds.includes(msg.payKind)) return;
 
-                const bubble = e.target.closest('.chat-bubble.pay-transfer-bubble, .pay-transfer-card');
+                const bubble = e.target.closest('.chat-bubble.apple-cash-bubble, .cash-transfer-card');
                 if (!bubble) return;
 
                 e.preventDefault();

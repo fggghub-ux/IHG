@@ -7095,14 +7095,14 @@ Affection: ` +
                           .reverse()
                           .find(
                               (value_3007_2) =>
-                                      value_3007_2?.payKind === 'family_card_pending' &&
+                                      value_3007_2?.role === 'user' && value_3007_2?.payKind === 'family_card_pending' &&
                                       value_3007_2.familyCardStatus === 'pending',
                           )
                     : null;
             const value_2792 =
                 '\n\nFamily-card interaction: Have you already given User a family card? ' +
                 hasFamilyCardStr +
-                '.\n- If User hints at or explicitly asks for a family card and you have not given one, you may output {"type":"payment","paymentAction":"family_card","amount":1000,"description":"亲属卡"}. This gives User a card with a 1000 limit.\n- If you already gave one and User asks again, the system allows only one card per person. You may instead output {"type":"payment","paymentAction":"family_card_increase","amount":500,"description":"亲属卡提额"} to increase its limit by 500, and remind User in dialogue that you can only increase the existing card.' +
+                '.\n- If User hints at or explicitly asks for a family card and you have not given one, you may output {"type":"payment","paymentAction":"family_card","amount":1000,"description":"亲属卡"}. This offers User a pending card with a 1000 limit. User must accept it before it becomes usable. Read the family-card message history for User acceptance or return; do not claim it is active while pending.\n- If you already gave one and User asks again, the system allows only one card per person. You may instead output {"type":"payment","paymentAction":"family_card_increase","amount":500,"description":"亲属卡提额"} to increase its limit by 500, and remind User in dialogue that you can only increase the existing card.' +
                 (value_2729_2
                     ? '\n- Priority: User gave you a pending family card with a limit of $' +
                       Number(value_2729_2.amount).toFixed(2) +
@@ -11368,7 +11368,7 @@ if (currentItem_4.kind === 'contact_card') {
                                               .reverse()
                                               .find(
                                                   (value_3520) =>
-                                                      value_3520?.payKind ===
+                                                      value_3520?.role === 'user' && value_3520?.payKind ===
                                                           'family_card_pending' &&
                                                       value_3520.familyCardStatus === 'pending',
                                               )
@@ -11386,75 +11386,77 @@ if (currentItem_4.kind === 'contact_card') {
                                         paymentAction_2 === 'family_card_increase'
                                     ) {
                                         if (typeof window.addOrUpdateFamilyCard === 'function') {
-                                            const result_3 = window.addOrUpdateFamilyCard(
-                                                    activeFriend_7.id,
-                                                    activeFriend_7.nickname ||
-                                                        activeFriend_7.realName,
-                                                    amount_2,
-                                                ),
-                                                timestamp_7 = Date.now();
-                                            let cardTitle_2 =
-                                                result_3.action === 'increase'
-                                                    ? '提升亲属卡额度'
-                                                    : '赠送亲属卡';
-                                            const options_3524 = {
-                                                id: window.imChat.createMessageId('pay'),
-                                                role: 'assistant',
-                                                type: 'pay_transfer',
-                                                payKind: 'system_notification',
-                                                paymentAction: paymentAction_2,
-                                                amount: amount_2,
-                                                description:
-                                                    cardTitle_2 + ' $' + amount_2.toFixed(2),
-                                                cardTitle: cardTitle_2,
-                                                payStatus: 'completed',
-                                                content:
-                                                    '[亲属卡] ' +
-                                                    cardTitle_2 +
-                                                    ' $' +
-                                                    amount_2.toFixed(2),
-                                                speaker:
-                                                    activeFriend_7.type === 'group'
-                                                        ? paymentSpeakerName_2
-                                                        : '',
-                                                speakerMemberId:
-                                                    activeFriend_7.type === 'group'
-                                                        ? paymentSpeaker?.id || ''
-                                                        : '',
-                                                senderAvatarUrl:
-                                                    activeFriend_7.type === 'group'
-                                                        ? paymentSpeaker?.avatarUrl || ''
-                                                        : '',
-                                                timestamp: timestamp_7,
-                                                apiRunId: apiRunId_4,
-                                            };
-                                            handleAction_2861(options_3524);
-                                            const value_2909_3539 = getSafeContainer(),
-                                                value_3540 =
-                                                    window.imData.currentActiveFriend &&
-                                                    String(window.imData.currentActiveFriend.id) ===
-                                                        String(activeFriend_7.id) &&
-                                                    value_2909_3539,
-                                                options_3541 = {};
-                                            options_3541.silent = true;
-                                            const value_3542 = window.imApp.appendFriendMessage
-                                                ? await window.imApp.appendFriendMessage(
-                                                      activeFriend_7.id || friend_31.id,
-                                                      options_3524,
-                                                      options_3541,
-                                                  )
-                                                : false;
-                                            ((apk110New_2556, apk110New_2557) =>
-                                                apk110New_2556 && apk110New_2557)(
-                                                value_3542,
-                                                value_3540,
-                                            ) &&
-                                                handleAction_2862(
-                                                    options_3524,
-                                                    activeFriend_7,
-                                                    value_2909_3539,
-                                                    timestamp_7,
-                                                );
+                                            const activeCard = window.hasFamilyCard(activeFriend_7.id);
+                                            const pendingCard = window.imApp.getFriendById(activeFriend_7.id)?.messages?.some(message => message.role === 'assistant' && message.payKind === 'family_card_incoming' && message.familyCardStatus === 'pending');
+                                            if (activeCard || !pendingCard) {
+                                                const result_3 = { action: activeCard ? 'increase' : 'grant' },
+                                                    timestamp_7 = Date.now();
+                                                let cardTitle_2 =
+                                                    result_3.action === 'increase'
+                                                        ? '提升亲属卡额度'
+                                                        : '赠送亲属卡';
+                                                const options_3524 = {
+                                                    id: window.imChat.createMessageId('pay'),
+                                                    role: 'assistant',
+                                                    type: 'pay_transfer',
+                                                    payKind: activeCard ? 'system_notification' : 'family_card_incoming',
+                                                    payDirection: 'char_to_user',
+                                                    familyCardStatus: activeCard ? 'accepted' : 'pending',
+                                                    paymentAction: paymentAction_2,
+                                                    amount: amount_2,
+                                                    description:
+                                                        cardTitle_2 + ' $' + amount_2.toFixed(2),
+                                                    cardTitle: cardTitle_2,
+                                                    payStatus: activeCard ? 'completed' : 'pending',
+                                                    content:
+                                                        '[亲属卡] ' +
+                                                        cardTitle_2 +
+                                                        ' $' +
+                                                        amount_2.toFixed(2),
+                                                    speaker:
+                                                        activeFriend_7.type === 'group'
+                                                            ? paymentSpeakerName_2
+                                                            : '',
+                                                    speakerMemberId:
+                                                        activeFriend_7.type === 'group'
+                                                            ? paymentSpeaker?.id || ''
+                                                            : '',
+                                                    senderAvatarUrl:
+                                                        activeFriend_7.type === 'group'
+                                                            ? paymentSpeaker?.avatarUrl || ''
+                                                            : '',
+                                                    timestamp: timestamp_7,
+                                                    apiRunId: apiRunId_4,
+                                                };
+                                                handleAction_2861(options_3524);
+                                                const value_2909_3539 = getSafeContainer(),
+                                                    value_3540 =
+                                                        window.imData.currentActiveFriend &&
+                                                        String(window.imData.currentActiveFriend.id) ===
+                                                            String(activeFriend_7.id) &&
+                                                        value_2909_3539,
+                                                    options_3541 = {};
+                                                options_3541.silent = true;
+                                                const value_3542 = window.imApp.appendFriendMessage
+                                                    ? await window.imApp.appendFriendMessage(
+                                                          activeFriend_7.id || friend_31.id,
+                                                          options_3524,
+                                                          options_3541,
+                                                      )
+                                                    : false;
+                                                if (value_3542 && activeCard) window.addOrUpdateFamilyCard(activeFriend_7.id, activeFriend_7.nickname || activeFriend_7.realName, amount_2);
+                                                ((apk110New_2556, apk110New_2557) =>
+                                                    apk110New_2556 && apk110New_2557)(
+                                                    value_3542,
+                                                    value_3540,
+                                                ) &&
+                                                    handleAction_2862(
+                                                        options_3524,
+                                                        activeFriend_7,
+                                                        value_2909_3539,
+                                                        timestamp_7,
+                                                    );
+                                            }
                                         }
                                     } else {
                                         if (paymentAction_2 === 'transfer') {

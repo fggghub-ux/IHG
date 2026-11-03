@@ -2123,7 +2123,7 @@
                 value_163 +
                 '" style="color: #c7c7cc; font-size: 22px;"></i>\n                </div>\n                <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">\n                    ' +
                 handleAction_7_188 +
-                '\n                    <div style="display: flex; justify-content: flex-end; align-items: flex-end; width: 100%;">\n                        <div class="chat-bubble user-bubble im-card-bubble pay-transfer-bubble group-red-packet-bubble">' +
+                '\n                    <div style="display: flex; justify-content: flex-end; align-items: flex-end; width: 100%;">\n                        <div class="chat-bubble user-bubble im-card-bubble group-red-packet-bubble">' +
                 value_366_2 +
                 text_192 +
                 '</div>\n                    </div>\n                </div>\n            ';
@@ -2136,13 +2136,13 @@
                     (enabled_170
                         ? ''
                         : '<div class="group-ai-speaker-name">' + name_166 + '</div>') +
-                    '\n                        <div class="group-ai-bubble-row">\n                            ' + '\n                            <div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble group-red-packet-bubble">' +
+                    '\n                        <div class="group-ai-bubble-row">\n                            ' + '\n                            <div class="chat-bubble ai-bubble im-card-bubble group-red-packet-bubble">' +
                     value_366_2 +
                     text_372 +
                     '</div>\n                        </div>\n                    </div>\n                ';
             } else
                 text_373 =
-                    '<div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble group-red-packet-bubble">' +
+                    '<div class="chat-bubble ai-bubble im-card-bubble group-red-packet-bubble">' +
                     value_366_2 +
                     text_372 +
                     '</div>';
@@ -4504,134 +4504,36 @@
         element_304.appendChild(row_14);
         window.imChat.scrollToBottom(element_304);
     }
-    function renderGroupOrFamilyTransferBubble(msg_19, friend_32, element_746, value_365 = Date.now()) {
-        const value_366 = msg_19.role === 'user';
-        const value_367 = !value_366 && friend_32.type === 'group';
-        const value_368 = value_367 ? resolveGroupBubbleIdentity(friend_32, msg_19) : null;
-        const speakerName_6 = value_368?.name || null;
-        const value_370 = value_368?.avatarUrl || null;
-        const lastElementChild_371 = element_746.lastElementChild;
-        let enabled_372 = false;
-        let enabled_373 = false;
-        if (lastElementChild_371) {
-            if (value_366 && lastElementChild_371.classList.contains('user-row')) {
-                enabled_372 = true;
-                lastElementChild_371.classList.add('has-next');
-            } else {
-                if (!value_366 && lastElementChild_371.classList.contains('ai-row')) {
-                    const value_392 = lastElementChild_371.getAttribute('data-speaker') || null;
-                    (!value_367 || value_392 === speakerName_6) &&
-                        ((enabled_372 = true),
-                        (enabled_373 = value_367),
-                        lastElementChild_371.classList.add('has-next'));
-                }
+    function renderGroupOrFamilyTransferBubble(msg, friend, container, timestamp = Date.now()) {
+        const isFamily = window.imFamilyCard.isFamily(msg);
+        const isUser = msg.role === 'user';
+        const identity = !isUser && friend.type === 'group' ? resolveGroupBubbleIdentity(friend, msg) : null;
+        const previous = container.lastElementChild;
+        const hasPrev = !!previous && (isUser ? previous.classList.contains('user-row') :
+            previous.classList.contains('ai-row') && (!identity || previous.dataset.speaker === identity.name));
+        if (hasPrev) previous.classList.add('has-next');
+        const row = document.createElement('div');
+        row.className = 'chat-row ' + (isUser ? 'user-row' : 'ai-row') + (hasPrev ? ' has-prev' : '');
+        if (identity) { row.classList.add('group-ai-row'); row.dataset.speaker = identity.name; }
+        row.dataset.timestamp = timestamp;
+        row.dataset.messageId = window.imChat.ensureMessageId(msg, 'pay');
+        handleAction_22(row, friend, msg);
+        handleAction_20(row, friend, msg);
+        if (isFamily) {
+            const header = buildMessageHeaderHtml(isUser, friend, timestamp, identity?.name || null, identity?.avatarUrl || null, hasPrev, msg);
+            row.innerHTML = `<div class="chat-checkbox-wrapper" style="display:${window.imData.batchSelectMode ? 'flex' : 'none'};width:40px;flex-shrink:0"><i class="far fa-circle chat-checkbox" data-timestamp="${timestamp}"></i></div><div style="flex:1;display:flex;flex-direction:column;min-width:0">${header}<div style="display:flex;justify-content:${isUser ? 'flex-end' : 'flex-start'};width:100%"><div class="chat-bubble ${isUser ? 'user-bubble' : 'ai-bubble'} im-card-bubble family-invitation-bubble">${window.imFamilyCard.markup(msg)}</div></div></div>`;
+            const card = row.querySelector('.family-invitation-bubble');
+            if (window.imFamilyCard.canClaim(msg)) {
+                card.setAttribute('role', 'button'); card.tabIndex = 0;
+                card.setAttribute('aria-label', '查看亲属卡');
+                const open = event => { event.preventDefault(); event.stopPropagation(); window.imFamilyCard.open(friend, msg); };
+                card.addEventListener('click', open);
+                card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') open(event); });
             }
-        }
-        const row_15 = document.createElement('div');
-        row_15.className =
-            'chat-row ' +
-            (value_366 ? 'user-row' : 'ai-row') +
-            ' ' +
-            (enabled_372 ? 'has-prev' : '') +
-            ' ' +
-            (value_367 ? 'group-ai-row' : '') +
-            ' ' +
-            (value_367 && enabled_373 ? 'group-ai-row-continuous' : '');
-        row_15.setAttribute('data-timestamp', value_365);
-        row_15.setAttribute('data-message-id', window.imChat.ensureMessageId(msg_19, 'pay'));
-        if (speakerName_6) row_15.setAttribute('data-speaker', speakerName_6);
-        handleAction_22(row_15, friend_32, msg_19);
-        handleAction_20(row_15, friend_32, msg_19);
-        const amount_2 = Number(msg_19.amount) || 0;
-        const value_758 = '$' + amount_2.toFixed(2);
-        const description_2 = window.imDataUtils.normalizeCurrencySymbols(msg_19.description).trim();
-        const parties = handleAction_23(msg_19, friend_32);
-        const {
-            payKind: payKind_3,
-            status: status_4,
-            payerName: payerName_3,
-            payeeName: payeeName_3,
-        } = parties;
-        const isOfficialReceipt =
-            msg_19.targetName === 'Payment' ||
-            msg_19.cardTitle === '收款通知' ||
-            msg_19.cardTitle === '支付凭证';
-        const familyCardText =
-            (msg_19.paymentAction || '') +
-            ' ' +
-            (msg_19.cardTitle || '') +
-            ' ' +
-            (msg_19.description || '') +
-            ' ' +
-            (msg_19.content || '');
-        const isFamilyCard =
-            msg_19.paymentAction === 'family_card' ||
-            msg_19.paymentAction === 'family_card_increase' ||
-            familyCardText.includes('亲属卡');
-        const startsWith_768 = String(msg_19.payKind || '').startsWith('family_card_');
-        let cardTitle_2 = msg_19.cardTitle || 'Payment';
-        let value_770 = payerName_3 + ' 向 ' + payeeName_3 + ' 转账';
-        let extraClass = '';
-        if (status_4 === 'claimed') {
-            cardTitle_2 = msg_19.cardTitle || payeeName_3 + '已收款';
-            value_770 = payeeName_3 + '已收取 ' + payerName_3 + ' 的转账';
-            extraClass = payKind_3 === 'char_received' ? ' is-received' : ' is-income';
         } else {
-            if (status_4 === 'rejected') {
-                cardTitle_2 = msg_19.cardTitle || '已退还';
-                value_770 = payeeName_3 + '已退还 ' + payerName_3 + ' 的转账';
-                extraClass = ' is-rejected';
-            } else
-                payKind_3 === 'char_to_user_pending' &&
-                    ((cardTitle_2 = msg_19.cardTitle || '转账'),
-                    (value_770 = payerName_3 + ' 向 ' + payeeName_3 + ' 转账'),
-                    (extraClass = ' is-pending'));
-        }
-        startsWith_768 &&
-            ((cardTitle_2 = msg_19.cardTitle || '亲属卡'),
-            (value_770 =
-                msg_19.familyCardStatus === 'pending'
-                    ? '等待对方收下'
-                    : msg_19.familyCardStatus === 'rejected'
-                      ? '已退回'
-                      : msg_19.familyCardStatus === 'unbound'
-                        ? '已解绑'
-                        : '已生效'),
-            (extraClass = ['rejected', 'unbound'].includes(msg_19.familyCardStatus)
-                ? ' is-rejected'
-                : msg_19.familyCardStatus === 'pending'
-                  ? ' is-pending'
-                  : ' is-income'));
-        const apk110New_1052 =
-            msg_19.familyCardStatus === 'pending'
-                ? '待领取'
-                : msg_19.familyCardStatus === 'rejected'
-                  ? '已退回'
-                  : msg_19.familyCardStatus === 'unbound'
-                    ? '已解绑'
-                    : '已生效';
-        const apk110New_1053 = isFamilyCard
-            ? apk110New_1052
-            : status_4 === 'rejected'
-              ? '已退回'
-              : status_4 === 'claimed'
-                ? ''
-                : payKind_3 === 'char_to_user_pending'
-                  ? '待收款'
-                  : '';
-        const handleAction_7_389 = buildMessageHeaderHtml(
-            value_366,
-            friend_32,
-            value_365,
-            speakerName_6,
-            value_370,
-            enabled_372,
-            msg_19,
-        );
-        const value_390 = new Date(getChatDisplayTimestamp(friend_32, value_365));
-        const value_391 =
-            formatBubbleTime(getChatDisplayTimestamp(friend_32, value_365));
-        if (isOfficialReceipt) {
+            const msg_19 = msg, row_15 = row, value_365 = timestamp;
+            const amount_2 = Number(msg.amount) || 0;
+            const description_2 = window.imDataUtils.normalizeCurrencySymbols(msg.description).trim();
             const sign = msg_19.cardTitle === '收款通知' ? '+' : '-';
             row_15.innerHTML =
                 '\n                <div class="chat-checkbox-wrapper" style="display: ' +
@@ -4653,120 +4555,10 @@
                       '</small>'
                     : '') +
                 '\n                    </div>\n                </div>\n            ';
-        } else {
-            const value_394 =
-                '\n                <div class="pay-transfer-card im-card-content' +
-                extraClass +
-                '">\n                    <div class="pay-transfer-card-top">\n                        <div class="pay-transfer-card-icon"><i class="fas fa-wallet" aria-hidden="true"></i></div>\n                        <div class="pay-transfer-card-meta">\n                            <div class="pay-transfer-card-title">' +
-                escapeHtml(cardTitle_2) +
-                '</div>\n                            ' +
-                (isFamilyCard && !startsWith_768
-                    ? ''
-                    : '<div class="pay-transfer-card-subtitle">' +
-                      escapeHtml(value_770) +
-                      '</div>') +
-                '\n                        </div>\n                    </div>\n                    <strong class="pay-transfer-card-amount">' +
-                value_758 +
-                '</strong>\n                    ' +
-                (apk110New_1053
-                    ? '<span class="pay-transfer-card-status">' +
-                      escapeHtml(apk110New_1053) +
-                      '</span>'
-                    : '') +
-                '\n                    ' +
-                (description_2 && (!/^转账$/.test(description_2) || isFamilyCard)
-                    ? '<small class="pay-transfer-card-desc">' +
-                      escapeHtml(description_2) +
-                      '</small>'
-                    : '') +
-                '\n                </div>\n            ';
-            if (value_366) {
-                const text_395 = '';
-                row_15.innerHTML =
-                    '\n                    <div class="chat-checkbox-wrapper" style="display: ' +
-                    (window.imData.batchSelectMode ? 'flex' : 'none') +
-                    '; width: 40px; justify-content: center; align-items: flex-end; padding-bottom: 10px; flex-shrink: 0; cursor: pointer; transition: all 0.2s;">\n                        <i class="far fa-circle chat-checkbox" data-timestamp="' +
-                    value_365 +
-                    '" style="color: #c7c7cc; font-size: 22px;"></i>\n                    </div>\n                    <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">\n                        ' +
-                    handleAction_7_389 +
-                    '\n                        <div style="display: flex; justify-content: flex-end; align-items: flex-end; width: 100%;">\n                            <div class="chat-bubble user-bubble im-card-bubble pay-transfer-bubble">' +
-                    value_394 +
-                    text_395 +
-                    '</div>\n                        </div>\n                    </div>\n                ';
-            } else {
-                const text_396 = '';
-                const value_397 = value_367
-                    ? '<div class="group-ai-bubble-wrap">\n                        ' +
-                      (enabled_373
-                          ? ''
-                          : '<div class="group-ai-speaker-name">' +
-                            escapeHtml(speakerName_6) +
-                            '</div>') +
-                      '\n                        <div class="group-ai-bubble-row">\n                            ' +
-                      '\n                            <div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble">' +
-                      value_394 +
-                      text_396 +
-                      '</div>\n                        </div>\n                    </div>'
-                    : '<div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble">' +
-                      value_394 +
-                      text_396 +
-                      '</div>';
-                row_15.innerHTML =
-                    '\n                    <div class="chat-checkbox-wrapper" style="display: ' +
-                    (window.imData.batchSelectMode ? 'flex' : 'none') +
-                    '; width: 40px; justify-content: center; align-items: flex-end; padding-bottom: 10px; flex-shrink: 0; cursor: pointer; transition: all 0.2s;">\n                        <i class="far fa-circle chat-checkbox" data-timestamp="' +
-                    value_365 +
-                    '" style="color: #c7c7cc; font-size: 22px;"></i>\n                    </div>\n                    <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">\n                        ' +
-                    handleAction_7_389 +
-                    '\n                        <div style="display: flex; justify-content: flex-start; align-items: flex-end; width: 100%;">' +
-                    value_397 +
-                    '</div>\n                    </div>\n                ';
-            }
         }
-        element_746.appendChild(row_15);
-        if (payKind_3 === 'char_to_user_pending' || payKind_3 === 'user_to_char') {
-            const clickableBubble_2 =
-                row_15.querySelector('.chat-bubble.pay-transfer-bubble') ||
-                row_15.querySelector('.pay-transfer-card');
-            clickableBubble_2 &&
-                ((clickableBubble_2.style.cursor = 'pointer'),
-                clickableBubble_2.addEventListener('click', (event_782) => {
-                    event_782.preventDefault();
-                    event_782.stopPropagation();
-                    const activePage_2 = element_746.closest('.active-chat-interface');
-                    if (!activePage_2) {
-                        if (window.showToast) window.showToast('未找到聊天页面');
-                        return;
-                    }
-                    !activePage_2._openTransferDetailOverlay &&
-                        window.imChat.ensureTransferDetailOverlayForExistingPage(
-                            activePage_2,
-                            friend_32,
-                        );
-                    if (activePage_2._openTransferDetailOverlay) {
-                        const messageId_6 = row_15.getAttribute('data-message-id'),
-                            rowTimestamp = row_15.getAttribute('data-timestamp'),
-                            liveFriend_2 =
-                                window.imData.currentActiveFriend &&
-                                String(window.imData.currentActiveFriend.id) ===
-                                    String(friend_32.id)
-                                    ? window.imData.currentActiveFriend
-                                    : friend_32,
-                            liveMsg = Array.isArray(liveFriend_2?.messages)
-                                ? liveFriend_2.messages.find((item_6) => {
-                                      if (messageId_6 && String(item_6.id) === String(messageId_6))
-                                          return true;
-                                      return (
-                                          rowTimestamp &&
-                                          String(item_6.timestamp) === String(rowTimestamp)
-                                      );
-                                  })
-                                : null;
-                        activePage_2._openTransferDetailOverlay(liveMsg || msg_19);
-                    } else window.showToast && window.showToast('详情卡片初始化失败');
-                }));
-        }
-        window.imChat.scrollToBottom(element_746);
+        container.appendChild(row);
+        if (isFamily) decorateMessageRowAvatar(row, friend, msg);
+        window.imChat.scrollToBottom(container);
     }
 
     function renderPayTransferBubble_2(msg, friend, container, timestamp = Date.now()) {
@@ -4882,7 +4674,7 @@
                 : '';
             const amountFontSize = Math.min(25, Math.max(12, 25 * 8 / amountText.length));
             const contentHtml = `
-                    <div class="pay-transfer-card cash-transfer-card im-card-content${extraClass}">
+                    <div class="cash-transfer-card im-card-content${extraClass}">
                         <div class="pay-transfer-card-top">
                             <div class="pay-transfer-card-brand">${appleLogoSvg}<span>Pay</span></div>
                             ${groupParties}
@@ -4903,7 +4695,7 @@
                         <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
                             ${headerHtml}
                             <div style="display: flex; justify-content: flex-end; align-items: flex-end; width: 100%;">
-                                <div class="chat-bubble user-bubble im-card-bubble pay-transfer-bubble apple-cash-bubble">${contentHtml}${metaHtml}</div>
+                                <div class="chat-bubble user-bubble im-card-bubble apple-cash-bubble">${contentHtml}${metaHtml}</div>
                             </div>
                         </div>
                     `;
@@ -4913,10 +4705,10 @@
                     ? `<div class="group-ai-bubble-wrap">
                             ${sameSpeaker ? '' : `<div class="group-ai-speaker-name">${escapeHtml(speakerName)}</div>`}
                             <div class="group-ai-bubble-row">
-                                <div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble apple-cash-bubble">${contentHtml}${metaHtml}</div>
+                                <div class="chat-bubble ai-bubble im-card-bubble apple-cash-bubble">${contentHtml}${metaHtml}</div>
                             </div>
                         </div>`
-                    : `<div class="chat-bubble ai-bubble im-card-bubble pay-transfer-bubble apple-cash-bubble">${contentHtml}${metaHtml}</div>`;
+                    : `<div class="chat-bubble ai-bubble im-card-bubble apple-cash-bubble">${contentHtml}${metaHtml}</div>`;
                 row.innerHTML = `
                         <div class="chat-checkbox-wrapper" style="display: ${window.imData.batchSelectMode ? 'flex' : 'none'}; width: 40px; justify-content: center; align-items: flex-end; padding-bottom: 10px; flex-shrink: 0; cursor: pointer; transition: all 0.2s;">
                             <i class="far fa-circle chat-checkbox" data-timestamp="${timestamp}" style="color: #c7c7cc; font-size: 22px;"></i>
@@ -4934,8 +4726,8 @@
         // 允许用户向AI转账时，以及AI向用户转账时，都可以点击打开弹窗
         if (!isOfficialReceipt && !isFamilyCard) {
             const clickableBubble =
-                row.querySelector('.chat-bubble.pay-transfer-bubble.apple-cash-bubble') ||
-                row.querySelector('.pay-transfer-card');
+                row.querySelector('.chat-bubble.apple-cash-bubble') ||
+                row.querySelector('.cash-transfer-card');
             if (clickableBubble) {
                 clickableBubble.style.cursor = 'pointer';
                 clickableBubble.addEventListener('click', (e) => {
