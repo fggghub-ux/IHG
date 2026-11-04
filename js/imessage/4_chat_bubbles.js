@@ -170,6 +170,182 @@
         }
         return null;
     }
+    // Single-chat quote references are message identities, never a sticky AI mode.
+    function resolveReplyTarget(message, friend) {
+        if (!message || friend?.type !== 'char') return null;
+        const all = Array.isArray(friend.messages) ? friend.messages : [];
+        const index = all.findIndex(item => item === message || (message.id && item.id === message.id));
+        const before = index < 0 ? all : all.slice(0, index);
+        const id = String(message.replyToMessageId || '').trim();
+        if (id) return before.find(item => String(item.id || '') === id) || null;
+        const quote = String(message.replyTo || '').trim();
+        if (!quote) return null;
+        const normalize = value => String(value || '').replace(/\s+/g, ' ').trim();
+        const needle = normalize(quote);
+        const candidates = before.filter(item => ['user', 'assistant'].includes(item.role));
+        const matches = item => [item.content, item.text, item.description,
+            window.imApp.getFriendMessagePreview?.(item)].some(value => normalize(value) === needle);
+        return candidates.findLast(matches) || candidates.findLast(item => {
+            const text = normalize(item.text || item.content);
+            return needle.length >= 8 && text.includes(needle);
+        }) || null;
+    }
+    window.imChat.resolveReplyTarget = resolveReplyTarget;
+    const replyLayouts = new WeakMap();
+    function scheduleReplyLayout(friend, container) {
+        if (friend?.type !== 'char' || !container) return;
+        let state = replyLayouts.get(container);
+        if (!state) {
+            state = { friend, frame: 0, observed: new Set(), mediaSizes: new Map() };
+            state.resize = new ResizeObserver(() => {
+                if (!container.isConnected) { state.resize.disconnect(); return; }
+                scheduleReplyLayout(state.friend, container);
+            });
+            replyLayouts.set(container, state);
+            state.resize.observe(container);
+        }
+        state.friend = window.imApp.getFriendById(friend.id) || friend;
+        if (!state.frame) state.frame = requestAnimationFrame(() => {
+            state.frame = 0;
+            if (container.isConnected) layoutReplyThreads(state.friend, container, state);
+        });
+    }
+    function layoutReplyThreads(friend, container, state) {
+        const following = container.scrollHeight - container.scrollTop - container.clientHeight <= 2;
+        const rows = [...container.querySelectorAll(':scope > .chat-row')];
+        const topEdge = container.getBoundingClientRect().top;
+        const anchor = following ? null : rows.find(row => row.getBoundingClientRect().bottom > topEdge);
+        const anchorTop = anchor?.getBoundingClientRect().top;
+        const all = Array.isArray(friend.messages) ? friend.messages : [];
+        const byId = new Map(all.map((message, index) => [String(message.id), {message, index}]));
+        // Read the actual theme's text-bubble fills, including user custom CSS.
+        for (const [role, fallback] of [['user', '#a0a0a0'], ['ai', '#e9e9ea']]) {
+            let sample = container.querySelector('.' + role + '-bubble:not(.im-card-bubble)');
+            let probe;
+            if (!sample) {
+                probe = document.createElement('div');
+                probe.className = 'chat-bubble ' + role + '-bubble';
+                probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none';
+                container.appendChild(probe); sample = probe;
+            }
+            const color = getComputedStyle(sample).backgroundColor;
+            container.style.setProperty('--im-quote-' + role, color === 'rgba(0, 0, 0, 0)' ? fallback : color);
+            probe?.remove();
+        }
+        const liveBubbles = new Set(rows.map(row => row.querySelector('.chat-bubble, .sticker-message-wrap')).filter(Boolean));
+        for (const bubble of state.observed) {
+            if (!liveBubbles.has(bubble)) { state.resize.unobserve(bubble); state.observed.delete(bubble); }
+        }
+        for (const row of rows) {
+            row.querySelectorAll(':scope > .im-quote-head, :scope > .im-quote-connector').forEach(node => node.remove());
+            row.classList.remove('im-quote-start', 'im-quote-continuation');
+            row.style.removeProperty('--im-quote-space');
+            const bubble = row.querySelector('.chat-bubble, .sticker-message-wrap');
+            if (bubble && !state.observed.has(bubble)) { state.resize.observe(bubble); state.observed.add(bubble); }
+        }
+        const groups = [];
+        let current = null;
+        for (const row of rows) {
+            const entry = byId.get(row.dataset.messageId);
+            const message = entry?.message || row._imReplyMessage;
+            const quote = String(message?.replyTo || '').trim();
+            if (!message || (!quote && !message.replyToMessageId)) { current = null; continue; }
+            let target = resolveReplyTarget(message, friend);
+            if (!target && state.referenceIndex) {
+                target = resolveReplyTarget(message, {...friend, messages:state.referenceIndex});
+            }
+            if (!target && !state.referenceIndex && !state.referenceLoading && window.imStorage?.loadMessageIndexByFriendId) {
+                // Recent-history windows may omit the original. Read metadata only;
+                // image blobs are still resolved individually through getAssetUrl.
+                state.referenceLoading = true;
+                window.imStorage.loadMessageIndexByFriendId(friend.id).then(result => {
+                    state.referenceIndex = result?.messages || [];
+                }).catch(() => { state.referenceIndex = []; }).finally(() => {
+                    state.referenceLoading = false; scheduleReplyLayout(friend, container);
+                });
+            }
+            const key = target?.id ? 'id:' + target.id : message.replyToMessageId
+                ? 'id:' + message.replyToMessageId : 'text:' + quote;
+            const index = entry?.index ?? all.length;
+            if (!current || current.key !== key || current.role !== message.role || current.index + 1 !== index) {
+                current = { key, role: message.role, target, quote, rows: [], index };
+                groups.push(current);
+            }
+            current.rows.push(row); current.index = index;
+        }
+        for (const group of groups) {
+            const first = group.rows[0], targetRole = group.target?.role || (group.role === 'user' ? 'assistant' : 'user');
+            const self = targetRole === group.role;
+            const scene = group.role === 'user' ? (self ? 'B' : 'A') : (self ? 'D' : 'C');
+            first.classList.add('im-quote-start');
+            group.rows.slice(1).forEach(row => row.classList.add('im-quote-continuation'));
+            const head = document.createElement('div');
+            head.className = 'im-quote-head ' + (targetRole === 'user' ? 'is-user-source' : 'is-char-source');
+            head.dataset.scene = scene;
+            const quote = document.createElement('div'); quote.className = 'im-quote-bubble';
+            const source = group.target;
+            if (source?.type === 'image' || source?.type === 'sticker') {
+                quote.classList.add('is-media');
+                const img = document.createElement('img'); img.alt = source.type === 'sticker' ? 'Sticker' : 'Image';
+                img.addEventListener('load', () => {
+                    const key = String(source.id || source.contentAssetId || source.content);
+                    const height = Math.min(96, 42 * img.naturalHeight / (img.naturalWidth || 1));
+                    if (height > 0 && state.mediaSizes.get(key) !== height) {
+                        state.mediaSizes.set(key, height); scheduleReplyLayout(friend, container);
+                    }
+                }, {once:true});
+                const knownHeight = state.mediaSizes.get(String(source.id || source.contentAssetId || source.content));
+                if (knownHeight) img.style.height = knownHeight + 'px';
+                const direct = source.type === 'sticker' ? source.stickerUrl : source.content;
+                const asset = source.type === 'sticker' ? source.stickerAssetId : source.contentAssetId;
+                if (direct && (!/^[a-z][a-z\d+.-]*:/i.test(direct) || /^(https?:|data:image\/|blob:)/i.test(direct))) img.src = direct;
+                else if (asset && window.appStorage?.getAssetUrl) {
+                    window.appStorage.getAssetUrl(asset).then(url => { if (img.isConnected && url) img.src = url; }).catch(() => {});
+                }
+                quote.appendChild(img);
+            } else {
+                const text = document.createElement('span'); text.className = 'im-quote-text';
+                text.textContent = group.quote || window.imApp.getFriendMessagePreview?.(source) || '';
+                quote.appendChild(text);
+            }
+            head.appendChild(quote);
+            if (group.rows.length > 1) {
+                const count = document.createElement('span'); count.className = 'im-quote-count';
+                count.textContent = group.rows.length + ' Replies'; head.appendChild(count);
+            }
+            first.appendChild(head);
+            first.style.setProperty('--im-quote-space', (head.getBoundingClientRect().height + (scene === 'D' ? 20 : 12)) + 'px');
+            group.head = head; group.scene = scene;
+        }
+        // All space reservations precede measurements, so an earlier thread can move later ones.
+        for (const group of groups) {
+            const first = group.rows[0], last = group.rows.at(-1);
+            const bubble = last.querySelector('.chat-bubble, .sticker-message-wrap');
+            if (!bubble) continue;
+            const origin = first.getBoundingClientRect(), head = group.head.getBoundingClientRect(), end = bubble.getBoundingClientRect();
+            const quoteBox = group.head.querySelector('.im-quote-bubble').getBoundingClientRect();
+            let top, bottom;
+            if (group.scene === 'A') { top = quoteBox.bottom - origin.top + 2; bottom = end.top + end.height / 2 - origin.top; }
+            else if (group.scene === 'B') { top = quoteBox.top + quoteBox.height / 2 - origin.top; bottom = end.top + end.height / 2 - origin.top; }
+            else if (group.scene === 'C') { top = quoteBox.bottom - origin.top + 4; bottom = (group.rows.length > 1 ? end.top + end.height / 2 : end.top - 8) - origin.top; }
+            else { top = quoteBox.bottom - origin.top + 3; bottom = end.top - origin.top - 7; }
+            const height = Math.max(group.scene === 'D' ? 13 : 26, bottom - top);
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.classList.add('im-quote-connector'); svg.dataset.scene = group.scene;
+            svg.setAttribute('width', '34'); svg.setAttribute('height', String(height));
+            svg.setAttribute('viewBox', '0 0 34 ' + height); svg.setAttribute('aria-hidden', 'true');
+            svg.style.top = top + 'px';
+            const path = document.createElementNS(svg.namespaceURI, 'path');
+            const h = height - 2;
+            path.setAttribute('d', group.scene === 'A' ? `M3 2 V${h-16} Q3 ${h} 19 ${h} H31`
+                : group.scene === 'B' ? `M31 2 H19 Q3 2 3 18 V${h-16} Q3 ${h} 19 ${h} H31`
+                : group.scene === 'C' ? `M31 2 H19 Q3 2 3 18 V${h}` : `M3 2 V${h}`);
+            svg.appendChild(path); first.appendChild(svg);
+        }
+        if (following) container.scrollTop = container.scrollHeight;
+        else if (anchor) container.scrollTop += anchor.getBoundingClientRect().top - anchorTop;
+    }
+    window.imChat.scheduleReplyLayout = scheduleReplyLayout;
     function handleAction_19(message_4, friend_5, value_127) {
         syncSingleChatAvatarState(friend_5, value_127);
         const messageId_2 = String(message_4?.id || ''),
@@ -183,6 +359,8 @@
         if (row_3) {
             decorateMessageRowAvatar(row_3, friend_5, message_4);
             apk110New_23(row_3, friend_5, message_4);
+            row_3._imReplyMessage = message_4;
+            scheduleReplyLayout(friend_5, value_127);
         }
         return true;
     }
@@ -3623,7 +3801,7 @@
         handleAction_20(element_618, friend_26, userMessage);
         let text_619 = '';
         const apk110New_822 =
-            friend_26?.type === 'char' && friend_26.replyStyle === 'outside' && !!value_608_2;
+            friend_26?.type === 'char';
         value_608_2 &&
             !apk110New_822 &&
             (text_619 +=
@@ -3655,16 +3833,12 @@
                 ? '<i class="fas fa-exclamation-circle chat-delivery-failed is-user" aria-label="发送失败"></i>'
                 : '') +
             '\n                    ' +
-            (apk110New_822
-                ? '<div class="im-reply-stack is-user"><div class="msg-reply-quote im-reply-outside-quote"><span>' +
-                  escapeHtml(String(value_608_2)) +
-                  '</span></div><div class="chat-bubble user-bubble">' +
-                  text_619 +
-                  '</div></div>'
-                : '<div class="chat-bubble user-bubble">' + text_619 + '</div>') +
+            ('<div class="chat-bubble user-bubble">' + text_619 + '</div>') +
             '\n                </div>\n            </div>\n        ';
         element_606_2.appendChild(element_618);
         decorateMessageRowAvatar(element_618, friend_26, userMessage);
+        element_618._imReplyMessage = userMessage;
+        scheduleReplyLayout(friend_26, element_606_2);
         window.imChat.scrollToBottom(element_606_2, {
             force: true,
         });
@@ -3725,7 +3899,7 @@
         thought_2 && row_12.setAttribute('data-thought', thought_2);
         let text_642 = '';
         const apk110New_847 =
-            friend_27?.type === 'char' && friend_27.replyStyle === 'outside' && !!value_628;
+            friend_27?.type === 'char';
         value_628 &&
             !apk110New_847 &&
             (text_642 +=
@@ -3762,13 +3936,7 @@
                 text_642 +
                 '</div>\n                    </div>\n                </div>\n            ';
         } else
-            text_645 = apk110New_847
-                ? '<div class="im-reply-stack is-ai"><div class="msg-reply-quote im-reply-outside-quote"><span>' +
-                  escapeHtml(String(value_628)) +
-                  '</span></div><div class="chat-bubble ai-bubble">' +
-                  text_642 +
-                  '</div></div>'
-                : '<div class="chat-bubble ai-bubble">' + text_642 + '</div>';
+            text_645 = '<div class="chat-bubble ai-bubble">' + text_642 + '</div>';
         row_12.innerHTML =
             '\n            <div class="chat-checkbox-wrapper" style="display: ' +
             (window.imData.batchSelectMode ? 'flex' : 'none') +
@@ -3791,6 +3959,8 @@
                 role: 'assistant',
             },
         );
+        row_12._imReplyMessage = value_262 || {id:value_254, role:"assistant", replyTo:value_628};
+        scheduleReplyLayout(friend_27, element_245);
         window.imChat.scrollToBottom(element_245);
     }
     function getGeneratedChatImageFileName(timestamp_7, mimeType = '') {

@@ -221,6 +221,9 @@
         window.imData.currentReplyMessageId = sourceMessage?.id || messageId_2 || null;
         const page_2 = handleAction_9();
         if (page_2) {
+            page_2._imReplyContext = {
+                text: text_2, messageId: sourceMessage?.id || messageId_2 || null,
+            };
             const previewContainer = page_2.querySelector('.reply-preview-container'),
                 previewText = page_2.querySelector('.reply-preview-text'),
                 input = page_2.querySelector('.chat-input');

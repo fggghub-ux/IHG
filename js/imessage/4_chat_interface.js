@@ -751,6 +751,11 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
             });
         let id_4 = 'chat-interface-' + friend_6.id,
             page_9 = document.getElementById(id_4);
+        // Restore this page's composer only; a retained single-chat quote must not leak to another contact/group.
+        const visibleReply = page_9?.querySelector('.reply-preview-container');
+        const ownReply = visibleReply?.style.display !== 'none' ? page_9?._imReplyContext : null;
+        window.imData.currentReplyText = ownReply?.text || null;
+        window.imData.currentReplyMessageId = ownReply?.messageId || null;
         const isGroupChat = friend_6.type === 'group',
             isNpcChat = friend_6.type === 'npc',
             value_134 = friend_6.type === 'official',
@@ -1176,6 +1181,7 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
             }
             replyCancelBtn &&
                 replyCancelBtn.addEventListener('click', () => {
+                    page_9._imReplyContext = null;
                     window.imData.currentReplyText = null;
                     window.imData.currentReplyMessageId = null;
                     const preview = page_9.querySelector('.reply-preview-container');

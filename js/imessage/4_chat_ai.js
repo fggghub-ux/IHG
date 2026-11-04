@@ -1244,8 +1244,13 @@ if (message_1132.type === 'fake_link') {
                 : null;
         (!message_1406 || timestamp_2 - (message_1406.timestamp || 0) > 300000) &&
             window.imChat.renderTimestamp(timestamp_2, container_3, friend_13);
-        const value_1407 = window.imData.currentReplyText || null;
-        const replyToMessageId_2 = window.imData.currentReplyMessageId || null;
+        const replyPage = document.getElementById('chat-interface-' + friend_13.id);
+        const replyPreview = replyPage?.querySelector('.reply-preview-container');
+        const ownReply = liveFriend_3.type === 'char'
+            ? (replyPreview?.style.display !== 'none' ? replyPage?._imReplyContext : null)
+            : {text: window.imData.currentReplyText, messageId: window.imData.currentReplyMessageId};
+        const value_1407 = ownReply?.text || null;
+        const replyToMessageId_2 = ownReply?.messageId || null;
         const msgObj = {
             id: window.imChat.createMessageId('msg'),
             role: 'user',
@@ -1327,13 +1332,15 @@ if (message_1132.type === 'fake_link') {
             if (window.showToast) window.showToast('消息保存失败');
             return;
         }
-        window.imData.currentReplyText = null;
-        window.imData.currentReplyMessageId = null;
-        const page = document.getElementById('chat-interface-' + friend_13.id);
-        if (page) {
-            const preview = page.querySelector('.reply-preview-container');
+        if (liveFriend_3.type !== 'char') {
+            window.imData.currentReplyText = null;
+            window.imData.currentReplyMessageId = null;
+            if (replyPage) replyPage._imReplyContext = null;
+            const page = document.getElementById('chat-interface-' + friend_13.id);
+            const preview = page?.querySelector('.reply-preview-container');
             if (preview) preview.style.display = 'none';
         }
+        window.imChat.scheduleReplyLayout?.(getLiveFriendById(friend_13.id) || liveFriend_3, container_3);
         if (liveFriend_3.type === 'official' && window.u2OfficialAccounts?.generate) {
             const options_1420 = {};
             options_1420.source = 'send';
@@ -11891,6 +11898,10 @@ if (currentItem_4.kind === 'contact_card') {
                                     replyTo: replyTo_2,
                                     apiRunId: apiRunId_4,
                                 };
+                if (speakerFriend.type === 'char' && msgObj_5.replyTo) {
+                    const target = window.imChat.resolveReplyTarget?.(msgObj_5, speakerFriend);
+                    if (target?.id) msgObj_5.replyToMessageId = target.id;
+                }
                 value_2684_2 &&
                     speakerFriend.type !== 'group' &&
                     ((msgObj_5.deliveryStatus = 'blocked'),

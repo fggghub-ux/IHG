@@ -15188,59 +15188,31 @@ button.moment-private-chat-bubble.has-translation {
 .active-chat-interface.im-chat-single.separate-bubbles .chat-row:is(.user-row, .ai-row) .chat-bubble:not(.im-card-bubble) {
     border-radius: 20px !important;
 }
-.active-chat-interface.im-chat-single .im-reply-stack {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: max-content;
-    max-width: min(70%, 300px);
-    min-width: 0;
-}
-.active-chat-interface.im-chat-single .im-reply-stack.is-user { align-items: flex-end; }
-.active-chat-interface.im-chat-single .im-reply-stack > .chat-bubble { max-width: 100%; box-sizing: border-box; }
-.active-chat-interface.im-chat-single .im-reply-outside-quote {
-    position: relative;
-    display: block;
-    width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    margin-bottom: 7px;
-    padding: 1px 18px 2px 0;
-    color: #8e8e93;
-    background: transparent;
-    font-size: 12px;
-    line-height: 1.4;
-    text-align: right;
-}
-.active-chat-interface.im-chat-single .im-reply-stack.is-user .im-reply-outside-quote {
-    padding: 1px 0 2px 18px;
-    text-align: left;
-}
-.active-chat-interface.im-chat-single .im-reply-outside-quote > span {
-    display: block;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-.active-chat-interface.im-chat-single .im-reply-outside-quote::before {
-    content: '';
-    position: absolute;
-    top: 3px;
-    right: 0;
-    width: 12px;
-    height: 23px;
-    border-top: 1.5px solid #c8c8cd;
-    border-right: 1.5px solid #c8c8cd;
-    border-radius: 0 10px 0 0;
-    pointer-events: none;
-}
-.active-chat-interface.im-chat-single .im-reply-stack.is-user .im-reply-outside-quote::before {
-    right: auto;
-    left: 0;
-    border-right: 0;
-    border-left: 1.5px solid #c8c8cd;
-    border-radius: 10px 0 0 0;
-}
+/* Detached single-chat quotes: the four layouts and media metrics from iMessage-引用.css. */
+.im-chat-single .chat-row.im-quote-start { padding-top:var(--im-quote-space,54px); position:relative; }
+.im-chat-single .chat-row.im-quote-continuation { margin-top:4px; }
+.im-chat-single .im-quote-head { position:absolute; top:0; max-width:70%; z-index:2; }
+.im-chat-single .im-quote-head.is-char-source { left:0; }
+.im-chat-single .im-quote-head.is-user-source { right:0; }
+.im-chat-single .im-quote-bubble { position:relative; width:max-content; max-width:100%; box-sizing:border-box; padding:6px 11px 12px; }
+.im-chat-single .im-quote-bubble::before { content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+    background:#e8e8e9; -webkit-mask-box-image:url('../assets/imessage/reply-quote-mask.png') 53 55 69 61 fill / 18px 18px 23px 21px stretch; }
+.im-chat-single .is-user-source .im-quote-bubble { margin-left:auto; }
+.im-chat-single .is-user-source .im-quote-bubble::before { background:var(--im-quote-user,#a0a0a0); transform:scaleX(-1); }
+.im-chat-single .im-quote-text { display:block; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    font-size:12px; line-height:1.2; font-weight:400; color:#a0a0a0; }
+.im-chat-single .is-user-source .im-quote-text { color:var(--im-quote-user,#a0a0a0); }
+.im-chat-single .im-quote-count { display:block; margin:0 12px; white-space:nowrap; font-size:11px; line-height:16px; font-weight:600; color:var(--im-quote-user,#a0a0a0); }
+.im-chat-single .is-char-source .im-quote-count { margin-left:36px; }
+.im-chat-single .is-user-source .im-quote-count { text-align:right; color:var(--im-quote-ai,#e9e9ea); }
+.im-chat-single .im-quote-bubble.is-media { padding:0; }
+.im-chat-single .im-quote-bubble.is-media::before { content:none; }
+.im-chat-single .im-quote-bubble img { display:block; width:42px; max-width:42px; height:auto; max-height:96px; min-height:24px;
+    object-fit:cover; border-radius:8px; border:.5px solid rgba(255,255,255,.4); }
+.im-chat-single .im-quote-connector { position:absolute; left:18px; overflow:visible; pointer-events:none; z-index:0; }
+.im-chat-single .im-quote-connector path { fill:none; stroke:#e8e8e9; stroke-width:3.8; stroke-linecap:round; stroke-linejoin:round; }
+.im-chat-single .im-quote-connector[data-scene="D"] path { stroke:#e5e5ea; }
+.im-chat-single .im-quote-start .chat-bubble, .im-chat-single .im-quote-continuation .chat-bubble { position:relative; z-index:1; }
 
 /* Official Accounts / 有兔创作助手 */
 #official-accounts-view.u2-official-accounts-view {
