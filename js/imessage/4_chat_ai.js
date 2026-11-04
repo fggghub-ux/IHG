@@ -1340,7 +1340,7 @@ if (message_1132.type === 'fake_link') {
             const preview = page?.querySelector('.reply-preview-container');
             if (preview) preview.style.display = 'none';
         }
-        window.imChat.scheduleReplyLayout?.(getLiveFriendById(friend_13.id) || liveFriend_3, container_3);
+        window.imChat.syncReplyThreads?.(getLiveFriendById(friend_13.id) || liveFriend_3, container_3);
         if (liveFriend_3.type === 'official' && window.u2OfficialAccounts?.generate) {
             const options_1420 = {};
             options_1420.source = 'send';

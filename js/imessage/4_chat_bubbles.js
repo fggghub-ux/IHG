@@ -191,161 +191,154 @@
         }) || null;
     }
     window.imChat.resolveReplyTarget = resolveReplyTarget;
-    const replyLayouts = new WeakMap();
-    function scheduleReplyLayout(friend, container) {
-        if (friend?.type !== 'char' || !container) return;
-        let state = replyLayouts.get(container);
+    // Quote geometry lives in CSS Grid. This registry reconciles message identity
+    // and thread membership only; it never measures boxes or observes their sizes.
+    const replyThreads = new WeakMap();
+    function registerReplyRow(row, friend, message, container) {
+        if (friend?.type !== 'char' || !row || !container) return;
+        let state = replyThreads.get(container);
         if (!state) {
-            state = { friend, frame: 0, observed: new Set(), mediaSizes: new Map() };
-            state.resize = new ResizeObserver(() => {
-                if (!container.isConnected) { state.resize.disconnect(); return; }
-                scheduleReplyLayout(state.friend, container);
-            });
-            replyLayouts.set(container, state);
-            state.resize.observe(container);
+            state = {rows:new Map(), groups:new Map(), resolved:new Map(), queued:false};
+            replyThreads.set(container, state);
         }
-        state.friend = window.imApp.getFriendById(friend.id) || friend;
-        if (!state.frame) state.frame = requestAnimationFrame(() => {
-            state.frame = 0;
-            if (container.isConnected) layoutReplyThreads(state.friend, container, state);
+        state.rows.set(row, message);
+        syncReplyThreads(friend, container);
+    }
+    function syncReplyThreads(friend, container) {
+        if (friend?.type !== 'char' || !container) return;
+        const state = replyThreads.get(container);
+        if (!state || state.queued) return;
+        state.queued = true;
+        queueMicrotask(() => {
+            state.queued = false;
+            reconcileReplyThreads(window.imApp.getFriendById(friend.id) || friend, container, state);
         });
     }
-    function layoutReplyThreads(friend, container, state) {
-        const following = container.scrollHeight - container.scrollTop - container.clientHeight <= 2;
-        const rows = [...container.querySelectorAll(':scope > .chat-row')];
-        const topEdge = container.getBoundingClientRect().top;
-        const anchor = following ? null : rows.find(row => row.getBoundingClientRect().bottom > topEdge);
-        const anchorTop = anchor?.getBoundingClientRect().top;
-        const all = Array.isArray(friend.messages) ? friend.messages : [];
-        const byId = new Map(all.map((message, index) => [String(message.id), {message, index}]));
-        // Read the actual theme's text-bubble fills, including user custom CSS.
-        for (const [role, fallback] of [['user', '#a0a0a0'], ['ai', '#e9e9ea']]) {
-            let sample = container.querySelector('.' + role + '-bubble:not(.im-card-bubble)');
-            let probe;
-            if (!sample) {
-                probe = document.createElement('div');
-                probe.className = 'chat-bubble ' + role + '-bubble';
-                probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none';
-                container.appendChild(probe); sample = probe;
+    function setReplyClass(row, name, enabled) {
+        if (row.classList.contains(name) !== enabled) row.classList.toggle(name, enabled);
+    }
+    function clearReplyRow(row) {
+        if (!row._imQuoteParts) return;
+        for (const node of row._imQuoteParts.nodes) node.remove();
+        row._imQuoteParts.body.classList.remove('im-quote-body');
+        for (const name of ['im-quote-row','im-quote-start','im-quote-continuation','im-quote-end','im-quote-multiple','im-quote-scene-A','im-quote-scene-B','im-quote-scene-C','im-quote-scene-D']) row.classList.remove(name);
+        delete row._imQuoteParts;
+    }
+    function prepareReplyRow(row) {
+        if (row._imQuoteParts) return row._imQuoteParts;
+        const body = [...row.children].find(node => node.tagName === 'DIV' && !node.classList.contains('chat-checkbox-wrapper'));
+        if (!body) return null;
+        body.classList.add('im-quote-body');
+        const nodes = ['cap','stem','line'].map(kind => {
+            const node = document.createElement('span');
+            node.className = 'im-quote-' + kind;
+            node.setAttribute('aria-hidden','true'); row.appendChild(node); return node;
+        });
+        return row._imQuoteParts = {body, nodes};
+    }
+    function makeReplyHead(group) {
+        const head = document.createElement('div'); head.className = 'im-quote-head';
+        const quote = document.createElement('div'); quote.className = 'im-quote-bubble';
+        const source = group.target;
+        if (source?.type === 'image' || source?.type === 'sticker') {
+            quote.classList.add('is-media');
+            const image = document.createElement('img'); image.alt = source.type === 'sticker' ? 'Sticker' : 'Image';
+            image.decoding = 'async';
+            const direct = source.type === 'sticker' ? source.stickerUrl : source.content;
+            const asset = source.type === 'sticker' ? source.stickerAssetId : source.contentAssetId;
+            if (direct && (!/^[a-z][a-z\d+.-]*:/i.test(direct) || /^(https?:|data:image\/|blob:)/i.test(direct))) image.src = direct;
+            else if (asset && window.appStorage?.getAssetUrl) {
+                window.appStorage.getAssetUrl(asset).then(url => { if (image.isConnected && url) image.src = url; }).catch(() => {});
             }
-            const color = getComputedStyle(sample).backgroundColor;
-            container.style.setProperty('--im-quote-' + role, color === 'rgba(0, 0, 0, 0)' ? fallback : color);
-            probe?.remove();
+            // CSS handles intrinsic image height; loading an image never rebuilds a thread.
+            quote.appendChild(image);
+        } else {
+            const text = document.createElement('span'); text.className = 'im-quote-text';
+            text.textContent = group.quote || window.imApp.getFriendMessagePreview?.(source) || '';
+            quote.appendChild(text);
         }
-        const liveBubbles = new Set(rows.map(row => row.querySelector('.chat-bubble, .sticker-message-wrap')).filter(Boolean));
-        for (const bubble of state.observed) {
-            if (!liveBubbles.has(bubble)) { state.resize.unobserve(bubble); state.observed.delete(bubble); }
-        }
-        for (const row of rows) {
-            row.querySelectorAll(':scope > .im-quote-head, :scope > .im-quote-connector').forEach(node => node.remove());
-            row.classList.remove('im-quote-start', 'im-quote-continuation');
-            row.style.removeProperty('--im-quote-space');
-            const bubble = row.querySelector('.chat-bubble, .sticker-message-wrap');
-            if (bubble && !state.observed.has(bubble)) { state.resize.observe(bubble); state.observed.add(bubble); }
-        }
+        head.appendChild(quote); return head;
+    }
+    function reconcileReplyThreads(friend, container, state) {
+        const all = Array.isArray(friend.messages) ? friend.messages : [];
+        const byId = new Map(all.map((message,index) => [String(message.id), {message,index}]));
         const groups = [];
-        let current = null;
-        for (const row of rows) {
-            const entry = byId.get(row.dataset.messageId);
-            const message = entry?.message || row._imReplyMessage;
+        const quotedRows = new Set();
+        let group = null;
+        for (const [row, rendered] of state.rows) {
+            if (row.parentElement !== container) { state.rows.delete(row); continue; }
+            const entry = byId.get(row.dataset.messageId), message = entry?.message || rendered;
             const quote = String(message?.replyTo || '').trim();
-            if (!message || (!quote && !message.replyToMessageId)) { current = null; continue; }
-            let target = resolveReplyTarget(message, friend);
-            if (!target && state.referenceIndex) {
-                target = resolveReplyTarget(message, {...friend, messages:state.referenceIndex});
+            if (!quote && !message?.replyToMessageId) { group = null; continue; }
+            const id = String(message.replyToMessageId || '');
+            let target = id ? byId.get(id)?.message || state.referenceById?.get(id) : null;
+            const lookup = String(message.id) + ':' + quote;
+            if (!target) target = state.resolved.get(lookup);
+            if (!target) {
+                target = resolveReplyTarget(message, friend) || (state.referenceIndex && resolveReplyTarget(message, {...friend,messages:state.referenceIndex}));
+                if (target) state.resolved.set(lookup,target);
             }
             if (!target && !state.referenceIndex && !state.referenceLoading && window.imStorage?.loadMessageIndexByFriendId) {
-                // Recent-history windows may omit the original. Read metadata only;
-                // image blobs are still resolved individually through getAssetUrl.
                 state.referenceLoading = true;
                 window.imStorage.loadMessageIndexByFriendId(friend.id).then(result => {
                     state.referenceIndex = result?.messages || [];
+                    state.referenceById = new Map(state.referenceIndex.map(item => [String(item.id),item]));
                 }).catch(() => { state.referenceIndex = []; }).finally(() => {
-                    state.referenceLoading = false; scheduleReplyLayout(friend, container);
+                    state.referenceLoading = false; syncReplyThreads(friend,container);
                 });
             }
-            const key = target?.id ? 'id:' + target.id : message.replyToMessageId
-                ? 'id:' + message.replyToMessageId : 'text:' + quote;
+            const key = 'id:' + (target?.id || id || 'text:' + quote);
             const index = entry?.index ?? all.length;
-            if (!current || current.key !== key || current.role !== message.role || current.index + 1 !== index) {
-                current = { key, role: message.role, target, quote, rows: [], index };
-                groups.push(current);
+            if (!group || group.key !== key || group.role !== message.role || group.index + 1 !== index) {
+                group = {key, role:message.role, target, quote, rows:[], index}; groups.push(group);
             }
-            current.rows.push(row); current.index = index;
+            group.rows.push(row); group.index = index; quotedRows.add(row);
         }
+        for (const [row] of state.rows) if (!quotedRows.has(row)) clearReplyRow(row);
+        const active = new Set();
         for (const group of groups) {
-            const first = group.rows[0], targetRole = group.target?.role || (group.role === 'user' ? 'assistant' : 'user');
+            const first = group.rows[0]; active.add(first);
+            const targetRole = group.target?.role || (group.role === 'user' ? 'assistant' : 'user');
             const self = targetRole === group.role;
-            const scene = group.role === 'user' ? (self ? 'B' : 'A') : (self ? 'D' : 'C');
-            first.classList.add('im-quote-start');
-            group.rows.slice(1).forEach(row => row.classList.add('im-quote-continuation'));
-            const head = document.createElement('div');
-            head.className = 'im-quote-head ' + (targetRole === 'user' ? 'is-user-source' : 'is-char-source');
-            head.dataset.scene = scene;
-            const quote = document.createElement('div'); quote.className = 'im-quote-bubble';
+            const scene = group.role === 'user' ? (self?'B':'A') : (self?'D':'C');
             const source = group.target;
-            if (source?.type === 'image' || source?.type === 'sticker') {
-                quote.classList.add('is-media');
-                const img = document.createElement('img'); img.alt = source.type === 'sticker' ? 'Sticker' : 'Image';
-                img.addEventListener('load', () => {
-                    const key = String(source.id || source.contentAssetId || source.content);
-                    const height = Math.min(96, 42 * img.naturalHeight / (img.naturalWidth || 1));
-                    if (height > 0 && state.mediaSizes.get(key) !== height) {
-                        state.mediaSizes.set(key, height); scheduleReplyLayout(friend, container);
-                    }
-                }, {once:true});
-                const knownHeight = state.mediaSizes.get(String(source.id || source.contentAssetId || source.content));
-                if (knownHeight) img.style.height = knownHeight + 'px';
-                const direct = source.type === 'sticker' ? source.stickerUrl : source.content;
-                const asset = source.type === 'sticker' ? source.stickerAssetId : source.contentAssetId;
-                if (direct && (!/^[a-z][a-z\d+.-]*:/i.test(direct) || /^(https?:|data:image\/|blob:)/i.test(direct))) img.src = direct;
-                else if (asset && window.appStorage?.getAssetUrl) {
-                    window.appStorage.getAssetUrl(asset).then(url => { if (img.isConnected && url) img.src = url; }).catch(() => {});
-                }
-                quote.appendChild(img);
-            } else {
-                const text = document.createElement('span'); text.className = 'im-quote-text';
-                text.textContent = group.quote || window.imApp.getFriendMessagePreview?.(source) || '';
-                quote.appendChild(text);
+            const signature = [group.key,group.quote,targetRole,source?.type,source?.content,source?.contentAssetId,source?.stickerUrl,source?.stickerAssetId];
+            let saved = state.groups.get(first);
+            if (!saved || signature.some((value,i) => value !== saved.signature[i])) {
+                saved?.head.remove();
+                saved = {signature,head:makeReplyHead(group)};
+                saved.head.classList.add(targetRole === 'user' ? 'is-user-source' : 'is-char-source');
+                first.appendChild(saved.head); state.groups.set(first,saved);
             }
-            head.appendChild(quote);
-            if (group.rows.length > 1) {
-                const count = document.createElement('span'); count.className = 'im-quote-count';
-                count.textContent = group.rows.length + ' Replies'; head.appendChild(count);
-            }
-            first.appendChild(head);
-            first.style.setProperty('--im-quote-space', (head.getBoundingClientRect().height + (scene === 'D' ? 20 : 12)) + 'px');
-            group.head = head; group.scene = scene;
+            const multiple = group.rows.length > 1;
+            let count = saved.head.querySelector('.im-quote-count');
+            if (multiple) {
+                if (!count) { count = document.createElement('span'); count.className = 'im-quote-count'; saved.head.appendChild(count); }
+                const label = group.rows.length + ' Replies';
+                if (count.textContent !== label) count.textContent = label;
+            } else count?.remove();
+            group.rows.forEach((row,i) => {
+                if (!prepareReplyRow(row)) return;
+                for (const [name,on] of [['im-quote-row',true],['im-quote-start',i===0],['im-quote-continuation',i>0],['im-quote-end',i===group.rows.length-1],['im-quote-multiple',multiple]]) setReplyClass(row,name,on);
+                for (const letter of ['A','B','C','D']) setReplyClass(row,'im-quote-scene-'+letter,scene===letter);
+            });
         }
-        // All space reservations precede measurements, so an earlier thread can move later ones.
-        for (const group of groups) {
-            const first = group.rows[0], last = group.rows.at(-1);
-            const bubble = last.querySelector('.chat-bubble, .sticker-message-wrap');
-            if (!bubble) continue;
-            const origin = first.getBoundingClientRect(), head = group.head.getBoundingClientRect(), end = bubble.getBoundingClientRect();
-            const quoteBox = group.head.querySelector('.im-quote-bubble').getBoundingClientRect();
-            let top, bottom;
-            if (group.scene === 'A') { top = quoteBox.bottom - origin.top + 2; bottom = end.top + end.height / 2 - origin.top; }
-            else if (group.scene === 'B') { top = quoteBox.top + quoteBox.height / 2 - origin.top; bottom = end.top + end.height / 2 - origin.top; }
-            else if (group.scene === 'C') { top = quoteBox.bottom - origin.top + 4; bottom = (group.rows.length > 1 ? end.top + end.height / 2 : end.top - 8) - origin.top; }
-            else { top = quoteBox.bottom - origin.top + 3; bottom = end.top - origin.top - 7; }
-            const height = Math.max(group.scene === 'D' ? 13 : 26, bottom - top);
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.classList.add('im-quote-connector'); svg.dataset.scene = group.scene;
-            svg.setAttribute('width', '34'); svg.setAttribute('height', String(height));
-            svg.setAttribute('viewBox', '0 0 34 ' + height); svg.setAttribute('aria-hidden', 'true');
-            svg.style.top = top + 'px';
-            const path = document.createElementNS(svg.namespaceURI, 'path');
-            const h = height - 2;
-            path.setAttribute('d', group.scene === 'A' ? `M3 2 V${h-16} Q3 ${h} 19 ${h} H31`
-                : group.scene === 'B' ? `M31 2 H19 Q3 2 3 18 V${h-16} Q3 ${h} 19 ${h} H31`
-                : group.scene === 'C' ? `M31 2 H19 Q3 2 3 18 V${h}` : `M3 2 V${h}`);
-            svg.appendChild(path); first.appendChild(svg);
+        for (const [first,saved] of state.groups) {
+            if (!active.has(first)) { saved.head.remove(); state.groups.delete(first); }
         }
-        if (following) container.scrollTop = container.scrollHeight;
-        else if (anchor) container.scrollTop += anchor.getBoundingClientRect().top - anchorTop;
+        if (!groups.length) return;
+        // Read both theme fills together, after all structural writes. No box reads,
+        // per-thread flushes, hidden probes, ResizeObserver or image-load callbacks.
+        const user = container.querySelector('.user-bubble:not(.im-card-bubble)');
+        const ai = container.querySelector('.ai-bubble:not(.im-card-bubble)');
+        const colors = [user && getComputedStyle(user).backgroundColor, ai && getComputedStyle(ai).backgroundColor];
+        colors.forEach((color,i) => {
+            if (!color || color === 'rgba(0, 0, 0, 0)') return;
+            const name = i ? '--im-quote-ai' : '--im-quote-user';
+            if (container.style.getPropertyValue(name) !== color) container.style.setProperty(name,color);
+        });
     }
-    window.imChat.scheduleReplyLayout = scheduleReplyLayout;
+    window.imChat.syncReplyThreads = syncReplyThreads;
     function handleAction_19(message_4, friend_5, value_127) {
         syncSingleChatAvatarState(friend_5, value_127);
         const messageId_2 = String(message_4?.id || ''),
@@ -359,8 +352,7 @@
         if (row_3) {
             decorateMessageRowAvatar(row_3, friend_5, message_4);
             apk110New_23(row_3, friend_5, message_4);
-            row_3._imReplyMessage = message_4;
-            scheduleReplyLayout(friend_5, value_127);
+            registerReplyRow(row_3, friend_5, message_4, value_127);
         }
         return true;
     }
@@ -3709,6 +3701,7 @@
         } finally {
             container_15._imIsRenderingHistory = false;
         }
+        syncReplyThreads(friend_25, container_15);
         window.imChat.syncBatchSelectionUi &&
             window.imChat.syncBatchSelectionUi(
                 friend_25,
@@ -3837,8 +3830,7 @@
             '\n                </div>\n            </div>\n        ';
         element_606_2.appendChild(element_618);
         decorateMessageRowAvatar(element_618, friend_26, userMessage);
-        element_618._imReplyMessage = userMessage;
-        scheduleReplyLayout(friend_26, element_606_2);
+        registerReplyRow(element_618, friend_26, userMessage, element_606_2);
         window.imChat.scrollToBottom(element_606_2, {
             force: true,
         });
@@ -3959,8 +3951,7 @@
                 role: 'assistant',
             },
         );
-        row_12._imReplyMessage = value_262 || {id:value_254, role:"assistant", replyTo:value_628};
-        scheduleReplyLayout(friend_27, element_245);
+        registerReplyRow(row_12, friend_27, value_262 || {id:value_254, role:"assistant", replyTo:value_628}, element_245);
         window.imChat.scrollToBottom(element_245);
     }
     function getGeneratedChatImageFileName(timestamp_7, mimeType = '') {

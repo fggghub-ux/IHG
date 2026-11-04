@@ -15188,12 +15188,22 @@ button.moment-private-chat-bubble.has-translation {
 .active-chat-interface.im-chat-single.separate-bubbles .chat-row:is(.user-row, .ai-row) .chat-bubble:not(.im-card-bubble) {
     border-radius: 20px !important;
 }
-/* Detached single-chat quotes: the four layouts and media metrics from iMessage-引用.css. */
-.im-chat-single .chat-row.im-quote-start { padding-top:var(--im-quote-space,54px); position:relative; }
-.im-chat-single .chat-row.im-quote-continuation { margin-top:4px; }
-.im-chat-single .im-quote-head { position:absolute; top:0; max-width:70%; z-index:2; }
-.im-chat-single .im-quote-head.is-char-source { left:0; }
-.im-chat-single .im-quote-head.is-user-source { right:0; }
+/* Single-chat quote threads use normal-flow grid tracks and segmented CSS
+   connectors. Intrinsic text/image heights and avatars need no JS coordinates. */
+.im-chat-single .chat-row.im-quote-row {
+    display:grid; grid-template-columns:auto var(--quote-avatar-left,0px) 34px minmax(0,1fr) var(--quote-avatar-right,0px);
+    grid-template-rows:auto auto auto; gap:0; padding:0 !important; position:relative; min-width:0;
+}
+.im-chat-single .chat-row.im-quote-start { margin-top:14px !important; }
+.im-chat-single .chat-row.im-quote-continuation { margin-top:0 !important; }
+.im-chat-single .chat-row.im-quote-row:not(.im-quote-end) { margin-bottom:0 !important; padding-bottom:12px !important; }
+.im-chat-single .im-quote-row > .chat-checkbox-wrapper { grid-column:1; grid-row:3; }
+.im-chat-single .im-quote-row > .im-quote-body { display:contents !important; }
+.im-chat-single .im-quote-body > .chat-message-header { grid-column:4; grid-row:2; }
+.im-chat-single .im-quote-body > div:not(.chat-message-header) { grid-column:4; grid-row:3; min-width:0; }
+.im-chat-single .im-quote-head { grid-column:3 / 5; grid-row:1; position:relative; max-width:70%; margin-bottom:20px; z-index:2; }
+.im-chat-single .im-quote-head.is-char-source { justify-self:start; }
+.im-chat-single .im-quote-head.is-user-source { justify-self:end; }
 .im-chat-single .im-quote-bubble { position:relative; width:max-content; max-width:100%; box-sizing:border-box; padding:6px 11px 12px; }
 .im-chat-single .im-quote-bubble::before { content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
     background:#e8e8e9; -webkit-mask-box-image:url('../assets/imessage/reply-quote-mask.png') 53 55 69 61 fill / 18px 18px 23px 21px stretch; }
@@ -15209,10 +15219,36 @@ button.moment-private-chat-bubble.has-translation {
 .im-chat-single .im-quote-bubble.is-media::before { content:none; }
 .im-chat-single .im-quote-bubble img { display:block; width:42px; max-width:42px; height:auto; max-height:96px; min-height:24px;
     object-fit:cover; border-radius:8px; border:.5px solid rgba(255,255,255,.4); }
-.im-chat-single .im-quote-connector { position:absolute; left:18px; overflow:visible; pointer-events:none; z-index:0; }
-.im-chat-single .im-quote-connector path { fill:none; stroke:#e8e8e9; stroke-width:3.8; stroke-linecap:round; stroke-linejoin:round; }
-.im-chat-single .im-quote-connector[data-scene="D"] path { stroke:#e5e5ea; }
-.im-chat-single .im-quote-start .chat-bubble, .im-chat-single .im-quote-continuation .chat-bubble { position:relative; z-index:1; }
+.im-chat-single .im-quote-cap, .im-chat-single .im-quote-stem, .im-chat-single .im-quote-line {
+    grid-column:3; align-self:stretch; position:relative; width:34px; pointer-events:none; color:#e8e8e9;
+}
+.im-chat-single .im-quote-cap { grid-row:1; }
+.im-chat-single .im-quote-stem { grid-row:2; }
+.im-chat-single .im-quote-line { grid-row:3; }
+.im-chat-single .im-quote-stem::before, .im-chat-single .im-quote-line::before {
+    content:''; position:absolute; left:0; width:3.8px; top:0; bottom:-15px; background:currentColor;
+}
+.im-chat-single .im-quote-start .im-quote-stem::before { top:-14px; }
+.im-chat-single .im-quote-end .im-quote-line::before { bottom:50%; }
+.im-chat-single :is(.im-quote-scene-A,.im-quote-scene-B).im-quote-end .im-quote-line::before { bottom:calc(50% + 16px); }
+.im-chat-single :is(.im-quote-scene-A,.im-quote-scene-B).im-quote-end .im-quote-line::after {
+    content:''; position:absolute; left:0; top:calc(50% - 16px); width:32px; height:16px;
+    box-sizing:border-box; border-left:3.8px solid; border-bottom:3.8px solid; border-radius:0 0 0 17px;
+}
+.im-chat-single :is(.im-quote-scene-B,.im-quote-scene-C).im-quote-start .im-quote-cap::before {
+    content:''; position:absolute; left:0; right:2px; top:calc((100% - 20px - var(--quote-count-height,0px)) / 2); bottom:0;
+    border-left:3.8px solid; border-top:3.8px solid; border-radius:17px 0 0 0;
+}
+.im-chat-single .im-quote-multiple { --quote-count-height:16px; }
+.im-chat-single :is(.im-quote-scene-B,.im-quote-scene-C).im-quote-start .im-quote-stem::before { top:0; }
+.im-chat-single .im-quote-scene-D .im-quote-stem, .im-chat-single .im-quote-scene-D .im-quote-line { color:#e5e5ea; }
+.im-chat-single .im-quote-scene-D.im-quote-start.im-quote-end .im-quote-line::before { content:none; }
+.im-chat-char .ins-chat-messages.avatar-mode-two .chat-row.im-quote-row.im-quote-continuation { margin-top:0 !important; }
+.im-chat-char .ins-chat-messages.avatar-mode-two .chat-row.im-quote-row.ai-row { --quote-avatar-left:calc(var(--im-message-avatar-size) + var(--im-message-avatar-gap)); }
+.im-chat-char .ins-chat-messages.avatar-mode-two .chat-row.im-quote-row.user-row { --quote-avatar-right:calc(var(--im-message-avatar-size) + var(--im-message-avatar-gap)); }
+.im-chat-char .ins-chat-messages.avatar-mode-two .chat-row.im-quote-row > .im-message-avatar { position:static; grid-row:3; align-self:start; }
+.im-chat-char .ins-chat-messages.avatar-mode-two .chat-row.im-quote-row > .im-message-avatar.is-assistant { grid-column:2; }
+.im-chat-char .ins-chat-messages.avatar-mode-two .chat-row.im-quote-row > .im-message-avatar.is-user { grid-column:5; justify-self:end; }
 
 /* Official Accounts / 有兔创作助手 */
 #official-accounts-view.u2-official-accounts-view {

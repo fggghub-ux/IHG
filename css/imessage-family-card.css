@@ -1,4 +1,4 @@
-/* Family-card face: screenshot-relative size, borderless white header,
+/* Family-card face: screenshot-relative size, softly outlined white header,
    and the note metrics from 转账卡片.css. */
 .chat-bubble.family-invitation-bubble {
     width:254px; max-width:min(100%,71vw); min-width:0; padding:0; background:transparent;
@@ -14,10 +14,10 @@
 .family-invitation-brand {
     display:flex; align-items:center; justify-content:center;
     gap:2px; height:64px; padding:0 12px; box-sizing:border-box;
-    border:0; background:#fff; color:#010101;
+    border:.5px solid #e8e8e8; border-bottom:0; border-radius:20px 20px 0 0; background:#fff; color:#010101;
 }
 .family-invitation-brand .family-invitation-apple {
-    display:block; width:19px; height:24px; flex:0 0 19px; color:#010101;
+    display:block; width:21px; height:26px; flex:0 0 21px; color:#010101;
 }
 .family-invitation-brand span {
     font-family:"Helvetica Neue","SF Pro Display",-apple-system,BlinkMacSystemFont,sans-serif !important;
@@ -26,7 +26,7 @@
 .family-invitation-summary {
     display:grid; grid-template-columns:minmax(0,1fr) auto;
     grid-template-areas:"amount status" "limit limit"; column-gap:12px;
-    padding:8px 16px; background:#26252a;
+    padding:9px 16px 13px; row-gap:2px; background:#26252a;
     border:.5px solid rgba(255,255,255,.35); border-top:0;
     border-radius:0 0 20px 20px; box-sizing:border-box;
 }
