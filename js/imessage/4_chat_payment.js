@@ -1425,7 +1425,7 @@
                         value_202.messages.length > 1
                             ? value_202.messages[value_202.messages.length - 2]
                             : null;
-                window.imChat.shouldShowTimestamp(value_202, timestamp_2, message_228?.timestamp || 0) &&
+                window.imChat.shouldShowTimestamp(timestamp_2, message_228?.timestamp || 0) &&
                     window.imChat.renderTimestamp(timestamp_2, element_227);
                 window.imChat.renderMessageBubble
                     ? window.imChat.renderMessageBubble(
@@ -1659,7 +1659,7 @@
                         value_229.messages.length > 1
                             ? value_229.messages[value_229.messages.length - 2]
                             : null;
-                window.imChat.shouldShowTimestamp(value_229, timestamp_3, message_256?.timestamp || 0) &&
+                window.imChat.shouldShowTimestamp(timestamp_3, message_256?.timestamp || 0) &&
                     window.imChat.renderTimestamp(timestamp_3, element_255);
                 window.imChat.renderMessageBubble
                     ? window.imChat.renderMessageBubble(

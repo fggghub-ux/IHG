@@ -5,11 +5,8 @@
     const { apiConfig: apiConfig_2, userState: userState_2 } = window;
     window.imChat = window.imChat || {};
     const imChat_3 = window.imChat;
-    imChat_3.shouldShowTimestamp = (friend, timestamp, previousTimestamp) => {
-        if (!previousTimestamp) return true;
-        const interval = timestamp - previousTimestamp;
-        return friend?.type === 'char' ? interval >= 60 * 60 * 1000 : interval > 300000;
-    };
+    imChat_3.shouldShowTimestamp = (timestamp, previousTimestamp) =>
+        !previousTimestamp || timestamp - previousTimestamp >= 60 * 60 * 1000;
     const count = 20;
     const count_5 = 60;
     const HISTORY_LOAD_MORE_USER_ROUNDS = 10;
@@ -3356,7 +3353,7 @@
                     Number(row_10.getAttribute('data-timestamp')) > 0,
         );
         const value_560 = Number(handleAction_18_559?.getAttribute('data-timestamp')) || 0;
-        window.imChat.shouldShowTimestamp(friend_22, msgTime_2, value_560) &&
+        window.imChat.shouldShowTimestamp(msgTime_2, value_560) &&
             window.imChat.renderTimestamp(msgTime_2, container_12, friend_22, msg_13);
         const rendered = renderMessageBubble_3(msg_13, friend_22, container_12, msgTime_2);
         if (
@@ -3515,7 +3512,7 @@
                                       .at(-1)
                                 : null;
                         if (
-                            window.imChat.shouldShowTimestamp(friend_25, value_598, count_590) ||
+                            window.imChat.shouldShowTimestamp(value_598, count_590) ||
                             timeAnchor
                         ) {
                             window.imChat.renderTimestamp(
