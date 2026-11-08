@@ -1,4 +1,4 @@
-// Home-only image warmup and cover selection. Account state remains owned by settings.js.
+
 (window.u2OnStorageReady || (callback => document.addEventListener('DOMContentLoaded', callback)))(() => {
     const button = document.getElementById('imessage-home-cover');
     const input = document.getElementById('imessage-home-cover-input');
