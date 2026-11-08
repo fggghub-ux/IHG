@@ -10,10 +10,6 @@
         (/Mac/.test(navigator.userAgent + navigator.platform) && navigator.maxTouchPoints > 1)
     );
     root.classList.toggle('app-ipad-layout', isIPad);
-    // The APK keeps a relative 100vh app frame. Preserve that layout on iPad:
-    // Safari owns keyboard panning; a second owner moving/resizing #app creates
-    // stale offsets during dismissal and moves the nested scrollports as well.
-    // Keep only the platform marker used by the existing iPad CSS repairs.
     if (isIPad) return;
 
     let frame = 0;
@@ -59,8 +55,6 @@
         if (!focused && !keyboardOpen) restingHeight = Math.max(height, window.innerHeight);
         keyboardOpen = restingHeight - height > 100 && (focused || keyboardOpen);
         if (height >= restingHeight - 72) keyboardOpen = false;
-        // STATUS edits keep the existing app frame, as on GPT. This viewport
-        // owner also waits for keyboard dismissal before resuming normal sizing.
         const statusModalOpen = !!document.querySelector(
             '#custom-modal-overlay.active[data-keep-background="true"]',
         );

@@ -24,7 +24,6 @@
             seed = Math.imul(seed ^ ch.charCodeAt(0), 16777619) >>> 0;
         return Array.from({length: 24}, (_, i) => {
             seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-            // Rounded, varied bars matching the reference; stable for each message.
             const h = 6 + ((seed >>> 16) % 17);
             return `<span style="height:${h}px;--voice-bar-start:${i / 24};--voice-bar-count:24"></span>`;
         }).join('');

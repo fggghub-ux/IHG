@@ -1207,7 +1207,7 @@
 
 .bstage-chat-bubble {
     padding: 10px 14px;
-    border-radius: 20px; /* Pure rounded corners as requested */
+    border-radius: 20px;
     font-size: 15px;
     line-height: 1.4;
     position: relative;
@@ -1539,7 +1539,6 @@
     align-items: center;
     width: 16px;
     height: 16px;
-    /* Remove background as requested */
     background-color: transparent;
     color: #888; /* Subtle color */
     font-size: 12px; /* Slightly larger for X */

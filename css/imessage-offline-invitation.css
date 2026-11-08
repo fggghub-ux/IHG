@@ -1,4 +1,3 @@
-/* Invitation-only presentation, adapted from the supplied Face ID/header/slider UI. */
 .offline-invite-card {
     position: relative;
     display: block !important;
@@ -169,8 +168,6 @@
 .offline-invite-slider.is-unlocked .invitation-lock-open { display: block; }
 @keyframes offline-invite-unlock { 50% { transform: scale(1.08); } }
 
-/* The source header uses this backing color beneath its translucent glass.
-   Keep that surface local to the invitation; the offline page keeps its theme. */
 .offline-invitation-opening {
     flex: 0 0 auto;
     width: calc(100% - 28px);

@@ -1064,10 +1064,6 @@ button.group-private-chat-detail-bubble {
     overscroll-behavior-x: none;
 }
 
-/* Home default UI — adapted from JW-Home-ig.
-   Reference: 1080px screenshot / 3 = 360 CSS px; cover 292 x 170,
-   avatar 58, content inset 34, header title inset 38.
-   The shared header above remains the Chats/Moments baseline. */
 #imessage-view[data-im-active-surface="home"] > .line-header {
     position: relative;
     top: 0;
@@ -3236,7 +3232,6 @@ button.group-private-chat-detail-bubble {
     }
 }
 
-/* Chats list view — metrics are taken from the supplied 430px Messages source. */
 .chats-content {
     display: none;
     flex-direction: column;
@@ -3840,7 +3835,6 @@ button.group-private-chat-detail-bubble {
     display: none !important;
 }
 
-/* Only this Chats rule is taken from GPT's later iPad conversation media block. */
 @media (min-width: 768px) {
     .chat-pinned-dot { left: calc(14px * var(--chats-ui-scale)); }
 }
@@ -5199,7 +5193,6 @@ button.group-private-chat-detail-bubble {
     overflow: visible;
 }
 
-/* GX/GPT photo-batch presentation for IHG album messages. */
 .photo-batch-summary {
     width: 100%;
     display: flex;
@@ -6989,7 +6982,6 @@ button.group-private-chat-detail-bubble {
 
 /* Adjust padding for group packets / pay transfer in outside mode */
 
-/* Tails removed as requested */
 
 /* Make connecting bubbles squarish */
 .user-row.has-prev .user-bubble:not(.im-card-bubble) {
@@ -7691,7 +7683,6 @@ button.group-private-chat-detail-bubble {
 }
 */
 
-/* Toggle Switch (Commented to use ios_emulator.css version) */
 /*
 .toggle-switch {
     position: relative;
@@ -17856,8 +17847,6 @@ button.moment-private-chat-bubble.has-translation {
 .loves-invitation-card .gift-message-status { margin-top:4px; font-size:11px; color:rgba(255,255,255,.78); }
 .loves-invitation-card .gift-message-footer { position:relative; z-index:1; height:21px; padding:3px 13px 0; box-sizing:border-box; border-top:1px solid rgba(255,255,255,.16); font-size:10px; color:rgba(255,255,255,.68); }
 
-/* App Store & iTunes gift card adapted from the supplied reference.
-   Gift status stays in message data; both directions always use this one UI. */
 .chat-row .chat-bubble.gift-message-bubble:not(.loves-invitation-bubble) {
     width: 220px !important;
     min-width: 0 !important;
@@ -17900,7 +17889,6 @@ button.moment-private-chat-bubble.has-translation {
   transform: scale(0.97);
 }
 
-/* Centered logo from the reference. */
 .gift-message-card:not(.loves-invitation-card)::before {
   content: "";
   display: block;
@@ -17911,7 +17899,6 @@ button.moment-private-chat-bubble.has-translation {
   width: 66px;
   height: 78px;
 
-  /* Reference SVG logo. */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'%3E%3Cpath fill='%23ffffff' d='M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z'/%3E%3C/svg%3E");
   background-size: contain;
   background-repeat: no-repeat;

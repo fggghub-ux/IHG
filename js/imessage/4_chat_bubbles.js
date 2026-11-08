@@ -4070,12 +4070,6 @@
     openChatImagePrompt120(apk120Value1004, apk120Value1005, apk120Value1006, apk120Value1007);
   }), apk120Value1009.style.display = "flex", apk120Value1009.tabIndex = -0x1, apk120Value1009.focus(), void apk120Value1035(apk120Value1028);
 }
-    /* PhotoStack by Wren036 (https://github.com/Wren036/PhotoStack).
-       https://polyformproject.org/licenses/noncommercial/1.0.0/
-       Adapted from fggghub-ux/PhotoStack README, “展开 / 收起动画”:
-       shared 280ms X/rotation/scale timeline; 280+45*i ms Y timelines;
-       solid, reused images; FLIP following rows; no scripted viewport scrolling.
-       The source explicitly does not ship a host-independent expand/collapse function. */
     function attachPhotoAlbumMorph(summary, stack, cards, cardOrder, motion, container, groupId) {
         const expandedGroups = container._imExpandedPhotoGroups || new Set();
         container._imExpandedPhotoGroups = expandedGroups;
@@ -4188,8 +4182,6 @@
         resize.observe(stack);
     }
 
-    // GX/GPT renderPhotoBatchGroup presentation and swipe motion, adapted to
-    // IHG's one image message with albumImages and its existing detail viewer.
     function mountChatPhotoAlbum(summary, message, container, openDetail) {
         const count = 1 + message.albumImages.length;
         const gridIconSvg = `<svg class="photo-batch-grid-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor"></rect><rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor"></rect><rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor"></rect><rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor"></rect></svg>`;
@@ -4231,9 +4223,6 @@
         });
         const cardOrder = cards.slice();
 
-        // Gesture timing and scrub behavior adapted from fggghub-ux/PhotoStack
-        // (PolyForm Noncommercial 1.0.0). The order wraps so either direction
-        // moves the visible card to the back, as required by this chat UI.
         let suppressClickUntil = 0;
         const stackMotion = {
             frame: 0,

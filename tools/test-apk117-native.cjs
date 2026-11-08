@@ -1,4 +1,3 @@
-// Tests only the JavaScript integrations shipped inside APK 1.1.7. No native build.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');

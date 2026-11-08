@@ -1,5 +1,3 @@
-/* Mark actual iPad scrollports for CSS overscroll containment. As in the APK,
- * content gestures remain native: do not cancel touchmove or move the app. */
 (function () {
     if (!document.documentElement.classList.contains('app-ipad-layout')) return;
 

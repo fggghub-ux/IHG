@@ -126,11 +126,7 @@ body {
     cursor: pointer;
 }
 
-/* ==========================================
-   合并自 iiso/ios_emulator.css 的样式
-   ========================================== */
 
-/* 重新定义局部变量，覆盖 iiso 的根变量以匹配当前上下文 */
 :root {
     --bg-color: #ffffff;
     --screen-bg: #ffffff;
@@ -160,7 +156,6 @@ body {
     --z-system: 99999;
 }
 
-/* 移除重复的通用样式定义，保留 iiso 专有的组件样式 */
 
 input,
 textarea,

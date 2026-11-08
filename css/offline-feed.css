@@ -1,5 +1,4 @@
 
-/* Offline feed layout; profile geometry and typography below come from GX/GPT. */
 #offline-chat-view .offline-chat-bubble { display:flex; flex-direction:column; flex-shrink:0; }
 #offline-chat-view .offline-chat-bubble-body { display:flex; flex-direction:column; gap:0; }
 #offline-chat-view .offline-chat-avatar { display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
@@ -15,7 +14,6 @@
 #offline-chat-view .offline-chat-bubble-text { word-break:break-word; }
 #offline-chat-view .offline-chat-bubble-text.is-streaming { white-space:pre-wrap; }
 #offline-chat-view .offline-chat-speech { display:inline; }
-/* Offline profile-feed UI — adapted from the supplied 线下-X source. */
 #offline-chat-view {
     --offline-profile-bg: #ffffff;
     --offline-profile-text: #1a1a1a;

@@ -1,5 +1,3 @@
-// Offline integration checks for the GX/GPT -> IHG/<3 single-chat migration.
-// External network requests are blocked; AI/TTS use local test fixtures only.
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');

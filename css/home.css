@@ -1953,7 +1953,6 @@ body:has(#u2-login-screen:not(.is-hidden)) #pages-container > .page-wrapper * {
     }
 }
 
-/* Home status bar: supplied design adapted to the home chrome toggle. */
 .home-ios-status-bar {
     position: absolute;
     top: env(safe-area-inset-top, 0px);
