@@ -801,11 +801,15 @@ Rules:
                 if (succeeded) closeComposer(true);
             }
         }
-        async function openAnonymousQa_2() {
+        async function openAnonymousQa_2(backLabel = 'App Store') {
             await refreshCharacters();
             setStatus('');
+            elements.qaBack.setAttribute('aria-label', '返回 ' + backLabel);
             root_3.openView?.(elements.qaView);
         }
+        root_3.document.getElementById('imessage-anonymous-qa-btn')?.addEventListener('click', () => {
+            void openAnonymousQa_2('iMessage');
+        });
         elements.qaBack.addEventListener('click', () => {
             closeComposer(true);
             root_3.closeView?.(elements.qaView);
