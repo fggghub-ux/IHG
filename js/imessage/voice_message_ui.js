@@ -139,7 +139,7 @@
         const s = stateOf(f, m);
         bubble.dataset.voiceKey = s.key;
         // Only the voice container is sized; its existing background/tail is preserved.
-        for (const [name, val] of Object.entries({display:'inline-flex', 'flex-direction':'column', width:'220px', 'max-width':'220px', 'min-width':'0', height:'auto', 'min-height':'43px', 'max-height':'none', 'aspect-ratio':'auto', flex:'0 0 auto', padding:'5px 12px 6px 10px', 'box-sizing':'border-box', 'white-space':'normal'})) bubble.style.setProperty(name, val, 'important');
+        for (const [name, val] of Object.entries({display:'inline-flex', 'flex-direction':'column', width:'200px', 'max-width':'200px', 'min-width':'0', height:'auto', 'min-height':'43px', 'max-height':'none', 'aspect-ratio':'auto', flex:'0 0 auto', padding:'5px 12px 6px 10px', 'box-sizing':'border-box', 'white-space':'normal'})) bubble.style.setProperty(name, val, 'important');
         bubble.querySelector('.voice-message-play')?.addEventListener('click', async event => {
             event.preventDefault(); event.stopPropagation();
             try { await play(f, m); }
