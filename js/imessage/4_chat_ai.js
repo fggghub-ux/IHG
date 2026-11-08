@@ -1242,7 +1242,7 @@ if (message_1132.type === 'fake_link') {
             liveFriend_3.messages && liveFriend_3.messages.length > 0
                 ? liveFriend_3.messages[liveFriend_3.messages.length - 1]
                 : null;
-        (!message_1406 || timestamp_2 - (message_1406.timestamp || 0) > 300000) &&
+        window.imChat.shouldShowTimestamp(liveFriend_3, timestamp_2, message_1406?.timestamp || 0) &&
             window.imChat.renderTimestamp(timestamp_2, container_3, friend_13);
         const value_1407 = window.imData.currentReplyText || null;
         const replyToMessageId_2 = window.imData.currentReplyMessageId || null;
@@ -10452,7 +10452,7 @@ if (value_3364 === 'contact_card') return handleAction_81_2(currentItem_3);
                     : null;
             queueItems.length > 0 &&
                 dtsVU_2910 &&
-                (!message_2912 || now_2908 - (message_2912.timestamp || 0) > 300000) &&
+                window.imChat.shouldShowTimestamp(value_2911, now_2908, message_2912?.timestamp || 0) &&
                 window.imChat.renderTimestamp(now_2908, dtsVU_2910, friend_31);
             let lastGroupSpeaker = null;
             let recallPresentationCommitted = false;
