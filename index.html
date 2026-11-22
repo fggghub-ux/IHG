@@ -1672,6 +1672,72 @@
                 </div>
             </div>
 
+            <div class="app-view treasure-view" id="treasure-view" role="application" aria-label="Treasure" aria-hidden="true" inert>
+                <header class="treasure-topbar">
+                    <button type="button" class="treasure-circle" id="treasure-back" aria-label="返回主屏幕"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+                    <button type="button" id="treasure-conversation" class="treasure-conversation" aria-haspopup="dialog" aria-expanded="false"><span id="treasure-current-avatar" class="treasure-avatar"></span><span id="treasure-current-name">选择会话</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+                    <button type="button" class="treasure-circle" id="treasure-manage" aria-label="多选收藏" title="多选收藏"><i class="far fa-circle-check" aria-hidden="true"></i></button>
+                </header>
+                <main class="treasure-scroll">
+                    <div class="treasure-heading"><span>YOUR COLLECTION</span><h1>Treasure</h1><p id="treasure-summary"></p></div>
+                    <div class="treasure-search-panel" id="treasure-search-panel" hidden>
+                        <label class="treasure-search-field" for="treasure-search-input"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" id="treasure-search-input" aria-label="搜索收藏记录" placeholder="搜索当前会话的全部收藏" autocomplete="off" enterkeyhint="search"><button type="button" id="treasure-search-clear" aria-label="清空搜索" hidden><i class="fas fa-circle-xmark" aria-hidden="true"></i></button></label>
+                    </div>
+                    <div class="treasure-management" id="treasure-management" hidden>
+                        <button type="button" id="treasure-select-all">全选本页</button><span id="treasure-selected-count" aria-live="polite">已选 0 条</span>
+                        <button type="button" class="treasure-circle" id="treasure-delete-selected" aria-label="删除所选收藏"><i class="far fa-trash-can" aria-hidden="true"></i></button>
+                    </div>
+                    <div id="treasure-list" class="treasure-list" aria-live="polite"></div>
+                    <nav id="treasure-pagination" class="treasure-pagination" aria-label="收藏翻页" hidden>
+                        <button type="button" id="treasure-page-previous" aria-label="上一页收藏"><i class="fas fa-chevron-left" aria-hidden="true"></i><span>上一页</span></button>
+                        <span id="treasure-page-status" role="status" aria-live="polite"></span>
+                        <button type="button" id="treasure-page-next" aria-label="下一页收藏"><span>下一页</span><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+                    </nav>
+                    <button type="button" id="treasure-clear" class="treasure-clear">清空当前分类</button>
+                </main>
+                <div class="treasure-menu-backdrop" id="treasure-menu-backdrop" hidden aria-hidden="true"></div>
+                <div class="treasure-bottom-controls">
+                    <button type="button" class="treasure-search-button" id="treasure-search-button" aria-label="搜索收藏" aria-pressed="false" aria-controls="treasure-search-panel"><i class="fas fa-magnifying-glass" aria-hidden="true"></i></button>
+                    <div class="treasure-category-control">
+                        <nav class="treasure-category-menu" id="treasure-category-menu" role="menu" aria-label="收藏分类" aria-hidden="true" inert>
+                            <button type="button" role="menuitemradio" tabindex="-1" data-treasure-category="online" aria-checked="true" style="--menu-order:0"><i class="far fa-comment" aria-hidden="true"></i><span>线上</span></button>
+                            <button type="button" role="menuitemradio" tabindex="-1" data-treasure-category="voice" aria-checked="false" style="--menu-order:1"><i class="fas fa-wave-square" aria-hidden="true"></i><span>语音</span></button>
+                            <button type="button" role="menuitemradio" tabindex="-1" data-treasure-category="offline" aria-checked="false" style="--menu-order:2"><i class="fas fa-book-open" aria-hidden="true"></i><span>线下</span></button>
+                            <button type="button" role="menuitemradio" tabindex="-1" data-treasure-category="file" aria-checked="false" style="--menu-order:3"><i class="far fa-file-lines" aria-hidden="true"></i><span>文件</span></button>
+                            <button type="button" role="menuitemradio" tabindex="-1" data-treasure-category="status" aria-checked="false" style="--menu-order:4"><i class="far fa-id-card" aria-hidden="true"></i><span>状态栏</span></button>
+                        </nav>
+                        <button type="button" class="treasure-category-button" id="treasure-category-button" aria-label="展开收藏分类" aria-haspopup="menu" aria-expanded="false" aria-controls="treasure-category-menu"><i class="fas fa-plus" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+                <div class="treasure-overlay" id="treasure-picker" hidden>
+                    <section class="treasure-picker-panel" role="dialog" aria-modal="true" aria-label="选择收藏会话">
+                        <header><h2>选择会话</h2><button type="button" class="treasure-circle" data-treasure-close="picker" aria-label="关闭"><i class="fas fa-xmark" aria-hidden="true"></i></button></header>
+                        <div id="treasure-conversations"></div>
+                    </section>
+                </div>
+                <div class="treasure-overlay" id="treasure-confirm" hidden>
+                    <section class="treasure-confirm-panel" role="dialog" aria-modal="true" aria-labelledby="treasure-confirm-title">
+                        <i class="far fa-trash-can" aria-hidden="true"></i><h2 id="treasure-confirm-title">删除收藏</h2><p id="treasure-confirm-copy"></p>
+                        <div><button type="button" data-treasure-close="confirm">取消</button><button type="button" id="treasure-confirm-delete">删除</button></div><p id="treasure-confirm-error" role="status"></p>
+                    </section>
+                </div>
+                <div class="treasure-overlay treasure-image-preview" id="treasure-image-preview" hidden role="dialog" aria-modal="true" aria-label="图片预览">
+                    <button type="button" class="treasure-circle" data-treasure-close="image-preview" aria-label="关闭图片预览"><i class="fas fa-xmark" aria-hidden="true"></i></button><img id="treasure-preview-img" alt="收藏的图片">
+                </div>
+                <div class="treasure-overlay" id="treasure-offline-detail" hidden>
+                    <section class="treasure-offline-panel" role="dialog" aria-modal="true" aria-labelledby="treasure-offline-time">
+                        <header><time id="treasure-offline-time"></time><button type="button" class="treasure-circle" data-treasure-close="offline-detail" aria-label="关闭线下收藏"><i class="fas fa-xmark" aria-hidden="true"></i></button></header>
+                        <div id="treasure-offline-text" class="treasure-offline-text"></div>
+                    </section>
+                </div>
+                <div class="treasure-overlay" id="treasure-status-detail" hidden>
+                    <section class="treasure-status-panel" role="dialog" aria-modal="true" aria-labelledby="treasure-status-title">
+                        <header><h2 id="treasure-status-title">收藏的状态栏</h2><button type="button" class="treasure-circle" data-treasure-close="status-detail" aria-label="关闭状态栏收藏"><i class="fas fa-xmark" aria-hidden="true"></i></button></header>
+                        <div id="treasure-status-content" class="treasure-status-content"></div>
+                    </section>
+                </div>
+            </div>
+
             <!-- Gallery -->
             <div
                 class="app-view gallery-view"
@@ -20071,71 +20137,6 @@
         <!-- 引入主逻辑脚本 -->
         <script src="script.js?v=20260725-modal-owner-v1&home-swipe=20260801-scrollend-v2&performance=20260801-v1&splash-notice-handshake=20260813-v1&reader-selection=20260819-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1"></script>
         <script src="js/app_tutorials.js?v=120"></script>
-    <div class="app-view treasure-view" id="treasure-view" role="application" aria-label="Treasure" aria-hidden="true" inert>
-            <header class="treasure-topbar">
-                <button type="button" class="treasure-circle" id="treasure-back" aria-label="返回主屏幕"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
-                <button type="button" id="treasure-conversation" class="treasure-conversation" aria-haspopup="dialog" aria-expanded="false"><span id="treasure-current-avatar" class="treasure-avatar"></span><span id="treasure-current-name">选择会话</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
-                <button type="button" class="treasure-circle" id="treasure-manage" aria-label="多选收藏" title="多选收藏"><i class="far fa-circle-check" aria-hidden="true"></i></button>
-            </header>
-            <main class="treasure-scroll">
-                <div class="treasure-heading"><span>YOUR COLLECTION</span><h1>Treasure</h1><p id="treasure-summary"></p></div>
-                <div class="treasure-search-panel" id="treasure-search-panel" hidden>
-                    <label class="treasure-search-field" for="treasure-search-input"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" id="treasure-search-input" aria-label="搜索收藏记录" placeholder="搜索当前会话的全部收藏" autocomplete="off" enterkeyhint="search"><button type="button" id="treasure-search-clear" aria-label="清空搜索" hidden><i class="fas fa-circle-xmark" aria-hidden="true"></i></button></label>
-                </div>
-                <div class="treasure-management" id="treasure-management" hidden>
-                    <button type="button" id="treasure-select-all">全选本页</button><span id="treasure-selected-count" aria-live="polite">已选 0 条</span>
-                    <button type="button" class="treasure-circle" id="treasure-delete-selected" aria-label="删除所选收藏"><i class="far fa-trash-can" aria-hidden="true"></i></button>
-                </div>
-                <div id="treasure-list" class="treasure-list" aria-live="polite"></div>
-                <nav id="treasure-pagination" class="treasure-pagination" aria-label="收藏翻页" hidden>
-                    <button type="button" id="treasure-page-previous" aria-label="上一页收藏"><i class="fas fa-chevron-left" aria-hidden="true"></i><span>上一页</span></button>
-                    <span id="treasure-page-status" role="status" aria-live="polite"></span>
-                    <button type="button" id="treasure-page-next" aria-label="下一页收藏"><span>下一页</span><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
-                </nav>
-                <button type="button" id="treasure-clear" class="treasure-clear">清空当前分类</button>
-            </main>
-            <div class="treasure-menu-backdrop" id="treasure-menu-backdrop" hidden aria-hidden="true"></div>
-            <div class="treasure-bottom-controls">
-                <button type="button" class="treasure-search-button" id="treasure-search-button" aria-label="搜索收藏" aria-pressed="false" aria-controls="treasure-search-panel"><i class="fas fa-magnifying-glass" aria-hidden="true"></i></button>
-                <div class="treasure-category-control">
-                    <nav class="treasure-category-menu" id="treasure-category-menu" role="menu" aria-label="收藏分类" aria-hidden="true" inert>
-                        <button type="button" role="menuitemradio" tabindex="-1" data-treasure-category="online" aria-checked="true" style="--menu-order:0"><i class="far fa-comment" aria-hidden="true"></i><span>线上</span></button>
-                        <button type="button" role="menuitemradio" tabindex="-1" data-treasure-category="voice" aria-checked="false" style="--menu-order:1"><i class="fas fa-wave-square" aria-hidden="true"></i><span>语音</span></button>
-                        <button type="button" role="menuitemradio" tabindex="-1" data-treasure-category="offline" aria-checked="false" style="--menu-order:2"><i class="fas fa-book-open" aria-hidden="true"></i><span>线下</span></button>
-                        <button type="button" role="menuitemradio" tabindex="-1" data-treasure-category="file" aria-checked="false" style="--menu-order:3"><i class="far fa-file-lines" aria-hidden="true"></i><span>文件</span></button>
-                        <button type="button" role="menuitemradio" tabindex="-1" data-treasure-category="status" aria-checked="false" style="--menu-order:4"><i class="far fa-id-card" aria-hidden="true"></i><span>状态栏</span></button>
-                    </nav>
-                    <button type="button" class="treasure-category-button" id="treasure-category-button" aria-label="展开收藏分类" aria-haspopup="menu" aria-expanded="false" aria-controls="treasure-category-menu"><i class="fas fa-plus" aria-hidden="true"></i></button>
-                </div>
-            </div>
-            <div class="treasure-overlay" id="treasure-picker" hidden>
-                <section class="treasure-picker-panel" role="dialog" aria-modal="true" aria-label="选择收藏会话">
-                    <header><h2>选择会话</h2><button type="button" class="treasure-circle" data-treasure-close="picker" aria-label="关闭"><i class="fas fa-xmark" aria-hidden="true"></i></button></header>
-                    <div id="treasure-conversations"></div>
-                </section>
-            </div>
-            <div class="treasure-overlay" id="treasure-confirm" hidden>
-                <section class="treasure-confirm-panel" role="dialog" aria-modal="true" aria-labelledby="treasure-confirm-title">
-                    <i class="far fa-trash-can" aria-hidden="true"></i><h2 id="treasure-confirm-title">删除收藏</h2><p id="treasure-confirm-copy"></p>
-                    <div><button type="button" data-treasure-close="confirm">取消</button><button type="button" id="treasure-confirm-delete">删除</button></div><p id="treasure-confirm-error" role="status"></p>
-                </section>
-            </div>
-            <div class="treasure-overlay treasure-image-preview" id="treasure-image-preview" hidden role="dialog" aria-modal="true" aria-label="图片预览">
-                <button type="button" class="treasure-circle" data-treasure-close="image-preview" aria-label="关闭图片预览"><i class="fas fa-xmark" aria-hidden="true"></i></button><img id="treasure-preview-img" alt="收藏的图片">
-            </div>
-            <div class="treasure-overlay" id="treasure-offline-detail" hidden>
-                <section class="treasure-offline-panel" role="dialog" aria-modal="true" aria-labelledby="treasure-offline-time">
-                    <header><time id="treasure-offline-time"></time><button type="button" class="treasure-circle" data-treasure-close="offline-detail" aria-label="关闭线下收藏"><i class="fas fa-xmark" aria-hidden="true"></i></button></header>
-                    <div id="treasure-offline-text" class="treasure-offline-text"></div>
-                </section>
-            </div>
-            <div class="treasure-overlay" id="treasure-status-detail" hidden>
-                <section class="treasure-status-panel" role="dialog" aria-modal="true" aria-labelledby="treasure-status-title">
-                    <header><h2 id="treasure-status-title">收藏的状态栏</h2><button type="button" class="treasure-circle" data-treasure-close="status-detail" aria-label="关闭状态栏收藏"><i class="fas fa-xmark" aria-hidden="true"></i></button></header>
-                    <div id="treasure-status-content" class="treasure-status-content"></div>
-                </section>
-            </div>
-        </div>
 <div class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay" id="group-announcement-sheet" style="z-index: 700;">
     <section class="wb-centered-modal-card wb-group-modal-card im-group-announcement-panel" role="dialog" aria-modal="true" aria-labelledby="group-announcement-title">
         <header class="wb-centered-modal-header">
