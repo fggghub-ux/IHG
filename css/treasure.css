@@ -79,16 +79,7 @@
 .treasure-category-menu button[aria-checked="true"] { background: #202024; border-color: #202024; color: #fff; }
 .treasure-category-menu.is-open { visibility: visible; pointer-events: auto; transition-delay: 0s; }
 .treasure-category-menu.is-open button { opacity: 1; transform: translateY(0) scale(1); transition-duration: 220ms; transition-delay: calc(var(--menu-order) * 15ms); }
-@media (prefers-reduced-motion: reduce) {
-    .treasure-category-button { transition: background-color 150ms ease, color 150ms ease; }
-    .treasure-category-button i { transition: none; }
-    .treasure-category-menu { transition: visibility 0s 150ms; }
-    .treasure-category-menu.is-open { transition-delay: 0s; }
-    .treasure-category-menu button, .treasure-category-menu.is-open button {
-        transform: none;
-        transition: opacity 150ms ease;
-    }
-}
+@media (prefers-reduced-motion: reduce) { .treasure-category-button i, .treasure-category-menu, .treasure-category-menu button, .treasure-category-menu.is-open button { transition: none; } }
 .treasure-search-button[aria-pressed="true"] { color: #fff; background: #202024; }
 .treasure-search-panel { margin: 0 0 20px; }
 .treasure-search-field { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 14px; border: 1px solid #e7e7eb; border-radius: 24px; background: #fff; color: #939399; }
