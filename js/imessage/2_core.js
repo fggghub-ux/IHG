@@ -5894,9 +5894,9 @@ window.addEventListener("pagehide", () => {
   });
   const chatCoreScopeValue1709 = document.getElementById("nav-home-btn");
   const chatCoreScopeValue1710 = document.getElementById("nav-chats-btn");
-  const chatCoreScopeValue1711 = document.getElementById("nav-moments-btn");
   const chatCoreScopeValue1712 = document.getElementById("line-nav-indicator");
   const chatCoreScopeValue1713 = document.querySelector(".line-bottom-nav-container");
+  const bottomNavParent = chatCoreScopeValue1713?.parentElement;
   const chatCoreScopeValue1714 = document.querySelector(".line-content");
   const chatCoreScopeValue1715 = document.getElementById("chats-content");
   const chatCoreScopeValue1716 = document.getElementById("memory-location-sheet");
@@ -6961,13 +6961,18 @@ window.addEventListener("pagehide", () => {
     if (chatCoreScopeValue1715) chatCoreScopeValue1715.setAttribute("aria-hidden", "true");
     if (chatCoreScopeValue1709) chatCoreScopeValue1709.classList.remove("active");
     if (chatCoreScopeValue1710) chatCoreScopeValue1710.classList.remove("active");
-    if (chatCoreScopeValue1711) chatCoreScopeValue1711.classList.remove("active");
     const chatCoreScopeValue2390 = document.querySelector(".line-header-right");
     if (chatCoreScopeValue2390) chatCoreScopeValue2390.style.display = "flex";
+  }
+  function mountBottomNav() {
+    if (!bottomNavParent || chatCoreScopeValue1713.parentElement === bottomNavParent) return;
+    bottomNavParent.appendChild(chatCoreScopeValue1713);
+    window.imApp.updateChatsUnreadBadges?.();
   }
   chatCoreScopeValue1709 && chatCoreScopeValue1709.addEventListener("click", () => {
     chatCoreScopeValue1784();
     window.imApp.setActiveThemeSurface("home");
+    mountBottomNav();
     if (chatCoreScopeValue1714) chatCoreScopeValue1714.style.display = "block";
     if (chatCoreScopeValue1714) chatCoreScopeValue1714.setAttribute("aria-hidden", "false");
     if (chatCoreScopeValue1713) chatCoreScopeValue1713.style.display = "flex";
@@ -6979,6 +6984,7 @@ window.addEventListener("pagehide", () => {
   chatCoreScopeValue1710 && chatCoreScopeValue1710.addEventListener("click", () => {
     chatCoreScopeValue1784();
     window.imApp.setActiveThemeSurface("chats");
+    mountBottomNav();
     if (chatCoreScopeValue1715) {
       chatCoreScopeValue1715.style.display = "flex";
       chatCoreScopeValue1715.style.flexDirection = "column";

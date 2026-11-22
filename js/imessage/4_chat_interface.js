@@ -466,10 +466,9 @@ This is not a message sent by User in the group. No member may claim to have see
     window.imChat.cancelPendingChatOpen = () => {
         count += 1;
     };
-    ['nav-home-btn', 'nav-chats-btn'].forEach((id) => {
-        document
-            .getElementById(id)
-            ?.addEventListener('click', window.imChat.cancelPendingChatOpen, true);
+    const navChatsBtn = document.getElementById('nav-chats-btn');
+    [document.getElementById('nav-home-btn'), navChatsBtn].forEach((button) => {
+        button?.addEventListener('click', window.imChat.cancelPendingChatOpen, true);
     });
     const imessageRoot = document.getElementById('imessage-view');
     if (imessageRoot)
@@ -713,8 +712,7 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
 
     async function openChatTab_2(friend_6) {
         const value_34 = ++count,
-            chatsContent_2 = document.getElementById('chats-content'),
-            navChatsBtn = document.getElementById('nav-chats-btn');
+            chatsContent_2 = document.getElementById('chats-content');
         closeStaleGroupCallSheets();
         const currentActiveFriend_2 =
             (window.imData.friends || []).find(
