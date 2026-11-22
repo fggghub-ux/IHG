@@ -1143,7 +1143,55 @@
   var Ze = Xe().catch(t => {
     console.warn("[native_bridge] Native runtime initialization failed:", t);
   });
+async function requestFishAudioTts({
+  url: i,
+  apiKey: e,
+  model: t,
+  body: n,
+  timeoutMs: r = 45e3
+} = {}) {
+  if (!isNativeIos) throw new Error("Fish Audio 原生请求仅支持 iOS");
+  let a = new URL(String(i || ""));
+  if (a.protocol !== "https:" || a.username || a.password) throw new Error("App \u5185\u7684 Fish Audio \u63A5\u53E3\u5730\u5740\u5FC5\u987B\u4F7F\u7528 HTTPS\uFF0C\u4E14\u4E0D\u80FD\u5305\u542B\u7528\u6237\u540D\u6216\u5BC6\u7801");
+  let o = Math.max(1e3, Math.min(45e3, Number(r) || 45e3)),
+    s = await ie.request({
+      url: a.href,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "audio/mpeg",
+        Authorization: `Bearer ${e}`,
+        model: t
+      },
+      data: n,
+      connectTimeout: o,
+      readTimeout: o,
+      responseType: "arraybuffer"
+    }),
+    c = Number(s?.status);
+  if (!Number.isInteger(c) || c < 200 || c > 599) throw new Error("Fish Audio TTS \u672A\u8FD4\u56DE\u6709\u6548\u7684 HTTP \u54CD\u5E94");
+  let d = new Headers(s.headers || {}),
+    u = String(d.get("content-type") || "").toLowerCase(),
+    l = c >= 200 && c < 300,
+    h = s.data;
+  return h != null && typeof h == "object" ? (h = JSON.stringify(h), d.set("Content-Type", "application/json")) : !u.includes("application/json") && !(f && !l) && (h = je(h)), d.has("content-type") || d.set("Content-Type", l ? "audio/mpeg" : "text/plain; charset=utf-8"), new Response([204, 205, 304].includes(c) ? null : h, {
+    status: c,
+    headers: d
+  });
+}
+  async function openExternalUrl(value) {
+    const address = String(value || '').trim();
+    let url;
+    try { url = new URL(address); } catch { throw new Error('支付地址无效'); }
+    if (!/^https:\/\//i.test(address) || url.protocol !== 'https:' || !url.hostname || url.username || url.password || /[\x00-\x20\x7f\\]/.test(address)) throw new Error('仅支持有效的 HTTPS 支付地址');
+    if (isNativeIos) return iosNavigationPlugin.openExternalUrl({url: address});
+    const link = document.createElement('a');
+    link.href = address; link.target = '_blank'; link.rel = 'noopener noreferrer';
+    document.body.appendChild(link); link.click(); link.remove();
+  }
   window.u2NativeBridge = Object.freeze({
+    requestFishAudioTts,
+    openExternalUrl,
     isNativeAndroid: () => f,
     isNativeIOS: () => isNativeIos,
     importBackupFile,

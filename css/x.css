@@ -5111,3 +5111,56 @@ button.x-dm-translation-bubble {
 @media (prefers-reduced-motion: reduce) { .x-official-letter-overlay { transition: none; } }
 #x-dm-profile-body .x-profile-cover-right-actions { gap: 5px; }
 [data-profile-report-id]:disabled { opacity: .55; }
+
+.x-bot-submission-list {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 2px 18px 16px;
+}
+
+.x-bot-submission-controls { flex: 0 0 auto; padding: 14px 18px; border-top: 1px solid var(--x-soft-line); }
+
+.x-bot-submission-controls label { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+
+.x-bot-submission-controls input { width: 65px; min-height: 36px; border: 1px solid var(--x-soft-line); border-radius: 8px; padding: 6px; font: inherit; }
+
+.x-bot-submission-controls > div { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+
+.x-bot-submission-controls button { flex: 1; min-height: 40px; border: 0; border-radius: 20px; background: var(--x-ink); color: #fff; font: inherit; font-size: 14px; font-weight: 700; }
+
+.x-bot-submission-controls button:disabled { opacity: .45; }
+
+.x-bot-submission-controls p { margin-top: 8px; color: var(--x-muted); font-size: 12px; overflow-wrap: anywhere; }
+
+.x-bot-submission-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.x-bot-submission-meta strong {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.x-bot-submission-delete { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 32px; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; color: var(--x-muted); background: #f2f3f5; font: inherit; font-size: 22px; line-height: 1; cursor: pointer; }
+
+.x-bot-submission-delete:disabled { opacity: .45; }
+
+.x-compose-status {
+    margin: 0;
+    padding: 8px 0;
+    color: var(--x-muted);
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.x-compose-status[hidden] { display: none; }

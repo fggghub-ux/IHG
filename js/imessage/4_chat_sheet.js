@@ -1563,11 +1563,13 @@ The prompt must describe the same current moment with characters, action, settin
             text_13,
             value_580,
             value_582,
+            voiceCacheEpoch = window.appStorage?.voiceCacheEpoch,
         ) => {
             if (!window.appStorage?.saveAssetFromBlob) throw new Error('音频存储服务不可用');
             const assetId_3 = value_196(value_576?.id, value_577?.id, speechIndex_3, value_580);
             await window.appStorage.saveAssetFromBlob(assetId_3, value_582, {
                 ownerType: 'imessage_offline_tts',
+                voiceCacheEpoch,
                 ownerId: String(value_577?.id || ''),
                 friendId: String(value_576?.id || ''),
                 speechIndex: speechIndex_3,
@@ -1585,6 +1587,8 @@ The prompt must describe the same current moment with characters, action, settin
                 const value_585 = await commitSheetFriendChange(
                     value_576?.id,
                     (value_586) => {
+                        if (voiceCacheEpoch !== window.appStorage?.voiceCacheEpoch)
+                            throw new Error('语音缓存已清理，请重新生成');
                         const value_587 = (value_588) => {
                             if (
                                 !value_588 ||
@@ -1680,6 +1684,7 @@ The prompt must describe the same current moment with characters, action, settin
                 play: document.getElementById('offline-speech-play'),
                 regenerate: document.getElementById('offline-speech-regenerate'),
                 download: document.getElementById('offline-speech-download'),
+                treasure: document.getElementById('offline-speech-treasure'),
                 status: document.getElementById('offline-speech-status'),
             });
             const _value22 = (_value34) => {
@@ -1700,6 +1705,10 @@ The prompt must describe the same current moment with characters, action, settin
                     if (_value41) _value41.disabled = !_value39;
                 });
                 if (_value37.speaker) _value37.speaker.disabled = !!_value19?.busy;
+                if (_value37.treasure) {
+                    _value37.treasure.disabled = !_value38 || !!_value19?.busy;
+                    if (_value19) window.treasureStore?.syncButton(_value37.treasure, _value19.friend, _value19.message, 'voice', _value19.speechIndex + ':' + _value19.speakerId);
+                }
                 const _value40 =
                     !!_value19?.audio && !_value19.audio.paused && !_value19.audio.ended;
                 _value37.wave?.classList.toggle('is-playing', _value40);
@@ -1776,6 +1785,7 @@ The prompt must describe the same current moment with characters, action, settin
                     }
                 }
                 if (!window.u2Tts?.prepareSpeech) throw new Error('TTS 不可用');
+                const voiceCacheEpoch = window.appStorage?.voiceCacheEpoch;
                 const _value55 = await window.u2Tts.prepareSpeech(_value52.text, _value54);
                 let _value56;
                 try {
@@ -1790,6 +1800,7 @@ The prompt must describe the same current moment with characters, action, settin
                     _value52.text,
                     _value52.speakerId,
                     _value56,
+                    voiceCacheEpoch,
                 );
                 return {
                     assetId: _value57,
@@ -1979,6 +1990,21 @@ The prompt must describe the same current moment with characters, action, settin
                 _value79.play.addEventListener('click', () => _value30('play'));
                 _value79.regenerate.addEventListener('click', () => _value30('regenerate'));
                 _value79.download.addEventListener('click', () => _value30('download'));
+                if (_value79.treasure) {
+                    _value79.treasure._treasureSync = _value23;
+                    _value79.treasure.addEventListener('click', async () => {
+                        const current = _value19;
+                        if (!current || current.busy || !_value22(current)) return;
+                        current.busy = true; _value23();
+                        const speech = { text: current.text, speechIndex: current.speechIndex, speakerId: current.speakerId || String(current.friend.id), speakerName: _value22(current)?.nickname || _value22(current)?.realName || 'Char' };
+                        const message = { id: current.message.id, timestamp: current.message.timestamp, role: 'assistant', type: 'voice_message', text: current.text, transcript: current.text, speaker: speech.speakerName, speakerMemberId: speech.speakerId };
+                        try {
+                            const result = await window.treasureStore.toggle(current.friend, message, 'voice', { detail: current.speechIndex + ':' + current.speakerId, speech, prepareAudio: () => _value28(current) });
+                            if (_value19 === current) _value24(result.removed ? '已取消收藏' : '已收藏到 Treasure');
+                        } catch (error) { if (_value19 === current) _value24(error.message || '收藏失败，请重试', true); }
+                        finally { current.busy = false; if (_value19 === current) _value23(); }
+                    });
+                }
             };
             const _value33 = ({
                 friend: _value88,
@@ -4321,14 +4347,14 @@ The prompt must describe the same current moment with characters, action, settin
             const imageUrl_2 = String(message_18?.imageUrl || '').trim();
             if (!imageUrl_2 || typeof window.u2ExportFile !== 'function')
                 throw new Error('图片保存功能尚未加载，请刷新后重试');
-            const response_3 = await fetch(imageUrl_2);
-            if (!response_3.ok) throw new Error('无法读取这张图片，请稍后重试');
-            const blob_2 = await response_3.blob();
+            const blob_2 = await window.u2ImageResources.readBlob(imageUrl_2);
             if (!/^image\//i.test(blob_2.type || '')) throw new Error('图片数据无效，无法保存');
             const result_2 = await window.u2ExportFile({
                 blob: blob_2,
                 fileName: getOfflineGeneratedImageFileName(message_18.timestamp, blob_2.type),
                 title: 'iMessage 线下剧情图片',
+                mode: 'image',
+                imageUrl: imageUrl_2,
             });
             if (result_2 === 'failed') throw new Error('图片保存失败，请稍后重试');
             return result_2;
@@ -4370,6 +4396,8 @@ The prompt must describe the same current moment with characters, action, settin
                                 const result_3 = await handleAction_276(message_19);
                                 if (result_3 === 'downloaded')
                                     window.showToast?.('图片已保存到本地');
+                                if (result_3 === 'download-started')
+                                    window.showToast?.('已发起下载，请查看浏览器下载列表');
                                 if (result_3 === 'shared')
                                     window.showToast?.('已打开系统保存，请选择“存储到文件”');
                             } catch (value_1048) {
@@ -4593,8 +4621,7 @@ The prompt must describe the same current moment with characters, action, settin
                 card.setAttribute('role', 'dialog');
                 card.setAttribute('aria-label', 'Message actions');
                 card.setAttribute('aria-modal', 'true');
-                // Same menu row styles and icon classes as the online More Actions card.
-                card.innerHTML = `<div class="msg-menu-item" data-offline-action="edit"><span>Edit</span><i class="far fa-edit" style="font-size:16px;color:#8e8e93"></i></div><div class="msg-menu-item" data-offline-action="reroll"><span>Reroll</span><i class="fas fa-rotate-left" style="font-size:16px;color:#8e8e93"></i></div><div class="msg-menu-item destructive" data-offline-action="delete"><span>Delete</span><i class="far fa-trash-alt" style="font-size:16px"></i></div>`;
+                card.innerHTML = `<div class="msg-menu-item" data-offline-action="edit"><span>Edit</span><i class="far fa-edit" style="font-size:16px;color:#8e8e93"></i></div><div class="msg-menu-item" data-offline-action="treasure"><span>Saved</span><i class="far fa-bookmark"></i></div><div class="msg-menu-item" data-offline-action="reroll"><span>Reroll</span><i class="fas fa-rotate-left" style="font-size:16px;color:#8e8e93"></i></div><div class="msg-menu-item destructive" data-offline-action="delete"><span>Delete</span><i class="far fa-trash-alt" style="font-size:16px"></i></div>`;
                 if (message.role !== 'assistant' || isOfflineAutoImageMessage(message)) {
                     const reroll = card.querySelector('[data-offline-action="reroll"]');
                     reroll?.setAttribute('aria-disabled', 'true');
@@ -4602,7 +4629,6 @@ The prompt must describe the same current moment with characters, action, settin
                 if (isOfflineAutoImageMessage(message)) card.querySelector('[data-offline-action="edit"]')?.setAttribute('aria-disabled', 'true');
                 const close = () => { overlay.remove(); button.focus({ preventScroll: true }); };
                 overlay.appendChild(card);
-                // Keep the menu in the same coordinate space as the existing app.
                 document.getElementById('offline-chat-view').appendChild(overlay);
                 const anchor = button.getBoundingClientRect();
                 const bounds = overlay.getBoundingClientRect();
@@ -4626,6 +4652,8 @@ The prompt must describe the same current moment with characters, action, settin
                         event.stopImmediatePropagation();
                     }
                 }, true);
+                const sourceFriend = window.imData.currentActiveFriend;
+                window.imChat.bindTreasureMenuButton?.(card.querySelector('[data-offline-action="treasure"]'), () => ({ friend: window.imApp.getFriendById(sourceFriend.id) || sourceFriend, message }), 'offline');
                 bindOfflineChatBubbleActions(card, message);
                 card.addEventListener('click', event => {
                     const row = event.target.closest('[data-offline-action]');
@@ -4643,7 +4671,7 @@ The prompt must describe the same current moment with characters, action, settin
                 start = { id: event.pointerId, x: event.clientX, y: event.clientY };
                 try { button.setPointerCapture(event.pointerId); } catch (_) {}
                 clear();
-                timer = setTimeout(open, 800);
+                timer = setTimeout(open, 350);
             });
             button.addEventListener('pointermove', event => {
                 if (start?.id === event.pointerId && Math.hypot(event.clientX - start.x, event.clientY - start.y) > 10) clear();
@@ -4654,7 +4682,6 @@ The prompt must describe the same current moment with characters, action, settin
             button.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
         };
 
-        // Reuse the first two feed icons for IHG-only actions, preserving five columns.
         const syncOfflineAuxiliaryAction = (bubble, message, disabled = false) => {
             const metrics = bubble?.querySelectorAll('.offline-chat-social-actions > .offline-chat-social-item');
             if (!metrics?.length) return;
@@ -5328,7 +5355,7 @@ The prompt must describe the same current moment with characters, action, settin
                 return (
                     nextMessages.splice(sourceIndex + 1, 0, imageMessage),
                     await persistOfflineMessages(value_1118, nextMessages),
-                    window.showToast?.('线下剧情图片生成完成'),
+                    window.showToast?.(result_4.imageCacheWarning || '线下剧情图片生成完成'),
                     window.imData.currentActiveFriend &&
                         String(window.imData.currentActiveFriend.id) === String(value_1118.id) &&
                         renderOfflineCurrentMessages(value_1118, {
@@ -9341,6 +9368,21 @@ If a <thinking> block is produced for the frontend, put it before the JSON objec
                 }
                 return (scheduleLegacyOfflinePromptCleanup(), window.imData.offlinePrompts);
             };
+        const resetGlobalOfflinePrompts = async () => {
+            const keys = ['offlinePrompts','offlinePromptPresets','offlinePromptActivePresetId','offlinePromptsInitialized','offlineTextReplacementRules','offlineHtmlTemplateRules'];
+            const previous = Object.fromEntries(keys.map(key => [key, window.imData[key]]));
+            try {
+                const result = await persistGlobalOfflinePromptState({ prompts: createOfflineDefaultPrompts(), activePresetId: '' });
+                if (typeof window.saveGlobalData === 'function') {
+                    if (await window.saveGlobalData() === false) throw new Error('线下提示词保存失败');
+                } else if (window.appStorage?.flushPendingWrites && await window.appStorage.flushPendingWrites() === false) throw new Error('线下提示词保存失败');
+                return result;
+            } catch (error) {
+                Object.assign(window.imData, previous);
+                try { await window.imApp.saveImessageUiState?.(); } catch (_) {}
+                throw error;
+            }
+        };
         const persistOfflinePrompts = async (prompts_9, value_1853 = {}) =>
                 persistGlobalOfflinePromptState({
                     prompts: prompts_9,
@@ -10703,7 +10745,25 @@ Persona: ` +
                       })
                     : onConfirm_3();
             });
-            element_2056.append(promptPresetSelect, deletePromptPresetBtn);
+            const resetButton = document.createElement('button');
+            resetButton.type = 'button'; resetButton.id = 'offline-prompt-preset-reset-btn'; resetButton.className = 'offline-theme-preset-reset'; resetButton.textContent = '重置预设';
+            const reset = async () => {
+                if (resetButton.disabled) return;
+                resetButton.disabled = true;
+                const inert = listEl.inert; listEl.inert = true;
+                try {
+                    await resetGlobalOfflinePrompts();
+                    if (listEl.contains(resetButton)) renderOfflineChatSettingsEditor(listEl, activeFriend_46);
+                    window.showToast?.('已恢复默认线下提示词');
+                } catch (error) { window.showToast?.(error.message || '重置失败，已保留原提示词'); }
+                finally { listEl.inert = inert; resetButton.disabled = false; }
+            };
+            resetButton.addEventListener('click', () => {
+                const message = '将恢复所有角色和群聊共用的整套默认线下提示词，当前未存为命名预设的修改将丢失。已保存的命名预设、文字替换规则和 HTML 模板会保留。';
+                if (window.showCustomModal) window.showCustomModal({ title: '重置预设', message, confirmText: '恢复默认', cancelText: '取消', isDestructive: true, onConfirm: reset });
+                else if (window.confirm?.(message)) void reset();
+            });
+            element_2056.append(promptPresetSelect, deletePromptPresetBtn, resetButton);
             promptPresetCard.appendChild(element_2056);
             const element_2058 = document.createElement('div');
             element_2058.className = 'offline-theme-save-row';
@@ -12467,7 +12527,7 @@ Persona: ` +
                             friendId: friendId_5,
                         },
                     );
-                if (sent) window.showToast?.('图片已生成并发送');
+                if (sent) window.showToast?.(value_2332.imageCacheWarning || '图片已生成并发送');
                 return sent;
             } catch (error_22) {
                 console.error('Failed to generate chat image', error_22);

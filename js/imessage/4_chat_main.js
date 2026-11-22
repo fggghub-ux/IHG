@@ -63,7 +63,7 @@
                     window.imData.longPressTimer = null;
                     window.imData.suppressCardClickUntil = Date.now() + 800;
                     window.imChat.showContextMenu(row, e_2);
-                }, 500);
+                }, 350);
             },
             value_22 = (value_25) => {
                 window.imData.longPressTimer &&
@@ -72,8 +72,8 @@
             },
             movePress = (e_3) => {
                 if (!window.imData.longPressTimer) return;
-                const currentX = e_3.type.includes('mouse') ? e_3.pageX : e_3.touches[0].clientX,
-                    currentY = e_3.type.includes('mouse') ? e_3.pageY : e_3.touches[0].clientY;
+                const currentX = e_3.type.includes('mouse') ? e_3.clientX : e_3.touches[0].clientX,
+                    currentY = e_3.type.includes('mouse') ? e_3.clientY : e_3.touches[0].clientY;
                 (Math.abs(currentX - startX) > 10 || Math.abs(currentY - startY) > 10) &&
                     value_22();
             };
@@ -81,11 +81,16 @@
             passive: true,
         });
         chatsContent.addEventListener('touchend', value_22);
+        chatsContent.addEventListener('touchcancel', value_22);
         chatsContent.addEventListener('touchmove', movePress, {
             passive: true,
         });
         chatsContent.addEventListener('mousedown', startPress);
         chatsContent.addEventListener('mouseup', value_22);
+        chatsContent.addEventListener('mouseleave', value_22);
+        chatsContent.addEventListener('scroll', value_22, true);
+        document.addEventListener('mouseup', value_22);
+        window.addEventListener('blur', value_22);
         chatsContent.addEventListener('mousemove', movePress);
         chatsContent.addEventListener('contextmenu', (event_29) => {
             event_29.target.closest('.chat-row') && event_29.preventDefault();
@@ -287,6 +292,19 @@
                     const rowId = window.imData.currentActiveRow?.getAttribute('data-message-id');
                     const message = (window.imData.currentActiveFriend?.messages || []).find(item => String(item.id) === String(rowId));
                     if (message?.type === 'file') { window.imChat.closeContextMenu(); return; }
+                }
+                if (action === 'treasure') {
+                    const row = window.imData.currentActiveRow, currentFriend = window.imData.currentActiveFriend;
+                    window.imChat.closeContextMenu();
+                    if (row && currentFriend) {
+                        const liveFriend = window.imApp.getFriendById?.(currentFriend.id) || currentFriend;
+                        try {
+                            const messages = window.treasureStore.resolveMessages(liveFriend, [{ id: row.getAttribute('data-message-id'), timestamp: row.getAttribute('data-timestamp') }]);
+                            const result = await window.treasureStore.save(liveFriend, messages, 'online');
+                            window.showToast?.(result.duplicate ? '已在 Treasure 中' : '已收藏到 Treasure');
+                        } catch (error) { window.showToast?.(error.message || '收藏失败，请重试'); }
+                    }
+                    return;
                 }
                 if (action === 'reply') {
                     if (Date.now() < suppressReplyClickUntil) {
@@ -606,6 +624,7 @@
                                         throw new Error('TTS 未初始化');
                                     const cacheOwner =
                                             msg_2 && typeof msg_2 === 'object' ? msg_2 : {},
+                                        voiceCacheEpoch = window.appStorage?.voiceCacheEpoch,
                                         audioUrl = await window.u2Tts.speakTextCached(
                                             text_4,
                                             ttsFriend,
@@ -623,7 +642,12 @@
                                                 timestamp: ts_3 || null,
                                             },
                                             (targetMsg) => {
-                                                if (targetMsg) targetMsg.ttsAudioUrl = audioUrl;
+                                                if (
+                                                    targetMsg &&
+                                                    voiceCacheEpoch ===
+                                                        window.appStorage?.voiceCacheEpoch
+                                                )
+                                                    targetMsg.ttsAudioUrl = audioUrl;
                                             },
                                             {
                                                 silent: true,

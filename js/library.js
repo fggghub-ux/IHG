@@ -88,6 +88,7 @@
         lastMediaTime: 0,
         playbackAttemptId: 0,
         playbackStartingAttemptId: 0,
+        playbackSourceAttemptId: 0,
         playbackFailedAttemptId: 0,
         neteasePlaybackRetryCount: 0,
         neteaseSessionToken: '',
@@ -4195,18 +4196,32 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
     function isNetEaseTrack(track_24) {
         return track_24?.source === 'netease' && /^\d+$/.test(String(track_24.neteaseId || ''));
     }
+    function isNativePlayback() {
+        return window.u2NativeBridge?.isNativeIOS?.() === true;
+    }
+    function normalizePlaybackUrl(value) {
+        const safeUrl = safeHttpUrl(value);
+        if (!safeUrl || !isNativePlayback()) return safeUrl;
+        const url = new URL(safeUrl);
+        if (url.protocol === 'http:' && url.hostname.endsWith('.music.126.net'))
+            url.protocol = 'https:';
+        return url.href;
+    }
     async function handleAction_164(track_25, value_1093) {
         if (handleAction_27(track_25)) {
             const cacheKey_2 = String(track_25.neteaseId),
                 html_4 = readerChunkHtmlCache_3.get(cacheKey_2);
-            if (html_4?.expiresAt > Date.now() && safeHttpUrl(html_4.url)) return html_4.url;
+            if (html_4?.expiresAt > Date.now() && safeHttpUrl(html_4.url)) {
+                html_4.url = normalizePlaybackUrl(html_4.url);
+                return html_4.url;
+            }
             const value_1096 = await handleAction_28(
                     '/api/netease/songs/' +
                         encodeURIComponent(track_25.neteaseId) +
                         '/url?level=exhigh',
                 ),
                 value_1097 = value_1096?.song || {},
-                url_6 = safeHttpUrl(value_1097.url);
+                url_6 = normalizePlaybackUrl(value_1097.url);
             if (!url_6) {
                 const options_1099 = {
                         vip_required: '这首歌需要当前网易云账号具备会员权限',
@@ -4238,6 +4253,32 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
     function isCurrentPlaybackAttempt(track, attemptId) {
         return attemptId === state.playbackAttemptId && state.currentTrack?.id === track?.id;
     }
+    function playbackErrorMessage(error) {
+        const messages = {
+            VIP_REQUIRED: '这首歌需要当前网易云账号具备会员权限',
+            TRIAL_ONLY: '这首歌当前只能试听',
+            UNAVAILABLE: '这首歌因版权、地区或下架原因无法播放',
+            SESSION_REQUIRED: '请先扫码登录网易云音乐',
+            INVALID_SESSION: '网易云登录状态已失效，请重新扫码',
+            SESSION_EXPIRED: '网易云登录状态已失效，请重新扫码',
+            PLAYBACK_UNAVAILABLE: '网易云没有返回可播放地址',
+            PLAYBACK_INVALID_URL: '歌曲没有有效的播放地址',
+            PLAYBACK_INVALID_SOURCE: '歌曲解析没有返回可播放的音频',
+            PLAYBACK_UNTRUSTED_HOST: '歌曲解析返回了不支持的音频地址',
+            PLAYBACK_HTTPS_REQUIRED: '歌曲地址跳转异常，请稍后重试',
+            PLAYBACK_NETWORK: '歌曲加载失败，请检查网络后重试',
+        };
+        if (messages[error?.code]) return messages[error.code];
+        if (error?.name === 'NotAllowedError') return '请点击播放按钮后重试';
+        if ([401, 403].includes(Number(error?.status))) return '歌曲播放地址已失效，请重试';
+        if (Number(error?.status) === 404) return '歌曲音频暂时不可用';
+        const mediaErrorCode = Number(audio.error?.code) || Number(error?.code) || 0;
+        if (mediaErrorCode === 2) return '歌曲加载失败，请检查网络后重试';
+        if (mediaErrorCode === 3) return '当前设备无法解码这首歌的音频';
+        if (mediaErrorCode === 4 || error?.name === 'NotSupportedError')
+            return '歌曲音频无法加载，可能是链接失效或格式不受支持';
+        return '歌曲加载失败，请检查网络或稍后重试';
+    }
     function finishPlaybackFailure(value_1101, error_18, attemptId = state.playbackAttemptId) {
         if (
             !isCurrentPlaybackAttempt(value_1101, attemptId) ||
@@ -4246,19 +4287,76 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             return;
         state.playbackFailedAttemptId = attemptId;
         state.pendingPlayStatTrackId = null;
-        console.warn('[Library] Playback failed:', error_18);
-        toast(error_18?.message || '当前歌曲暂时无法播放');
+        if (isNativePlayback()) {
+            let playbackHost = String(error_18?.playbackHost || '');
+            try {
+                playbackHost = new URL(audio.currentSrc || audio.src).hostname;
+            } catch (error) {}
+            console.warn('[Library] Native playback failed:', {
+                trackId: value_1101?.id,
+                source: value_1101?.source,
+                errorName: error_18?.name || '',
+                code: error_18?.code || '',
+                status: Number(error_18?.status) || 0,
+                mediaErrorCode: Number(audio.error?.code) || 0,
+                playbackHost,
+            });
+            toast(playbackErrorMessage(error_18));
+        } else {
+            console.warn('[Library] Playback failed:', error_18);
+            toast(error_18?.message || '当前歌曲暂时无法播放');
+        }
         updatePlayerUi();
         emitTogetherListeningChange(true);
+    }
+    function shouldRetryPlayback(track, error) {
+        return (
+            (isNetEaseTrack(track) || handleAction_27(track)) &&
+            state.neteasePlaybackRetryCount < 1 &&
+            error?.name !== 'NotAllowedError' &&
+            (!isNativePlayback() ||
+                (error?.name !== 'AbortError' &&
+                    ![
+                        'VIP_REQUIRED',
+                        'TRIAL_ONLY',
+                        'UNAVAILABLE',
+                        'SESSION_REQUIRED',
+                        'INVALID_SESSION',
+                        'SESSION_EXPIRED',
+                        'PLAYBACK_UNTRUSTED_HOST',
+                        'PLAYBACK_HTTPS_REQUIRED',
+                    ].includes(error?.code)))
+        );
+    }
+    function retryPlayback(track) {
+        state.neteasePlaybackRetryCount += 1;
+        if (handleAction_27(track)) readerChunkHtmlCache_3.delete(String(track.neteaseId));
+        console.warn(
+            '[Library] NetEase playback retry ' +
+                state.neteasePlaybackRetryCount +
+                '/1 for track ' +
+                track.neteaseId,
+        );
+        return handleAction_166(track);
     }
     async function handleAction_166(track_26) {
         const attemptId = ++state.playbackAttemptId;
         state.playbackStartingAttemptId = attemptId;
         let sourceAssigned = false;
         try {
+            if (isNativePlayback()) {
+                state.playbackSourceAttemptId = 0;
+                audio.pause();
+                audio.removeAttribute('src');
+                audio.load();
+            }
             const src = await handleAction_164(track_26, attemptId);
             if (!isCurrentPlaybackAttempt(track_26, attemptId)) return false;
-            if (!src) throw new Error('歌曲没有有效的播放地址');
+            if (!src)
+                throw Object.assign(new Error('歌曲没有有效的播放地址'), {
+                    code: 'PLAYBACK_INVALID_URL',
+                });
+            state.playbackSourceAttemptId = attemptId;
             audio.src = src;
             audio.load();
             sourceAssigned = true;
@@ -4266,25 +4364,46 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             return isCurrentPlaybackAttempt(track_26, attemptId);
         } catch (error) {
             if (!isCurrentPlaybackAttempt(track_26, attemptId)) return false;
-            if (
-                sourceAssigned &&
-                (isNetEaseTrack(track_26) || handleAction_27(track_26)) &&
-                state.neteasePlaybackRetryCount < 1 &&
-                error?.name !== 'NotAllowedError'
-            ) {
-                state.neteasePlaybackRetryCount += 1;
-                if (handleAction_27(track_26))
-                    readerChunkHtmlCache_3.delete(String(track_26.neteaseId));
-                console.warn(
-                    '[Library] NetEase playback retry ' +
-                        state.neteasePlaybackRetryCount +
-                        '/1 for track ' +
-                        track_26.neteaseId,
-                );
-                return handleAction_166(track_26);
-            }
+            if (error?.name === 'AbortError' && isNativePlayback()) return false;
+            if ((isNativePlayback() || sourceAssigned) && shouldRetryPlayback(track_26, error))
+                return retryPlayback(track_26);
             finishPlaybackFailure(track_26, error, attemptId);
             return false;
+        } finally {
+            if (state.playbackStartingAttemptId === attemptId) state.playbackStartingAttemptId = 0;
+        }
+    }
+    function handlePlaybackError() {
+        const track = state.currentTrack;
+        if (!track || !audio.src) return;
+        if (state.playbackStartingAttemptId === state.playbackAttemptId) return;
+        if (isNativePlayback()) {
+            if (!audio.error || state.playbackSourceAttemptId !== state.playbackAttemptId) return;
+            if (state.playbackFailedAttemptId === state.playbackAttemptId) return;
+            if (shouldRetryPlayback(track, audio.error)) {
+                void retryPlayback(track);
+                return;
+            }
+            finishPlaybackFailure(track, audio.error);
+            return;
+        }
+        if (handleAction_27(track) && state.neteasePlaybackRetryCount < 1 && handleAction_25()) {
+            void retryPlayback(track);
+            return;
+        }
+        toast('当前歌曲暂时无法播放');
+        updatePlayerUi();
+        emitTogetherListeningChange(true);
+    }
+    async function resumePlayback(track) {
+        const attemptId = state.playbackAttemptId;
+        state.playbackStartingAttemptId = attemptId;
+        try {
+            await audio.play();
+        } catch (error) {
+            if (!isCurrentPlaybackAttempt(track, attemptId) || error?.name === 'AbortError') return;
+            if (shouldRetryPlayback(track, error)) return retryPlayback(track);
+            finishPlaybackFailure(track, error, attemptId);
         } finally {
             if (state.playbackStartingAttemptId === attemptId) state.playbackStartingAttemptId = 0;
         }
@@ -4464,6 +4583,28 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
             const first = state.tracks.find(isPlayableTrack);
             if (first) playTrack(first, [first.id]);
             else toast('还没有可播放的歌曲');
+            return;
+        }
+        if (isNativePlayback()) {
+            if (state.playbackStartingAttemptId === state.playbackAttemptId) {
+                state.playbackAttemptId += 1;
+                state.playbackStartingAttemptId = 0;
+                state.playbackSourceAttemptId = 0;
+                state.pendingPlayStatTrackId = null;
+                audio.pause();
+                updatePlayerUi();
+                emitTogetherListeningChange(true);
+            } else if (audio.paused) {
+                if (
+                    !audio.src ||
+                    audio.error ||
+                    state.playbackSourceAttemptId !== state.playbackAttemptId
+                ) {
+                    state.neteasePlaybackRetryCount = 0;
+                    state.pendingPlayStatTrackId = state.currentTrack.id;
+                    void handleAction_166(state.currentTrack);
+                } else void resumePlayback(state.currentTrack);
+            } else audio.pause();
             return;
         }
         if (audio.paused) {
@@ -4832,19 +4973,7 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
       if (state.pendingListeningSeconds >= 0xf) handleAction_170()["catch"](console.error);
     }
     state.lastMediaTime = apk120Value1447, handleAction_169(), updateLyrics(apk120Value1447), emitTogetherListeningChange(![]);
-  }), audio.addEventListener('ended', handleTrackEnded), audio.addEventListener("error", () => {
-  if (!state.currentTrack || !audio.src) return;
-  if (state.playbackStartingAttemptId === state.playbackAttemptId) return;
-  if (handleAction_27(state.currentTrack) && state.neteasePlaybackRetryCount < 1 && handleAction_25()) {
-    state.neteasePlaybackRetryCount += 1;
-    readerChunkHtmlCache_3['delete'](String(state.currentTrack.neteaseId));
-    handleAction_166(state.currentTrack);
-    return;
-  }
-  toast('当前歌曲暂时无法播放');
-  updatePlayerUi();
-  emitTogetherListeningChange(true);
-}), window.addEventListener("pagehide", () => {
+  }), audio.addEventListener('ended', handleTrackEnded), audio.addEventListener("error", handlePlaybackError), window.addEventListener("pagehide", () => {
     handleAction_129();
     if (state.currentBook) updateReaderProgress(!![], null, {
       'immediate': !![]

@@ -100,9 +100,7 @@
                 artistPrompt: String(_value55.artistPrompt || '').trim(),
                 negativePrompt: String(_value55.negativePrompt || '').trim(),
                 activePresetId: _value55.activePresetId || '',
-                presets: Array.isArray(_value55.presets)
-                    ? _value55.presets
-                    : _value56.presets || [],
+                presets: _value55.presets || [],
                 autoGenerate: _value56.autoGenerate === true,
             };
         }
@@ -273,26 +271,6 @@
                 generationPrompt: {
                     ..._value81,
                     showAutoGenerate: false,
-                    onSavePreset: async ({
-                        presets: _value87,
-                        activePresetId: _value88,
-                        preset: _value89,
-                    }) => {
-                        const _value90 = _value11(_value78).record.imagePromptConfig || {};
-                        await _value13(_value78, {
-                            imagePromptConfig: {
-                                ..._value90,
-                                presets: _value87,
-                                activePresetId: _value88,
-                                charAppearance: _value89.charAppearance || '',
-                                userAppearance: _value89.userAppearance || '',
-                                artistPrompt: _value89.artistPrompt || '',
-                                negativePrompt: _value89.negativePrompt || '',
-                                basePrompt: _value89.basePrompt || _value89.prompt || '',
-                                lastPrompt: _value89.basePrompt || _value89.prompt || '',
-                            },
-                        });
-                    },
                 },
                 referenceFaces: {
                     char: {
@@ -392,7 +370,7 @@
                 if (!_value104?.imageUrl) throw new Error('生图接口没有返回图片');
                 if (!_value0(_value97.videoId)) throw new Error('视频已删除，生成结果未应用');
                 _value97.result = _value104;
-                _value97.status = '预览满意后，可设为当前视频配图。';
+                _value97.status = _value104.imageCacheWarning || '预览满意后，可设为当前视频配图。';
             } catch (_value108) {
                 if (_value108.name === 'AbortError') return;
                 _value97.status = _value108.message || '生成失败，请重试';
@@ -432,9 +410,9 @@
                         _value110.saving = true;
                         _value25(_value110);
                         if (!window.u2ExportFile) throw new Error('图片保存功能尚未加载');
-                        const _value112 = await fetch(_value110.result.imageUrl);
-                        if (!_value112.ok) throw new Error('无法读取图片');
-                        const _value113 = await _value112.blob();
+                        const _value113 = window.u2ImageResources
+                            ? await window.u2ImageResources.readBlob(_value110.result.imageUrl)
+                            : await (await fetch(_value110.result.imageUrl)).blob();
                         if (!/^image\//i.test(_value113.type)) throw new Error('图片数据无效');
                         const _value114 = _value113.type.includes('jpeg')
                             ? 'jpg'
@@ -445,9 +423,15 @@
                             blob: _value113,
                             fileName: 'tiktok-' + _value8() + '.' + _value114,
                             title: 'TikTok 生成图片',
+                            mode: 'image',
+                            imageUrl: _value110.result.imageUrl,
                         });
                         if (_value115 === 'failed') throw new Error('图片保存失败');
-                        if (_value115 !== 'cancelled') _value7('图片已导出');
+                        if (_value115 === 'download-started')
+                            _value7('已发起下载，请查看浏览器下载列表');
+                        else if (_value115 === 'downloaded') _value7('图片已保存');
+                        else if (_value115 === 'shared')
+                            _value7('图片已分享，请在所选应用中完成保存');
                     } else {
                         if (_value111 === 'apply') await _value26(_value110);
                     }

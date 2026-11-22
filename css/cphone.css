@@ -1268,3 +1268,9 @@
 .cphone-help-button { position: absolute; top: calc(var(--safe-top) + 12px); right: 18px; z-index: 10; font-size: 15px; }
 
 #cphone-settings-help-btn { top: calc(var(--safe-top) + 8px); right: 20px; }
+
+.cphone-app-generation-status { margin: 12px 0 0; padding: 12px 14px; border-radius: 14px; background: #eef3ff; color: #315489; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+#friend-phone-settings-sheet .friend-gen-submit:disabled { opacity: .65; cursor: wait; }
+.cphone-app-generation-status[hidden] { display: none !important; }
+.cphone-app-generation-status[data-state="ready"] { background: #eaf6ee; color: #28633c; }
+.cphone-app-generation-status[data-state="failed"] { background: #fff0ed; color: #a4382c; }

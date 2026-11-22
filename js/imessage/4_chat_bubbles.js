@@ -1,3 +1,303 @@
+(() => {
+    const escape = (value) => String(value ?? '').replace(/[&<>"']/g, (c) =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+    const pin = '<svg viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M192 0C86 0 0 86 0 192c0 77 25 99 172 310a24 24 0 0 0 40 0C359 291 384 269 384 192 384 86 298 0 192 0zm0 256a64 64 0 1 1 0-128 64 64 0 0 1 0 128z"/></svg>';
+    const arrow = '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="8 18 14 12 8 6"/><polyline points="13 18 19 12 13 6"/></svg>';
+    const lock = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path class="invitation-lock-closed" d="M7 11V7a5 5 0 0 1 10 0v4"/><path class="invitation-lock-open" d="M7 11V6a4.5 4.5 0 0 1 7.7-3.2l2.3 2.3"/></svg>';
+    function faceMarkup(friend) {
+        const name = friend?.nickname || friend?.realName || 'Char';
+        return '<img class="offline-invite-face" src="assets/imessage/offline-face-id.svg" alt="">' +
+            '<div class="offline-invite-face-copy"><span>Face ID</span><span>Date with ' + escape(name) + '</span></div>';
+    }
+    function openingMarkup(invitation) {
+        return '<div class="offline-opening-glass">' +
+            '<span class="offline-opening-back" aria-hidden="true"><span class="offline-opening-chevron"></span></span>' +
+            '<div class="offline-opening-copy"><strong>' + escape(invitation.title || '线下见面') +
+            '</strong><p>' + escape(invitation.invitationText || '') + '</p></div>' +
+            '<div class="offline-opening-actions">' +
+            '<span class="offline-opening-dots" aria-hidden="true"><i></i><i></i></span>' +
+            '<span class="offline-opening-place">' + pin + '<span>' + escape(invitation.place || '') +
+            '</span></span></div></div>';
+    }
+    function detailMarkup(invitation, status) {
+        return '<div class="offline-invite-detail" role="dialog" aria-modal="true" aria-label="线下邀请">' +
+            '<div class="offline-invite-detail-heading"><div class="offline-invite-detail-icon">' + pin +
+            '</div><div class="offline-invite-detail-place">' + escape(invitation.place || '') + '</div></div>' +
+            '<h2>' + escape(invitation.title || '见面邀请') + '</h2>' +
+            '<div class="offline-invite-details"><div class="offline-invite-details-label">Details</div>' +
+            '<p>' + escape(invitation.invitationText || '') + '</p></div>' +
+            (status === 'pending' ? '<div class="offline-invite-slider">' +
+                '<span class="offline-invite-slider-label" aria-live="polite">slide to unlock</span>' +
+                '<span class="offline-invite-slider-lock" aria-hidden="true">' + lock + '</span>' +
+                '<button type="button" class="offline-invite-slider-thumb" aria-label="滑动回应邀请">' + arrow + '</button></div>' :
+                '<div class="offline-invite-resolved">' + ({ accepted: 'Accepted', declined: 'Declined', superseded: '邀请已失效' }[status] || '邀请已结束') + '</div>') + '</div>';
+    }
+    function bindSlider(overlay, respond) {
+        const track = overlay.querySelector('.offline-invite-slider');
+        if (!track) return () => {};
+        const thumb = track.querySelector('button'), label = track.querySelector('.offline-invite-slider-label');
+        let active = null, timer = null, animation = null, busy = false, disposed = false;
+        const clearTimer = () => { clearTimeout(timer); timer = null; };
+        function reset() {
+            clearTimer();
+            const id = active?.id;
+            active = null;
+            if (id != null && thumb.hasPointerCapture?.(id)) thumb.releasePointerCapture(id);
+            track.classList.remove('is-dragging', 'is-declining', 'is-unlocked');
+            thumb.style.removeProperty('--invitation-thumb-x');
+            label.textContent = 'slide to unlock';
+        }
+        async function finish(action) {
+            if (busy || disposed || !overlay.isConnected) return;
+            clearTimer();
+            busy = true;
+            active = null;
+            thumb.disabled = true;
+            track.classList.remove('is-dragging');
+            if (action === 'accept') {
+                track.classList.add('is-unlocked');
+                await new Promise(resolve => { animation = { resolve, id: setTimeout(resolve, 180) }; });
+                animation = null;
+            }
+            if (disposed || !overlay.isConnected) return;
+            try {
+                if (await respond(action) === false) {
+                    busy = false;
+                    thumb.disabled = false;
+                    reset();
+                }
+            } catch (error) {
+                console.error('[iMessage] invitation response failed', error);
+                if (!disposed) {
+                    busy = false;
+                    thumb.disabled = false;
+                    reset();
+                    window.showToast?.('邀请状态保存失败，请重试');
+                }
+            }
+        }
+        function down(event) {
+            if (busy || disposed || active || event.isPrimary === false || event.button !== 0) return;
+            event.preventDefault();
+            const rect = track.getBoundingClientRect(), size = thumb.getBoundingClientRect().width;
+            active = { id: event.pointerId, startX: event.clientX, rect,
+                origin: thumb.offsetLeft, min: 6, max: rect.width - size - 6 };
+            thumb.setPointerCapture?.(event.pointerId);
+            track.classList.add('is-dragging');
+        }
+        function move(event) {
+            if (!active || active.id !== event.pointerId || busy) return;
+            if (event.clientY < active.rect.top || event.clientY > active.rect.bottom ||
+                event.clientX < active.rect.left || event.clientX > active.rect.right) {
+                reset();
+                return;
+            }
+            const delta = event.clientX - active.startX;
+            const x = Math.max(active.min, Math.min(active.max, active.origin + delta));
+            thumb.style.setProperty('--invitation-thumb-x', x + 'px');
+            if (delta > 24 && x >= active.max - 2) {
+                void finish('accept');
+            } else if (delta < -12 && x <= active.min + 3) {
+                track.classList.add('is-declining');
+                label.innerHTML = '<span>3s 后自动拒绝</span> <span>松开取消</span>';
+                if (timer == null) timer = setTimeout(() => {
+                    if (active && !disposed && track.classList.contains('is-declining')) void finish('decline');
+                }, 3000);
+            } else {
+                clearTimer();
+                track.classList.remove('is-declining');
+                label.textContent = 'slide to unlock';
+            }
+        }
+        function up(event) { if (active?.id === event.pointerId && !busy) reset(); }
+        function cancel() { if (!busy) reset(); }
+        function visibility() { if (document.hidden) cancel(); }
+        thumb.addEventListener('pointerdown', down);
+        thumb.addEventListener('pointermove', move);
+        thumb.addEventListener('pointerup', up);
+        thumb.addEventListener('pointercancel', cancel);
+        thumb.addEventListener('lostpointercapture', up);
+        window.addEventListener('blur', cancel);
+        window.addEventListener('resize', cancel);
+        document.addEventListener('visibilitychange', visibility);
+        return () => {
+            disposed = true;
+            reset();
+            if (animation) { clearTimeout(animation.id); animation.resolve(); animation = null; }
+            thumb.removeEventListener('pointerdown', down);
+            thumb.removeEventListener('pointermove', move);
+            thumb.removeEventListener('pointerup', up);
+            thumb.removeEventListener('pointercancel', cancel);
+            thumb.removeEventListener('lostpointercapture', up);
+            window.removeEventListener('blur', cancel);
+            window.removeEventListener('resize', cancel);
+            document.removeEventListener('visibilitychange', visibility);
+        };
+    }
+    window.imOfflineInvitationUI = { faceMarkup, openingMarkup, detailMarkup, bindSlider };
+})();
+
+
+(() => {
+    const states = new Map();
+    const probes = new Map();
+    const textOf = m => String(m?.transcript || m?.text || '').trim();
+    const keyOf = (f, m) => encodeURIComponent(JSON.stringify([String(f.id), String(m.id || m.timestamp)]));
+    const format = seconds => {
+        const n = Math.max(0, Math.ceil(Number(seconds) || 0));
+        return `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`;
+    };
+    const stateOf = (f, m) => {
+        const key = keyOf(f, m);
+        let s = states.get(key);
+        if (!s || s.text !== textOf(m)) {
+            s?.audio?.pause();
+            s = {key, text: textOf(m), duration: null, audio: null, busy: false, progress: 0};
+            states.set(key, s);
+        }
+        return s;
+    };
+    function bars(message) {
+        let seed = 2166136261;
+        for (const ch of String(message.id || message.timestamp || '') + textOf(message))
+            seed = Math.imul(seed ^ ch.charCodeAt(0), 16777619) >>> 0;
+        return Array.from({length: 24}, (_, i) => {
+            seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+            const h = 6 + ((seed >>> 16) % 17);
+            return `<span style="height:${h}px;--voice-bar-start:${i / 24};--voice-bar-count:24"></span>`;
+        }).join('');
+    }
+    function controls(f, m) {
+        const s = stateOf(f, m);
+        return `<div class="voice-message-bubble-main"><button type="button" class="voice-message-play" aria-label="播放语音"><i class="fas fa-play" aria-hidden="true"></i></button><button type="button" class="voice-message-bubble-inner" aria-expanded="false" aria-label="展开语音转文字"><span class="voice-message-wave" aria-hidden="true">${bars(m)}</span><span class="voice-message-duration">${format(s.duration ?? Math.min(115, Math.max(3, Math.ceil(s.text.length / 3))))}</span></button></div>`;
+    }
+    function paint(s) {
+        for (const bubble of document.querySelectorAll(`[data-voice-key="${s.key}"]`)) {
+            bubble.style.setProperty('--voice-progress', String(s.progress));
+            const duration = bubble.querySelector('.voice-message-duration');
+            if (duration) duration.textContent = format(s.duration ?? Math.min(115, Math.max(3, Math.ceil(s.text.length / 3))));
+            const button = bubble.querySelector('.voice-message-play');
+            const playing = !!s.audio && !s.audio.paused && !s.audio.ended;
+            if (button) {
+                button.disabled = s.busy;
+                button.setAttribute('aria-label', s.busy ? '正在准备语音' : playing ? '暂停语音' : '播放语音');
+                button.setAttribute('aria-pressed', String(playing));
+                button.querySelector('i').className = s.busy ? 'fas fa-spinner voice-message-action-spinner' : playing ? 'fas fa-pause' : 'fas fa-play';
+            }
+        }
+    }
+    function attach(s, audio) {
+        if (!audio?.addEventListener) return;
+        if (s.audio === audio) { paint(s); return; }
+        s.audio?.pause();
+        s.audio = audio;
+        let frame = null;
+        const update = () => {
+            if (s.audio !== audio) { if (frame !== null) cancelAnimationFrame(frame); return; }
+            if (Number.isFinite(audio.duration) && audio.duration > 0) {
+                s.duration = audio.duration;
+                s.progress = Math.min(1, Math.max(0, audio.currentTime / audio.duration));
+            }
+            if (audio.ended) s.progress = 1;
+            paint(s);
+            if (!audio.paused && !audio.ended && frame === null)
+                frame = requestAnimationFrame(() => { frame = null; update(); });
+            else if ((audio.paused || audio.ended) && frame !== null) {
+                cancelAnimationFrame(frame); frame = null;
+            }
+        };
+        for (const event of ['loadedmetadata', 'durationchange', 'timeupdate', 'play', 'pause', 'ended', 'error']) audio.addEventListener(event, update);
+        update();
+    }
+    function inspectUrl(url) {
+        return new Promise(resolve => {
+            const audio = new Audio();
+            let timer;
+            const finish = () => {
+                const n = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : null;
+                clearTimeout(timer);
+                audio.removeEventListener('loadedmetadata', finish);
+                audio.removeEventListener('error', finish);
+                audio.removeAttribute('src'); audio.load();
+                resolve(n);
+            };
+            audio.addEventListener('loadedmetadata', finish);
+            audio.addEventListener('error', finish);
+            timer = setTimeout(finish, 8000);
+            audio.preload = 'metadata'; audio.src = url;
+        });
+    }
+    async function inspect(f, m) {
+        const s = stateOf(f, m);
+        const live = window.imApp?.getFriendById?.(f.id)?.messages?.find(x => String(x.id) === String(m.id)) || m;
+        const asset = live.ttsAudioText === textOf(live) ? live.ttsAudioAssetId : null;
+        const token = asset || live.ttsAudioUrl || live.ttsAudioCache?.url;
+        if (!token) return;
+        s.asset = token;
+        if (!probes.has(token)) probes.set(token, (async () => {
+            if (!asset) return inspectUrl(token);
+            const blob = await window.appStorage?.getAssetBlob?.(asset);
+            if (!blob?.size) return null;
+            const url = URL.createObjectURL(blob);
+            try { return await inspectUrl(url); } finally { URL.revokeObjectURL(url); }
+        })().catch(() => null));
+        const n = await probes.get(token);
+        if (s.asset === token && n !== null) { s.duration = n; paint(s); }
+    }
+    async function play(f, m, {restart = false} = {}) {
+        const s = stateOf(f, m);
+        if (s.busy) return;
+        if (!restart && s.audio && !s.audio.ended) {
+            if (s.audio.paused) await window.u2Tts.resumeAudio(s.audio); else s.audio.pause();
+            paint(s); return;
+        }
+        s.busy = true; paint(s);
+        try {
+            if (m.role === 'assistant' && window.imVoiceMessageAudio?.canManage?.(f, m)) {
+                const result = await window.imVoiceMessageAudio.play(f, m);
+                if (result?.readyForTap) {
+                    await inspect(f, m);
+                    window.showToast?.('语音已准备好，再点播放');
+                } else attach(s, result);
+            } else if (m.role === 'user') {
+                const friend = window.u2Tts?.resolveMessageTtsFriend?.(f, m);
+                if (!window.u2Tts?.canSpeakForFriend?.(friend)) return;
+                await window.u2Tts.speakTextCached(textOf(m), friend, m, {onAudio: audio => attach(s, audio)});
+            }
+        } finally { s.busy = false; paint(s); }
+    }
+    function reportError(error, operation = '语音生成') {
+        if (!window.u2Api?.isRequestError?.(error) || !window.u2Api.reportError(error, {operation}))
+            window.showToast?.(window.u2Tts?.getUserErrorMessage?.(error) || error.message || '语音操作失败');
+    }
+    function bind(row, f, m) {
+        const bubble = row.querySelector('.voice-message-bubble');
+        if (!bubble) return;
+        const s = stateOf(f, m);
+        bubble.dataset.voiceKey = s.key;
+        for (const [name, val] of Object.entries({display:'inline-flex', 'flex-direction':'column', width:'200px', 'max-width':'200px', 'min-width':'0', height:'auto', 'min-height':'43px', 'max-height':'none', 'aspect-ratio':'auto', flex:'0 0 auto', padding:'5px 12px 6px 10px', 'box-sizing':'border-box', 'white-space':'normal'})) bubble.style.setProperty(name, val, 'important');
+        bubble.querySelector('.voice-message-play')?.addEventListener('click', async event => {
+            event.preventDefault(); event.stopPropagation();
+            try { await play(f, m); }
+            catch (error) { reportError(error); }
+        });
+        paint(s); requestAnimationFrame(() => paint(s)); void inspect(f, m);
+    }
+    async function regenerate(f, m) {
+        const s = stateOf(f, m);
+        if (s.busy) return;
+        s.audio?.pause(); s.audio = null; s.busy = true; paint(s);
+        try {
+            const result = await window.imVoiceMessageAudio.regenerate(f, m);
+            s.duration = null; s.progress = 0;
+            await inspect(f, m);
+            return result;
+        } finally { s.busy = false; paint(s); }
+    }
+    window.imVoiceMessageUI = Object.freeze({controls, bind, play, regenerate, inspect, reportError, observe: (f, m, audio) => attach(stateOf(f, m), audio)});
+})();
+
+
 (
     window.u2OnStorageReady ||
     ((callback) => document.addEventListener('DOMContentLoaded', callback))
@@ -321,6 +621,9 @@
     function handleAction_22(row_5, friend_8, value_138 = {}) {
         if (!row_5 || friend_8?.type !== 'group') return;
         const groupIdentity = resolveGroupBubbleIdentity(friend_8, value_138);
+        if (groupIdentity.name) row_5.setAttribute('data-speaker', groupIdentity.name);
+        if (typeof value_138.thought === 'string' && value_138.thought.trim()) row_5.setAttribute('data-thought', value_138.thought);
+
         groupIdentity.memberId !== '' &&
             row_5.setAttribute('data-speaker-member-id', String(groupIdentity.memberId));
     }
@@ -1421,6 +1724,7 @@
         row_6.className = 'chat-system-row';
         row_6.setAttribute('data-timestamp', value_147);
         row_6.setAttribute('data-message-id', window.imChat.ensureMessageId(msg_6, 'notice'));
+        if (msg_6.noticeKind === 'away_activity') return window.imChat.awayActivity?.renderNotice(msg_6, friend_11, container_3, value_147) || null;
         const noticeKind_2 = msg_6.noticeKind || '';
         const noticeText =
             window.imApp?.getGroupManagementNoticeText?.(friend_11, msg_6) ||
@@ -2382,6 +2686,22 @@
         window.imChat.ensureMessageId(msg_10, msg_10.type === 'pay_transfer' ? 'pay' : 'msg');
         const msgTime = timestamp_3 || msg_10.timestamp || Date.now();
         renderCotSummaryCard_3(msg_10, friend_16, container_6);
+        if (msg_10.type === 'mcp_payment') { window.imMcpPayments?.render(msg_10, friend_16, container_6); return handleAction_19(msg_10, friend_16, container_6); }
+if (msg_10.type === "group_announcement") {
+  const announcementValue5de06e = document.createElement("div"),
+    announcementValue31fded = msg_10.role === "user";
+  announcementValue5de06e.className = "chat-row " + (announcementValue31fded ? "user-row" : "ai-row") + " group-announcement-row", announcementValue5de06e.setAttribute("data-timestamp", String(msgTime)), announcementValue5de06e.setAttribute("data-message-id", window.imChat.ensureMessageId(msg_10, "announcement")), handleAction_20(announcementValue5de06e, friend_16, msg_10);
+  const announcementValue37e706 = msg_10.payload?.["announcement"] || {
+      "content": msg_10.text || msg_10.content || ""
+    },
+    announcementValue5b3ba1 = msg_10.payload?.["action"] === "modified" ? announcementValue37e706.updatedBy : announcementValue37e706.publishedBy,
+    announcementValue76daac = msg_10.payload?.["action"] === "modified" ? announcementValue37e706.updatedAt : announcementValue37e706.publishedAt;
+  return announcementValue5de06e.innerHTML = "<div class=\"group-announcement-message-content\">\n                <div class=\"" + (announcementValue31fded ? "user-header" : "ai-header") + "\"><span class=\"chat-header-name\">" + escapeHtml(announcementValue5b3ba1?.["name"] || msg_10.speaker || "群成员") + "</span></div>\n                <div class=\"group-announcement-bubble-line\"><button type=\"button\" class=\"chat-bubble " + (announcementValue31fded ? "user-bubble" : "ai-bubble") + " im-card-bubble group-announcement-card\" aria-label=\"查看群公告\">\n                    <span class=\"group-announcement-card-title\"><i class=\"fas fa-bullhorn\" aria-hidden=\"true\"></i> " + (msg_10.payload?.["action"] === "modified" ? "群公告已修改" : "群公告") + "</span>\n                    <span class=\"group-announcement-card-preview\">" + escapeHtml(announcementValue37e706.content) + "</span>\n                    <span class=\"group-announcement-card-time\">" + escapeHtml(announcementValue76daac ? new Date(announcementValue76daac).toLocaleString("en-US", {
+    "hour12": true
+  }) : "") + "</span>\n                    <span class=\"group-announcement-card-footer\">查看全文 <i class=\"fas fa-chevron-right\" aria-hidden=\"true\"></i></span>\n                </button></div></div>", announcementValue5de06e.querySelector("button").addEventListener("click", announcementValue1a39f1 => {
+    announcementValue1a39f1.stopPropagation(), window.imApp.openGroupAnnouncement?.(friend_16.id, announcementValue37e706);
+  }), container_6.appendChild(announcementValue5de06e), handleAction_19(msg_10, friend_16, container_6);
+}
         if (
             msg_10.type === 'official_artifact' &&
             typeof window.imChat.renderOfficialArtifactBubble === 'function'
@@ -3814,17 +4134,19 @@
                 : date_2.toISOString().replace(/[:.]/g, '-').slice(0, 19);
         return 'imessage-generated-' + stamp + '.' + extension;
     }
-    async function saveGeneratedChatImage(imageUrl_2, timestamp_8) {
+    async function saveGeneratedChatImage(imageUrl_2, timestamp_8, options = {}) {
         if (!imageUrl_2 || typeof window.u2ExportFile !== 'function')
             throw new Error('图片保存功能尚未加载，请刷新后重试');
-        const response = await fetch(imageUrl_2);
-        if (!response.ok) throw new Error('无法读取这张图片，请稍后重试');
-        const blob_2 = await response.blob();
-        if (!/^image\//i.test(blob_2.type || '')) throw new Error('图片数据无效，无法保存');
+        const blob_2 = options.blob || (options.message
+            ? await window.u2ImageResources.readMessageBlob(options.message, options.index || 0)
+            : await window.u2ImageResources.readBlob(imageUrl_2));
         const result_2 = await window.u2ExportFile({
             blob: blob_2,
             fileName: getGeneratedChatImageFileName(timestamp_8, blob_2.type),
             title: 'iMessage 生成图片',
+            mode: 'image',
+            imageUrl: imageUrl_2,
+            showOptions: options.showOptions === true,
         });
         if (result_2 === 'failed') throw new Error('图片保存失败，请稍后重试');
         return result_2;
@@ -3914,11 +4236,13 @@
           return apk120Value954.timestamp && String(apk120Value975.dataset.timestamp || '') === String(apk120Value954.timestamp);
         }),
         apk120Value974 = apk120Value973?.querySelector('.chat-image-bubble-img');
-      if (apk120Value974 && apk120Value965.content) apk120Value974.src = apk120Value965.content;
+      if (apk120Value974?._setChatImageMessage) apk120Value974._setChatImageMessage(apk120Value965);
+      else if (apk120Value974 && apk120Value965.content) apk120Value974.src = apk120Value965.content;
     }
     return {
       'updatedFriend': apk120Value964,
-      'updatedMessage': apk120Value965
+      'updatedMessage': apk120Value965,
+      imageCacheWarning: apk120Value961.imageCacheWarning || ''
     };
   } finally {
     imageGenerationJobs120['delete'](apk120Value952);
@@ -3939,142 +4263,216 @@
             '图片重 roll 失败：' + reason_2 + '。旧图片已保留'
         );
     }
-    async function handleAction_27(message_277, value_279) {
+    async function handleAction_27(message_277, value_279, options = {}) {
+        if (window.u2ImageResources)
+            return window.u2ImageResources.resolveMessageUrl(message_277, value_279, options);
         if (value_279 === 0)
             return (
-                message_277.content ||
                 (message_277.contentAssetId && window.appStorage?.getAssetUrl
-                    ? await window.appStorage.getAssetUrl(message_277.contentAssetId)
-                    : '')
+                    ? await window.appStorage.getAssetUrl(message_277.contentAssetId, options)
+                    : '') || message_277.content || ''
             );
         const value_280 = message_277.albumImages?.[value_279 - 1];
         if (!value_280) return '';
-        if (value_280.url) return value_280.url;
-        if (!value_280.assetId || !window.appStorage?.getAssetUrl) return '';
-        return (await window.appStorage.getAssetUrl(value_280.assetId)) || '';
+        return (value_280.assetId && window.appStorage?.getAssetUrl
+            ? await window.appStorage.getAssetUrl(value_280.assetId, options) : '') || value_280.url || '';
     }
-    function openChatImageDetail(apk120Value1004, apk120Value1005, apk120Value1006, apk120Value1007, apk120Value1008 = 0x0) {
-  let apk120Value1009 = document.getElementById("chat-image-detail-overlay");
-  !apk120Value1009 && (apk120Value1009 = document.createElement("div"), apk120Value1009.id = "chat-image-detail-overlay", apk120Value1009.className = 'chat-image-detail-overlay', apk120Value1009.innerHTML = "\n                <div class=\"chat-image-detail-card\">\n                    <div class=\"chat-image-detail-header\">\n                        <div class=\"chat-image-detail-heading\">\n                            <div class=\"chat-image-detail-sender\"></div>\n                            <div class=\"chat-image-detail-time\"></div>\n                        </div>\n                        <div class=\"chat-image-detail-actions\">\n                            <button type=\"button\" class=\"chat-image-detail-reroll\"><i class=\"fas fa-redo\"></i> 重 roll</button>\n                            <button type=\"button\" class=\"chat-image-detail-save\">保存</button>\n                            <button type=\"button\" class=\"chat-image-detail-close\" aria-label=\"关闭\"><i class=\"fas fa-times\"></i></button>\n                        </div>\n                    </div>\n                    <div class=\"chat-image-detail-media\">\n                        <button type=\"button\" class=\"chat-image-detail-prev\" aria-label=\"上一张图片\">‹</button>\n                        <img class=\"chat-image-detail-img\" src=\"\" alt=\"\">\n                        <button type=\"button\" class=\"chat-image-detail-next\" aria-label=\"下一张图片\">›</button>\n                        <span class=\"chat-image-detail-counter\" aria-live=\"polite\"></span>\n                    </div>\n                    <div class=\"chat-image-detail-reroll-error\" role=\"alert\" aria-live=\"assertive\"></div>\n                    <div class=\"chat-image-detail-copy\">\n                        <div class=\"chat-image-detail-label\">图片详情</div>\n                        <div class=\"chat-image-detail-desc\" style=\"font-size:15px; color:#222; line-height:1.55; white-space:pre-wrap; word-break:break-word;\"></div>\n                    </div>\n                </div>\n            ", document.body.appendChild(apk120Value1009), apk120Value1009.addEventListener('click', apk120Value1038 => {
-    (apk120Value1038.target === apk120Value1009 || apk120Value1038.target.closest('.chat-image-detail-close')) && (apk120Value1009.style.display = 'none');
-  }));
-  const apk120Value1010 = apk120Value1009.querySelector(".chat-image-detail-img"),
-    apk120Value1011 = apk120Value1009.querySelector(".chat-image-detail-card"),
-    apk120Value1012 = apk120Value1009.querySelector('.chat-image-detail-header'),
-    apk120Value1013 = apk120Value1009.querySelector(".chat-image-detail-media"),
-    apk120Value1014 = apk120Value1009.querySelector(".chat-image-detail-copy"),
-    apk120Value1015 = apk120Value1009.querySelector('.chat-image-detail-sender'),
-    apk120Value1016 = apk120Value1009.querySelector(".chat-image-detail-time"),
-    apk120Value1017 = apk120Value1009.querySelector(".chat-image-detail-desc"),
-    apk120Value1018 = apk120Value1009.querySelector(".chat-image-detail-reroll-error"),
-    apk120Value1019 = apk120Value1009.querySelector(".chat-image-detail-reroll"),
-    apk120Value1020 = apk120Value1009.querySelector('.chat-image-detail-save'),
-    apk120Value1021 = apk120Value1009.querySelector(".chat-image-detail-prev"),
-    apk120Value1022 = apk120Value1009.querySelector('.chat-image-detail-next'),
-    apk120Value1023 = apk120Value1009.querySelector(".chat-image-detail-counter"),
-    apk120Value1024 = new Date(getChatDisplayTimestamp(apk120Value1005, apk120Value1006 || apk120Value1004.timestamp || Date.now())),
-    apk120Value1025 = typeof window.formatChatBubbleTime === "function" ? window.formatChatBubbleTime(getChatDisplayTimestamp(apk120Value1005, apk120Value1006 || apk120Value1004.timestamp || Date.now())) : apk120Value1024.getHours() + ':' + apk120Value1024.getMinutes().toString().padStart(0x2, '0'),
-    apk120Value1026 = apk120Value1004.content || window.imChat.CHAT_IMAGE_PLACEHOLDER_URL || '',
-    apk120Value1027 = 0x1 + (Array.isArray(apk120Value1004.albumImages) ? apk120Value1004.albumImages.length : 0x0);
-  let apk120Value1028 = Math.min(apk120Value1027 - 0x1, Math.max(0x0, Number(apk120Value1008) || 0x0));
-  const apk120Value1029 = apk120Value1004.imageSource === "generated" && !isImagePlaceholder120(apk120Value1004),
-    apk120Value1030 = canGenerateChatImage120(apk120Value1004),
-    apk120Value1031 = String(apk120Value1004.id || apk120Value1006 || apk120Value1004.timestamp || '');
-  let apk120Value1032 = apk120Value1031 + ':' + apk120Value1028;
-  const apk120Value1033 = () => {
-      if (!apk120Value1010?.naturalWidth || !apk120Value1010?.naturalHeight || !apk120Value1011 || !apk120Value1013) return;
-      const apk120Value1039 = window.visualViewport?.height || window.innerHeight,
-        apk120Value1040 = Math.min(apk120Value1039 * 0.86, 0x2a8),
-        apk120Value1041 = apk120Value1018 ? window.getComputedStyle(apk120Value1018) : null,
-        apk120Value1042 = apk120Value1041?.display !== "none" ? apk120Value1018.offsetHeight + (parseFloat(apk120Value1041.marginTop) || 0x0) : 0x0,
-        apk120Value1043 = (apk120Value1012?.offsetHeight || 0x0) + (apk120Value1014?.offsetHeight || 0x0) + apk120Value1042,
-        apk120Value1044 = Math.max(0x40, Math.floor(apk120Value1040 - apk120Value1043)),
-        apk120Value1045 = Math.max(0x1, Math.floor(apk120Value1011.getBoundingClientRect().width)),
-        apk120Value1046 = Math.min(apk120Value1045 / apk120Value1010.naturalWidth, apk120Value1044 / apk120Value1010.naturalHeight),
-        apk120Value1047 = Math.max(0x1, Math.floor(apk120Value1010.naturalWidth * apk120Value1046)),
-        apk120Value1048 = Math.max(0x1, Math.floor(apk120Value1010.naturalHeight * apk120Value1046));
-      apk120Value1013.style.width = apk120Value1047 + 'px', apk120Value1013.style.height = apk120Value1048 + 'px', apk120Value1013.style.aspectRatio = apk120Value1010.naturalWidth + " / " + apk120Value1010.naturalHeight;
-    },
-    apk120Value1034 = () => {
-      window.requestAnimationFrame(() => {
-        if (apk120Value1010?.dataset.detailImageKey === apk120Value1032) apk120Value1033();
-      });
-    };
-  apk120Value1009.dataset.messageKey = apk120Value1031;
-  apk120Value1010 && (apk120Value1010.onload = apk120Value1034);
-  const apk120Value1035 = async apk120Value1049 => {
-    if (apk120Value1049 < 0x0 || apk120Value1049 >= apk120Value1027) return;
-    apk120Value1028 = apk120Value1049, apk120Value1032 = apk120Value1031 + ':' + apk120Value1028;
-    apk120Value1023 && (apk120Value1023.style.display = apk120Value1027 > 0x1 ? '' : 'none', apk120Value1023.textContent = apk120Value1028 + 0x1 + '/' + apk120Value1027);
-    apk120Value1021 && (apk120Value1021.style.display = apk120Value1027 > 0x1 ? '' : 'none', apk120Value1021.disabled = apk120Value1028 === 0x0);
-    apk120Value1022 && (apk120Value1022.style.display = apk120Value1027 > 0x1 ? '' : "none", apk120Value1022.disabled = apk120Value1028 === apk120Value1027 - 0x1);
-    apk120Value1013?.style.removeProperty("width"), apk120Value1013?.style.removeProperty("height"), apk120Value1013?.style.removeProperty("aspect-ratio"), apk120Value1010.dataset.detailImageKey = apk120Value1032, apk120Value1010.alt = '第\x20' + (apk120Value1028 + 0x1) + " 张图片", apk120Value1010.removeAttribute("src");
-    try {
-      const apk120Value1050 = await handleAction_27(apk120Value1004, apk120Value1028);
-      if (apk120Value1010.dataset.detailImageKey === apk120Value1032 && apk120Value1009.style.display !== 'none') {
-        if (apk120Value1050) apk120Value1010.src = apk120Value1050;else window.showToast?.("图片加载失败");
+  function openChatImageDetail(imageDetailValue1, imageDetailValue2, imageDetailValue3, imageDetailValue4, imageDetailValue5 = 0) {
+    let imageDetailValue6 = document.getElementById("chat-image-detail-overlay");
+    !imageDetailValue6 && (imageDetailValue6 = document.createElement("div"), imageDetailValue6.id = "chat-image-detail-overlay", imageDetailValue6.className = "chat-image-detail-overlay", imageDetailValue6.innerHTML = "\n                <div class=\"chat-image-detail-card\">\n                    <div class=\"chat-image-detail-header\">\n                        <div class=\"chat-image-detail-heading\">\n                            <div class=\"chat-image-detail-sender\"></div>\n                            <div class=\"chat-image-detail-time\"></div>\n                        </div>\n                        <div class=\"chat-image-detail-actions\">\n                            <button type=\"button\" class=\"chat-image-detail-reroll\" aria-label=\"重新生成\" title=\"重新生成\"><i class=\"fas fa-redo\" aria-hidden=\"true\"></i></button>\n                            <button type=\"button\" class=\"chat-image-detail-save\" aria-label=\"保存图片\" title=\"保存图片\"><i class=\"fas fa-download\" aria-hidden=\"true\"></i></button>\n                            <button type=\"button\" class=\"chat-image-detail-close\" aria-label=\"关闭\"><i class=\"fas fa-times\"></i></button>\n                        </div>\n                    </div>\n                    <div class=\"chat-image-detail-media\">\n                        <button type=\"button\" class=\"chat-image-detail-prev\" aria-label=\"上一张图片\">‹</button>\n                        <img class=\"chat-image-detail-img\" src=\"\" alt=\"\">\n                        <button type=\"button\" class=\"chat-image-load-retry\" hidden>图片加载失败，点击重试</button>\n                        <button type=\"button\" class=\"chat-image-detail-next\" aria-label=\"下一张图片\">›</button>\n                        <span class=\"chat-image-detail-counter\" aria-live=\"polite\"></span>\n                    </div>\n                    <div class=\"chat-image-detail-reroll-error\" role=\"alert\" aria-live=\"assertive\"></div>\n                    <div class=\"chat-image-detail-copy\">\n                        <div class=\"chat-image-detail-label\">图片详情</div>\n                        <button type=\"button\" class=\"chat-image-detail-save-options\">备用保存</button>\n                        <div class=\"chat-image-detail-desc\" style=\"font-size:15px; color:#222; line-height:1.55; white-space:pre-wrap; word-break:break-word;\"></div>\n                    </div>\n                </div>\n            ", document.body.appendChild(imageDetailValue6), imageDetailValue6.addEventListener("click", imageDetailValue7 => {
+      (imageDetailValue7.target === imageDetailValue6 || imageDetailValue7.target.closest(".chat-image-detail-close")) && (imageDetailValue6.style.display = "none");
+    }));
+    const imageDetailValue8 = imageDetailValue6.querySelector(".chat-image-detail-img"),
+      imageDetailValue9 = imageDetailValue6.querySelector(".chat-image-detail-card"),
+      imageDetailValue10 = imageDetailValue6.querySelector(".chat-image-detail-header"),
+      imageDetailValue11 = imageDetailValue6.querySelector(".chat-image-detail-media"),
+      imageDetailValue12 = imageDetailValue6.querySelector(".chat-image-detail-copy"),
+      imageDetailValue13 = imageDetailValue6.querySelector(".chat-image-detail-sender"),
+      imageDetailValue14 = imageDetailValue6.querySelector(".chat-image-detail-time"),
+      imageDetailValue15 = imageDetailValue6.querySelector(".chat-image-detail-desc"),
+      imageDetailValue16 = imageDetailValue6.querySelector(".chat-image-detail-reroll-error"),
+      imageDetailValue17 = imageDetailValue6.querySelector(".chat-image-detail-reroll"),
+      imageDetailValue18 = imageDetailValue6.querySelector(".chat-image-detail-save"),
+      imageDetailValue19 = imageDetailValue6.querySelector(".chat-image-detail-prev"),
+      imageDetailValue20 = imageDetailValue6.querySelector(".chat-image-detail-next"),
+      imageDetailValue21 = imageDetailValue6.querySelector(".chat-image-detail-counter"),
+      imageDetailValue22 = (imageDetailValue6._imageDetailSession || 0) + 1;
+    imageDetailValue6._imageDetailSession = imageDetailValue22;
+    const imageDetailValue23 = () => imageDetailValue6._imageDetailSession === imageDetailValue22,
+      imageDetailValue24 = imageDetailValue6.querySelector(".chat-image-load-retry"),
+      imageDetailValue25 = imageDetailValue6.querySelector(".chat-image-detail-save-options");
+    let imageDetailValue26 = null,
+      imageDetailValue27 = null,
+      imageDetailValue28 = null,
+      imageDetailValue29 = 0,
+      imageDetailValue30 = false;
+    const imageDetailValue31 = new Date(getChatDisplayTimestamp(imageDetailValue2, imageDetailValue3 || imageDetailValue1.timestamp || Date.now())),
+      imageDetailValue32 = typeof window.formatChatBubbleTime === "function" ? window.formatChatBubbleTime(getChatDisplayTimestamp(imageDetailValue2, imageDetailValue3 || imageDetailValue1.timestamp || Date.now())) : imageDetailValue31.getHours() + ":" + imageDetailValue31.getMinutes().toString().padStart(2, "0"),
+      imageDetailValue33 = imageDetailValue1.content || window.imChat.CHAT_IMAGE_PLACEHOLDER_URL || "",
+      imageDetailValue34 = 1 + (Array.isArray(imageDetailValue1.albumImages) ? imageDetailValue1.albumImages.length : 0);
+    let imageDetailValue35 = Math.min(imageDetailValue34 - 1, Math.max(0, Number(imageDetailValue5) || 0));
+    const imageDetailValue36 = imageDetailValue1.imageSource === "generated" && !isImagePlaceholder120(imageDetailValue1),
+      imageDetailValue37 = canGenerateChatImage120(imageDetailValue1),
+      imageDetailValue38 = String(imageDetailValue1.id || imageDetailValue3 || imageDetailValue1.timestamp || "");
+    let imageDetailValue39 = imageDetailValue38 + ":" + imageDetailValue35;
+    const imageDetailValue40 = () => {
+        if (!imageDetailValue8?.["naturalWidth"] || !imageDetailValue8?.["naturalHeight"] || !imageDetailValue9 || !imageDetailValue11) return;
+        const imageDetailValue41 = window.visualViewport?.["height"] || window.innerHeight,
+          imageDetailValue42 = Math.min(imageDetailValue41 * 0.86, 680),
+          imageDetailValue43 = imageDetailValue16 ? window.getComputedStyle(imageDetailValue16) : null,
+          imageDetailValue44 = imageDetailValue43?.["display"] !== "none" ? imageDetailValue16.offsetHeight + (parseFloat(imageDetailValue43.marginTop) || 0) : 0,
+          imageDetailValue45 = (imageDetailValue10?.["offsetHeight"] || 0) + (imageDetailValue12?.["offsetHeight"] || 0) + imageDetailValue44,
+          imageDetailValue46 = Math.max(64, Math.floor(imageDetailValue42 - imageDetailValue45)),
+          imageDetailValue47 = Math.max(1, Math.floor(imageDetailValue9.getBoundingClientRect().width)),
+          imageDetailValue48 = Math.min(imageDetailValue47 / imageDetailValue8.naturalWidth, imageDetailValue46 / imageDetailValue8.naturalHeight),
+          imageDetailValue49 = Math.max(1, Math.floor(imageDetailValue8.naturalWidth * imageDetailValue48)),
+          imageDetailValue50 = Math.max(1, Math.floor(imageDetailValue8.naturalHeight * imageDetailValue48));
+        imageDetailValue11.style.width = imageDetailValue49 + "px", imageDetailValue11.style.height = imageDetailValue50 + "px", imageDetailValue11.style.aspectRatio = imageDetailValue8.naturalWidth + " / " + imageDetailValue8.naturalHeight;
+      },
+      imageDetailValue51 = () => {
+        window.requestAnimationFrame(() => {
+          if (imageDetailValue8?.["dataset"]["detailImageKey"] === imageDetailValue39) imageDetailValue40();
+        });
+      };
+    imageDetailValue6.dataset.messageKey = imageDetailValue38;
+    imageDetailValue8 && (imageDetailValue8.onload = imageDetailValue51);
+    const imageDetailValue52 = async (imageDetailValue53, imageDetailValue54 = false) => {
+      if (imageDetailValue53 < 0 || imageDetailValue53 >= imageDetailValue34) return;
+      const imageDetailValue55 = ++imageDetailValue29;
+      imageDetailValue35 = imageDetailValue53, imageDetailValue30 = imageDetailValue54, imageDetailValue26 = null, imageDetailValue28 = null;
+      if (imageDetailValue24) imageDetailValue24.hidden = true;
+      imageDetailValue39 = imageDetailValue38 + ":" + imageDetailValue35;
+      imageDetailValue21 && (imageDetailValue21.style.display = imageDetailValue34 > 1 ? "" : "none", imageDetailValue21.textContent = imageDetailValue35 + 1 + "/" + imageDetailValue34);
+      imageDetailValue19 && (imageDetailValue19.style.display = imageDetailValue34 > 1 ? "" : "none", imageDetailValue19.disabled = imageDetailValue35 === 0);
+      imageDetailValue20 && (imageDetailValue20.style.display = imageDetailValue34 > 1 ? "" : "none", imageDetailValue20.disabled = imageDetailValue35 === imageDetailValue34 - 1);
+      imageDetailValue11?.["style"]["removeProperty"]("width"), imageDetailValue11?.["style"]["removeProperty"]("height"), imageDetailValue11?.["style"]["removeProperty"]("aspect-ratio"), imageDetailValue8.dataset.detailImageKey = imageDetailValue39, imageDetailValue8.alt = "第 " + (imageDetailValue35 + 1) + " 张图片", imageDetailValue8.removeAttribute("src");
+      const imageDetailValue56 = imageDetailValue39;
+      imageDetailValue36 && window.u2ImageResources && (imageDetailValue27 = window.u2ImageResources.readMessageBlob(imageDetailValue1, imageDetailValue53).then(imageDetailValue57 => {
+        if (imageDetailValue55 === imageDetailValue29 && imageDetailValue23()) imageDetailValue26 = imageDetailValue57;
+        return imageDetailValue57;
+      })["catch"](imageDetailValue58 => {
+        if (imageDetailValue55 === imageDetailValue29) imageDetailValue28 = imageDetailValue58;
+        return null;
+      }));
+      try {
+        const imageDetailValue59 = await handleAction_27(imageDetailValue1, imageDetailValue53, {
+          "refresh": imageDetailValue54
+        });
+        if (imageDetailValue23() && imageDetailValue55 === imageDetailValue29 && imageDetailValue8.dataset.detailImageKey === imageDetailValue56 && imageDetailValue6.style.display !== "none") {
+          if (imageDetailValue59) imageDetailValue8.src = imageDetailValue59;else {
+            if (imageDetailValue24) imageDetailValue24.hidden = false;
+          }
+        }
+      } catch (imageDetailValue60) {
+        if (imageDetailValue23() && imageDetailValue55 === imageDetailValue29 && imageDetailValue8.dataset.detailImageKey === imageDetailValue56 && imageDetailValue24) imageDetailValue24.hidden = false;
       }
-    } catch (apk120Value1051) {
-      if (apk120Value1010.dataset.detailImageKey === apk120Value1032) window.showToast?.('图片加载失败');
-    }
-  };
-  apk120Value1021.onclick = () => {
-    void apk120Value1035(apk120Value1028 - 0x1);
-  }, apk120Value1022.onclick = () => {
-    void apk120Value1035(apk120Value1028 + 0x1);
-  };
-  let apk120Value1036 = null;
-  const apk120Value1037 = (apk120Value1052, apk120Value1053) => {
-    if (!apk120Value1036 || apk120Value1027 < 0x2) return;
-    const apk120Value1054 = apk120Value1052 - apk120Value1036.x,
-      apk120Value1055 = apk120Value1053 - apk120Value1036.y;
-    apk120Value1036 = null, Math.abs(apk120Value1054) > 0x20 && Math.abs(apk120Value1054) > Math.abs(apk120Value1055) * 1.15 && void apk120Value1035(apk120Value1028 + (apk120Value1054 < 0x0 ? 0x1 : -0x1));
-  };
-  apk120Value1013.onpointerdown = apk120Value1056 => {
-    if (apk120Value1056.pointerType !== "touch") apk120Value1036 = {
-      'x': apk120Value1056.clientX,
-      'y': apk120Value1056.clientY
     };
-  }, apk120Value1013.onpointerup = apk120Value1057 => {
-    if (apk120Value1057.pointerType !== "touch") apk120Value1037(apk120Value1057.clientX, apk120Value1057.clientY);
-  }, apk120Value1013.onpointercancel = () => {
-    apk120Value1036 = null;
-  }, apk120Value1013.ontouchstart = apk120Value1058 => {
-    const apk120Value1059 = apk120Value1058.touches?.[0x0];
-    if (apk120Value1059) apk120Value1036 = {
-      'x': apk120Value1059.clientX,
-      'y': apk120Value1059.clientY
+    imageDetailValue8.onerror = () => {
+      if (imageDetailValue6.dataset.messageKey !== imageDetailValue38) return;
+      if (!imageDetailValue30) {
+        void imageDetailValue52(imageDetailValue35, true);
+        return;
+      }
+      imageDetailValue8.removeAttribute("src");
+      if (imageDetailValue24) imageDetailValue24.hidden = false;
     };
-  }, apk120Value1013.ontouchend = apk120Value1060 => {
-    const apk120Value1061 = apk120Value1060.changedTouches?.[0x0];
-    if (apk120Value1061) apk120Value1037(apk120Value1061.clientX, apk120Value1061.clientY);
-  }, apk120Value1013.ontouchcancel = () => {
-    apk120Value1036 = null;
-  }, apk120Value1009.onkeydown = apk120Value1062 => {
-    apk120Value1062.key === "ArrowLeft" && (apk120Value1062.preventDefault(), void apk120Value1035(apk120Value1028 - 0x1));
-    apk120Value1062.key === "ArrowRight" && (apk120Value1062.preventDefault(), void apk120Value1035(apk120Value1028 + 0x1));
-    if (apk120Value1062.key === "Escape") apk120Value1009.style.display = "none";
-  };
-  if (apk120Value1015) apk120Value1015.textContent = apk120Value1007 || apk120Value1005?.nickname || apk120Value1005?.realName || '图片';
-  if (apk120Value1016) apk120Value1016.textContent = apk120Value1025;
-  if (apk120Value1017) apk120Value1017.textContent = apk120Value1004.text || apk120Value1004.description || "暂无图片描述";
-  apk120Value1018 && (apk120Value1018.style.display = "none", apk120Value1018.textContent = ''), apk120Value1020 && (apk120Value1020.style.display = apk120Value1029 ? 'inline-flex' : 'none', apk120Value1020.disabled = ![], apk120Value1020.textContent = '保存', apk120Value1020.onclick = async () => {
-    if (!apk120Value1029 || apk120Value1020.disabled) return;
-    const apk120Value1063 = apk120Value1020.textContent;
-    apk120Value1020.disabled = !![], apk120Value1020.textContent = '保存中…';
-    try {
-      const apk120Value1064 = await saveGeneratedChatImage(await handleAction_27(apk120Value1004, apk120Value1028), apk120Value1006 || apk120Value1004.timestamp);
-      if (apk120Value1064 === 'downloaded' || apk120Value1064 === "shared") window.showToast?.("图片已保存");
-    } catch (apk120Value1065) {
-      window.showToast?.(apk120Value1065?.message || "图片保存失败，请稍后重试");
-    } finally {
-      apk120Value1020.disabled = ![], apk120Value1020.textContent = apk120Value1063;
-    }
-  }), apk120Value1019 && (apk120Value1019.style.display = apk120Value1030 ? "inline-flex" : "none", apk120Value1019.disabled = ![], apk120Value1019.innerHTML = apk120Value1029 ? "<i class=\"fas fa-redo\"></i> 重 roll" : "<i class=\"fas fa-magic\"></i> 生成图片", apk120Value1019.onclick = () => {
-    if (!apk120Value1030 || apk120Value1019.disabled) return;
-    openChatImagePrompt120(apk120Value1004, apk120Value1005, apk120Value1006, apk120Value1007);
-  }), apk120Value1009.style.display = "flex", apk120Value1009.tabIndex = -0x1, apk120Value1009.focus(), void apk120Value1035(apk120Value1028);
-}
+    if (imageDetailValue24) imageDetailValue24.onclick = () => {
+      void imageDetailValue52(imageDetailValue35, true);
+    };
+    imageDetailValue19.onclick = () => {
+      void imageDetailValue52(imageDetailValue35 - 1);
+    }, imageDetailValue20.onclick = () => {
+      void imageDetailValue52(imageDetailValue35 + 1);
+    };
+    let imageDetailValue61 = null;
+    const imageDetailValue62 = (imageDetailValue63, imageDetailValue64) => {
+      if (!imageDetailValue61 || imageDetailValue34 < 2) return;
+      const imageDetailValue65 = imageDetailValue63 - imageDetailValue61.x,
+        imageDetailValue66 = imageDetailValue64 - imageDetailValue61.y;
+      imageDetailValue61 = null, Math.abs(imageDetailValue65) > 32 && Math.abs(imageDetailValue65) > Math.abs(imageDetailValue66) * 1.15 && void imageDetailValue52(imageDetailValue35 + (imageDetailValue65 < 0 ? 1 : -1));
+    };
+    imageDetailValue11.onpointerdown = imageDetailValue67 => {
+      if (imageDetailValue67.pointerType !== "touch") imageDetailValue61 = {
+        "x": imageDetailValue67.clientX,
+        "y": imageDetailValue67.clientY
+      };
+    }, imageDetailValue11.onpointerup = imageDetailValue68 => {
+      if (imageDetailValue68.pointerType !== "touch") imageDetailValue62(imageDetailValue68.clientX, imageDetailValue68.clientY);
+    }, imageDetailValue11.onpointercancel = () => {
+      imageDetailValue61 = null;
+    }, imageDetailValue11.ontouchstart = imageDetailValue69 => {
+      const imageDetailValue70 = imageDetailValue69.touches?.[0];
+      if (imageDetailValue70) imageDetailValue61 = {
+        "x": imageDetailValue70.clientX,
+        "y": imageDetailValue70.clientY
+      };
+    }, imageDetailValue11.ontouchend = imageDetailValue71 => {
+      const imageDetailValue72 = imageDetailValue71.changedTouches?.[0];
+      if (imageDetailValue72) imageDetailValue62(imageDetailValue72.clientX, imageDetailValue72.clientY);
+    }, imageDetailValue11.ontouchcancel = () => {
+      imageDetailValue61 = null;
+    }, imageDetailValue6.onkeydown = imageDetailValue73 => {
+      imageDetailValue73.key === "ArrowLeft" && (imageDetailValue73.preventDefault(), void imageDetailValue52(imageDetailValue35 - 1));
+      imageDetailValue73.key === "ArrowRight" && (imageDetailValue73.preventDefault(), void imageDetailValue52(imageDetailValue35 + 1));
+      if (imageDetailValue73.key === "Escape") imageDetailValue6.style.display = "none";
+    };
+    if (imageDetailValue13) imageDetailValue13.textContent = imageDetailValue4 || imageDetailValue2?.["nickname"] || imageDetailValue2?.["realName"] || "图片";
+    if (imageDetailValue14) imageDetailValue14.textContent = imageDetailValue32;
+    if (imageDetailValue15) imageDetailValue15.textContent = imageDetailValue1.text || imageDetailValue1.description || "暂无图片描述";
+    imageDetailValue16 && (imageDetailValue16.style.display = "none", imageDetailValue16.textContent = ""), imageDetailValue18 && (imageDetailValue18.style.display = imageDetailValue36 ? "inline-flex" : "none", imageDetailValue18.disabled = false, imageDetailValue18.innerHTML = "<i class=\"fas fa-download\" aria-hidden=\"true\"></i>", imageDetailValue18.setAttribute("aria-label", "保存图片"), imageDetailValue18.onclick = async () => {
+      if (!imageDetailValue36 || imageDetailValue18.disabled) return;
+      const imageDetailValue74 = imageDetailValue39;
+      imageDetailValue28 && window.u2ImageResources && (imageDetailValue28 = null, imageDetailValue27 = window.u2ImageResources.readMessageBlob(imageDetailValue1, imageDetailValue35).then(imageDetailValue75 => {
+        if (imageDetailValue23() && imageDetailValue8.dataset.detailImageKey === imageDetailValue74) imageDetailValue26 = imageDetailValue75;
+        return imageDetailValue75;
+      })["catch"](imageDetailValue76 => {
+        return imageDetailValue28 = imageDetailValue76, null;
+      }));
+      const imageDetailValue77 = !imageDetailValue26;
+      imageDetailValue18.disabled = true, imageDetailValue18.innerHTML = "<i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i>", imageDetailValue18.setAttribute("aria-label", "正在准备图片");
+      try {
+        const imageDetailValue78 = imageDetailValue26 || (await imageDetailValue27);
+        if (!imageDetailValue23() || imageDetailValue8.dataset.detailImageKey !== imageDetailValue74 || imageDetailValue6.style.display === "none") return;
+        if (!imageDetailValue78 && imageDetailValue28) throw imageDetailValue28;
+        const imageDetailValue79 = await saveGeneratedChatImage(imageDetailValue1.content || "local-image", imageDetailValue3 || imageDetailValue1.timestamp, {
+          "message": imageDetailValue1,
+          "index": imageDetailValue35,
+          "blob": imageDetailValue78,
+          "showOptions": imageDetailValue77
+        });
+        if (imageDetailValue79 === "download-started") window.showToast?.("已发起下载，请查看浏览器下载列表；失败时可使用备用保存");else {
+          if (imageDetailValue79 === "downloaded") window.showToast?.("图片已保存");else {
+            if (imageDetailValue79 === "shared") window.showToast?.("图片已分享，请在所选应用中完成保存");
+          }
+        }
+      } catch (imageDetailValue80) {
+        window.showToast?.(imageDetailValue80?.["message"] || "图片保存失败，请稍后重试");
+      } finally {
+        imageDetailValue23() && imageDetailValue8.dataset.detailImageKey === imageDetailValue74 && (imageDetailValue18.disabled = false, imageDetailValue18.innerHTML = "<i class=\"fas fa-download\" aria-hidden=\"true\"></i>", imageDetailValue18.setAttribute("aria-label", "保存图片"));
+      }
+    }), imageDetailValue25 && (imageDetailValue25.hidden = !imageDetailValue36, imageDetailValue25.onclick = async () => {
+      try {
+        const imageDetailValue81 = imageDetailValue39,
+          imageDetailValue82 = imageDetailValue26,
+          imageDetailValue83 = await handleAction_27(imageDetailValue1, imageDetailValue35);
+        if (!imageDetailValue23() || imageDetailValue8.dataset.detailImageKey !== imageDetailValue81 || imageDetailValue6.style.display === "none") return;
+        const imageDetailValue84 = await window.u2ExportFile?.({
+          "blob": imageDetailValue82,
+          "imageUrl": imageDetailValue83,
+          "mode": "image",
+          "showOptions": true,
+          "fileName": getGeneratedChatImageFileName(imageDetailValue3 || imageDetailValue1.timestamp, imageDetailValue82?.["type"]),
+          "title": "iMessage 生成图片"
+        });
+        if (!imageDetailValue84 || imageDetailValue84 === "failed") window.showToast?.("图片资源无法读取，请重试或重新生成");
+      } catch (imageDetailValue85) {
+        window.showToast?.(imageDetailValue85.message || "图片资源无法读取，请重试或重新生成");
+      }
+    }), imageDetailValue17 && (imageDetailValue17.style.display = imageDetailValue37 ? "inline-flex" : "none", imageDetailValue17.disabled = false, imageDetailValue17.innerHTML = imageDetailValue36 ? "<i class=\"fas fa-redo\" aria-hidden=\"true\"></i>" : "<i class=\"fas fa-magic\" aria-hidden=\"true\"></i>", imageDetailValue17.setAttribute("aria-label", imageDetailValue36 ? "重新生成" : "生成图片"), imageDetailValue17.title = imageDetailValue36 ? "重新生成" : "生成图片", imageDetailValue17.onclick = () => {
+      if (!imageDetailValue37 || imageDetailValue17.disabled) return;
+      openChatImagePrompt120(imageDetailValue1, imageDetailValue2, imageDetailValue3, imageDetailValue4);
+    }), imageDetailValue6.style.display = "flex", imageDetailValue6.tabIndex = -1, imageDetailValue6.focus(), void imageDetailValue52(imageDetailValue35);
+  }
     function attachPhotoAlbumMorph(summary, stack, cards, cardOrder, motion, container, groupId) {
         const expandedGroups = container._imExpandedPhotoGroups || new Set();
         container._imExpandedPhotoGroups = expandedGroups;
@@ -4214,7 +4612,6 @@
             image.draggable = false;
             card.appendChild(image);
             stack.appendChild(card);
-            // Keep IHG's asset URL lookup, including albums restored from storage.
             void handleAction_27(message, index).then(src => {
                 if (src) image.src = src;
             }).catch(() => undefined);
@@ -4478,15 +4875,49 @@
             value_325 +
             '\n                </div>\n            </div>\n        ';
         const imageEl_2 = row_14.querySelector('.chat-image-bubble-img');
-        imageEl_2 &&
+        if (imageEl_2) {
+            const media = document.createElement('div');
+            media.className = 'chat-image-bubble-media';
+            imageEl_2.replaceWith(media);
+            const retry = document.createElement('button');
+            retry.type = 'button';
+            retry.className = 'chat-image-load-retry';
+            retry.textContent = '图片加载失败，点击重试';
+            retry.hidden = true;
+            media.append(imageEl_2, retry);
+            let liveMessage = msg_18, refreshed = false, requestId = 0;
+            const loadImage = async (refresh = false) => {
+                const activeRequest = ++requestId;
+                refreshed = refresh;
+                retry.hidden = true;
+                try {
+                    const url = await handleAction_27(liveMessage, 0, { refresh });
+                    if (activeRequest !== requestId || !imageEl_2.isConnected) return;
+                    if (url) imageEl_2.src = url;
+                    else { imageEl_2.removeAttribute('src'); retry.hidden = false; }
+                } catch {
+                    if (activeRequest === requestId && imageEl_2.isConnected) retry.hidden = false;
+                }
+            };
+            imageEl_2._setChatImageMessage = message => { liveMessage = message; void loadImage(); };
+            imageEl_2.addEventListener('error', () => {
+                if (!refreshed) { void loadImage(true); return; }
+                imageEl_2.removeAttribute('src');
+                retry.hidden = false;
+            });
+            retry.addEventListener('click', event => {
+                event.preventDefault(); event.stopPropagation(); void loadImage(true);
+            });
+            if (msg_18.contentAssetId) void Promise.resolve().then(() => loadImage());
             imageEl_2.addEventListener('click', (event_10) => {
                 event_10.preventDefault();
                 event_10.stopPropagation();
                 const senderName_3 = isUser
                     ? getEffectiveUserProfile(friend_31).name
                     : speakerName || friend_31?.nickname || friend_31?.realName || 'Char';
-                openChatImageDetail(msg_18, friend_31, timestamp_10, senderName_3);
+                openChatImageDetail(liveMessage, friend_31, timestamp_10, senderName_3);
             });
+        }
         if (value_320) {
             const senderName = isUser
                 ? getEffectiveUserProfile(friend_31).name
@@ -6367,11 +6798,11 @@ function renderFileBubble(apk119Value1269, apk119Value1270, apk119Value1271, apk
   apk119Value1281.innerHTML = "\n            <div class=\"chat-checkbox-wrapper\" style=\"display:" + (window.imData.batchSelectMode ? "flex" : "none") + ";width:40px;justify-content:center;align-items:flex-end;padding-bottom:10px;flex-shrink:0;cursor:pointer;transition:all .2s;\">\n                <i class=\"far fa-circle chat-checkbox\" data-timestamp=\"" + apk119Value1272 + "\" style=\"color:#c7c7cc;font-size:22px;\"></i>\n            </div>\n            <div style=\"flex:1;display:flex;flex-direction:column;min-width:0;\">\n                " + apk119Value1284 + "\n                <div style=\"display:flex;justify-content:" + (apk119Value1273 ? "flex-end" : "flex-start") + ";align-items:flex-end;width:100%;\">" + apk119Value1283 + "</div>\n            </div>";
   const apk119Value1285 = apk119Value1281.querySelector(".im-file-card");
   apk119Value1285?.["addEventListener"]("click", () => {
-    if (!window.imData.batchSelectMode) window.imChat.openFileDetail(apk119Value1269);
+    if (!window.imData.batchSelectMode) window.imChat.openFileDetail(apk119Value1269, {friend: apk119Value1270});
   }), apk119Value1285?.["addEventListener"]("keydown", apk119Value1290 => {
     if (apk119Value1290.key !== "Enter" && apk119Value1290.key !== " ") return;
     apk119Value1290.preventDefault();
-    if (!window.imData.batchSelectMode) window.imChat.openFileDetail(apk119Value1269);
+    if (!window.imData.batchSelectMode) window.imChat.openFileDetail(apk119Value1269, {friend: apk119Value1270});
   }), apk119Value1271.appendChild(apk119Value1281), window.imChat.scrollToBottom(apk119Value1271);
 }
 function renderFakeLinkDetailPane(apk119Value1382, apk119Value1383) {
@@ -6474,7 +6905,7 @@ function openChatImagePrompt120(apk120Value976, apk120Value977, apk120Value978, 
     'generationPrompt': {
       ...apk120Value982.config,
       'showSubjects': !![],
-      'showPresets': ![],
+      basePromptTarget: 'secondary',
       'showAutoGenerate': ![]
     },
     'onCancel': () => apk120Value984(),
@@ -6492,9 +6923,10 @@ function openChatImagePrompt120(apk120Value976, apk120Value977, apk120Value978, 
       try {
         const {
           updatedFriend: apk120Value995,
-          updatedMessage: apk120Value996
+          updatedMessage: apk120Value996,
+          imageCacheWarning
         } = await rerollGeneratedChatImage(apk120Value976, apk120Value977, apk120Value992);
-        window.showToast?.("图片已生成");
+        window.showToast?.(imageCacheWarning || "图片已生成");
         if (apk120Value991.isCurrent?.() !== ![]) apk120Value984(apk120Value995, apk120Value996);
         return !![];
       } catch (apk120Value997) {

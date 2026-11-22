@@ -1,241 +1,201 @@
 (function () {
-    const value = new Map();
-    const _value = new Map();
-    function handleAction(value_14) {
-        return String(value_14?.transcript || value_14?.text || '').trim();
+  const localValue1 = new Map(),
+    localValue2 = new Map();
+  function localValue3(localValue20) {
+    return String(localValue20?.["transcript"] || localValue20?.["text"] || "").trim();
+  }
+  function localValue4(localValue21, localValue22) {
+    const localValue23 = String(localValue22?.["id"] || "");
+    return (localValue21?.["messages"] || []).find(localValue24 => String(localValue24?.["id"] || "") === localValue23) || localValue22;
+  }
+  function localValue5(localValue25, localValue26) {
+    if (localValue26?.["role"] !== "assistant" || localValue26?.["type"] !== "voice_message") return null;
+    const localValue27 = window.u2Tts?.["resolveMessageTtsFriend"]?.(localValue25, localValue26);
+    return localValue27 && (localValue27.type === "char" || localValue27.type === "friend") ? localValue27 : null;
+  }
+  function localValue6(localValue28, localValue29) {
+    return !!localValue5(localValue28, localValue29);
+  }
+  function localValue7(localValue30, localValue31) {
+    return String(localValue30?.["id"] || "") + ":" + String(localValue31?.["id"] || localValue31?.["timestamp"] || "");
+  }
+  function localValue8(localValue32, localValue33) {
+    const localValue34 = localValue7(localValue32, localValue33),
+      localValue35 = localValue4(localValue32, localValue33),
+      localValue36 = localValue2.get(localValue34);
+    if (!localValue36) return null;
+    if (localValue36.assetId !== localValue35?.["ttsAudioAssetId"] || localValue36.text !== localValue3(localValue35) || localValue35?.["ttsAudioText"] !== localValue36.text) return localValue2["delete"](localValue34), null;
+    return localValue36;
+  }
+  function localValue9() {
+    const localValue37 = typeof navigator === "undefined" ? null : navigator,
+      localValue38 = String(localValue37?.["userAgent"] || "");
+    return /iPad|iPhone|iPod/i.test(localValue38) || /Macintosh/i.test(localValue38) && Number(localValue37?.["maxTouchPoints"]) > 1;
+  }
+  async function localValue10(localValue39) {
+    const localValue40 = String(localValue39 || "").trim();
+    if (!localValue40) throw new Error("TTS 未返回可保存的音频");
+    if (localValue40.startsWith("data:")) {
+      const localValue43 = window.appStorage?.["dataUrlToBlob"]?.(localValue40);
+      if (localValue43?.["size"]) return localValue43;
     }
-    function handleAction_1(value_15, value_16) {
-        const string = String(value_16?.id || '');
-        return (
-            (value_15?.messages || []).find((value_17) => String(value_17?.id || '') === string) ||
-            value_16
-        );
+    const localValue41 = await fetch(localValue40);
+    if (!localValue41.ok) throw new Error("无法读取生成的音频 (" + localValue41.status + ")");
+    const localValue42 = await localValue41.blob();
+    if (!localValue42.size) throw new Error("生成的音频为空");
+    return localValue42;
+  }
+  async function localValue11(localValue44, localValue45) {
+    const localValue46 = localValue4(localValue44, localValue45),
+      localValue47 = localValue3(localValue46),
+      localValue48 = String(localValue46?.["ttsAudioAssetId"] || "");
+    if (!localValue48 || !localValue47 || localValue46.ttsAudioText !== localValue47) return null;
+    const localValue49 = await window.appStorage?.["getAssetBlob"]?.(localValue48);
+    return localValue49?.["size"] ? {
+      "assetId": localValue48,
+      "blob": localValue49
+    } : null;
+  }
+  function localValue12(localValue50, localValue51) {
+    const localValue52 = ((localValue50?.["id"] || "") + "_" + (localValue51?.["id"] || "")).replace(/[^a-z0-9_-]+/gi, "-").slice(0, 140),
+      localValue53 = window.crypto?.["randomUUID"]?.() || Date.now() + "_" + Math.random().toString(36).slice(2);
+    return "im_voice_tts_" + localValue52 + "_" + localValue53;
+  }
+  async function localValue13(localValue54, localValue55) {
+    const localValue56 = window.appStorage?.["voiceCacheEpoch"],
+      localValue57 = localValue4(localValue54, localValue55),
+      localValue58 = localValue5(localValue54, localValue57),
+      localValue59 = localValue3(localValue57);
+    if (!localValue58) throw new Error("无法确定这条语音的发送角色");
+    if (!localValue59) throw new Error("这条语音没有可合成的文字");
+    if (!window.u2Tts?.["canSpeakForFriend"]?.(localValue58)) throw new Error("请先为该角色开启 TTS 并设置音色 ID");
+    if (!window.appStorage?.["saveAssetFromBlob"] || !window.appStorage?.["getAssetBlob"] || !window.imApp?.["updateFriendMessage"]) throw new Error("语音存储服务不可用，请刷新后重试");
+    const localValue60 = await window.u2Tts.prepareSpeech(localValue59, localValue58);
+    let localValue61;
+    try {
+      localValue61 = await localValue10(localValue60);
+    } finally {
+      if (String(localValue60 || "").startsWith("blob:")) URL.revokeObjectURL(localValue60);
     }
-    function handleAction_2(value_18, message) {
-        if (message?.role !== 'assistant' || message?.type !== 'voice_message') return null;
-        const messageTtsFriend = window.u2Tts?.resolveMessageTtsFriend?.(value_18, message);
-        return messageTtsFriend &&
-            (messageTtsFriend.type === 'char' || messageTtsFriend.type === 'friend')
-            ? messageTtsFriend
-            : null;
-    }
-    function handleAction_3(value_19, value_20) {
-        return !!handleAction_2(value_19, value_20);
-    }
-    function handleAction_4(value_21, message_22) {
-        return (
-            String(value_21?.id || '') + ':' + String(message_22?.id || message_22?.timestamp || '')
-        );
-    }
-    function _value2(_value5, _value6) {
-        const _value7 = handleAction_4(_value5, _value6);
-        const _value8 = handleAction_1(_value5, _value6);
-        const _value9 = _value.get(_value7);
-        if (!_value9) return null;
-        if (
-            _value9.assetId !== _value8?.ttsAudioAssetId ||
-            _value9.text !== handleAction(_value8) ||
-            _value8?.ttsAudioText !== _value9.text
-        ) {
-            _value['delete'](_value7);
-            return null;
-        }
-        return _value9;
-    }
-    function _value3() {
-        const _value0 = typeof navigator === 'undefined' ? null : navigator;
-        const _value1 = String(_value0?.userAgent || '');
-        return (
-            /iPad|iPhone|iPod/i.test(_value1) ||
-            (/Macintosh/i.test(_value1) && Number(_value0?.maxTouchPoints) > 1)
-        );
-    }
-    async function handleAction_5(value_23) {
-        const trim_24 = String(value_23 || '').trim();
-        if (!trim_24) throw new Error('TTS 未返回可保存的音频');
-        if (trim_24.startsWith('data:')) {
-            const dataUrlToBlob_27 = window.appStorage?.dataUrlToBlob?.(trim_24);
-            if (dataUrlToBlob_27?.size) return dataUrlToBlob_27;
-        }
-        const value_25 = await fetch(trim_24);
-        if (!value_25.ok) throw new Error('无法读取生成的音频 (' + value_25.status + ')');
-        const value_26 = await value_25.blob();
-        if (!value_26.size) throw new Error('生成的音频为空');
-        return value_26;
-    }
-    async function handleAction_6(value_28, value_29) {
-        const handleAction_1_30 = handleAction_1(value_28, value_29);
-        const handleAction_31 = handleAction(handleAction_1_30);
-        const string_32 = String(handleAction_1_30?.ttsAudioAssetId || '');
-        if (!string_32 || !handleAction_31 || handleAction_1_30.ttsAudioText !== handleAction_31)
-            return null;
-        const value_33 = await window.appStorage?.getAssetBlob?.(string_32);
-        return value_33?.size
-            ? {
-                  assetId: string_32,
-                  blob: value_33,
-              }
-            : null;
-    }
-    function handleAction_7(value_34, value_35) {
-        const slice_36 = ((value_34?.id || '') + '_' + (value_35?.id || ''))
-            .replace(/[^a-z0-9_-]+/gi, '-')
-            .slice(0, 140);
-        const value_37 =
-            window.crypto?.randomUUID?.() || Date.now() + '_' + Math.random().toString(36).slice(2);
-        return 'im_voice_tts_' + slice_36 + '_' + value_37;
-    }
-    async function handleAction_8(value_38, value_39) {
-        const handleAction_1_40 = handleAction_1(value_38, value_39);
-        const handleAction_2_41 = handleAction_2(value_38, handleAction_1_40);
-        const handleAction_42 = handleAction(handleAction_1_40);
-        if (!handleAction_2_41) throw new Error('无法确定这条语音的发送角色');
-        if (!handleAction_42) throw new Error('这条语音没有可合成的文字');
-        if (!window.u2Tts?.canSpeakForFriend?.(handleAction_2_41))
-            throw new Error('请先为该角色开启 TTS 并设置音色 ID');
-        if (
-            !window.appStorage?.saveAssetFromBlob ||
-            !window.appStorage?.getAssetBlob ||
-            !window.imApp?.updateFriendMessage
-        )
-            throw new Error('语音存储服务不可用，请刷新后重试');
-        const value_43 = await window.u2Tts.prepareSpeech(handleAction_42, handleAction_2_41);
-        let value_44;
-        try {
-            value_44 = await handleAction_5(value_43);
-        } finally {
-            if (String(value_43 || '').startsWith('blob:')) URL.revokeObjectURL(value_43);
-        }
-        const handleAction_7_45 = handleAction_7(value_38, handleAction_1_40);
-        await window.appStorage.saveAssetFromBlob(handleAction_7_45, value_44, {
-            ownerType: 'imessage_voice_tts',
-            ownerId: String(handleAction_1_40.id || ''),
-            friendId: String(value_38.id || ''),
-        });
-        try {
-            const value_46 = await window.imApp.updateFriendMessage(
-                value_38.id,
-                {
-                    id: handleAction_1_40.id || null,
-                    timestamp: handleAction_1_40.id ? null : handleAction_1_40.timestamp || null,
-                },
-                (value_47) => {
-                    if (!value_47 || handleAction(value_47) !== handleAction_42)
-                        throw new Error('语音文字已变化，请重试');
-                    value_47.ttsAudioAssetId = handleAction_7_45;
-                    value_47.ttsAudioText = handleAction_42;
-                },
-                {
-                    silent: true,
-                },
-            );
-            if (!value_46) throw new Error('语音保存失败，请重试');
-        } catch (value_48) {
-            await window.appStorage.deleteAsset?.(handleAction_7_45)['catch'](() => undefined);
-            throw value_48;
-        }
-        value_39.ttsAudioAssetId = handleAction_7_45;
-        value_39.ttsAudioText = handleAction_42;
-        return {
-            assetId: handleAction_7_45,
-            blob: value_44,
-        };
-    }
-    async function handleAction_9(value_49, value_50, { regenerate = false } = {}) {
-        if (!handleAction_3(value_49, value_50)) throw new Error('这条语音不能生成音频');
-        const handleAction_4_51 = handleAction_4(value_49, value_50);
-        const result = value.get(handleAction_4_51);
-        if (result) {
-            if (!regenerate) return result;
-            try {
-                await result;
-            } catch (value_53) {}
-        }
-        const value_52 = (async () => {
-            if (!regenerate) {
-                const value_54 = await handleAction_6(value_49, value_50);
-                if (value_54) return value_54;
-            }
-            return handleAction_8(value_49, value_50);
-        })();
-        value.set(handleAction_4_51, value_52);
-        try {
-            return await value_52;
-        } finally {
-            if (value.get(handleAction_4_51) === value_52) value['delete'](handleAction_4_51);
-        }
-    }
-    async function handleAction_10(value_55, value_56, _value11 = {}) {
-        const { assetId: value_57 } = await handleAction_9(value_55, value_56, _value11);
-        const value_58 = await window.appStorage.getAssetUrl(value_57);
-        if (!value_58) throw new Error('已保存的语音无法读取，请重试');
-        const _value12 = handleAction_1(value_55, value_56);
-        const _value13 = handleAction(_value12);
-        if (
-            String(_value12?.ttsAudioAssetId || '') !== value_57 ||
-            _value12?.ttsAudioText !== _value13
-        )
-            throw new Error('语音文字已变化，请重试');
-        const _value14 = {
-            assetId: value_57,
-            url: value_58,
-            text: _value13,
-        };
-        _value.set(handleAction_4(value_55, value_56), _value14);
-        return _value14;
-    }
-    function _value4(_value15, _value16) {
-        const value_58 = _value2(_value15, _value16);
-        if (value_58) return window.u2Tts.playAudioUrl(value_58.url);
-        return handleAction_10(_value15, _value16).then((_value17) =>
-            _value3()
-                ? {
-                      readyForTap: true,
-                  }
-                : window.u2Tts.playAudioUrl(_value17.url),
-        );
-    }
-    async function handleAction_11(value_59, value_60) {
-        return handleAction_10(value_59, value_60, {
-            regenerate: true,
-        });
-    }
-    function handleAction_12(message_61, value_62) {
-        const value_63 =
-            {
-                'audio/mpeg': 'mp3',
-                'audio/mp3': 'mp3',
-                'audio/wav': 'wav',
-                'audio/x-wav': 'wav',
-                'audio/ogg': 'ogg',
-                'audio/mp4': 'm4a',
-                'audio/webm': 'webm',
-                'audio/flac': 'flac',
-            }[String(value_62 || '').toLowerCase()] || 'mp3';
-        const value_64 = new Date(message_61?.timestamp || Date.now());
-        const value_65 = Number.isNaN(value_64.getTime())
-            ? String(Date.now())
-            : value_64.toISOString().replace(/[:.]/g, '-').slice(0, 19);
-        return 'imessage-voice-' + value_65 + '.' + value_63;
-    }
-    async function handleAction_13(value_66, value_67) {
-        if (typeof window.u2ExportFile !== 'function')
-            throw new Error('文件下载功能尚未加载，请刷新后重试');
-        const { blob: value_68 } = await handleAction_9(value_66, value_67);
-        const value_69 = await window.u2ExportFile({
-            blob: value_68,
-            fileName: handleAction_12(value_67, value_68.type),
-            title: 'iMessage 语音',
-        });
-        if (value_69 === 'failed') throw new Error('语音下载失败，请重试');
-        return value_69;
-    }
-    window.imVoiceMessageAudio = Object.freeze({
-        canManage: handleAction_3,
-        getOrCreate: handleAction_9,
-        isReady: (_value18, _value19) => !!_value2(_value18, _value19),
-        play: _value4,
-        regenerate: handleAction_11,
-        download: handleAction_13,
+    const localValue62 = localValue12(localValue54, localValue57);
+    await window.appStorage.saveAssetFromBlob(localValue62, localValue61, {
+      "ownerType": "imessage_voice_tts",
+      "voiceCacheEpoch": localValue56,
+      "ownerId": String(localValue57.id || ""),
+      "friendId": String(localValue54.id || "")
     });
+    try {
+      const localValue63 = await window.imApp.updateFriendMessage(localValue54.id, {
+        "id": localValue57.id || null,
+        "timestamp": localValue57.timestamp || null
+      }, localValue64 => {
+        if (localValue56 !== window.appStorage?.["voiceCacheEpoch"]) throw new Error("语音缓存已清理，请重新生成");
+        if (!localValue64 || localValue3(localValue64) !== localValue59) throw new Error("语音文字已变化，请重试");
+        localValue64.ttsAudioAssetId = localValue62, localValue64.ttsAudioText = localValue59;
+      }, {
+        "silent": true
+      });
+      if (!localValue63) throw new Error("语音保存失败，请重试");
+    } catch (localValue65) {
+      await window.appStorage.deleteAsset?.(localValue62)["catch"](() => undefined);
+      throw localValue65;
+    }
+    return localValue55.ttsAudioAssetId = localValue62, localValue55.ttsAudioText = localValue59, {
+      "assetId": localValue62,
+      "blob": localValue61
+    };
+  }
+  async function localValue14(localValue66, localValue67, {
+    regenerate = false
+  } = {}) {
+    if (!localValue6(localValue66, localValue67)) throw new Error("这条语音不能生成音频");
+    const localValue68 = localValue7(localValue66, localValue67),
+      localValue69 = localValue1.get(localValue68);
+    if (localValue69) {
+      if (!regenerate) return localValue69;
+      try {
+        await localValue69;
+      } catch (localValue71) {}
+    }
+    const localValue70 = (async () => {
+      if (!regenerate) {
+        const localValue72 = await localValue11(localValue66, localValue67);
+        if (localValue72) return localValue72;
+      }
+      return localValue13(localValue66, localValue67);
+    })();
+    localValue1.set(localValue68, localValue70);
+    try {
+      return await localValue70;
+    } finally {
+      if (localValue1.get(localValue68) === localValue70) localValue1["delete"](localValue68);
+    }
+  }
+  async function localValue15(localValue73, localValue74, localValue75 = {}) {
+    const {
+        assetId: localValue76
+      } = await localValue14(localValue73, localValue74, localValue75),
+      localValue77 = await window.appStorage.getAssetUrl(localValue76);
+    if (!localValue77) throw new Error("已保存的语音无法读取，请重试");
+    const localValue78 = localValue4(localValue73, localValue74),
+      localValue79 = localValue3(localValue78);
+    if (String(localValue78?.["ttsAudioAssetId"] || "") !== localValue76 || localValue78?.["ttsAudioText"] !== localValue79) throw new Error("语音文字已变化，请重试");
+    const localValue80 = {
+      "assetId": localValue76,
+      "url": localValue77,
+      "text": localValue79
+    };
+    return localValue2.set(localValue7(localValue73, localValue74), localValue80), localValue80;
+  }
+  function localValue16(localValue81, localValue82) {
+    const localValue83 = localValue8(localValue81, localValue82);
+    if (localValue83) return window.u2Tts.playAudioUrl(localValue83.url);
+    return localValue15(localValue81, localValue82).then(localValue84 => localValue9() ? {
+      "readyForTap": true
+    } : window.u2Tts.playAudioUrl(localValue84.url));
+  }
+  async function localValue17(localValue85, localValue86) {
+    return localValue15(localValue85, localValue86, {
+      "regenerate": true
+    });
+  }
+  function localValue18(localValue87, localValue88) {
+    const localValue89 = {
+        "audio/mpeg": "mp3",
+        "audio/mp3": "mp3",
+        "audio/wav": "wav",
+        "audio/x-wav": "wav",
+        "audio/ogg": "ogg",
+        "audio/mp4": "m4a",
+        "audio/webm": "webm",
+        "audio/flac": "flac"
+      }[String(localValue88 || "").toLowerCase()] || "mp3",
+      localValue90 = new Date(localValue87?.["timestamp"] || Date.now()),
+      localValue91 = Number.isNaN(localValue90.getTime()) ? String(Date.now()) : localValue90.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    return "imessage-voice-" + localValue91 + "." + localValue89;
+  }
+  async function localValue19(localValue92, localValue93) {
+    if (typeof window.u2ExportFile !== "function") throw new Error("文件下载功能尚未加载，请刷新后重试");
+    const {
+        blob: localValue94
+      } = await localValue14(localValue92, localValue93),
+      localValue95 = await window.u2ExportFile({
+        "blob": localValue94,
+        "fileName": localValue18(localValue93, localValue94.type),
+        "title": "iMessage 语音"
+      });
+    if (localValue95 === "failed") throw new Error("语音下载失败，请重试");
+    return localValue95;
+  }
+  window.imVoiceMessageAudio = Object.freeze({
+    "canManage": localValue6,
+    "getOrCreate": localValue14,
+    "isReady": (localValue96, localValue97) => !!localValue8(localValue96, localValue97),
+    "play": localValue16,
+    "regenerate": localValue17,
+    "download": localValue19,
+    "clearCache": () => {
+      localValue2.clear(), localValue1.clear();
+    }
+  });
 })();

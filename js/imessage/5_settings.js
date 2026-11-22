@@ -79,6 +79,20 @@
     let relationshipPickerType = 'all';
     let relationshipPreviewFrame = null;
     let pendingRelationshipPreviewFriend = null;
+    const cotPresetLibrary = window.u2ConfigPresets.createLibrary({
+        get: () => window.imData.onlineCotPresets,
+        set: values => { window.imData.onlineCotPresets = values; },
+        persist: async () => { await window.imApp.saveImessageUiState(); return window.saveGlobalData(); },
+        restore: () => window.imApp.saveImessageUiState()
+    });
+    const cotPresetManager = window.u2ConfigPresets.createManager({
+        id: 'online-cot-preset', title: '线上 COT', library: cotPresetLibrary,
+        getDraft: () => ({ prompt: chatCotPromptInput.value }),
+        applyDraft: data => { chatCotPromptInput.value = String(data.prompt ?? ''); },
+        describe: data => ({ meta: String(data.prompt ?? '').length + ' 字' })
+    });
+    document.getElementById('save-chat-cot-preset-btn')?.addEventListener('click', cotPresetManager.openSave);
+    document.getElementById('load-chat-cot-preset-btn')?.addEventListener('click', cotPresetManager.openLoad);
     async function commitSettingsFriendChange(mutator, options_2 = {}) {
         const currentFriend = window.imData.currentSettingsFriend;
         if (!currentFriend) return false;
@@ -2442,9 +2456,7 @@
             const currentSettingsFriend_492 = window.imData.currentSettingsFriend;
             if (!currentSettingsFriend_492 || currentSettingsFriend_492.type === 'group') return;
             const nextEnabled = chatCotEnabledToggle?.checked !== false;
-            const nextPrompt = String(chatCotPromptInput?.value || '')
-                    .trim()
-                    .slice(0, 4000);
+            const nextPrompt = String(chatCotPromptInput?.value || '').trim();
             saveChatCotSettingsBtn.disabled = true;
             const saved_9 = await commitSettingsFriendChange(
                 (targetFriend_7) => {
@@ -5297,6 +5309,10 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         chatAvatarToggleElement_914 &&
             (chatAvatarToggleElement_914.checked = !!friend_57.showAvatar);
         if (apk110New_1227) apk110New_1227.checked = friend_57.continuousBubbles !== false;
+        for (const [id, key] of [['chat-thought-status-toggle', 'thoughtStatusEnabled'], ['chat-cherished-memory-toggle', 'allowCharCherishedMemory']]) {
+            const toggle = document.getElementById(id);
+            if (toggle) toggle.checked = friend_57[key] !== false;
+        }
         if (apk110New_1228)
             apk110New_1228.value = friend_57.replyStyle === 'outside' ? 'outside' : 'inside';
         const avatarBody = document.getElementById('avatar-position-body');
@@ -5995,6 +6011,19 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                 onConfirm: () => void value_1007(),
             });
         }));
+    [['chat-thought-status-toggle', 'thoughtStatusEnabled'], ['chat-cherished-memory-toggle', 'allowCharCherishedMemory']].forEach(([id, key]) => {
+        const toggle = document.getElementById(id);
+        if (!toggle || toggle.dataset.bound === 'true') return;
+        toggle.dataset.bound = 'true';
+        toggle.addEventListener('change', async () => {
+            const friend = window.imData.currentSettingsFriend;
+            if (!friend || friend.type === 'group') return;
+            const previous = friend[key] !== false;
+            const checked = toggle.checked;
+            const saved = await commitSettingsFriendChange(target => { target[key] = checked; }, { silent: true });
+            if (!saved) { toggle.checked = previous; showToast_2('设置保存失败'); }
+        });
+    });
     const chatAutoExpandTranslationToggleElement = document.getElementById(
         'chat-auto-expand-translation-toggle',
     );

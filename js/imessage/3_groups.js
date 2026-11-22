@@ -28,6 +28,7 @@
         groupContextEnabledToggle = document.getElementById('group-context-enabled-toggle'),
         groupContextLimitInput = document.getElementById('group-context-limit-input'),
         groupTimeAwareToggle = document.getElementById('group-time-aware-toggle'),
+        groupThoughtStatusToggle = document.getElementById('group-thought-status-toggle'),
         apk110New_29 = document.getElementById('group-show-titles-toggle'),
         groupAutoExpandTranslationToggle = document.getElementById(
             'group-auto-expand-translation-toggle',
@@ -932,6 +933,7 @@
         groupContextLimitInput && (groupContextLimitInput.value = value_3);
         groupTimeAwareToggle &&
             (groupTimeAwareToggle.checked = currentViewingGroup.timeAware === true);
+        if (groupThoughtStatusToggle) groupThoughtStatusToggle.checked = currentViewingGroup.thoughtStatusEnabled !== false;
         apk110New_29 &&
             (apk110New_29.checked = window.imApp.areGroupTitlesEnabled(currentViewingGroup));
         groupAutoExpandTranslationToggle &&
@@ -1570,6 +1572,9 @@
         cancelCreateGroupBtn.addEventListener('click', () => {
             closeView_2(createGroupSheet);
         });
+    document.getElementById('group-announcement-btn')?.addEventListener('click', () => {
+        window.imApp.openGroupAnnouncement?.(window.imApp.getFriendById?.(currentViewingGroup?.id) || currentViewingGroup);
+    });
     const groupAvatarWrapper = document.getElementById('group-avatar-wrapper'),
         groupAvatarUpload = document.getElementById('group-avatar-upload');
     groupAvatarWrapper &&
@@ -2367,6 +2372,7 @@
                     targetGroup_7.memory.context.enabled = enabled_2;
                     targetGroup_7.memory.context.limit = limit_2;
                     targetGroup_7.timeAware = timeAware_2;
+                    targetGroup_7.thoughtStatusEnabled = groupThoughtStatusToggle ? groupThoughtStatusToggle.checked : targetGroup_7.thoughtStatusEnabled !== false;
                     targetGroup_7.showGroupTitles = apk110New_567;
                     targetGroup_7.autoExpandTranslation = autoExpandTranslation_2;
                     targetGroup_7.showGroupUserAvatar = showGroupUserAvatar_2;

@@ -250,7 +250,16 @@
                     const fileCard = document.createElement('button');
                     fileCard.type = 'button'; fileCard.className = 'im-file-card';
                     fileCard.innerHTML = global.imChat.buildFileCardHtml(favorite_2);
-                    fileCard.addEventListener('click', () => global.imChat.openFileDetail(favorite_2));
+                    fileCard.addEventListener('click', () =>
+                        global.imChat.openFileDetail(
+                            {
+                                ...favorite_2,
+                                id: favorite_2.messageId || favorite_2.id,
+                                type: 'file',
+                            },
+                            { friend: friend_4 },
+                        ),
+                    );
                     card.appendChild(fileCard);
                 }
                 documentFragment.appendChild(card);

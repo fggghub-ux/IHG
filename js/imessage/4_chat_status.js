@@ -136,7 +136,11 @@
                         value_52.removeAttribute(value_53.name);
                 });
             }),
-            element.innerHTML
+            Array.from(element.content.childNodes).map(node => {
+                if (node.nodeType === 1) return node.outerHTML;
+                if (node.nodeType === 3) return escapeProfilePanelHtml(node.textContent);
+                return '';
+            }).join('')
         );
     }
     function validateStatusTemplate_2(value_57) {
@@ -462,6 +466,7 @@
                 ? statusSelection_2.index <= 0
                 : statusSelection_2.index >= statusSelection_2.history.length - 1;
         });
+        panelEl_2.querySelector('[data-action="treasure-status"]')?._treasureSync?.();
     }
     function renderProfilePanel_2(friend_8, panelEl) {
         if (!friend_8 || !panelEl) return;
@@ -489,8 +494,8 @@
                           currentTotalMinutes >= sleepMin && currentTotalMinutes < wakeMin);
             }
         }
-        const name_2 = friend_8.nickname || friend_8.realName || 'Unknown',
-            signature_2 = friend_8.signature || '这个人很懒，什么都没写',
+        const name_2 = escapeProfilePanelHtml(friend_8.nickname || friend_8.realName || 'Unknown'),
+            signature_2 = escapeProfilePanelHtml(friend_8.signature || '这个人很懒，什么都没写'),
             onlineLabel = formatProfileStatusLabel(
                 panel_7.status || friend_8.status || 'online',
                 isSleeping_2,
@@ -522,7 +527,7 @@
                 <div class="gmp-header chat-profile-panel-header" style="position: relative;">
                     <div class="gmp-avatar-wrapper">
                         <div class="gmp-avatar"><img src="` +
-                  avatarUrl_2 +
+                  escapeProfilePanelHtml(avatarUrl_2) +
                   `"></div>
                         <div class="gmp-status-bubble chat-profile-panel-header-status">` +
                   onlineLabel +
@@ -586,16 +591,18 @@
                     </div>
                 </div>
                 
-                <div class="chat-profile-panel-floating-tabs" style="display: flex; flex-direction: row; gap: 8px; margin-top: 18px; z-index: 100;">
+                <div class="chat-profile-panel-floating-tabs" style="display: flex; flex-direction: row; justify-content: center; gap: 8px; margin-top: 18px; z-index: 100;">
                     ` +
-            (templateResult_2.applied
-                ? '<button type="button" class="chat-profile-panel-action-btn chat-profile-panel-system-close" aria-label="关闭"><i class="fas fa-times"></i></button>'
-                : '') +
             `
                     <button type="button" class="chat-profile-panel-action-btn is-page" data-action="page-status" data-direction="newer" aria-label="上一条状态" ` +
             (canPageNewer ? '' : 'disabled') +
             `><i class="fas fa-chevron-left"></i></button>
                     <button type="button" class="chat-profile-panel-action-btn" data-action="edit-status" aria-label="编辑状态"><i class="fas fa-pen"></i></button>
+                    ` +
+            (friend_8.type === 'group'
+                ? ''
+                : '<button type="button" class="chat-profile-panel-action-btn" data-action="treasure-status" aria-label="收藏到 Treasure"><i class="far fa-bookmark"></i></button>') +
+            `
                     <button type="button" class="chat-profile-panel-action-btn is-danger" data-action="delete-status" aria-label="删除状态"><i class="fas fa-trash-alt"></i></button>
                     <button type="button" class="chat-profile-panel-action-btn is-page" data-action="page-status" data-direction="older" aria-label="下一条状态" ` +
             (canPageOlder ? '' : 'disabled') +
@@ -603,6 +610,32 @@
                 </div>
             </div>
         `;
+        const treasureButton = panelEl.querySelector('[data-action="treasure-status"]');
+        if (treasureButton && friend_8.type !== 'group') {
+            const sync = () => {
+                const friend = window.imApp.getFriendById?.(friend_8.id) || friend_8;
+                const snapshot = getSelectedProfileStatus_2(friend, window.imChat.getProfilePanelData(friend)).snapshot;
+                window.treasureStore?.syncStatusButton(treasureButton, friend, snapshot);
+                treasureButton.disabled = !snapshot || !!treasureButton._treasureSaving || !window.treasureStore;
+            };
+            treasureButton._treasureSync = sync; sync();
+            treasureButton.addEventListener('click', async event => {
+                event.preventDefault(); event.stopPropagation();
+                if (treasureButton.disabled) return;
+                const friend = window.imApp.getFriendById?.(friend_8.id) || friend_8;
+                const snapshot = getSelectedProfileStatus_2(friend, window.imChat.getProfilePanelData(friend)).snapshot;
+                if (!snapshot) return;
+                treasureButton._treasureSaving = true; treasureButton.disabled = true; treasureButton.setAttribute('aria-busy', 'true');
+                try {
+                    const cssActive = handleAction_7(friend, snapshot);
+                    const savedCard = panelEl.querySelector('.chat-profile-panel-card')?.cloneNode(true);
+                    savedCard?.querySelectorAll('.chat-profile-status-edit-overlay, .chat-profile-panel-close').forEach(element => element.remove());
+                    const result = await window.treasureStore.toggleStatus(friend, snapshot, { html: savedCard?.outerHTML || '', cssActive, css: cssActive ? String(friend.statusCss || '') : '' });
+                    window.showToast?.(result.removed ? '已取消收藏' : '已收藏到 Treasure');
+                } catch (error) { window.showToast?.(error.message || '收藏失败，请重试'); }
+                finally { treasureButton._treasureSaving = false; treasureButton.setAttribute('aria-busy','false'); if (treasureButton.isConnected) sync(); }
+            });
+        }
         const closeBtn = panelEl.querySelector(
             '.chat-profile-panel-close, .chat-profile-panel-system-close',
         );

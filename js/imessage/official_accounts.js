@@ -26,7 +26,8 @@
         value_9 = new Set([...value_7, 'worldbook', ...value_8]),
         value_10 = new Set(['status_template', 'status_css', 'bubble_css']),
         value_11 = new Map();
-    let value_12 = null;
+    let value_12 = null,
+        directoryUnderlayState = null;
     const text_13 =
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" rx="25" fill="#111"/><rect x="29" y="15" width="14" height="38" rx="9" fill="#fff" transform="rotate(-7 36 34)"/><rect x="53" y="15" width="14" height="38" rx="9" fill="#fff" transform="rotate(7 60 34)"/><rect x="22" y="39" width="52" height="43" rx="23" fill="#fff"/></svg>',
         value_14 = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(text_13);
@@ -579,8 +580,17 @@
                     }),
             );
     }
+    function restoreDirectoryUnderlay() {
+        if (!directoryUnderlayState) return;
+        directoryUnderlayState.element.removeAttribute('data-official-directory-underlay');
+        directoryUnderlayState.element.inert = directoryUnderlayState.inert;
+        if (!directoryUnderlayState.inert)
+            directoryUnderlayState.element.removeAttribute('inert');
+        directoryUnderlayState = null;
+    }
     function handleAction_35(value_165, value_166 = null) {
         if (!value_165) return;
+        if (value_165.id === 'official-accounts-view') restoreDirectoryUnderlay();
         const activeElement_167 = document.activeElement;
         activeElement_167 &&
             value_165.contains(activeElement_167) &&
@@ -2003,9 +2013,21 @@ Complete world-book entries explicitly named this turn: ` +
         element_396.appendChild(element_398);
     }
     function openDirectory_2() {
+        value_2.closeAppGuideModal?.({ restoreFocus: false });
+        handleAction_74();
         const handleAction_33_430 = handleAction_33(
             document.getElementById('official-accounts-view'),
-        );
+            ),
+            imessageView = document.getElementById('imessage-view');
+        if (handleAction_33_430 && imessageView && !directoryUnderlayState) {
+            directoryUnderlayState = {
+                element: imessageView,
+                inert: imessageView.inert === true,
+            };
+            imessageView.inert = true;
+            imessageView.setAttribute('inert', '');
+            imessageView.setAttribute('data-official-directory-underlay', '');
+        }
         handleAction_36();
         if (handleAction_33_430)
             handleAction_34(
@@ -2033,7 +2055,10 @@ Complete world-book entries explicitly named this turn: ` +
         value_12 = null;
     }
     function handleAction_75() {
-        handleAction_33(document.getElementById('official-accounts-view'));
+        handleAction_33(document.getElementById('official-accounts-view'))?.addEventListener(
+            'u2:view-closing',
+            restoreDirectoryUnderlay,
+        );
         handleAction_33(document.getElementById('official-chat-settings-sheet'));
         document
             .getElementById('imessage-official-accounts-btn')

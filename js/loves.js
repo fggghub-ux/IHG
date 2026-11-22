@@ -5573,1846 +5573,812 @@ Char 已存：` +
             }
         });
     },
-    openFriendPhone: function (friend_28) {
-        this.syncFriendPhoneAppMetadata();
-        const loversFriendPhoneViewElement = document.getElementById('lovers-friend-phone-view');
-        if (!loversFriendPhoneViewElement || friend_28?.type !== 'char') return;
-        String(this.currentFriend?.id || '') !== String(friend_28?.id || '') &&
-            ((this._healthHistoryIndex = 0), (this._payHistoryIndex = 0));
-        this.currentFriend = friend_28;
-        loversFriendPhoneViewElement.style.backgroundImage = 'none';
-        this.bindFriendPhoneTranslationDelegation(loversFriendPhoneViewElement);
-        if (window.openView) window.openView(loversFriendPhoneViewElement);
-        const backBtn_3 = document.getElementById('friend-phone-back-btn');
-        backBtn_3 &&
-            (backBtn_3.onclick = () => {
-                if (window.closeView) window.closeView(loversFriendPhoneViewElement);
-            });
-        const settingsSheet = document.getElementById('friend-phone-settings-sheet'),
-            settingsBtn = document.getElementById('friend-phone-app-settings');
-        settingsBtn &&
-            settingsSheet &&
-            (settingsBtn.onclick = () => window.openView(settingsSheet));
-        const settingsBackBtn = document.getElementById('friend-settings-back-btn');
-        settingsBackBtn &&
-            settingsSheet &&
-            (settingsBackBtn.onclick = () => {
-                if (window.closeView) window.closeView(settingsSheet);
-            });
-        const getGenAppCheckboxes = () =>
-                Array.from(document.querySelectorAll('.gen-app-checkbox')),
-            items_805 = ['music', 'health', 'pay', 'game', 'call', 'safari', 'weibo', 'files'],
-            genCountInputs = {
-                musicTop: document.getElementById('friend-gen-music-top-count'),
-                safariTotal: document.getElementById('friend-gen-safari-count'),
-                gameTotal: document.getElementById('friend-gen-game-count'),
-                callTotal: document.getElementById('friend-gen-call-count'),
-                weiboPostsTotal: document.getElementById('friend-gen-weibo-post-count'),
-                weiboPhotosTotal: document.getElementById('friend-gen-weibo-photo-count'),
-            },
-            realTimeToggle_3 = document.getElementById('friend-phone-real-time-toggle'),
-            chatContextToggle = document.getElementById('friend-phone-chat-context-toggle'),
-            getSavedGenApps = () => {
-                return Array.isArray(friend_28.phoneGenApps)
-                    ? friend_28.phoneGenApps.filter((value_810) => value_810 !== 'imessage')
-                    : items_805;
-            },
-            applySavedGenApps = () => {
-                const savedApps = getSavedGenApps();
-                getGenAppCheckboxes().forEach((cb) => {
-                    cb.checked = savedApps.includes(cb.value);
-                });
-            },
-            saveGenApps = () => {
-                friend_28.phoneGenApps = getGenAppCheckboxes()
-                    .filter((cb_2) => cb_2.checked)
-                    .map((cb_3) => cb_3.value);
-                this.persistFriendState(friend_28, {
-                    silent: true,
-                });
-            },
-            syncGenRows = () => {
-                getGenAppCheckboxes().forEach((cb_4) => {
-                    const row = cb_4.closest('.friend-gen-limit-row');
-                    if (!row) return;
-                    row.classList.toggle('is-disabled', !cb_4.checked);
-                    row.querySelectorAll('input[type="number"]').forEach((input_6) => {
-                        input_6.disabled = !cb_4.checked;
-                    });
-                });
-            },
-            applySavedGenCounts = () => {
-                const counts = this.getFriendPhoneGenCounts(friend_28);
-                Object.entries(genCountInputs).forEach(([key_11, input_7]) => {
-                    if (input_7) input_7.value = String(counts[key_11]);
-                });
-            },
-            saveGenCounts = () => {
-                const phoneGenCounts_2 = this.getFriendPhoneGenCounts({
-                    phoneGenCounts: Object.fromEntries(
-                        Object.entries(genCountInputs).map(([key_12, input_8]) => [
-                            key_12,
-                            input_8?.value,
-                        ]),
-                    ),
-                });
-                return (
-                    (friend_28.phoneGenCounts = phoneGenCounts_2),
-                    Object.entries(genCountInputs).forEach(([value_819, value_820]) => {
-                        if (value_820) value_820.value = String(phoneGenCounts_2[value_819]);
-                    }),
-                    this.persistFriendState(friend_28, {
-                        silent: true,
-                    }),
-                    phoneGenCounts_2
-                );
-            };
-        getGenAppCheckboxes().forEach((cb_5) => {
-            cb_5.onchange = () => {
-                syncGenRows();
-                saveGenApps();
-            };
-        });
-        Object.values(genCountInputs).forEach((input_9) => {
-            if (input_9) input_9.onchange = () => saveGenCounts();
-        });
-        realTimeToggle_3 &&
-            ((realTimeToggle_3.checked = friend_28.phoneIncludeRealTime !== false),
-            (realTimeToggle_3.onchange = () => {
-                friend_28.phoneIncludeRealTime = realTimeToggle_3.checked;
-                this.persistFriendState(friend_28, {
-                    silent: true,
-                });
-            }));
-        chatContextToggle &&
-            ((chatContextToggle.checked = friend_28.phoneIncludeChatContext !== false),
-            (chatContextToggle.onchange = () => {
-                friend_28.phoneIncludeChatContext = chatContextToggle.checked;
-                this.persistFriendState(friend_28, {
-                    silent: true,
-                });
-            }));
-        applySavedGenApps();
-        applySavedGenCounts();
-        syncGenRows();
-        const genConfirmBtn = document.getElementById('friend-phone-gen-confirm-btn');
-        genConfirmBtn &&
-            (genConfirmBtn.onclick = async () => {
-  if (genConfirmBtn.disabled) return;
-  saveGenApps();
-  const apk119Value1242 = saveGenCounts(),
-    apk119Value1243 = getSavedGenApps(),
-    apk119Value1244 = realTimeToggle_3 ? realTimeToggle_3.checked : friend_28.phoneIncludeRealTime !== false,
-    apk119Value1245 = chatContextToggle ? chatContextToggle.checked : friend_28.phoneIncludeChatContext !== false;
-  friend_28.phoneIncludeRealTime = apk119Value1244, friend_28.phoneIncludeChatContext = apk119Value1245;
-  const apk119Value1246 = this.splitFriendGenTotal(apk119Value1242.safariTotal),
-    apk119Value1247 = this.splitFriendGenTotal(apk119Value1242.weiboPostsTotal),
-    apk119Value1248 = this.splitFriendGenTotal(apk119Value1242.weiboPhotosTotal);
-  if (apk119Value1243.length === 0) {
-    if (window.showToast) window.showToast("请至少选择一个应用");
-    return;
+    _phoneGenerationStates: new Map(),
+syncFriendPhoneGenerationStatus: function () {
+  const phoneValue1 = document.getElementById("friend-phone-settings-sheet"),
+    phoneValue2 = String(phoneValue1?.["dataset"]["friendId"] || this.currentFriend?.["id"] || ""),
+    phoneValue3 = this._phoneGenerationStates.get(phoneValue2),
+    phoneValue4 = phoneValue3?.["status"] === "running",
+    phoneValue5 = document.getElementById("friend-phone-gen-confirm-btn");
+  if (phoneValue5) {
+    phoneValue5.disabled = phoneValue4, phoneValue5.setAttribute("aria-busy", String(phoneValue4));
+    const phoneValue7 = phoneValue5.querySelector("span"),
+      phoneValue8 = phoneValue5.querySelector("i");
+    if (phoneValue7) phoneValue7.textContent = phoneValue4 ? "正在生成…" : "生成选中的应用数据";
+    if (phoneValue8) phoneValue8.className = phoneValue4 ? "fas fa-spinner fa-spin" : "fas fa-wand-magic-sparkles";
   }
-  if (!window.apiConfig || !window.apiConfig.endpoint || !window.apiConfig.apiKey) {
-    if (window.showToast) window.showToast("请先在系统设置中配置 API");
-    return;
-  }
-  let apk119Value1249 = null;
-  genConfirmBtn.disabled = true;
-  try {
-    if (apk119Value1243.includes("call")) {
-      if (!window.cphoneCallApp) throw new Error("通话模块尚未就绪，请刷新页面");
-      apk119Value1249 = window.cphoneCallApp.beginJob(friend_28);
+  const phoneValue6 = document.getElementById("friend-phone-app-generation-status");
+  phoneValue6 && (phoneValue6.hidden = !phoneValue3, phoneValue6.textContent = phoneValue3?.["message"] || "", phoneValue6.dataset.state = phoneValue3?.["status"] || "");
+},
+setFriendPhoneGenerationStatus: function (phoneValue1, phoneValue2, phoneValue3) {
+  this._phoneGenerationStates.set(String(phoneValue1), {
+    "status": phoneValue2,
+    "message": phoneValue3
+  }), this.syncFriendPhoneGenerationStatus();
+},
+openFriendPhone: function (phoneValue1) {
+  const phoneValue2 = document.getElementById("lovers-friend-phone-view");
+  if (!phoneValue2 || phoneValue1?.["type"] !== "char") return;
+  String(this.currentFriend?.["id"] || "") !== String(phoneValue1?.["id"] || "") && (this._healthHistoryIndex = 0, this._payHistoryIndex = 0);
+  this.currentFriend = phoneValue1, phoneValue2.style.backgroundImage = "none", this.bindFriendPhoneTranslationDelegation(phoneValue2);
+  if (window.openView) window.openView(phoneValue2);
+  const phoneValue3 = document.getElementById("friend-phone-back-btn");
+  phoneValue3 && (phoneValue3.onclick = () => {
+    if (window.closeView) window.closeView(phoneValue2);
+  });
+  const phoneValue4 = document.getElementById("friend-phone-settings-sheet"),
+    phoneValue5 = document.getElementById("friend-phone-app-settings");
+  if (phoneValue4) phoneValue4.dataset.friendId = String(phoneValue1.id);
+  this.syncFriendPhoneGenerationStatus();
+  phoneValue5 && phoneValue4 && (phoneValue5.onclick = () => {
+    this.syncFriendPhoneGenerationStatus(), window.openView(phoneValue4);
+  });
+  const phoneValue6 = document.getElementById("friend-settings-back-btn");
+  phoneValue6 && phoneValue4 && (phoneValue6.onclick = () => {
+    if (window.closeView) window.closeView(phoneValue4);
+  });
+  const phoneValue7 = () => Array.from(document.querySelectorAll(".gen-app-checkbox")),
+    phoneValue8 = ["music", "health", "pay", "game", "call", "safari", "weibo", "files"],
+    phoneValue9 = {
+      "musicTop": document.getElementById("friend-gen-music-top-count"),
+      "safariTotal": document.getElementById("friend-gen-safari-count"),
+      "gameTotal": document.getElementById("friend-gen-game-count"),
+      "callTotal": document.getElementById("friend-gen-call-count"),
+      "weiboPostsTotal": document.getElementById("friend-gen-weibo-post-count"),
+      "weiboPhotosTotal": document.getElementById("friend-gen-weibo-photo-count")
+    },
+    phoneValue10 = document.getElementById("friend-phone-real-time-toggle"),
+    phoneValue11 = document.getElementById("friend-phone-chat-context-toggle"),
+    phoneValue12 = () => {
+      return Array.isArray(phoneValue1.phoneGenApps) ? phoneValue1.phoneGenApps.filter(phoneValue46 => phoneValue46 !== "imessage") : phoneValue8;
+    },
+    phoneValue13 = () => {
+      const phoneValue47 = phoneValue12();
+      phoneValue7().forEach(phoneValue48 => {
+        phoneValue48.checked = phoneValue47.includes(phoneValue48.value);
+      });
+    },
+    phoneValue14 = () => {
+      phoneValue1.phoneGenApps = phoneValue7().filter(phoneValue49 => phoneValue49.checked).map(phoneValue50 => phoneValue50.value), this.persistFriendState(phoneValue1, {
+        "silent": !![]
+      });
+    },
+    phoneValue15 = () => {
+      phoneValue7().forEach(phoneValue51 => {
+        const phoneValue52 = phoneValue51.closest(".friend-gen-limit-row");
+        if (!phoneValue52) return;
+        phoneValue52.classList.toggle("is-disabled", !phoneValue51.checked), phoneValue52.querySelectorAll("input[type=\"number\"]").forEach(phoneValue53 => {
+          phoneValue53.disabled = !phoneValue51.checked;
+        });
+      });
+    },
+    phoneValue16 = () => {
+      const phoneValue54 = this.getFriendPhoneGenCounts(phoneValue1);
+      Object.entries(phoneValue9).forEach(([phoneValue55, phoneValue56]) => {
+        if (phoneValue56) phoneValue56.value = String(phoneValue54[phoneValue55]);
+      });
+    },
+    phoneValue17 = () => {
+      const phoneValue57 = this.getFriendPhoneGenCounts({
+        "phoneGenCounts": Object.fromEntries(Object.entries(phoneValue9).map(([phoneValue58, phoneValue59]) => [phoneValue58, phoneValue59?.["value"]]))
+      });
+      return phoneValue1.phoneGenCounts = phoneValue57, Object.entries(phoneValue9).forEach(([phoneValue60, phoneValue61]) => {
+        if (phoneValue61) phoneValue61.value = String(phoneValue57[phoneValue60]);
+      }), this.persistFriendState(phoneValue1, {
+        "silent": !![]
+      }), phoneValue57;
+    };
+  phoneValue7().forEach(phoneValue62 => {
+    phoneValue62.onchange = () => {
+      phoneValue15(), phoneValue14();
+    };
+  }), Object.values(phoneValue9).forEach(phoneValue63 => {
+    if (phoneValue63) phoneValue63.onchange = () => phoneValue17();
+  });
+  phoneValue10 && (phoneValue10.checked = phoneValue1.phoneIncludeRealTime !== ![], phoneValue10.onchange = () => {
+    phoneValue1.phoneIncludeRealTime = phoneValue10.checked, this.persistFriendState(phoneValue1, {
+      "silent": !![]
+    });
+  });
+  phoneValue11 && (phoneValue11.checked = phoneValue1.phoneIncludeChatContext !== ![], phoneValue11.onchange = () => {
+    phoneValue1.phoneIncludeChatContext = phoneValue11.checked, this.persistFriendState(phoneValue1, {
+      "silent": !![]
+    });
+  });
+  phoneValue13(), phoneValue16(), phoneValue15();
+  const phoneValue18 = document.getElementById("friend-phone-gen-confirm-btn");
+  phoneValue18 && (phoneValue18.onclick = async () => {
+    if (phoneValue18.disabled || this._phoneGenerationStates.get(String(phoneValue1.id))?.["status"] === "running") return;
+    phoneValue14();
+    const phoneValue64 = phoneValue17(),
+      phoneValue65 = phoneValue12(),
+      phoneValue66 = phoneValue10 ? phoneValue10.checked : phoneValue1.phoneIncludeRealTime !== ![],
+      phoneValue67 = phoneValue11 ? phoneValue11.checked : phoneValue1.phoneIncludeChatContext !== ![];
+    phoneValue1.phoneIncludeRealTime = phoneValue66, phoneValue1.phoneIncludeChatContext = phoneValue67;
+    const phoneValue68 = this.splitFriendGenTotal(phoneValue64.safariTotal),
+      phoneValue69 = this.splitFriendGenTotal(phoneValue64.weiboPostsTotal),
+      phoneValue70 = this.splitFriendGenTotal(phoneValue64.weiboPhotosTotal);
+    if (phoneValue65.length === 0) {
+      if (window.showToast) window.showToast("请至少选择一个应用");
+      return;
     }
-    let apk119Value1250 = "";
-    if (window.getGlobalWorldBookContextByPosition) {
-      apk119Value1250 = window.getGlobalWorldBookContextByPosition("system_depth") || "";
-      const apk119Value1264 = window.getGlobalWorldBookContextByPosition("before_role");
-      if (apk119Value1264) apk119Value1250 += "\n" + apk119Value1264;
+    if (!window.apiConfig || !window.apiConfig.endpoint || !window.apiConfig.apiKey) {
+      if (window.showToast) window.showToast("请先在系统设置中配置 API");
+      return;
     }
-    const apk119Value1251 = this.getGenerationUserPersona(friend_28),
-      apk119Value1252 = friend_28.persona || "普通角色";
-    let apk119Value1253 = "";
-    if (apk119Value1245) {
-      const apk119Value1265 = await this.ensureFriendPhoneMessagesLoaded(friend_28),
-        apk119Value1266 = this.getRecentSingleChatMessages(apk119Value1265?.["messages"], 20);
-      apk119Value1266.length > 0 && (apk119Value1253 = apk119Value1266.map(apk119Value1267 => {
-        const apk119Value1268 = this.isFriendPhoneUserMessage(apk119Value1267) ? "User" : "Char";
-        return apk119Value1268 + ": " + this.getFriendPhoneMessageText(apk119Value1267);
-      }).join("\n"));
-    }
-    const apk119Value1254 = this.normalizeFriendPhoneLanguage(friend_28.language || "zh"),
-      apk119Value1255 = this.getFriendPhoneLanguageName(apk119Value1254);
-    let apk119Value1256 = "你现在要模拟生成一部手机里不同应用的数据。请严格遵循给定的世界观设定、角色人设和聊天上下文，生成符合角色性格的JSON格式数据。\n";
-    apk119Value1256 += "\n【最高优先级语言与翻译协议】\n- 所有 AI 创作的可读字符串原文必须只使用 Char 的默认语言：" + apk119Value1255 + " (" + apk119Value1254 + ")。\n- 通话例外：Call 完全遵循下方独立的通话生成协议；已有姓名原样保留，标识和状态等机器字段不翻译。\n- 音乐例外：music 内每首歌的 name 必须使用歌曲真实、正常的官方歌名，保留歌名本来的语言，不受 Char 默认语言限制，不返回 nameTranslationZh。\n- 游戏例外：game 中除 highlights[].desc、innerThoughts、postGameReflection（兼容 thoughts）外，其余字段均不受 Char 默认语言限制，也不需要任何 TranslationZh 字段；仅这四类叙事字段遵循 Char 默认语言并返回中文翻译。\n- 微博例外：weibo 只有帖子正文 text 和评论正文 comments[].text 遵循 Char 默认语言并返回 textTranslationZh；账号名、昵称、签名、作者名、来源、相册描述等其他字段不限制语言，也不返回翻译字段。\n- 文件例外：files 只有文件详情正文 items[].content 遵循 Char 默认语言并返回 contentTranslationZh；标签名与文件标题不限制语言，也不返回翻译字段。\n- 除以上例外，对每个可读字符串字段 field，都必须同时返回 fieldTranslationZh。原文非中文时，fieldTranslationZh 必须是自然准确的简体中文翻译；原文为中文时必须为空字符串。\n- sender、type、icon、数值、布尔值、URL、ID、银行卡号等机器字段不翻译。\n", apk119Value1256 += "\n【最高优先级时间协议】不要返回 time、date、createdAt、timestamp、addedTime、recentCallTime 等记录时间字段，也不要为应用记录编造时间戳；真实生成时间始终由前端写入。\n";
-    if (apk119Value1244) apk119Value1256 += "\n【当前真实时间】" + this.getCurrentRealTimeContext() + "\n- 仅将它用于理解当前季节、昼夜、作息、近期事件与内容语境，让生成内容具有自然的时间感知；不要把它复制成 JSON 时间字段。\n";
-    apk119Value1256 += "\n【覆盖规则】除通话追加保留旧记录外，本次勾选的其他应用完整覆盖该应用旧数据。其他应用请生成一套独立、完整的新内容。\n";
-    if (apk119Value1250) apk119Value1256 += "\n【世界书设定】：\n" + apk119Value1250 + "\n";
-    apk119Value1256 += "\n【角色 (Char) 人设】：\n" + apk119Value1252 + "\n", apk119Value1256 += "\n【用户 (User) 人设】：\n" + apk119Value1251 + "\n";
-    if (apk119Value1253) apk119Value1256 += "\n【固定挂载的最近 20 条单聊上下文】：\n" + apk119Value1253 + "\n";
-    apk119Value1256 += "\n根据选择的应用返回对应的数据。\n";
-    const apk119Value1257 = {
-        safari: "[safari]: 严格生成 " + apk119Value1246.primary + " 条公开模式的日常搜索，以及 " + apk119Value1246.secondary + " 条无痕模式下符合其隐私、疑问或不愿公开心境的搜索内容，共 " + apk119Value1242.safariTotal + " 条。搜索主题、关键词长度、网页来源和详情表达需要自然多样，不要把无痕内容机械等同于阴暗或猎奇。",
-        files: "[files]: 生成符合角色人设的文件列表，其中 tags 内必须包含能够体现其性格、癖好、或对 User 的看法的隐私内容（如小说草稿、私密日记、账单等），需生成 2-3 个标签，每个标签 1-3 个新文件，确保文件名不要与历史已有的重复。标签名和文件标题不限制语言且不需要翻译；只有文件详情 content 按 Char 默认语言生成并提供中文翻译。",
-        call: apk119Value1243.includes("call") ? window.cphoneCallApp.buildGenerationPrompt(friend_28, apk119Value1242.callTotal) : "",
-        music: "[music]: 听歌排行 top 严格生成 " + apk119Value1242.musicTop + " 首，风格应极大程度体现其人设与心境；歌曲 name 必须使用真实、正常的官方歌名，保留原本语言，不要翻译歌名，也不要返回 nameTranslationZh。每首歌必须包含循环次数（纯数字）和不少于 20 字的细腻心声。recent 和 favorites 保持自然数量，不受排行榜数量限制。",
-        health: "[health]: 严格符合其人设（如是否运动、熬夜、体型等）生成近期睡眠、步数、身高和体重；dream 写约 30 字的昨夜梦境；stepsThoughts 写约 30 字的跑步或运动时心理活动；heartRate 必须是符合当前状态的纯数字 BPM，heartRateStatus 是与该心率匹配的简短状态。",
-        pay: "[pay]: 生成符合人设的银行卡总金额和近期不少于 5 条收支记录。",
-        game: "[game]: 严格生成 " + apk119Value1242.gameTotal + " 个符合人设的游戏。只有高光时刻 highlights[].desc、局内心声 innerThoughts、局后复盘 postGameReflection 受 Char 默认语言限制并需要中文翻译；游戏名、玩家名、段位、英雄、结果、时长等其余字段可使用其正常语言，不要返回翻译字段。每局必须包含结果、KDA(如8/2/5)、使用英雄、高光时刻(数组)、内心戏(30字)、复盘(30字)，不得包含时间。格式必须完全符合提供的JSON模板，不要使用特殊字符。",
-        weibo: "[weibo]: 生成完整微博资料。只有帖子正文 text 和评论正文 comments[].text 按 Char 默认语言生成并提供中文翻译；账号名、昵称、签名、评论作者名、来源、相册描述等其他字段不限制语言且不需要翻译。大号严格生成 " + apk119Value1247.primary + " 条主页帖子和 " + apk119Value1248.primary + " 张相册照片；小号严格生成 " + apk119Value1247.secondary + " 条主页帖子和 " + apk119Value1248.secondary + " 张相册照片。每条主页帖子尽量生成 2-5 条自然评论；大号和小号的赞过列表各保持 3 条。大号像可被熟人看到的公开主页，小号则贴近隐藏身份，可以写关于 User 的情绪、珍视的记忆、关系思考或只有小号才敢保存的瞬间，但不要让所有内容围绕 User，也不要让小号只有负面情绪。所有帖子必须在主题、篇幅、语气、叙事视角和互动氛围上有真实差异，禁止套用固定开头、固定剧情、编号化文案、同义改写和重复句式；照片描述也要覆盖不同主体、场景、构图、光线和拍摄质感。小号头像 avatarUrl 留空，由系统补充外部图片链接。"
-      },
-      apk119Value1258 = {
-        safari: "\"safari\": {\n  \"recentSearches\": [\n    {\"keyword\": \"搜索关键词1\", \"keywordTranslationZh\": \"中文翻译或空字符串\", \"title\": \"网页标题1\", \"titleTranslationZh\": \"中文翻译或空字符串\", \"content\": \"网页内容(如知乎,百度百科等真实浏览器内容50-100字)\", \"contentTranslationZh\": \"中文翻译或空字符串\"}\n  ],\n  \"privateSearches\": [\n    {\"keyword\": \"无痕搜索词1\", \"keywordTranslationZh\": \"中文翻译或空字符串\", \"title\": \"无痕网页标题1\", \"titleTranslationZh\": \"中文翻译或空字符串\", \"content\": \"隐私搜索详情内容(50-100字)\", \"contentTranslationZh\": \"中文翻译或空字符串\"}\n  ]\n}",
-        files: "\"files\": {\n  \"tags\": [\n    {\"name\": \"新标签名称，不限制语言\", \"color\": \"#ff3b30\", \"items\": [{\"title\": \"新文件名，不限制语言\", \"content\": \"一段极度符合人设的私密内容(50-100字)\", \"contentTranslationZh\": \"中文翻译或空字符串\"}]}\n  ]\n}",
-        call: "\"call\": {\"contacts\": [], \"recentCalls\": []}",
-        music: "\"music\": {\n  \"recent\": [{\"name\": \"歌曲真实官方歌名（保留原本语言）\", \"artist\": \"歌手1\", \"artistTranslationZh\": \"中文翻译或空字符串\"}],\n  \"favorites\": [{\"name\": \"歌曲真实官方歌名（保留原本语言）\", \"artist\": \"最爱歌手1\", \"artistTranslationZh\": \"中文翻译或空字符串\"}],\n  \"top\": [{\"name\": \"歌曲真实官方歌名（保留原本语言）\", \"artist\": \"歌手1\", \"artistTranslationZh\": \"中文翻译或空字符串\", \"loops\": 156, \"thoughts\": \"听这首歌时的内心情感与心声，要非常符合人设且细腻，不少于30字\", \"thoughtsTranslationZh\": \"中文翻译或空字符串\"}]\n}",
-        health: "\"health\": {\n  \"steps\": \"步数纯数字\",\n  \"stepsThoughts\": \"跑步或运动时的心理活动，约30字\",\n  \"stepsThoughtsTranslationZh\": \"中文翻译或空字符串\",\n  \"sleepHours\": \"睡眠小时数纯数字\",\n  \"sleepMinutes\": \"睡眠分钟数纯数字\",\n  \"dream\": \"昨夜梦境内容，约30字\",\n  \"dreamTranslationZh\": \"中文翻译或空字符串\",\n  \"heartRate\": \"当前心率纯数字BPM\",\n  \"heartRateStatus\": \"符合心率与角色状态的简短描述\",\n  \"heartRateStatusTranslationZh\": \"中文翻译或空字符串\",\n  \"weight\": \"体重\",\n  \"height\": \"身高\"\n}",
-        pay: "\"pay\": {\n  \"totalAssets\": \"24560.88\",\n  \"recentTransactions\": [\n    {\"title\": \"交易标题原文\", \"titleTranslationZh\": \"中文翻译或空字符串\", \"amount\": \"-128.00\", \"isIncome\": false}\n  ]\n}",
-        game: "\"game\": {\n  \"playerName\": \"正常游戏内 ID，不限制语言\",\n  \"totalHours\": \"200小时\",\n  \"recentGames\": [\n    {\"name\": \"正常游戏名，不限制语言\", \"hours\": \"50小时\", \"rank\": \"正常段位，不限制语言\", \"winRate\": \"65%\", \"icon\": \"fas fa-gamepad\", \"matches\": [\n      {\"result\": \"正常对局结果，不限制语言\", \"kda\": \"8/2/5\", \"hero\": \"正常英雄名，不限制语言\", \"highlights\": [{\"desc\": \"高光描述原文\", \"descTranslationZh\": \"中文翻译或空字符串\"}], \"innerThoughts\": \"局内心声原文\", \"innerThoughtsTranslationZh\": \"中文翻译或空字符串\", \"postGameReflection\": \"复盘原文\", \"postGameReflectionTranslationZh\": \"中文翻译或空字符串\"}\n    ]}\n  ]\n}",
-        weibo: "\"weibo\": {\n  \"mainAccount\": {\n    \"name\": \"大号昵称，不限制语言\",\n    \"signature\": \"符合 Char 公开形象的签名，不限制语言\",\n    \"posts\": [\n      {\"text\": \"自然且各不相同的大号帖子正文\", \"textTranslationZh\": \"中文翻译或空字符串\", \"source\": \"真实来源，不限制语言\", \"comments\": [{\"author\": \"评论用户名，不限制语言\", \"text\": \"贴合该帖语境的评论\", \"textTranslationZh\": \"中文翻译或空字符串\"}], \"reposts\": 6, \"likes\": 128}\n    ],\n    \"album\": [\n      {\"description\": \"具体且不重复的图片主体、场景、构图和质感描述20-50字，不限制语言\"}\n    ],\n    \"liked\": [\n      {\"author\": \"被赞博主名，不限制语言\", \"text\": \"符合大号公开兴趣的赞过帖子\", \"textTranslationZh\": \"中文翻译或空字符串\", \"source\": \"真实来源，不限制语言\", \"comments\": [], \"reposts\": 12, \"likes\": 241}\n    ]\n  },\n  \"altAccount\": {\n    \"name\": \"符合隐藏身份的小号名，不限制语言\",\n    \"signature\": \"符合小号隐秘状态的签名，不限制语言\",\n    \"avatarUrl\": \"\",\n    \"posts\": [\n      {\"text\": \"符合隐藏身份且主题自然多样的小号帖子正文\", \"textTranslationZh\": \"中文翻译或空字符串\", \"source\": \"真实来源，不限制语言\", \"comments\": [{\"author\": \"评论用户名，不限制语言\", \"text\": \"贴合该帖语境的评论\", \"textTranslationZh\": \"中文翻译或空字符串\"}], \"reposts\": 1, \"likes\": 19}\n    ],\n    \"album\": [\n      {\"description\": \"符合小号状态且与其他照片不同的具体画面描述20-50字，不限制语言\"}\n    ],\n    \"liked\": [\n      {\"author\": \"被赞博主名，不限制语言\", \"text\": \"符合小号隐秘兴趣的赞过帖子\", \"textTranslationZh\": \"中文翻译或空字符串\", \"source\": \"真实来源，不限制语言\", \"comments\": [], \"reposts\": 2, \"likes\": 33}\n    ]\n  }\n}"
-      };
-    apk119Value1256 += "\n【各应用生成要求】：\n", apk119Value1243.forEach(apk119Value1269 => {
-      apk119Value1256 += apk119Value1257[apk119Value1269] + "\n";
-    }), apk119Value1256 += "\n请包含以下字段（根据选择包含对应的对象）：\n{\n";
-    let apk119Value1259 = apk119Value1243.map(apk119Value1270 => apk119Value1258[apk119Value1270]).join(",\n").replace(/"(?:time|date|createdAt|timestamp|addedTime|recentCallTime)"\s*:\s*"[^"]*"\s*,?/g, "");
-    apk119Value1256 += apk119Value1259 + "\n}", apk119Value1256 += "\n注意：必须且只能返回合法的 JSON 字符串，不要包含任何多余的文字说明，不要 Markdown 标记。确保 JSON 格式绝对正确，键名和字符串都使用双引号。";
-    if (window.showToast) window.showToast("正在生成符合设定的数据，请稍候...");
-    const apk119Value1260 = [{
-        role: "system",
-        content: "你是一个数据生成助手。只能返回合法的 JSON 字符串。"
-      }, {
-        role: "user",
-        content: apk119Value1256
-      }],
-      apk119Value1261 = window.apiConfig.model || "gpt-3.5-turbo",
-      apk119Value1262 = window.u2Api.resolveChatCompletionsEndpoint(window.apiConfig.endpoint),
-      apk119Value1263 = fetch(apk119Value1262, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + window.apiConfig.apiKey
+    let phoneValue71 = null;
+    this.setFriendPhoneGenerationStatus(phoneValue1.id, "running", "正在生成…关闭设置后仍会继续，请勿重复提交。");
+    try {
+      if (phoneValue65.includes("call")) {
+        if (!window.cphoneCallApp) throw new Error("通话模块尚未就绪，请刷新页面");
+        phoneValue71 = window.cphoneCallApp.beginJob(phoneValue1);
+      }
+      window.showToast?.("开始生成应用数据");
+      let phoneValue72 = "";
+      if (window.getGlobalWorldBookContextByPosition) {
+        phoneValue72 = window.getGlobalWorldBookContextByPosition("system_depth") || "";
+        const phoneValue86 = window.getGlobalWorldBookContextByPosition("before_role");
+        if (phoneValue86) phoneValue72 += "\n" + phoneValue86;
+      }
+      const phoneValue73 = this.getGenerationUserPersona(phoneValue1),
+        phoneValue74 = phoneValue1.persona || "普通角色";
+      let phoneValue75 = "";
+      if (phoneValue67) {
+        const phoneValue87 = await this.ensureFriendPhoneMessagesLoaded(phoneValue1),
+          phoneValue88 = this.getRecentSingleChatMessages(phoneValue87?.["messages"], 20);
+        phoneValue88.length > 0 && (phoneValue75 = phoneValue88.map(phoneValue89 => {
+          const phoneValue90 = this.isFriendPhoneUserMessage(phoneValue89) ? "User" : "Char";
+          return phoneValue90 + ": " + this.getFriendPhoneMessageText(phoneValue89);
+        }).join("\n"));
+      }
+      const phoneValue76 = this.normalizeFriendPhoneLanguage(phoneValue1.language || "zh"),
+        phoneValue77 = this.getFriendPhoneLanguageName(phoneValue76);
+      let phoneValue78 = "你现在要模拟生成一部手机里不同应用的数据。请严格遵循给定的世界观设定、角色人设和聊天上下文，生成符合角色性格的JSON格式数据。\n";
+      phoneValue78 += "\n【最高优先级语言与翻译协议】\n- 所有 AI 创作的可读字符串原文必须只使用 Char 的默认语言：" + phoneValue77 + " (" + phoneValue76 + ")。\n- 通话例外：Call 完全遵循下方独立的通话生成协议；已有姓名原样保留，标识和状态等机器字段不翻译。\n- 音乐例外：music 内每首歌的 name 必须使用歌曲真实、正常的官方歌名，保留歌名本来的语言，不受 Char 默认语言限制，不返回 nameTranslationZh。\n- 游戏例外：game 中除 highlights[].desc、innerThoughts、postGameReflection（兼容 thoughts）外，其余字段均不受 Char 默认语言限制，也不需要任何 TranslationZh 字段；仅这四类叙事字段遵循 Char 默认语言并返回中文翻译。\n- 微博例外：weibo 只有帖子正文 text 和评论正文 comments[].text 遵循 Char 默认语言并返回 textTranslationZh；账号名、昵称、签名、作者名、来源、相册描述等其他字段不限制语言，也不返回翻译字段。\n- 文件例外：files 只有文件详情正文 items[].content 遵循 Char 默认语言并返回 contentTranslationZh；标签名与文件标题不限制语言，也不返回翻译字段。\n- 除以上例外，对每个可读字符串字段 field，都必须同时返回 fieldTranslationZh。原文非中文时，fieldTranslationZh 必须是自然准确的简体中文翻译；原文为中文时必须为空字符串。\n- sender、type、icon、数值、布尔值、URL、ID、银行卡号等机器字段不翻译。\n", phoneValue78 += "\n【最高优先级时间协议】不要返回 time、date、createdAt、timestamp、addedTime、recentCallTime 等记录时间字段，也不要为应用记录编造时间戳；真实生成时间始终由前端写入。\n";
+      if (phoneValue66) phoneValue78 += "\n【当前真实时间】" + this.getCurrentRealTimeContext() + "\n- 仅将它用于理解当前季节、昼夜、作息、近期事件与内容语境，让生成内容具有自然的时间感知；不要把它复制成 JSON 时间字段。\n";
+      phoneValue78 += "\n【覆盖规则】除通话追加保留旧记录外，本次勾选的其他应用完整覆盖该应用旧数据。其他应用请生成一套独立、完整的新内容。\n";
+      if (phoneValue72) phoneValue78 += "\n【世界书设定】：\n" + phoneValue72 + "\n";
+      phoneValue78 += "\n【角色 (Char) 人设】：\n" + phoneValue74 + "\n", phoneValue78 += "\n【用户 (User) 人设】：\n" + phoneValue73 + "\n";
+      if (phoneValue75) phoneValue78 += "\n【固定挂载的最近 20 条单聊上下文】：\n" + phoneValue75 + "\n";
+      phoneValue78 += "\n根据选择的应用返回对应的数据。\n";
+      const phoneValue79 = {
+          "safari": "[safari]: 严格生成 " + phoneValue68.primary + " 条公开模式的日常搜索，以及 " + phoneValue68.secondary + " 条无痕模式下符合其隐私、疑问或不愿公开心境的搜索内容，共 " + phoneValue64.safariTotal + " 条。搜索主题、关键词长度、网页来源和详情表达需要自然多样，不要把无痕内容机械等同于阴暗或猎奇。",
+          "files": "[files]: 生成符合角色人设的文件列表，其中 tags 内必须包含能够体现其性格、癖好、或对 User 的看法的隐私内容（如小说草稿、私密日记、账单等），需生成 2-3 个标签，每个标签 1-3 个新文件，确保文件名不要与历史已有的重复。标签名和文件标题不限制语言且不需要翻译；只有文件详情 content 按 Char 默认语言生成并提供中文翻译。",
+          "call": phoneValue65.includes("call") ? window.cphoneCallApp.buildGenerationPrompt(phoneValue1, phoneValue64.callTotal) : "",
+          "music": "[music]: 听歌排行 top 严格生成 " + phoneValue64.musicTop + " 首，风格应极大程度体现其人设与心境；歌曲 name 必须使用真实、正常的官方歌名，保留原本语言，不要翻译歌名，也不要返回 nameTranslationZh。每首歌必须包含循环次数（纯数字）和不少于 20 字的细腻心声。recent 和 favorites 保持自然数量，不受排行榜数量限制。",
+          "health": "[health]: 严格符合其人设（如是否运动、熬夜、体型等）生成近期睡眠、步数、身高和体重；dream 写约 30 字的昨夜梦境；stepsThoughts 写约 30 字的跑步或运动时心理活动；heartRate 必须是符合当前状态的纯数字 BPM，heartRateStatus 是与该心率匹配的简短状态。",
+          "pay": "[pay]: 生成符合人设的银行卡总金额和近期不少于 5 条收支记录。",
+          "game": "[game]: 严格生成 " + phoneValue64.gameTotal + " 个符合人设的游戏。只有高光时刻 highlights[].desc、局内心声 innerThoughts、局后复盘 postGameReflection 受 Char 默认语言限制并需要中文翻译；游戏名、玩家名、段位、英雄、结果、时长等其余字段可使用其正常语言，不要返回翻译字段。每局必须包含结果、KDA(如8/2/5)、使用英雄、高光时刻(数组)、内心戏(30字)、复盘(30字)，不得包含时间。格式必须完全符合提供的JSON模板，不要使用特殊字符。",
+          "weibo": "[weibo]: 生成完整微博资料。只有帖子正文 text 和评论正文 comments[].text 按 Char 默认语言生成并提供中文翻译；账号名、昵称、签名、评论作者名、来源、相册描述等其他字段不限制语言且不需要翻译。大号严格生成 " + phoneValue69.primary + " 条主页帖子和 " + phoneValue70.primary + " 张相册照片；小号严格生成 " + phoneValue69.secondary + " 条主页帖子和 " + phoneValue70.secondary + " 张相册照片。每条主页帖子尽量生成 2-5 条自然评论；大号和小号的赞过列表各保持 3 条。大号像可被熟人看到的公开主页，小号则贴近隐藏身份，可以写关于 User 的情绪、珍视的记忆、关系思考或只有小号才敢保存的瞬间，但不要让所有内容围绕 User，也不要让小号只有负面情绪。所有帖子必须在主题、篇幅、语气、叙事视角和互动氛围上有真实差异，禁止套用固定开头、固定剧情、编号化文案、同义改写和重复句式；照片描述也要覆盖不同主体、场景、构图、光线和拍摄质感。小号头像 avatarUrl 留空，由系统补充外部图片链接。"
         },
-        body: JSON.stringify({
-          model: apk119Value1261,
-          messages: apk119Value1260,
-          temperature: 0.7
-        })
-      }).then(async apk119Value1271 => {
-        if (!apk119Value1271.ok) {
-          let apk119Value1272 = "HTTP error! status: " + apk119Value1271.status;
-          try {
-            const apk119Value1273 = await apk119Value1271.text();
-            console.error("API Error Response Body:", apk119Value1273);
-            const apk119Value1274 = JSON.parse(apk119Value1273);
-            apk119Value1274.error && apk119Value1274.error.message ? apk119Value1272 = apk119Value1274.error.message : apk119Value1272 += " - " + apk119Value1273;
-          } catch (apk119Value1275) {}
-          throw Object.assign(new Error(apk119Value1272), {
-            status: apk119Value1271.status,
-            apiDetail: apk119Value1272
-          });
-        }
-        return apk119Value1271.json();
-      }).then(async apk119Value1276 => {
-        let apk119Value1277 = apk119Value1276.choices?.[0]?.["message"]?.["content"] || "",
-          apk119Value1278 = apk119Value1277;
-        const apk119Value1279 = apk119Value1277.match(/\{[\s\S]*\}/);
-        apk119Value1279 ? apk119Value1278 = apk119Value1279[0] : apk119Value1278 = apk119Value1277.replace(/```json/gi, "").replace(/```/g, "").trim();
-        try {
-          const apk119Value1280 = JSON.parse(apk119Value1278),
-            apk119Value1281 = apk119Value1243.filter(apk119Value1288 => !apk119Value1280?.[apk119Value1288] || typeof apk119Value1280[apk119Value1288] !== "object");
-          if (apk119Value1281.length) throw new Error("缺少应用数据：" + apk119Value1281.join("、"));
-          const apk119Value1282 = (apk119Value1289, apk119Value1290, apk119Value1291) => {
-              if (!Array.isArray(apk119Value1289) || apk119Value1289.length !== apk119Value1290) throw new Error(apk119Value1291 + " 数量必须为 " + apk119Value1290);
+        phoneValue80 = {
+          "safari": "\"safari\": {\n  \"recentSearches\": [\n    {\"keyword\": \"搜索关键词1\", \"keywordTranslationZh\": \"中文翻译或空字符串\", \"title\": \"网页标题1\", \"titleTranslationZh\": \"中文翻译或空字符串\", \"content\": \"网页内容(如知乎,百度百科等真实浏览器内容50-100字)\", \"contentTranslationZh\": \"中文翻译或空字符串\"}\n  ],\n  \"privateSearches\": [\n    {\"keyword\": \"无痕搜索词1\", \"keywordTranslationZh\": \"中文翻译或空字符串\", \"title\": \"无痕网页标题1\", \"titleTranslationZh\": \"中文翻译或空字符串\", \"content\": \"隐私搜索详情内容(50-100字)\", \"contentTranslationZh\": \"中文翻译或空字符串\"}\n  ]\n}",
+          "files": "\"files\": {\n  \"tags\": [\n    {\"name\": \"新标签名称，不限制语言\", \"color\": \"#ff3b30\", \"items\": [{\"title\": \"新文件名，不限制语言\", \"content\": \"一段极度符合人设的私密内容(50-100字)\", \"contentTranslationZh\": \"中文翻译或空字符串\"}]}\n  ]\n}",
+          "call": "\"call\": {\"contacts\": [], \"recentCalls\": []}",
+          "music": "\"music\": {\n  \"recent\": [{\"name\": \"歌曲真实官方歌名（保留原本语言）\", \"artist\": \"歌手1\", \"artistTranslationZh\": \"中文翻译或空字符串\"}],\n  \"favorites\": [{\"name\": \"歌曲真实官方歌名（保留原本语言）\", \"artist\": \"最爱歌手1\", \"artistTranslationZh\": \"中文翻译或空字符串\"}],\n  \"top\": [{\"name\": \"歌曲真实官方歌名（保留原本语言）\", \"artist\": \"歌手1\", \"artistTranslationZh\": \"中文翻译或空字符串\", \"loops\": 156, \"thoughts\": \"听这首歌时的内心情感与心声，要非常符合人设且细腻，不少于30字\", \"thoughtsTranslationZh\": \"中文翻译或空字符串\"}]\n}",
+          "health": "\"health\": {\n  \"steps\": \"步数纯数字\",\n  \"stepsThoughts\": \"跑步或运动时的心理活动，约30字\",\n  \"stepsThoughtsTranslationZh\": \"中文翻译或空字符串\",\n  \"sleepHours\": \"睡眠小时数纯数字\",\n  \"sleepMinutes\": \"睡眠分钟数纯数字\",\n  \"dream\": \"昨夜梦境内容，约30字\",\n  \"dreamTranslationZh\": \"中文翻译或空字符串\",\n  \"heartRate\": \"当前心率纯数字BPM\",\n  \"heartRateStatus\": \"符合心率与角色状态的简短描述\",\n  \"heartRateStatusTranslationZh\": \"中文翻译或空字符串\",\n  \"weight\": \"体重\",\n  \"height\": \"身高\"\n}",
+          "pay": "\"pay\": {\n  \"totalAssets\": \"24560.88\",\n  \"recentTransactions\": [\n    {\"title\": \"交易标题原文\", \"titleTranslationZh\": \"中文翻译或空字符串\", \"amount\": \"-128.00\", \"isIncome\": false}\n  ]\n}",
+          "game": "\"game\": {\n  \"playerName\": \"正常游戏内 ID，不限制语言\",\n  \"totalHours\": \"200小时\",\n  \"recentGames\": [\n    {\"name\": \"正常游戏名，不限制语言\", \"hours\": \"50小时\", \"rank\": \"正常段位，不限制语言\", \"winRate\": \"65%\", \"icon\": \"fas fa-gamepad\", \"matches\": [\n      {\"result\": \"正常对局结果，不限制语言\", \"kda\": \"8/2/5\", \"hero\": \"正常英雄名，不限制语言\", \"highlights\": [{\"desc\": \"高光描述原文\", \"descTranslationZh\": \"中文翻译或空字符串\"}], \"innerThoughts\": \"局内心声原文\", \"innerThoughtsTranslationZh\": \"中文翻译或空字符串\", \"postGameReflection\": \"复盘原文\", \"postGameReflectionTranslationZh\": \"中文翻译或空字符串\"}\n    ]}\n  ]\n}",
+          "weibo": "\"weibo\": {\n  \"mainAccount\": {\n    \"name\": \"大号昵称，不限制语言\",\n    \"signature\": \"符合 Char 公开形象的签名，不限制语言\",\n    \"posts\": [\n      {\"text\": \"自然且各不相同的大号帖子正文\", \"textTranslationZh\": \"中文翻译或空字符串\", \"source\": \"真实来源，不限制语言\", \"comments\": [{\"author\": \"评论用户名，不限制语言\", \"text\": \"贴合该帖语境的评论\", \"textTranslationZh\": \"中文翻译或空字符串\"}], \"reposts\": 6, \"likes\": 128}\n    ],\n    \"album\": [\n      {\"description\": \"具体且不重复的图片主体、场景、构图和质感描述20-50字，不限制语言\"}\n    ],\n    \"liked\": [\n      {\"author\": \"被赞博主名，不限制语言\", \"text\": \"符合大号公开兴趣的赞过帖子\", \"textTranslationZh\": \"中文翻译或空字符串\", \"source\": \"真实来源，不限制语言\", \"comments\": [], \"reposts\": 12, \"likes\": 241}\n    ]\n  },\n  \"altAccount\": {\n    \"name\": \"符合隐藏身份的小号名，不限制语言\",\n    \"signature\": \"符合小号隐秘状态的签名，不限制语言\",\n    \"avatarUrl\": \"\",\n    \"posts\": [\n      {\"text\": \"符合隐藏身份且主题自然多样的小号帖子正文\", \"textTranslationZh\": \"中文翻译或空字符串\", \"source\": \"真实来源，不限制语言\", \"comments\": [{\"author\": \"评论用户名，不限制语言\", \"text\": \"贴合该帖语境的评论\", \"textTranslationZh\": \"中文翻译或空字符串\"}], \"reposts\": 1, \"likes\": 19}\n    ],\n    \"album\": [\n      {\"description\": \"符合小号状态且与其他照片不同的具体画面描述20-50字，不限制语言\"}\n    ],\n    \"liked\": [\n      {\"author\": \"被赞博主名，不限制语言\", \"text\": \"符合小号隐秘兴趣的赞过帖子\", \"textTranslationZh\": \"中文翻译或空字符串\", \"source\": \"真实来源，不限制语言\", \"comments\": [], \"reposts\": 2, \"likes\": 33}\n    ]\n  }\n}"
+        };
+      phoneValue78 += "\n【各应用生成要求】：\n", phoneValue65.forEach(phoneValue91 => {
+        phoneValue78 += phoneValue79[phoneValue91] + "\n";
+      }), phoneValue78 += "\n请包含以下字段（根据选择包含对应的对象）：\n{\n";
+      let phoneValue81 = phoneValue65.map(phoneValue92 => phoneValue80[phoneValue92]).join(",\n").replace(/"(?:time|date|createdAt|timestamp|addedTime|recentCallTime)"\s*:\s*"[^"]*"\s*,?/g, "");
+      phoneValue78 += phoneValue81 + "\n}", phoneValue78 += "\n注意：必须且只能返回合法的 JSON 字符串，不要包含任何多余的文字说明，不要 Markdown 标记。确保 JSON 格式绝对正确，键名和字符串都使用双引号。";
+      const phoneValue82 = [{
+          "role": "system",
+          "content": "你是一个数据生成助手。只能返回合法的 JSON 字符串。"
+        }, {
+          "role": "user",
+          "content": phoneValue78
+        }],
+        phoneValue83 = window.apiConfig.model || "gpt-3.5-turbo",
+        phoneValue84 = window.u2Api.resolveChatCompletionsEndpoint(window.apiConfig.endpoint),
+        phoneValue85 = fetch(phoneValue84, {
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + window.apiConfig.apiKey
+          },
+          "body": JSON.stringify({
+            "model": phoneValue83,
+            "messages": phoneValue82,
+            "temperature": 0.7
+          })
+        }).then(async phoneValue93 => {
+          if (!phoneValue93.ok) {
+            let phoneValue94 = "HTTP error! status: " + phoneValue93.status;
+            try {
+              const phoneValue95 = await phoneValue93.text();
+              console.error("API Error Response Body:", phoneValue95);
+              const phoneValue96 = JSON.parse(phoneValue95);
+              phoneValue96.error && phoneValue96.error.message ? phoneValue94 = phoneValue96.error.message : phoneValue94 += " - " + phoneValue95;
+            } catch (phoneValue97) {}
+            throw Object.assign(new Error(phoneValue94), {
+              "status": phoneValue93.status,
+              "apiDetail": phoneValue94
+            });
+          }
+          return phoneValue93.json();
+        }).then(async phoneValue98 => {
+          let phoneValue99 = phoneValue98.choices?.[0]?.["message"]?.["content"] || "",
+            phoneValue100 = phoneValue99;
+          const phoneValue101 = phoneValue99.match(/\{[\s\S]*\}/);
+          phoneValue101 ? phoneValue100 = phoneValue101[0] : phoneValue100 = phoneValue99.replace(/```json/gi, "").replace(/```/g, "").trim();
+          const phoneValue102 = JSON.parse(phoneValue100),
+            phoneValue103 = phoneValue65.filter(phoneValue110 => !phoneValue102?.[phoneValue110] || typeof phoneValue102[phoneValue110] !== "object");
+          if (phoneValue103.length) throw new Error("缺少应用数据：" + phoneValue103.join("、"));
+          const phoneValue104 = (phoneValue111, phoneValue112, phoneValue113) => {
+              if (!Array.isArray(phoneValue111) || phoneValue111.length !== phoneValue112) throw new Error(phoneValue113 + " 数量必须为 " + phoneValue112);
             },
-            apk119Value1283 = (apk119Value1292, apk119Value1293, apk119Value1294, apk119Value1295) => {
-              if (!Array.isArray(apk119Value1292) || apk119Value1292.length < apk119Value1293 || apk119Value1292.length > apk119Value1294) throw new Error(apk119Value1295 + " 数量必须为 " + apk119Value1293 + "-" + apk119Value1294);
+            phoneValue105 = (phoneValue114, phoneValue115, phoneValue116, phoneValue117) => {
+              if (!Array.isArray(phoneValue114) || phoneValue114.length < phoneValue115 || phoneValue114.length > phoneValue116) throw new Error(phoneValue117 + " 数量必须为 " + phoneValue115 + "-" + phoneValue116);
             };
-          if (apk119Value1280.music) apk119Value1282(apk119Value1280.music.top, apk119Value1242.musicTop, "音乐排行");
-          apk119Value1280.safari && (apk119Value1282(apk119Value1280.safari.recentSearches, apk119Value1246.primary, "Safari 公开搜索"), apk119Value1282(apk119Value1280.safari.privateSearches, apk119Value1246.secondary, "Safari 无痕搜索"));
-          if (apk119Value1280.game) apk119Value1282(apk119Value1280.game.recentGames, apk119Value1242.gameTotal, "游戏");
-          if (apk119Value1280.call) apk119Value1282(apk119Value1280.call.recentCalls, apk119Value1242.callTotal, "通话记录");
-          apk119Value1280.weibo && (apk119Value1282(apk119Value1280.weibo.mainAccount?.["posts"], apk119Value1247.primary, "微博大号帖子"), apk119Value1282(apk119Value1280.weibo.altAccount?.["posts"], apk119Value1247.secondary, "微博小号帖子"), apk119Value1282(apk119Value1280.weibo.mainAccount?.["album"], apk119Value1248.primary, "微博大号相册"), apk119Value1282(apk119Value1280.weibo.altAccount?.["album"], apk119Value1248.secondary, "微博小号相册"), apk119Value1282(apk119Value1280.weibo.mainAccount?.["liked"], 3, "微博大号赞过"), apk119Value1282(apk119Value1280.weibo.altAccount?.["liked"], 3, "微博小号赞过"), apk119Value1280.weibo.mainAccount.posts = this.normalizeFriendPhoneWeiboPostComments(apk119Value1280.weibo.mainAccount.posts, 5), apk119Value1280.weibo.altAccount.posts = this.normalizeFriendPhoneWeiboPostComments(apk119Value1280.weibo.altAccount.posts, 5));
-          apk119Value1280.files && (apk119Value1283(apk119Value1280.files.tags, 2, 3, "文件标签"), apk119Value1280.files.tags.forEach((apk119Value1296, apk119Value1297) => apk119Value1283(apk119Value1296?.["items"], 1, 3, "文件标签 " + (apk119Value1297 + 1))));
-          if (apk119Value1280.pay) apk119Value1283(apk119Value1280.pay.recentTransactions, 5, 50, "钱包交易");
-          this.validateFriendPhoneLocalizedTree(apk119Value1280, friend_28.language || "zh", "phone");
-          const apk119Value1284 = {};
-          apk119Value1280.music && (apk119Value1284.musicData = {
-            recent: Array.isArray(apk119Value1280.music.recent) ? apk119Value1280.music.recent : [],
-            favorites: Array.isArray(apk119Value1280.music.favorites) ? apk119Value1280.music.favorites : [],
-            top: Array.isArray(apk119Value1280.music.top) ? apk119Value1280.music.top.slice(0, apk119Value1242.musicTop) : []
+          if (phoneValue102.music) phoneValue104(phoneValue102.music.top, phoneValue64.musicTop, "音乐排行");
+          phoneValue102.safari && (phoneValue104(phoneValue102.safari.recentSearches, phoneValue68.primary, "Safari 公开搜索"), phoneValue104(phoneValue102.safari.privateSearches, phoneValue68.secondary, "Safari 无痕搜索"));
+          if (phoneValue102.game) phoneValue104(phoneValue102.game.recentGames, phoneValue64.gameTotal, "游戏");
+          if (phoneValue102.call) phoneValue104(phoneValue102.call.recentCalls, phoneValue64.callTotal, "通话记录");
+          phoneValue102.weibo && (phoneValue104(phoneValue102.weibo.mainAccount?.["posts"], phoneValue69.primary, "微博大号帖子"), phoneValue104(phoneValue102.weibo.altAccount?.["posts"], phoneValue69.secondary, "微博小号帖子"), phoneValue104(phoneValue102.weibo.mainAccount?.["album"], phoneValue70.primary, "微博大号相册"), phoneValue104(phoneValue102.weibo.altAccount?.["album"], phoneValue70.secondary, "微博小号相册"), phoneValue104(phoneValue102.weibo.mainAccount?.["liked"], 3, "微博大号赞过"), phoneValue104(phoneValue102.weibo.altAccount?.["liked"], 3, "微博小号赞过"), phoneValue102.weibo.mainAccount.posts = this.normalizeFriendPhoneWeiboPostComments(phoneValue102.weibo.mainAccount.posts, 5), phoneValue102.weibo.altAccount.posts = this.normalizeFriendPhoneWeiboPostComments(phoneValue102.weibo.altAccount.posts, 5));
+          phoneValue102.files && (phoneValue105(phoneValue102.files.tags, 2, 3, "文件标签"), phoneValue102.files.tags.forEach((phoneValue118, phoneValue119) => phoneValue105(phoneValue118?.["items"], 1, 3, "文件标签 " + (phoneValue119 + 1))));
+          if (phoneValue102.pay) phoneValue105(phoneValue102.pay.recentTransactions, 5, 50, "钱包交易");
+          this.validateFriendPhoneLocalizedTree(phoneValue102, phoneValue1.language || "zh", "phone");
+          const phoneValue106 = {};
+          phoneValue102.music && (phoneValue106.musicData = {
+            "recent": Array.isArray(phoneValue102.music.recent) ? phoneValue102.music.recent : [],
+            "favorites": Array.isArray(phoneValue102.music.favorites) ? phoneValue102.music.favorites : [],
+            "top": Array.isArray(phoneValue102.music.top) ? phoneValue102.music.top.slice(0, phoneValue64.musicTop) : []
           });
-          apk119Value1280.health && (apk119Value1284.healthData = apk119Value1280.health);
-          apk119Value1280.pay && (apk119Value1284.payData = {
-            ...apk119Value1280.pay,
-            recentTransactions: Array.isArray(apk119Value1280.pay.recentTransactions) ? apk119Value1280.pay.recentTransactions : []
+          phoneValue102.health && (phoneValue106.healthData = phoneValue102.health);
+          phoneValue102.pay && (phoneValue106.payData = {
+            ...phoneValue102.pay,
+            "recentTransactions": Array.isArray(phoneValue102.pay.recentTransactions) ? phoneValue102.pay.recentTransactions : []
           });
-          apk119Value1280.game && (apk119Value1284.gameData = {
-            ...apk119Value1280.game,
-            recentGames: Array.isArray(apk119Value1280.game.recentGames) ? apk119Value1280.game.recentGames.slice(0, apk119Value1242.gameTotal) : []
+          phoneValue102.game && (phoneValue106.gameData = {
+            ...phoneValue102.game,
+            "recentGames": Array.isArray(phoneValue102.game.recentGames) ? phoneValue102.game.recentGames.slice(0, phoneValue64.gameTotal) : []
           });
-          apk119Value1280.call && (apk119Value1284.callData = {
-            ...apk119Value1280.call,
-            recentCalls: Array.isArray(apk119Value1280.call.recentCalls) ? apk119Value1280.call.recentCalls.slice(0, apk119Value1242.callTotal) : [],
-            contacts: Array.isArray(apk119Value1280.call.contacts) ? apk119Value1280.call.contacts : []
+          phoneValue102.call && (phoneValue106.callData = {
+            ...phoneValue102.call,
+            "recentCalls": Array.isArray(phoneValue102.call.recentCalls) ? phoneValue102.call.recentCalls.slice(0, phoneValue64.callTotal) : [],
+            "contacts": Array.isArray(phoneValue102.call.contacts) ? phoneValue102.call.contacts : []
           });
-          apk119Value1280.safari && (apk119Value1284.safariData = {
-            recentSearches: Array.isArray(apk119Value1280.safari.recentSearches) ? apk119Value1280.safari.recentSearches.slice(0, apk119Value1246.primary) : [],
-            privateSearches: Array.isArray(apk119Value1280.safari.privateSearches) ? apk119Value1280.safari.privateSearches.slice(0, apk119Value1246.secondary) : []
+          phoneValue102.safari && (phoneValue106.safariData = {
+            "recentSearches": Array.isArray(phoneValue102.safari.recentSearches) ? phoneValue102.safari.recentSearches.slice(0, phoneValue68.primary) : [],
+            "privateSearches": Array.isArray(phoneValue102.safari.privateSearches) ? phoneValue102.safari.privateSearches.slice(0, phoneValue68.secondary) : []
           });
-          apk119Value1280.files && (apk119Value1284.filesData = {
-            ...apk119Value1280.files,
-            tags: Array.isArray(apk119Value1280.files.tags) ? apk119Value1280.files.tags : [],
-            recent: Array.isArray(apk119Value1280.files.recent) ? apk119Value1280.files.recent : []
+          phoneValue102.files && (phoneValue106.filesData = {
+            ...phoneValue102.files,
+            "tags": Array.isArray(phoneValue102.files.tags) ? phoneValue102.files.tags : [],
+            "recent": Array.isArray(phoneValue102.files.recent) ? phoneValue102.files.recent : []
           });
-          if (apk119Value1280.weibo) {
-            const apk119Value1298 = apk119Value1280.weibo || {},
-              apk119Value1299 = (apk119Value1300, apk119Value1301) => {
-                const apk119Value1302 = apk119Value1301 === "altAccount",
-                  apk119Value1303 = this.normalizeWeiboAccount(apk119Value1300 || {}, friend_28, apk119Value1301 === "altAccount" ? "alt" : "main"),
-                  apk119Value1304 = apk119Value1302 ? apk119Value1247.secondary : apk119Value1247.primary,
-                  apk119Value1305 = apk119Value1302 ? apk119Value1248.secondary : apk119Value1248.primary;
-                return apk119Value1303.posts = apk119Value1303.posts.slice(0, apk119Value1304), apk119Value1303.album = apk119Value1303.album.slice(0, apk119Value1305), apk119Value1303.liked = apk119Value1303.liked.slice(0, 3), apk119Value1303;
+          if (phoneValue102.weibo) {
+            const phoneValue120 = phoneValue102.weibo || {},
+              phoneValue121 = (phoneValue122, phoneValue123) => {
+                const phoneValue124 = phoneValue123 === "altAccount",
+                  phoneValue125 = this.normalizeWeiboAccount(phoneValue122 || {}, phoneValue1, phoneValue123 === "altAccount" ? "alt" : "main"),
+                  phoneValue126 = phoneValue124 ? phoneValue69.secondary : phoneValue69.primary,
+                  phoneValue127 = phoneValue124 ? phoneValue70.secondary : phoneValue70.primary;
+                return phoneValue125.posts = phoneValue125.posts.slice(0, phoneValue126), phoneValue125.album = phoneValue125.album.slice(0, phoneValue127), phoneValue125.liked = phoneValue125.liked.slice(0, 3), phoneValue125;
               };
-            apk119Value1284.weiboData = {
-              mainAccount: apk119Value1299(apk119Value1298.mainAccount || apk119Value1298.main || apk119Value1298, "mainAccount"),
-              altAccount: apk119Value1299(apk119Value1298.altAccount || apk119Value1298.alt || {}, "altAccount")
+            phoneValue106.weiboData = {
+              "mainAccount": phoneValue121(phoneValue120.mainAccount || phoneValue120.main || phoneValue120, "mainAccount"),
+              "altAccount": phoneValue121(phoneValue120.altAccount || phoneValue120.alt || {}, "altAccount")
             };
           }
-          const apk119Value1285 = {};
-          if (apk119Value1284.musicData) apk119Value1285.music = apk119Value1284.musicData;
-          if (apk119Value1284.healthData) apk119Value1285.health = apk119Value1284.healthData;
-          if (apk119Value1284.payData) apk119Value1285.pay = apk119Value1284.payData;
-          if (apk119Value1284.gameData) apk119Value1285.game = apk119Value1284.gameData;
-          if (apk119Value1284.callData) apk119Value1285.call = apk119Value1284.callData;
-          if (apk119Value1284.safariData) apk119Value1285.safari = apk119Value1284.safariData;
-          if (apk119Value1284.filesData) apk119Value1285.files = apk119Value1284.filesData;
-          if (apk119Value1284.weiboData) apk119Value1285.weibo = apk119Value1284.weiboData;
-          const apk119Value1286 = (window.imData?.["friends"] || []).find(apk119Value1306 => String(apk119Value1306.id) === String(friend_28.id));
-          if (!apk119Value1286) throw new Error("发起生成的角色已被删除，结果未保存");
-          if (apk119Value1285.call) window.cphoneCallApp.normalizeGeneratedData(apk119Value1286, apk119Value1285.call, apk119Value1242.callTotal);
-          const apk119Value1287 = await this.persistFriendState(apk119Value1286, {
-            metaOnly: true,
-            mutate: apk119Value1307 => {
-              const apk119Value1308 = this.mergeFriendPhoneGeneratedData(apk119Value1307, apk119Value1285, {
-                generatedAt: Date.now(),
-                skipValidation: true,
-                callCount: apk119Value1242.callTotal
+          const phoneValue107 = {};
+          if (phoneValue106.musicData) phoneValue107.music = phoneValue106.musicData;
+          if (phoneValue106.healthData) phoneValue107.health = phoneValue106.healthData;
+          if (phoneValue106.payData) phoneValue107.pay = phoneValue106.payData;
+          if (phoneValue106.gameData) phoneValue107.game = phoneValue106.gameData;
+          if (phoneValue106.callData) phoneValue107.call = phoneValue106.callData;
+          if (phoneValue106.safariData) phoneValue107.safari = phoneValue106.safariData;
+          if (phoneValue106.filesData) phoneValue107.files = phoneValue106.filesData;
+          if (phoneValue106.weiboData) phoneValue107.weibo = phoneValue106.weiboData;
+          const phoneValue108 = (window.imData?.["friends"] || []).find(phoneValue128 => String(phoneValue128.id) === String(phoneValue1.id));
+          if (!phoneValue108) throw new Error("发起生成的角色已被删除，结果未保存");
+          if (phoneValue107.call) window.cphoneCallApp.normalizeGeneratedData(phoneValue108, phoneValue107.call, phoneValue64.callTotal);
+          const phoneValue109 = await this.persistFriendState(phoneValue108, {
+            "metaOnly": !![],
+            "mutate": phoneValue129 => {
+              const phoneValue130 = this.mergeFriendPhoneGeneratedData(phoneValue129, phoneValue107, {
+                "generatedAt": Date.now(),
+                "skipValidation": !![],
+                "callCount": phoneValue64.callTotal
               });
-              Object.assign(apk119Value1307, apk119Value1308.next);
+              Object.assign(phoneValue129, phoneValue130.next);
             }
           });
-          if (!apk119Value1287) throw new Error("应用数据保存失败，已撤销本次生成");
-          if (apk119Value1249) {
-            window.cphoneCallApp.setNotice(apk119Value1249.ownerId, "已新增 " + apk119Value1242.callTotal + " 条通话记录");
-            if (window.cphoneCallApp.ownerId === apk119Value1249.ownerId) window.cphoneCallApp.render();
+          if (!phoneValue109) throw new Error("应用数据保存失败，已撤销本次生成");
+          if (phoneValue71) {
+            window.cphoneCallApp.setNotice(phoneValue71.ownerId, "已新增 " + phoneValue64.callTotal + " 条通话记录");
+            if (window.cphoneCallApp.ownerId === phoneValue71.ownerId) window.cphoneCallApp.render();
           }
-          if (window.showToast) window.showToast("生成成功");
-          window.closeView && String(this.currentFriend?.["id"] || "") === String(friend_28.id) && window.closeView(settingsSheet);
-        } catch (apk119Value1309) {
-          console.error("JSON Parse error", apk119Value1309, "\nOriginal Text:", apk119Value1277, "\nExtracted:", apk119Value1278);
-          if (apk119Value1249) window.cphoneCallApp.setNotice(apk119Value1249.ownerId, apk119Value1309.message || "通话生成失败", true);
-          if (window.showToast) window.showToast("生成失败：" + (apk119Value1309.message || "数据格式无效，请重试"));
-        }
-      })["catch"](apk119Value1310 => {
-        console.error("API Error:", apk119Value1310);
-        if (apk119Value1249) window.cphoneCallApp.setNotice(apk119Value1249.ownerId, apk119Value1310.message || "通话生成失败", true);
-        let apk119Value1311 = apk119Value1310.message || "未知网络错误";
-        apk119Value1311.length > 50 && (apk119Value1311 = apk119Value1311.substring(0, 50) + "...");
-        if (!window.u2Api?.["isRequestError"]?.(apk119Value1310) || !window.u2Api.reportError(apk119Value1310, {
-          operation: "手机数据生成"
-        })) {
-          if (window.showToast) window.showToast("API 请求失败: " + apk119Value1311);else alert("API 请求失败: " + apk119Value1311);
-        }
+          this.setFriendPhoneGenerationStatus(phoneValue1.id, "ready", "生成完成，已保存 " + phoneValue65.length + " 个应用的数据。"), window.showToast?.((phoneValue1.nickname || phoneValue1.name || "Char") + " 的应用数据生成完成");
+        });
+      await phoneValue85;
+    } catch (phoneValue131) {
+      console.error("[Cphone] App data generation failed:", phoneValue131);
+      const phoneValue132 = phoneValue131.message || "生成失败，请重试";
+      this.setFriendPhoneGenerationStatus(phoneValue1.id, "failed", "生成失败：" + phoneValue132);
+      if (phoneValue71) window.cphoneCallApp.setNotice(phoneValue71.ownerId, phoneValue131.message || "生成失败", !![]);
+      (!window.u2Api?.["isRequestError"]?.(phoneValue131) || !window.u2Api.reportError(phoneValue131, {
+        "operation": "手机数据生成"
+      })) && window.showToast?.("生成失败：" + phoneValue132);
+    } finally {
+      window.cphoneCallApp?.["endJob"](phoneValue71), this.syncFriendPhoneGenerationStatus();
+    }
+  });
+  const phoneValue19 = document.getElementById("friend-phone-app-imessage");
+  if (phoneValue19) phoneValue19.onclick = () => {
+    try {
+      window.cphoneApp?.["openMessages"]();
+    } catch (phoneValue133) {
+      console.error("[Loves] Cphone messages failed to open", phoneValue133), window.showToast?.("短信页面打开失败，请重试");
+    }
+  };
+  const phoneValue20 = document.getElementById("friend-phone-app-files"),
+    phoneValue21 = document.getElementById("friend-files-view"),
+    phoneValue22 = document.getElementById("friend-files-recently-deleted-view"),
+    phoneValue23 = document.getElementById("friend-files-recently-deleted-back-btn"),
+    phoneValue24 = document.getElementById("friend-files-recently-deleted-list");
+  !window.lovesApp._filesRecentlyDeletedBound && (document.addEventListener("click", phoneValue134 => {
+    const phoneValue135 = phoneValue134.target.closest("#filesRecentlyDeletedBtn");
+    if (phoneValue135 && phoneValue22) {
+      if (window.openView) window.openView(phoneValue22);
+      const phoneValue136 = window.lovesApp.currentFriend;
+      phoneValue24 && (phoneValue136 && phoneValue136.filesData && phoneValue136.filesData.recentlyDeleted && phoneValue136.filesData.recentlyDeleted.length > 0 ? phoneValue24.innerHTML = phoneValue136.filesData.recentlyDeleted.map(phoneValue137 => "\n                                <div style=\"background: #fff; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; align-items: center;  position: relative; cursor: pointer;\">\n                                    <div style=\"width: 100%; aspect-ratio: 1; background: #f2f2f7; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; color: #8e8e93; font-size: 30px;\">\n                                        " + (phoneValue137.type === "image" ? "<i class=\"fas fa-image\"></i>" : "<i class=\"far fa-file-alt\"></i>") + "\n                                    </div>\n                                    <div style=\"font-size: 13px; font-weight: 500; color: #111; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;\">" + phoneValue137.name + "</div>\n                                    <div style=\"font-size: 11px; color: #8e8e93; margin-top: 4px;\">" + (phoneValue137.size || "未知大小") + "</div>\n                                    <div style=\"position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.5); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 6px;\">" + (phoneValue137.daysLeft || "30") + "天</div>\n                                </div>\n                            ").join("") : phoneValue24.innerHTML = "<div style=\"grid-column: span 3; text-align: center; color: #8e8e93; padding: 40px 0;\">最近删除为空</div>");
+    }
+  }), phoneValue23 && phoneValue22 && phoneValue23.addEventListener("click", () => {
+    if (window.closeView) window.closeView(phoneValue22);
+  }), window.lovesApp._filesRecentlyDeletedBound = !![]);
+  phoneValue20 && phoneValue21 && (phoneValue20.onclick = () => {
+    if (window.openView) window.openView(phoneValue21);
+    const phoneValue138 = document.getElementById("friend-files-tags-list");
+    phoneValue138 && (phoneValue1.filesData && phoneValue1.filesData.tags ? (phoneValue138.innerHTML = phoneValue1.filesData.tags.map((phoneValue139, phoneValue140) => {
+      const phoneValue141 = phoneValue139.items ? phoneValue139.items.map((phoneValue142, phoneValue143) => {
+        const phoneValue144 = encodeURIComponent(JSON.stringify(phoneValue142));
+        return "\n                                    <div class=\"file-item-clickable\" data-item=\"" + phoneValue144 + "\" style=\"display: flex; align-items: center; padding: 12px 15px; border-top: 1px solid #f0f0f0; cursor: pointer; background: #fff;\">\n                                        <i class=\"far fa-file-alt\" style=\"color: #8e8e93; font-size: 18px; margin-right: 12px;\"></i>\n                                        <span style=\"font-size: 16px; color: #111; flex: 1;\">" + this.escapeHTML(phoneValue142.title || "未命名文件") + this.renderFriendPhoneGeneratedTime(phoneValue142) + "</span>\n                                        <i class=\"fas fa-chevron-right\" style=\"color: #c7c7cc; font-size: 14px;\"></i>\n                                    </div>\n                                ";
+      }).join("") : "";
+      return "\n                                <div style=\"border-radius: 12px; overflow: hidden;  margin-bottom: 10px;\">\n                                    <div style=\"display: flex; align-items: center; padding: 12px 15px; background: #fff;\">\n                                        <div style=\"width: 12px; height: 12px; border-radius: 50%; background: " + (phoneValue139.color || "#ff9500") + "; margin-right: 12px;\"></div>\n                                        <span style=\"font-size: 17px; font-weight: 600; color: #111; flex: 1;\">" + this.escapeHTML(phoneValue139.name || "未命名标签") + "</span>\n                                    </div>\n                                    " + phoneValue141 + "\n                                </div>\n                            ";
+    }).join(""), setTimeout(() => {
+      const phoneValue145 = phoneValue138.querySelectorAll(".file-item-clickable");
+      phoneValue145.forEach(phoneValue146 => {
+        phoneValue146.addEventListener("click", function (phoneValue147) {
+          phoneValue147.preventDefault(), phoneValue147.stopPropagation();
+          try {
+            const phoneValue148 = JSON.parse(decodeURIComponent(this.getAttribute("data-item")));
+            window.lovesApp.showDetailModal(phoneValue148.title, "<div style=\"white-space: pre-wrap; font-size: 15px; line-height: 1.6; color: #333;\">" + window.lovesApp.renderFriendPhoneLocalized(phoneValue148, "content", {
+              "id": "file-content"
+            }) + "</div>" + window.lovesApp.renderFriendPhoneGeneratedTime(phoneValue148));
+          } catch (phoneValue149) {
+            console.error("File item parse error", phoneValue149);
+          }
+        }), window.lovesApp.bindLongPress(phoneValue146, function () {
+          try {
+            const phoneValue150 = JSON.parse(decodeURIComponent(phoneValue146.getAttribute("data-item")));
+            window.lovesApp.showDeleteConfirm(phoneValue150.title, () => {
+              phoneValue1.filesData && phoneValue1.filesData.tags && (phoneValue1.filesData.tags.forEach(phoneValue151 => {
+                if (phoneValue151.items) {
+                  const phoneValue152 = phoneValue151.items.findIndex(phoneValue153 => phoneValue153.title === phoneValue150.title && phoneValue153.content === phoneValue150.content);
+                  if (phoneValue152 !== -1) phoneValue151.items.splice(phoneValue152, 1);
+                }
+              }), phoneValue20.onclick());
+            });
+          } catch (phoneValue154) {}
+        });
       });
-    if (apk119Value1249) await apk119Value1263;
-  } catch (apk119Value1312) {
-    if (apk119Value1249) window.cphoneCallApp.setNotice(apk119Value1249.ownerId, apk119Value1312.message || "生成失败", true);
-    window.showToast?.(apk119Value1312.message || "生成失败，请重试");
-  } finally {
-    window.cphoneCallApp?.["endJob"](apk119Value1249), genConfirmBtn.disabled = false;
-  }
-});
-        const imsgBtn = document.getElementById('friend-phone-app-imessage');
-        if (imsgBtn)
-            imsgBtn.onclick = () => {
-                try {
-                    window.cphoneApp?.openMessages();
-                } catch (value_426) {
-                    console.error('[Loves] Cphone messages failed to open', value_426);
-                    window.showToast?.('短信页面打开失败，请重试');
-                }
-            };
-        const filesBtn = document.getElementById('friend-phone-app-files'),
-            filesView = document.getElementById('friend-files-view'),
-            filesRecentlyDeletedView = document.getElementById(
-                'friend-files-recently-deleted-view',
-            ),
-            filesRecentlyDeletedBackBtn = document.getElementById(
-                'friend-files-recently-deleted-back-btn',
-            ),
-            filesRecentlyDeletedList = document.getElementById(
-                'friend-files-recently-deleted-list',
-            );
-        !window.lovesApp._filesRecentlyDeletedBound &&
-            (document.addEventListener('click', (e_10) => {
-                const targetBtn = e_10.target.closest('#filesRecentlyDeletedBtn');
-                if (targetBtn && filesRecentlyDeletedView) {
-                    if (window.openView) window.openView(filesRecentlyDeletedView);
-                    const activeFriend_3 = window.lovesApp.currentFriend;
-                    filesRecentlyDeletedList &&
-                        (activeFriend_3 &&
-                        activeFriend_3.filesData &&
-                        activeFriend_3.filesData.recentlyDeleted &&
-                        activeFriend_3.filesData.recentlyDeleted.length > 0
-                            ? (filesRecentlyDeletedList.innerHTML =
-                                  activeFriend_3.filesData.recentlyDeleted
-                                      .map(
-                                          (value_430) =>
-                                              `
-                                <div style="background: #fff; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; align-items: center;  position: relative; cursor: pointer;">
-                                    <div style="width: 100%; aspect-ratio: 1; background: #f2f2f7; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; color: #8e8e93; font-size: 30px;">
-                                        ` +
-                                              (value_430.type === 'image'
-                                                  ? '<i class="fas fa-image"></i>'
-                                                  : '<i class="far fa-file-alt"></i>') +
-                                              `
-                                    </div>
-                                    <div style="font-size: 13px; font-weight: 500; color: #111; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">` +
-                                              value_430.name +
-                                              `</div>
-                                    <div style="font-size: 11px; color: #8e8e93; margin-top: 4px;">` +
-                                              (value_430.size || '未知大小') +
-                                              `</div>
-                                    <div style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.5); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 6px;">` +
-                                              (value_430.daysLeft || '30') +
-                                              `天</div>
-                                </div>
-                            `,
-                                      )
-                                      .join(''))
-                            : (filesRecentlyDeletedList.innerHTML =
-                                  '<div style="grid-column: span 3; text-align: center; color: #8e8e93; padding: 40px 0;">最近删除为空</div>'));
-                }
+    }, 50)) : phoneValue138.innerHTML = "<div style=\"padding: 30px; text-align: center; color: #8e8e93; font-size: 14px;\">暂无文件数据<br><span style=\"font-size: 12px; margin-top: 5px; display: inline-block;\">请在设置中生成</span></div>");
+  });
+  const phoneValue25 = document.getElementById("friend-files-back-btn");
+  if (phoneValue25) phoneValue25.onclick = () => {
+    if (window.closeView) window.closeView(phoneValue21);
+  };
+  const phoneValue26 = document.getElementById("friend-phone-app-safari"),
+    phoneValue27 = document.getElementById("friend-safari-view");
+  phoneValue26 && phoneValue27 && (phoneValue26.onclick = () => {
+    if (window.openView) window.openView(phoneValue27);
+    const phoneValue155 = document.getElementById("friend-safari-topbar"),
+      phoneValue156 = document.getElementById("friend-safari-search-bar"),
+      phoneValue157 = document.getElementById("friend-safari-back-btn"),
+      phoneValue158 = document.getElementById("friend-safari-normal-mode"),
+      phoneValue159 = document.getElementById("friend-safari-private-mode"),
+      phoneValue160 = document.getElementById("friend-safari-dock"),
+      phoneValue161 = document.getElementById("friend-safari-private-btn");
+    let phoneValue162 = ![];
+    phoneValue27.classList.remove("is-private"), phoneValue160.style.background = "rgba(255,255,255,0.95)", phoneValue160.style.color = "#111", phoneValue158.style.opacity = "1", phoneValue158.style.pointerEvents = "auto", phoneValue158.style.transform = "translateY(0)", phoneValue159.style.opacity = "0", phoneValue159.style.pointerEvents = "none", phoneValue159.style.transform = "translateY(20px)";
+    phoneValue161 && (phoneValue161.onclick = () => {
+      phoneValue162 = !phoneValue162, phoneValue27.classList.toggle("is-private", phoneValue162), phoneValue162 ? (phoneValue27.style.background = "#000", phoneValue155.style.background = "#000", phoneValue156.style.background = "#1c1c1e", phoneValue156.style.color = "#8e8e93", phoneValue157.style.color = "#fff", phoneValue160.style.background = "rgba(0,0,0,0.95)", phoneValue160.style.color = "#fff", phoneValue160.style.borderTop = "1px solid transparent", phoneValue158.style.opacity = "0", phoneValue158.style.pointerEvents = "none", phoneValue158.style.transform = "translateY(-20px)", phoneValue159.style.opacity = "1", phoneValue159.style.pointerEvents = "auto", phoneValue159.style.transform = "translateY(0)") : (phoneValue27.style.background = "#f4f4f5", phoneValue155.style.background = "#f4f4f5", phoneValue156.style.background = "#e5e5ea", phoneValue156.style.color = "#8e8e93", phoneValue157.style.color = "#111", phoneValue160.style.background = "rgba(255,255,255,0.95)", phoneValue160.style.color = "#111", phoneValue160.style.borderTop = "1px solid #f0f0f0", phoneValue159.style.opacity = "0", phoneValue159.style.pointerEvents = "none", phoneValue159.style.transform = "translateY(20px)", phoneValue158.style.opacity = "1", phoneValue158.style.pointerEvents = "auto", phoneValue158.style.transform = "translateY(0)");
+    });
+    const phoneValue163 = document.getElementById("friend-safari-history-list"),
+      phoneValue164 = document.getElementById("friend-safari-private-history-list");
+    phoneValue163 && (phoneValue1.safariData && phoneValue1.safariData.recentSearches ? (phoneValue163.innerHTML = phoneValue1.safariData.recentSearches.map((phoneValue165, phoneValue166) => {
+      let phoneValue167 = typeof phoneValue165 === "string" ? phoneValue165 : phoneValue165.keyword || "未知搜索";
+      return "\n                        <div class=\"safari-history-item-new\" data-idx=\"" + phoneValue166 + "\" style=\"display: flex; align-items: center; gap: 15px; padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,0.04); cursor: pointer;\">\n                            <i class=\"fas fa-search\" style=\"color: #c7c7cc; font-size: 14px; pointer-events: none;\"></i>\n                            <span style=\"font-size: 16px; color: #111; font-weight: 500; flex:1;\">" + this.escapeHTML(phoneValue167) + (typeof phoneValue165 === "object" ? this.renderFriendPhoneGeneratedTime(phoneValue165) : "") + "</span>\n                        </div>\n                        ";
+    }).join(""), setTimeout(() => {
+      try {
+        const phoneValue168 = phoneValue163.querySelectorAll(".safari-history-item-new");
+        phoneValue168.forEach(phoneValue169 => {
+          phoneValue169.addEventListener("click", function (phoneValue170) {
+            phoneValue170.preventDefault(), phoneValue170.stopPropagation();
+            const phoneValue171 = this.getAttribute("data-idx"),
+              phoneValue172 = phoneValue1.safariData.recentSearches[phoneValue171];
+            typeof phoneValue172 === "object" && phoneValue172.title && phoneValue172.content ? window.lovesApp.showBrowserDetailModal(phoneValue172.title, phoneValue172.content, ![], phoneValue172) : window.lovesApp.showBrowserDetailModal("搜索记录", "无更多详情", ![]);
+          }), window.lovesApp.bindLongPress(phoneValue169, function () {
+            const phoneValue173 = phoneValue169.getAttribute("data-idx"),
+              phoneValue174 = phoneValue1.safariData.recentSearches[phoneValue173],
+              phoneValue175 = typeof phoneValue174 === "string" ? phoneValue174 : phoneValue174.keyword || "未知搜索";
+            window.lovesApp.showDeleteConfirm(phoneValue175, () => {
+              phoneValue1.safariData.recentSearches.splice(phoneValue173, 1), phoneValue26.onclick();
+            });
+          });
+        });
+      } catch (phoneValue176) {
+        console.error("Safari normal bind error", phoneValue176);
+      }
+    }, 50)) : phoneValue163.innerHTML = "<div style=\"padding: 30px; text-align: center; color: #8e8e93; font-size: 14px;\">暂无搜索数据<br><span style=\"font-size: 12px; margin-top: 5px; display: inline-block;\">请在设置中生成</span></div>"), phoneValue164 && (phoneValue1.safariData && phoneValue1.safariData.privateSearches ? (phoneValue164.innerHTML = phoneValue1.safariData.privateSearches.map((phoneValue177, phoneValue178) => {
+      let phoneValue179 = typeof phoneValue177 === "string" ? phoneValue177 : phoneValue177.keyword || "未知记录";
+      return "\n                        <div class=\"safari-private-item-new\" data-idx=\"" + phoneValue178 + "\" style=\"display: flex; align-items: center; gap: 15px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer;\">\n                            <i class=\"fas fa-search\" style=\"color: #666; font-size: 14px; pointer-events: none;\"></i>\n                            <span style=\"font-size: 16px; color: #fff; font-weight: 500; flex:1;\">" + this.escapeHTML(phoneValue179) + (typeof phoneValue177 === "object" ? this.renderFriendPhoneGeneratedTime(phoneValue177, "is-dark") : "") + "</span>\n                        </div>\n                        ";
+    }).join(""), setTimeout(() => {
+      try {
+        const phoneValue180 = phoneValue164.querySelectorAll(".safari-private-item-new");
+        phoneValue180.forEach(phoneValue181 => {
+          phoneValue181.addEventListener("click", function (phoneValue182) {
+            phoneValue182.preventDefault(), phoneValue182.stopPropagation();
+            const phoneValue183 = this.getAttribute("data-idx"),
+              phoneValue184 = phoneValue1.safariData.privateSearches[phoneValue183];
+            typeof phoneValue184 === "object" && phoneValue184.title && phoneValue184.content ? window.lovesApp.showBrowserDetailModal(phoneValue184.title, phoneValue184.content, !![], phoneValue184) : window.lovesApp.showBrowserDetailModal("隐私记录", "无更多详情", !![]);
+          }), window.lovesApp.bindLongPress(phoneValue181, function () {
+            const phoneValue185 = phoneValue181.getAttribute("data-idx"),
+              phoneValue186 = phoneValue1.safariData.privateSearches[phoneValue185],
+              phoneValue187 = typeof phoneValue186 === "string" ? phoneValue186 : phoneValue186.keyword || "未知记录";
+            window.lovesApp.showDeleteConfirm(phoneValue187, () => {
+              phoneValue1.safariData.privateSearches.splice(phoneValue185, 1), phoneValue26.onclick();
+            });
+          });
+        });
+      } catch (phoneValue188) {
+        console.error("Safari private bind error", phoneValue188);
+      }
+    }, 50)) : phoneValue164.innerHTML = "<div style=\"padding: 30px; text-align: center; color: #666; font-size: 14px;\">暂无无痕搜索数据<br><span style=\"font-size: 12px; margin-top: 5px; display: inline-block;\">请在设置中生成</span></div>");
+  });
+  const phoneValue28 = document.getElementById("friend-safari-back-btn");
+  if (phoneValue28) phoneValue28.onclick = () => {
+    if (window.closeView) window.closeView(phoneValue27);
+  };
+  const phoneValue29 = document.getElementById("friend-phone-app-weibo"),
+    phoneValue30 = document.getElementById("friend-weibo-view");
+  phoneValue29 && phoneValue30 && (phoneValue29.onclick = () => {
+    this.currentWeiboAccount = "main", this.renderFriendWeibo(phoneValue1);
+    const phoneValue189 = Array.from(phoneValue30.querySelectorAll(".friend-weibo-tab")),
+      phoneValue190 = document.getElementById("friend-weibo-pages");
+    let phoneValue191 = -1;
+    const phoneValue192 = phoneValue193 => {
+      if (phoneValue191 === phoneValue193) return;
+      phoneValue191 = phoneValue193, phoneValue189.forEach((phoneValue194, phoneValue195) => {
+        const phoneValue196 = phoneValue195 === phoneValue193;
+        phoneValue194.style.color = phoneValue196 ? "#111" : "#777", phoneValue194.style.fontWeight = phoneValue196 ? "700" : "600";
+        const phoneValue197 = phoneValue194.querySelector(".friend-weibo-tab-line");
+        if (phoneValue197) phoneValue197.style.display = phoneValue196 ? "block" : "none";
+      });
+    };
+    if (phoneValue190 && phoneValue189.length) {
+      let phoneValue198 = ![];
+      phoneValue189.forEach((phoneValue199, phoneValue200) => {
+        phoneValue199.onclick = () => {
+          phoneValue190.scrollTo({
+            "left": phoneValue200 * phoneValue190.clientWidth,
+            "behavior": "smooth"
+          }), phoneValue192(phoneValue200);
+        };
+      }), phoneValue190.onscroll = () => {
+        if (phoneValue198) return;
+        phoneValue198 = !![], (window.requestAnimationFrame || (phoneValue201 => setTimeout(phoneValue201, 16)))(() => {
+          phoneValue198 = ![];
+          const phoneValue202 = phoneValue190.clientWidth || 1,
+            phoneValue203 = Math.max(0, Math.min(phoneValue189.length - 1, Math.round(phoneValue190.scrollLeft / phoneValue202)));
+          phoneValue192(phoneValue203);
+        });
+      }, phoneValue190.scrollTo({
+        "left": 0,
+        "behavior": "auto"
+      }), phoneValue192(0);
+    }
+    if (window.openView) window.openView(phoneValue30);
+  });
+  const phoneValue31 = document.getElementById("friend-weibo-switch-account-btn");
+  phoneValue31 && (phoneValue31.onclick = phoneValue204 => {
+    phoneValue204.preventDefault(), phoneValue204.stopPropagation();
+    const phoneValue205 = this.getFriendWeiboData(phoneValue1);
+    if (this.currentWeiboAccount === "main") {
+      if (!phoneValue205.altAccount) {
+        if (window.showToast) window.showToast("暂无微博小号数据，请在生成设置中生成微博");
+        return;
+      }
+      this.currentWeiboAccount = "alt";
+    } else this.currentWeiboAccount = "main";
+    this.renderFriendWeibo(phoneValue1);
+    if (window.showToast) window.showToast(this.currentWeiboAccount === "alt" ? "已切换到微博小号" : "已切换到微博大号");
+  });
+  const phoneValue32 = document.getElementById("friend-weibo-back-btn");
+  if (phoneValue32) phoneValue32.onclick = () => {
+    if (window.closeView) window.closeView(phoneValue30);
+  };
+  const phoneValue33 = document.getElementById("friend-phone-app-music"),
+    phoneValue34 = document.getElementById("friend-music-view");
+  phoneValue33 && phoneValue34 && (phoneValue33.onclick = () => {
+    if (window.openView) window.openView(phoneValue34);
+    const phoneValue206 = document.getElementById("friend-music-content");
+    if (phoneValue206) {
+      let phoneValue207 = phoneValue1.musicData;
+      if (!phoneValue207 || !phoneValue207.top || phoneValue207.top.length === 0) phoneValue206.innerHTML = "<div style=\"padding: 50px 20px; text-align: center; color: #8e8e93; font-size: 15px;\">暂无音乐数据<br><span style=\"font-size: 13px; margin-top: 8px; display: inline-block;\">请在设置中生成</span></div>";else {
+        const phoneValue208 = (phoneValue207.top || []).map((phoneValue209, phoneValue210) => "\n                            <div class=\"music-history-item\" data-idx=\"" + phoneValue210 + "\" style=\"display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; cursor: pointer;\">\n                                <div style=\"font-size: 16px; font-weight: 700; color: #111; width: 20px; text-align: center;\">" + (phoneValue210 + 1) + "</div>\n                                <div style=\"width: 50px; height: 50px; border-radius: 6px; background: #111; flex-shrink: 0; display: flex; justify-content: center; align-items: center; color: #fff;\">\n                                    <i class=\"fas fa-music\"></i>\n                                </div>\n                                <div style=\"flex: 1; display: flex; flex-direction: column; pointer-events: none;\">\n                                    <div style=\"font-size: 16px; font-weight: 600; color: #111;\">" + this.escapeHTML(phoneValue209.name || "未知歌曲") + "</div>\n                                    <div style=\"font-size: 13px; color: #8e8e93;\">" + this.renderFriendPhoneLocalized(phoneValue209, "artist", {
+          "id": "song-artist-" + phoneValue210
+        }) + this.renderFriendPhoneGeneratedTime(phoneValue209) + "</div>\n                                </div>\n                                <i class=\"fas fa-ellipsis-v\" style=\"color: #c7c7cc; pointer-events: none;\"></i>\n                            </div>\n                        ").join("");
+        phoneValue206.innerHTML = "\n                        <div style=\"padding: 20px 16px; background: #fff;\">\n                            <div style=\"font-size: 28px; font-weight: 800; color: #111; margin-bottom: 20px; letter-spacing: -0.5px;\">音乐库</div>\n                            <div style=\"display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px;\">\n                                <div style=\"min-width: 140px; display: flex; flex-direction: column; gap: 10px;\">\n                                    <div style=\"width: 140px; height: 140px; border-radius: 12px; background: #f4f4f5; display: flex; justify-content: center; align-items: center; color: #111; font-size: 30px; \">\n                                        <i class=\"fas fa-history\"></i>\n                                    </div>\n                                    <div style=\"font-size: 15px; font-weight: 700; color: #111;\">最近播放</div>\n                                    <div style=\"font-size: 13px; color: #8e8e93;\">" + (phoneValue207.recent ? phoneValue207.recent.length : 0) + " 首歌曲</div>\n                                </div>\n                                <div style=\"min-width: 140px; display: flex; flex-direction: column; gap: 10px;\">\n                                    <div style=\"width: 140px; height: 140px; border-radius: 12px; background: #111; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 30px; \">\n                                        <i class=\"fas fa-heart\"></i>\n                                    </div>\n                                    <div style=\"font-size: 15px; font-weight: 700; color: #111;\">最爱</div>\n                                    <div style=\"font-size: 13px; color: #8e8e93;\">" + (phoneValue207.favorites ? phoneValue207.favorites.length : 0) + " 首歌曲</div>\n                                </div>\n                            </div>\n                        </div>\n                        <div style=\"padding: 10px 16px 30px; background: #fff; border-top: 1px solid #f0f0f0;\">\n                            <div style=\"font-size: 22px; font-weight: 700; color: #111; margin-bottom: 15px; margin-top: 10px;\">听歌排行</div>\n                            <div style=\"display: flex; flex-direction: column; gap: 5px;\">\n                                " + phoneValue208 + "\n                            </div>\n                        </div>\n                        ";
+      }
+      setTimeout(() => {
+        try {
+          const phoneValue211 = phoneValue206.querySelectorAll(".music-history-item");
+          phoneValue211.forEach(phoneValue212 => {
+            phoneValue212.addEventListener("click", function (phoneValue213) {
+              phoneValue213.preventDefault(), phoneValue213.stopPropagation();
+              const phoneValue214 = this.getAttribute("data-idx"),
+                phoneValue215 = phoneValue207.top[phoneValue214],
+                phoneValue216 = parseInt(phoneValue215.loops) || Math.floor(Math.random() * 100) + 10,
+                phoneValue217 = phoneValue215.thoughts || "这首歌旋律很好听，每次听都能让我安静下来。",
+                phoneValue218 = "\n                                        <div style=\"display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px;\">\n                                            <div style=\"width: 80px; height: 80px; border-radius: 50%; background: #111; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 30px; margin-bottom: 15px; \">\n                                                <i class=\"fas fa-compact-disc\"></i>\n                                            </div>\n                                            <div style=\"font-size: 22px; font-weight: 800; color: #111; margin-bottom: 4px;\">" + window.lovesApp.escapeHTML(phoneValue215.name || "未知歌曲") + "</div>\n                                            <div style=\"font-size: 15px; color: #8e8e93;\">" + window.lovesApp.renderFriendPhoneLocalized(phoneValue215, "artist", {
+                  "id": "song-detail-artist"
+                }) + window.lovesApp.renderFriendPhoneGeneratedTime(phoneValue215) + "</div>\n                                        </div>\n                                        \n                                        <div style=\"background: #f4f4f5; border-radius: 16px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;\">\n                                            <div style=\"display: flex; align-items: center; gap: 8px;\">\n                                                <div style=\"width: 32px; height: 32px; border-radius: 8px; background: #fff; display: flex; justify-content: center; align-items: center; color: #111;\">\n                                                    <i class=\"fas fa-redo-alt\" style=\"font-size: 14px;\"></i>\n                                                </div>\n                                                <span style=\"font-size: 15px; font-weight: 600; color: #111;\">循环次数</span>\n                                            </div>\n                                            <div style=\"font-size: 20px; font-weight: 800; color: #111;\">" + phoneValue216 + " <span style=\"font-size: 13px; font-weight: 500; color: #8e8e93;\">次</span></div>\n                                        </div>\n\n                                        <div style=\"background: #111; border-radius: 16px; padding: 20px; border-left: 4px solid #fff;\">\n                                            <div style=\"font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;\">\n                                                <i class=\"fas fa-headphones-alt\" style=\"color: #fff;\"></i> 听歌心声\n                                            </div>\n                                            <div style=\"color: #ccc; line-height: 1.6; font-size: 14px; font-style: italic;\">\n                                                “" + window.lovesApp.renderFriendPhoneLocalized(phoneValue215, "thoughts", {
+                  "fallback": phoneValue217,
+                  "id": "song-thoughts"
+                }) + "”\n                                            </div>\n                                        </div>\n                                    ";
+              window.lovesApp.showDetailModal("单曲详情", phoneValue218);
+            }), window.lovesApp.bindLongPress(phoneValue212, function () {
+              const phoneValue219 = phoneValue212.getAttribute("data-idx"),
+                phoneValue220 = phoneValue207.top[phoneValue219];
+              window.lovesApp.showDeleteConfirm(phoneValue220.name, () => {
+                phoneValue207.top.splice(phoneValue219, 1), phoneValue33.onclick();
+              });
+            });
+          });
+        } catch (phoneValue221) {
+          console.error("Music bind error", phoneValue221);
+        }
+      }, 50);
+    }
+  });
+  const phoneValue35 = document.getElementById("friend-music-back-btn");
+  if (phoneValue35) phoneValue35.onclick = () => {
+    if (window.closeView) window.closeView(phoneValue34);
+  };
+  const phoneValue36 = document.getElementById("friend-phone-app-call");
+  if (phoneValue36) phoneValue36.onclick = () => window.cphoneCallApp?.["open"](phoneValue1);
+  const phoneValue37 = document.getElementById("friend-phone-app-health"),
+    phoneValue38 = document.getElementById("friend-health-view");
+  phoneValue37 && phoneValue38 && (phoneValue37.onclick = () => {
+    if (window.openView) window.openView(phoneValue38);
+    const phoneValue222 = document.getElementById("friend-health-content");
+    if (phoneValue222) {
+      if (!phoneValue1.healthData) phoneValue222.innerHTML = "<div style=\"padding: 50px 20px; text-align: center; color: #8e8e93; font-size: 15px;\">暂无健康数据<br><span style=\"font-size: 13px; margin-top: 8px; display: inline-block;\">请在设置中生成</span></div>";else {
+        const phoneValue223 = Array.isArray(phoneValue1.healthData.history) && phoneValue1.healthData.history.length ? phoneValue1.healthData.history : [phoneValue1.healthData],
+          phoneValue224 = Math.min(Number(this._healthHistoryIndex) || 0, phoneValue223.length - 1),
+          phoneValue225 = phoneValue223[phoneValue224] || phoneValue1.healthData,
+          phoneValue226 = new Date(),
+          phoneValue227 = this.renderFriendPhoneLocalized(phoneValue225, "stepsThoughts", {
+            "fallback": "暂无运动心声",
+            "id": "health-steps-thoughts"
+          }),
+          phoneValue228 = this.renderFriendPhoneLocalized(phoneValue225, "dream", {
+            "fallback": "暂无梦境记录",
+            "id": "health-dream"
+          }),
+          phoneValue229 = this.escapeHTML(phoneValue225.heartRate || "--"),
+          phoneValue230 = this.renderFriendPhoneLocalized(phoneValue225, "heartRateStatus", {
+            "fallback": "暂无状态",
+            "id": "health-heart-status"
+          }),
+          phoneValue231 = phoneValue223.map((phoneValue234, phoneValue235) => "<option value=\"" + phoneValue235 + "\" " + (phoneValue235 === phoneValue224 ? "selected" : "") + ">" + this.escapeHTML(this.formatFriendPhoneGeneratedAt(phoneValue234.generatedAt) || "旧记录 " + (phoneValue235 + 1)) + "</option>").join(""),
+          phoneValue232 = [-2, -1, 0, 1, 2].map(phoneValue236 => {
+            const phoneValue237 = new Date(phoneValue226);
+            phoneValue237.setDate(phoneValue226.getDate() + phoneValue236);
+            const phoneValue238 = phoneValue237.getDate(),
+              phoneValue239 = ["日", "一", "二", "三", "四", "五", "六"][phoneValue237.getDay()],
+              phoneValue240 = phoneValue236 === 0;
+            return "\n                            <div style=\"display: flex; flex-direction: column; align-items: center; justify-content: center; width: 44px; height: 56px; border-radius: 14px; background: " + (phoneValue240 ? "#111" : "transparent") + "; color: " + (phoneValue240 ? "#fff" : "#8e8e93") + "; flex-shrink: 0; cursor: pointer; \">\n                                <div style=\"font-size: 11px; font-weight: 600; margin-bottom: 2px;\">" + phoneValue239 + "</div>\n                                <div style=\"font-size: 16px; font-weight: 800;\">" + phoneValue238 + "</div>\n                            </div>\n                        ";
+          }).join("");
+        phoneValue222.innerHTML = "\n                        <!-- 顶部日期选择 -->\n                        <label class=\"friend-phone-history-picker\"><span>生成记录</span><select id=\"friend-health-history-select\">" + phoneValue231 + "</select></label>\n                        <div style=\"display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;\">\n                            <div style=\"font-size: 28px; font-weight: 800; color: #111; letter-spacing: -0.5px;\">摘要</div>\n                            <div style=\"width: 32px; height: 32px; border-radius: 50%; background: #f2f2f7; display: flex; justify-content: center; align-items: center; color: #111; font-size: 14px; cursor: pointer;\">\n                                <i class=\"fas fa-calendar-day\"></i>\n                            </div>\n                        </div>\n                        \n                        <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: #fff; border-radius: 20px; padding: 8px; \">\n                            " + phoneValue232 + "\n                        </div>\n\n                        <!-- 步数卡片 -->\n                        <div style=\"background: #fff; border-radius: 24px; padding: 22px; margin-bottom: 15px; border: 1px solid #f0f0f0; \">\n                            <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;\">\n                                <div style=\"display: flex; align-items: center; gap: 8px; color: #111; font-weight: 600;\">\n                                    <div style=\"width: 28px; height: 28px; border-radius: 8px; background: #f2f2f7; display: flex; justify-content: center; align-items: center;\"><i class=\"fas fa-shoe-prints\" style=\"font-size: 12px; color: #ff3b30;\"></i></div>\n                                    <span>步数</span>\n                                </div>\n                                <div style=\"font-size: 12px; color: #8e8e93; font-weight: 600;\">14:20 更新</div>\n                            </div>\n                            <div style=\"font-size: 42px; font-weight: 800; color: #111; display: flex; align-items: baseline; gap: 6px; letter-spacing: -1px;\">\n                                " + (phoneValue225.steps || "0") + " <span style=\"font-size: 15px; color: #8e8e93; font-weight: 600; letter-spacing: 0;\">步</span>\n                            </div>\n                            <div style=\"margin-top: 14px; padding-top: 13px; border-top: 1px solid #f0f0f0; color: #666; font-size: 13px; line-height: 1.65;\">" + phoneValue227 + "</div>\n                        </div>\n\n                        <!-- 睡眠卡片 -->\n                        <div style=\"background: #fff; border-radius: 24px; padding: 22px; margin-bottom: 15px; border: 1px solid #f0f0f0; \">\n                            <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;\">\n                                <div style=\"display: flex; align-items: center; gap: 8px; color: #111; font-weight: 600;\">\n                                    <div style=\"width: 28px; height: 28px; border-radius: 8px; background: #f2f2f7; display: flex; justify-content: center; align-items: center;\"><i class=\"fas fa-bed\" style=\"font-size: 12px; color: #5856d6;\"></i></div>\n                                    <span>睡眠</span>\n                                </div>\n                                <div style=\"font-size: 12px; color: #8e8e93; font-weight: 600;\">昨晚记录</div>\n                            </div>\n                            <div style=\"font-size: 36px; font-weight: 800; color: #111; display: flex; align-items: baseline; gap: 6px; letter-spacing: -0.5px;\">\n                                " + (phoneValue225.sleepHours || "0") + " <span style=\"font-size: 15px; color: #8e8e93; font-weight: 600; letter-spacing: 0;\">小时</span> \n                                " + (phoneValue225.sleepMinutes || "0") + " <span style=\"font-size: 15px; color: #8e8e93; font-weight: 600; letter-spacing: 0;\">分钟</span>\n                            </div>\n                            <div style=\"margin-top: 14px; padding-top: 13px; border-top: 1px solid #f0f0f0; color: #666; font-size: 13px; line-height: 1.65;\">" + phoneValue228 + "</div>\n                        </div>\n\n                        <!-- 当前心率 -->\n                        <div style=\"background: #fff; border-radius: 24px; padding: 22px; margin-bottom: 15px; border: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; gap: 16px;\">\n                            <div>\n                                <div style=\"display: flex; align-items: center; gap: 8px; color: #111; font-weight: 600; margin-bottom: 10px;\">\n                                    <div style=\"width: 28px; height: 28px; border-radius: 8px; background: #fff0f2; display: flex; justify-content: center; align-items: center;\"><i class=\"fas fa-heartbeat\" style=\"font-size: 13px; color: #ff2d55;\"></i></div>\n                                    <span>实时心率</span>\n                                </div>\n                                <div style=\"color: #8e8e93; font-size: 13px;\">" + phoneValue230 + "</div>\n                            </div>\n                            <div style=\"color: #111; display: flex; align-items: baseline; gap: 5px; flex-shrink: 0;\">\n                                <span style=\"font-size: 40px; font-weight: 800;\">" + phoneValue229 + "</span>\n                                <span style=\"color: #8e8e93; font-size: 12px; font-weight: 600;\">BPM</span>\n                            </div>\n                        </div>\n\n                        <!-- 身体指标 -->\n                        <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 15px;\">\n                            <div style=\"background: #fff; border-radius: 24px; padding: 20px; border: 1px solid #f0f0f0; \">\n                                <div style=\"display: flex; align-items: center; gap: 8px; color: #111; font-weight: 600; margin-bottom: 16px;\">\n                                    <div style=\"width: 28px; height: 28px; border-radius: 8px; background: #f2f2f7; display: flex; justify-content: center; align-items: center;\"><i class=\"fas fa-weight\" style=\"font-size: 12px; color: #007aff;\"></i></div>\n                                    <span>体重</span>\n                                </div>\n                                <div style=\"font-size: 28px; font-weight: 800; color: #111; letter-spacing: -0.5px;\">" + (phoneValue225.weight || "-") + " <span style=\"font-size: 13px; color: #8e8e93; font-weight: 600; letter-spacing: 0;\">kg</span></div>\n                            </div>\n                            <div style=\"background: #fff; border-radius: 24px; padding: 20px; border: 1px solid #f0f0f0; \">\n                                <div style=\"display: flex; align-items: center; gap: 8px; color: #111; font-weight: 600; margin-bottom: 16px;\">\n                                    <div style=\"width: 28px; height: 28px; border-radius: 8px; background: #f2f2f7; display: flex; justify-content: center; align-items: center;\"><i class=\"fas fa-ruler-vertical\" style=\"font-size: 12px; color: #ff9500;\"></i></div>\n                                    <span>身高</span>\n                                </div>\n                                <div style=\"font-size: 28px; font-weight: 800; color: #111; letter-spacing: -0.5px;\">" + (phoneValue225.height || "-") + " <span style=\"font-size: 13px; color: #8e8e93; font-weight: 600; letter-spacing: 0;\">cm</span></div>\n                            </div>\n                        </div>\n                    ";
+        const phoneValue233 = document.getElementById("friend-health-history-select");
+        if (phoneValue233) phoneValue233.onchange = () => {
+          this._healthHistoryIndex = Number(phoneValue233.value) || 0, phoneValue37.onclick();
+        };
+      }
+    }
+  });
+  const phoneValue39 = document.getElementById("friend-health-back-btn");
+  if (phoneValue39) phoneValue39.onclick = () => {
+    if (window.closeView) window.closeView(phoneValue38);
+  };
+  const phoneValue40 = document.getElementById("friend-phone-app-pay"),
+    phoneValue41 = document.getElementById("friend-pay-view");
+  phoneValue40 && phoneValue41 && (phoneValue40.onclick = () => {
+    if (window.openView) window.openView(phoneValue41);
+    const phoneValue241 = document.getElementById("friend-pay-content");
+    if (phoneValue241) {
+      const phoneValue242 = Array.isArray(phoneValue1.payData?.["snapshots"]) && phoneValue1.payData.snapshots.length ? phoneValue1.payData.snapshots : phoneValue1.payData ? [phoneValue1.payData] : [],
+        phoneValue243 = Math.min(Number(this._payHistoryIndex) || 0, Math.max(0, phoneValue242.length - 1));
+      let phoneValue244 = phoneValue242[phoneValue243] || phoneValue1.payData;
+      if (!phoneValue244) phoneValue241.innerHTML = "<div style=\"padding: 50px 20px; text-align: center; color: #8e8e93; font-size: 15px;\">暂无钱包数据<br><span style=\"font-size: 13px; margin-top: 8px; display: inline-block;\">请在设置中生成</span></div>";else {
+        const phoneValue245 = phoneValue242.map((phoneValue249, phoneValue250) => "<option value=\"" + phoneValue250 + "\" " + (phoneValue250 === phoneValue243 ? "selected" : "") + ">" + this.escapeHTML(this.formatFriendPhoneGeneratedAt(phoneValue249.generatedAt) || "旧记录 " + (phoneValue250 + 1)) + "</option>").join("");
+        let phoneValue246 = phoneValue244.cards;
+        if (!phoneValue246) {
+          const phoneValue251 = String(phoneValue244.totalAssets || "0").replace(/,/g, ""),
+            phoneValue252 = parseFloat(phoneValue251) || 0,
+            phoneValue253 = phoneValue244.recentTransactions || [];
+          phoneValue246 = [{
+            "id": "card1",
+            "bankName": "黑金储蓄卡",
+            "cardType": "Debit",
+            "cardNumber": "**** **** **** 8888",
+            "amount": (phoneValue252 * 0.6).toLocaleString("en-US", {
+              "minimumFractionDigits": 2,
+              "maximumFractionDigits": 2
             }),
-            filesRecentlyDeletedBackBtn &&
-                filesRecentlyDeletedView &&
-                filesRecentlyDeletedBackBtn.addEventListener('click', () => {
-                    if (window.closeView) window.closeView(filesRecentlyDeletedView);
-                }),
-            (window.lovesApp._filesRecentlyDeletedBound = true));
-        filesBtn &&
-            filesView &&
-            (filesBtn.onclick = () => {
-                if (window.openView) window.openView(filesView);
-                const tagsList = document.getElementById('friend-files-tags-list');
-                tagsList &&
-                    (friend_28.filesData && friend_28.filesData.tags
-                        ? ((tagsList.innerHTML = friend_28.filesData.tags
-                              .map((tag_2, value_432) => {
-                                  const value_434 = tag_2.items
-                                      ? tag_2.items
-                                            .map((item_19, value_436) => {
-                                                const encodeURIComponent_437 = encodeURIComponent(
-                                                    JSON.stringify(item_19),
-                                                );
-                                                return (
-                                                    `
-                                    <div class="file-item-clickable" data-item="` +
-                                                    encodeURIComponent_437 +
-                                                    `" style="display: flex; align-items: center; padding: 12px 15px; border-top: 1px solid #f0f0f0; cursor: pointer; background: #fff;">
-                                        <i class="far fa-file-alt" style="color: #8e8e93; font-size: 18px; margin-right: 12px;"></i>
-                                        <span style="font-size: 16px; color: #111; flex: 1;">` +
-                                                    this.escapeHTML(item_19.title || '未命名文件') +
-                                                    this.renderFriendPhoneGeneratedTime(item_19) +
-                                                    `</span>
-                                        <i class="fas fa-chevron-right" style="color: #c7c7cc; font-size: 14px;"></i>
-                                    </div>
-                                `
-                                                );
-                                            })
-                                            .join('')
-                                      : '';
-                                  return (
-                                      `
-                                <div style="border-radius: 12px; overflow: hidden;  margin-bottom: 10px;">
-                                    <div style="display: flex; align-items: center; padding: 12px 15px; background: #fff;">
-                                        <div style="width: 12px; height: 12px; border-radius: 50%; background: ` +
-                                      (tag_2.color || '#ff9500') +
-                                      `; margin-right: 12px;"></div>
-                                        <span style="font-size: 17px; font-weight: 600; color: #111; flex: 1;">` +
-                                      this.escapeHTML(tag_2.name || '未命名标签') +
-                                      `</span>
-                                    </div>
-                                    ` +
-                                      value_434 +
-                                      `
-                                </div>
-                            `
-                                  );
-                              })
-                              .join('')),
-                          setTimeout(() => {
-                              const fileItems = tagsList.querySelectorAll('.file-item-clickable');
-                              fileItems.forEach((el) => {
-                                  el.addEventListener('click', function (event_896) {
-                                      event_896.preventDefault();
-                                      event_896.stopPropagation();
-                                      try {
-                                          const item_20 = JSON.parse(
-                                              decodeURIComponent(this.getAttribute('data-item')),
-                                          );
-                                          window.lovesApp.showDetailModal(
-                                              item_20.title,
-                                              '<div style="white-space: pre-wrap; font-size: 15px; line-height: 1.6; color: #333;">' +
-                                                  window.lovesApp.renderFriendPhoneLocalized(
-                                                      item_20,
-                                                      'content',
-                                                      {
-                                                          id: 'file-content',
-                                                      },
-                                                  ) +
-                                                  '</div>' +
-                                                  window.lovesApp.renderFriendPhoneGeneratedTime(
-                                                      item_20,
-                                                  ),
-                                          );
-                                      } catch (err_3) {
-                                          console.error('File item parse error', err_3);
-                                      }
-                                  });
-                                  window.lovesApp.bindLongPress(el, function () {
-                                      try {
-                                          const item_21 = JSON.parse(
-                                              decodeURIComponent(el.getAttribute('data-item')),
-                                          );
-                                          window.lovesApp.showDeleteConfirm(item_21.title, () => {
-                                              friend_28.filesData &&
-                                                  friend_28.filesData.tags &&
-                                                  (friend_28.filesData.tags.forEach((tag) => {
-                                                      if (tag.items) {
-                                                          const idx_8 = tag.items.findIndex(
-                                                              (i_2) =>
-                                                                  i_2.title === item_21.title &&
-                                                                  i_2.content === item_21.content,
-                                                          );
-                                                          if (idx_8 !== -1)
-                                                              tag.items.splice(idx_8, 1);
-                                                      }
-                                                  }),
-                                                  filesBtn.onclick());
-                                          });
-                                      } catch (value_902) {}
-                                  });
-                              });
-                          }, 50))
-                        : (tagsList.innerHTML =
-                              '<div style="padding: 30px; text-align: center; color: #8e8e93; font-size: 14px;">暂无文件数据<br><span style="font-size: 12px; margin-top: 5px; display: inline-block;">请在设置中生成</span></div>'));
-            });
-        const filesBackBtn = document.getElementById('friend-files-back-btn');
-        if (filesBackBtn)
-            filesBackBtn.onclick = () => {
-                if (window.closeView) window.closeView(filesView);
+            "transactions": phoneValue253.filter((phoneValue254, phoneValue255) => phoneValue255 % 2 === 0)
+          }, {
+            "id": "card2",
+            "bankName": "白金信用卡",
+            "cardType": "Credit",
+            "cardNumber": "**** **** **** 1234",
+            "amount": (phoneValue252 * 0.4).toLocaleString("en-US", {
+              "minimumFractionDigits": 2,
+              "maximumFractionDigits": 2
+            }),
+            "transactions": phoneValue253.filter((phoneValue256, phoneValue257) => phoneValue257 % 2 !== 0)
+          }, {
+            "id": "card3",
+            "bankName": "虚拟支付卡",
+            "cardType": "Prepaid",
+            "cardNumber": "**** **** **** 9999",
+            "amount": "0.00",
+            "transactions": []
+          }], phoneValue1.payData && (phoneValue1.payData.cards = phoneValue246);
+        }
+        let phoneValue247 = 0;
+        const phoneValue248 = () => {
+          const phoneValue258 = phoneValue246.map((phoneValue265, phoneValue266) => {
+              const phoneValue267 = phoneValue266 === phoneValue247;
+              let phoneValue268 = 0,
+                phoneValue269 = 1,
+                phoneValue270 = 1,
+                phoneValue271 = 100;
+              const phoneValue272 = ["linear-gradient(135deg, #111, #1a1a1c)", "linear-gradient(135deg, #141416, #222)", "linear-gradient(135deg, #0a0a0c, #161618)"],
+                phoneValue273 = phoneValue272[phoneValue266 % phoneValue272.length],
+                phoneValue274 = "#fff",
+                phoneValue275 = "rgba(255,255,255,0.6)",
+                phoneValue276 = "rgba(255,255,255,0.15)";
+              if (!phoneValue267) {
+                let phoneValue278 = phoneValue266 - phoneValue247;
+                phoneValue278 < 0 && (phoneValue278 += phoneValue246.length), phoneValue268 = 40 + (phoneValue278 - 1) * 20, phoneValue269 = 1 - 0.06 * phoneValue278, phoneValue271 = 10 - phoneValue278;
+              } else phoneValue268 = -10, phoneValue269 = 1.02, phoneValue271 = 100;
+              const phoneValue277 = "transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.6s ease";
+              return "\n                                <div class=\"pay-wallet-card\" data-idx=\"" + phoneValue266 + "\" style=\"position: absolute; top: 0; left: 0; right: 0; height: 180px; background: " + phoneValue273 + "; border-radius: 20px; padding: 20px; color: " + phoneValue274 + ";  transition: " + phoneValue277 + "; transform: translateY(" + phoneValue268 + "px) scale(" + phoneValue269 + "); opacity: " + phoneValue270 + "; z-index: " + phoneValue271 + "; cursor: pointer; border: 1px solid rgba(255,255,255,0.08);\">\n                                    <div style=\"display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;\">\n                                        <div style=\"font-size: 16px; font-weight: 700; letter-spacing: 0.5px;\">" + phoneValue265.bankName + "</div>\n                                        <div style=\"font-size: 11px; color: " + phoneValue275 + "; border: 1px solid " + phoneValue276 + "; padding: 2px 10px; border-radius: 12px; font-weight: 600;\">" + phoneValue265.cardType + "</div>\n                                    </div>\n                                    <div style=\"font-size: 20px; font-family: monospace; letter-spacing: 2px; margin-bottom: 20px; text-shadow: 0 1px 2px rgba(0,0,0,0.5);\">" + phoneValue265.cardNumber + "</div>\n                                    <div style=\"display: flex; justify-content: space-between; align-items: flex-end;\">\n                                        <div>\n                                            <div style=\"font-size: 11px; color: " + phoneValue275 + "; margin-bottom: 4px; font-weight: 500;\">当前金额</div>\n                                            <div style=\"font-size: 22px; font-weight: 800; letter-spacing: -0.5px;\">¥ " + phoneValue265.amount + "</div>\n                                        </div>\n                                        <i class=\"fab fa-cc-visa\" style=\"font-size: 28px; color: " + phoneValue274 + "; opacity: 0.7;\"></i>\n                                    </div>\n                                </div>\n                            ";
+            }).join(""),
+            phoneValue259 = phoneValue246[phoneValue247],
+            phoneValue260 = phoneValue259.transactions && phoneValue259.transactions.length > 0 ? phoneValue259.transactions.map(phoneValue279 => "\n                            <div style=\"display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0;\">\n                                <div style=\"display: flex; align-items: center; gap: 12px;\">\n                                    <div style=\"width: 40px; height: 40px; border-radius: 12px; background: #f4f4f5; display: flex; justify-content: center; align-items: center; color: #111; font-size: 14px;\">\n                                        <i class=\"" + (phoneValue279.isIncome ? "fas fa-arrow-down" : "fas fa-arrow-up") + "\" style=\"transform: " + (phoneValue279.isIncome ? "none" : "rotate(45deg)") + ";\"></i>\n                                    </div>\n                                    <div>\n                                        <div style=\"font-size: 15px; font-weight: 600; color: #111; margin-bottom: 2px;\">" + this.renderFriendPhoneLocalized(phoneValue279, "title", {
+              "id": "pay-title"
+            }) + "</div>\n                                        <div style=\"font-size: 12px; color: #8e8e93; font-weight: 500;\">" + this.escapeHTML(this.formatFriendPhoneGeneratedAt(phoneValue279.generatedAt) || phoneValue279.time || "") + "</div>\n                                    </div>\n                                </div>\n                                <div style=\"font-size: 16px; font-weight: 700; color: #111;\">" + (phoneValue279.isIncome ? "+" : "") + phoneValue279.amount + "</div>\n                            </div>\n                        ").join("") : "<div style=\"padding: 30px; text-align: center; color: #8e8e93; font-size: 13px;\">暂无交易记录</div>",
+            phoneValue261 = 50 + Math.max(0, phoneValue246.length - 2) * 20,
+            phoneValue262 = phoneValue261 + 45 + 180;
+          phoneValue241.innerHTML = "\n                            <div style=\"padding:16px 20px 0;\"><label class=\"friend-phone-history-picker\"><span>生成记录</span><select id=\"friend-pay-history-select\">" + phoneValue245 + "</select></label></div>\n                            <style>\n                            #pay-tx-container { animation: fadeUp 0.4s ease-out forwards; } \n                            @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }\n                            </style>\n                            <div style=\"padding: 20px;\">\n                                <div style=\"font-size: 34px; font-weight: 800; color: #111; margin-bottom: 25px; letter-spacing: -0.5px;\">Cards</div>\n                                <div id=\"pay-cards-container\" style=\"position: relative; width: 100%; height: " + phoneValue262 + "px; margin-bottom: 10px;\">\n                                    " + phoneValue258 + "\n                                </div>\n                            </div>\n                            \n                            <div style=\"padding: 0 20px 40px;\" id=\"pay-tx-container\">\n                                <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;\">\n                                    <div style=\"font-size: 20px; font-weight: 800; color: #111; letter-spacing: -0.5px;\">Transactions</div>\n                                    <div style=\"width: 32px; height: 32px; border-radius: 16px; background: #e5e5ea; display: flex; justify-content: center; align-items: center; color: #111; font-size: 14px;\">\n                                        <i class=\"fas fa-search\"></i>\n                                    </div>\n                                </div>\n                                <div style=\"background: #fff; border-radius: 20px; padding: 0 20px; \">\n                                    " + phoneValue260 + "\n                                </div>\n                            </div>\n                        ";
+          const phoneValue263 = document.getElementById("friend-pay-history-select");
+          if (phoneValue263) phoneValue263.onchange = () => {
+            this._payHistoryIndex = Number(phoneValue263.value) || 0, phoneValue40.onclick();
+          };
+          const phoneValue264 = document.getElementById("pay-cards-container");
+          phoneValue264 && phoneValue264.querySelectorAll(".pay-wallet-card").forEach(phoneValue280 => {
+            phoneValue280.onclick = () => {
+              const phoneValue281 = parseInt(phoneValue280.getAttribute("data-idx"));
+              phoneValue281 !== phoneValue247 && (phoneValue247 = phoneValue281, phoneValue248());
             };
-        const safariBtn = document.getElementById('friend-phone-app-safari'),
-            safariView = document.getElementById('friend-safari-view');
-        safariBtn &&
-            safariView &&
-            (safariBtn.onclick = () => {
-                if (window.openView) window.openView(safariView);
-                const topbar = document.getElementById('friend-safari-topbar'),
-                    searchBar = document.getElementById('friend-safari-search-bar'),
-                    backBtnIcon = document.getElementById('friend-safari-back-btn'),
-                    normalMode = document.getElementById('friend-safari-normal-mode'),
-                    privateMode = document.getElementById('friend-safari-private-mode'),
-                    dock = document.getElementById('friend-safari-dock'),
-                    privateToggleBtn = document.getElementById('friend-safari-private-btn');
-                let enabled_904 = false;
-                safariView.classList.remove('is-private');
-                dock.style.background = 'rgba(255,255,255,0.95)';
-                dock.style.color = '#111';
-                normalMode.style.opacity = '1';
-                normalMode.style.pointerEvents = 'auto';
-                normalMode.style.transform = 'translateY(0)';
-                privateMode.style.opacity = '0';
-                privateMode.style.pointerEvents = 'none';
-                privateMode.style.transform = 'translateY(20px)';
-                privateToggleBtn &&
-                    (privateToggleBtn.onclick = () => {
-                        enabled_904 = !enabled_904;
-                        safariView.classList.toggle('is-private', enabled_904);
-                        enabled_904
-                            ? ((safariView.style.background = '#000'),
-                              (topbar.style.background = '#000'),
-                              (searchBar.style.background = '#1c1c1e'),
-                              (searchBar.style.color = '#8e8e93'),
-                              (backBtnIcon.style.color = '#fff'),
-                              (dock.style.background = 'rgba(0,0,0,0.95)'),
-                              (dock.style.color = '#fff'),
-                              (dock.style.borderTop = '1px solid transparent'),
-                              (normalMode.style.opacity = '0'),
-                              (normalMode.style.pointerEvents = 'none'),
-                              (normalMode.style.transform = 'translateY(-20px)'),
-                              (privateMode.style.opacity = '1'),
-                              (privateMode.style.pointerEvents = 'auto'),
-                              (privateMode.style.transform = 'translateY(0)'))
-                            : ((safariView.style.background = '#f4f4f5'),
-                              (topbar.style.background = '#f4f4f5'),
-                              (searchBar.style.background = '#e5e5ea'),
-                              (searchBar.style.color = '#8e8e93'),
-                              (backBtnIcon.style.color = '#111'),
-                              (dock.style.background = 'rgba(255,255,255,0.95)'),
-                              (dock.style.color = '#111'),
-                              (dock.style.borderTop = '1px solid #f0f0f0'),
-                              (privateMode.style.opacity = '0'),
-                              (privateMode.style.pointerEvents = 'none'),
-                              (privateMode.style.transform = 'translateY(20px)'),
-                              (normalMode.style.opacity = '1'),
-                              (normalMode.style.pointerEvents = 'auto'),
-                              (normalMode.style.transform = 'translateY(0)'));
-                    });
-                const historyList = document.getElementById('friend-safari-history-list'),
-                    privateHistoryList = document.getElementById(
-                        'friend-safari-private-history-list',
-                    );
-                historyList &&
-                    (friend_28.safariData && friend_28.safariData.recentSearches
-                        ? ((historyList.innerHTML = friend_28.safariData.recentSearches
-                              .map((value_438, value_439) => {
-                                  let value_440 =
-                                      typeof value_438 === 'string'
-                                          ? value_438
-                                          : value_438.keyword || '未知搜索';
-                                  return (
-                                      `
-                        <div class="safari-history-item-new" data-idx="` +
-                                      value_439 +
-                                      `" style="display: flex; align-items: center; gap: 15px; padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,0.04); cursor: pointer;">
-                            <i class="fas fa-search" style="color: #c7c7cc; font-size: 14px; pointer-events: none;"></i>
-                            <span style="font-size: 16px; color: #111; font-weight: 500; flex:1;">` +
-                                      this.escapeHTML(value_440) +
-                                      (typeof value_438 === 'object'
-                                          ? this.renderFriendPhoneGeneratedTime(value_438)
-                                          : '') +
-                                      `</span>
-                        </div>
-                        `
-                                  );
-                              })
-                              .join('')),
-                          setTimeout(() => {
-                              try {
-                                  const items_2 = historyList.querySelectorAll(
-                                      '.safari-history-item-new',
-                                  );
-                                  items_2.forEach((value_908) => {
-                                      value_908.addEventListener('click', function (event_909) {
-                                          event_909.preventDefault();
-                                          event_909.stopPropagation();
-                                          const attribute_910 = this.getAttribute('data-idx'),
-                                              s =
-                                                  friend_28.safariData.recentSearches[
-                                                      attribute_910
-                                                  ];
-                                          typeof s === 'object' && s.title && s.content
-                                              ? window.lovesApp.showBrowserDetailModal(
-                                                    s.title,
-                                                    s.content,
-                                                    false,
-                                                    s,
-                                                )
-                                              : window.lovesApp.showBrowserDetailModal(
-                                                    '搜索记录',
-                                                    '无更多详情',
-                                                    false,
-                                                );
-                                      });
-                                      window.lovesApp.bindLongPress(value_908, function () {
-                                          const idx_9 = value_908.getAttribute('data-idx'),
-                                              value_913 =
-                                                  friend_28.safariData.recentSearches[idx_9],
-                                              text_10 =
-                                                  typeof value_913 === 'string'
-                                                      ? value_913
-                                                      : value_913.keyword || '未知搜索';
-                                          window.lovesApp.showDeleteConfirm(text_10, () => {
-                                              friend_28.safariData.recentSearches.splice(idx_9, 1);
-                                              safariBtn.onclick();
-                                          });
-                                      });
-                                  });
-                              } catch (err_4) {
-                                  console.error('Safari normal bind error', err_4);
-                              }
-                          }, 50))
-                        : (historyList.innerHTML =
-                              '<div style="padding: 30px; text-align: center; color: #8e8e93; font-size: 14px;">暂无搜索数据<br><span style="font-size: 12px; margin-top: 5px; display: inline-block;">请在设置中生成</span></div>'));
-                privateHistoryList &&
-                    (friend_28.safariData && friend_28.safariData.privateSearches
-                        ? ((privateHistoryList.innerHTML = friend_28.safariData.privateSearches
-                              .map((value_441, value_442) => {
-                                  let value_443 =
-                                      typeof value_441 === 'string'
-                                          ? value_441
-                                          : value_441.keyword || '未知记录';
-                                  return (
-                                      `
-                        <div class="safari-private-item-new" data-idx="` +
-                                      value_442 +
-                                      `" style="display: flex; align-items: center; gap: 15px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
-                            <i class="fas fa-search" style="color: #666; font-size: 14px; pointer-events: none;"></i>
-                            <span style="font-size: 16px; color: #fff; font-weight: 500; flex:1;">` +
-                                      this.escapeHTML(value_443) +
-                                      (typeof value_441 === 'object'
-                                          ? this.renderFriendPhoneGeneratedTime(
-                                                value_441,
-                                                'is-dark',
-                                            )
-                                          : '') +
-                                      `</span>
-                        </div>
-                        `
-                                  );
-                              })
-                              .join('')),
-                          setTimeout(() => {
-                              try {
-                                  const items_3 = privateHistoryList.querySelectorAll(
-                                      '.safari-private-item-new',
-                                  );
-                                  items_3.forEach((value_919) => {
-                                      value_919.addEventListener('click', function (event_920) {
-                                          event_920.preventDefault();
-                                          event_920.stopPropagation();
-                                          const attribute_921 = this.getAttribute('data-idx'),
-                                              s_2 =
-                                                  friend_28.safariData.privateSearches[
-                                                      attribute_921
-                                                  ];
-                                          typeof s_2 === 'object' && s_2.title && s_2.content
-                                              ? window.lovesApp.showBrowserDetailModal(
-                                                    s_2.title,
-                                                    s_2.content,
-                                                    true,
-                                                    s_2,
-                                                )
-                                              : window.lovesApp.showBrowserDetailModal(
-                                                    '隐私记录',
-                                                    '无更多详情',
-                                                    true,
-                                                );
-                                      });
-                                      window.lovesApp.bindLongPress(value_919, function () {
-                                          const idx_10 = value_919.getAttribute('data-idx'),
-                                              value_924 =
-                                                  friend_28.safariData.privateSearches[idx_10],
-                                              text_11 =
-                                                  typeof value_924 === 'string'
-                                                      ? value_924
-                                                      : value_924.keyword || '未知记录';
-                                          window.lovesApp.showDeleteConfirm(text_11, () => {
-                                              friend_28.safariData.privateSearches.splice(
-                                                  idx_10,
-                                                  1,
-                                              );
-                                              safariBtn.onclick();
-                                          });
-                                      });
-                                  });
-                              } catch (err_5) {
-                                  console.error('Safari private bind error', err_5);
-                              }
-                          }, 50))
-                        : (privateHistoryList.innerHTML =
-                              '<div style="padding: 30px; text-align: center; color: #666; font-size: 14px;">暂无无痕搜索数据<br><span style="font-size: 12px; margin-top: 5px; display: inline-block;">请在设置中生成</span></div>'));
-            });
-        const friendSafariBackBtnElement = document.getElementById('friend-safari-back-btn');
-        if (friendSafariBackBtnElement)
-            friendSafariBackBtnElement.onclick = () => {
-                if (window.closeView) window.closeView(safariView);
-            };
-        const weiboBtn = document.getElementById('friend-phone-app-weibo'),
-            weiboView_2 = document.getElementById('friend-weibo-view');
-        weiboBtn &&
-            weiboView_2 &&
-            (weiboBtn.onclick = () => {
-                this.currentWeiboAccount = 'main';
-                this.renderFriendWeibo(friend_28);
-                const tabs = Array.from(weiboView_2.querySelectorAll('.friend-weibo-tab')),
-                    pages = document.getElementById('friend-weibo-pages'),
-                    setActiveWeiboTab = (activeIndex) => {
-                        if (pages?._activeWeiboIndex === activeIndex) return;
-                        if (pages) pages._activeWeiboIndex = activeIndex;
-                        tabs.forEach((tab, index_14) => {
-                            const isActive = index_14 === activeIndex;
-                            tab.style.color = isActive ? '#111' : '#777';
-                            tab.style.fontWeight = isActive ? '700' : '600';
-                            const line = tab.querySelector('.friend-weibo-tab-line');
-                            if (line) line.style.display = isActive ? 'block' : 'none';
-                        });
-                    };
-                pages &&
-                    tabs.length &&
-                    (tabs.forEach((tab_2, index_15) => {
-                        tab_2.onclick = () => {
-                            pages.scrollTo({
-                                left: index_15 * pages.clientWidth,
-                                behavior: 'smooth',
-                            });
-                            setActiveWeiboTab(index_15);
-                        };
-                    }),
-                    (pages.onscroll = () => {
-                        if (pages._weiboScrollPending) return;
-                        pages._weiboScrollPending = true;
-                        requestAnimationFrame(() => {
-                            pages._weiboScrollPending = false;
-                            const pageWidth = pages.clientWidth || 1,
-                                activeIndex_2 = Math.max(
-                                    0,
-                                    Math.min(
-                                        tabs.length - 1,
-                                        Math.round(pages.scrollLeft / pageWidth),
-                                    ),
-                                );
-                            setActiveWeiboTab(activeIndex_2);
-                        });
-                    }),
-                    pages.scrollTo({
-                        left: 0,
-                        behavior: 'auto',
-                    }),
-                    setActiveWeiboTab(0));
-                if (window.openView) window.openView(weiboView_2);
-            });
-        const friendWeiboSwitchAccountBtnElement_809 = document.getElementById(
-            'friend-weibo-switch-account-btn',
-        );
-        friendWeiboSwitchAccountBtnElement_809 &&
-            (friendWeiboSwitchAccountBtnElement_809.onclick = (event_932) => {
-                event_932.preventDefault();
-                event_932.stopPropagation();
-                const data_4 = this.getFriendWeiboData(friend_28);
-                if (this.currentWeiboAccount === 'main') {
-                    if (!data_4.altAccount) {
-                        if (window.showToast)
-                            window.showToast('暂无微博小号数据，请在生成设置中生成微博');
-                        return;
+          });
+        };
+        phoneValue248();
+      }
+    }
+  });
+  const phoneValue42 = document.getElementById("friend-pay-back-btn");
+  if (phoneValue42) phoneValue42.onclick = () => {
+    if (window.closeView) window.closeView(phoneValue41);
+  };
+  const phoneValue43 = document.getElementById("friend-phone-app-game"),
+    phoneValue44 = document.getElementById("friend-game-view");
+  phoneValue43 && phoneValue44 && (phoneValue43.onclick = () => {
+    if (window.openView) window.openView(phoneValue44);
+    const phoneValue282 = document.getElementById("friend-game-content");
+    if (phoneValue282 && phoneValue1.gameData) {
+      const phoneValue283 = phoneValue1.gameData.recentGames ? phoneValue1.gameData.recentGames.map((phoneValue284, phoneValue285) => {
+        return "\n                        <div class=\"game-history-item-new\" data-idx=\"" + phoneValue285 + "\" style=\"background: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 20px; padding: 18px; display: flex; gap: 16px; align-items: center; cursor: pointer;\">\n                            <div style=\"width: 56px; height: 56px; border-radius: 16px; background: #2c2c2e; display: flex; justify-content: center; align-items: center; font-size: 24px; color: #fff; pointer-events: none;\">\n                                <i class=\"" + (phoneValue284.icon || "fas fa-gamepad") + "\"></i>\n                            </div>\n                            <div style=\"flex: 1; pointer-events: none;\">\n                                <div style=\"font-size: 17px; font-weight: 600; color: #fff; letter-spacing: 0.5px;\">" + this.escapeHTML(phoneValue284.name || "未知游戏") + "</div>\n                                <div style=\"font-size: 13px; color: #8e8e93; margin-top: 4px;\">时长: " + phoneValue284.hours + "</div>\n                                <div style=\"display: flex; align-items: center; gap: 10px; margin-top: 10px;\">\n                                    <div style=\"background: #3a3a3c; color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 6px; font-weight: 600;\">" + this.escapeHTML(phoneValue284.rank || "未定级") + "</div>\n                                    <div style=\"font-size: 12px; color: #8e8e93;\">胜率: <span style=\"color: #fff; font-weight: 500;\">" + phoneValue284.winRate + "</span>" + this.renderFriendPhoneGeneratedTime(phoneValue284, "is-dark") + "</div>\n                                </div>\n                            </div>\n                        </div>\n                    ";
+      }).join("") : "";
+      phoneValue282.innerHTML = "\n                        <div style=\"display: flex; align-items: center; gap: 15px; margin-bottom: 30px;\">\n                            <div style=\"width: 70px; height: 70px; border-radius: 50%; background: #1c1c1e; display: flex; justify-content: center; align-items: center; font-size: 30px; color: #fff; border: 2px solid #3a3a3c;\">\n                                <i class=\"fas fa-user\"></i>\n                            </div>\n                            <div>\n                                <div style=\"font-size: 20px; font-weight: 700; color: #fff; letter-spacing: 0.5px;\">" + this.escapeHTML(phoneValue1.gameData.playerName || "Player One") + "</div>\n                                <div style=\"font-size: 13px; color: #8e8e93; margin-top: 6px;\">游戏总时长: <span style=\"color: #fff; font-weight: 500;\">" + (phoneValue1.gameData.totalHours || "0 小时") + "</span></div>\n                            </div>\n                        </div>\n                        <div style=\"font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 15px;\">常玩的游戏</div>\n                        <div style=\"display: flex; flex-direction: column; gap: 15px;\">\n                            " + phoneValue283 + "\n                        </div>\n                    ", setTimeout(() => {
+        try {
+          const phoneValue286 = phoneValue282.querySelectorAll(".game-history-item-new");
+          phoneValue286.forEach(phoneValue287 => {
+            window.lovesApp.bindLongPress(phoneValue287, function () {
+              const phoneValue288 = phoneValue287.getAttribute("data-idx"),
+                phoneValue289 = phoneValue1.gameData.recentGames[phoneValue288];
+              window.lovesApp.showDeleteConfirm(phoneValue289.name, () => {
+                phoneValue1.gameData.recentGames.splice(phoneValue288, 1), phoneValue43.onclick();
+              });
+            }), phoneValue287.addEventListener("click", function (phoneValue290) {
+              phoneValue290.preventDefault(), phoneValue290.stopPropagation();
+              const phoneValue291 = this.getAttribute("data-idx"),
+                phoneValue292 = phoneValue1.gameData.recentGames[phoneValue291];
+              let phoneValue293 = "";
+              if (Array.isArray(phoneValue292.matches)) phoneValue293 += "<div style=\"background: #f4f4f5; border-radius: 24px; padding: 16px; margin-bottom: 16px;\">\n                                            <div style=\"font-weight: 700; color: #111; margin-bottom: 12px; padding-left: 4px; display: flex; align-items: center; gap: 8px;\"><i class=\"fas fa-gamepad\" style=\"color: #111;\"></i> 近期对局 (点击查看单局详情)</div>", phoneValue292.matches.forEach((phoneValue294, phoneValue295) => {
+                const phoneValue296 = phoneValue294.result === "胜利" || phoneValue294.result === "Win",
+                  phoneValue297 = phoneValue296 ? "#111" : "#fff",
+                  phoneValue298 = phoneValue296 ? "#fff" : "#8e8e93",
+                  phoneValue299 = phoneValue296 ? "#fff" : "#111",
+                  phoneValue300 = phoneValue296 ? "#333" : "#f4f4f5",
+                  phoneValue301 = phoneValue296 ? "#fff" : "#111",
+                  phoneValue302 = phoneValue296 ? "#fff" : "#111",
+                  phoneValue303 = encodeURIComponent(JSON.stringify(phoneValue294));
+                phoneValue293 += "\n                                            <div class=\"game-match-item\" data-match=\"" + phoneValue303 + "\" style=\"display: flex; align-items: center; justify-content: space-between; background: " + phoneValue297 + "; border: 1px solid #e5e5ea; border-radius: 16px; padding: 16px; margin-bottom: 10px; cursor: pointer;\">\n                                                <div style=\"display: flex; flex-direction: column; align-items: center; gap: 6px; width: 50px; pointer-events: none;\">\n                                                    <div style=\"width: 40px; height: 40px; border-radius: 50%; background: rgba(142,142,147,0.1); display: flex; justify-content: center; align-items: center; color: " + phoneValue302 + "; font-size: 16px;\">\n                                                        <i class=\"fas fa-user\"></i>\n                                                    </div>\n                                                    <div style=\"font-size: 11px; font-weight: 500; color: " + phoneValue298 + "; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center;\">" + window.lovesApp.escapeHTML(phoneValue294.hero || "我方") + "</div>\n                                                </div>\n                                                \n                                                <div style=\"display: flex; flex-direction: column; align-items: center; flex: 1; pointer-events: none;\">\n                                                    <div style=\"font-size: 18px; font-weight: 800; color: " + phoneValue299 + "; letter-spacing: 1px;\">" + phoneValue294.result + "</div>\n                                                    <div style=\"font-size: 11px; color: #8e8e93; margin-top: 6px;\">" + window.lovesApp.escapeHTML(window.lovesApp.formatFriendPhoneGeneratedAt(phoneValue294.generatedAt) || phoneValue294.time || "") + "</div>\n                                                    <div style=\"font-size: 12px; font-weight: 700; color: " + phoneValue301 + "; margin-top: 8px; background: " + phoneValue300 + "; padding: 4px 10px; border-radius: 8px;\">KDA: " + (phoneValue294.kda || "-/-/-") + "</div>\n                                                </div>\n\n                                                <div style=\"display: flex; flex-direction: column; align-items: center; gap: 6px; width: 50px; pointer-events: none;\">\n                                                    <div style=\"width: 40px; height: 40px; border-radius: 50%; background: rgba(142,142,147,0.1); display: flex; justify-content: center; align-items: center; color: " + phoneValue302 + "; font-size: 16px;\">\n                                                        <i class=\"fas fa-skull\"></i>\n                                                    </div>\n                                                    <div style=\"font-size: 11px; font-weight: 500; color: " + phoneValue298 + ";\">敌方</div>\n                                                </div>\n                                            </div>";
+              }), phoneValue293 += "</div>";else typeof phoneValue292.matches === "string" && phoneValue292.matches && (phoneValue293 += "<div style=\"background: #f4f4f5; border-radius: 24px; padding: 16px; margin-bottom: 16px;\">\n                                            <div style=\"font-weight: 700; color: #111; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;\"><i class=\"fas fa-history\" style=\"color: #111;\"></i> 近期对局</div>\n                                            <div style=\"color: #333; line-height: 1.6; font-size: 14px;\">" + phoneValue292.matches.replace(/\n/g, "<br>") + "</div>\n                                        </div>");
+              phoneValue292.innerThoughts && !Array.isArray(phoneValue292.matches) && (phoneValue293 += "<div style=\"background: #f4f4f5; border-radius: 24px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #111;\">\n                                            <div style=\"font-weight: 700; color: #111; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;\"><i class=\"fas fa-headset\" style=\"color: #111;\"></i> 局内心声</div>\n                                            <div style=\"color: #333; line-height: 1.6; font-size: 14px; font-style: italic;\">“" + window.lovesApp.renderFriendPhoneLocalized(phoneValue292, "innerThoughts", {
+                "id": "game-thoughts"
+              }) + "”</div>\n                                        </div>");
+              phoneValue292.postGameReflection && !Array.isArray(phoneValue292.matches) && (phoneValue293 += "<div style=\"background: #111; border-radius: 24px; padding: 16px; margin-bottom: 16px;\">\n                                            <div style=\"font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;\"><i class=\"fas fa-clipboard-list\" style=\"color: #fff;\"></i> 局后复盘</div>\n                                            <div style=\"color: #ccc; line-height: 1.6; font-size: 14px;\">" + window.lovesApp.renderFriendPhoneLocalized(phoneValue292, "postGameReflection", {
+                "id": "game-reflection"
+              }) + "</div>\n                                        </div>");
+              if (!phoneValue293) phoneValue293 = "暂无更多数据";
+              window.lovesApp.showDetailModal(phoneValue292.name + " - 战绩列表", phoneValue293), setTimeout(() => {
+                const phoneValue304 = document.querySelectorAll(".game-match-item");
+                phoneValue304.forEach(phoneValue305 => {
+                  phoneValue305.addEventListener("click", function () {
+                    const phoneValue306 = this.getAttribute("data-match");
+                    if (phoneValue306) try {
+                      const phoneValue307 = JSON.parse(decodeURIComponent(phoneValue306));
+                      let phoneValue308 = "";
+                      phoneValue308 += "\n                                                            <div style=\"background: #f4f4f5; border-radius: 20px; padding: 16px; margin-bottom: 16px;\">\n                                                                <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;\">\n                                                                    <div style=\"font-weight: 800; font-size: 20px; color: " + (phoneValue307.result === "胜利" || phoneValue307.result === "Win" ? "#111" : "#8e8e93") + ";\">" + phoneValue307.result + "</div>\n                                                                    <div style=\"font-weight: 700; color: #111; background: #e5e5ea; padding: 4px 10px; border-radius: 8px;\">KDA: " + (phoneValue307.kda || "-/-/-") + "</div>\n                                                                </div>\n                                                                <div style=\"display: flex; align-items: center; gap: 8px; color: #8e8e93; font-size: 13px;\">\n                                                                    <i class=\"fas fa-clock\"></i> " + window.lovesApp.escapeHTML(window.lovesApp.formatFriendPhoneGeneratedAt(phoneValue307.generatedAt) || phoneValue307.time || "") + " | 英雄: " + window.lovesApp.escapeHTML(phoneValue307.hero || "未知") + "\n                                                                </div>\n                                                            </div>\n                                                        ";
+                      if (phoneValue307.highlights && Array.isArray(phoneValue307.highlights) && phoneValue307.highlights.length > 0) {
+                        let phoneValue309 = phoneValue307.highlights.map(phoneValue310 => "\n                                                                <div style=\"display: flex; gap: 12px; margin-bottom: 8px; align-items: flex-start;\">\n                                                                    <div style=\"font-weight: 700; color: #111; font-size: 13px; background: #e5e5ea; padding: 2px 6px; border-radius: 4px; flex-shrink: 0;\">" + window.lovesApp.escapeHTML(window.lovesApp.formatFriendPhoneGeneratedAt(phoneValue310.generatedAt) || "") + "</div>\n                                                                    <div style=\"color: #333; font-size: 14px; line-height: 1.4;\">" + window.lovesApp.renderFriendPhoneLocalized(phoneValue310, "desc", {
+                          "id": "match-highlight"
+                        }) + "</div>\n                                                                </div>\n                                                            ").join("");
+                        phoneValue308 += "\n                                                                <div style=\"background: #fff; border: 1px solid #e5e5ea; border-radius: 20px; padding: 16px; margin-bottom: 16px;\">\n                                                                    <div style=\"font-weight: 700; color: #111; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;\"><i class=\"fas fa-bolt\" style=\"color: #111;\"></i> 高光时刻</div>\n                                                                    " + phoneValue309 + "\n                                                                </div>\n                                                            ";
+                      }
+                      phoneValue307.innerThoughts && (phoneValue308 += "\n                                                                <div style=\"background: #f4f4f5; border-radius: 20px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #111;\">\n                                                                    <div style=\"font-weight: 700; color: #111; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;\"><i class=\"fas fa-headset\" style=\"color: #111;\"></i> 局内心声</div>\n                                                                    <div style=\"color: #333; line-height: 1.6; font-size: 14px; font-style: italic;\">“" + window.lovesApp.renderFriendPhoneLocalized(phoneValue307, "innerThoughts", {
+                        "id": "match-thoughts"
+                      }) + "”</div>\n                                                                </div>\n                                                            ");
+                      if (phoneValue307.postGameReflection || phoneValue307.thoughts) {
+                        const phoneValue311 = phoneValue307.postGameReflection || phoneValue307.thoughts;
+                        phoneValue308 += "\n                                                                <div style=\"background: #111; border-radius: 20px; padding: 16px; margin-bottom: 16px;\">\n                                                                    <div style=\"font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;\"><i class=\"fas fa-clipboard-list\" style=\"color: #fff;\"></i> 局后复盘</div>\n                                                                    <div style=\"color: #ccc; line-height: 1.6; font-size: 14px;\">" + window.lovesApp.renderFriendPhoneLocalized(phoneValue307, phoneValue307.postGameReflection ? "postGameReflection" : "thoughts", {
+                          "fallback": phoneValue311,
+                          "id": "match-reflection"
+                        }) + "</div>\n                                                                </div>\n                                                            ";
+                      }
+                      if (!phoneValue308) phoneValue308 = "暂无详情数据";
+                      window.lovesApp.showDetailModal("单局详情", phoneValue308);
+                    } catch (phoneValue312) {
+                      console.error("Parse match data error", phoneValue312);
                     }
-                    this.currentWeiboAccount = 'alt';
-                } else this.currentWeiboAccount = 'main';
-                this.renderFriendWeibo(friend_28);
-                if (window.showToast)
-                    window.showToast(
-                        this.currentWeiboAccount === 'alt'
-                            ? '已切换到微博小号'
-                            : '已切换到微博大号',
-                    );
+                  });
+                });
+              }, 100);
             });
-        const weiboBackBtn = document.getElementById('friend-weibo-back-btn');
-        if (weiboBackBtn)
-            weiboBackBtn.onclick = () => {
-                if (window.closeView) window.closeView(weiboView_2);
-            };
-        const musicBtn = document.getElementById('friend-phone-app-music'),
-            musicView = document.getElementById('friend-music-view');
-        musicBtn &&
-            musicView &&
-            (musicBtn.onclick = () => {
-                if (window.openView) window.openView(musicView);
-                const musicContent = document.getElementById('friend-music-content');
-                if (musicContent) {
-                    let musicData_2 = friend_28.musicData;
-                    if (!musicData_2 || !musicData_2.top || musicData_2.top.length === 0)
-                        musicContent.innerHTML =
-                            '<div style="padding: 50px 20px; text-align: center; color: #8e8e93; font-size: 15px;">暂无音乐数据<br><span style="font-size: 13px; margin-top: 8px; display: inline-block;">请在设置中生成</span></div>';
-                    else {
-                        const join_444 = (musicData_2.top || [])
-                            .map(
-                                (song, value_937) =>
-                                    `
-                            <div class="music-history-item" data-idx="` +
-                                    value_937 +
-                                    `" style="display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; cursor: pointer;">
-                                <div style="font-size: 16px; font-weight: 700; color: #111; width: 20px; text-align: center;">` +
-                                    (value_937 + 1) +
-                                    `</div>
-                                <div style="width: 50px; height: 50px; border-radius: 6px; background: #111; flex-shrink: 0; display: flex; justify-content: center; align-items: center; color: #fff;">
-                                    <i class="fas fa-music"></i>
-                                </div>
-                                <div style="flex: 1; display: flex; flex-direction: column; pointer-events: none;">
-                                    <div style="font-size: 16px; font-weight: 600; color: #111;">` +
-                                    this.escapeHTML(song.name || '未知歌曲') +
-                                    `</div>
-                                    <div style="font-size: 13px; color: #8e8e93;">` +
-                                    this.renderFriendPhoneLocalized(song, 'artist', {
-                                        id: 'song-artist-' + value_937,
-                                    }) +
-                                    this.renderFriendPhoneGeneratedTime(song) +
-                                    `</div>
-                                </div>
-                                <i class="fas fa-ellipsis-v" style="color: #c7c7cc; pointer-events: none;"></i>
-                            </div>
-                        `,
-                            )
-                            .join('');
-                        musicContent.innerHTML =
-                            `
-                        <div style="padding: 20px 16px; background: #fff;">
-                            <div style="font-size: 28px; font-weight: 800; color: #111; margin-bottom: 20px; letter-spacing: -0.5px;">APPLE</div>
-                            <div style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px;">
-                                <div style="min-width: 140px; display: flex; flex-direction: column; gap: 10px;">
-                                    <div style="width: 140px; height: 140px; border-radius: 12px; background: #f4f4f5; display: flex; justify-content: center; align-items: center; color: #111; font-size: 30px; ">
-                                        <i class="fas fa-history"></i>
-                                    </div>
-                                    <div style="font-size: 15px; font-weight: 700; color: #111;">Recently</div>
-                                    <div style="font-size: 13px; color: #8e8e93;">` +
-                            (musicData_2.recent ? musicData_2.recent.length : 0) +
-                            ` Songs</div>
-                                </div>
-                                <div style="min-width: 140px; display: flex; flex-direction: column; gap: 10px;">
-                                    <div style="width: 140px; height: 140px; border-radius: 12px; background: #111; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 30px; ">
-                                        <i class="fas fa-heart"></i>
-                                    </div>
-                                    <div style="font-size: 15px; font-weight: 700; color: #111;">Favorites</div>
-                                    <div style="font-size: 13px; color: #8e8e93;">` +
-                            (musicData_2.favorites ? musicData_2.favorites.length : 0) +
-                            ` Songs</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="padding: 10px 16px 30px; background: #fff; border-top: 1px solid #f0f0f0;">
-                            <div style="font-size: 22px; font-weight: 700; color: #111; margin-bottom: 15px; margin-top: 10px;">RANKINGS</div>
-                            <div style="display: flex; flex-direction: column; gap: 5px;">
-                                ` +
-                            join_444 +
-                            `
-                            </div>
-                        </div>
-                        `;
-                    }
-                    setTimeout(() => {
-                        try {
-                            const items_4 = musicContent.querySelectorAll('.music-history-item');
-                            items_4.forEach((value_938) => {
-                                value_938.addEventListener('click', function (event_447) {
-                                    event_447.preventDefault();
-                                    event_447.stopPropagation();
-                                    const attribute = this.getAttribute('data-idx'),
-                                        song_2 = musicData_2.top[attribute],
-                                        loops_2 =
-                                            parseInt(song_2.loops) ||
-                                            Math.floor(Math.random() * 100) + 10,
-                                        fallback_5 =
-                                            song_2.thoughts ||
-                                            '这首歌旋律很好听，每次听都能让我安静下来。',
-                                        content_8 =
-                                            `
-                                        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px;">
-                                            <div style="width: 80px; height: 80px; border-radius: 50%; background: #111; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 30px; margin-bottom: 15px; ">
-                                                <i class="fas fa-compact-disc"></i>
-                                            </div>
-                                            <div style="font-size: 22px; font-weight: 800; color: #111; margin-bottom: 4px;">` +
-                                            window.lovesApp.escapeHTML(song_2.name || '未知歌曲') +
-                                            `</div>
-                                            <div style="font-size: 15px; color: #8e8e93;">` +
-                                            window.lovesApp.renderFriendPhoneLocalized(
-                                                song_2,
-                                                'artist',
-                                                {
-                                                    id: 'song-detail-artist',
-                                                },
-                                            ) +
-                                            window.lovesApp.renderFriendPhoneGeneratedTime(song_2) +
-                                            `</div>
-                                        </div>
-                                        
-                                        <div style="background: #f4f4f5; border-radius: 16px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-                                            <div style="display: flex; align-items: center; gap: 8px;">
-                                                <div style="width: 32px; height: 32px; border-radius: 8px; background: #fff; display: flex; justify-content: center; align-items: center; color: #111;">
-                                                    <i class="fas fa-redo-alt" style="font-size: 14px;"></i>
-                                                </div>
-                                                <span style="font-size: 15px; font-weight: 600; color: #111;">Repeated</span>
-                                            </div>
-                                            <div style="font-size: 20px; font-weight: 800; color: #111;">` +
-                                            loops_2 +
-                                            ` <span style="font-size: 13px; font-weight: 500; color: #8e8e93;">Times</span></div>
-                                        </div>
-
-                                        <div style="background: #111; border-radius: 16px; padding: 20px; border-left: 4px solid #fff;">
-                                            <div style="font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                                                <i class="fas fa-headphones-alt" style="color: #fff;"></i> THOUGHTS
-                                            </div>
-                                            <div style="color: #ccc; line-height: 1.6; font-size: 14px; font-style: italic;">
-                                                “` +
-                                            window.lovesApp.renderFriendPhoneLocalized(
-                                                song_2,
-                                                'thoughts',
-                                                {
-                                                    fallback: fallback_5,
-                                                    id: 'song-thoughts',
-                                                },
-                                            ) +
-                                            `”
-                                            </div>
-                                        </div>
-                                    `;
-                                    window.lovesApp.showDetailModal('SINGLE', content_8);
-                                });
-                                window.lovesApp.bindLongPress(value_938, function () {
-                                    const idx_11 = value_938.getAttribute('data-idx'),
-                                        song_3 = musicData_2.top[idx_11];
-                                    window.lovesApp.showDeleteConfirm(song_3.name, () => {
-                                        musicData_2.top.splice(idx_11, 1);
-                                        musicBtn.onclick();
-                                    });
-                                });
-                            });
-                        } catch (err_6) {
-                            console.error('Music bind error', err_6);
-                        }
-                    }, 50);
-                }
-            });
-        const musicBackBtn = document.getElementById('friend-music-back-btn');
-        if (musicBackBtn)
-            musicBackBtn.onclick = () => {
-                if (window.closeView) window.closeView(musicView);
-            };
-        const callButton = document.getElementById("friend-phone-app-call");
-        if (callButton) callButton.onclick = () => window.cphoneCallApp?.open(friend_28);
-        const healthBtn = document.getElementById('friend-phone-app-health'),
-            healthView = document.getElementById('friend-health-view');
-        healthBtn &&
-            healthView &&
-            (healthBtn.onclick = () => {
-                if (window.openView) window.openView(healthView);
-                const healthContent = document.getElementById('friend-health-content');
-                if (healthContent) {
-                    if (!friend_28.healthData)
-                        healthContent.innerHTML =
-                            '<div style="padding: 50px 20px; text-align: center; color: #8e8e93; font-size: 15px;">暂无健康数据<br><span style="font-size: 13px; margin-top: 8px; display: inline-block;">请在设置中生成</span></div>';
-                    else {
-                        const healthHistory =
-                                Array.isArray(friend_28.healthData.history) &&
-                                friend_28.healthData.history.length
-                                    ? friend_28.healthData.history
-                                    : [friend_28.healthData],
-                            healthIndex = Math.min(
-                                Number(this._healthHistoryIndex) || 0,
-                                healthHistory.length - 1,
-                            ),
-                            healthData_2 = healthHistory[healthIndex] || friend_28.healthData,
-                            value_463 = new Date(),
-                            stepsThoughts = this.renderFriendPhoneLocalized(
-                                healthData_2,
-                                'stepsThoughts',
-                                {
-                                    fallback: '暂无运动心声',
-                                    id: 'health-steps-thoughts',
-                                },
-                            ),
-                            dream = this.renderFriendPhoneLocalized(healthData_2, 'dream', {
-                                fallback: '暂无梦境记录',
-                                id: 'health-dream',
-                            }),
-                            heartRate_2 = this.escapeHTML(healthData_2.heartRate || '--'),
-                            heartRateStatus = this.renderFriendPhoneLocalized(
-                                healthData_2,
-                                'heartRateStatus',
-                                {
-                                    fallback: '暂无状态',
-                                    id: 'health-heart-status',
-                                },
-                            ),
-                            join_468 = healthHistory
-                                .map(
-                                    (value_470, value_471) =>
-                                        '<option value="' +
-                                        value_471 +
-                                        '" ' +
-                                        (value_471 === healthIndex ? 'selected' : '') +
-                                        '>' +
-                                        this.escapeHTML(
-                                            this.formatFriendPhoneGeneratedAt(
-                                                value_470.generatedAt,
-                                            ) || '旧记录 ' + (value_471 + 1),
-                                        ) +
-                                        '</option>',
-                                )
-                                .join(''),
-                            join_469 = [-2, -1, 0, 1, 2]
-                                .map((value_472) => {
-                                    const d = new Date(value_463);
-                                    d.setDate(value_463.getDate() + value_472);
-                                    const date_474 = d.getDate(),
-                                        weekStr = ['日', '一', '二', '三', '四', '五', '六'][
-                                            d.getDay()
-                                        ],
-                                        value_476 = value_472 === 0;
-                                    return (
-                                        `
-                            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 44px; height: 56px; border-radius: 14px; background: ` +
-                                        (value_476 ? '#111' : 'transparent') +
-                                        '; color: ' +
-                                        (value_476 ? '#fff' : '#8e8e93') +
-                                        `; flex-shrink: 0; cursor: pointer; ">
-                                <div style="font-size: 11px; font-weight: 600; margin-bottom: 2px;">` +
-                                        weekStr +
-                                        `</div>
-                                <div style="font-size: 16px; font-weight: 800;">` +
-                                        date_474 +
-                                        `</div>
-                            </div>
-                        `
-                                    );
-                                })
-                                .join('');
-                        healthContent.innerHTML =
-                            `
-                        <!-- 顶部日期选择 -->
-                        <label class="friend-phone-history-picker"><span>生成记录</span><select id="friend-health-history-select">` +
-                            join_468 +
-                            `</select></label>
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
-                            <div style="font-size: 28px; font-weight: 800; color: #111; letter-spacing: -0.5px;">摘要</div>
-                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #f2f2f7; display: flex; justify-content: center; align-items: center; color: #111; font-size: 14px; cursor: pointer;">
-                                <i class="fas fa-calendar-day"></i>
-                            </div>
-                        </div>
-                        
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: #fff; border-radius: 20px; padding: 8px; ">
-                            ` +
-                            join_469 +
-                            `
-                        </div>
-
-                        <!-- 步数卡片 -->
-                        <div style="background: #fff; border-radius: 24px; padding: 22px; margin-bottom: 15px; border: 1px solid #f0f0f0; ">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                <div style="display: flex; align-items: center; gap: 8px; color: #111; font-weight: 600;">
-                                    <div style="width: 28px; height: 28px; border-radius: 8px; background: #f2f2f7; display: flex; justify-content: center; align-items: center;"><i class="fas fa-shoe-prints" style="font-size: 12px; color: #ff3b30;"></i></div>
-                                    <span>步数</span>
-                                </div>
-                                <div style="font-size: 12px; color: #8e8e93; font-weight: 600;">14:20 更新</div>
-                            </div>
-                            <div style="font-size: 42px; font-weight: 800; color: #111; display: flex; align-items: baseline; gap: 6px; letter-spacing: -1px;">
-                                ` +
-                            (healthData_2.steps || '0') +
-                            ` <span style="font-size: 15px; color: #8e8e93; font-weight: 600; letter-spacing: 0;">步</span>
-                            </div>
-                            <div style="margin-top: 14px; padding-top: 13px; border-top: 1px solid #f0f0f0; color: #666; font-size: 13px; line-height: 1.65;">` +
-                            stepsThoughts +
-                            `</div>
-                        </div>
-
-                        <!-- 睡眠卡片 -->
-                        <div style="background: #fff; border-radius: 24px; padding: 22px; margin-bottom: 15px; border: 1px solid #f0f0f0; ">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                <div style="display: flex; align-items: center; gap: 8px; color: #111; font-weight: 600;">
-                                    <div style="width: 28px; height: 28px; border-radius: 8px; background: #f2f2f7; display: flex; justify-content: center; align-items: center;"><i class="fas fa-bed" style="font-size: 12px; color: #5856d6;"></i></div>
-                                    <span>睡眠</span>
-                                </div>
-                                <div style="font-size: 12px; color: #8e8e93; font-weight: 600;">昨晚记录</div>
-                            </div>
-                            <div style="font-size: 36px; font-weight: 800; color: #111; display: flex; align-items: baseline; gap: 6px; letter-spacing: -0.5px;">
-                                ` +
-                            (healthData_2.sleepHours || '0') +
-                            ` <span style="font-size: 15px; color: #8e8e93; font-weight: 600; letter-spacing: 0;">小时</span> 
-                                ` +
-                            (healthData_2.sleepMinutes || '0') +
-                            ` <span style="font-size: 15px; color: #8e8e93; font-weight: 600; letter-spacing: 0;">分钟</span>
-                            </div>
-                            <div style="margin-top: 14px; padding-top: 13px; border-top: 1px solid #f0f0f0; color: #666; font-size: 13px; line-height: 1.65;">` +
-                            dream +
-                            `</div>
-                        </div>
-
-                        <!-- 当前心率 -->
-                        <div style="background: #fff; border-radius: 24px; padding: 22px; margin-bottom: 15px; border: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-                            <div>
-                                <div style="display: flex; align-items: center; gap: 8px; color: #111; font-weight: 600; margin-bottom: 10px;">
-                                    <div style="width: 28px; height: 28px; border-radius: 8px; background: #fff0f2; display: flex; justify-content: center; align-items: center;"><i class="fas fa-heartbeat" style="font-size: 13px; color: #ff2d55;"></i></div>
-                                    <span>实时心率</span>
-                                </div>
-                                <div style="color: #8e8e93; font-size: 13px;">` +
-                            heartRateStatus +
-                            `</div>
-                            </div>
-                            <div style="color: #111; display: flex; align-items: baseline; gap: 5px; flex-shrink: 0;">
-                                <span style="font-size: 40px; font-weight: 800;">` +
-                            heartRate_2 +
-                            `</span>
-                                <span style="color: #8e8e93; font-size: 12px; font-weight: 600;">BPM</span>
-                            </div>
-                        </div>
-
-                        <!-- 身体指标 -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div style="background: #fff; border-radius: 24px; padding: 20px; border: 1px solid #f0f0f0; ">
-                                <div style="display: flex; align-items: center; gap: 8px; color: #111; font-weight: 600; margin-bottom: 16px;">
-                                    <div style="width: 28px; height: 28px; border-radius: 8px; background: #f2f2f7; display: flex; justify-content: center; align-items: center;"><i class="fas fa-weight" style="font-size: 12px; color: #007aff;"></i></div>
-                                    <span>体重</span>
-                                </div>
-                                <div style="font-size: 28px; font-weight: 800; color: #111; letter-spacing: -0.5px;">` +
-                            (healthData_2.weight || '-') +
-                            ` <span style="font-size: 13px; color: #8e8e93; font-weight: 600; letter-spacing: 0;">kg</span></div>
-                            </div>
-                            <div style="background: #fff; border-radius: 24px; padding: 20px; border: 1px solid #f0f0f0; ">
-                                <div style="display: flex; align-items: center; gap: 8px; color: #111; font-weight: 600; margin-bottom: 16px;">
-                                    <div style="width: 28px; height: 28px; border-radius: 8px; background: #f2f2f7; display: flex; justify-content: center; align-items: center;"><i class="fas fa-ruler-vertical" style="font-size: 12px; color: #ff9500;"></i></div>
-                                    <span>身高</span>
-                                </div>
-                                <div style="font-size: 28px; font-weight: 800; color: #111; letter-spacing: -0.5px;">` +
-                            (healthData_2.height || '-') +
-                            ` <span style="font-size: 13px; color: #8e8e93; font-weight: 600; letter-spacing: 0;">cm</span></div>
-                            </div>
-                        </div>
-                    `;
-                        const healthHistorySelect = document.getElementById(
-                            'friend-health-history-select',
-                        );
-                        if (healthHistorySelect)
-                            healthHistorySelect.onchange = () => {
-                                this._healthHistoryIndex = Number(healthHistorySelect.value) || 0;
-                                healthBtn.onclick();
-                            };
-                    }
-                }
-            });
-        const healthBackBtn = document.getElementById('friend-health-back-btn');
-        if (healthBackBtn)
-            healthBackBtn.onclick = () => {
-                if (window.closeView) window.closeView(healthView);
-            };
-        const payBtn = document.getElementById('friend-phone-app-pay'),
-            payView = document.getElementById('friend-pay-view');
-        payBtn &&
-            payView &&
-            (payBtn.onclick = () => {
-                if (window.openView) window.openView(payView);
-                const payContent = document.getElementById('friend-pay-content');
-                if (payContent) {
-                    const payHistory =
-                            Array.isArray(friend_28.payData?.snapshots) &&
-                            friend_28.payData.snapshots.length
-                                ? friend_28.payData.snapshots
-                                : friend_28.payData
-                                  ? [friend_28.payData]
-                                  : [],
-                        payIndex = Math.min(
-                            Number(this._payHistoryIndex) || 0,
-                            Math.max(0, payHistory.length - 1),
-                        );
-                    let payData_2 = payHistory[payIndex] || friend_28.payData;
-                    if (!payData_2)
-                        payContent.innerHTML =
-                            '<div style="padding: 50px 20px; text-align: center; color: #8e8e93; font-size: 15px;">暂无钱包数据<br><span style="font-size: 13px; margin-top: 8px; display: inline-block;">请在设置中生成</span></div>';
-                    else {
-                        const join_480 = payHistory
-                            .map(
-                                (value_482, value_483) =>
-                                    '<option value="' +
-                                    value_483 +
-                                    '" ' +
-                                    (value_483 === payIndex ? 'selected' : '') +
-                                    '>' +
-                                    this.escapeHTML(
-                                        this.formatFriendPhoneGeneratedAt(value_482.generatedAt) ||
-                                            '旧记录 ' + (value_483 + 1),
-                                    ) +
-                                    '</option>',
-                            )
-                            .join('');
-                        let cards_2 = payData_2.cards;
-                        if (!cards_2) {
-                            const totalStr = String(payData_2.totalAssets || '0').replace(/,/g, ''),
-                                total_3 = parseFloat(totalStr) || 0,
-                                txs = payData_2.recentTransactions || [];
-                            cards_2 = [
-                                {
-                                    id: 'card1',
-                                    bankName: 'AMERICA EXPRESS',
-                                    cardType: 'Debit',
-                                    cardNumber: '**** **** **** 1991',
-                                    amount: (total_3 * 0.6).toLocaleString('en-US', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2,
-                                    }),
-                                    transactions: txs.filter((_, i_3) => i_3 % 2 === 0),
-                                },
-                                {
-                                    id: 'card2',
-                                    bankName: 'J.P. Morgan',
-                                    cardType: 'Credit',
-                                    cardNumber: '**** **** **** 0914',
-                                    amount: (total_3 * 0.4).toLocaleString('en-US', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2,
-                                    }),
-                                    transactions: txs.filter((__2, i_4) => i_4 % 2 !== 0),
-                                },
-                                {
-                                    id: 'card3',
-                                    bankName: 'Virtual Card',
-                                    cardType: 'Prepaid',
-                                    cardNumber: '**** **** **** 9999',
-                                    amount: '0.00',
-                                    transactions: [],
-                                },
-                            ];
-                            friend_28.payData && (friend_28.payData.cards = cards_2);
-                        }
-                        let count_991 = 0;
-                        const value_992 = () => {
-                            const join_487 = cards_2
-                                    .map((value_492, i_5) => {
-                                        const value_1008 = i_5 === count_991;
-                                        let translateY = 0,
-                                            count_1010 = 1,
-                                            count_497 = 1,
-                                            count_1012 = 100;
-                                        const bgStyles = [
-                                                'linear-gradient(135deg, #111, #1a1a1c)',
-                                                'linear-gradient(135deg, #141416, #222)',
-                                                'linear-gradient(135deg, #0a0a0c, #161618)',
-                                            ],
-                                            bgStyle = bgStyles[i_5 % bgStyles.length],
-                                            text_501 = '#fff',
-                                            subtitleColor = 'rgba(255,255,255,0.6)',
-                                            borderColor = 'rgba(255,255,255,0.15)';
-                                        if (!value_1008) {
-                                            let rank_2 = i_5 - count_991;
-                                            rank_2 < 0 && (rank_2 += cards_2.length);
-                                            translateY = 40 + (rank_2 - 1) * 20;
-                                            count_1010 = 1 - 0.06 * rank_2;
-                                            count_1012 = 10 - rank_2;
-                                        } else {
-                                            translateY = -10;
-                                            count_1010 = 1.02;
-                                            count_1012 = 100;
-                                        }
-                                        const transCSS =
-                                            'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.6s ease';
-                                        return (
-                                            `
-                                <div class="pay-wallet-card" data-idx="` +
-                                            i_5 +
-                                            '" style="position: absolute; top: 0; left: 0; right: 0; height: 180px; background: ' +
-                                            bgStyle +
-                                            '; border-radius: 20px; padding: 20px; color: ' +
-                                            text_501 +
-                                            ';  transition: ' +
-                                            transCSS +
-                                            '; transform: translateY(' +
-                                            translateY +
-                                            'px) scale(' +
-                                            count_1010 +
-                                            '); opacity: ' +
-                                            count_497 +
-                                            '; z-index: ' +
-                                            count_1012 +
-                                            `; cursor: pointer; border: 1px solid rgba(255,255,255,0.08);">
-                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
-                                        <div style="font-size: 16px; font-weight: 700; letter-spacing: 0.5px;">` +
-                                            value_492.bankName +
-                                            `</div>
-                                        <div style="font-size: 11px; color: ` +
-                                            subtitleColor +
-                                            '; border: 1px solid ' +
-                                            borderColor +
-                                            '; padding: 2px 10px; border-radius: 12px; font-weight: 600;">' +
-                                            value_492.cardType +
-                                            `</div>
-                                    </div>
-                                    <div style="font-size: 20px; font-family: monospace; letter-spacing: 2px; margin-bottom: 20px; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">` +
-                                            value_492.cardNumber +
-                                            `</div>
-                                    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                                        <div>
-                                            <div style="font-size: 11px; color: ` +
-                                            subtitleColor +
-                                            `; margin-bottom: 4px; font-weight: 500;">当前金额</div>
-                                            <div style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">$ ` +
-                                            value_492.amount +
-                                            `</div>
-                                        </div>
-                                        <i class="fab fa-cc-visa" style="font-size: 28px; color: ` +
-                                            text_501 +
-                                            `; opacity: 0.7;"></i>
-                                    </div>
-                                </div>
-                            `
-                                        );
-                                    })
-                                    .join(''),
-                                value_488 = cards_2[count_991],
-                                value_489 =
-                                    value_488.transactions && value_488.transactions.length > 0
-                                        ? value_488.transactions
-                                              .map(
-                                                  (tx) =>
-                                                      `
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0;">
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <div style="width: 40px; height: 40px; border-radius: 12px; background: #f4f4f5; display: flex; justify-content: center; align-items: center; color: #111; font-size: 14px;">
-                                        <i class="` +
-                                                      (tx.isIncome
-                                                          ? 'fas fa-arrow-down'
-                                                          : 'fas fa-arrow-up') +
-                                                      '" style="transform: ' +
-                                                      (tx.isIncome ? 'none' : 'rotate(45deg)') +
-                                                      `;"></i>
-                                    </div>
-                                    <div>
-                                        <div style="font-size: 15px; font-weight: 600; color: #111; margin-bottom: 2px;">` +
-                                                      this.renderFriendPhoneLocalized(tx, 'title', {
-                                                          id: 'pay-title',
-                                                      }) +
-                                                      `</div>
-                                        <div style="font-size: 12px; color: #8e8e93; font-weight: 500;">` +
-                                                      this.escapeHTML(
-                                                          this.formatFriendPhoneGeneratedAt(
-                                                              tx.generatedAt,
-                                                          ) ||
-                                                              tx.time ||
-                                                              '',
-                                                      ) +
-                                                      `</div>
-                                    </div>
-                                </div>
-                                <div style="font-size: 16px; font-weight: 700; color: #111;">` +
-                                                      (tx.isIncome ? '+' : '') +
-                                                      tx.amount +
-                                                      `</div>
-                            </div>
-                        `,
-                                              )
-                                              .join('')
-                                        : '<div style="padding: 30px; text-align: center; color: #8e8e93; font-size: 13px;">暂无交易记录</div>',
-                                maxTranslateY = 50 + Math.max(0, cards_2.length - 2) * 20,
-                                containerHeight = maxTranslateY + 45 + 180;
-                            payContent.innerHTML =
-                                `
-                            <div style="padding:16px 20px 0;"><label class="friend-phone-history-picker"><span>生成记录</span><select id="friend-pay-history-select">` +
-                                join_480 +
-                                `</select></label></div>
-                            <style>
-                            #pay-tx-container { animation: fadeUp 0.4s ease-out forwards; } 
-                            @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-                            </style>
-                            <div style="padding: 20px;">
-                                <div style="font-size: 34px; font-weight: 800; color: #111; margin-bottom: 25px; letter-spacing: -0.5px;">Cards</div>
-                                <div id="pay-cards-container" style="position: relative; width: 100%; height: ` +
-                                containerHeight +
-                                `px; margin-bottom: 10px;">
-                                    ` +
-                                join_487 +
-                                `
-                                </div>
-                            </div>
-                            
-                            <div style="padding: 0 20px 40px;" id="pay-tx-container">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                    <div style="font-size: 20px; font-weight: 800; color: #111; letter-spacing: -0.5px;">Transactions</div>
-                                    <div style="width: 32px; height: 32px; border-radius: 16px; background: #e5e5ea; display: flex; justify-content: center; align-items: center; color: #111; font-size: 14px;">
-                                        <i class="fas fa-search"></i>
-                                    </div>
-                                </div>
-                                <div style="background: #fff; border-radius: 20px; padding: 0 20px; ">
-                                    ` +
-                                value_489 +
-                                `
-                                </div>
-                            </div>
-                        `;
-                            const payHistorySelect = document.getElementById(
-                                'friend-pay-history-select',
-                            );
-                            if (payHistorySelect)
-                                payHistorySelect.onchange = () => {
-                                    this._payHistoryIndex = Number(payHistorySelect.value) || 0;
-                                    payBtn.onclick();
-                                };
-                            const container_5 = document.getElementById('pay-cards-container');
-                            container_5 &&
-                                container_5.querySelectorAll('.pay-wallet-card').forEach((el_2) => {
-                                    el_2.onclick = () => {
-                                        const idx_14 = parseInt(el_2.getAttribute('data-idx'));
-                                        idx_14 !== count_991 && ((count_991 = idx_14), value_992());
-                                    };
-                                });
-                        };
-                        value_992();
-                    }
-                }
-            });
-        const payBackBtn = document.getElementById('friend-pay-back-btn');
-        if (payBackBtn)
-            payBackBtn.onclick = () => {
-                if (window.closeView) window.closeView(payView);
-            };
-        const gameBtn = document.getElementById('friend-phone-app-game'),
-            gameView = document.getElementById('friend-game-view');
-        gameBtn &&
-            gameView &&
-            (gameBtn.onclick = () => {
-                if (window.openView) window.openView(gameView);
-                const gameContent = document.getElementById('friend-game-content');
-                if (gameContent && friend_28.gameData) {
-                    const value_507 = friend_28.gameData.recentGames
-                        ? friend_28.gameData.recentGames
-                              .map((g, value_509) => {
-                                  return (
-                                      `
-                        <div class="game-history-item-new" data-idx="` +
-                                      value_509 +
-                                      `" style="background: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 20px; padding: 18px; display: flex; gap: 16px; align-items: center; cursor: pointer;">
-                            <div style="width: 56px; height: 56px; border-radius: 16px; background: #2c2c2e; display: flex; justify-content: center; align-items: center; font-size: 24px; color: #fff; pointer-events: none;">
-                                <i class="` +
-                                      (g.icon || 'fas fa-gamepad') +
-                                      `"></i>
-                            </div>
-                            <div style="flex: 1; pointer-events: none;">
-                                <div style="font-size: 17px; font-weight: 600; color: #fff; letter-spacing: 0.5px;">` +
-                                      this.escapeHTML(g.name || '未知游戏') +
-                                      `</div>
-                                <div style="font-size: 13px; color: #8e8e93; margin-top: 4px;">时长: ` +
-                                      g.hours +
-                                      `</div>
-                                <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                                    <div style="background: #3a3a3c; color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 6px; font-weight: 600;">` +
-                                      this.escapeHTML(g.rank || '未定级') +
-                                      `</div>
-                                    <div style="font-size: 12px; color: #8e8e93;">胜率: <span style="color: #fff; font-weight: 500;">` +
-                                      g.winRate +
-                                      '</span>' +
-                                      this.renderFriendPhoneGeneratedTime(g, 'is-dark') +
-                                      `</div>
-                                </div>
-                            </div>
-                        </div>
-                    `
-                                  );
-                              })
-                              .join('')
-                        : '';
-                    gameContent.innerHTML =
-                        `
-                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px;">
-                            <div style="width: 70px; height: 70px; border-radius: 50%; background: #1c1c1e; display: flex; justify-content: center; align-items: center; font-size: 30px; color: #fff; border: 2px solid #3a3a3c;">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div>
-                                <div style="font-size: 20px; font-weight: 700; color: #fff; letter-spacing: 0.5px;">` +
-                        this.escapeHTML(friend_28.gameData.playerName || 'Player One') +
-                        `</div>
-                                <div style="font-size: 13px; color: #8e8e93; margin-top: 6px;">游戏总时长: <span style="color: #fff; font-weight: 500;">` +
-                        (friend_28.gameData.totalHours || '0 小时') +
-                        `</span></div>
-                            </div>
-                        </div>
-                        <div style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 15px;">常玩的游戏</div>
-                        <div style="display: flex; flex-direction: column; gap: 15px;">
-                            ` +
-                        value_507 +
-                        `
-                        </div>
-                    `;
-                    setTimeout(() => {
-                        try {
-                            const items_7 = gameContent.querySelectorAll('.game-history-item-new');
-                            items_7.forEach((value_1026) => {
-                                window.lovesApp.bindLongPress(value_1026, function () {
-                                    const idx_15 = value_1026.getAttribute('data-idx'),
-                                        g_2 = friend_28.gameData.recentGames[idx_15];
-                                    window.lovesApp.showDeleteConfirm(g_2.name, () => {
-                                        friend_28.gameData.recentGames.splice(idx_15, 1);
-                                        gameBtn.onclick();
-                                    });
-                                });
-                                value_1026.addEventListener('click', function (event_510) {
-                                    event_510.preventDefault();
-                                    event_510.stopPropagation();
-                                    const attribute_511 = this.getAttribute('data-idx'),
-                                        g_3 = friend_28.gameData.recentGames[attribute_511];
-                                    let content_9 = '';
-                                    if (Array.isArray(g_3.matches)) {
-                                        content_9 += `<div style="background: #242424; border-radius: 24px; padding: 16px; margin-bottom: 16px;">
-                                            <div style="font-weight: 700; color: #fff; margin-bottom: 12px; padding-left: 4px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-gamepad" style="color: #fff;"></i> 近期对局 (点击查看单局详情)</div>`;
-                                        g_3.matches.forEach((m_9, value_515) => {
-                                            const isWin =
-                                                    m_9.result === '胜利' || m_9.result === 'Win',
-                                                bgColor = isWin ? '#242424' : '#111',
-                                                textColor = isWin ? '#fff' : '#aaa',
-                                                value_522 = '#fff',
-                                                kdaBgColor = isWin ? '#333' : '#242424',
-                                                value_524 = '#fff',
-                                                value_525 = '#fff',
-                                                encodeURIComponent_526 = encodeURIComponent(
-                                                    JSON.stringify(m_9),
-                                                );
-                                            content_9 +=
-                                                `
-                                            <div class="game-match-item" data-match="` +
-                                                encodeURIComponent_526 +
-                                                '" style="display: flex; align-items: center; justify-content: space-between; background: ' +
-                                                bgColor +
-                                                `; border: 1px solid #555; border-radius: 16px; padding: 16px; margin-bottom: 10px; cursor: pointer;">
-                                                <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 50px; pointer-events: none;">
-                                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(142,142,147,0.1); display: flex; justify-content: center; align-items: center; color: ` +
-                                                value_525 +
-                                                `; font-size: 16px;">
-                                                        <i class="fas fa-user"></i>
-                                                    </div>
-                                                    <div style="font-size: 11px; font-weight: 500; color: ` +
-                                                textColor +
-                                                '; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center;">' +
-                                                window.lovesApp.escapeHTML(m_9.hero || '我方') +
-                                                `</div>
-                                                </div>
-                                                
-                                                <div style="display: flex; flex-direction: column; align-items: center; flex: 1; pointer-events: none;">
-                                                    <div style="font-size: 18px; font-weight: 800; color: ` +
-                                                value_522 +
-                                                '; letter-spacing: 1px;">' +
-                                                m_9.result +
-                                                `</div>
-                                                    <div style="font-size: 11px; color: #8e8e93; margin-top: 6px;">` +
-                                                window.lovesApp.escapeHTML(
-                                                    window.lovesApp.formatFriendPhoneGeneratedAt(
-                                                        m_9.generatedAt,
-                                                    ) ||
-                                                        m_9.time ||
-                                                        '',
-                                                ) +
-                                                `</div>
-                                                    <div style="font-size: 12px; font-weight: 700; color: ` +
-                                                value_524 +
-                                                '; margin-top: 8px; background: ' +
-                                                kdaBgColor +
-                                                '; padding: 4px 10px; border-radius: 8px;">KDA: ' +
-                                                (m_9.kda || '-/-/-') +
-                                                `</div>
-                                                </div>
-
-                                                <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 50px; pointer-events: none;">
-                                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(142,142,147,0.1); display: flex; justify-content: center; align-items: center; color: ` +
-                                                value_525 +
-                                                `; font-size: 16px;">
-                                                        <i class="fas fa-skull"></i>
-                                                    </div>
-                                                    <div style="font-size: 11px; font-weight: 500; color: ` +
-                                                textColor +
-                                                `;">敌方</div>
-                                                </div>
-                                            </div>`;
-                                        });
-                                        content_9 += '</div>';
-                                    } else
-                                        typeof g_3.matches === 'string' &&
-                                            g_3.matches &&
-                                            (content_9 +=
-                                                `<div style="background: #242424; border-radius: 24px; padding: 16px; margin-bottom: 16px;">
-                                            <div style="font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-history" style="color: #fff;"></i> 近期对局</div>
-                                            <div style="color: #ccc; line-height: 1.6; font-size: 14px;">` +
-                                                g_3.matches.replace(/\n/g, '<br>') +
-                                                `</div>
-                                        </div>`);
-                                    g_3.innerThoughts &&
-                                        !Array.isArray(g_3.matches) &&
-                                        (content_9 +=
-                                            `<div style="background: #242424; border-radius: 24px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #fff;">
-                                            <div style="font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-headset" style="color: #fff;"></i> 局内心声</div>
-                                            <div style="color: #ccc; line-height: 1.6; font-size: 14px; font-style: italic;">“` +
-                                            window.lovesApp.renderFriendPhoneLocalized(
-                                                g_3,
-                                                'innerThoughts',
-                                                {
-                                                    id: 'game-thoughts',
-                                                },
-                                            ) +
-                                            `”</div>
-                                        </div>`);
-                                    g_3.postGameReflection &&
-                                        !Array.isArray(g_3.matches) &&
-                                        (content_9 +=
-                                            `<div style="background: #111; border-radius: 24px; padding: 16px; margin-bottom: 16px;">
-                                            <div style="font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-clipboard-list" style="color: #fff;"></i> 局后复盘</div>
-                                            <div style="color: #ccc; line-height: 1.6; font-size: 14px;">` +
-                                            window.lovesApp.renderFriendPhoneLocalized(
-                                                g_3,
-                                                'postGameReflection',
-                                                {
-                                                    id: 'game-reflection',
-                                                },
-                                            ) +
-                                            `</div>
-                                        </div>`);
-                                    if (!content_9) content_9 = '暂无更多数据';
-                                    window.lovesApp.showDetailModal(
-                                        g_3.name + ' - 战绩列表',
-                                        content_9,
-                                        true,
-                                    );
-                                    setTimeout(() => {
-                                        const matchItems =
-                                            document.querySelectorAll('.game-match-item');
-                                        matchItems.forEach((value_527) => {
-                                            value_527.addEventListener('click', function () {
-                                                const matchStr = this.getAttribute('data-match');
-                                                if (matchStr)
-                                                    try {
-                                                        const m_10 = JSON.parse(
-                                                            decodeURIComponent(matchStr),
-                                                        );
-                                                        let matchDetailContent = '';
-                                                        matchDetailContent +=
-                                                            `
-                                                            <div style="background: #242424; border-radius: 20px; padding: 16px; margin-bottom: 16px;">
-                                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                                                    <div style="font-weight: 800; font-size: 20px; color: ` +
-                                                            (m_10.result === '胜利' ||
-                                                            m_10.result === 'Win'
-                                                                ? '#fff'
-                                                                : '#8e8e93') +
-                                                            ';">' +
-                                                            m_10.result +
-                                                            `</div>
-                                                                    <div style="font-weight: 700; color: #fff; background: #333; padding: 4px 10px; border-radius: 8px;">KDA: ` +
-                                                            (m_10.kda || '-/-/-') +
-                                                            `</div>
-                                                                </div>
-                                                                <div style="display: flex; align-items: center; gap: 8px; color: #8e8e93; font-size: 13px;">
-                                                                    <i class="fas fa-clock"></i> ` +
-                                                            window.lovesApp.escapeHTML(
-                                                                window.lovesApp.formatFriendPhoneGeneratedAt(
-                                                                    m_10.generatedAt,
-                                                                ) ||
-                                                                    m_10.time ||
-                                                                    '',
-                                                            ) +
-                                                            ' | 英雄: ' +
-                                                            window.lovesApp.escapeHTML(
-                                                                m_10.hero || '未知',
-                                                            ) +
-                                                            `
-                                                                </div>
-                                                            </div>
-                                                        `;
-                                                        if (
-                                                            m_10.highlights &&
-                                                            Array.isArray(m_10.highlights) &&
-                                                            m_10.highlights.length > 0
-                                                        ) {
-                                                            let join_531 = m_10.highlights
-                                                                .map(
-                                                                    (h) =>
-                                                                        `
-                                                                <div style="display: flex; gap: 12px; margin-bottom: 8px; align-items: flex-start;">
-                                                                    <div style="font-weight: 700; color: #fff; font-size: 13px; background: #333; padding: 2px 6px; border-radius: 4px; flex-shrink: 0;">` +
-                                                                        window.lovesApp.escapeHTML(
-                                                                            window.lovesApp.formatFriendPhoneGeneratedAt(
-                                                                                h.generatedAt,
-                                                                            ) || '',
-                                                                        ) +
-                                                                        `</div>
-                                                                    <div style="color: #ccc; font-size: 14px; line-height: 1.4;">` +
-                                                                        window.lovesApp.renderFriendPhoneLocalized(
-                                                                            h,
-                                                                            'desc',
-                                                                            {
-                                                                                id: 'match-highlight',
-                                                                            },
-                                                                        ) +
-                                                                        `</div>
-                                                                </div>
-                                                            `,
-                                                                )
-                                                                .join('');
-                                                            matchDetailContent +=
-                                                                `
-                                                                <div style="background: #111; border: 1px solid #555; border-radius: 20px; padding: 16px; margin-bottom: 16px;">
-                                                                    <div style="font-weight: 700; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-bolt" style="color: #fff;"></i> 高光时刻</div>
-                                                                    ` +
-                                                                join_531 +
-                                                                `
-                                                                </div>
-                                                            `;
-                                                        }
-                                                        m_10.innerThoughts &&
-                                                            (matchDetailContent +=
-                                                                `
-                                                                <div style="background: #242424; border-radius: 20px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #fff;">
-                                                                    <div style="font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-headset" style="color: #fff;"></i> 局内心声</div>
-                                                                    <div style="color: #ccc; line-height: 1.6; font-size: 14px; font-style: italic;">“` +
-                                                                window.lovesApp.renderFriendPhoneLocalized(
-                                                                    m_10,
-                                                                    'innerThoughts',
-                                                                    {
-                                                                        id: 'match-thoughts',
-                                                                    },
-                                                                ) +
-                                                                `”</div>
-                                                                </div>
-                                                            `);
-                                                        if (
-                                                            m_10.postGameReflection ||
-                                                            m_10.thoughts
-                                                        ) {
-                                                            const fallback_6 =
-                                                                m_10.postGameReflection ||
-                                                                m_10.thoughts;
-                                                            matchDetailContent +=
-                                                                `
-                                                                <div style="background: #111; border-radius: 20px; padding: 16px; margin-bottom: 16px;">
-                                                                    <div style="font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-clipboard-list" style="color: #fff;"></i> 局后复盘</div>
-                                                                    <div style="color: #ccc; line-height: 1.6; font-size: 14px;">` +
-                                                                window.lovesApp.renderFriendPhoneLocalized(
-                                                                    m_10,
-                                                                    m_10.postGameReflection
-                                                                        ? 'postGameReflection'
-                                                                        : 'thoughts',
-                                                                    {
-                                                                        fallback: fallback_6,
-                                                                        id: 'match-reflection',
-                                                                    },
-                                                                ) +
-                                                                `</div>
-                                                                </div>
-                                                            `;
-                                                        }
-                                                        if (!matchDetailContent)
-                                                            matchDetailContent = '暂无详情数据';
-                                                        window.lovesApp.showDetailModal(
-                                                            '单局详情',
-                                                            matchDetailContent,
-                                                            true,
-                                                        );
-                                                    } catch (e_11) {
-                                                        console.error(
-                                                            'Parse match data error',
-                                                            e_11,
-                                                        );
-                                                    }
-                                            });
-                                        });
-                                    }, 100);
-                                });
-                            });
-                        } catch (err_8) {
-                            console.error('Game bind error', err_8);
-                        }
-                    }, 50);
-                } else
-                    gameContent &&
-                        (gameContent.innerHTML =
-                            '<div style="padding: 50px 20px; text-align: center; color: #8e8e93; font-size: 15px;">暂无游戏数据<br><span style="font-size: 13px; margin-top: 8px; display: inline-block;">请在设置中生成</span></div>');
-            });
-        const gameBackBtn = document.getElementById('friend-game-back-btn');
-        if (gameBackBtn)
-            gameBackBtn.onclick = () => {
-                if (window.closeView) window.closeView(gameView);
-            };
-    },
+          });
+        } catch (phoneValue313) {
+          console.error("Game bind error", phoneValue313);
+        }
+      }, 50);
+    } else phoneValue282 && (phoneValue282.innerHTML = "<div style=\"padding: 50px 20px; text-align: center; color: #8e8e93; font-size: 15px;\">暂无游戏数据<br><span style=\"font-size: 13px; margin-top: 8px; display: inline-block;\">请在设置中生成</span></div>");
+  });
+  const phoneValue45 = document.getElementById("friend-game-back-btn");
+  if (phoneValue45) phoneValue45.onclick = () => {
+    if (window.closeView) window.closeView(phoneValue44);
+  };
+},
     showDetailModal: function (innerText_3, innerHTML_2, isGame = false) {
         try {
             const oldModals_3 = document.querySelectorAll('#loves-detail-modal');

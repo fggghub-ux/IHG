@@ -282,12 +282,30 @@
       apk119Value1.showToast?.("复制失败，请检查剪贴板权限");
     }
   }
-  async function apk119Value26(apk119Value122) {
+  async function apk119Value26(apk119Value122, options = {}) {
     const apk119Value123 = apk119Value12(apk119Value122.fileData),
       apk119Value124 = apk119Value24(apk119Value123.name);
     apk119Value124.overlay.classList.add("is-file-reader"), apk119Value124.body.innerHTML = "<div class=\"im-file-info\">" + apk119Value8(apk119Value22(apk119Value123.size)) + "</div><div class=\"im-file-status\" role=\"status\">" + apk119Value8(apk119Value15(apk119Value123)) + "</div><div class=\"im-file-document\"></div>";
     const apk119Value125 = apk119Value124.body.querySelector(".im-file-document");
     apk119Value125.classList.toggle("is-plain", apk119Value123.format !== "markdown"), apk119Value125.textContent = apk119Value123.text, apk119Value124.footer.innerHTML = "<button type=\"button\" data-copy title=\"复制正文\" aria-label=\"复制正文\"><i class=\"far fa-copy\" aria-hidden=\"true\"></i></button><button type=\"button\" data-translate title=\"查看翻译\" aria-label=\"查看翻译\" aria-pressed=\"false\"><i class=\"fas fa-language\" aria-hidden=\"true\"></i></button><button type=\"button\" data-download title=\"下载文件\" aria-label=\"下载文件\"><i class=\"fas fa-download\" aria-hidden=\"true\"></i></button>";
+    if (options.friend && apk119Value122.id && apk119Value1.treasureStore) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('data-treasure-button', '');
+      apk119Value124.footer.appendChild(button);
+      apk119Value1.treasureStore.bindButton(button, options.friend, apk119Value122, 'file');
+    } else if (options.treasureEntryId && apk119Value1.treasureStore) {
+      const button = document.createElement('button');
+      button.type = 'button'; button.title = '取消收藏'; button.setAttribute('aria-label', '取消收藏');
+      button.innerHTML = '<i class="fas fa-bookmark" aria-hidden="true"></i>';
+      apk119Value124.footer.appendChild(button);
+      button.addEventListener('click', async () => {
+        if (button.disabled) return;
+        button.disabled = true;
+        try { await apk119Value1.treasureStore.remove([options.treasureEntryId]); apk119Value124.close(); }
+        catch (error) { apk119Value1.showToast?.(error.message || '取消收藏失败'); button.disabled = false; }
+      });
+    }
     let apk119Value126 = false;
     const apk119Value127 = apk119Value124.footer.querySelector("[data-copy]");
     apk119Value127.disabled = !apk119Value123.text, apk119Value127.addEventListener("click", () => apk119Value25(apk119Value126 ? apk119Value123.translation : apk119Value123.text));

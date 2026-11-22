@@ -65,8 +65,8 @@
                 const button = handleAction_3(element_14, 'button', 'app-guide-section-action', value_12.action.label);
                 button.type = 'button';
                 button.addEventListener('click', () => {
-                    closeAppGuideModal_2();
-                    value_12.action.onClick();
+                    closeAppGuideModal_2({ restoreFocus: false });
+                    requestAnimationFrame(() => value_12.action.onClick());
                 });
             }
             appGuideContentElement.appendChild(element_14);
@@ -80,14 +80,16 @@
         }
         appGuideContentElement.scrollTop = 0;
     }
-    function closeAppGuideModal_2() {
+    function closeAppGuideModal_2(options = {}) {
         if (appGuideModalElement.hidden) return false;
         appGuideModalElement.hidden = true;
         appGuideModalElement.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = overflow_2;
         overflow_2 = '';
         const value_18 = value;
-        return ((value = null), value_18?.focus?.(), true);
+        value = null;
+        if (options.restoreFocus !== false) value_18?.focus?.({ preventScroll: true });
+        return true;
     }
     function openAppGuideModal_2(value_19 = {}) {
         if (!value_19 || typeof value_19 !== 'object') return false;

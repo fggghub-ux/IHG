@@ -2,7 +2,7 @@
     const PAGE_EDGE_PX = 44;
     const count_2 = 24;
     const DOCK_CAPACITY = 4;
-    const schemaVersion_3 = 10;
+    const schemaVersion_3 = 11;
     const count_5 = 3;
     const count_6 = 450;
     const count_7 = window.matchMedia('(pointer: coarse)').matches ? 12 : 8;
@@ -905,6 +905,8 @@
             handleAction_3(pages_4, dock_3, widgets_3);
         if (value_169 && Number(safe.schemaVersion || 0) < 10)
             migrateHomeAppPositions(pages_4, dock_3);
+        if (value_169 && Number(safe.schemaVersion || 0) < 11)
+            handleAction_3(pages_4, dock_3, widgets_3, 'app-treasure-btn');
         pages_4 = pages_4.map((page) =>
             page.filter((item_2) => !isRemovedWidgetItem(item_2, widgets_3)),
         );
@@ -1140,8 +1142,8 @@
         }
         desktopStateNeedsSave = true;
     }
-    function handleAction_3(items_246_2, value_20, value_248_2) {
-        const id_22 = 'app-cycle-btn',
+    function handleAction_3(items_246_2, value_20, value_248_2, appId = 'app-cycle-btn') {
+        const id_22 = appId,
             value_23 = new Set(
                 [...items_246_2.flat(), ...value_20]
                     .map((value_26) => value_26?.id)

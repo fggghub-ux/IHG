@@ -7,6 +7,11 @@
     const imChat_2 = window.imChat,
         isAndroid = /Android/i.test(navigator.userAgent || ''),
         nativeInsetsOnly_2 = isAndroid && window.u2NativeBridge?.isNativeAndroid?.() === true;
+    function escapeChatIdentity(value) {
+        return String(value ?? '').replace(/[&<>"']/g, character => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+        })[character]);
+    }
     isAndroid &&
         window.mobileInputCompat?.registerFocusScope &&
         !imChat_2._androidChatFocusScopeCleanup &&
@@ -78,6 +83,7 @@
             topBar = activePage.querySelector('.chat-top-bar'),
             batchHeader = activePage.querySelector('.chat-batch-header'),
             insChatInputWrapperElement = activePage.querySelector('.ins-chat-input-wrapper');
+        activePage.classList.toggle('batch-selection-active', isActiveSelection);
         if (topBar) topBar.style.display = isActiveSelection ? 'none' : 'flex';
         if (batchHeader) batchHeader.style.display = isActiveSelection ? 'flex' : 'none';
         if (insChatInputWrapperElement)
@@ -98,6 +104,8 @@
         const selectedCount = isActiveSelection ? selection.size : 0,
             count_2 = activePage.querySelector('.chat-batch-selection-count');
         if (count_2) count_2.textContent = '已选择 ' + selectedCount + ' 条';
+        const batchTreasureButton = activePage.querySelector('.batch-treasure-btn');
+        if (batchTreasureButton) { batchTreasureButton.disabled = selectedCount === 0; batchTreasureButton.style.opacity = selectedCount ? '1' : '0.4'; }
         const batchDeleteBtnElement = activePage.querySelector('.batch-delete-btn'),
             batchForwardBtnElement = activePage.querySelector('.batch-forward-btn');
         batchForwardBtnElement &&
@@ -250,7 +258,7 @@
     function renderGroupHeaderAvatarInnerHtml(friend_5) {
         const avatarUrl_2 = friend_5?.avatarUrl || '';
         if (avatarUrl_2)
-            return '<img class="im-group-header-avatar-img" src="' + avatarUrl_2 + '" alt="">';
+            return '<img class="im-group-header-avatar-img" src="' + escapeChatIdentity(avatarUrl_2) + '" alt="">';
         return (
             '<div class="im-group-header-avatar-fallback">' +
             getGroupAvatarInitial(friend_5) +
@@ -784,14 +792,14 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
             isGroupChat
                 ? (value_143_2 = renderGroupHeaderAvatarInnerHtml(friend_6))
                 : (value_143_2 = friend_6.avatarUrl
-                      ? '<img src="' + friend_6.avatarUrl + '" style="display: block;">'
+                      ? '<img src="' + escapeChatIdentity(friend_6.avatarUrl) + '" style="display: block;">'
                       : '<i class="fas fa-user"></i>');
             let text_57 = '';
             if (isGroupChat)
                 text_57 =
                     `<div class="im-chat-group-title-wrap">
                         <div class="ins-chat-name">` +
-                    friend_6.nickname +
+                    escapeChatIdentity(friend_6.nickname) +
                     `</div>
                         <div class="ins-chat-sign">` +
                     formatGroupMemberCount(getGroupMemberCount(friend_6)) +
@@ -809,7 +817,7 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                    </div>
                    <div class="im-chat-title-wrap">
                         <div class="ins-chat-name">` +
-                        (friend_6.nickname === '有兔' ? 'LHV' : friend_6.nickname) +
+                        escapeChatIdentity(friend_6.nickname === '有兔' ? 'LHV' : friend_6.nickname) +
                         `</div>
                         <div class="ins-chat-sign"><div class="im-chat-status-dot"></div><span>` +
                         statusLabel +
@@ -827,7 +835,7 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                    </div>
                    <div class="im-chat-title-wrap">
                         <div class="ins-chat-name">` +
-                              friend_6.nickname +
+                              escapeChatIdentity(friend_6.nickname) +
                               `</div>
                    </div>`)
                         : (text_57 =
@@ -840,7 +848,7 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                    </div>
                    <div class="im-chat-title-wrap">
                         <div class="ins-chat-name">` +
-                              friend_6.nickname +
+                              escapeChatIdentity(friend_6.nickname) +
                               `</div>
                    </div>`);
             }
@@ -916,11 +924,12 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                 text_60 +
                 `
                     <div class="chat-batch-header" style="display:none; align-items:center; justify-content:space-between; min-height:46px; padding:0 14px; color:#111; pointer-events:auto;">
-                        <button type="button" class="chat-cancel-batch-btn im-chat-cancel-batch-btn">取消</button>
+                        <button type="button" class="chat-cancel-batch-btn im-chat-cancel-batch-btn" aria-label="取消多选" title="取消多选"><i class="fas fa-xmark" aria-hidden="true"></i></button>
                         <div class="chat-batch-selection-count" style="font-size:16px; font-weight:600;">已选择 0 条</div>
                         <div class="chat-batch-actions">
-                            <button type="button" class="batch-forward-btn">转发</button>
-                            <button type="button" class="batch-delete-btn">删除</button>
+                            <button type="button" class="batch-forward-btn" aria-label="转发" title="转发"><i class="fas fa-share" aria-hidden="true"></i></button>
+                            <button type="button" class="batch-treasure-btn" aria-label="收藏到 Treasure" title="收藏到 Treasure"><i class="far fa-bookmark" aria-hidden="true"></i></button>
+                            <button type="button" class="batch-delete-btn" aria-label="删除" title="删除"><i class="far fa-trash-can" aria-hidden="true"></i></button>
                         </div>
                     </div>
                 </div>
@@ -1019,6 +1028,20 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                 cancelBatchBtn.addEventListener('click', () => {
                     exitBatchSelectMode_3();
                 });
+            const batchTreasureButton = page_9.querySelector('.batch-treasure-btn');
+            batchTreasureButton?.addEventListener('click', async () => {
+                if (batchTreasureButton.disabled || String(window.imData.batchSelectionFriendId || '') !== String(friend_6.id)) return;
+                const liveFriend = window.imApp.getFriendById?.(friend_6.id) || friend_6;
+                const descriptors = Array.from(ensureBatchSelectionMap().values());
+                batchTreasureButton.disabled = true;
+                try {
+                    const messages = window.treasureStore.resolveMessages(liveFriend, descriptors);
+                    const result = await window.treasureStore.save(liveFriend, messages, 'online');
+                    window.showToast?.(result.duplicate ? '已在 Treasure 中' : '已收藏到 Treasure');
+                    if (String(window.imData.batchSelectionFriendId || '') === String(friend_6.id)) exitBatchSelectMode_3();
+                } catch (error) { window.showToast?.(error.message || '收藏失败，请重试'); }
+                finally { syncBatchSelectionUi_2(friend_6, page_9); }
+            });
             batchForwardBtnElement_149 &&
                 batchForwardBtnElement_149.addEventListener('click', () => {
                     if (String(window.imData.batchSelectionFriendId || '') !== String(friend_6.id))
@@ -1082,12 +1105,8 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                                                             !selectedDescriptors.some(
                                                                 (descriptor_6) => {
                                                                     if (!m) return true;
-                                                                    if (
-                                                                        descriptor_6.id &&
-                                                                        String(m.id) ===
-                                                                            String(descriptor_6.id)
-                                                                    )
-                                                                        return true;
+                                                                    if (descriptor_6.id)
+                                                                        return String(m.id) === String(descriptor_6.id);
                                                                     if (
                                                                         descriptor_6.timestamp &&
                                                                         String(m.timestamp) ===
@@ -1283,7 +1302,7 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                         chatInputElement_197 &&
                             document.activeElement === chatInputElement_197 &&
                             chatInputElement_197.blur();
-                        const avatarSlot = e_9.target.closest('.group-ai-avatar-slot');
+                        const avatarSlot = e_9.target.closest('.group-ai-avatar-slot, .im-message-avatar.is-assistant');
                         if (avatarSlot) {
                             const row_4 = avatarSlot.closest('.ai-row');
                             if (row_4) {
@@ -2183,6 +2202,11 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
         msgContextMenu.dataset.voiceMenu = isVoice ? 'true' : 'false';
         if (voiceActions) voiceActions.style.display = isVoice ? 'flex' : 'none';
         if (isVoice && mainActions_2) mainActions_2.style.display = 'none';
+        if (isVoice) window.imChat.bindTreasureMenuButton?.(
+            voiceActions?.querySelector('[data-action="voice-saved"]'),
+            () => ({ friend: window.imApp.getFriendById(activeFriend_2.id) || activeFriend_2, message: targetMessage }),
+            'voice'
+        );
         if (isVoice && activeFriend_2?.type !== 'group' && speakAction) speakAction.style.display = 'none';
         msgContextOverlayElement.style.display = 'flex';
         msgContextOverlayElement.style.opacity = '1';

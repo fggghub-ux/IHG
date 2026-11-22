@@ -276,15 +276,15 @@ window.openImessageTutorial120 = () => {
       'action': apk120Value1665("打开 Moments", "moments")
     }, {
       'label': '08\x20/\x20YOUTU',
-      'title': "有兔创作助手",
+      'title': "LHV创作助手",
       'items': [{
-        'title': '找到有兔',
-        'text': "首页 Services → Official Accounts → 有兔。第一次点“添加”，之后可从这里或 Chats 进入会话。"
+        'title': '找到LHV',
+        'text': "首页 Services → Official Accounts → LHV。第一次点“添加”，之后可从这里或 Chats 进入会话。"
       }, {
         'title': '可以怎么玩',
-        'text': "告诉有兔你想要的主题、世界书或 Char / User 人设。生成作品会先显示预览，选择目标并确认后才会写入；生成前要在有兔设置里选好 API 预设。"
+        'text': "告诉LHV你想要的主题、世界书或 Char / User 人设。生成作品会先显示预览，选择目标并确认后才会写入；生成前要在LHV设置里选好 API 预设。"
       }],
-      'action': apk120Value1665("找到有兔", "youtu")
+      'action': apk120Value1665("找到LHV", "youtu")
     }]
   });
 };
@@ -462,13 +462,14 @@ window.openCphoneTutorial120 = function () {
   });
 };
 function apk120Value1664(apk120Value1906) {
+  if (apk120Value1906 === "youtu") { window.u2OfficialAccounts?.openDirectory?.(); return; }
   if (apk120Value1906 === "add-char" || apk120Value1906 === 'persona') document.getElementById("open-add-friend-sheet-btn")?.click();else {
     if (apk120Value1906 === "groups") window.imApp["openCreateGroupSheet"]?.();else {
       const apk120Value1907 = {
           'stickers': '[data-imessage-service=\x22stickers\x22]',
           'themes': '#imessage-themes-btn',
-          'moments': "#nav-moments-btn",
-          'youtu': "#imessage-official-accounts-btn"
+          'moments': "#nav-moments-btn"
+
         },
         apk120Value1908 = apk120Value1907[apk120Value1906];
       if (apk120Value1908) document["querySelector"](apk120Value1908)?.["click"]();

@@ -2928,3 +2928,111 @@ button.settings-item {
     font: inherit;
     font-size: 13px;
 }
+
+.config-preset-actions {
+    display: block;
+    margin: 16px;
+}
+.config-preset-actions > button {
+    width: 100%;
+    min-width: 0;
+    min-height: 50px;
+    border: 0;
+    border-radius: 0;
+    justify-content: flex-start;
+    color: var(--blue-color, #007aff);
+    font: inherit;
+    cursor: pointer;
+}
+.config-preset-actions .settings-text { color: inherit; font-weight: 500; text-align: left; }
+.cot-settings-sheet-content .config-preset-actions { margin: 16px 0; }
+.config-preset-overlay { z-index: 1200; }
+.config-preset-overlay [hidden] { display: none !important; }
+.config-preset-overlay [data-preset-load] {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+.config-preset-overlay [data-preset-save] { overflow-y: auto; }
+.config-preset-overlay .api-preset-card-content { display: flex; flex-direction: column; gap: 4px; }
+.config-preset-overlay .api-preset-save-sheet { overflow-y: auto; }
+
+.data-management-lite-picker label { grid-column: 1 / -1; }
+
+.data-transfer-group-heading > div:first-of-type { flex: 1; min-width: 0; }
+
+.data-transfer-group-heading { flex-wrap: wrap; }
+.data-transfer-toolbar { display: flex; gap: 4px; margin-left: auto; flex: 0 0 auto; }
+
+.data-transfer-icon-button,
+.data-management-lite-picker .data-transfer-icon-button {
+    display: inline-grid; place-items: center; width: 44px; min-width: 44px; min-height: 44px;
+    padding: 0; border: 0; border-radius: 13px; background: #f1f2f6; color: #25252b;
+    font: inherit; font-size: 17px; cursor: pointer; flex: 0 0 auto;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.data-transfer-icon-button:hover { background: #e5e8ef; }
+
+.data-transfer-icon-button:active { transform: scale(.95); }
+
+.data-transfer-icon-button:focus-visible,
+.data-backup-picker button:focus-visible { outline: 2px solid #007aff; outline-offset: 2px; }
+
+.data-transfer-icon-button:disabled { opacity: .4; cursor: default; }
+
+.data-transfer-icon-button.is-busy i { animation: data-transfer-pulse .8s ease-in-out infinite alternate; }
+@keyframes data-transfer-pulse { to { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) {
+    .data-transfer-icon-button.is-busy i { animation: none; }
+}
+
+.data-transfer-group .data-management-actions:empty { display: none; }
+
+.data-transfer-group .data-management-lite-picker { grid-template-columns: minmax(0, 1fr) 44px; padding: 12px 16px; }
+
+.data-backup-picker { padding: 14px 16px; }
+
+@media (max-width: 360px) {
+    .data-transfer-group-heading { gap: 8px; padding: 12px; }
+    .data-transfer-group-symbol { width: 30px; height: 30px; border-radius: 9px; }
+    .data-transfer-toolbar { gap: 0; }
+    .data-transfer-group-heading h4 { font-size: 14px; }
+}
+
+.data-backup-picker[hidden] { display: none; }
+
+.data-backup-picker-heading, .data-backup-picker-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+.data-backup-picker-heading strong { font-size: 13px; }
+
+.data-backup-picker-heading button { border: 0; background: none; color: #007aff; font: inherit; font-size: 12px; min-height: 44px; padding: 0 8px; }
+
+.data-backup-picker-footer { margin-top: 10px; color: #73737e; font-size: 12px; }
+
+.data-backup-app-list { display: grid; grid-template-columns: minmax(0, 1fr); max-height: min(44vh, 360px); overflow: auto; overscroll-behavior: contain; }
+
+.data-backup-app-option { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 9px 0; box-sizing: border-box; border-bottom: 1px solid #f1f1f4; cursor: pointer; }
+
+.data-backup-app-option input { accent-color: #007aff; width: 18px; height: 18px; flex: 0 0 auto; }
+
+.data-backup-app-option span { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+
+.data-backup-app-option strong { color: #25252b; font-size: 13px; }
+
+.data-backup-app-option small { color: #777782; font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
+
+.data-media-card { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+
+.data-media-card > div { flex: 1; min-width: 120px; }
+
+.data-media-card strong { font-size: 14px; }
+
+.data-media-card p { margin: 5px 0 0; font-size: 12px; color: #777782; line-height: 1.5; }
+
+.data-media-card > p { width: 100%; }
+
+.data-media-card > button { min-height: 44px; border: 0; border-radius: 10px; padding: 0 12px; background: #f1f2f6; color: #25252b; font: inherit; font-size: 12px; cursor: pointer; }
+
+.data-media-card > button:disabled { opacity: .45; }

@@ -335,8 +335,7 @@
             wanted = Array.isArray(value_86) ? value_86 : [];
         return messages_2.filter((message_14) =>
             wanted.some((descriptor) => {
-                if (descriptor?.id && String(message_14?.id || '') === String(descriptor.id))
-                    return true;
+                if (descriptor?.id) return String(message_14?.id || '') === String(descriptor.id);
                 return (
                     descriptor?.timestamp &&
                     String(message_14?.timestamp || '') === String(descriptor.timestamp)
@@ -592,7 +591,7 @@
             overlay_3
         );
     }
-    function openChatRecordDetail_3(apk119Value170) {
+    function openChatRecordDetail_3(apk119Value170, friend = null) {
   const apk119Value171 = apk119Value170?.["record"] && typeof apk119Value170.record === "object" ? apk119Value170.record : {},
     apk119Value172 = Array.isArray(apk119Value171.entries) ? apk119Value171.entries : [],
     apk119Value173 = handleAction_6(),
@@ -601,7 +600,11 @@
     apk119Value176 = apk119Value171.sourceType === "group" ? "群聊聊天记录" : "私聊聊天记录";
   apk119Value174.innerHTML = "<span>" + escapeHtml(apk119Value176) + "</span><h2>" + escapeHtml(apk119Value171.title || "聊天记录") + "</h2><p>" + apk119Value172.length + " 条消息 · 转发于 " + escapeHtml(formatEntryTime(apk119Value171.createdAt)) + "</p>", apk119Value175.innerHTML = apk119Value172.map((apk119Value177, apk119Value178) => "<article class=\"im-chat-record-entry\">\n            <div class=\"im-chat-record-entry-avatar\">" + (apk119Value177?.["senderAvatarUrl"] || apk119Value177?.["senderAvatarAssetId"] ? "<img src=\"" + escapeHtml(apk119Value177.senderAvatarUrl || "") + "\" data-record-asset-id=\"" + escapeHtml(apk119Value177.senderAvatarAssetId || "") + "\" alt=\"\">" : "<span>" + escapeHtml(String(apk119Value177?.["senderName"] || "?").charAt(0)) + "</span>") + "</div>\n            <div class=\"im-chat-record-entry-body\">\n                <div class=\"im-chat-record-entry-meta\"><strong>" + escapeHtml(apk119Value177?.["senderName"] || "未知发送者") + "</strong><time>" + escapeHtml(formatEntryTime(apk119Value177?.["timestamp"])) + "</time></div>\n                <div class=\"im-chat-record-entry-content\">" + handleAction_5(apk119Value177, apk119Value178) + "</div>\n            </div>\n        </article>").join(""), apk119Value173.hidden = false, apk119Value175.querySelectorAll("[data-file-entry]").forEach(apk119Value179 => apk119Value179.addEventListener("click", () => {
     const apk119Value180 = apk119Value172[Number(apk119Value179.dataset.fileEntry)];
-    if (apk119Value180?.["type"] === "file") window.imChat.openFileDetail(apk119Value180);
+    if (apk119Value180?.["type"] === "file") window.imChat.openFileDetail({
+      ...apk119Value180,
+      id: apk119Value170.id + ':file:' + (apk119Value180.sourceMessageId || apk119Value179.dataset.fileEntry),
+      role: apk119Value180.senderRole || 'user'
+    }, { friend });
   })), apk119Value175.scrollTop = 0, window.appStorage?.["getAssetUrl"] && apk119Value175.querySelectorAll("img[data-record-asset-id]").forEach(apk119Value181 => {
     const apk119Value182 = String(apk119Value181.dataset.recordAssetId || "").trim();
     if (!apk119Value182) return;
@@ -695,7 +698,7 @@
             row.querySelector('.im-chat-record-card')?.addEventListener('click', (event_2) => {
                 event_2.preventDefault();
                 event_2.stopPropagation();
-                openChatRecordDetail_3(message_15);
+                openChatRecordDetail_3(message_15, value_63);
             }),
             element_2.appendChild(row),
             window.imChat.scrollToBottom?.(element_2),

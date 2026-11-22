@@ -1729,3 +1729,70 @@
         transition: none;
     }
 }
+
+.ao3-chapter-body-edited { white-space: pre-wrap; overflow-wrap: anywhere; }
+.ao3-chapter-edit-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    padding: max(10px, var(--safe-top)) 10px max(10px, var(--safe-bottom));
+    background: rgba(0, 0, 0, .56);
+}
+.ao3-chapter-edit-overlay[hidden] { display: none; }
+.ao3-chapter-edit-card {
+    width: min(100%, 760px);
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #777;
+    border-radius: 6px;
+    background: #f7f7f7;
+    box-shadow: 0 5px 26px rgba(0, 0, 0, .38);
+}
+.ao3-chapter-edit-scroll {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0 16px 18px;
+    -webkit-overflow-scrolling: touch;
+}
+.ao3-chapter-edit-scroll label { display: block; margin-top: 16px; font-weight: 700; }
+.ao3-chapter-edit-scroll label small { display: block; margin-top: 2px; color: #666; font-size: 11px; font-weight: 400; }
+.ao3-chapter-edit-scroll input,
+.ao3-chapter-edit-scroll textarea {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    margin-top: 5px;
+    padding: 10px;
+    border: 1px solid #999;
+    border-radius: 2px;
+    background: #fff;
+    color: #222;
+    font-size: 16px;
+    line-height: 1.6;
+    user-select: text;
+    -webkit-user-select: text;
+}
+.ao3-chapter-edit-scroll textarea { resize: none; overflow-y: auto; white-space: pre-wrap; }
+#ao3-chapter-edit-content-input { height: 320px; }
+#ao3-chapter-edit-notes-input { height: 112px; }
+.ao3-chapter-edit-footer { flex: 0 0 auto; background: #e5e5e5; }
+.ao3-chapter-edit-footer .ao3-form-error { margin: 0; padding: 0 15px; }
+.ao3-chapter-edit-footer .ao3-form-error:not(:empty) { padding-block: 8px; }
+.ao3-chapter-edit-footer button { min-height: 44px; }
+.ao3-chapter-edit-footer button:disabled { opacity: .6; }
+
+@media (max-width: 680px) {
+    .ao3-chapter-edit-overlay { padding: var(--safe-top) 0 var(--safe-bottom); }
+    .ao3-chapter-edit-card { border: 0; border-radius: 0; }
+    .ao3-chapter-edit-scroll { padding-inline: 12px; }
+}
