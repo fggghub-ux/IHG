@@ -2211,7 +2211,17 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
         const isVoice = targetMessage?.type === 'voice_message' || !!row_5.querySelector('.voice-message-bubble');
         msgContextMenu.dataset.voiceMenu = isVoice ? 'true' : 'false';
         const treasureAction = msgContextMoreActionsElement?.querySelector('[data-action="treasure"]');
-        if (treasureAction) treasureAction.style.display = isVoice ? 'none' : '';
+        if (treasureAction) {
+            treasureAction.style.display = isVoice ? 'none' : '';
+            treasureAction._treasureSync = () => {
+                const saved = !isVoice && !!targetMessage &&
+                    !!window.treasureStore?.has(activeFriend_2, targetMessage, 'online');
+                const icon = treasureAction.querySelector('.fa-bookmark');
+                icon?.classList.toggle('fas', saved);
+                icon?.classList.toggle('far', !saved);
+            };
+            treasureAction._treasureSync();
+        }
         if (voiceActions) voiceActions.style.display = isVoice ? 'flex' : 'none';
         if (isVoice && mainActions_2) mainActions_2.style.display = 'none';
         if (isVoice) window.imChat.bindTreasureMenuButton?.(

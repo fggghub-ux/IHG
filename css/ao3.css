@@ -1001,6 +1001,7 @@
     border: 1px solid #aaa;
     border-bottom: 0;
     background: linear-gradient(#fff, #ddd);
+    color: var(--ao3-link);
     cursor: pointer;
 }
 .ao3-profile-tab.is-active {

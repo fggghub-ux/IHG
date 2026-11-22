@@ -133,8 +133,6 @@
     }
     const apk119Value67 = /^text\//i.test(apk119Value65.mimeType) || /\.(txt|text|md|markdown|json|csv|tsv|log|xml|html?|css|[cm]?js|ts|py|ya?ml|ini|conf|sql|sh)$/i.test(apk119Value66),
       apk119Value68 = new Uint8Array(await apk119Value64.slice(0, 8192).arrayBuffer());
-    const textEncoding = getUtf16BomEncoding(apk119Value68);
-    if (textEncoding) return new TextDecoder(textEncoding).decode(await apk119Value64.slice(0, 400004).arrayBuffer());
     if (!apk119Value67 && (apk119Value68.includes(0) || apk119Value68.some(apk119Value82 => apk119Value82 < 9 || apk119Value82 > 13 && apk119Value82 < 32))) return null;
     let apk119Value69;
     try {
@@ -149,11 +147,6 @@
     }
     const apk119Value70 = await apk119Value64.slice(0, 400004).arrayBuffer();
     return apk119Value69.decode(apk119Value70);
-  }
-  function getUtf16BomEncoding(bytes) {
-    if (bytes[0] === 255 && bytes[1] === 254) return "utf-16le";
-    if (bytes[0] === 254 && bytes[1] === 255) return "utf-16be";
-    return "";
   }
   async function apk119Value20(apk119Value84) {
     if (!apk119Value84 || apk119Value84.size > apk119Value3) throw new Error("请选择不超过 20 MiB 的文件");
@@ -364,20 +357,6 @@
       apk119Value126 = !apk119Value126, apk119Value128.setAttribute("aria-pressed", String(apk119Value126)), apk119Value128.title = apk119Value126 ? "查看原文" : "查看翻译", apk119Value128.setAttribute("aria-label", apk119Value128.title), void apk119Value129();
     });
     void apk119Value129();
-    if (apk119Value123.source === "upload" && apk119Value123.assetId && apk119Value123.text.includes("\ufffd")) {
-      void (async () => {
-        const blob = await apk119Value1.appStorage.getAssetBlob(apk119Value123.assetId);
-        if (!blob || !apk119Value124.overlay.isConnected) return;
-        const encoding = getUtf16BomEncoding(new Uint8Array(await blob.slice(0, 2).arrayBuffer()));
-        if (!encoding) return;
-        const recovered = new TextDecoder(encoding).decode(await blob.slice(0, 400004).arrayBuffer());
-        if (!apk119Value124.overlay.isConnected) return;
-        apk119Value123.text = recovered.slice(0, apk119Value4);
-        apk119Value123.truncated = recovered.length > apk119Value4;
-        apk119Value124.body.querySelector('.im-file-status').textContent = apk119Value15(apk119Value123);
-        if (!apk119Value126) await apk119Value129();
-      })().catch(() => {});
-    }
     return apk119Value124.close;
   }
   function apk119Value27(apk119Value139) {
