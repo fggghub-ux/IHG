@@ -133,6 +133,8 @@
     }
     const apk119Value67 = /^text\//i.test(apk119Value65.mimeType) || /\.(txt|text|md|markdown|json|csv|tsv|log|xml|html?|css|[cm]?js|ts|py|ya?ml|ini|conf|sql|sh)$/i.test(apk119Value66),
       apk119Value68 = new Uint8Array(await apk119Value64.slice(0, 8192).arrayBuffer());
+    const textEncoding = getUtf16BomEncoding(apk119Value68);
+    if (textEncoding) return new TextDecoder(textEncoding).decode(await apk119Value64.slice(0, 400004).arrayBuffer());
     if (!apk119Value67 && (apk119Value68.includes(0) || apk119Value68.some(apk119Value82 => apk119Value82 < 9 || apk119Value82 > 13 && apk119Value82 < 32))) return null;
     let apk119Value69;
     try {
@@ -147,6 +149,11 @@
     }
     const apk119Value70 = await apk119Value64.slice(0, 400004).arrayBuffer();
     return apk119Value69.decode(apk119Value70);
+  }
+  function getUtf16BomEncoding(bytes) {
+    if (bytes[0] === 255 && bytes[1] === 254) return "utf-16le";
+    if (bytes[0] === 254 && bytes[1] === 255) return "utf-16be";
+    return "";
   }
   async function apk119Value20(apk119Value84) {
     if (!apk119Value84 || apk119Value84.size > apk119Value3) throw new Error("请选择不超过 20 MiB 的文件");
@@ -245,17 +252,18 @@
       apk119Value108 = apk119Value107.name.includes(".") ? apk119Value107.name.split(".").pop().slice(0, 8).toUpperCase() : "FILE";
     return "<span class=\"im-file-icon\" aria-hidden=\"true\"><i class=\"far fa-file-lines\"></i><small>" + apk119Value8(apk119Value108) + "</small></span><span class=\"im-file-copy\"><strong>" + apk119Value8(apk119Value107.name) + "</strong><small>" + apk119Value8(apk119Value22(apk119Value107.size)) + " · 点击查看</small></span>";
   }
-  function apk119Value24(apk119Value109) {
+  function apk119Value24(apk119Value109, container = document.getElementById("app") || document.body) {
     const apk119Value110 = document.createElement("div");
     apk119Value110.className = "im-file-overlay", apk119Value110.innerHTML = "<section class=\"im-file-dialog\" role=\"dialog\" aria-modal=\"true\" aria-label=\"" + apk119Value8(apk119Value109) + "\"><header><strong>" + apk119Value8(apk119Value109) + "</strong><button type=\"button\" data-close aria-label=\"关闭\">×</button></header><div class=\"im-file-body\"></div><footer></footer></section>";
     const apk119Value111 = document.activeElement,
       apk119Value112 = () => {
+        if (!apk119Value110.isConnected) return;
         apk119Value110.remove(), document.removeEventListener("keydown", apk119Value113), apk119Value111?.["focus"]?.({
           preventScroll: true
         });
       },
       apk119Value113 = apk119Value114 => {
-        if (apk119Value110 !== document.querySelector(".im-file-overlay:last-child")) return;
+        if (apk119Value110 !== [...container.children].filter(child => child.classList.contains("im-file-overlay")).at(-1)) return;
         apk119Value114.key === "Escape" && (apk119Value114.preventDefault(), apk119Value112());
         if (apk119Value114.key === "Tab") {
           const apk119Value115 = [...apk119Value110.querySelectorAll("button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled), a[href]")].filter(apk119Value118 => !apk119Value118.hidden && apk119Value118.type !== "file"),
@@ -266,7 +274,7 @@
       };
     return apk119Value110.querySelector("[data-close]").addEventListener("click", apk119Value112), apk119Value110.addEventListener("click", apk119Value119 => {
       if (apk119Value119.target === apk119Value110) apk119Value112();
-    }), document.addEventListener("keydown", apk119Value113), (document.getElementById("app") || document.body).appendChild(apk119Value110), apk119Value110.querySelector("[data-close]").focus({
+    }), document.addEventListener("keydown", apk119Value113), container.appendChild(apk119Value110), apk119Value110.querySelector("[data-close]").focus({
       preventScroll: true
     }), {
       overlay: apk119Value110,
@@ -282,9 +290,9 @@
       apk119Value1.showToast?.("复制失败，请检查剪贴板权限");
     }
   }
-  async function apk119Value26(apk119Value122, options = {}) {
+  function apk119Value26(apk119Value122, options = {}) {
     const apk119Value123 = apk119Value12(apk119Value122.fileData),
-      apk119Value124 = apk119Value24(apk119Value123.name);
+      apk119Value124 = apk119Value24(apk119Value123.name, options.container);
     apk119Value124.overlay.classList.add("is-file-reader"), apk119Value124.body.innerHTML = "<div class=\"im-file-info\">" + apk119Value8(apk119Value22(apk119Value123.size)) + "</div><div class=\"im-file-status\" role=\"status\">" + apk119Value8(apk119Value15(apk119Value123)) + "</div><div class=\"im-file-document\"></div>";
     const apk119Value125 = apk119Value124.body.querySelector(".im-file-document");
     apk119Value125.classList.toggle("is-plain", apk119Value123.format !== "markdown"), apk119Value125.textContent = apk119Value123.text, apk119Value124.footer.innerHTML = "<button type=\"button\" data-copy title=\"复制正文\" aria-label=\"复制正文\"><i class=\"far fa-copy\" aria-hidden=\"true\"></i></button><button type=\"button\" data-translate title=\"查看翻译\" aria-label=\"查看翻译\" aria-pressed=\"false\"><i class=\"fas fa-language\" aria-hidden=\"true\"></i></button><button type=\"button\" data-download title=\"下载文件\" aria-label=\"下载文件\"><i class=\"fas fa-download\" aria-hidden=\"true\"></i></button>";
@@ -354,7 +362,23 @@
     };
     apk119Value128.addEventListener("click", () => {
       apk119Value126 = !apk119Value126, apk119Value128.setAttribute("aria-pressed", String(apk119Value126)), apk119Value128.title = apk119Value126 ? "查看原文" : "查看翻译", apk119Value128.setAttribute("aria-label", apk119Value128.title), void apk119Value129();
-    }), await apk119Value129();
+    });
+    void apk119Value129();
+    if (apk119Value123.source === "upload" && apk119Value123.assetId && apk119Value123.text.includes("\ufffd")) {
+      void (async () => {
+        const blob = await apk119Value1.appStorage.getAssetBlob(apk119Value123.assetId);
+        if (!blob || !apk119Value124.overlay.isConnected) return;
+        const encoding = getUtf16BomEncoding(new Uint8Array(await blob.slice(0, 2).arrayBuffer()));
+        if (!encoding) return;
+        const recovered = new TextDecoder(encoding).decode(await blob.slice(0, 400004).arrayBuffer());
+        if (!apk119Value124.overlay.isConnected) return;
+        apk119Value123.text = recovered.slice(0, apk119Value4);
+        apk119Value123.truncated = recovered.length > apk119Value4;
+        apk119Value124.body.querySelector('.im-file-status').textContent = apk119Value15(apk119Value123);
+        if (!apk119Value126) await apk119Value129();
+      })().catch(() => {});
+    }
+    return apk119Value124.close;
   }
   function apk119Value27(apk119Value139) {
     const apk119Value140 = apk119Value139.id,

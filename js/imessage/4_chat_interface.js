@@ -2097,6 +2097,8 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
             screenRect_2 = value_160.getBoundingClientRect(),
             sourceBubbleRect = bubble.getBoundingClientRect(),
             isUserRow = row_5.classList.contains('user-row'),
+            menuWidth = Math.min(screenRect_2.width - 32, 300),
+            retainsCardAppearance = bubble.matches('.im-contact-card-bubble, .im-file-card'),
             isCardBubble =
                 bubble.classList.contains('im-card-bubble') ||
                 !!bubble.querySelector(
@@ -2105,6 +2107,7 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
             msgContextBubbleCloneElement_274 = document.getElementById('msg-context-bubble-clone');
         if (msgContextBubbleCloneElement_274) {
             msgContextBubbleCloneElement_274.innerHTML = '';
+            msgContextBubbleCloneElement_274.classList.toggle('msg-context-full-card', retainsCardAppearance);
             const activeFriend = window.imData.currentActiveFriend;
             msgContextBubbleCloneElement_274.dataset.chatType = activeFriend?.type || 'char';
             activeFriend?.id != null
@@ -2126,7 +2129,7 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
             const clonedBubble = bubble.cloneNode(true);
             clonedBubble.style.margin = '0';
             if (isCardBubble) {
-                const cloneWidth = Math.max(
+                const cloneWidth = retainsCardAppearance ? Math.min(sourceBubbleRect.width || 260, menuWidth) : Math.max(
                     180,
                     Math.min(sourceBubbleRect.width || 260, 270, screenRect_2.width - 48),
                 );
@@ -2141,6 +2144,21 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                         card.style.maxWidth = '100%';
                         card.style.boxSizing = 'border-box';
                     });
+                if (retainsCardAppearance) {
+                    const sourceNodes = [bubble, ...bubble.querySelectorAll('*')];
+                    const cloneNodes = [clonedBubble, ...clonedBubble.querySelectorAll('*')];
+                    const properties = ['background-color', 'color', 'border-color', 'border-radius', 'box-shadow'];
+                    const appearances = sourceNodes.map(node => {
+                        const style = getComputedStyle(node);
+                        return properties.map(property => style.getPropertyValue(property));
+                    });
+                    cloneNodes.forEach((node, index) => {
+                        properties.forEach((property, propertyIndex) => {
+                            const value = appearances[index][propertyIndex];
+                            if (value) node.style.setProperty(property, value, 'important');
+                        });
+                    });
+                }
             } else clonedBubble.style.maxWidth = '100%';
             clonedRow.appendChild(clonedBubble);
             msgContextBubbleCloneElement_274.appendChild(clonedRow);
@@ -2154,17 +2172,9 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
             activeFriend_2 = window.imData.currentActiveFriend,
             messageId = row_5.getAttribute('data-message-id'),
             messageTimestamp = row_5.getAttribute('data-timestamp'),
-            targetMessage =
-                activeFriend_2 && Array.isArray(activeFriend_2.messages)
-                    ? activeFriend_2.messages.find((message_2) => {
-                          if (!message_2) return false;
-                          if (messageId && String(message_2.id) === String(messageId)) return true;
-                          return (
-                              messageTimestamp &&
-                              String(message_2.timestamp) === String(messageTimestamp)
-                          );
-                      })
-                    : null;
+            targetMessage = window.imDataUtils.findMessageByReference(
+                activeFriend_2?.messages, messageId, messageTimestamp,
+            );
         if (recallAction) {
             const canRecall =
                 row_5.classList.contains('user-row') &&
@@ -2200,6 +2210,8 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
         const voiceActions = document.getElementById('msg-context-voice-actions');
         const isVoice = targetMessage?.type === 'voice_message' || !!row_5.querySelector('.voice-message-bubble');
         msgContextMenu.dataset.voiceMenu = isVoice ? 'true' : 'false';
+        const treasureAction = msgContextMoreActionsElement?.querySelector('[data-action="treasure"]');
+        if (treasureAction) treasureAction.style.display = isVoice ? 'none' : '';
         if (voiceActions) voiceActions.style.display = isVoice ? 'flex' : 'none';
         if (isVoice && mainActions_2) mainActions_2.style.display = 'none';
         if (isVoice) window.imChat.bindTreasureMenuButton?.(
@@ -2210,7 +2222,6 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
         if (isVoice && activeFriend_2?.type !== 'group' && speakAction) speakAction.style.display = 'none';
         msgContextOverlayElement.style.display = 'flex';
         msgContextOverlayElement.style.opacity = '1';
-        const menuWidth = Math.min(screenRect_2.width - 32, 300);
         msgContextMenu.style.width = menuWidth + 'px';
         isUserRow
             ? ((msgContextMenu.style.alignItems = 'flex-end'),

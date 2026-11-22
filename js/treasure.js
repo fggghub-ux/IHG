@@ -180,7 +180,11 @@
     localValue4("list").innerHTML = localValue117.length ? localValue117.map(localValue128 => localValue34(localValue128, localValue118)).join("") : "<div class=\"treasure-empty\"><i class=\"" + (localValue17 ? "fas fa-magnifying-glass" : "far fa-bookmark") + "\" aria-hidden=\"true\"></i><span>" + (localValue17 ? localValue18.trim() ? "没有找到相关收藏" : "输入关键词搜索收藏" : "暂无收藏") + "</span></div>", localValue4("pagination").hidden = localValue113 <= 1, localValue4("page-status").textContent = "第 " + (localValue19 + 1) + " / " + localValue113 + " 页", localValue4("page-previous").disabled = localValue19 === 0, localValue4("page-next").disabled = localValue19 === localValue113 - 1, localValue28(), localValue4("list").querySelectorAll("[data-treasure-file]").forEach(localValue129 => localValue129.addEventListener("click", () => {
       if (localValue9) return;
       const localValue130 = localValue117.find(localValue131 => localValue131.id === localValue129.closest("[data-treasure-entry]").dataset.treasureEntry);
-      window.imChat.openFileDetail(localValue118[Number(localValue129.dataset.treasureFile)], {
+      const message = localValue118[Number(localValue129.dataset.treasureFile)];
+      if (!localValue130 || !message) return;
+      closeFileReader?.();
+      closeFileReader = window.imChat.openFileDetail(message, {
+        container: localValue4("view"),
         "treasureEntryId": localValue130.category === "file" ? localValue130.id : null
       });
     })), localValue4("list").querySelectorAll("[data-treasure-audio-download]").forEach(localValue132 => localValue132.addEventListener("click", async () => {
@@ -286,6 +290,7 @@
       window.showToast?.("浏览位置保存失败");
     }
   }
+  let closeFileReader;
   async function localValue45() {
     await localValue1.ready(), localValue8 = window.imData?.["friends"]?.["length"] ? window.imData.friends : await window.appStorage.loadFriends(), localValue1.resetIndexes(), localValue20 = "", localValue19 = 0;
     const localValue178 = localValue1.state();
@@ -296,6 +301,8 @@
     await localValue36(), void localValue44();
   }
   function localValue46() {
+    closeFileReader?.();
+    closeFileReader = null;
     localValue43(), localValue11++, localValue24(false), localValue23++, localValue4("status-content").replaceChildren(), localValue21?.["disconnect"](), window.mobileInputCompat?.["releaseForOverlay"]?.(localValue4("view"));
     for (const localValue181 of ["picker", "confirm", "image-preview", "offline-detail", "status-detail"]) localValue4(localValue181).hidden = true;
     const localValue180 = localValue4("view");

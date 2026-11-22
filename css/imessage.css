@@ -19518,8 +19518,15 @@ button.moment-private-chat-bubble.has-translation {
     padding: 10px;
     box-sizing: border-box;
 }
-#msg-context-bubble-clone:not(:has(.family-invitation-card)) {
+#msg-context-bubble-clone:not(.msg-context-full-card):not(:has(.family-invitation-card)) {
     max-width: 75%;
+}
+#msg-context-bubble-clone.msg-context-full-card {
+    max-width: 100%;
+    padding: 0;
+}
+#msg-context-bubble-clone.msg-context-full-card .msg-context-card-clone {
+    max-width: 100% !important;
 }
 #msg-context-menu {
     gap: 10px;

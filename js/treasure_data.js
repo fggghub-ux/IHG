@@ -447,7 +447,7 @@
         label = document.createElement('span');
         button.prepend(label);
       }
-      label.textContent = 'Saved';
+      label.textContent = category === 'voice' ? 'Treasure' : 'Saved';
     };
     button._treasureSync = sync;
     sync();
@@ -459,6 +459,7 @@
       if (button._treasureSaving || window.imData?.batchSelectMode) return;
       const source = button._treasureMenuSource?.();
       if (!source?.friend || !source.message) return;
+      if (category === 'voice') window.imChat.closeContextMenu();
       button._treasureSaving = true;
       button.setAttribute('aria-busy', 'true');
       try {
