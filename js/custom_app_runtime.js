@@ -535,9 +535,17 @@
                 apiConfig_2.provider,
             ),
             value_151 = new AbortController(),
-            setTimeout_152 = window.setTimeout(() => value_151.abort(), 60000);
+            setTimeout_152 = window.setTimeout(() => {
+              window.u2ApiConsole?.markTimeout(value_151.signal);
+              value_151.abort();
+            }, 60000);
         try {
             const value_154 = await window.u2Api.fetchChatCompletion(apiEndpoint, {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "自定义应用",
+                  purpose: "运行 AI 功能"
+                },
                 method: 'POST',
                 headers: window.u2Api.buildApiHeaders(apiConfig_2, {
                     [window.u2Api.INTERNAL_SILENT_ERROR_HEADER]: '1',

@@ -358,7 +358,7 @@
             records_3.length
         );
     }
-    async function requestEmbeddings_2(value_106, inputs) {
+    async function requestEmbeddings_2(value_106, inputs, purpose = "生成文本向量", connectionTest = false) {
         const normalized_4 = normalizeConfig_2(value_106);
         if (!isConfigured(normalized_4)) throw new Error('请先完成向量记忆服务配置');
         const values_2 = (Array.isArray(inputs) ? inputs : [inputs])
@@ -366,9 +366,21 @@
             .filter(Boolean);
         if (values_2.length === 0) return [];
         const controller = typeof AbortController === 'function' ? new AbortController() : null,
-            timeout = window.setTimeout(() => controller?.abort(), EMBEDDING_REQUEST_TIMEOUT_MS_2);
+            timeout = window.setTimeout(() => {
+              window.u2ApiConsole?.markTimeout(controller?.signal);
+              controller?.abort();
+            }, EMBEDDING_REQUEST_TIMEOUT_MS_2);
+          let trace;
         try {
             const value_112 = await fetch(getEmbeddingEndpoint_2(normalized_4), {
+                  u2ApiTrace: {
+                    service: connectionTest ? "test" : "embedding",
+                    source: connectionTest ? "设置 › 向量记忆" : "iMessage › 向量记忆",
+                    purpose: purpose,
+                    provider: normalized_4.provider,
+                    model: normalized_4.model,
+                    format: "manual"
+                  },
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',
@@ -380,17 +392,20 @@
                         input: values_2,
                     }),
                     signal: controller?.signal,
-                }),
-                raw = await value_112.text();
+                });
+                trace = window.u2ApiConsole?.forResponse(value_112);
+                const raw = await value_112.text();
             let data_2 = {};
             if (raw)
                 try {
                     data_2 = JSON.parse(raw);
                 } catch (value_116) {
+                    trace?.fail(value_116);
                     data_2 = {
                         error: raw.slice(0, 500),
                     };
                 }
+            trace?.payload(data_2);
             if (!value_112.ok)
                 throw new Error(
                     String(
@@ -426,8 +441,9 @@
             const dimensions = embeddings[0].length;
             if (embeddings.some((vector_2) => vector_2.length !== dimensions))
                 throw new Error('嵌入服务返回的向量维度不一致');
-            return embeddings;
+            return trace?.finish(), embeddings;
         } catch (error_2) {
+            trace?.fail(error_2);
             if (error_2?.name === 'AbortError') throw new Error('嵌入请求超时，请稍后重试');
             throw error_2;
         } finally {
@@ -437,7 +453,7 @@
     async function testConnection_2(config_8) {
         try {
             return (
-                await requestEmbeddings_2(config_8, ['vector memory connection test']),
+                await requestEmbeddings_2(config_8, ['vector memory connection test'], '测试连接', true),
                 {
                     ok: true,
                 }
@@ -506,10 +522,7 @@
         let indexedCount_2 = 0;
         for (let start = 0; start < pending.length; start += EMBEDDING_BATCH_SIZE) {
             const batch = pending.slice(start, start + EMBEDDING_BATCH_SIZE),
-                embeddings_2 = await requestEmbeddings_2(
-                    config_9,
-                    batch.map((item_6) => item_6.item.content),
-                ),
+                embeddings_2 = await requestEmbeddings_2(config_9, batch.map(entry => entry.item.content), "写入记忆索引"),
                 records_4 = batch
                     .map((item_7, index_5) =>
                         createIndexRecord_2(friend_5, item_7.item, embeddings_2[index_5], config_9),
@@ -688,7 +701,7 @@
                 results: [],
                 skipped: true,
             };
-        const queryEmbedding = (await requestEmbeddings_2(config_11, [query.slice(0, 6000)]))[0],
+        const queryEmbedding = (await requestEmbeddings_2(config_11, [query.slice(0, 6000)], "检索相关记忆"))[0],
             fingerprint_4 = getConfigFingerprint_2(config_11),
             records_6 = await getIndexRecords(getScopeFriendKey(config_11, friend_9.id)),
             requestedLimit = Math.round(Number(options_3?.limit)),

@@ -2288,6 +2288,11 @@ User 从未加入这个群，不能发言，也不能被当作群成员。群里
                 );
                 if (!chatCompletionsEndpoint) throw new Error('API 地址无效');
                 const value_313 = await fetch(chatCompletionsEndpoint, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "Char 手机",
+                      purpose: "生成手机内容"
+                    },
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -2515,6 +2515,12 @@
       ...(typeof scopeValue1107.thought === "string" ? { thought: scopeValue1107.thought } : {}),
       type: scopeValue1107.type || "text",
       ...scopeValue170(scopeValue1107),
+      ...(scopeValue1107.type === "location" ? {
+        locationName: String(scopeValue1107.locationName || scopeValue1107.name || "").slice(0, 80),
+        locationAddress: String(scopeValue1107.locationAddress || scopeValue1107.address || "").slice(0, 160),
+        locationNameTranslation: String(scopeValue1107.locationNameTranslation || "").slice(0, 80),
+        locationAddressTranslation: String(scopeValue1107.locationAddressTranslation || "").slice(0, 160)
+      } : {}),
       ...(scopeValue1107.type === "file" ? {
         fileData: scopeValue49(scopeValue47(scopeValue1107.fileData || {}))
       } : {}),
@@ -2738,6 +2744,12 @@
       ...(typeof scopeValue1137.thought === "string" ? { thought: scopeValue1137.thought } : {}),
       type: scopeValue1137.type,
       ...scopeValue170(scopeValue1137),
+      ...(scopeValue1137.type === "location" ? {
+        locationName: String(scopeValue1137.locationName || ""),
+        locationAddress: String(scopeValue1137.locationAddress || ""),
+        locationNameTranslation: String(scopeValue1137.locationNameTranslation || ""),
+        locationAddressTranslation: String(scopeValue1137.locationAddressTranslation || "")
+      } : {}),
       ...(scopeValue1137.type === "file" ? {
         fileData: scopeValue47(scopeValue1137.fileData || {})
       } : {}),
@@ -3233,7 +3245,7 @@
         };
         const newScope1292 = String(scopeValue1243.actorMemberId || "");
         const newScope1293 = scopeValue1243.actorRole === "assistant" && newScope1292 ? await scopeValue77(newScope1288.get(newScope1292)) : null;
-        const newScope1294 = scopeValue1243.actorRole === "user" ? !(Number(newScope1291.leftGroupAt) > 0 || newScope1291.groupObserverMode === true) : scopeValue1243.actorRole === "assistant" && newScope1292 && (newScope1291.members || []).some(newScope1305 => String(newScope1305) === newScope1292) && (newScope1291.adminMemberIds || []).some(newScope1306 => String(newScope1306) === newScope1292) && ["char", "npc"].includes(newScope1293?.type) && [newScope1293?.nickname, newScope1293?.realName].some(newScope1307 => newScope1307 && newScope1307 === scopeValue1243.actorName);
+        const newScope1294 = scopeValue1243.actorRole === "user" ? !(Number(newScope1291.leftGroupAt) > 0 || newScope1291.groupObserverMode === true) : scopeValue1243.actorRole === "assistant" && newScope1292 && (newScope1291.members || []).some(newScope1305 => String(newScope1305) === newScope1292) && (newScope1291.adminMemberIds || []).some(newScope1306 => String(newScope1306) === newScope1292) && !(Number(newScope1291.groupMutes?.[newScope1292]?.until) > Date.now()) && ["char", "npc"].includes(newScope1293?.type) && [newScope1293?.nickname, newScope1293?.realName].some(newScope1307 => newScope1307 && newScope1307 === scopeValue1243.actorName);
         if (!newScope1294) return {
           success: false,
           reason: "forbidden"
@@ -3319,6 +3331,35 @@
       }
     });
   }
+  async function commitGroupManagement(groupId, draft) {
+      const id = String(groupId);
+      return scopeValue83([scopeValue9.imFriends, scopeValue9.imMessages, scopeValue9.imChatSummaries], 'readwrite', async (stores, transaction) => {
+          try {
+              const friends = stores[scopeValue9.imFriends], messages = stores[scopeValue9.imMessages], summaries = stores[scopeValue9.imChatSummaries];
+              const group = await scopeValue77(friends.get(id));
+              if (!group || group.type !== 'group') return { success: false, reason: 'not_group' };
+              const actor = draft.actorMemberId ? await scopeValue77(friends.get(String(draft.actorMemberId))) : null;
+              const target = draft.targetMemberId ? await scopeValue77(friends.get(String(draft.targetMemberId))) : null;
+              const requestId = draft.requestId || group.groupMuteRequests?.[draft.targetMemberId]?.requestId;
+              const request = requestId ? await scopeValue77(messages.get(String(requestId))) : null;
+              const summary = await scopeValue77(summaries.get(id));
+              if (draft.isCurrent && !draft.isCurrent()) return { success: false, reason: 'cancelled' };
+              const result = draft.reduce(group, actor, target, request);
+              if (!result?.success || !result.message) return result;
+              const order = Math.max(0, Number(summary?.messageCount) || Number(group.messageCount) || 0);
+              const message = { ...result.message, __messageOrder: order };
+              const nextSummary = scopeValue188(id, { ...summary, messageCount: order + 1,
+                  lastMessagePreview: message.text || message.content || '', lastMessageTimestamp: message.timestamp,
+                  unreadCount: Math.max(0, Number(summary?.unreadCount) || 0) + (draft.incomingUnread ? 1 : 0) });
+              friends.put(scopeValue49({ ...group, updatedAt: Date.now() }));
+              messages.put(scopeValue171(id, message, order));
+              if (result.updatedRequest) messages.put(scopeValue49(result.updatedRequest));
+              summaries.put(nextSummary);
+              return { ...result, group, message, summary: nextSummary };
+          } catch (error) { transaction.abort(); throw error; }
+      });
+  }
+
   async function newScope201(scopeValue1242, newScope1310, scopeValue1244 = 0) {
     if (!scopeValue1242 || scopeValue1242.id == null) throw new Error("Friend is required for atomic message commit.");
     const scopeValue1245 = String(scopeValue1242.id);
@@ -4474,6 +4515,9 @@
         model: typeof scopeValue1561.apiConfig.model === "string" ? scopeValue1561.apiConfig.model : "",
         temperature: Number.isFinite(parseFloat(scopeValue1561.apiConfig.temperature)) ? parseFloat(scopeValue1561.apiConfig.temperature) : 0.7,
         frequencyPenalty: Number.isFinite(parseFloat(scopeValue1561.apiConfig.frequencyPenalty)) ? Math.max(-2, Math.min(2, parseFloat(scopeValue1561.apiConfig.frequencyPenalty))) : 0,
+        maxTokens: ["number", "string"].includes(typeof scopeValue1561.apiConfig.maxTokens)
+          && Number.isSafeInteger(Number(scopeValue1561.apiConfig.maxTokens)) && Number(scopeValue1561.apiConfig.maxTokens) > 0
+          ? Number(scopeValue1561.apiConfig.maxTokens) : null,
         streamEnabled: scopeValue1561.apiConfig.streamEnabled === true
       } : {
         provider: "openai-compatible",
@@ -4482,6 +4526,7 @@
         model: "",
         temperature: 0.7,
         frequencyPenalty: 0,
+        maxTokens: null,
         streamEnabled: false
       },
       vectorMemoryConfig: (() => {
@@ -7978,6 +8023,7 @@
     saveFriendMessage: scopeValue192,
     commitFriendMessage: newScope201,
     commitGroupAnnouncement: scopeValue193,
+    commitGroupManagement,
     claimAwayReturn: newScope202,
     finishAwayReturn: newScope203,
     getAwayReturnState: newScope204,

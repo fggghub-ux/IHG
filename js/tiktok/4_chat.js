@@ -189,6 +189,11 @@
             '\n\nHard requirements:\n1. Return one strict JSON object only. No markdown, no prose, no comments, no trailing commas.\n2. The JSON shape must be {"users":[...]}.\n3. Generate 2-5 different senders. To reflect real TikTok DMs, mix normal users (strangers, peers, followers) with UNWANTED users (crypto/forex scammers, fake sugar daddies/mommies, fake agency collabs, bots, weird creeps, or harassment messages).\n4. Every sender must include "name", "handle", "avatarDesc", "persona", "status", and "messages". "persona" must explicitly describe their motive (e.g. "Crypto scammer trying to sell a course" or "Creepy stranger asking for feet pics").\n5. "messages" must contain 5-10 message objects from that sender to the user. Each object is one short chat bubble.\n6. The messages must feel EXTREMELY REAL to TikTok. Scammers should use their typical aggressive/scripted tactics, creeps should be inappropriately forward, bots should sound like spam, and normal users should be casual.\n7. Do not use emoji. Do not write as the user. Do not include offer cards or non-text message types. 禁止扮演user的身份发抖音和评论，你只能是除了user以外的人。\n8. The app is international. The message text can be any language that fits the sender persona. If "text" is not Chinese, "translationZh" must contain a natural Chinese translation. If "text" is Chinese, "translationZh" must be an empty string.\n\nJSON example:\n{\n  "users": [\n    {\n      "name": "sender name",\n      "handle": "sender_handle",\n      "avatarDesc": "short avatar seed",\n      "persona": "why this sender would DM the user",\n      "status": "short TikTok status",\n      "messages": [\n        { "text": "message 1", "translationZh": "" },\n        { "text": "foreign-language message", "translationZh": "这条外语消息的中文翻译" },\n        { "text": "message 3", "translationZh": "" },\n        { "text": "message 4", "translationZh": "" },\n        { "text": "message 5", "translationZh": "" }\n      ]\n    }\n  ]\n}\n';
         try {
             const value_27 = await window.tkFetch('dms', tkDmResolveApiEndpoint(), {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "TikTok › 私信",
+                  purpose: "生成收到的私信"
+                },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1109,6 +1114,7 @@
                 window.apiConfig.endpoint,
             );
             const value_137 = await window.tkFetch('dms', chatCompletionsEndpoint, {
+                u2ApiTrace: { service: "text", source: "TikTok › 私信", purpose: "生成聊天回复" },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1342,6 +1348,7 @@
                 window.apiConfig.endpoint,
             );
             const value_164 = await window.tkFetch('dms', chatCompletionsEndpoint_163, {
+                u2ApiTrace: { service: "text", source: "TikTok › 私信", purpose: "总结私信" },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1810,6 +1817,7 @@
                     window.apiConfig.endpoint,
                 );
                 const value_231 = await window.tkFetch('dms', chatCompletionsEndpoint_230, {
+                    u2ApiTrace: { service: "text", source: "TikTok › 私信", purpose: "生成私信内容" },
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

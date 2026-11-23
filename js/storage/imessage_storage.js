@@ -114,6 +114,7 @@
         commitFriendMessage: proxy('commitFriendMessage'),
         commitMemoryRequestDecision: proxy('commitMemoryRequestDecision'),
         commitGroupAnnouncement: proxy('commitGroupAnnouncement'),
+        commitGroupManagement: proxy('commitGroupManagement'),
         claimAwayReturn: proxy('claimAwayReturn'),
         finishAwayReturn: proxy('finishAwayReturn'),
         getAwayReturnState: proxy('getAwayReturnState'),

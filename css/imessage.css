@@ -20306,3 +20306,27 @@ button.moment-private-chat-bubble.has-translation {
     font-size: 12px;
     cursor: pointer;
 }
+
+#chat-char-gallery-photos-row[hidden],
+#chat-memory-autonomous-diary-card[hidden] {
+    display: none !important;
+}
+
+
+/* Group moderation controls share the application's centered card surfaces. */
+.group-mute-dialog-overlay { position:absolute; inset:0; z-index:15000; display:flex; align-items:center; justify-content:center; padding:24px; background:rgba(0,0,0,.3); box-sizing:border-box; }
+.group-mute-dialog { width:min(100%,360px); max-height:85%; overflow:auto; background:var(--card-bg,#fff); color:var(--text-primary,#222); border-radius:20px; padding:22px; display:flex; flex-direction:column; gap:16px; box-sizing:border-box; }
+.group-mute-dialog strong { font-size:18px; overflow-wrap:anywhere; }
+.group-mute-dialog label { display:flex; flex-direction:column; gap:8px; }
+.group-mute-dialog select,.group-mute-dialog input { min-width:0; min-height:44px; border:1px solid #ccc; background:#fff; color:#222; border-radius:10px; padding:8px; font-size:16px; box-sizing:border-box; }
+.group-mute-custom { display:flex; gap:8px; }
+.group-mute-custom[hidden] { display:none; }
+.group-mute-custom input { flex:1; width:100%; }
+.group-management-buttons { display:flex; gap:8px; margin-top:8px; }
+.group-management-buttons button { flex:1; border:0; border-radius:10px; min-height:40px; padding:8px; background:#ededf0; color:#222; font-size:14px; cursor:pointer; }
+.group-management-buttons button:last-child { background:#007aff; color:#fff; }
+.group-management-buttons button:disabled { opacity:.5; }
+.group-unmute-request-row { justify-content:center !important; }
+.group-unmute-request-card { width:min(85%,320px); padding:16px; border-radius:16px; background:rgba(128,128,128,.1); color:var(--text-primary,#222); font-size:14px; overflow-wrap:anywhere; }
+.group-unmute-request-card p { margin:10px 0; white-space:pre-wrap; }
+.group-unmute-request-card small { opacity:.65; }

@@ -1942,6 +1942,11 @@ window.lovesApp = {
 5. 只返回纯 JSON：{"mood":"上述一个 id","message":{"text":"Char 自己的心情记录","translation":"中文翻译或空字符串"},"comment":{"text":"Char 给 User 心情的留言","translation":"中文翻译或空字符串"}}。不要 Markdown。`,
                 endpoint_2 = window.u2Api.resolveChatCompletionsEndpoint(apiConfig_2.endpoint),
                 value_136 = await fetch(endpoint_2, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "Loves › 心情",
+                      purpose: "生成心情回复"
+                    },
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2729,6 +2734,11 @@ User 刚刚在这条 Char 动态下评论：` + options_6.userComment);
                     apiConfig_2_2.endpoint,
                 ),
                 response = await fetch(endpoint_2_2, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "Loves › 动态",
+                      purpose: "生成评论"
+                    },
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -3570,6 +3580,11 @@ Char 已存：` +
         if (window.showToast) window.showToast('Requesting withdrawal...');
         try {
             const response_2 = await fetch(endpoint_3, {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "Loves › 存钱罐",
+                  purpose: "处理取款申请"
+                },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -5493,6 +5508,11 @@ Char 已存：` +
         window.showToast?.('Computer is running, please wait...');
         try {
             const response_3 = await fetch(chatCompletionsEndpoint_791, {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "Loves › Char 电脑",
+                  purpose: "生成电脑内容"
+                },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -5776,6 +5796,11 @@ openFriendPhone: function (phoneValue1) {
         phoneValue83 = window.apiConfig.model || "gpt-3.5-turbo",
         phoneValue84 = window.u2Api.resolveChatCompletionsEndpoint(window.apiConfig.endpoint),
         phoneValue85 = fetch(phoneValue84, {
+          u2ApiTrace: {
+            service: "text",
+            source: "Loves › Char 电脑",
+            purpose: "生成应用内容"
+          },
           "method": "POST",
           "headers": {
             "Content-Type": "application/json",

@@ -2426,6 +2426,11 @@ async function getVODResponse(userMessage_2, titleOverride, value_299 = false) {
                 window.apiConfig.endpoint,
             ),
             value_307 = await fetch(chatCompletionsEndpoint, {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "YouTube › 视频",
+                  purpose: "生成观看互动"
+                },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -2737,6 +2742,11 @@ async function getYtReplayTopLevelComments(video_7, channel_12) {
             window.apiConfig.endpoint,
         ),
         value_359 = await fetch(chatCompletionsEndpoint_358, {
+            u2ApiTrace: {
+              service: "text",
+              source: "YouTube › 回放",
+              purpose: "生成回放评论"
+            },
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -3166,6 +3176,11 @@ async function getCharResponse(
                 window.apiConfig.endpoint,
             ),
             value_444 = await fetch(chatCompletionsEndpoint_443, {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "YouTube › 直播",
+                  purpose: "生成直播互动"
+                },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -3491,6 +3506,11 @@ async function generateLiveSummary() {
                 window.apiConfig.endpoint,
             ),
             value_481 = await fetch(chatCompletionsEndpoint_480, {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "YouTube › 直播",
+                  purpose: "总结直播"
+                },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -4426,6 +4446,11 @@ false &&
                     window.apiConfig.endpoint,
                 ),
                 value_567 = await fetch(chatCompletionsEndpoint_566, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "YouTube › 内容生成",
+                      purpose: "生成视频内容"
+                    },
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -4836,6 +4861,11 @@ async function requestYtCharTabGeneration(mode_3, requirement_2, count_4) {
             window.apiConfig.endpoint,
         ),
         value_611 = await fetch(chatCompletionsEndpoint_610, {
+            u2ApiTrace: {
+              service: "text",
+              source: "YouTube › 频道",
+              purpose: "生成频道内容"
+            },
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

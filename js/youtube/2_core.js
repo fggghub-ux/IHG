@@ -1026,6 +1026,11 @@ offerData.price 用于展示，offerData.rmbAmount 是纯数字，代表换算�
   try {
     const scopeValue353 = window.u2Api.resolveChatCompletionsEndpoint(window.apiConfig.endpoint),
       scopeValue354 = await fetch(scopeValue353, {
+        u2ApiTrace: {
+          service: "text",
+          source: "YouTube › 私信",
+          purpose: "生成收到的私信"
+        },
         method: "POST",
         headers: {
           "Content-Type": "application/json",

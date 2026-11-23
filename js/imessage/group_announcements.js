@@ -8,7 +8,7 @@
   localValue2.canPublishGroupAnnouncement = function (localValue10, localValue11) {
     if (localValue10?.["type"] !== "group") return false;
     if (localValue11?.["role"] === "user") return !(Number(localValue10.leftGroupAt) > 0 || localValue10.groupObserverMode === true);
-    if (localValue11?.["role"] !== "assistant" || !localValue11.memberId) return false;
+    if (localValue11?.role !== "assistant" || !localValue11.memberId || localValue2.isGroupMemberMuted?.(localValue10, localValue11.memberId)) return false;
     const localValue12 = (localValue1.imData?.["friends"] || []).find(localValue13 => String(localValue13.id) === String(localValue11.memberId));
     return !!localValue12 && ["char", "npc"].includes(localValue12.type) && (localValue10.members || []).some(localValue14 => String(localValue14) === String(localValue12.id)) && localValue2.isGroupAdmin(localValue10, localValue12.id) && [localValue12.nickname, localValue12.realName].some(localValue15 => localValue15 && localValue15 === localValue11.name);
   }, localValue2.formatGroupAnnouncement = function (localValue16, localValue17 = "") {

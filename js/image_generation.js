@@ -171,12 +171,25 @@
       "apiDetail": localValue82
     });
   }
-  async function localValue18(localValue83, localValue84, localValue85) {
+  async function localValue18(localValue83, localValue84, localValue85, config) {
     const localValue86 = new AbortController(),
-      localValue87 = setTimeout(() => localValue86.abort(), localValue2);
+      localValue87 = setTimeout(() => {
+        window.u2ApiConsole?.markTimeout(localValue86.signal);
+        localValue86.abort();
+      }, localValue2),
+      listRequest = localValue84.method === "GET",
+      trace = {
+        service: listRequest ? "models" : "image",
+        source: listRequest ? "设置 › 生图配置" : config.traceSource || "生图",
+        purpose: listRequest ? "获取模型列表" : "生成图片",
+        provider: config.provider,
+        model: listRequest ? "" : config.model,
+        tokenApplicable: !listRequest
+      };
     try {
       const localValue88 = await fetch(localValue83, {
         ...localValue84,
+        u2ApiTrace: trace,
         "signal": localValue86.signal
       });
       if (!localValue88.ok) throw await localValue17(localValue88, localValue85);
@@ -263,7 +276,7 @@
             "image_size": "1K"
           }
         })
-      }, "Gemini Image"),
+      }, "Gemini Image", localValue101),
       localValue106 = localValue19(localValue105);
     return localValue106 ? {
       "imageUrl": localValue11(localValue106.base64, localValue106.mimeType),
@@ -315,7 +328,7 @@
             ...localValue115
           }
         })
-      }, "NovelAI"),
+      }, "NovelAI", localValue110),
       localValue117 = Array.isArray(localValue116?.["images"]) ? localValue116.images[0] : null;
     return localValue117?.["image"] ? {
       "imageUrl": localValue11(localValue117.image, "image/png"),
@@ -347,7 +360,7 @@
             "aspect_ratio": localValue120.size === "1024x1536" ? "2:3" : localValue120.size === "1536x1024" ? "3:2" : "1:1",
             "response_format": "b64_json"
           })
-        }, localValue121);
+        }, localValue121, localValue120);
       return localValue20(localValue127);
     }
     const localValue125 = new FormData();
@@ -364,7 +377,7 @@
           ...localValue10()
         },
         "body": localValue125
-      }, localValue121);
+      }, localValue121, localValue120);
       return localValue20(localValue131);
     } catch (localValue132) {
       if (localValue120.provider === "relay") {
@@ -394,7 +407,7 @@
         ...localValue10()
       },
       "body": JSON.stringify(localValue139)
-    }, localValue135);
+    }, localValue135, localValue134);
     return localValue20(localValue140);
   }
   function localValue25(localValue141, localValue142) {
@@ -432,7 +445,7 @@
       localValue152 = await localValue18(localValue149, {
         "method": "GET",
         "headers": localValue150
-      }, localValue151);
+      }, localValue151, localValue148);
     let localValue153 = [];
     if (localValue148.provider === "gemini") localValue153 = Array.isArray(localValue152?.["models"]) ? localValue152.models : [];else {
       if (localValue148.provider === "grok") localValue153 = Array.isArray(localValue152?.["models"]) ? localValue152.models : [];else localValue153 = Array.isArray(localValue152?.["data"]) ? localValue152.data : Array.isArray(localValue152?.["models"]) ? localValue152.models : [];
@@ -500,7 +513,10 @@
     };
   }
   async function localValue30(localValue183, localValue184 = {}) {
-    const localValue185 = localValue9(localValue184.config || localValue6()),
+    const localValue185 = {
+        ...localValue9(localValue184.config || localValue6()),
+        traceSource: localValue184.traceSource
+      },
       localValue186 = localValue29(localValue183, localValue184, localValue185.provider),
       localValue187 = Array.isArray(localValue184.referenceImages) ? localValue184.referenceImages : localValue184.referenceImage ? [{
         "role": "char",

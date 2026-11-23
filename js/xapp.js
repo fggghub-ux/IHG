@@ -569,11 +569,18 @@
       const scopeValue708 = typeof window.getApiConfig === "function" ? window.getApiConfig() : window.apiConfig || {},
         scopeValue709 = scopeValue240(scopeValue708);
       if (!scopeValue709 || !scopeValue708.apiKey) throw new Error("API config missing");
+      const generationLimit = scopeValue707.maxOutputTokens && window.u2Api?.detectApiProviderFromEndpoint?.(scopeValue709) === "anthropic"
+        ? { max_tokens: scopeValue707.maxOutputTokens } : {};
       const scopeValue710 = Object.values(scopeValue280().xAccountModeration).filter(scopeValue713 => scopeValue713.endsAt > Date.now()).map(scopeValue714 => ({
           authorId: scopeValue714.targetId,
           handle: scopeValue714.targetHandle
         })),
         scopeValue711 = await fetch(scopeValue709, {
+          u2ApiTrace: {
+            service: "text",
+            source: scopeValue707.traceSource || "X",
+            purpose: scopeValue707.tracePurpose || "生成社交内容"
+          },
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -585,7 +592,8 @@
               role: "system",
               content: scopeValue241() + (scopeValue710.length ? "\nTemporarily suspended X accounts (context only; never generate new posts, comments, replies or private messages authored by these identities): " + JSON.stringify(scopeValue710) : "")
             }, ...(Array.isArray(scopeValue706) ? scopeValue706 : [])],
-            temperature: parseFloat(scopeValue708.temperature) || scopeValue707.temperature || 0.8
+            temperature: parseFloat(scopeValue708.temperature) || scopeValue707.temperature || 0.8,
+            ...generationLimit
           })
         });
       if (!scopeValue711.ok) {
@@ -1195,6 +1203,31 @@
         return console.warn("[X] Failed to flush " + scopeValue979, scopeValue980), false;
       });
     }
+    async function persistAdvanceResult(accountId, applyChanges, reason) {
+      scopeValue395();
+      let previousState;
+      let nextState;
+      try {
+        const storage = window.appStorage;
+        if (!storage?.commitDomain) return false;
+        await storage.ready;
+        const commit = await storage.commitDomain("x", () => {
+          previousState = scopeValue280();
+          if (String(previousState.activeXPlayerAccountId) !== accountId) throw new Error("X account changed before saving");
+          nextState = scopeValue278(scopeValue279(applyChanges(previousState)));
+          return nextState;
+        }, { critical: true, reason });
+        if (!commit?.durable) return false;
+      } catch (error) {
+        console.warn("[X] Failed to persist " + reason, error);
+        return false;
+      }
+      const currentState = scopeValue280();
+      if (String(currentState.activeXPlayerAccountId) === accountId) {
+        scopeValue281(currentState === previousState ? nextState : applyChanges(currentState));
+      }
+      return true;
+    }
     function scopeValue288(scopeValue981, scopeValue982, scopeValue983, scopeValue984 = "") {
       scopeValue280();
       scopeValue186 !== scopeValue193 && (scopeValue185.clear(), scopeValue186 = scopeValue193);
@@ -1397,7 +1430,7 @@
       scopeValue128 = document.getElementById("x-search-generate-sheet"), !scopeValue128 && (scopeValue128 = document.createElement("div"), scopeValue128.className = "bottom-sheet-overlay detail-sheet-overlay x-search-generate-overlay", scopeValue128.id = "x-search-generate-sheet", scopeValue128.style.zIndex = "273", scopeValue128.innerHTML = "\n                    <div class=\"bottom-sheet x-search-generate-sheet\">\n                        <div class=\"sheet-handle\"></div>\n                        <div class=\"x-edit-sheet-header\">\n                            <button class=\"x-edit-sheet-text-btn\" id=\"x-search-generate-close-btn\" type=\"button\">Close</button>\n                            <strong id=\"x-search-generate-title\">搜索/生成帖子</strong>\n                            <button class=\"x-edit-sheet-save\" id=\"x-search-generate-run-btn\" type=\"button\">Generate</button>\n                        </div>\n                        <div class=\"x-search-generate-body\">\n                            <label class=\"x-add-dm-field\">\n                                <span id=\"x-search-generate-label\">生成方向</span>\n                                <textarea id=\"x-search-generate-input\" maxlength=\"500\" placeholder=\"可留空，或输入想生成的帖子主题\"></textarea>\n                            </label>\n                            <section class=\"x-home-generation-options\" id=\"x-home-generation-options\">\n                                <label class=\"x-home-generation-toggle\">\n                                    <span><strong>挂载 Char 人设</strong><small>使用已添加的 iMessage Char 的人设</small></span>\n                                    <input id=\"x-home-mount-char-persona\" type=\"checkbox\">\n                                </label>\n                                <label class=\"x-home-generation-toggle\">\n                                    <span><strong>挂载 User 人设</strong><small>使用当前 X 账号的 User 人设</small></span>\n                                    <input id=\"x-home-mount-user-persona\" type=\"checkbox\">\n                                </label>\n                                <label class=\"x-home-generation-toggle\">\n                                    <span><strong>挂载单聊上下文</strong><small>每位 Char 仅引用自己的 iMessage 单聊</small></span>\n                                    <input id=\"x-home-mount-single-chat\" type=\"checkbox\">\n                                </label>\n                                <label class=\"x-home-generation-context-count\">\n                                    <span>上下文条数</span>\n                                    <input id=\"x-home-single-chat-limit\" type=\"number\" min=\"1\" max=\"50\" step=\"1\" inputmode=\"numeric\" value=\"20\" disabled>\n                                    <small>每位 Char 最近 1–50 条，默认 20 条</small>\n                                </label>\n                            </section>\n                        </div>\n                    </div>\n                ", scopeValue2.appendChild(scopeValue128)), scopeValue129 = document.getElementById("x-search-generate-input"), scopeValue128?.["querySelectorAll"](".x-settings-note")["forEach"](scopeValue1041 => scopeValue1041.remove());
     }
     function scopeValue308() {
-      scopeValue132 = document.getElementById("x-advance-sheet"), !scopeValue132 && (scopeValue132 = document.createElement("div"), scopeValue132.className = "bottom-sheet-overlay detail-sheet-overlay x-advance-overlay", scopeValue132.id = "x-advance-sheet", scopeValue132.style.zIndex = "276", scopeValue132.innerHTML = "\n                    <div class=\"bottom-sheet x-advance-sheet\">\n                        <div class=\"sheet-handle\"></div>\n                        <div class=\"x-edit-sheet-header\">\n                            <button class=\"x-edit-sheet-text-btn\" id=\"x-advance-close-btn\" type=\"button\">关闭</button>\n                            <strong>推进到下一天</strong>\n                            <button class=\"x-edit-sheet-save\" id=\"x-advance-run-btn\" type=\"button\">生成</button>\n                        </div>\n                        <div class=\"x-advance-body\">\n                            <label class=\"x-advance-field\">\n                                <span>想推进的剧情</span>\n                                <textarea id=\"x-advance-plot-input\" maxlength=\"800\" placeholder=\"可留空，留空时将随机延续当前剧情\"></textarea>\n                            </label>\n                            <div class=\"x-advance-section-title\">生成内容</div>\n                            <div class=\"x-advance-options\">\n                                <label class=\"x-advance-option\">\n                                    <input id=\"x-advance-strangers-toggle\" type=\"checkbox\">\n                                    <span class=\"x-advance-option-copy\">\n                                        <strong>陌生人私信</strong>\n                                        <span>每人生成 2–5 条对方来信</span>\n                                    </span>\n                                    <input class=\"x-advance-count\" id=\"x-advance-strangers-count\" type=\"number\" min=\"1\" max=\"20\" inputmode=\"numeric\" aria-label=\"陌生人人数\">\n                                </label>\n                                <label class=\"x-advance-option\">\n                                    <input id=\"x-advance-trends-toggle\" type=\"checkbox\">\n                                    <span class=\"x-advance-option-copy\">\n                                        <strong>推进热搜</strong>\n                                        <span>新热搜置顶，旧热搜依次下移</span>\n                                    </span>\n                                    <input class=\"x-advance-count\" id=\"x-advance-trends-count\" type=\"number\" min=\"1\" max=\"15\" inputmode=\"numeric\" aria-label=\"热搜数量\">\n                                </label>\n                                <label class=\"x-advance-option\">\n                                    <input id=\"x-advance-posts-toggle\" type=\"checkbox\">\n                                    <span class=\"x-advance-option-copy\">\n                                        <strong>推进帖子</strong>\n                                        <span>每条新帖子至少生成 5 条评论</span>\n                                    </span>\n                                    <input class=\"x-advance-count\" id=\"x-advance-posts-count\" type=\"number\" min=\"1\" max=\"20\" inputmode=\"numeric\" aria-label=\"帖子数量\">\n                                </label>\n                            </div>\n                            <p class=\"x-advance-note\">将使用 X 已绑定的世界书和当前热搜、帖子作为剧情上下文。全部生成成功后才会保存。</p>\n                        </div>\n                    </div>\n                ", scopeValue2.appendChild(scopeValue132)), scopeValue133 = document.getElementById("x-advance-plot-input");
+      scopeValue132 = document.getElementById("x-advance-sheet"), !scopeValue132 && (scopeValue132 = document.createElement("div"), scopeValue132.className = "bottom-sheet-overlay detail-sheet-overlay x-advance-overlay", scopeValue132.id = "x-advance-sheet", scopeValue132.style.zIndex = "276", scopeValue132.innerHTML = "\n                    <div class=\"bottom-sheet x-advance-sheet\">\n                        <div class=\"sheet-handle\"></div>\n                        <div class=\"x-edit-sheet-header\">\n                            <button class=\"x-edit-sheet-text-btn\" id=\"x-advance-close-btn\" type=\"button\">关闭</button>\n                            <strong>推进到下一天</strong>\n                            <button class=\"x-edit-sheet-save\" id=\"x-advance-run-btn\" type=\"button\">生成</button>\n                        </div>\n                        <div class=\"x-advance-body\">\n                            <label class=\"x-advance-field\">\n                                <span>想推进的剧情</span>\n                                <textarea id=\"x-advance-plot-input\" maxlength=\"800\" placeholder=\"可留空，留空时将随机延续当前剧情\"></textarea>\n                            </label>\n                            <div class=\"x-advance-section-title\">生成内容</div>\n                            <div class=\"x-advance-options\">\n                                <label class=\"x-advance-option\">\n                                    <input id=\"x-advance-strangers-toggle\" type=\"checkbox\">\n                                    <span class=\"x-advance-option-copy\">\n                                        <strong>陌生人私信</strong>\n                                        <span>每人生成 2–5 条对方来信</span>\n                                    </span>\n                                    <input class=\"x-advance-count\" id=\"x-advance-strangers-count\" type=\"number\" min=\"1\" max=\"20\" inputmode=\"numeric\" aria-label=\"陌生人人数\">\n                                </label>\n                                <label class=\"x-advance-option\">\n                                    <input id=\"x-advance-trends-toggle\" type=\"checkbox\">\n                                    <span class=\"x-advance-option-copy\">\n                                        <strong>推进热搜</strong>\n                                        <span>新热搜置顶，旧热搜依次下移</span>\n                                    </span>\n                                    <input class=\"x-advance-count\" id=\"x-advance-trends-count\" type=\"number\" min=\"1\" max=\"15\" inputmode=\"numeric\" aria-label=\"热搜数量\">\n                                </label>\n                                <label class=\"x-advance-option\">\n                                    <input id=\"x-advance-posts-toggle\" type=\"checkbox\">\n                                    <span class=\"x-advance-option-copy\">\n                                        <strong>推进帖子</strong>\n                                        <span>每条新帖子至少生成 5 条评论</span>\n                                    </span>\n                                    <input class=\"x-advance-count\" id=\"x-advance-posts-count\" type=\"number\" min=\"1\" max=\"20\" inputmode=\"numeric\" aria-label=\"帖子数量\">\n                                </label>\n                            </div>\n                            <p class=\"x-advance-note\">一次请求生成所有勾选内容，使用 X 已绑定的世界书和当前热搜、帖子作为剧情上下文。全部生成成功后才会保存。</p>\n                        </div>\n                    </div>\n                ", scopeValue2.appendChild(scopeValue132)), scopeValue133 = document.getElementById("x-advance-plot-input");
     }
     function scopeValue309() {
       scopeValue138 = document.getElementById("x-post-settings-sheet"), !scopeValue138 && (scopeValue138 = document.createElement("div"), scopeValue138.className = "bottom-sheet-overlay detail-sheet-overlay x-dm-settings-overlay", scopeValue138.id = "x-post-settings-sheet", scopeValue138.style.zIndex = "275", scopeValue138.innerHTML = "\n                    <div class=\"bottom-sheet x-dm-settings-sheet\">\n                        <div class=\"sheet-handle\"></div>\n                        <div class=\"x-edit-sheet-header\">\n                            <button class=\"x-edit-sheet-text-btn\" id=\"x-post-settings-close-btn\" type=\"button\">关闭</button>\n                            <strong>帖子设置</strong>\n                            <span class=\"x-settings-spacer\"></span>\n                        </div>\n                        <div class=\"x-dm-settings-body\">\n                            <button class=\"x-dm-settings-action\" id=\"x-post-advance-btn\" type=\"button\">\n                                <i class=\"fas fa-forward\"></i>\n                                <span>Advance post</span>\n                            </button>\n                            <button class=\"x-dm-settings-action danger\" id=\"x-post-delete-btn\" type=\"button\">\n                                <i class=\"far fa-trash-alt\"></i>\n                                <span>删除帖子</span>\n                            </button>\n                        </div>\n                    </div>\n                ", scopeValue2.appendChild(scopeValue138));
@@ -2040,7 +2073,9 @@
             role: "user",
             content: scopeValue1231
           }], {
-            temperature: 0.9
+            temperature: 0.9,
+            traceSource: "X › 话题",
+            tracePurpose: "生成话题帖子"
           }),
           scopeValue1233 = scopeValue243(scopeValue1232),
           scopeValue1234 = scopeValue251(Array.isArray(scopeValue1233) ? scopeValue1233 : Array.isArray(scopeValue1233.posts) ? scopeValue1233.posts : []);
@@ -2141,7 +2176,9 @@
             role: "user",
             content: scopeValue1279
           }], {
-            temperature: 0.9
+            temperature: 0.9,
+            traceSource: "X › 超话",
+            tracePurpose: "更新超话"
           }),
           scopeValue1281 = scopeValue243(scopeValue1280);
         let scopeValue1282 = [],
@@ -2924,7 +2961,9 @@
             role: "user",
             content: scopeValue1565
           }], {
-            temperature: 0.9
+            temperature: 0.9,
+            traceSource: "X › 评论",
+            tracePurpose: "生成评论互动"
           });
         if (scopeValue1560 !== scopeValue280().activeXPlayerAccountId) return;
         const scopeValue1567 = scopeValue243(scopeValue1566),
@@ -3650,7 +3689,9 @@
           role: "user",
           content: JSON.stringify(scopeValue458(scopeValue1818, scopeValue1819, scopeValue1820))
         }], {
-          temperature: 0.4
+          temperature: 0.4,
+          traceSource: "X › 举报",
+          tracePurpose: "处理举报"
         });
         if (!scopeValue1823()) return;
         const scopeValue1829 = scopeValue243(scopeValue1828),
@@ -4134,7 +4175,9 @@
               purpose: newScope2035.persona
             }) + "\nRequests: " + JSON.stringify(newScope2040) + "\nDo not reuse these stranger handles: " + JSON.stringify([scopeValue87.handle, ...(newScope2041.xDirectMessages || []).map(newScope2053 => newScope2053.handle), ...(newScope2041.xAccounts || []).map(newScope2054 => newScope2054.handle)]) + "\nStory context: " + newScope2043 + "\nWorldbook:\n" + (newScope2042 || "None")
           }], {
-            temperature: 0.85
+            temperature: 0.85,
+            traceSource: "X › Bot 投稿箱",
+            tracePurpose: "生成投稿"
           });
           scopeValue560(newScope2037);
           const newScope2049 = scopeValue243(newScope2048)?.["submissions"];
@@ -4578,7 +4621,9 @@
           role: "user",
           content: scopeValue2066
         }], {
-          temperature: 0.9
+          temperature: 0.9,
+          traceSource: "X › 个人主页",
+          tracePurpose: "生成角色帖子"
         }),
         scopeValue2068 = scopeValue243(scopeValue2067),
         scopeValue2069 = scopeValue251(Array.isArray(scopeValue2068) ? scopeValue2068 : Array.isArray(scopeValue2068?.["posts"]) ? scopeValue2068.posts : [], {
@@ -4659,6 +4704,7 @@
           try {
             if (!window.u2ImageGeneration?.["generate"]) throw new Error("生图功能尚未加载，请刷新后重试");
             scopeValue2097 = await window.u2ImageGeneration.generate(scopeValue2110, {
+              traceSource: "X › 个人主页",
               referenceImage: scopeValue2089.autoUseReferenceFace ? scopeValue121 : "",
               charAppearance: scopeValue2089.charAppearance,
               userAppearance: scopeValue2089.userAppearance,
@@ -5157,7 +5203,9 @@
               handle: scopeValue87.handle
             }) + "\nWorldbook: " + (scopeValue2292 || "None") + "\nRecent User-Bot conversation: " + (scopeValue2293 || "None") + "\nUnreviewed private messages and pending submissions, in sending order: " + JSON.stringify(scopeValue2291) + "\nReturn {\"messages\":[{\"text\":\"\",\"translation\":\"\"}],\"posts\":[{\"sourceIds\":[\"\"],\"text\":\"\"}],\"ordinarySourceIds\":[\"\"]}.\nReply as the human operator in 1 to 4 natural private-message bubbles. Every Char submission must become one post with its single source ID. For User submissions, consecutive private messages can be separate lines of ONE submission: identify all message IDs that belong to the same submission, put them together in one sourceIds array in chronological order, and fill text with the COMPLETE submission content. For example, if the User sends \"投稿：第一句\" followed by \"第二句\" and \"第三句\", output ONE post with all three source IDs and text containing 第一句、第二句、第三句 in the original wording and order. Preserve every submitted sentence verbatim, including line breaks where appropriate; remove only control words such as a standalone \"投稿\". Do not paraphrase, shorten, embellish, or add private chat. Do not post ordinary User conversation. Put the IDs of all ordinary User chat messages that are not in posts into ordinarySourceIds; never put a continuing submission line there. Do not put a number in text; the application adds 【1】, 【2】, etc. Reader comments will be generated in separate calls, so return only the complete post text here. Do not invent submissions, reuse a source ID in two posts, or output text outside JSON. Every private reply must include translation: accurate Simplified Chinese for non-Chinese text, otherwise empty string."
           }], {
-            temperature: 0.8
+            temperature: 0.8,
+            traceSource: "X › Bot 私信",
+            tracePurpose: "生成回复"
           }),
           scopeValue2295 = scopeValue243(scopeValue2294),
           scopeValue2296 = Array.isArray(scopeValue2295?.["messages"]) ? scopeValue2295.messages : [],
@@ -5209,7 +5257,9 @@
                 currentText: scopeValue2335.text
               })))
             }], {
-              temperature: 0.3
+              temperature: 0.3,
+              traceSource: "X › Bot 私信",
+              tracePurpose: "修复回复格式"
             }),
             scopeValue2334 = scopeValue243(scopeValue2333)?.["posts"];
           (Array.isArray(scopeValue2334) ? scopeValue2334 : []).forEach(scopeValue2336 => {
@@ -5244,7 +5294,9 @@
               role: "user",
               content: "Return {\"comments\":[{\"authorName\":\"\",\"handle\":\"\",\"text\":\"\",\"translation\":\"\",\"replies\":[{\"authorName\":\"\",\"handle\":\"\",\"text\":\"\",\"translation\":\"\"}]}]}. Generate at least 12 additional distinct, substantive reader comments or nested replies about this single post. Comments should react to concrete details, with varied viewpoints. Authors must be ordinary X users, never the current User or Bot. Include accurate Simplified Chinese translations for non-Chinese comments, otherwise \"\". Bot account purpose: " + newScope2472.persona + ". Post text: " + scopeValue2341.text + ". Existing comments to avoid repeating: " + JSON.stringify(scopeValue2341.comments.map(scopeValue2345 => scopeValue2345.text))
             }], {
-              temperature: 0.8
+              temperature: 0.8,
+              traceSource: "X › Bot 投稿箱",
+              tracePurpose: "补充投稿"
             }),
             scopeValue2344 = scopeValue243(scopeValue2343);
           scopeValue2341.comments.push(...scopeValue531(scopeValue2344?.["comments"]));
@@ -5401,7 +5453,9 @@
             role: "user",
             content: "Character: " + scopeValue2382.name + " " + (scopeValue2382.handle || "") + "\nPersona: " + (scopeValue2382.persona || "ordinary user") + "\nBio/signature: " + (scopeValue2382.bio || "") + "\nUser profile: " + scopeValue87.name + " " + scopeValue87.handle + "\nUser persona: " + (scopeValue87.persona || scopeValue87.bio || "") + "\nConversation channel: this is a private one-to-one X app direct message between this Character and User.\nWorldbook:\n" + (scopeValue2388 || "None") + "\niMessage single-chat continuity:\n" + (scopeValue2386 || "None") + "\nRecent chat:\n" + (scopeValue2387 || "No previous chat.") + "\nGenerate between 3 and 8 natural incoming private-message bubbles from this Character.\nRules:\n- The messages array MUST contain 3 to 8 objects, inclusive.\n- Every message is authored by the Character. Never generate a message, action, narration or reply authored by the User.\n- Write one coherent conversational burst: each bubble should advance the thought or reaction, without repeating the same sentence.\n- Keep individual bubbles concise and realistic. Splitting a longer thought across multiple bubbles is encouraged.\n- Continue naturally from the most recent chat and respond to concrete details. If the latest context contains a forwarded post, react specifically to that post.\n- Do not prefix messages with a name, handle, role label or quotation marks. Do not include markdown or text outside the JSON object.\n- Each message object must contain text and translation. If text is not Simplified Chinese, translation must be an accurate Simplified Chinese translation; otherwise translation must be an empty string."
           }], {
-            temperature: 0.85
+            temperature: 0.85,
+            traceSource: "X › 私信",
+            tracePurpose: "生成私信回复"
           }),
           scopeValue2390 = scopeValue243(scopeValue2389);
         if (scopeValue2385 !== scopeValue212 || scopeValue2384 !== scopeValue280().activeXPlayerAccountId || !scopeValue450(scopeValue2382)) return;
@@ -5560,6 +5614,7 @@
           scopeValue2456 = scopeValue2455.autoUseReferenceFace ? await scopeValue494(scopeValue2450) : "",
           scopeValue2457 = [scopeValue223(scopeValue2449.image.text, scopeValue2449.post.text), scopeValue2455.lastPrompt].filter(Boolean).join("\n"),
           scopeValue2458 = await window.u2ImageGeneration.generate(scopeValue2457, {
+            traceSource: "X › 发帖",
             referenceImage: scopeValue2456,
             charAppearance: scopeValue2455.charAppearance,
             userAppearance: scopeValue2455.userAppearance,
@@ -5592,6 +5647,7 @@
       scopeValue542(scopeValue2461.post.id, scopeValue2461.image.id, null), scopeValue540(), scopeValue543(scopeValue2461.post.id), await scopeValue287("x-image-delete");
     }
     function scopeValue547(scopeValue2462) {
+      if (scopeValue132?.classList.contains("active")) return;
       scopeValue139 = scopeValue2462;
       if (typeof window.openView === "function") window.openView(scopeValue138);else scopeValue138?.["classList"]["add"]("active");
     }
@@ -5753,7 +5809,9 @@
           role: "user",
           content: scopeValue2509
         }], {
-          temperature: 0.9
+          temperature: 0.9,
+          traceSource: "X › 发现",
+          tracePurpose: "生成热门话题"
         });
       return scopeValue557(scopeValue243(scopeValue2510));
     }
@@ -5850,7 +5908,9 @@
           role: "user",
           content: "Return {\"trends\":[{\"title\":\"#Topic\",\"category\":\"Trending\",\"heat\":\"12K\",\"posts\":[{\"text\":\"\",\"translation\":\"\",\"comments\":[{\"authorName\":\"\",\"handle\":\"\",\"text\":\"\",\"translation\":\"\"}]}]}]}. Generate exactly one plausible public topic inspired by this Char's current life and one directly related post by this exact author. Private continuity may influence the author's mood or choices only; never turn private chat, secrets or another person's private activity into a public hot search. All reader comments know only the public post. Never author content as User. Include Simplified Chinese translations for non-Chinese content.\nAuthor identity: " + JSON.stringify(newScope2710) + "\nSearch intent: " + (newScope2708.topic || "自然公开动态") + "\nUser profile: " + JSON.stringify(newScope2708.userProfile) + "\n" + newScope2709 + "\nWorldbook:\n" + (newScope2711 || "None")
         }], {
-          temperature: 0.9
+          temperature: 0.9,
+          traceSource: "X › 发现",
+          tracePurpose: "生成角色趋势"
         });
         scopeValue560(newScope2708.accountId);
         if (!scopeValue450(newScope2707)) return [];
@@ -5894,7 +5954,9 @@
           role: "user",
           content: scopeValue2528
         }], {
-          temperature: 0.9
+          temperature: 0.9,
+          traceSource: "X › 首页",
+          tracePurpose: "生成角色帖子"
         });
         scopeValue560(newScope2720.accountId);
         const scopeValue2534 = scopeValue243(scopeValue2533);
@@ -5962,7 +6024,9 @@
           role: "user",
           content: scopeValue2551
         }], {
-          temperature: 0.9
+          temperature: 0.9,
+          traceSource: "X › 搜索",
+          tracePurpose: "生成搜索帖子"
         });
       scopeValue560(scopeValue2539);
       const scopeValue2553 = scopeValue243(scopeValue2552),
@@ -6062,6 +6126,7 @@
       }), scopeValue2580;
     }
     function scopeValue569() {
+      if (scopeValue138?.classList.contains("active")) return;
       if (scopeValue133) scopeValue133.value = "";
       scopeValue567();
       if (typeof window.openView === "function") window.openView(scopeValue132);else scopeValue132?.["classList"]["add"]("active");
@@ -6095,30 +6160,19 @@
         recentPosts: scopeValue2586
       });
     }
-    async function scopeValue573({
-      total: scopeValue2589,
-      batchSize: scopeValue2590,
-      blockedKeys: scopeValue2594 = [],
-      getKey: scopeValue2591,
-      requestBatch: scopeValue2592,
-      label: scopeValue2593
-    }) {
+    function selectUniqueAdvanceResults(candidates, count, getKey, label, existingKeys = []) {
+      if (!count) return [];
       const scopeValue2595 = [],
-        scopeValue2596 = new Set(scopeValue2594.map(scopeValue2599 => String(scopeValue2599).toLocaleLowerCase())),
-        scopeValue2597 = scopeValue2600 => {
-          (Array.isArray(scopeValue2600) ? scopeValue2600 : []).forEach(scopeValue2601 => {
-            const scopeValue2602 = scopeValue223(scopeValue2591(scopeValue2601)).toLocaleLowerCase();
-            if (!scopeValue2602 || scopeValue2596.has(scopeValue2602) || scopeValue2595.length >= scopeValue2589) return;
-            scopeValue2596.add(scopeValue2602), scopeValue2595.push(scopeValue2601);
-          });
-        },
-        scopeValue2598 = Math.ceil(scopeValue2589 / scopeValue2590);
-      for (let scopeValue2603 = 0; scopeValue2603 < scopeValue2598 && scopeValue2595.length < scopeValue2589; scopeValue2603 += 1) {
-        scopeValue2597(await scopeValue2592(Math.min(scopeValue2590, scopeValue2589 - scopeValue2595.length), Array.from(scopeValue2596)));
+        scopeValue2596 = new Set(existingKeys.map(key => String(key).toLocaleLowerCase()));
+      for (const candidate of candidates) {
+        if (!candidate) continue;
+        const scopeValue2602 = scopeValue223(getKey(candidate)).toLocaleLowerCase();
+        if (!scopeValue2602 || scopeValue2596.has(scopeValue2602)) continue;
+        scopeValue2596.add(scopeValue2602);
+        scopeValue2595.push(candidate);
+        if (scopeValue2595.length === count) return scopeValue2595;
       }
-      scopeValue2595.length < scopeValue2589 && scopeValue2597(await scopeValue2592(scopeValue2589 - scopeValue2595.length, Array.from(scopeValue2596)));
-      if (scopeValue2595.length < scopeValue2589) throw new Error(scopeValue2593 + " returned fewer than " + scopeValue2589 + " valid items");
-      return scopeValue2595.slice(0, scopeValue2589);
+      throw new Error(label + "有效数量不足（" + scopeValue2595.length + '/' + count + '）');
     }
     function scopeValue574(scopeValue2604 = {}, scopeValue2605 = 0) {
       const scopeValue2606 = scopeValue223(scopeValue2604.name || scopeValue2604.nickname || scopeValue2604.handle);
@@ -6156,19 +6210,23 @@
         scopeValue575(scopeValue2619.replies, scopeValue2618);
       }), scopeValue2618;
     }
-    function scopeValue577(scopeValue2620, scopeValue2621) {
-      const scopeValue2622 = {
-        ...scopeValue2620,
-        replies: Array.isArray(scopeValue2620.replies) ? scopeValue2620.replies : []
-      };
-      if (!scopeValue2622.id || scopeValue2621.has(String(scopeValue2622.id))) scopeValue2622.id = scopeValue228("auto-comment");
-      return scopeValue2621.add(String(scopeValue2622.id)), scopeValue2622.replies = scopeValue2622.replies.map(scopeValue2623 => {
-        const scopeValue2624 = {
-          ...scopeValue2623,
+    function scopeValue577(comment, usedIds, generatedIdMap) {
+      function resolveGeneratedId(proposedId, idPrefix) {
+        const isTemporaryId = generatedIdMap && String(proposedId).startsWith("new:"),
+          id = isTemporaryId || !proposedId || usedIds.has(String(proposedId)) ? scopeValue228(idPrefix) : proposedId;
+        usedIds.add(String(id));
+        if (isTemporaryId) generatedIdMap.set(proposedId, generatedIdMap.has(proposedId) ? null : id);
+        return id;
+      }
+      return {
+        ...comment,
+        id: resolveGeneratedId(comment.id, 'auto-comment'),
+        replies: (Array.isArray(comment.replies) ? comment.replies : []).map(reply => ({
+          ...reply,
+          id: resolveGeneratedId(reply.id, 'auto-reply'),
           replies: []
-        };
-        return (!scopeValue2624.id || scopeValue2621.has(String(scopeValue2624.id))) && (scopeValue2624.id = scopeValue228("auto-reply")), scopeValue2621.add(String(scopeValue2624.id)), scopeValue2624;
-      }), scopeValue2622;
+        }))
+      };
     }
     function scopeValue578(scopeValue2625 = {}) {
       const scopeValue2626 = Array.isArray(scopeValue2625) ? scopeValue2625 : Array.isArray(scopeValue2625.comments) ? scopeValue2625.comments : Array.isArray(scopeValue2625.replies) ? scopeValue2625.replies : [];
@@ -6349,7 +6407,10 @@
       const newScope2905 = await scopeValue2650.analyze({
           url: scopeValue2647.url,
           mimeType: scopeValue2647.mimeType
-        }, scopeValue2657),
+        }, {
+          ...scopeValue2657,
+          traceSource: "X › 帖子"
+        }),
         newScope2906 = scopeValue223(newScope2905?.["summary"]);
       if (!newScope2906) throw new Error("识图接口没有返回图片描述，请重试或手填描述");
       return {
@@ -6434,33 +6495,100 @@
       const scopeValue2668 = scopeValue2667.includePrivateMessages !== false,
         scopeValue2669 = scopeValue584(scopeValue2666),
         scopeValue2670 = JSON.stringify(scopeValue2669),
-        scopeValue2671 = scopeValue246(scopeValue2669.post.text + " " + scopeValue2669.post.topicTag + " " + scopeValue87.persona + " " + scopeValue2670),
-        scopeValue2672 = (scopeValue280().xDirectMessages || []).filter(newScope2946 => newScope2946.kind !== "bot" && newScope2946.origin !== "generated").map(newScope2947 => ({
+        scopeValue2671 = scopeValue246(scopeValue2669.post.text + '\x20' + scopeValue2669.post.topicTag + '\x20' + scopeValue87.persona + '\x20' + scopeValue2670),
+        scopeValue2672 = (scopeValue280().xDirectMessages || []).filter(newScope2946 => newScope2946.kind !== 'bot' && newScope2946.origin !== "generated").map(newScope2947 => ({
           authorId: newScope2947.id,
           sourceFriendId: newScope2947.sourceFriendId,
           name: newScope2947.name,
           handle: newScope2947.handle
         })),
-        newScope2940 = scopeValue2668 ? "{\"comments\":[{\"authorName\":\"\",\"handle\":\"\",\"text\":\"\",\"translation\":\"\",\"replies\":[{\"authorName\":\"\",\"handle\":\"\",\"text\":\"\",\"translation\":\"\"}]}],\"threadReplies\":[{\"targetCommentId\":\"\",\"targetReplyId\":\"\",\"reply\":{\"authorName\":\"\",\"handle\":\"\",\"text\":\"\",\"translation\":\"\"}}],\"privateMessages\":[{\"name\":\"\",\"handle\":\"\",\"bio\":\"\",\"translation\":\"\",\"persona\":\"\",\"messages\":[{\"text\":\"\",\"translation\":\"\"},{\"text\":\"\",\"translation\":\"\"}]}]}" : "{\"comments\":[{\"authorName\":\"\",\"handle\":\"\",\"text\":\"\",\"translation\":\"\",\"replies\":[{\"authorName\":\"\",\"handle\":\"\",\"text\":\"\",\"translation\":\"\"}]}],\"threadReplies\":[{\"targetCommentId\":\"\",\"targetReplyId\":\"\",\"reply\":{\"authorName\":\"\",\"handle\":\"\",\"text\":\"\",\"translation\":\"\"}}]}",
-        scopeValue2673 = "Return strict JSON only in this shape: " + newScope2940 + ".\nGenerate engagement for this exact X post.\nMinimum requirements:\n- comments, nested replies and threadReplies combined MUST contain at least 10 generated comment objects from other accounts.\n- Reserved Chars are read-only context and handled separately. Never write a comment, nested reply or threadReply as any reserved Char, including aliases of their ID, name or handle: " + JSON.stringify(scopeValue2672) + ".\n- Use threadReplies to continue existing discussions when there is something new to say. Copy targetCommentId from the root comment's id and optionally targetReplyId from a reply inside that root; leave targetReplyId empty to reply to the root. Never invent target IDs. Use comments only for new top-level comments and their nested replies.\n- Do not repeat or paraphrase an account's earlier opinions. Vary the actual contributions, not just their wording.\n- Comments and replies must react to concrete details from the post, image descriptions, topic, existing comments, User persona, or Worldbook.\n- Use each image's text as the author's optional description. When a ready vision object is present, ground visual claims in it and use the author's description as supplied context. Do not invent unseen details.\n- Images with imageSource:\"placeholder\" have no actual photograph. React only to their supplied descriptions; never claim to see or analyze a real photo for these entries.\n" + (scopeValue2668 ? "- privateMessages MUST contain at least 2 new stranger private-message conversations.\n- Each privateMessages[].messages MUST contain 2 to 5 incoming message objects, and every message is authored by that stranger.\n- Private messages must be prompted by this specific User post and must not reuse existing DM contacts." : "- Do not include privateMessages or any private-message content.") + "\n- Never generate content authored by the current User. The User is context only.\n- Every generated author must be a non-User identity.\n- Every user-facing text object must include translation. If the original text is Simplified Chinese, translation must be \"\".\n- Do not include markdown, explanations, or text outside JSON.\n" + (scopeValue2667.retryReason ? "Retry reason: " + scopeValue2667.retryReason : "") + "\n\nUser profile/persona:\n" + JSON.stringify(scopeValue2669.user) + "\n\nPost context:\n" + scopeValue2670 + "\n\nWorldbook:\n" + (scopeValue2671 || "None"),
+        participatingChars = scopeValue2667.singleRequest && scopeValue247(newScope596(scopeValue2666)) ? scopeValue552() : [],
+        charParticipants = new Map(participatingChars.map(participant => [String(participant.id), {
+          authorId: String(participant.id),
+          name: participant.name,
+          handle: participant.handle,
+          bio: participant.bio,
+          persona: participant.persona,
+          ownHistory: []
+        }]));
+      if (charParticipants.size) for (const rootComment of scopeValue392(scopeValue2666).comments) {
+        for (const commentOrReply of [rootComment, ...(rootComment.replies || [])]) {
+          const matchedChar = scopeValue579(commentOrReply, participatingChars);
+          charParticipants.get(String(matchedChar?.id))?.ownHistory.push({
+            id: commentOrReply.id,
+            rootCommentId: rootComment.id,
+            text: commentOrReply.text,
+            replyToId: commentOrReply.replyToId || ''
+          });
+        }
+      }
+      const commentSchema = {
+          ...(charParticipants.size ? {
+            id: "new:unique-label"
+          } : {}),
+          authorName: '',
+          handle: '',
+          text: '',
+          translation: ''
+        },
+        outputSchema = JSON.stringify({
+          comments: [{
+            ...commentSchema,
+            replies: [commentSchema]
+          }],
+          threadReplies: [{
+            targetCommentId: '',
+            targetReplyId: '',
+            reply: commentSchema
+          }],
+          ...(scopeValue2668 ? {
+            privateMessages: [{
+              name: '',
+              handle: '',
+              bio: '',
+              translation: '',
+              persona: '',
+              messages: [{
+                text: '',
+                translation: ''
+              }, {
+                text: '',
+                translation: ''
+              }]
+            }]
+          } : {}),
+          ...(charParticipants.size ? {
+            charInteractions: [{
+              authorId: '',
+              action: "comment|reply",
+              text: '',
+              translation: '',
+              targetCommentId: '',
+              targetReplyId: ''
+            }]
+          } : {})
+        }),
+        charInstructions = charParticipants.size ? "\n- Put optional reserved Char participation only in charInteractions, using the exact authorId from the participant list. Use each persona only to decide that Char's action. Omit Chars who have no concrete new contribution. Each Char can write at most one action and at most one top-level comment across the whole post.\n- Do not repeat a Char's public history or reply to themselves. A Char reply may reference an existing thread by its exact IDs or a new comment or reply from this response. For new public comments and replies, assign distinct IDs starting with \"new:\" and copy those IDs into the corresponding target fields. Never invent a target or expose private information.\n- Char participants and their public comment history: " + JSON.stringify([...charParticipants.values()]) : '',
+        scopeValue2673 = "Return strict JSON only in this shape: " + outputSchema + ".\nGenerate engagement for this exact X post.\nMinimum requirements:\n- comments, nested replies and threadReplies combined MUST contain at least 10 generated comment objects from other accounts.\n- Never write a comment, nested reply or threadReply as any reserved Char, including aliases of their ID, name or handle: " + JSON.stringify(scopeValue2672) + '.' + charInstructions + "\n- Use threadReplies to continue existing discussions when there is something new to say. Copy targetCommentId from the root comment's id and optionally targetReplyId from a reply inside that root; leave targetReplyId empty to reply to the root. Never invent target IDs. Use comments only for new top-level comments and their nested replies.\n- Do not repeat or paraphrase an account's earlier opinions. Vary the actual contributions, not just their wording.\n- Comments and replies must react to concrete details from the post, image descriptions, topic, existing comments, User persona, or Worldbook.\n- Use each image's text as the author's optional description. When a ready vision object is present, ground visual claims in it and use the author's description as supplied context. Do not invent unseen details.\n- Images with imageSource:\"placeholder\" have no actual photograph. React only to their supplied descriptions; never claim to see or analyze a real photo for these entries.\n" + (scopeValue2668 ? "- privateMessages MUST contain at least 2 new stranger private-message conversations.\n- Each privateMessages[].messages MUST contain 2 to 5 incoming message objects, and every message is authored by that stranger.\n- Private messages must be prompted by this specific User post and must not reuse existing DM contacts." : '-\x20Do\x20not\x20include\x20privateMessages\x20or\x20any\x20private-message\x20content.') + "\n- Never generate content authored by the current User. The User is context only.\n- Every generated author must be a non-User identity.\n- Every user-facing text object must include translation. If the original text is Simplified Chinese, translation must be \"\".\n- Do not include markdown, explanations, or text outside JSON.\n" + (scopeValue2667.retryReason ? "Retry reason: " + scopeValue2667.retryReason : '') + "\n\nUser profile/persona:\n" + JSON.stringify(scopeValue2669.user) + "\n\nPost context:\n" + scopeValue2670 + "\n\nWorldbook:\n" + (scopeValue2671 || "None"),
         scopeValue2674 = await scopeValue242([{
-          role: "system",
+          role: 'system',
           content: "Generate strict JSON for fictional X post engagement. Output JSON only."
         }, {
-          role: "user",
+          role: 'user',
           content: scopeValue2673
         }], {
-          temperature: 0.9
+          temperature: 0.9,
+          traceSource: scopeValue2667.singleRequest ? "X › 帖子设置 › Advance post" : "X › 帖子",
+          tracePurpose: scopeValue2667.singleRequest ? "推进当前帖子的评论互动" : "生成帖子互动"
         }),
         scopeValue2675 = scopeValue243(scopeValue2674),
         newScope2944 = scopeValue575(scopeValue392(scopeValue2666).comments),
+        generatedIds = charParticipants.size ? new Map() : undefined,
         newScope2945 = scopeValue578({
-          comments: (Array.isArray(scopeValue2675?.["comments"]) ? scopeValue2675.comments : []).map(newScope591).filter(Boolean)
-        }).map(newScope2948 => scopeValue577(newScope2948, newScope2944));
-      return {
-        comments: newScope2945,
-        threadReplies: (Array.isArray(scopeValue2675?.["threadReplies"]) ? scopeValue2675.threadReplies : []).map(newScope2949 => {
-          const newScope2950 = newScope591(newScope2949?.["reply"]),
+          comments: (Array.isArray(scopeValue2675?.comments) ? scopeValue2675.comments : []).map(newScope591).filter(Boolean)
+        }).map(comment => scopeValue577(comment, newScope2944, generatedIds)),
+        threadReplies = (Array.isArray(scopeValue2675?.threadReplies) ? scopeValue2675.threadReplies : []).map(newScope2949 => {
+          const newScope2950 = newScope591(newScope2949?.reply),
             newScope2951 = newScope2950 && scopeValue258(newScope2950);
           return newScope2951 ? {
             targetCommentId: scopeValue223(newScope2949.targetCommentId),
@@ -6468,9 +6596,33 @@
             reply: scopeValue577({
               ...newScope2951,
               replies: []
-            }, newScope2944)
+            }, newScope2944, generatedIds)
           } : null;
         }).filter(Boolean),
+        resolveTargetId = inputId => {
+          const targetId = scopeValue223(inputId);
+          return targetId.startsWith("new:") ? generatedIds?.get(targetId) || null : targetId;
+        },
+        charInteractions = (charParticipants.size && Array.isArray(scopeValue2675?.charInteractions) ? scopeValue2675.charInteractions : []).flatMap(interaction => {
+          const authorId = scopeValue223(interaction?.authorId),
+            text = scopeValue223(interaction?.text);
+          if (!charParticipants.has(authorId) || !text || !["comment", "reply"].includes(interaction.action)) return [];
+          const targetCommentId = interaction.action === "reply" ? resolveTargetId(interaction.targetCommentId) : '',
+            targetReplyId = interaction.action === 'reply' ? resolveTargetId(interaction.targetReplyId) : '';
+          if (interaction.action === "reply" && (!targetCommentId || targetReplyId === null)) return [];
+          return [{
+            authorId: authorId,
+            action: interaction.action,
+            text: text,
+            translation: scopeValue257(interaction, text),
+            targetCommentId: targetCommentId,
+            targetReplyId: targetReplyId
+          }];
+        });
+      return {
+        comments: newScope2945,
+        threadReplies: threadReplies,
+        charInteractions: charInteractions,
         privateMessages: scopeValue2668 ? newScope595(scopeValue2675) : []
       };
     }
@@ -6518,7 +6670,9 @@
                     bio: newScope2962.bio
                   }) + "\nOwn history on this post: " + JSON.stringify(newScope2964) + "\nPost context: " + JSON.stringify(newScope2960) + "\n" + newScope2969 + "\nWorldbook:\n" + (newScope2963 || "None")
                 }], {
-                  temperature: 0.8
+                  temperature: 0.8,
+                  traceSource: "X › 帖子",
+                  tracePurpose: "生成角色互动"
                 });
                 scopeValue560(scopeValue2677);
                 if (!scopeValue552().some(newScope2972 => String(newScope2972.id) === String(newScope2962.id))) return null;
@@ -6549,30 +6703,37 @@
     }
     async function newScope604(newScope2974, newScope2975 = {}) {
       const newScope2976 = scopeValue280().activeXPlayerAccountId,
-        scopeValue2678 = Number(newScope2975.minCommentItems) || 10,
-        scopeValue2679 = newScope2975.includePrivateMessages === false ? 0 : Number(newScope2975.minPrivateMessages) || 2;
-      let scopeValue2680 = "",
+        scopeValue2678 = Number(newScope2975.minCommentItems) || 0xa,
+        scopeValue2679 = newScope2975.includePrivateMessages === false ? 0x0 : Number(newScope2975.minPrivateMessages) || 0x2;
+      let scopeValue2680 = '',
         scopeValue2681 = null,
         newScope2981 = null;
-      for (let scopeValue2682 = 0; scopeValue2682 < 2; scopeValue2682 += 1) {
+      const attemptLimit = newScope2975.singleRequest ? 0x1 : 0x2;
+      for (let attempt = 0x0; attempt < attemptLimit; attempt += 0x1) {
         try {
           const scopeValue2683 = await scopeValue585(newScope2974, {
             ...newScope2975,
             retryReason: scopeValue2680
           });
           scopeValue560(newScope2976);
-          const scopeValue2684 = newScope594(newScope2974, scopeValue2683.comments, scopeValue2683).addedCount,
+          const scopeValue2684 = newScope594(newScope2974, scopeValue2683.comments, {
+              threadReplies: scopeValue2683.threadReplies
+            }).addedCount,
             scopeValue2685 = scopeValue2683.privateMessages.length;
           if (scopeValue2684 >= scopeValue2678 && scopeValue2685 >= scopeValue2679) {
             newScope2981 = scopeValue2683;
             break;
           }
-          scopeValue2680 = "Previous response produced " + scopeValue2684 + " comment/reply objects and " + scopeValue2685 + " private-message conversations; minimums are " + scopeValue2678 + " comments/replies and " + scopeValue2679 + " private-message conversations.", scopeValue2681 = new Error(scopeValue2680);
+          scopeValue2680 = "Previous response produced " + scopeValue2684 + " comment/reply objects and " + scopeValue2685 + " private-message conversations; minimums are " + scopeValue2678 + " comments/replies and " + scopeValue2679 + " private-message conversations.";
+          scopeValue2681 = new Error(scopeValue2680);
         } catch (scopeValue2686) {
-          scopeValue560(newScope2976), scopeValue2681 = scopeValue2686, scopeValue2680 = "Previous response failed validation: " + (scopeValue2686?.["message"] || scopeValue2686);
+          scopeValue560(newScope2976);
+          scopeValue2681 = scopeValue2686;
+          scopeValue2680 = "Previous response failed validation: " + (scopeValue2686?.message || scopeValue2686);
         }
       }
-      if (!newScope2981) throw scopeValue2681 || new Error("Post interaction generation failed");
+      if (!newScope2981) throw scopeValue2681 || new Error('Post\x20interaction\x20generation\x20failed');
+      if (newScope2975.singleRequest) return newScope2981;
       const scopeValue2689 = await scopeValue586(newScope2974, newScope2976, newScope2981);
       return {
         ...newScope2981,
@@ -6628,225 +6789,299 @@
         scopeValue148["delete"](scopeValue2703);
       }
     }
-    async function scopeValue590() {
+    async function scopeValue590(event) {
+      event?.stopPropagation();
+      if (scopeValue132?.classList.contains("active")) return;
       const newScope3007 = scopeValue280().activeXPlayerAccountId,
         scopeValue2709 = scopeValue139 || scopeValue94;
       if (!scopeValue2709) return;
       const scopeValue2710 = document.getElementById("x-post-advance-btn");
-      if (scopeValue2710?.["classList"]["contains"]("loading")) return;
-      const scopeValue2711 = scopeValue2710?.["querySelector"]("span"),
-        scopeValue2712 = scopeValue2711?.["textContent"] || "Advance post";
-      scopeValue2710?.["classList"]["add"]("loading"), scopeValue2710?.["setAttribute"]("aria-busy", "true");
+      if (scopeValue2710?.classList.contains('loading')) return;
+      const scopeValue2711 = scopeValue2710?.querySelector("span"),
+        scopeValue2712 = scopeValue2711?.textContent || "Advance post";
+      scopeValue2710?.classList.add("loading");
+      scopeValue2710?.setAttribute('aria-busy', 'true');
       if (scopeValue2710) scopeValue2710.disabled = true;
       if (scopeValue2711) scopeValue2711.textContent = "Generating...";
-      if (typeof window.showToast === "function") window.showToast("Generating post engagement...");
+      if (typeof window.showToast === "function") window.showToast('Generating\x20post\x20engagement...');
       try {
         const scopeValue2713 = await newScope604(scopeValue2709, {
           includePrivateMessages: false,
-          minCommentItems: 10
+          minCommentItems: 0xa,
+          singleRequest: true
         });
         if (newScope3007 !== scopeValue280().activeXPlayerAccountId) return;
-        const scopeValue2714 = scopeValue587(scopeValue2709, scopeValue2713.comments, scopeValue2713);
-        await scopeValue287("x-post-advance-comments"), scopeValue548(), typeof window.showToast === "function" && window.showToast("Advanced post with " + scopeValue2714 + " new replies");
+        let addedCount = 0;
+        const saved = await persistAdvanceResult(String(newScope3007), state => {
+          const result = newScope594(scopeValue2709, scopeValue2713.comments, scopeValue2713);
+          addedCount = result.addedCount;
+          return {
+            ...state,
+            xPostThreads: { ...state.xPostThreads, [scopeValue2709]: result.thread }
+          };
+        }, "x-post-advance-comments");
+        if (newScope3007 !== scopeValue280().activeXPlayerAccountId) return;
+        if (!saved) {
+          window.showToast?.("本轮评论已生成，但保存失败，请重试");
+          return;
+        }
+        const thread = scopeValue392(scopeValue2709);
+        scopeValue398(scopeValue2709, thread);
+        if (String(scopeValue94) === String(scopeValue2709)) {
+          scopeValue405(scopeValue2709, thread);
+          const countElement = document.getElementById("x-detail-comments");
+          if (countElement) countElement.textContent = scopeValue227(thread.commentsCount);
+        }
+        scopeValue548();
+        window.showToast?.("Advanced post with " + addedCount + " new replies");
       } catch (scopeValue2715) {
         console.error("[X] Advance post comments failed", scopeValue2715);
-        if (typeof window.showToast === "function") window.showToast("Advance post failed; existing content was unchanged");
+        if (typeof window.showToast === "function") window.showToast('Advance\x20post\x20failed;\x20existing\x20content\x20was\x20unchanged');
       } finally {
-        scopeValue2710?.["classList"]["remove"]("loading"), scopeValue2710?.["removeAttribute"]("aria-busy");
+        scopeValue2710?.classList.remove('loading');
+        scopeValue2710?.removeAttribute("aria-busy");
         if (scopeValue2710) scopeValue2710.disabled = false;
         if (scopeValue2711) scopeValue2711.textContent = scopeValue2712;
       }
     }
-    async function scopeValue591(scopeValue2716, scopeValue2717, scopeValue2718, scopeValue2719, scopeValue2720) {
-      const scopeValue2721 = "Return strict JSON only: {\"strangers\":[{\"name\":\"\",\"handle\":\"\",\"bio\":\"\",\"translation\":\"\",\"persona\":\"\",\"messages\":[{\"text\":\"\",\"translation\":\"\"},{\"text\":\"\",\"translation\":\"\"}]}]}.\nGenerate exactly " + scopeValue2716 + " unique strangers who proactively send private messages to the X user. Each stranger must send 2 to 5 incoming messages; do not write messages for the user. Messages should form a natural short sequence related to the ongoing plot.\nEvery message is incoming from the named stranger. Never generate an outbound User message or reuse the User identity as a stranger.\nEvery stranger must have a concrete reason to contact this specific User. Their identity, opening topic, tone and message details MUST reference or logically derive from the User profile/persona below, not only from the general plot. Avoid generic greetings that could be sent to anyone.\nEach stranger may use the language natural to their identity. Every non-Chinese bio and message must include an accurate Simplified Chinese translation; Chinese originals use \"\".\nPlot direction: " + (scopeValue2718 || "随机延续当前剧情") + "\nUser profile/persona: " + JSON.stringify({
-          name: scopeValue87.name,
-          handle: scopeValue87.handle,
-          bio: scopeValue87.bio,
-          persona: scopeValue87.persona
-        }) + "\nDo not repeat these names or handles: " + (scopeValue2717.length ? scopeValue2717.join("、") : "None") + "\nCurrent story context: " + scopeValue2719 + "\nWorldbook:\n" + (scopeValue2720 || "None"),
-        scopeValue2722 = await scopeValue242([{
+    function buildAdvanceBotPairs(state, strangerRefs) {
+      if (!strangerRefs.length) return [];
+      const contacts = state.xDirectMessages.filter(contact => scopeValue450(contact)),
+        senders = [...contacts.filter(contact => contact.kind !== "bot").map(sender => ({
+          senderRef: "existing:" + sender.id,
+          senderName: sender.name,
+          senderHandle: sender.handle,
+          senderPersona: sender.persona
+        })), ...strangerRefs.map(senderRef => ({
+          senderRef: senderRef
+        }))];
+      return contacts.filter(contact => contact.kind === 'bot').map((bot, index) => ({
+        botId: String(bot.id),
+        botName: bot.name,
+        botHandle: bot.handle,
+        botPurpose: bot.persona,
+        ...senders[index % senders.length]
+      }));
+    }
+    async function requestNextDayContent(state, counts, strangerRefs, botPairs, plot) {
+      const existingTrendTitles = scopeValue275(state.xTrends).slice(0x0, scopeValue79).map(trend => trend.title),
+        worldbook = scopeValue246(plot + '\x20' + scopeValue87.bio + '\x20' + scopeValue87.persona),
+        resultSchema = {
+          ...(counts.trends ? {
+            trends: [{
+              title: "#Topic",
+              translation: '',
+              category: "Trending",
+              heat: '12.3K'
+            }]
+          } : {}),
+          ...(counts.posts ? {
+            posts: [{
+              authorName: '',
+              handle: '',
+              text: '',
+              translation: '',
+              topicTag: "#Topic",
+              likes: 0x0,
+              reposts: 0x0,
+              commentsCount: 0x5,
+              mediaType: "text",
+              comments: [{
+                authorName: '',
+                handle: '',
+                text: '',
+                translation: ''
+              }]
+            }]
+          } : {}),
+          ...(counts.strangers ? {
+            strangers: [{
+              ref: strangerRefs[0x0],
+              name: '',
+              handle: '',
+              bio: '',
+              translation: '',
+              persona: '',
+              messages: [{
+                text: '',
+                translation: ''
+              }, {
+                text: '',
+                translation: ''
+              }]
+            }]
+          } : {}),
+          ...(botPairs.length ? {
+            submissions: [{
+              botId: '',
+              senderRef: '',
+              text: ''
+            }]
+          } : {})
+        },
+        instructions = [counts.trends ? 'Generate\x20exactly\x20' + counts.trends + " distinct new international trends. Continue the current story with new developments and avoid every existing title." : '', counts.posts ? "Generate exactly " + counts.posts + " distinct new public X posts with at least 5 valid, concrete comments each. For topicTag use the exact title of a trend in this response or the existing trend list, preferring new trends. Use a variety of authors, locations and viewpoints. For an existing author, copy their exact authorId from the reusable authors. Reusable authors: " + JSON.stringify(scopeValue291()) : '', counts.strangers ? 'Generate\x20exactly\x20' + counts.strangers + '\x20new\x20strangers.\x20Use\x20each\x20of\x20these\x20refs\x20once:\x20' + JSON.stringify(strangerRefs) + ". Each stranger sends 2 to 5 incoming private messages that continue the story; use the stranger as the author of every message. Use distinct handles that do not match existing DM contacts: " + JSON.stringify(state.xDirectMessages.map(contact => contact.handle)) + '.' : '', botPairs.length ? "Generate exactly one pending submission per requested Bot and sender pair. Copy botId and senderRef exactly. A new stranger senderRef refers to the stranger with that ref in this response. The text must fit the Bot's purpose, its sender and the story. Keep submissions private to the Bot inbox. Requested pairs: " + JSON.stringify(botPairs) : ''].filter(Boolean),
+        scopeValue2721 = "Return one complete JSON object with only these requested sections: " + JSON.stringify(resultSchema) + '.\x0a' + instructions.join('\x0a') + "\nGenerate the sections as one coherent next-day update. Use concise text so the complete JSON fits in a single response. Never generate as the current User. Include accurate Simplified Chinese translations for non-Chinese trends, posts, comments, bios and messages; use an empty translation for Simplified Chinese originals.\nPlot direction: " + (plot || "随机延续当前剧情") + "\nExisting trend titles: " + JSON.stringify(existingTrendTitles) + "\nCurrent story context: " + scopeValue572(state) + '\x0aWorldbook:\x0a' + (worldbook || "None"),
+        scopeValue2752 = await scopeValue242([{
           role: "system",
-          content: "Generate strict JSON for fictional incoming X private messages. Output JSON only."
+          content: 'Generate\x20a\x20complete\x20next-day\x20update\x20for\x20the\x20fictional\x20X\x20app.\x20Output\x20strict\x20JSON\x20only.'
         }, {
           role: "user",
           content: scopeValue2721
         }], {
-          temperature: 0.9
-        }),
-        scopeValue2723 = scopeValue243(scopeValue2722),
-        scopeValue2724 = scopeValue252(Array.isArray(scopeValue2723) ? scopeValue2723 : Array.isArray(scopeValue2723?.["strangers"]) ? scopeValue2723.strangers : []);
-      return scopeValue2724.map(scopeValue574).filter(Boolean);
+          temperature: 0.9,
+          maxOutputTokens: Math.min(0x3e80, Math.max(0x800, counts.posts * 0x190 + counts.strangers * 0xdc + counts.trends * 0x46 + botPairs.length * 0x8c)),
+          traceSource: "X › 推进到下一天",
+          tracePurpose: "生成全部勾选内容"
+        });
+      return scopeValue243(scopeValue2752);
     }
-    async function scopeValue592(scopeValue2725, scopeValue2726, scopeValue2727, scopeValue2728) {
-      const scopeValue2729 = (scopeValue2725.xDirectMessages || []).filter(scopeValue2735 => scopeValue2735.kind === "bot" && scopeValue450(scopeValue2735)),
-        scopeValue2730 = (scopeValue2725.xDirectMessages || []).filter(scopeValue2736 => scopeValue2736.kind !== "bot" && scopeValue450(scopeValue2736));
-      if (!scopeValue2729.length || !scopeValue2730.length) return [];
-      const scopeValue2731 = scopeValue2729.map((scopeValue2737, scopeValue2738) => ({
-          botId: String(scopeValue2737.id),
-          botName: scopeValue2737.name,
-          botHandle: scopeValue2737.handle,
-          botPurpose: scopeValue2737.persona,
-          senderId: String(scopeValue2730[scopeValue2738 % scopeValue2730.length].id),
-          senderName: scopeValue2730[scopeValue2738 % scopeValue2730.length].name,
-          senderHandle: scopeValue2730[scopeValue2738 % scopeValue2730.length].handle,
-          senderPersona: scopeValue2730[scopeValue2738 % scopeValue2730.length].persona
+    function scopeValue594(scopeValue2753, scopeValue2754) {
+      const scopeValue2755 = scopeValue223(scopeValue2753).replace(/^#+/, '').toLocaleLowerCase();
+      if (!scopeValue2755) return '';
+      const scopeValue2756 = scopeValue2754.find(scopeValue2757 => scopeValue2757.title.replace(/^#+/, '').toLocaleLowerCase() === scopeValue2755);
+      return scopeValue2756?.title || '';
+    }
+    function normalizeNextDayContent(response, state, counts, strangerRefs, botPairs) {
+      const existingTrends = scopeValue275(state.xTrends),
+        newTrends = selectUniqueAdvanceResults(scopeValue275((counts.trends && Array.isArray(response?.trends) ? response.trends : []).filter(trend => trend && typeof trend === "object").map(trend => ({
+          ...trend,
+          id: undefined
+        }))), counts.trends, trend => trend.title, '热搜', existingTrends.map(trend => trend.title)).map(trend => ({
+          ...trend,
+          movement: 'up'
         })),
-        scopeValue2732 = await scopeValue242([{
-          role: "system",
-          content: "Generate fictional private-message submissions from the specified X characters to the specified human-run Bot accounts. Return strict JSON only."
-        }, {
-          role: "user",
-          content: "Return {\"submissions\":[{\"botId\":\"\",\"senderId\":\"\",\"text\":\"\"}]}. Generate exactly one private-message submission for each requested Bot and sender pair. Copy botId and senderId exactly. Each text must be a plausible message that this Char privately sends to that Bot for publication, fitting the Bot purpose and ongoing plot. Do not write as the current User. Do not publish posts yet.\nRequested pairs: " + JSON.stringify(scopeValue2731) + "\nPlot: " + (scopeValue2726 || "自然推进") + "\nStory context: " + scopeValue2727 + "\nWorldbook: " + (scopeValue2728 || "None")
-        }], {
-          temperature: 0.85
-        }),
-        scopeValue2733 = scopeValue243(scopeValue2732),
-        scopeValue2734 = Array.isArray(scopeValue2733?.["submissions"]) ? scopeValue2733.submissions : [];
-      if (scopeValue2734.length !== scopeValue2731.length) throw new Error("Bot 投稿数量不匹配");
-      return scopeValue2731.map((scopeValue2739, scopeValue2740) => {
-        const scopeValue2741 = scopeValue2734.find(scopeValue2743 => String(scopeValue2743.botId) === scopeValue2739.botId && String(scopeValue2743.senderId) === scopeValue2739.senderId),
-          scopeValue2742 = scopeValue223(scopeValue2741?.["text"]);
-        if (!scopeValue2742) throw new Error("Bot 投稿内容缺失");
+        allTrends = [...newTrends, ...existingTrends].slice(0x0, scopeValue79),
+        postCandidates = counts.posts ? scopeValue251(response?.posts).map((scopeValue2772, scopeValue2773) => {
+          const scopeValue2774 = scopeValue594(scopeValue2772.topicTag || scopeValue2772.topic || scopeValue2772.trend, allTrends);
+          if (!scopeValue2774) return null;
+          const scopeValue2775 = scopeValue259({
+            ...scopeValue2772,
+            id: undefined,
+            topicTag: scopeValue2774
+          }, scopeValue2773);
+          if (!scopeValue2775 || scopeValue2775.commentList.length < 0x5) return null;
+          return scopeValue2775.topicTag = scopeValue2774, scopeValue347(scopeValue2775);
+        }) : [],
+        newPosts = selectUniqueAdvanceResults(postCandidates, counts.posts, post => post.name + '|' + post.text, '帖子'),
+        strangersByRef = new Map(),
+        expectedRefs = new Set(strangerRefs);
+      for (const candidate of scopeValue252(response?.strangers)) {
+        const ref = scopeValue223(candidate.ref);
+        if (expectedRefs.has(ref)) strangersByRef.set(ref, strangersByRef.has(ref) ? null : candidate);
+      }
+      const existingContactKeys = state.xDirectMessages.map(contact => scopeValue265(contact.handle, contact.name)),
+        newStrangersWithRefs = selectUniqueAdvanceResults(strangerRefs.map((ref, index) => {
+          const candidate = strangersByRef.get(ref),
+            stranger = candidate && scopeValue574({
+              ...candidate,
+              id: undefined
+            }, index);
+          return stranger ? {
+            ref: ref,
+            stranger: stranger
+          } : null;
+        }), counts.strangers, ({
+          stranger: stranger
+        }) => scopeValue265(stranger.handle, stranger.name), "陌生人", existingContactKeys),
+        sendersByRef = new Map([...state.xDirectMessages.filter(contact => contact.kind !== "bot").map(contact => ['existing:' + contact.id, contact]), ...newStrangersWithRefs.map(({
+          ref: ref,
+          stranger: stranger
+        }) => [ref, stranger])]),
+        submissions = botPairs.length && Array.isArray(response?.submissions) ? response.submissions : [];
+      if (submissions.length !== botPairs.length) throw new Error('Bot\x20投稿数量不匹配');
+      const newBotSubmissions = botPairs.map(({
+        botId: botId,
+        senderRef: senderRef
+      }, index) => {
+        const submission = submissions.find(candidate => String(candidate?.botId) === botId && candidate.senderRef === senderRef),
+          sender = sendersByRef.get(senderRef),
+          text = scopeValue223(submission?.text);
+        if (!sender || !text) throw new Error("Bot 投稿缺少内容或有效的投稿人");
         return {
-          botId: scopeValue2739.botId,
+          botId: botId,
           submission: {
             id: scopeValue228("bot-submission"),
-            sourceMessageId: "",
-            senderId: scopeValue2739.senderId,
-            senderName: scopeValue2739.senderName,
-            senderHandle: scopeValue2739.senderHandle,
-            text: scopeValue2742,
+            sourceMessageId: '',
+            senderId: String(sender.id),
+            senderName: sender.name,
+            senderHandle: sender.handle,
+            text: text,
             status: "pending",
-            postId: "",
-            createdAt: Date.now() + scopeValue2740
+            postId: '',
+            createdAt: Date.now() + index
           }
         };
       });
+      return {
+        newTrends: newTrends,
+        newPosts: newPosts,
+        newStrangers: newStrangersWithRefs.map(({
+          stranger: stranger
+        }) => stranger),
+        newBotSubmissions: newBotSubmissions
+      };
     }
-    async function scopeValue593(scopeValue2744, scopeValue2745, scopeValue2746, scopeValue2747, scopeValue2748) {
-      const scopeValue2749 = "Return strict JSON only: {\"trends\":[{\"title\":\"#Topic\",\"translation\":\"\",\"category\":\"Category · Trending\",\"heat\":\"12.3K\"}]}.\nGenerate exactly " + scopeValue2744 + " unique new global hot-search topics that continue and evolve the existing trends and posts. New trends must be relevant to the requested plot and feel like later developments, not paraphrases.\nTopics may originate from any region or language. For non-Chinese title/category text include accurate Simplified Chinese in translation; Chinese originals use \"\".\nPlot direction: " + (scopeValue2746 || "随机延续当前剧情") + "\nDo not repeat these titles: " + (scopeValue2745.length ? scopeValue2745.join("、") : "None") + "\nCurrent story context: " + scopeValue2747 + "\nWorldbook:\n" + (scopeValue2748 || "None"),
-        scopeValue2750 = await scopeValue242([{
-          role: "system",
-          content: "Generate strict JSON for fictional international X hot searches. Output JSON only."
-        }, {
-          role: "user",
-          content: scopeValue2749
-        }], {
-          temperature: 0.9
-        }),
-        scopeValue2751 = scopeValue243(scopeValue2750),
-        scopeValue2752 = Array.isArray(scopeValue2751) ? scopeValue2751 : Array.isArray(scopeValue2751?.["trends"]) ? scopeValue2751.trends : [];
-      return scopeValue275(scopeValue2752);
-    }
-    function scopeValue594(scopeValue2753, scopeValue2754) {
-      const scopeValue2755 = scopeValue223(scopeValue2753).replace(/^#+/, "").toLocaleLowerCase();
-      if (!scopeValue2755) return "";
-      const scopeValue2756 = scopeValue2754.find(scopeValue2757 => scopeValue2757.title.replace(/^#+/, "").toLocaleLowerCase() === scopeValue2755);
-      return scopeValue2756?.["title"] || "";
-    }
-    async function scopeValue595(scopeValue2758, scopeValue2759, scopeValue2760, scopeValue2761, scopeValue2762, scopeValue2763, scopeValue2764) {
-      const scopeValue2765 = scopeValue2763.map(scopeValue2771 => scopeValue2771.title),
-        scopeValue2766 = scopeValue291(),
-        scopeValue2767 = "Return strict JSON only: {\"posts\":[{\"authorName\":\"\",\"handle\":\"\",\"text\":\"\",\"translation\":\"\",\"topicTag\":\"#精确热搜名\",\"likes\":0,\"reposts\":0,\"commentsCount\":5,\"mediaType\":\"text\",\"comments\":[{\"authorName\":\"\",\"handle\":\"\",\"text\":\"\",\"translation\":\"\"}]}]}.\nGenerate exactly " + scopeValue2758 + " new international X posts that advance the current plot. Every post must use one exact topicTag from the allowed trend list and contain at least 5 valid, concrete comments in its comments array. Comments must respond to details in their own post.\nNever use the current User as a generated post, comment or reply author. All generated authors must be non-User accounts.\nPrefer newly generated trends while still allowing continuation of older trends. Use varied countries, languages, authors and viewpoints. Every non-Chinese post, comment and reply must include an accurate Simplified Chinese translation; Chinese originals use \"\".\nPlot direction: " + (scopeValue2760 || "随机延续当前剧情") + "\nAllowed trends: " + scopeValue2765.join("、") + "\nNew trends to prioritize: " + (scopeValue2764.length ? scopeValue2764.join("、") : "None") + "\nReusable existing authors (optional; when used, return their exact authorId): " + JSON.stringify(scopeValue2766) + "\nDo not repeat these post identifiers or summaries: " + (scopeValue2759.length ? scopeValue2759.join("、") : "None") + "\nCurrent story context: " + scopeValue2761 + "\nWorldbook:\n" + (scopeValue2762 || "None"),
-        scopeValue2768 = await scopeValue242([{
-          role: "system",
-          content: "Generate strict JSON for fictional international X posts. Output JSON only."
-        }, {
-          role: "user",
-          content: scopeValue2767
-        }], {
-          temperature: 0.9
-        }),
-        scopeValue2769 = scopeValue243(scopeValue2768),
-        scopeValue2770 = scopeValue251(Array.isArray(scopeValue2769) ? scopeValue2769 : Array.isArray(scopeValue2769?.["posts"]) ? scopeValue2769.posts : []);
-      return scopeValue2770.map((scopeValue2772, scopeValue2773) => {
-        const scopeValue2774 = scopeValue594(scopeValue2772?.["topicTag"] || scopeValue2772?.["topic"] || scopeValue2772?.["trend"], scopeValue2763);
-        if (!scopeValue2774) return null;
-        const scopeValue2775 = scopeValue259({
-          ...scopeValue2772,
-          topicTag: scopeValue2774
-        }, scopeValue2773);
-        if (!scopeValue2775 || !Array.isArray(scopeValue2775.commentList) || scopeValue2775.commentList.length < 5) return null;
-        return scopeValue2775.topicTag = scopeValue2774, scopeValue347(scopeValue2775);
-      }).filter(Boolean);
-    }
-    async function scopeValue596() {
+    async function scopeValue596(event) {
+      event?.stopPropagation();
+      if (!scopeValue2.classList.contains("active") || !scopeValue132?.classList.contains("active") || scopeValue138?.classList.contains("active") || scopeValue564().runButton?.classList.contains('loading')) return;
       const scopeValue2776 = scopeValue568();
       if (!scopeValue2776.strangersEnabled && !scopeValue2776.trendsEnabled && !scopeValue2776.postsEnabled) {
-        if (typeof window.showToast === "function") window.showToast("请至少开启一项生成内容");
+        if (typeof window.showToast === "function") window.showToast('请至少开启一项生成内容');
         return;
       }
-      const scopeValue2777 = scopeValue223(scopeValue133?.["value"]);
+      const scopeValue2777 = scopeValue223(scopeValue133?.value);
       scopeValue571(true);
       try {
         const scopeValue2778 = scopeValue280(),
           scopeValue2779 = String(scopeValue2778.activeXPlayerAccountId),
           scopeValue2780 = scopeValue212,
-          scopeValue2781 = scopeValue572(scopeValue2778),
-          scopeValue2782 = scopeValue246(scopeValue2777 + " " + scopeValue87.bio + " " + scopeValue87.persona),
-          scopeValue2783 = scopeValue275(scopeValue2778.xTrends || []);
-        let scopeValue2784 = [],
-          scopeValue2785 = [],
-          scopeValue2786 = [],
-          scopeValue2787 = [];
-        scopeValue2776.trendsEnabled && (scopeValue2784 = await scopeValue573({
-          total: scopeValue2776.trendsCount,
-          batchSize: 10,
-          blockedKeys: scopeValue2783.map(scopeValue2790 => scopeValue2790.title),
-          getKey: scopeValue2791 => scopeValue2791.title,
-          requestBatch: (scopeValue2792, scopeValue2793) => scopeValue593(scopeValue2792, scopeValue2793, scopeValue2777, scopeValue2781, scopeValue2782),
-          label: "Trends"
-        }), scopeValue2784 = scopeValue2784.map(scopeValue2794 => ({
-          ...scopeValue2794,
-          movement: "up"
-        })));
-        const scopeValue2788 = scopeValue2776.trendsEnabled ? scopeValue2783.map(scopeValue2795 => ({
-            ...scopeValue2795,
-            movement: "down"
-          })) : scopeValue2783,
-          scopeValue2789 = scopeValue275([...scopeValue2784, ...scopeValue2788]).slice(0, scopeValue79);
-        if (scopeValue2776.postsEnabled) {
-          if (scopeValue2789.length === 0) throw new Error("No trends available for generated posts");
-          scopeValue2785 = await scopeValue573({
-            total: scopeValue2776.postsCount,
-            batchSize: 5,
-            getKey: scopeValue2796 => scopeValue2796.name + "|" + scopeValue2796.text,
-            requestBatch: (scopeValue2797, scopeValue2798) => scopeValue595(scopeValue2797, scopeValue2798, scopeValue2777, scopeValue2781, scopeValue2782, scopeValue2789, scopeValue2784.map(scopeValue2799 => scopeValue2799.title)),
-            label: "Posts"
-          });
-        }
-        if (scopeValue2776.strangersEnabled) {
-          const scopeValue2800 = (scopeValue2778.xDirectMessages || []).map(scopeValue2801 => scopeValue223(scopeValue2801.name) + "|" + scopeValue223(scopeValue2801.handle));
-          scopeValue2786 = await scopeValue573({
-            total: scopeValue2776.strangersCount,
-            batchSize: 10,
-            blockedKeys: scopeValue2800,
-            getKey: scopeValue2802 => scopeValue2802.name + "|" + scopeValue2802.handle,
-            requestBatch: (scopeValue2803, scopeValue2804) => scopeValue591(scopeValue2803, scopeValue2804, scopeValue2777, scopeValue2781, scopeValue2782),
-            label: "Strangers"
-          }), scopeValue2787 = await scopeValue592({
-            ...scopeValue2778,
-            xDirectMessages: [...(scopeValue2778.xDirectMessages || []), ...scopeValue2786]
-          }, scopeValue2777, scopeValue2781, scopeValue2782);
-        }
+          counts = {
+            trends: scopeValue2776.trendsEnabled ? scopeValue2776.trendsCount : 0x0,
+            posts: scopeValue2776.postsEnabled ? scopeValue2776.postsCount : 0x0,
+            strangers: scopeValue2776.strangersEnabled ? scopeValue2776.strangersCount : 0x0
+          };
+        if (counts.posts && !counts.trends && !scopeValue275(scopeValue2778.xTrends).length) throw new Error('当前没有可关联的热搜');
+        const strangerRefs = Array.from({
+            length: counts.strangers
+          }, (_unused, index) => 'new-stranger-' + (index + 0x1)),
+          botPairs = buildAdvanceBotPairs(scopeValue2778, strangerRefs),
+          response = await requestNextDayContent(scopeValue2778, counts, strangerRefs, botPairs, scopeValue2777);
         if (scopeValue2780 !== scopeValue212 || String(scopeValue280().activeXPlayerAccountId) !== scopeValue2779) return;
-        scopeValue286(scopeValue2805 => {
-          scopeValue2805.xAdvancePreferences = scopeValue2776;
-          if (scopeValue2776.trendsEnabled) scopeValue2805.xTrends = scopeValue275([...scopeValue2784, ...scopeValue2805.xTrends.map(scopeValue2807 => ({
-            ...scopeValue2807,
+        const {
+          newTrends: scopeValue2784,
+          newPosts: scopeValue2785,
+          newStrangers: scopeValue2786,
+          newBotSubmissions: scopeValue2787
+        } = normalizeNextDayContent(response, scopeValue280(), counts, strangerRefs, botPairs);
+        const saved = await persistAdvanceResult(scopeValue2779, state => {
+          const draft = { ...state, xAdvancePreferences: scopeValue2776 };
+          if (scopeValue2776.trendsEnabled) draft.xTrends = scopeValue275([...scopeValue2784, ...draft.xTrends.map(trend => ({
+            ...trend,
             movement: "down"
-          }))]).slice(0, scopeValue79);
-          scopeValue2805.xGeneratedPosts = scopeValue551(scopeValue2805.xGeneratedPosts, scopeValue2785);
-          const scopeValue2806 = new Set(scopeValue2805.xDirectMessages.map(scopeValue2808 => scopeValue265(scopeValue2808.handle, scopeValue2808.name)));
-          scopeValue2805.xDirectMessages = [...scopeValue2786.filter(scopeValue2809 => scopeValue450(scopeValue2809) && !scopeValue2806.has(scopeValue265(scopeValue2809.handle, scopeValue2809.name))), ...scopeValue2805.xDirectMessages.map(scopeValue2810 => scopeValue2810.kind === "bot" && scopeValue450(scopeValue2810) ? {
-            ...scopeValue2810,
-            botSubmissions: [...(scopeValue2810.botSubmissions || []), ...scopeValue2787.filter(scopeValue2811 => scopeValue2811.botId === String(scopeValue2810.id) && scopeValue450(scopeValue467(scopeValue2811.submission.senderId) || scopeValue2786.find(scopeValue2812 => String(scopeValue2812.id) === scopeValue2811.submission.senderId))).map(scopeValue2813 => scopeValue2813.submission)]
-          } : scopeValue2810)];
-        }), await scopeValue287("x-advance-generation"), scopeValue293(), scopeValue353(), scopeValue434(), scopeValue571(false), scopeValue570(), typeof window.showToast === "function" && window.showToast("已生成 " + scopeValue2786.length + " 个陌生人、" + scopeValue2784.length + " 条热搜、" + scopeValue2785.length + " 条帖子、" + scopeValue2787.length + " 条 Bot 投稿");
+          }))]).slice(0x0, scopeValue79);
+          draft.xGeneratedPosts = scopeValue551(draft.xGeneratedPosts, scopeValue2785);
+          const existingContactKeys = new Set(draft.xDirectMessages.map(contact => scopeValue265(contact.handle, contact.name)));
+          draft.xDirectMessages = [...scopeValue2786.filter(stranger => scopeValue450(stranger) && !existingContactKeys.has(scopeValue265(stranger.handle, stranger.name))), ...draft.xDirectMessages.map(contact => contact.kind === "bot" && scopeValue450(contact) ? {
+            ...contact,
+            botSubmissions: [...(contact.botSubmissions || []), ...scopeValue2787.filter(item => item.botId === String(contact.id) && scopeValue450(scopeValue467(item.submission.senderId) || scopeValue2786.find(stranger => String(stranger.id) === item.submission.senderId))).map(item => item.submission)]
+          } : contact)];
+          return draft;
+        }, "x-advance-generation");
+        if (String(scopeValue280().activeXPlayerAccountId) !== scopeValue2779) return;
+        if (!saved) {
+          window.showToast?.("本轮内容已生成，但保存失败，请重试");
+          return;
+        }
+        scopeValue293();
+        scopeValue353();
+        scopeValue434();
+        scopeValue571(false);
+        scopeValue570();
+        typeof window.showToast === "function" && window.showToast("已生成 " + scopeValue2786.length + " 个陌生人、" + scopeValue2784.length + '\x20条热搜、' + scopeValue2785.length + '\x20条帖子、' + scopeValue2787.length + '\x20条\x20Bot\x20投稿');
       } catch (scopeValue2814) {
         console.error("[X] Advance generation failed", scopeValue2814);
-        if (!window.u2Api?.["isRequestError"]?.(scopeValue2814) || !window.u2Api.reportError(scopeValue2814, {
-          operation: "内容推进"
+        if (!window.u2Api?.isRequestError?.(scopeValue2814) || !window.u2Api.reportError(scopeValue2814, {
+          operation: '内容推进'
         })) {
           if (typeof window.showToast === "function") window.showToast("推进失败，未修改现有内容");
         }

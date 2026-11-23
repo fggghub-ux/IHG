@@ -766,6 +766,8 @@
     background: transparent;
     color: #26262a;
 }
+.diary-detail-actions { display: flex; align-items: center; justify-self: end; }
+#diary-detail-translate { width: auto; padding: 0 6px; border-radius: 8px; white-space: nowrap; font-size: 13px; color: #007aff; }
 .diary-detail-scroll {
     flex: 1 1 auto;
     min-height: 0;

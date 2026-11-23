@@ -617,7 +617,10 @@ Rules:
 6. Return valid JSON only, with no Markdown, code fence, or explanation.
 7. Each object must have exactly this shape: {"question":"question in Simplified Chinese","answer":"character's original answer","answerTranslationZh":"Simplified Chinese translation or empty string"}.`,
                 controller = new AbortController(),
-                timeout = setTimeout(() => controller.abort(), 90000);
+                timeout = setTimeout(() => {
+                  root_3.u2ApiConsole?.markTimeout(controller.signal);
+                  controller.abort();
+                }, 90000);
             try {
                 const headers_2 = root_3.u2Api?.buildApiHeaders
                         ? root_3.u2Api.buildApiHeaders(apiConfig_2, {
@@ -629,6 +632,11 @@ Rules:
                               'X-U2-Silent-Errors': '1',
                           },
                     response = await fetch(endpoint_2, {
+                        u2ApiTrace: {
+                          service: "text",
+                          source: "iMessage › 匿名问答",
+                          purpose: "生成问答"
+                        },
                         method: 'POST',
                         headers: headers_2,
                         body: JSON.stringify({

@@ -724,6 +724,8 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                 await window.imApp.ensureFriendRecentMessagesLoaded(currentActiveFriend_2);
             else if (window.imApp.ensureFriendMessagesLoaded)
                 await window.imApp.ensureFriendMessagesLoaded(currentActiveFriend_2);
+            if (currentActiveFriend_2.type === 'group')
+                await window.imApp.reconcileGroupMutes?.(currentActiveFriend_2);
             if (
                 currentActiveFriend_2.pendingLovesUnbindRequest &&
                 window.imApp.reconcilePendingLovesUnbindRequest

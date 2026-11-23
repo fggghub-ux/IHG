@@ -485,6 +485,13 @@
         if (row_3) {
             decorateMessageRowAvatar(row_3, friend_5, message_4);
             apk110New_23(row_3, friend_5, message_4);
+            if (message_4.deliveryStatus === 'blocked' && !row_3.querySelector('.chat-delivery-failed')) {
+                const failure = document.createElement('span');
+                failure.className = 'chat-delivery-failed is-char';
+                failure.setAttribute('aria-label', '发送失败');
+                failure.textContent = '发送失败';
+                row_3.appendChild(failure);
+            }
         }
         return true;
     }
@@ -2789,6 +2796,7 @@ if (msg_10.type === "group_announcement") {
                 window.imChat.renderMemoryRequestBubble(msg_10, friend_16, container_6, msgTime),
                 handleAction_19(msg_10, friend_16, container_6)
             );
+        if (msg_10.type === "group_unmute_request") return window.imApp.renderGroupUnmuteRequest?.(msg_10, friend_16, container_6), handleAction_19(msg_10, friend_16, container_6);
         if (msg_10.type === 'unblock_request')
             return (
                 window.imChat.renderUnblockRequestBubble(msg_10, friend_16, container_6, msgTime),

@@ -688,7 +688,20 @@ window.imApp.normalizeAutonomousTask = function (chatCoreScopeValue217) {
 window.imApp.createDefaultAutonomousActivity = function () {
   return {
     reply: window.imApp.createDefaultAutonomousTask(),
-    moment: window.imApp.createDefaultAutonomousTask()
+    moment: window.imApp.createDefaultAutonomousTask(),
+    diary: window.imApp.normalizeAutonomousDiaryTask()
+  };
+};
+window.imApp.normalizeAutonomousDiaryTask = function (task) {
+  const hours = Number(task?.intervalHours);
+  const enabled = task?.enabled === true;
+  const nextRunAt = Number(task?.nextRunAt);
+  const lastRunAt = Number(task?.lastRunAt);
+  return {
+    enabled,
+    intervalHours: Number.isInteger(hours) && hours >= 1 && Date.now() + hours * 3600000 <= 8640000000000000 ? hours : 24,
+    nextRunAt: enabled && Number.isFinite(nextRunAt) && nextRunAt > 0 && nextRunAt <= 8640000000000000 ? nextRunAt : 0,
+    lastRunAt: enabled && Number.isFinite(lastRunAt) && lastRunAt > 0 ? lastRunAt : 0
   };
 };
 window.imApp.normalizeAutonomousActivity = function (chatCoreScopeValue224) {
@@ -697,7 +710,8 @@ window.imApp.normalizeAutonomousActivity = function (chatCoreScopeValue224) {
     chatCoreScopeValue227 = chatCoreScopeValue226 ? chatCoreScopeValue225.reply : chatCoreScopeValue225;
   return {
     reply: window.imApp.normalizeAutonomousTask(chatCoreScopeValue227),
-    moment: window.imApp.normalizeAutonomousTask(chatCoreScopeValue225.moment)
+    moment: window.imApp.normalizeAutonomousTask(chatCoreScopeValue225.moment),
+    diary: window.imApp.normalizeAutonomousDiaryTask(chatCoreScopeValue225.diary)
   };
 };
 window.imApp.createDefaultMemory = function () {
@@ -1610,6 +1624,7 @@ window.imApp.normalizeFriendData = function (chatCoreScopeValue511) {
   chatCoreScopeValue512.allowCharBlock = !chatCoreScopeValue513 && chatCoreScopeValue512.allowCharBlock === true;
   chatCoreScopeValue512.blockState = chatCoreScopeValue513 ? window.imApp.normalizeChatBlockState(null) : window.imApp.normalizeChatBlockState(chatCoreScopeValue512.blockState);
   chatCoreScopeValue512.pendingLovesUnbindRequest = chatCoreScopeValue513 ? null : window.imApp.normalizePendingLovesUnbindRequest(chatCoreScopeValue512.pendingLovesUnbindRequest);
+  chatCoreScopeValue512.allowCharGalleryPhotos = chatCoreScopeValue512.allowCharGalleryPhotos !== false;
   chatCoreScopeValue512.thoughtStatusEnabled = chatCoreScopeValue512.thoughtStatusEnabled !== false;
   if (!chatCoreScopeValue513) chatCoreScopeValue512.allowCharCherishedMemory = chatCoreScopeValue512.allowCharCherishedMemory !== false;
   !chatCoreScopeValue513 && chatCoreScopeValue512.messages.forEach(chatCoreScopeValue537 => {
@@ -2120,7 +2135,7 @@ window.imApp.formatSystemNoticeForApiContext = function (chatCoreScopeValue676, 
     chatCoreScopeValue680 = window.imApp.getGroupManagementNoticeText ? window.imApp.getGroupManagementNoticeText(chatCoreScopeValue677, chatCoreScopeValue678) : chatCoreScopeValue678.content || chatCoreScopeValue678.text || "";
   if (chatCoreScopeValue679 === "group_left") return "[系统事件：User 已退出群聊。]";
   if (chatCoreScopeValue679 === "group_rejoined") return "[系统事件：User 重新进入群聊。]";
-  if (["group_admin_promoted", "group_admin_removed", "group_title_changed"].includes(chatCoreScopeValue679)) {
+  if (["group_admin_promoted", "group_admin_removed", "group_title_changed", "group_rename", "group_mute", "group_unmute", "group_mute_expired", "group_unmute_decision"].includes(chatCoreScopeValue679)) {
     if (!chatCoreScopeValue680) return "";
     const chatCoreScopeValue681 = String(chatCoreScopeValue678.targetMemberId || "").trim(),
       chatCoreScopeValue682 = chatCoreScopeValue681 && chatCoreScopeValue681 !== "__user__" ? "；目标成员 ID：" + chatCoreScopeValue681 : "";
@@ -2191,6 +2206,15 @@ window.imApp.formatMessageForApiContext = function (chatCoreScopeValue705, chatC
   let chatCoreScopeValue711 = chatCoreScopeValue709.content || "";
   if (chatCoreScopeValue709.excludedFromContext === true || chatCoreScopeValue709.type === "user_phone_access_card" || chatCoreScopeValue709.type === "system_notice" && ["user_phone_access", "user_remark_changed", "relationship_changed"].includes(chatCoreScopeValue709.noticeKind)) return null;
   if (chatCoreScopeValue709.type === "memory_request") return null;
+  if (chatCoreScopeValue709.type === "group_unmute_request") {
+    const request = chatCoreScopeValue709;
+    return {
+      role: "system",
+      content: "[群内公开解除禁言申请：" + request.speaker + "；成员 ID：" + request.speakerMemberId
+        + "；requestId=" + request.id + "；状态=" + (request.requestStatus || "pending")
+        + "；理由：" + (request.requestText || request.content || "") + "]"
+    };
+  }
   if (chatCoreScopeValue709.type === "unblock_request") {
     const chatCoreScopeValue716 = chatCoreScopeValue709.requesterRole === "assistant" ? "Char" : "User";
     const chatCoreScopeValue717 = chatCoreScopeValue709.requestStatus || "pending";
@@ -3205,6 +3229,15 @@ window.imApp.appendFriendMessage = async function (chatCoreScopeValue1106, chatC
   const chatCoreScopeValue1109 = String(chatCoreScopeValue1106),
     chatCoreScopeValue1110 = (window.imData.friends || []).find(chatCoreScopeValue1121 => String(chatCoreScopeValue1121.id) === chatCoreScopeValue1109);
   if (!chatCoreScopeValue1110) return false;
+  if (chatCoreScopeValue1110.type === "group") {
+    await window.imApp.reconcileGroupMutes?.(chatCoreScopeValue1110);
+    window.imApp.markGroupMutedDelivery?.(chatCoreScopeValue1110, chatCoreScopeValue1107);
+  } else if (chatCoreScopeValue1107?.role === "assistant" && chatCoreScopeValue1107.privateFromGroup === true
+    && chatCoreScopeValue1110.blockState?.userBlocksChar === true) {
+    chatCoreScopeValue1107.deliveryStatus = "blocked";
+    chatCoreScopeValue1107.excludedFromContext = true;
+    chatCoreScopeValue1107.blockedDirection = "user_blocks_char";
+  }
   if (!Array.isArray(chatCoreScopeValue1110.messages) && window.imApp.ensureFriendRecentMessagesLoaded) await window.imApp.ensureFriendRecentMessagesLoaded(chatCoreScopeValue1110);else !Array.isArray(chatCoreScopeValue1110.messages) && window.imApp.ensureFriendMessagesLoaded && (await window.imApp.ensureFriendMessagesLoaded(chatCoreScopeValue1110));
   if (!Array.isArray(chatCoreScopeValue1110.messages)) chatCoreScopeValue1110.messages = [];
   const chatCoreScopeValue1111 = chatCoreScopeValue1107 && typeof chatCoreScopeValue1107 === "object" ? chatCoreScopeValue1107 : {};
@@ -3414,7 +3447,9 @@ window.imApp.removeFriendMessages = async function (chatCoreScopeValue1147, chat
     if (!window.imStorage?.saveFriendMeta) throw new Error("Friend meta persistence unavailable");
     const chatCoreScopeValue1217 = chatCoreScopeValue1165.map(chatCoreScopeValue1218 => chatCoreScopeValue1218?.id ? String(chatCoreScopeValue1218.id) : null).filter(Boolean);
     return await window.imApp.runFriendPersistenceTask(chatCoreScopeValue1150, async () => {
-      if (chatCoreScopeValue1171 && !chatCoreScopeValue1170 && chatCoreScopeValue1217.length === chatCoreScopeValue1165.length && window.imStorage?.deleteFriendMessages) await window.imStorage.deleteFriendMessages(chatCoreScopeValue1217);else {
+      if (chatCoreScopeValue1171 && !chatCoreScopeValue1170
+          && !(chatCoreScopeValue1149.beforePersist && chatCoreScopeValue1165.some(message => message.payload?.groupManagementChange))
+          && chatCoreScopeValue1217.length === chatCoreScopeValue1165.length && window.imStorage?.deleteFriendMessages) await window.imStorage.deleteFriendMessages(chatCoreScopeValue1217);else {
         if (window.imStorage?.replaceFriendMessages) await window.imStorage.replaceFriendMessages(chatCoreScopeValue1150, chatCoreScopeValue1151.messages);else throw new Error("Friend message removal persistence unavailable");
       }
       return await window.imStorage.saveFriendMeta(chatCoreScopeValue1151), true;
@@ -4156,6 +4191,25 @@ window.imApp.getWorldBookContextForFriendByPosition = function (chatCoreScopeVal
 };
 window.getWorldBookContextForFriendByPosition = function (chatCoreScopeValue1469 = "before_role", chatCoreScopeValue1470 = null, chatCoreScopeValue1471 = "", chatCoreScopeValue1472 = {}) {
   return window.imApp.getWorldBookContextForFriendByPosition(chatCoreScopeValue1469, chatCoreScopeValue1470, chatCoreScopeValue1471, chatCoreScopeValue1472);
+};
+window.imApp.clearFriendProfileStatus = async function (friendId) {
+  const friend = window.imApp.getFriendById(friendId);
+  if (friend?.type !== "char") return false;
+  const saved = await window.imApp.commitFriendMetaPatch(friend.id, {
+    profilePanel: {
+      ...window.imApp.createDefaultProfilePanel(friend),
+      thought: "",
+      thoughtHistory: [],
+      statusHistory: []
+    },
+    latestThought: "",
+    profileStatusRevision: "clear-" + Date.now() + "-" + Math.random().toString(36).slice(2)
+  }, { silent: true });
+  if (saved) {
+    delete window.imData.profilePanelUiStateByFriendId?.[String(friend.id)];
+    window.imChat?.refreshProfilePanel?.(window.imApp.getFriendById(friend.id), { resetSelection: true });
+  }
+  return saved;
 };
 window.imApp.commitFriendMetaPatch = async function (chatCoreScopeValue1473, chatCoreScopeValue1474, chatCoreScopeValue1475 = {}) {
   const chatCoreScopeValue1476 = String(chatCoreScopeValue1473),

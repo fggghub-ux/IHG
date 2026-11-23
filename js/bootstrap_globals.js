@@ -14,7 +14,8 @@
             model: '',
             temperature: 0.7,
             frequencyPenalty: 0,
-            streamEnabled: false,
+            maxTokens: null,
+        streamEnabled: false,
         },
         VECTOR_MEMORY_PROVIDERS_2 = Object.freeze({
             siliconflow: {
@@ -611,6 +612,17 @@
         }
         return parsed_2.toString();
     }
+    function normalizeMaxTokens(value) {
+        if (!["number", "string"].includes(typeof value) || String(value).trim() === "") return null;
+        const tokens = Number(value);
+        return Number.isSafeInteger(tokens) && tokens > 0 ? tokens : null;
+    }
+    function validateMaxTokens(value) {
+        if (value == null || typeof value === "string" && value.trim() === "") return null;
+        const tokens = normalizeMaxTokens(value);
+        if (tokens === null) throw new Error("最大生成 Token 请输入正整数，或留空使用默认值");
+        return tokens;
+    }
     function sanitizeApiConfig_2(apk120Value170) {
   const apk120Value171 = apk120Value170 && typeof apk120Value170 === "object" ? apk120Value170 : {},
     apk120Value172 = Number.parseFloat(apk120Value171.temperature),
@@ -622,11 +634,13 @@
     'model': String(apk120Value171.model || '').trim(),
     'temperature': Number.isFinite(apk120Value172) ? Math.max(0x0, Math.min(0x2, apk120Value172)) : 0.7,
     'frequencyPenalty': Number.isFinite(apk120Value173) ? Math.max(-0x2, Math.min(0x2, apk120Value173)) : 0x0,
+    maxTokens: normalizeMaxTokens(apk120Value171.maxTokens),
     'streamEnabled': apk120Value171.streamEnabled === !![]
   };
 }
     function validateApiConfig_2(value_6, options_2 = {}) {
         const config = sanitizeApiConfig_2(value_6);
+        config.maxTokens = validateMaxTokens(value_6?.maxTokens);
         parseHttpUrl_2(config.endpoint);
         if (!config.apiKey) throw new Error('请填写 API 密钥');
         if (options_2.requireModel !== false && !config.model) throw new Error('请填写模型名称');
@@ -640,6 +654,8 @@
       ...apk120Value178
     });
   apk120Value181.set("X-U2-Stream-Enabled", apk120Value177?.streamEnabled === !![] ? '1' : '0');
+  apk120Value181.set(MAX_TOKENS_HEADER, String(normalizeMaxTokens(apk120Value177?.maxTokens) ?? ""));
+  apk120Value181.set(MAX_TOKENS_FIELD_HEADER, apk120Value180 === "openai" ? "max_completion_tokens" : "max_tokens");
   if (isGeminiProvider(apk120Value180)) apk120Value181.set('x-goog-api-key', String(apk120Value177?.apiKey || ''));else {
     if (isAnthropicProvider(apk120Value180)) apk120Value181.set('x-api-key', String(apk120Value177?.apiKey || '')), apk120Value181.set("anthropic-version", '2023-06-01');else /\.openai\.azure\.com(?=\/|$)/i.test(apk120Value179) ? apk120Value181.set("api-key", String(apk120Value177?.apiKey || '')) : apk120Value181.set("Authorization", 'Bearer\x20' + String(apk120Value177?.apiKey || ''));
   }
@@ -677,6 +693,8 @@
         resolveChatCompletionsEndpoint: resolveChatCompletionsEndpoint_2,
         resolveModelsEndpoint: resolveModelsEndpoint_2,
         sanitizeApiConfig: sanitizeApiConfig_2,
+        normalizeMaxTokens,
+        validateMaxTokens,
         VECTOR_MEMORY_PROVIDERS: VECTOR_MEMORY_PROVIDERS_2,
         normalizeVectorMemoryConfig: normalizeVectorMemoryConfig_2,
         VISION_PROVIDERS: VISION_PROVIDERS_2,
@@ -692,6 +710,38 @@
     const originalFetch = window.fetch,
         text_33 = 'X-U2-Frequency-Penalty';
     const API_STREAM_HEADER_120 = 'X-U2-Stream-Enabled';
+    const MAX_TOKENS_HEADER = "X-U2-Max-Tokens";
+    const MAX_TOKENS_FIELD_HEADER = "X-U2-Max-Tokens-Field";
+    function applyMaxTokens(url, headers, body, config) {
+        if (!body || !Array.isArray(body.messages) || !body.messages.some(Boolean)) return false;
+        const tokenFields = ["max_tokens", "max_completion_tokens", "max_output_tokens"];
+        if (tokenFields.some(field => Object.prototype.hasOwnProperty.call(body, field))) return false;
+        let tokens = null;
+        let provider = config?.provider || detectApiProviderFromEndpoint_2(url);
+        if (config) {
+            tokens = normalizeMaxTokens(config.maxTokens);
+        } else if (headers.has(MAX_TOKENS_HEADER)) {
+            tokens = normalizeMaxTokens(headers.get(MAX_TOKENS_HEADER));
+        } else {
+            const activeConfig = window.getApiConfig?.();
+            if (!activeConfig?.endpoint || String(body.model || "") !== activeConfig.model) return false;
+            try {
+                const activeHeaders = new Headers(buildApiHeaders_2(activeConfig));
+                const sameCredentials = ["Authorization", "api-key", "x-api-key", "x-goog-api-key"]
+                    .every(name => (activeHeaders.get(name) || "") === (headers.get(name) || ""));
+                if (!sameCredentials || normalizeApiEndpoint_2(activeConfig.endpoint, activeConfig.provider) !== url) return false;
+            } catch {
+                return false;
+            }
+            tokens = normalizeMaxTokens(activeConfig.maxTokens);
+            provider = activeConfig.provider;
+        }
+        if (tokens === null) return false;
+        const useCompletionTokens = provider === "openai" || /^https?:\/\/api\.openai\.com(?=[:/]|$)/i.test(url)
+            || !config && headers.get(MAX_TOKENS_FIELD_HEADER) === "max_completion_tokens";
+        body[useCompletionTokens ? "max_completion_tokens" : "max_tokens"] = tokens;
+        return true;
+    }
 function applyApiStreamMode_120(apk120Value190, apk120Value191, apk120Value192, apk120Value193, apk120Value194) {
   if (!apk120Value192 || !Array.isArray(apk120Value192.messages) || !apk120Value192.messages.some(Boolean)) return null;
   if (typeof apk120Value194 === 'boolean') return apk120Value192.stream = apk120Value194, apk120Value194;
@@ -717,6 +767,9 @@ function applyApiStreamMode_120(apk120Value190, apk120Value191, apk120Value192, 
     apk120Value208 = apk120Value206.get(INTERNAL_GLOBAL_ERROR_HEADER_2) === '1',
     apk120Value209 = apk120Value205 ? apk120Value205.frequencyPenalty : apk120Value206.get(text_33),
     apk120Value210 = apk120Value204.stream === !![];
+  applyMaxTokens(String(apk120Value201 || ""), apk120Value206, apk120Value204, apk120Value205);
+  apk120Value206.delete(MAX_TOKENS_HEADER);
+  apk120Value206.delete(MAX_TOKENS_FIELD_HEADER);
   applyApiStreamMode_120(String(apk120Value201 || ''), apk120Value206, apk120Value204, apk120Value205, apk120Value203.streamOverride), apk120Value206['delete'](API_STREAM_HEADER_120), apk120Value206["delete"](INTERNAL_SILENT_ERROR_HEADER_2), apk120Value206["delete"](INTERNAL_GLOBAL_ERROR_HEADER_2), apk120Value206["delete"](text_33);
   let apk120Value211 = String(apk120Value201 || '');
   if (/\.openai\.azure\.com(?=\/|$)/i.test(apk120Value211)) {
@@ -731,13 +784,21 @@ function applyApiStreamMode_120(apk120Value190, apk120Value191, apk120Value192, 
   const apk120Value214 = {
     ...apk120Value203
   };
-  return delete apk120Value214.apiConfig, delete apk120Value214.streamOverride, apk120Value214.headers = apk120Value206, apk120Value214.body = JSON.stringify(apk120Value213 ? apk120Value213.body : apk120Value204), handleAction_55([apk120Value211, apk120Value214], {
+  return delete apk120Value214.apiConfig, delete apk120Value214.streamOverride, delete apk120Value214.u2ApiTrace, apk120Value214.headers = apk120Value206, apk120Value214.body = JSON.stringify(apk120Value213 ? apk120Value213.body : apk120Value204), handleAction_55([apk120Value211, apk120Value214], {
     'nativeAdapter': apk120Value213,
     'responseStream': apk120Value210,
     'silentErrors': apk120Value207,
     'showGlobalErrors': apk120Value208,
-    'isAiApiRequest': !![],
-    'signal': apk120Value214.signal
+    isAiApiRequest: true,
+    traceInfo: {
+      service: "text",
+      source: "AI 服务",
+      purpose: "生成内容",
+      provider: apk120Value213?.provider || apk120Value212 || detectApiProviderFromEndpoint_2(apk120Value211),
+      model: apk120Value204.model,
+      ...apk120Value203.u2ApiTrace
+    },
+    signal: apk120Value214.signal
   });
 }
     function createHttpError_2(value_179, value_180, value_181 = 'API 请求失败') {
@@ -1522,28 +1583,42 @@ function applyApiStreamMode_120(apk120Value190, apk120Value191, apk120Value192, 
     responseStream = ![],
     silentErrors = ![],
     showGlobalErrors = ![],
-    isAiApiRequest = ![],
+    isAiApiRequest = false,
+    traceInfo = null,
     signal = null
   } = apk120Value399;
+  const journal = window.u2ApiConsole;
+  const trace = journal?.start(traceInfo, signal, apk120Value398[1]?.headers || apk120Value398[0]?.headers);
   try {
     const apk120Value400 = await originalFetch(...apk120Value398);
+    trace?.response(apk120Value400);
     if (apk120Value400.ok && isAiApiRequest && /text\/event-stream/i.test(apk120Value400.headers.get("Content-Type") || '')) {
       if (!window.u2ApiStream) throw new Error('流式传输模块未加载，请刷新页面重试');
-      return await window.u2ApiStream.adaptResponse(apk120Value400, {
+      const adaptedResponse = await window.u2ApiStream.adaptResponse(apk120Value400, {
         'provider': nativeAdapter?.provider,
         'model': nativeAdapter?.model,
         'responseStream': responseStream,
-        'signal': signal
+        signal,
+        trace
       });
+      return adaptedResponse === apk120Value400
+        ? journal?.watchResponse(apk120Value400, trace, "sse") || apk120Value400
+        : adaptedResponse;
     }
     if (apk120Value400.ok && nativeAdapter) {
       const apk120Value403 = await apk120Value400.json();
-      return createCompatibleNativeResponse(apk120Value400, {
+      trace?.payload(apk120Value403);
+      const adaptedResponse = createCompatibleNativeResponse(apk120Value400, {
         ...nativeAdapter,
         'stream': responseStream
       }, apk120Value403);
+      trace?.finish();
+      return adaptedResponse;
     }
-    if (apk120Value400.ok) return apk120Value400;
+    if (apk120Value400.ok) {
+      const format = traceInfo?.format || (isAiApiRequest || /json/i.test(apk120Value400.headers.get("Content-Type") || "") ? "json" : "");
+      return journal?.watchResponse(apk120Value400, trace, format) || apk120Value400;
+    }
     if (silentErrors || !showGlobalErrors || !isAiApiRequest) return apk120Value400;
     const apk120Value401 = apk120Value400.clone();
     let apk120Value402 = '';
@@ -1558,6 +1633,7 @@ function applyApiStreamMode_120(apk120Value190, apk120Value191, apk120Value192, 
       'operation': "API 请求"
     }), 0x0), apk120Value400;
   } catch (apk120Value405) {
+    trace?.fail(apk120Value405);
     const apk120Value406 = apk120Value405?.name === 'AbortError' || signal?.aborted === !![];
     !silentErrors && showGlobalErrors && !apk120Value406 && isAiApiRequest && setTimeout(() => reportError_2(apk120Value405, {
       'operation': "API 请求"
@@ -1591,16 +1667,20 @@ function applyApiStreamMode_120(apk120Value190, apk120Value191, apk120Value192, 
     apk120Value419 = ![];
   if (apk120Value415 && String(apk120Value409.method || (apk120Value408 instanceof Request ? apk120Value408.method : "GET")).toUpperCase() === "POST") {
     apk120Value417 = await handleAction_51(apk120Value408, apk120Value409), apk120Value419 = apk120Value417?.stream === !![];
+    const config = apk120Value409.apiConfig ? sanitizeApiConfig_2(apk120Value409.apiConfig) : null;
+    const appliedMaxTokens = applyMaxTokens(apk120Value414, apk120Value410, apk120Value417, config);
     const apk120Value424 = applyApiStreamMode_120(apk120Value414, apk120Value410, apk120Value417, apk120Value409.apiConfig ? sanitizeApiConfig_2(apk120Value409.apiConfig) : null, apk120Value409.streamOverride),
       apk120Value425 = handleAction_54(apk120Value414, apk120Value410, apk120Value417, apk120Value413);
-    apk120Value418 = apk120Value425 || apk120Value424 !== null, apk120Value416 = createNativeRequestAdapter(apk120Value414, apk120Value410, apk120Value417);
+    apk120Value418 = appliedMaxTokens || apk120Value425 || apk120Value424 !== null, apk120Value416 = createNativeRequestAdapter(apk120Value414, apk120Value410, apk120Value417);
     if (apk120Value416) apk120Value414 = apk120Value416.url;
   }
-  apk120Value410["delete"](API_STREAM_HEADER_120);
+  apk120Value410.delete(API_STREAM_HEADER_120);
+  apk120Value410.delete(MAX_TOKENS_HEADER);
+  apk120Value410.delete(MAX_TOKENS_FIELD_HEADER);
   const apk120Value420 = {
     ...apk120Value409
   };
-  delete apk120Value420.apiConfig, delete apk120Value420.streamOverride;
+  delete apk120Value420.apiConfig, delete apk120Value420.streamOverride, delete apk120Value420.u2ApiTrace;
   let apk120Value421;
   return apk120Value408 instanceof Request ? apk120Value421 = apk120Value416 ? [new Request(apk120Value414, {
     'method': apk120Value409.method || apk120Value408.method,
@@ -1626,8 +1706,14 @@ function applyApiStreamMode_120(apk120Value190, apk120Value191, apk120Value192, 
     'responseStream': apk120Value419,
     'silentErrors': apk120Value411,
     'showGlobalErrors': apk120Value412,
-    'isAiApiRequest': apk120Value415,
-    'signal': apk120Value409.signal || (apk120Value408 instanceof Request ? apk120Value408.signal : undefined)
+    isAiApiRequest: apk120Value415,
+    traceInfo: apk120Value409.u2ApiTrace && {
+      provider: apk120Value416?.provider || apk120Value409.apiConfig?.provider
+        || (apk120Value415 ? detectApiProviderFromEndpoint_2(apk120Value414) : ""),
+      model: apk120Value417?.model,
+      ...apk120Value409.u2ApiTrace
+    },
+    signal: apk120Value409.signal || (apk120Value408 instanceof Request ? apk120Value408.signal : undefined)
   });
 };
 })();

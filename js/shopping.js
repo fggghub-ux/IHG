@@ -723,6 +723,7 @@
                 const endpoint = window.u2Api.resolveChatCompletionsEndpoint(apiConfig.endpoint);
 
                 const response = await fetch(endpoint, {
+                    u2ApiTrace: { service: "text", source: "购物", purpose: "生成商品" },
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

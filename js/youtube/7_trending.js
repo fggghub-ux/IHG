@@ -312,6 +312,11 @@ trendRefreshBtn &&
                     window.apiConfig.endpoint,
                 ),
                 value_19 = await fetch(endpoint_2, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "YouTube › 热门",
+                      purpose: "生成热门内容"
+                    },
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

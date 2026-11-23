@@ -554,6 +554,7 @@
             model: String(value_159.model || '').trim(),
             temperature: value_159.temperature ?? value_159.temp ?? 0.7,
             frequencyPenalty: value_159.frequencyPenalty ?? 0,
+            maxTokens: value_159.maxTokens ?? null,
         };
         if (!options_160.endpoint || !options_160.apiKey || !options_160.model)
             throw new Error('LHV选择的 API 预设配置不完整，请重新选择');
@@ -1146,6 +1147,11 @@ Complete world-book entries explicitly named this turn: ` +
                     ? value_2.u2Api.resolveChatCompletionsEndpoint(value_271.endpoint)
                     : value_271.endpoint.replace(/\/$/, '') + '/chat/completions',
                 value_278 = await fetch(value_277, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "iMessage › 公众号",
+                      purpose: "生成作品"
+                    },
                     method: 'POST',
                     headers: value_2.u2Api?.buildApiHeaders
                         ? value_2.u2Api.buildApiHeaders(value_271, {

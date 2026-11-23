@@ -155,7 +155,7 @@
       "apiDetail": localValue68
     });
   }
-  async function localValue15(localValue69, localValue70, localValue71, localValue72) {
+  async function localValue15(localValue69, localValue70, localValue71, trace, localValue72) {
     const localValue73 = new AbortController();
     let localValue74 = false;
     const localValue75 = () => localValue73.abort();
@@ -163,11 +163,13 @@
       "once": true
     });
     const localValue76 = setTimeout(() => {
+      window.u2ApiConsole?.markTimeout(localValue73.signal);
       localValue74 = true, localValue73.abort();
     }, localValue2);
     try {
       const localValue77 = await fetch(localValue69, {
         ...localValue70,
+        u2ApiTrace: trace,
         "signal": localValue73.signal
       });
       if (!localValue77.ok) throw await localValue14(localValue77, localValue71);
@@ -347,6 +349,13 @@
       localValue138 = localValue16(localValue135),
       localValue139 = typeof localValue136.prompt === "string" && localValue136.prompt.trim() ? localValue136.prompt.trim().slice(0, 4000) : localValue4,
       localValue140 = Math.min(4096, Math.max(600, Math.round(Number(localValue136.maxTokens) || 600)));
+    const trace = {
+      service: "vision",
+      source: localValue136.traceSource || "识图",
+      purpose: "识别图片",
+      provider: localValue137.provider === "claude" ? "anthropic" : localValue137.provider,
+      model: localValue137.model
+    };
     let localValue141,
       localValue142 = "";
     if (localValue137.provider === "gemini") {
@@ -401,7 +410,7 @@
             }
           })
         })
-      }, "Gemini", localValue136.signal), localValue142 = localValue22(localValue141);
+      }, "Gemini", trace, localValue136.signal), localValue142 = localValue22(localValue141);
     } else {
       if (localValue137.provider === "claude") {
         const localValue147 = localValue138.kind === "base64" ? localValue138.value : await localValue18(localValue138.value, localValue136.signal),
@@ -434,7 +443,7 @@
               }]
             }]
           })
-        }, "Claude", localValue136.signal), localValue142 = localValue21(localValue141);
+        }, "Claude", trace, localValue136.signal), localValue142 = localValue21(localValue141);
       } else {
         const localValue149 = localValue137.provider === "openai" ? "OpenAI" : localValue137.provider === "grok" ? "Grok" : localValue137.provider === "qwen" ? "Qwen / DashScope" : localValue137.provider === "zhipu" ? "智谱 GLM" : "OpenAI 兼容服务";
         localValue141 = await localValue15(localValue9(localValue137.endpoint), {
@@ -465,7 +474,7 @@
               }]
             }]
           })
-        }, localValue149, localValue136.signal), localValue142 = localValue20(localValue141);
+        }, localValue149, trace, localValue136.signal), localValue142 = localValue20(localValue141);
       }
     }
     localValue136.signal?.["throwIfAborted"]?.();
@@ -490,7 +499,13 @@
     const localValue154 = await localValue15(localValue10(localValue152.endpoint, localValue151), {
         "method": "GET",
         "headers": localValue153
-      }, "识图服务"),
+      }, "识图服务", {
+        service: "models",
+        source: "设置 › 识图配置",
+        purpose: "获取模型列表",
+        provider: localValue151,
+        tokenApplicable: false
+      }),
       localValue155 = Array.isArray(localValue154?.["data"]) ? localValue154.data : Array.isArray(localValue154?.["models"]) ? localValue154.models : [],
       localValue156 = localValue155.map(localValue157 => typeof localValue157 === "string" ? localValue157 : localValue157?.["id"] || localValue157?.["name"] || localValue157?.["model"] || "").map(localValue158 => String(localValue158 || "").replace(/^models\//, "").trim()).filter(Boolean);
     return Array.from(new Set(localValue156)).sort((localValue159, localValue160) => localValue159.localeCompare(localValue160));

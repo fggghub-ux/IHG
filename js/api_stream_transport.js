@@ -57,7 +57,8 @@
   async function* apk120Value5(apk120Value28, {
     provider: apk120Value29,
     model: apk120Value30,
-    signal: apk120Value31
+    signal: apk120Value31,
+    trace: trace
   }) {
     let apk120Value32 = ![],
       apk120Value33 = (apk120Value29 || 'chat') + '-' + Date["now"](),
@@ -89,6 +90,7 @@
       } catch (apk120Value43) {
         throw apk120Value1('API\x20returned\x20an\x20invalid\x20SSE\x20event');
       }
+      trace?.payload(apk120Value42);
       if (apk120Value42.error || apk120Value42["type"] === "error") throw apk120Value1(String(apk120Value42["error"]?.["message"] || apk120Value42["message"] || "API stream failed"), "stream_error");
       if (apk120Value29 === "gemini") {
         const apk120Value44 = apk120Value42["candidates"]?.[0x0];
@@ -270,7 +272,10 @@
   async function apk120Value8(apk120Value82, apk120Value83 = {}) {
     if (!/text\/event-stream/i.test(apk120Value82.headers.get('Content-Type') || '')) return apk120Value82;
     if (apk120Value83.responseStream && !["gemini", "anthropic"]["includes"](apk120Value83["provider"])) return apk120Value82;
-    if (!apk120Value83["responseStream"]) return apk120Value7(apk120Value5(apk120Value82, apk120Value83), apk120Value82);
+    if (!apk120Value83.responseStream) {
+      const adaptedResponse = await apk120Value7(apk120Value5(apk120Value82, apk120Value83), apk120Value82);
+      return apk120Value83.trace?.finish(), adaptedResponse;
+    }
     const apk120Value84 = new AbortController(),
       apk120Value85 = () => apk120Value84["abort"]();
     if (apk120Value83["signal"]?.["aborted"]) apk120Value84.abort();else apk120Value83["signal"]?.["addEventListener"]("abort", apk120Value85, {
@@ -289,12 +294,14 @@
               value: apk120Value91,
               done: apk120Value92
             } = await apk120Value86["next"]();
-            if (apk120Value92) apk120Value90["enqueue"](apk120Value87.encode('data:\x20[DONE]\x0a\x0a')), apk120Value90["close"](), apk120Value88();else apk120Value90["enqueue"](apk120Value87["encode"]('data:\x20' + JSON["stringify"](apk120Value91) + '\x0a\x0a'));
+            if (apk120Value92) apk120Value83.trace?.finish(), apk120Value90.enqueue(apk120Value87.encode("data: [DONE]\n\n")), apk120Value90.close(), apk120Value88();else apk120Value90.enqueue(apk120Value87.encode("data: " + JSON.stringify(apk120Value91) + "\n\n"));
           } catch (apk120Value93) {
+            apk120Value83.trace?.fail(apk120Value93);
             apk120Value90["error"](apk120Value93), apk120Value88();
           }
         },
         async 'cancel'() {
+          apk120Value83.trace?.finish("cancelled");
           apk120Value84["abort"](), await apk120Value86["return"](), apk120Value88();
         }
       });

@@ -2922,6 +2922,20 @@
                     },
                 });
         });
+    document.getElementById("clear-thought-status-btn")?.addEventListener("click", () => {
+      const friendId = window.imData.currentSettingsFriend?.id;
+      if (friendId == null) return;
+      showCustomModal_2({
+        title: "清空心声状态栏",
+        message: "确定清空当前角色的最新心声及全部历史状态吗？聊天记录、好感度、模板和样式会保留，此操作不可恢复。",
+        isDestructive: true,
+        confirmText: "清空",
+        onConfirm: async () => {
+          const saved = await window.imApp.clearFriendProfileStatus(friendId);
+          showToast_2(saved ? "已清空心声状态栏" : "清空心声状态栏失败");
+        }
+      });
+    });
     deleteFriendBtn &&
         deleteFriendBtn.addEventListener('click', () => {
             window.imData.currentSettingsFriend &&
@@ -3613,21 +3627,39 @@
             nextTask
         );
     }
+    const autonomousDiaryCard = document.getElementById("chat-memory-autonomous-diary-card");
+    const autonomousDiaryToggle = document.getElementById("chat-memory-autonomous-diary-toggle");
+    const autonomousDiaryHours = document.getElementById("chat-memory-autonomous-diary-hours");
+    const autonomousDiaryNextLabel = document.getElementById("chat-memory-autonomous-diary-next-label");
+    function buildDiaryTaskFromControls(current, enabled, intervalHours, now = Date.now()) {
+        const previous = window.imApp.normalizeAutonomousDiaryTask(current);
+        const task = window.imApp.normalizeAutonomousDiaryTask({ ...previous, enabled, intervalHours });
+        if (task.enabled && (!task.nextRunAt || task.intervalHours !== previous.intervalHours)) {
+            task.nextRunAt = now + task.intervalHours * 3600000;
+        }
+        return task;
+    }
     function handleAction_58(friend_41) {
         const activity_2 = normalizeAutonomousActivity_2(friend_41?.memory?.autonomous),
             replyTask = normalizeAutonomousTask_2(activity_2.reply),
             momentTask = normalizeAutonomousTask_2(activity_2.moment);
-        autonomousStatus &&
-            ((autonomousStatus.textContent =
-                replyTask.enabled && momentTask.enabled
-                    ? '全部开启'
-                    : replyTask.enabled
-                      ? '主动消息开启'
-                      : momentTask.enabled
-                        ? '朋友圈开启'
-                        : '关闭'),
-            (autonomousStatus.style.color =
-                replyTask.enabled || momentTask.enabled ? '#34c759' : '#8e8e93'));
+        const isCharacter = friend_41?.type === "char";
+        const diaryTask = window.imApp.normalizeAutonomousDiaryTask(activity_2.diary);
+        if (autonomousStatus) {
+            const enabledTasks = [replyTask.enabled && "主动消息", momentTask.enabled && "朋友圈", isCharacter && diaryTask.enabled && "主动日记"].filter(Boolean);
+            autonomousStatus.textContent = enabledTasks.length === (isCharacter ? 3 : 2)
+                ? "全部开启" : enabledTasks.length ? enabledTasks.join("、") + "开启" : "关闭";
+            autonomousStatus.style.color = enabledTasks.length ? "#34c759" : "#8e8e93";
+        }
+        if (autonomousDiaryCard) autonomousDiaryCard.hidden = !isCharacter;
+        if (autonomousDiaryToggle) autonomousDiaryToggle.checked = isCharacter && diaryTask.enabled;
+        if (autonomousDiaryHours) autonomousDiaryHours.value = String(diaryTask.intervalHours);
+        setAutonomousCardExpanded(autonomousDiaryToggle, isCharacter && diaryTask.enabled);
+        if (autonomousDiaryNextLabel) {
+            autonomousDiaryNextLabel.textContent = isCharacter && diaryTask.enabled
+                ? diaryTask.nextRunAt ? formatAutonomousNextTime(diaryTask.nextRunAt) : "等待排期"
+                : "关闭后不会主动写日记";
+        }
         if (autonomousToggle) autonomousToggle.checked = !!replyTask.enabled;
         if (autonomousMomentToggle) autonomousMomentToggle.checked = !!momentTask.enabled;
         setAutonomousCardExpanded(autonomousToggle, replyTask.enabled);
@@ -3656,6 +3688,14 @@
         if (!friend_42 || !autonomousSaveBtn) return;
         const replyEnabled = !!autonomousToggle?.checked,
             momentEnabled = !!autonomousMomentToggle?.checked;
+        const diaryEnabled = friend_42.type === "char" && autonomousDiaryToggle?.checked === true;
+        const diaryHours = autonomousDiaryHours?.value;
+        if (diaryEnabled && (!autonomousDiaryHours.checkValidity()
+            || window.imApp.normalizeAutonomousDiaryTask({ intervalHours: diaryHours }).intervalHours !== Number(diaryHours))) {
+            showToast_2("请输入有效的日记间隔小时数");
+            autonomousDiaryHours?.focus();
+            return;
+        }
         autonomousSaveBtn.textContent = '保存中...';
         autonomousSaveBtn.style.pointerEvents = 'none';
         try {
@@ -3679,6 +3719,9 @@
                         autonomousMomentMinInput,
                         autonomousMomentMaxInput,
                     );
+                    if (targetFriend_14.type === "char") {
+                        activity_3.diary = buildDiaryTaskFromControls(activity_3.diary, diaryEnabled, diaryHours);
+                    }
                     targetFriend_14.memory.autonomous = activity_3;
                 },
                 {
@@ -3700,7 +3743,7 @@
             handleAction_58(currentSettingsFriend_6);
             window.imChat?.refreshAutonomousActivityTimers &&
                 window.imChat.refreshAutonomousActivityTimers();
-            showToast_2(replyEnabled || momentEnabled ? '自主活动已保存' : '自主活动已关闭');
+            showToast_2(replyEnabled || momentEnabled || diaryEnabled ? '自主活动已保存' : '自主活动已关闭');
             if (autonomousSheet && window.closeView) window.closeView(autonomousSheet);
         } finally {
             autonomousSaveBtn.textContent = '保存';
@@ -4146,7 +4189,9 @@
                 apiKey: selectedPreset.apiKey || '',
                 model: selectedPreset.model || '',
                 temperature: selectedPreset.temperature ?? selectedPreset.temp ?? 0.7,
-                frequencyPenalty: selectedPreset.frequencyPenalty ?? 0, streamEnabled: selectedPreset.streamEnabled === true,
+                frequencyPenalty: selectedPreset.frequencyPenalty ?? 0,
+                maxTokens: selectedPreset.maxTokens ?? null,
+                streamEnabled: selectedPreset.streamEnabled === true,
                 presetId: string_738,
             };
         const current = window.getApiConfig ? window.getApiConfig() : window.apiConfig || {};
@@ -4218,6 +4263,7 @@ Short-term memories:
 ` +
                 join_142;
         const value_753 = await fetch(normalizeSummaryApiEndpoint(anchorDate_2), {
+                u2ApiTrace: { service: "text", source: "iMessage › 短期记忆", purpose: "生成长期记忆草稿" },
                 method: 'POST',
                 headers: window.u2Api?.buildApiHeaders
                     ? window.u2Api.buildApiHeaders(anchorDate_2, {
@@ -4535,6 +4581,11 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                 value_179,
             summaryApiEndpoint = normalizeSummaryApiEndpoint(anchorDate_3),
             value_796 = await fetch(summaryApiEndpoint, {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "iMessage › 聊天记忆",
+                  purpose: "总结聊天"
+                },
                 method: 'POST',
                 headers: window.u2Api?.buildApiHeaders
                     ? window.u2Api.buildApiHeaders(anchorDate_3, {
@@ -5145,6 +5196,13 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                     ? '保存后将按当前间隔随机发朋友圈'
                     : '关闭后不会自动发朋友圈');
         });
+    autonomousDiaryToggle?.addEventListener("change", () => {
+        setAutonomousCardExpanded(autonomousDiaryToggle, autonomousDiaryToggle.checked);
+        if (autonomousDiaryNextLabel) {
+            autonomousDiaryNextLabel.textContent = autonomousDiaryToggle.checked
+                ? "保存后按所设间隔写日记" : "关闭后不会主动写日记";
+        }
+    });
     autonomousSaveBtn && autonomousSaveBtn.addEventListener('click', handleClick);
     manualSummaryConfirm &&
         manualSummaryConfirm.addEventListener('click', async () => {
@@ -5274,6 +5332,10 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         setActiveChatSettingsTab('info');
         if (chatReversePhoneBtnElement)
             chatReversePhoneBtnElement.hidden = friend_57.type !== 'char';
+        const galleryPhotosRow = document.getElementById("chat-char-gallery-photos-row");
+        const galleryPhotosInput = document.getElementById("chat-char-gallery-photos-toggle");
+        if (galleryPhotosRow) galleryPhotosRow.hidden = friend_57.type !== "char";
+        if (galleryPhotosInput) galleryPhotosInput.checked = friend_57.allowCharGalleryPhotos !== false;
         isRelationshipPickerVisible = false;
         relationshipPickerType = 'all';
         tempRelationshipDrafts = [];
@@ -5943,10 +6005,32 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                             silent: true,
                         },
                     );
-                !saved_21 &&
-                    ((event_994.target.checked = checked_8), showToast_2('角色撤回设置保存失败'));
+                !saved_21 && (event_994.target.checked = checked_8, showToast_2("Char 撤回设置保存失败"));
             }
         }));
+    const galleryPhotosToggle = document.getElementById("chat-char-gallery-photos-toggle");
+    galleryPhotosToggle?.addEventListener("change", async () => {
+      const friend = window.imData.currentSettingsFriend;
+      if (friend?.type !== "char") return;
+      const target = galleryPhotosToggle.checked;
+      galleryPhotosToggle.disabled = true;
+      try {
+        const checked = await commitSettingsFriendChange(saved => {
+          saved.allowCharGalleryPhotos = target;
+        }, {
+          silent: true
+        });
+        if (checked) return;
+        const currentFriend = window.imData.currentSettingsFriend;
+        if (String(currentFriend?.id) === String(friend.id)) {
+          const latestFriend = window.imApp.getFriendById(friend.id);
+          galleryPhotosToggle.checked = latestFriend?.allowCharGalleryPhotos !== false;
+        }
+        showToast_2("图库照片权限保存失败");
+      } finally {
+        galleryPhotosToggle.disabled = false;
+      }
+    });
     const chatCharBlockToggleElement = document.getElementById('chat-char-block-toggle');
     chatCharBlockToggleElement &&
         chatCharBlockToggleElement.dataset.bound !== 'true' &&

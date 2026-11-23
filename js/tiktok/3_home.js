@@ -1058,6 +1058,11 @@
             '\n\n返回格式：\n{\n  "newFollowers": [\n    {\n      "authorId": "follower_unique_id",\n      "authorName": "新粉丝名",\n      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=follower",\n      "handle": "follower_handle"\n    }\n  ],\n  "newLikes": 128,\n  "newSaves": 23,\n  "newComments": [\n    {\n      "authorId": "commenter_id",\n      "authorName": "评论者",\n      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=commenter",\n      "text": "评论内容",\n      "translationZh": "",\n      "likes": 12,\n      "replies": [\n        {\n          "authorId": "reply_id",\n          "authorName": "回复者",\n          "authorAvatar": "",\n          "text": "reply text",\n          "translationZh": "回复文字的中文翻译",\n          "likes": 5\n        }\n      ]\n    }\n  ],\n  "visitors": [\n    {\n      "authorName": "访客名",\n      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=visitor",\n      "handle": "visitor_handle",\n      "thought": "这条视频的细节让我想点进主页看看"\n    }\n  ]\n}\n';
         try {
             const value_55 = await window.tkFetch('videos', tkResolveApiEndpoint(), {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "TikTok › 视频",
+                  purpose: "生成视频互动"
+                },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1223,6 +1228,11 @@
             '\n\n返回格式示例：\n{\n  "replies": [\n    {\n      "authorName": "路人A",\n      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=a",\n      "text": "这句也太像我刚想说的了，尤其是后半句很准。",\n      "translationZh": "",\n      "likes": 18\n    }\n  ],\n  "visitors": [\n    {\n      "authorName": "小梨",\n      "authorAvatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=li",\n      "handle": "xiaoli",\n      "thought": "她评论太会抓重点了想看看主页"\n    }\n  ]\n}\n';
         try {
             const value_86 = await window.tkFetch('videos', tkResolveApiEndpoint(), {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "TikTok › 视频评论",
+                  purpose: "生成评论后续"
+                },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1992,6 +2002,7 @@
                     window.apiConfig.endpoint,
                 );
                 const value_340 = await window.tkFetch('videos', endpoint_2, {
+                    u2ApiTrace: { service: "text", source: "TikTok › 首页", purpose: "生成推荐视频" },
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -3027,6 +3038,11 @@
         try {
             window.showToast(topic ? 'Searching to generate content...' : 'Generating content randomly...');
             const value_528 = await window.tkFetch('videos', tkResolveApiEndpoint(), {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "TikTok › 搜索",
+                  purpose: "生成搜索视频"
+                },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

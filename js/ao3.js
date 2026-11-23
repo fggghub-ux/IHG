@@ -1351,7 +1351,7 @@ Keep sentences clean and concrete. Let the reader infer what the characters feel
     scopeValue18 = scopeValue624;
     scopeValue120(true);
     try {
-      const scopeValue628 = await scopeValue167(scopeValue118(scopeValue617, scopeValue619, scopeValue618, scopeValue616, scopeValue621, scopeValue623), scopeValue624.signal, "你是熟悉 AO3 评论生态与同人文化的读者互动模拟器，只输出要求的合法 JSON。", 1),
+      const scopeValue628 = await scopeValue167(scopeValue118(scopeValue617, scopeValue619, scopeValue618, scopeValue616, scopeValue621, scopeValue623), scopeValue624.signal, "你是熟悉 AO3 评论生态与同人文化的读者互动模拟器，只输出要求的合法 JSON。", 1, "生成作者评论回复"),
         scopeValue629 = scopeValue119(scopeValue628),
         scopeValue630 = scopeValue42(scopeValue9);
       if (!scopeValue74(scopeValue617.id, scopeValue619.id, scopeValue630).some(scopeValue633 => scopeValue633.id === scopeValue620.id)) return;
@@ -1402,7 +1402,7 @@ Keep sentences clean and concrete. Let the reader infer what the characters feel
     scopeValue17 = scopeValue646;
     scopeValue122(true);
     try {
-      const scopeValue648 = await scopeValue167(scopeValue115(scopeValue641, scopeValue643, scopeValue642, scopeValue645), scopeValue646.signal, "你是熟悉中文同人文化、AO3 评论生态与圈内语感的读者评论模拟器。你会严格区分正文事实、世界书背景与读者推测，只输出要求的合法 JSON。", 1),
+      const scopeValue648 = await scopeValue167(scopeValue115(scopeValue641, scopeValue643, scopeValue642, scopeValue645), scopeValue646.signal, "你是熟悉中文同人文化、AO3 评论生态与圈内语感的读者评论模拟器。你会严格区分正文事实、世界书背景与读者推测，只输出要求的合法 JSON。", 1, "生成章节评论"),
         scopeValue649 = scopeValue117(scopeValue648),
         scopeValue650 = scopeValue42(scopeValue9),
         scopeValue651 = Date.now(),
@@ -2197,7 +2197,7 @@ Keep sentences clean and concrete. Let the reader infer what the characters feel
       chapter: scopeValue847.chapters.length
     };
   }
-  async function scopeValue167(scopeValue849, scopeValue850, scopeValue851 = "你是严谨的小说创作助手，只输出要求的合法 JSON。", scopeValue852 = 0.8) {
+  async function scopeValue167(scopeValue849, scopeValue850, scopeValue851 = "你是严谨的小说创作助手，只输出要求的合法 JSON。", scopeValue852 = 0.8, purpose = "生成章节") {
     const scopeValue853 = typeof window.getApiConfig === "function" ? window.getApiConfig() : window.apiConfig || {};
     if (!scopeValue853?.endpoint || !scopeValue853?.apiKey || !scopeValue853?.model) throw new Error("请先在系统设置中完成 API 配置");
     const scopeValue854 = window.u2Api?.normalizeApiEndpoint ? window.u2Api.normalizeApiEndpoint(scopeValue853.endpoint, scopeValue853.provider) : window.u2Api?.resolveChatCompletionsEndpoint?.(scopeValue853.endpoint);
@@ -2223,18 +2223,21 @@ Keep sentences clean and concrete. Let the reader infer what the characters feel
           type: "json_object"
         }
       },
+      trace = { service: "text", source: "AO3 › 作品", purpose },
       scopeValue857 = window.u2Api?.fetchChatCompletion,
       scopeValue858 = scopeValue857 ? await scopeValue857(scopeValue854, {
         method: "POST",
         headers: scopeValue855,
         apiConfig: scopeValue853,
         body: scopeValue856,
-        signal: scopeValue850
+        signal: scopeValue850,
+        u2ApiTrace: trace
       }) : await window.fetch(scopeValue854, {
         method: "POST",
         headers: scopeValue855,
         body: JSON.stringify(scopeValue856),
-        signal: scopeValue850
+        signal: scopeValue850,
+        u2ApiTrace: trace
       });
     if (!scopeValue858.ok) {
       const scopeValue861 = window.u2Api?.readApiError ? await window.u2Api.readApiError(scopeValue858) : null;

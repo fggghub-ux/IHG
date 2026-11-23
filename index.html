@@ -100,7 +100,7 @@
         <link rel="stylesheet" href="css/worldbook.css?v=20261007-107-r1&apk-sync=113-selective-20261022" />
         <link rel="stylesheet" href="css/app_guide_modal.css?v=20261007-107-r1&repair=20261101-local-ui-v1" />
         <link rel="stylesheet" href="css/online_prompts.css?v=20260905-v6&repair=20261003&apk-sync=117-selective-20261022&ui-fixes=20261024-v1" />
-        <link rel="stylesheet" href="css/imessage.css?loves-ui=20261024-v1&album-ui=20261024-v2&v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&home-avatar-migration=20261023-v1&ipad-home-title=20261023-v1&chats-migration=20261023-v1&chat-ui=20261024-v2&chat-repair=20261024-v4&chats-scroll-toast=20261025-v1&chats-search-scroll=20261025-v2&offline-ui=20261025-v1&chats-return-nav=20261025-v1&apk-sync=119-selective-20261026&ui-fix=20261026-1&apk120=20261030-v1&repair=20261101-local-ui-v1&chats-spacing=20261101-v1&location-ui=20261103-v2&voice-ui=20261103-v1&invite-ui=20261103-v1&family-ui=20261103-v1&card-menu=20261122-v1" />
+        <link rel="stylesheet" href="css/imessage.css?loves-ui=20261024-v1&album-ui=20261024-v2&v=20261013-ipad-home-scroll&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&home-avatar-migration=20261023-v1&ipad-home-title=20261023-v1&chats-migration=20261023-v1&chat-ui=20261024-v2&chat-repair=20261024-v4&chats-scroll-toast=20261025-v1&chats-search-scroll=20261025-v2&offline-ui=20261025-v1&chats-return-nav=20261025-v1&apk-sync=119-selective-20261026&ui-fix=20261026-1&apk120=20261030-v1&repair=20261101-local-ui-v1&chats-spacing=20261101-v1&location-ui=20261103-v2&voice-ui=20261103-v1&invite-ui=20261103-v1&family-ui=20261103-v1&card-menu=20261122-v1&controls=20261111" />
         <link rel="stylesheet" href="css/offline-feed.css?v=20261025-v1">
         <link rel="stylesheet" href="css/pay.css?v=20260923-gallery-layout-v1&repair=20261003" />
         <link
@@ -128,7 +128,7 @@
         <!-- App Styles -->
         <link
             rel="stylesheet"
-            href="css/settings.css?v=20261009-restored-repairs&apk-sync=117-selective-20261022"
+            href="css/settings.css?v=20261009-restored-repairs&apk-sync=117-selective-20261022&controls=20261111"
         />
         <link
             rel="stylesheet"
@@ -153,7 +153,7 @@
         />
         <link
             rel="stylesheet"
-            href="css/diary.css?v=20260913-diary-v6-prompt-toggle-scroll&repair=20261003"
+            href="css/diary.css?v=20260913-diary-v6-prompt-toggle-scroll&repair=20261003&controls=20261111"
         />
         <link
             rel="stylesheet"
@@ -2841,9 +2841,10 @@
                             ><i class="fas fa-chevron-left"></i
                         ></button>
                         <h2 id="diary-detail-title">日记</h2>
-                        <button type="button" id="diary-detail-more" aria-label="日记操作"
-                            ><i class="fas fa-ellipsis"></i
-                        ></button>
+                        <div class="diary-detail-actions">
+                            <button type="button" id="diary-detail-translate" hidden>翻译</button>
+                            <button type="button" id="diary-detail-more" aria-label="日记操作"><i class="fas fa-ellipsis"></i></button>
+                        </div>
                     </header>
                     <div class="diary-detail-scroll">
                         <article class="diary-detail-entry" id="diary-detail-entry"></article>
@@ -8261,6 +8262,11 @@
                             <div class="settings-text">API Configuration</div>
                             <i class="fas fa-chevron-right arrow"></i>
                         </div>
+                        <button type="button" class="settings-item theme-font-entry-btn" id="api-console-btn">
+                            <div class="settings-icon" style="background-color: #36364a;"><i class="fas fa-terminal" aria-hidden="true"></i></div>
+                            <span class="settings-text">API 控制台</span>
+                            <i class="fas fa-chevron-right arrow" aria-hidden="true"></i>
+                        </button>
                         <div class="settings-item" id="vector-memory-config-btn">
                             <div class="settings-icon" style="background-color: #5856d6;"
                                 ><i class="fas fa-brain"></i
@@ -8820,6 +8826,50 @@
             </div>
 
             <!-- Data Management View -->
+            <div class="app-view data-management-view api-console-view" id="api-console-view">
+                <header class="data-management-header">
+                    <button type="button" class="data-management-back" id="api-console-back" aria-label="返回设置" data-ios-back>
+                        <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                    </button>
+                    <h2>API 控制台</h2>
+                    <span class="data-management-header-spacer" aria-hidden="true"></span>
+                </header>
+                <div class="data-management-content api-console-content">
+                    <section class="api-console-overview" aria-label="调用记录筛选">
+                        <div class="api-console-overview-heading">
+                            <div>
+                                <h3 id="api-console-caption" role="status">调用记录</h3>
+                                <p id="api-console-storage">仅本机 · 保留全部记录</p>
+                            </div>
+                            <button type="button" id="api-console-clear" disabled>清空记录</button>
+                        </div>
+                        <div class="api-console-controls">
+                            <select id="api-console-service" aria-label="按服务筛选"></select>
+                            <select id="api-console-status" aria-label="按状态筛选"></select>
+                        </div>
+                    </section>
+                    <section class="api-console-statistics" aria-labelledby="api-console-statistics-title">
+                        <div class="api-console-statistics-heading">
+                            <h3 id="api-console-statistics-title">调用统计</h3>
+                            <span id="api-console-statistics-scope">全部记录</span>
+                        </div>
+                        <dl class="api-console-stat-grid">
+                            <div><dt>成功</dt><dd id="api-console-stat-success">—</dd></div>
+                            <div><dt>失败 / 超时</dt><dd id="api-console-stat-failed">—</dd></div>
+                            <div><dt>平均耗时</dt><dd id="api-console-stat-duration">—</dd></div>
+                            <div><dt>已知总 Token</dt><dd id="api-console-stat-tokens">—</dd></div>
+                        </dl>
+                        <p id="api-console-stat-note" class="api-console-stat-note">总 Token 仅统计有用量数据的请求。</p>
+                    </section>
+                    <div id="api-console-list" class="api-console-list" tabindex="-1"></div>
+                </div>
+                <nav class="api-console-pagination" aria-label="调用记录分页">
+                    <button type="button" id="api-console-previous" disabled><i class="fas fa-chevron-left" aria-hidden="true"></i> 上一页</button>
+                    <span id="api-console-page" aria-live="polite">1 / 1 页</span>
+                    <button type="button" id="api-console-next" disabled>下一页 <i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+                </nav>
+            </div>
+
             <div class="app-view data-management-view" id="data-management-sheet" style="z-index: 520;">
             <header class="data-management-header">
                     <button
@@ -9401,6 +9451,10 @@
                                     style="text-align: right; padding-right: 5px;"
                                 />
                             </div>
+                            <div class="form-item">
+                                <label for="api-max-tokens-input" style="width: auto; flex: 0 0 auto; margin-right: 12px;">最大生成 Token</label>
+                                <input type="number" id="api-max-tokens-input" name="api-max-tokens" inputmode="numeric" autocomplete="off" min="1" step="1" placeholder="留空使用默认值" aria-describedby="api-max-tokens-hint" style="text-align: right; padding-right: 5px;">
+                            </div>
                             <div class="form-item" style="justify-content: space-between;">
                             <label for="api-stream-enabled">流式传输</label>
                             <label class="toggle-switch">
@@ -9416,6 +9470,7 @@
                             兼容接口生效。</div
                         >
 
+                        <div id="api-max-tokens-hint" style="margin: -12px 26px 20px; color: #8e8e93; font-size: 12px; line-height: 1.5;">限制单次生成量，过小可能截断回复。功能已有独立生成额度时，以功能设置为准。</div>
 <div id="api-stream-hint" style="margin: -12px 26px 20px; color: #8e8e93; font-size: 12px; line-height: 1.5;">随 API 预设保存。线下聊天由线下设置中的独立开关控制。</div>
                         <!-- Grouped Preset Actions -->
                         <div class="form-group fully-rounded" style="margin-bottom: 20px;">
@@ -13090,6 +13145,7 @@
                                 <input
                                     type="text"
                                     id="group-edit-name-input"
+                                    maxlength="80"
                                     placeholder="输入群名称"
                                     style="flex: 1; text-align: right; width: 100%;"
                                 />
@@ -14208,9 +14264,9 @@
                                 </div>
                                 <div class="settings-item" style="justify-content: space-between; cursor: default;">
                                     <div class="settings-icon" style="background-color: #8e8e93;"><i class="fas fa-undo-alt"></i></div>
-                                    <div class="settings-text">允许角色撤回</div>
+                                    <div class="settings-text">允许 Char 撤回</div>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" id="chat-role-recall-toggle">
+                                        <input type="checkbox" id="chat-role-recall-toggle" aria-label="允许 Char 撤回">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
@@ -14223,9 +14279,14 @@
                                     </label>
                                 </div>
                                 <div class="settings-item" style="justify-content: space-between; cursor: default;">
-                                    <div class="settings-icon" style="background-color: #8e8e93;"><i class="fas fa-heart"></i></div>
+                                    <div class="settings-icon" style="background-color: #F472B6;"><i class="fas fa-heart"></i></div>
                                     <div class="settings-text">允许 Char 产出珍视回忆</div>
                                     <label class="toggle-switch"><input type="checkbox" id="chat-cherished-memory-toggle" checked aria-label="允许 Char 产出珍视回忆"><span class="slider"></span></label>
+                                </div>
+                                <div class="settings-item" id="chat-char-gallery-photos-row" style="justify-content: space-between; cursor: default;" hidden>
+                                    <div class="settings-icon" style="background-color: #007aff;"><i class="fas fa-images"></i></div>
+                                    <div class="settings-text">允许 Char 发图库照片</div>
+                                    <label class="toggle-switch"><input type="checkbox" id="chat-char-gallery-photos-toggle" checked aria-label="允许 Char 发图库照片"><span class="slider"></span></label>
                                 </div>
 <div class="settings-item" style="justify-content: space-between; cursor: default;">
                                     <div class="settings-icon" style="background-color: #34c759;"><i class="fas fa-language"></i></div>
@@ -14300,6 +14361,7 @@
                             <div class="settings-group fully-rounded" style="margin: 30px 16px 10px;">
                                 <div class="sheet-action" id="chat-block-friend-btn" style="margin: 0 0 10px 0; color: #ff3b30;">拉黑好友</div>
                                 <div class="sheet-action" id="clear-history-btn" style="margin: 0 0 10px 0; color: #ff3b30;">清空聊天记录</div>
+                                <button type="button" class="sheet-action" id="clear-thought-status-btn" style="margin: 0 0 10px 0; color: #ff3b30; width:100%; border:0; font-family:inherit; box-sizing:border-box;">清空心声状态栏</button>
                                 <div class="sheet-action" id="delete-friend-btn" style="margin: 0; color: #ff3b30;">删除好友</div>
                             </div>
                         </div>
@@ -14909,6 +14971,22 @@
                                 <label class="chat-memory-autonomous-interval-row"><span>最长间隔</span><input type="number" id="chat-memory-autonomous-moment-max-input" min="1" value="240"><span>分钟</span></label>
                             </div>
                             <div class="chat-memory-autonomous-note" id="chat-memory-autonomous-moment-next-label">关闭后不会自动发朋友圈</div>
+                        </div>
+                        <div class="settings-group fully-rounded chat-memory-autonomous-group chat-memory-autonomous-card" id="chat-memory-autonomous-diary-card" hidden>
+                            <div class="settings-item chat-memory-autonomous-toggle-row" style="justify-content: space-between; cursor: default;">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="settings-icon" style="background-color: #5856d6;"><i class="fas fa-book-open"></i></div>
+                                    <div class="settings-text">主动写日记</div>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="chat-memory-autonomous-diary-toggle" aria-label="主动写日记">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="chat-memory-autonomous-intervals">
+                                <label class="chat-memory-autonomous-interval-row"><span>每隔</span><input type="number" id="chat-memory-autonomous-diary-hours" min="1" step="1" value="24"><span>小时写一篇</span></label>
+                            </div>
+                            <div class="chat-memory-autonomous-note" id="chat-memory-autonomous-diary-next-label">关闭后不会主动写日记</div>
                         </div>
                     </div>
                     <div class="sheet-action confirm-action chat-memory-autonomous-save" id="chat-memory-autonomous-save-btn">保存</div>
@@ -20018,17 +20096,18 @@
         <script src="js/ios_backup.js?apk-sync=117-selective-20261022"></script>
         <script src="js/vendor/native_bridge.js?v=20260916-android-save-v1&native-backup=20260917-v1&repair=20261003&apk-sync=119-selective-20261026&ui-fix=20261026-1"></script>
         <script src="js/ios_navigation.js?apk-sync=117-selective-20261022"></script>
-        <script src="js/storage/app_storage.js?v=20261007-107-r1&gift-update=20261024-v1&apk-sync=119-selective-20261026&apk120=20261030-v1&repair=20261101-gallery&location-ui=20261103-v2&family-ui=20261103-v1"></script>
-        <script src="js/storage/imessage_storage.js?v=20260710-storage-v8-idb1&imessage-performance=20260825-v2&offline-tts=20260827-v1&gallery=20260829-v1&history-index=20260907-v1&char-lite=20260923-v2&repair=20261003"></script>
+        <script src="js/storage/app_storage.js?v=20261007-107-r1&gift-update=20261024-v1&apk-sync=119-selective-20261026&apk120=20261030-v1&repair=20261101-gallery&location-ui=20261103-v2&family-ui=20261103-v1&v-update=20261123"></script>
+        <script src="js/storage/imessage_storage.js?v=20260710-storage-v8-idb1&imessage-performance=20260825-v2&offline-tts=20260827-v1&gallery=20260829-v1&history-index=20260907-v1&char-lite=20260923-v2&repair=20261003&v-update=20261123"></script>
         <script src="js/gallery_data.js?v=20260829-char-gallery-avatar-v1&repair=20261003"></script>
         <script src="storage.js?v=20260710-storage-v7-cache1"></script>
         <script src="js/lazy_vendor_loader.js?v=20260803-v1&repair=20261003"></script>
         <script src="js/app_state_bridge.js?v=20261007-107-r1&apk-sync=119-selective-20261026"></script>
         <script src="js/cycle_data.js?v=20261007-107-r1&apk-sync=119-selective-20261026"></script>
-        <script src="js/api_stream_transport.js?v=120"></script>
-<script src="js/bootstrap_globals.js?v=20260721-fetch-abort-v1&error-copy=20260801-zh-v1&api=20260803-unified-v1&provider-adapters=20260831-mcp-tools-v2&image-generation=20260807-model-cache-v1&image-understanding=20260811-v1&vector-memory=20260807-local-v1&tts=20260811-v2&frequency-penalty=20260822-v1&prepared-chat=20260825-v2&api-error-dialog=20260923-v1&repair=20261003&apk-sync=111-selective&apk120=20261030-v1"></script>
-        <script src="js/image_generation.js?v=20260807-model-cache-v1&prompt-parts=20260819-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=111-selective"></script>
-        <script src="js/image_understanding.js?v=20261007-107-r1"></script>
+        <script src="js/api_console.js?v=20261111"></script>
+        <script src="js/api_stream_transport.js?v=120&v-update=20261123"></script>
+<script src="js/bootstrap_globals.js?v=20260721-fetch-abort-v1&error-copy=20260801-zh-v1&api=20260803-unified-v1&provider-adapters=20260831-mcp-tools-v2&image-generation=20260807-model-cache-v1&image-understanding=20260811-v1&vector-memory=20260807-local-v1&tts=20260811-v2&frequency-penalty=20260822-v1&prepared-chat=20260825-v2&api-error-dialog=20260923-v1&repair=20261003&apk-sync=111-selective&apk120=20261030-v1&v-update=20261123"></script>
+        <script src="js/image_generation.js?v=20260807-model-cache-v1&prompt-parts=20260819-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=111-selective&v-update=20261123"></script>
+        <script src="js/image_understanding.js?v=20261007-107-r1&v-update=20261123"></script>
         <script src="js/export_file.js?v=20260907-capacitor-v1&repair=20261003&apk-sync=117-selective-20261022"></script>
         <script src="js/about_info_modal.js?v=20261007-107-r1&settings=20261010-r1"></script>
         <script src="js/login.js?v=20260801-resume-recovery-v1&changelog-notice=20260819-v1&repair=20261003&settings=20261010-r1"></script>
@@ -20040,103 +20119,105 @@
         <script src="js/system_notifications.js?v=20260907-capacitor-v1&image-assets=20260803-v1&custom-sound-v3&ios-notification=20260924-v1&repair=20261003&apk-sync=119-selective-20261026"></script>
 
         <!-- 引入 iMessage 模块分段代码 -->
-        <script src="js/imessage/game.js?v=20260830-appstore-anonymous-qa-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=111-selective&chat-ui=20261024-v2&home-entry=1"></script>
+        <script src="js/imessage/game.js?v=20260830-appstore-anonymous-qa-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=111-selective&chat-ui=20261024-v2&home-entry=1&v-update=20261123"></script>
         <script src="js/imessage/data_utils.js?v=20261007-107-r1&apk-sync=118-selective-20261022&chat-ui=20261024-v2&chat-repair=20261024-v3"></script>
         <script src="js/imessage/weather_context.js?v=20261007-107-r1"></script>
         <script src="js/imessage/online_prompts.js?v=20260905-v2&repair=20261003&apk-sync=117-selective-20261022"></script>
-        <script src="js/imessage/group_titles.js?v=apk110-selective&apk-sync=111-selective"></script>
+        <script src="js/imessage/group_titles.js?v=apk110-selective&apk-sync=111-selective&v-update=20261123"></script>
 <script src="js/config_presets.js"></script>
 <script src="js/image_generation_support.js"></script>
-<script src="js/imessage/2_core.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&chats-migration=20261023-v1&ui-fixes=20261024-v1&gift-update=20261024-v1&chat-ui=20261024-v3&chat-defaults=20261025-v1&chats-return-nav=20261025-v1&apk-sync=119-selective-20261026&apk120=20261030-v1&moments-nav=20261123-v1"></script>
-        <script src="js/imessage/vector_memory.js?v=20260807-local-vector-memory-v1&memory-recall-promotion=20260813-v1&repair=20261003&apk-sync=111-selective"></script>
+<script src="js/imessage/2_core.js?v=20261007-107-r1&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&chats-migration=20261023-v1&ui-fixes=20261024-v1&gift-update=20261024-v1&chat-ui=20261024-v3&chat-defaults=20261025-v1&chats-return-nav=20261025-v1&apk-sync=119-selective-20261026&apk120=20261030-v1&moments-nav=20261123-v1&v-update=20261123"></script>
+        <script src="js/imessage/vector_memory.js?v=20260807-local-vector-memory-v1&memory-recall-promotion=20260813-v1&repair=20261003&apk-sync=111-selective&v-update=20261123"></script>
         <script src="js/imessage/3_contacts.js?v=20260718-friend-profile-import-v1&render-cache=20260801-v1&vendor-lazy=20260803-v1&startup-queue=20260804-v1&official=20260827-v1&contact-card-actions=20260916-v4&repair=20261003&home-avatar-migration=20261023-v1&chats-migration=20261023-v1"></script>
     <script src="js/imessage/home_cover.js?v=20260913-v1&home-images=20261023-v1"></script>
     <script src="js/imessage/chats_featured.js?v=20261023-chats-v1&chat-ui=20261024-v2"></script>
-        <script src="js/imessage/3_groups.js?v=20260718-group-poll-v4-group-memory-editor-v1&observer=20260730-v1&render-cache=20260801-v1&user-avatar=20260802-v1&group-auto-translation=20260803-v1&startup-queue=20260804-v1&context-limit=20260804-v1&group-identity-css-v1&member-sync-private-permissions=20260812-v1&theme-avatar-hooks=20260814-v2&worldbook=20260817-v1&online-chat-optimization=20260818-v1&token-usage=20260822-v1&online-prompts=20260905-v2&history-index=20260907-v1&cross-group-memory=20260919-v1&group-chat-search=20260924-v1&tap-response=20260924-v1&repair=20261003&apk-sync=113-selective-20261022&apk-ui=111-rebuild-20261016&chat-ui=20261024-v2&chat-defaults=20261025-v1"></script>
+        <script src="js/imessage/3_groups.js?v=20260718-group-poll-v4-group-memory-editor-v1&observer=20260730-v1&render-cache=20260801-v1&user-avatar=20260802-v1&group-auto-translation=20260803-v1&startup-queue=20260804-v1&context-limit=20260804-v1&group-identity-css-v1&member-sync-private-permissions=20260812-v1&theme-avatar-hooks=20260814-v2&worldbook=20260817-v1&online-chat-optimization=20260818-v1&token-usage=20260822-v1&online-prompts=20260905-v2&history-index=20260907-v1&cross-group-memory=20260919-v1&group-chat-search=20260924-v1&tap-response=20260924-v1&repair=20261003&apk-sync=113-selective-20261022&apk-ui=111-rebuild-20261016&chat-ui=20261024-v2&chat-defaults=20261025-v1&v-update=20261123"></script>
         <script src="js/imessage/chat_record_forward.js?v=20261007-107-r1&chat-ui=20261024-v2&apk-sync=119-selective-20261026"></script>
-        <script src="js/imessage/4_chat_common.js?v=image-assets-20260803-v1&auto-image=20260807-v1&startup-queue=20260804-v1&auto-face-lock=20260813-v1&prompt-parts=20260819-v1&repair=20261003&apk-sync=111-selective"></script>
+        <script src="js/imessage/4_chat_common.js?v=image-assets-20260803-v1&auto-image=20260807-v1&startup-queue=20260804-v1&auto-face-lock=20260813-v1&prompt-parts=20260819-v1&repair=20261003&apk-sync=111-selective&v-update=20261123"></script>
         <script src="js/imessage/4_chat_status.js?v=20260821-status-memory-request-v1&template-avatar=20260821-v1&template-history-fallback=20260821-v1&paging=20260801-button-only-v1&startup-queue=20260804-v1&status-refresh=20260821-v1&offline-html-template-sanitize=20260822-v1&status-css-snapshot=20260822-v1&imessage-performance=20260825-v1&mcp-chat-settings=20260901-v2&repair=20261003&chat-ui=20261024-v2"></script>
         <script src="js/imessage/4_chat_payment.js?v=20260725-single-chat-cot-v1&startup-queue=20260804-v1&group-identity-css-v1&group-member-resolution=20260812-v1&repair=20261003&apk-sync=117-selective-20261022&chat-ui=20261024-v2&chat-repair=20261024-v3&family-ui=20261103-v1&group-response-rollback=20261108-v1&time-interval=3600000&time-scope=all"></script>
         <script src="js/imessage/voice_message_audio.js?v=20261015-apk111&apk-sync=113-selective-20261022&voice-ui=20261103-v1"></script>
         <script src="js/treasure_data.js?card-menu=20261122-v1"></script>
 <script src="js/imessage/away_activity.js"></script>
 <script src="js/imessage/chat_generation_preferences.js"></script>
-<script src="js/imessage/group_announcements.js"></script>
+<script src="js/imessage/group_announcements.js?v-update=20261123"></script>
+        <script src="js/imessage/group_management.js?v=20261111"></script>
 <script src="js/imessage/mcp_payments.js"></script>
-<script src="js/imessage/4_chat_bubbles.js?loves-ui=20261024-v1&album-ui=20261024-v2&voice-shell=20261024-v1&v=20261007-107-r1&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&apk-patch=20261022-1&ui-fixes=20261024-v1&chat-ui=20261024-v2&chat-repair=20261024-v3&apk-sync=119-selective-20261026&apk120=20261030-v1&repair=20261101-local-ui-v1&location-ui=20261103-v2&voice-ui=20261103-v1&invite-ui=20261103-v1&family-ui=20261103-v1&time-interval=3600000&time-scope=all"></script>
+<script src="js/imessage/4_chat_bubbles.js?loves-ui=20261024-v1&album-ui=20261024-v2&voice-shell=20261024-v1&v=20261007-107-r1&shop-moments=20261010-v1&apk-ui=111-rebuild-20261016&apk-patch=20261022-1&ui-fixes=20261024-v1&chat-ui=20261024-v2&chat-repair=20261024-v3&apk-sync=119-selective-20261026&apk120=20261030-v1&repair=20261101-local-ui-v1&location-ui=20261103-v2&voice-ui=20261103-v1&invite-ui=20261103-v1&family-ui=20261103-v1&time-interval=3600000&time-scope=all&v-update=20261123"></script>
         <script src="js/imessage/chat_search.js?v=20260718-chat-history-search-v2&keyboard-guard=20260801-v1&startup-queue=20260804-v1&location-timezone=20260825-v1&location-translation=20260825-v1&history-index=20260907-v1&group-chat-search=20260924-v3&repair=20261003&chat-ui=20261024-v2&apk-sync=119-selective-20261026"></script>
         <script src="js/imessage/chat_favorites.js?v=20260723-chat-favorites-v3&startup-queue=20260804-v1&repair=20261003&chat-ui=20261024-v2&apk-sync=119-selective-20261026"></script>
-        <script src="js/imessage/tts.js?v=20261007-107-r1&apk-sync=111-selective&voice-ui=20261103-v1"></script>
-        <script src="js/imessage/4_chat_ai.js?v=20261007-107-r1&settings=20261010-r1&chat-ui=20261024-v2&apk-sync=119-selective-20261026&apk120=20261030-v1&family-ui=20261103-v1&group-response-rollback=20261108-v1&time-interval=3600000&time-scope=all"></script>
+        <script src="js/imessage/tts.js?v=20261007-107-r1&apk-sync=111-selective&voice-ui=20261103-v1&v-update=20261123"></script>
+        <script src="js/imessage/4_chat_ai.js?v=20261007-107-r1&settings=20261010-r1&chat-ui=20261024-v2&apk-sync=119-selective-20261026&apk120=20261030-v1&family-ui=20261103-v1&group-response-rollback=20261108-v1&time-interval=3600000&time-scope=all&v-update=20261123"></script>
         <script src="js/imessage/offline_regex.js?v=20260705-offline-regex-v1&html-template=20260822-v3&offline-text-replacement=20260913-v1&repair=20261003"></script>
         <script src="js/imessage/offline_reasoning.js?v=20260718-offline-cot-v1&custom-cot=20260823-v1&repair=20261003"></script>
         <script src="js/imessage/offline_summary_errors.js?v=20260907-detailed-errors-v1&repair=20261003"></script>
         <script src="js/imessage/offline_response.js?v=20261025-v3"></script>
-        <script src="js/imessage/4_chat_sheet.js?v=20261007-107-r1&home-avatar-migration=20261023-v1&chat-ui=20261024-v2&offline-ui=20261025-v4&apk-sync=119-selective-20261026&ui-fix=20261026-1&apk120=20261030-v1&location-ui=20261103-v2&invite-ui=20261103-v1&stickers-ui=20261123-v1"></script>
+        <script src="js/imessage/4_chat_sheet.js?v=20261007-107-r1&home-avatar-migration=20261023-v1&chat-ui=20261024-v2&offline-ui=20261025-v4&apk-sync=119-selective-20261026&ui-fix=20261026-1&apk120=20261030-v1&location-ui=20261103-v2&invite-ui=20261103-v1&stickers-ui=20261123-v1&v-update=20261123"></script>
         <script src="js/imessage/4_chat_file.js?v=119&card-menu=20261122-v1&ui=20261122-v2"></script>
-        <script src="js/imessage/4_chat_link.js?v=20260726-light-link-theatre-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&picsum-cdn=20260815-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=119-selective-20261026"></script>
+        <script src="js/imessage/4_chat_link.js?v=20260726-light-link-theatre-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&picsum-cdn=20260815-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=119-selective-20261026&v-update=20261123"></script>
         <script src="js/imessage/4_chat_list.js?chat-runtime-performance=20260803-v1&startup-queue=20260804-v1&theme-surfaces=20260814-v1&imessage-performance=20260825-v2&mobile-latest=20260825-v1&mobile-performance=20260825-v1&official=20260827-v1&history-index=20260907-v1&chat-observer-lifecycle=20260920-v1&group-chat-search=20260924-v1&repair=20261003&settings=20261010-r1&apk-sync=111-selective&home-avatar-migration=20261023-v1&chats-migration=20261023-v1&ui-fixes=20261024-v1&gift-update=20261024-v1&chat-repair=20261024-v3&chats-return-nav=20261025-v1"></script>
-        <script src="js/imessage/4_chat_interface.js?v=20261007-107-r1&settings=20261010-r1&apk-ui=111-rebuild-20261016&chat-ui=20261024-v2&chats-return-nav=20261025-v1&apk-sync=119-selective-20261026&repair=20261101-local-ui-v1&voice-ui=20261103-v1&family-ui=20261103-v1&card-menu=20261122-v1&ui=20261122-v2&moments-nav=20261123-v1"></script>
-        <script src="js/imessage/4_chat_voice_call.js?v=20261009-restored-repairs&apk-sync=111-selective"></script>
-        <script src="js/imessage/video_call.js?v=20261020-ipad-call-keyboard&apk-sync=111-selective"></script>
+        <script src="js/imessage/4_chat_interface.js?v=20261007-107-r1&settings=20261010-r1&apk-ui=111-rebuild-20261016&chat-ui=20261024-v2&chats-return-nav=20261025-v1&apk-sync=119-selective-20261026&repair=20261101-local-ui-v1&voice-ui=20261103-v1&family-ui=20261103-v1&card-menu=20261122-v1&ui=20261122-v2&moments-nav=20261123-v1&v-update=20261123"></script>
+        <script src="js/imessage/4_chat_voice_call.js?v=20261009-restored-repairs&apk-sync=111-selective&v-update=20261123"></script>
+        <script src="js/imessage/video_call.js?v=20261020-ipad-call-keyboard&apk-sync=111-selective&v-update=20261123"></script>
         <script src="js/imessage/4_chat_main.js?v=20261007-107-r1&apk-sync=119-selective-20261026&voice-ui=20261103-v1"></script>
         <script src="js/imessage/online_prompt_settings.js?v=20260905-v6&repair=20261003&apk-sync=117-selective-20261022"></script>
-        <script src="js/imessage/5_settings.js?v=20261009-original-layout-clear&apk-sync=118-selective-20261022&ui-fixes=20261024-v1&chat-ui=20261024-v2&chat-defaults=20261025-v1&apk120=20261030-v1"></script>
-        <script src="js/imessage/6_moments.js?v=20260718-moments-target-reply-v1&auto-translation=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&current-account-avatar-v1&moment-visibility=20260811-v1&relationship-engagement=20260811-v1&char-batch=20260825-v1&comment-threads=20260825-v3&private-chat-labels=20260825-v1&moment-private-chats=20260825-v4&interaction-render=20260911-v1&api-error-dialog=20260923-v1&moments-home=20260923-v2&repair=20261003&shop-moments=20261010-v1&apk-sync=113-selective-20261022&home-avatar-migration=20261023-v1&chat-ui=20261024-v2&moments-nav=20261123-v1"></script>
+        <script src="js/imessage/5_settings.js?v=20261009-original-layout-clear&apk-sync=118-selective-20261022&ui-fixes=20261024-v1&chat-ui=20261024-v2&chat-defaults=20261025-v1&apk120=20261030-v1&v-update=20261123"></script>
+        <script src="js/imessage/6_moments.js?v=20260718-moments-target-reply-v1&auto-translation=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&group-identity-css-v1&current-account-avatar-v1&moment-visibility=20260811-v1&relationship-engagement=20260811-v1&char-batch=20260825-v1&comment-threads=20260825-v3&private-chat-labels=20260825-v1&moment-private-chats=20260825-v4&interaction-render=20260911-v1&api-error-dialog=20260923-v1&moments-home=20260923-v2&repair=20261003&shop-moments=20261010-v1&apk-sync=113-selective-20261022&home-avatar-migration=20261023-v1&chat-ui=20261024-v2&moments-nav=20261123-v1&v-update=20261123"></script>
 
         <script src="js/imessage/user_phone_access_ui.js?v=20260928-auto-toggle-scroll-v1&ihg=20260929-106-r1&repair=20261003"></script>
 
         <!-- 引入其他应用模块 -->
         <script src="js/pay.js?v=20260710-storage-ready-v1&open-performance=20260801-v1&startup-queue=20260804-v1&pay-transfer-bank=20260812-v1&family-card=20260921-v4&repair=20261003&apk-sync=113-selective-20261022&chat-ui=20261024-v2&chat-repair=20261024-v3&family-ui=20261103-v1"></script>
-        <script src="js/bstage.js?v=20260725-android-keyboard-actions-v2&subscribers=20260730-cap-compact-v1&keyboard-guard=20260801-v1&api=20260803-unified-v1&provider=20260807-v1&image-assets=20260803-v1&startup-queue=20260804-v1&frequency-penalty=20260822-v1&bstage-pop-memory=20260921-v1&api-error-dialog=20260923-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&chat-ui=20261024-v2&chat-repair=20261024-v3&apk120=20261030-v1"></script>
+        <script src="js/bstage.js?v=20260725-android-keyboard-actions-v2&subscribers=20260730-cap-compact-v1&keyboard-guard=20260801-v1&api=20260803-unified-v1&provider=20260807-v1&image-assets=20260803-v1&startup-queue=20260804-v1&frequency-penalty=20260822-v1&bstage-pop-memory=20260921-v1&api-error-dialog=20260923-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&chat-ui=20261024-v2&chat-repair=20261024-v3&apk120=20261030-v1&v-update=20261123"></script>
         <!-- 引入世界书核心模块脚本 -->
         <script src="js/builtin_worldbook.js?v=20260713-disable-override-limit-v2&repair=20261003"></script>
         <script src="js/worldbook.js?v=20261007-107-r1&apk-sync=113-selective-20261022"></script>
         <!-- 引入核心 UI 管理与设置模块脚本 -->
         <script src="js/ui.js?v=20260811-no-glass-v1&toast-full-message=20260822-v1&notification-banner-v3=&repair=20261003&shop-moments=20261010-v1&apk-sync=118-selective-20261022"></script>
         <script src="js/ui_translation.js?v=20260807-global-ui-zh-v1&repair=20261003"></script>
-        <script src="js/settings.js?voice-shell=20261024-v1&v=20261007-107-r1&settings=20261010-r1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&home-avatar-migration=20261023-v1&app-icons=20261024-v2&chat-ui=20261024-v2&apk-sync=119-selective-20261026&mcp-fonts=20261029&apk120=20261030-v1"></script>
-        <script src="js/imessage/official_accounts.js?v=20260828-youtu-preview-stable-v5&api-error-dialog=20260923-v1&official-css-generation=20260928-v1&ihg=20260929-106-r1&repair=20261003&settings=20261010-r1&apk-sync=111-selective"></script>
+        <script src="js/settings.js?voice-shell=20261024-v1&v=20261007-107-r1&settings=20261010-r1&apk-ui=111-rebuild-20261016&ui-fixes=20261018&apk-patch=20261022-1&home-avatar-migration=20261023-v1&app-icons=20261024-v2&chat-ui=20261024-v2&apk-sync=119-selective-20261026&mcp-fonts=20261029&apk120=20261030-v1&v-update=20261123"></script>
+        <script src="js/api_console_view.js?v=20261111"></script>
+        <script src="js/imessage/official_accounts.js?v=20260828-youtu-preview-stable-v5&api-error-dialog=20260923-v1&official-css-generation=20260928-v1&ihg=20260929-106-r1&repair=20261003&settings=20261010-r1&apk-sync=111-selective&v-update=20261123"></script>
         <script src="js/vendor/mcp_client_sdk.js?v=20260901-mobile-mcp-v3&repair=20261003"></script>
         <script src="js/mcp_relay_config.js?v=20260906-relay-v2&repair=20261003"></script>
         <script src="js/imessage/mcp_integration.js?v=20260906-relay-v3&version-compat=20260907-v1&storage-persistence=20260907-v1&repair=20261003&presets=20261028"></script>
         <script src="js/imessage/mcp_chat_config.js?v=20260901-mobile-mcp-v3&mcp-tool-history=20260906-v1&repair=20261003"></script>
-        <script src="js/library.js?v=20260911-netease-android-v1&player-performance=20260817-v1&open-performance=20260801-v1&vendor-lazy=20260803-v1&startup-queue=20260804-v1&reader-comments=20260817-v3&reader-selection=20260819-v1&reader-touch-compat=20260830-v1&netease-pagination=20260912-v1&together-listening-invite=20260916-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=119-selective-20261026&apk120=20261030-v1"></script>
-        <script src="js/loves.js?loves-ui=20261024-v1&v=20261007-107-r1&cphone=20261010-r2&chat-ui=20261024-v2&apk-sync=119-selective-20261026"></script>
+        <script src="js/library.js?v=20260911-netease-android-v1&player-performance=20260817-v1&open-performance=20260801-v1&vendor-lazy=20260803-v1&startup-queue=20260804-v1&reader-comments=20260817-v3&reader-selection=20260819-v1&reader-touch-compat=20260830-v1&netease-pagination=20260912-v1&together-listening-invite=20260916-v1&api-error-dialog=20260923-v1&repair=20261003&apk-sync=119-selective-20261026&apk120=20261030-v1&v-update=20261123"></script>
+        <script src="js/loves.js?loves-ui=20261024-v1&v=20261007-107-r1&cphone=20261010-r2&chat-ui=20261024-v2&apk-sync=119-selective-20261026&v-update=20261123"></script>
         <script src="js/tiktok/2_core.js?v=20260712-tiktok-feed-cleanup-v1&open-performance=20260801-v1&startup-queue=20260804-v1&fluidity=20260927-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=118-selective-20261022&tk-repair=20261022-v1&home-avatar-migration=20261023-v1"></script>
         <script src="js/cphone_call.js?v=119&ui-fix=20261026-1"></script>
-        <script src="js/cphone.js?v=20261007-107-r1&cphone=20261010-r2&apk-sync=119-selective-20261026"></script>
-        <script src="js/tiktok/3_home.js?v=20261007-107-r1&apk-sync=118-selective-20261022&tk-repair=20261022-v1"></script>
-        <script src="js/tiktok/4_chat.js?v=20260712-tiktok-polish-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=118-selective-20261022&tk-repair=20261022-v1"></script>
-        <script src="js/tiktok/5_profile.js?v=20260712-tiktok-polish-v1&performance=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&fluidity=20260927-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=118-selective-20261022&tk-repair=20261022-v1&ui-fixes=20261024-v1"></script>
-        <script src="js/tiktok/6_image_generation.js?apk-sync=118-selective-20261022&tk-repair=20261022-v1"></script>
-        <script src="js/youtube/2_core.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v2&ihg=20260929-106-r1&repair=20261003&home-avatar-migration=20261023-v1&chat-ui=20261024-v2&chat-repair=20261024-v3"></script>
+        <script src="js/cphone.js?v=20261007-107-r1&cphone=20261010-r2&apk-sync=119-selective-20261026&v-update=20261123"></script>
+        <script src="js/tiktok/3_home.js?v=20261007-107-r1&apk-sync=118-selective-20261022&tk-repair=20261022-v1&v-update=20261123"></script>
+        <script src="js/tiktok/4_chat.js?v=20260712-tiktok-polish-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=118-selective-20261022&tk-repair=20261022-v1&v-update=20261123"></script>
+        <script src="js/tiktok/5_profile.js?v=20260712-tiktok-polish-v1&performance=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&fluidity=20260927-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=118-selective-20261022&tk-repair=20261022-v1&ui-fixes=20261024-v1&v-update=20261123"></script>
+        <script src="js/tiktok/6_image_generation.js?apk-sync=118-selective-20261022&tk-repair=20261022-v1&v-update=20261123"></script>
+        <script src="js/youtube/2_core.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v2&ihg=20260929-106-r1&repair=20261003&home-avatar-migration=20261023-v1&chat-ui=20261024-v2&chat-repair=20261024-v3&v-update=20261123"></script>
         <script src="js/youtube/3_channel.js?v=20260717-char-lottery-consistency-v18&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003"></script>
         <script src="js/youtube/4_settings.js?repair=20261003&apk-sync=113-selective-20261022"></script>
-        <script src="js/youtube/5_player.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v2&ihg=20260929-106-r1&repair=20261003&chat-ui=20261024-v2&chat-repair=20261024-v3"></script>
-        <script src="js/youtube/6_community.js?v=20260801-dm-generation-fix-v19&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&composer-focus=20260811-v1&api-error-dialog=20260923-v1&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003"></script>
-        <script src="js/youtube/7_trending.js?worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&repair=20261003"></script>
-        <script src="js/youtube/8_user_live.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003&chat-ui=20261024-v2&chat-repair=20261024-v3"></script>
+        <script src="js/youtube/5_player.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v2&ihg=20260929-106-r1&repair=20261003&chat-ui=20261024-v2&chat-repair=20261024-v3&v-update=20261123"></script>
+        <script src="js/youtube/6_community.js?v=20260801-dm-generation-fix-v19&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&composer-focus=20260811-v1&api-error-dialog=20260923-v1&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003&v-update=20261123"></script>
+        <script src="js/youtube/7_trending.js?worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&repair=20261003&v-update=20261123"></script>
+        <script src="js/youtube/8_user_live.js?v=20260717-char-lottery-consistency-v18&worldbook=20260729-global-bound-only-v2&api=20260803-unified-v1&api-error-dialog=20260923-v1&perf=20260927-v1&ihg=20260929-106-r1&repair=20261003&chat-ui=20261024-v2&chat-repair=20261024-v3&v-update=20261123"></script>
         <script src="js/netflix_game_core.js?v=20260811-character-relations-v3&repair=20261003"></script>
-        <script src="js/netflix.js?v=20260928-story-hub-direct-v3&open-performance=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=113-selective-20261022"></script>
-        <script src="js/shopping.js?v=20260710-storage-ready-v1&performance=20260801-v2&api=20260803-unified-v1&startup-queue=20260804-v1&shop-fixes=20260820-v2&api-error-dialog=20260923-v1&layout=20260923-gallery-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1&apk-sync=113-selective-20261022&apk-patch=20261022-1&gift-update=20261024-v1"></script>
-        <script src="js/xapp.js?v=20261007-107-r1&apk-sync=119-selective-20261026"></script>
+        <script src="js/netflix.js?v=20260928-story-hub-direct-v3&open-performance=20260801-v1&api=20260803-unified-v1&startup-queue=20260804-v1&api-error-dialog=20260923-v1&ihg=20260929-106-r1&repair=20261003&apk-sync=113-selective-20261022&v-update=20261123"></script>
+        <script src="js/shopping.js?v=20260710-storage-ready-v1&performance=20260801-v2&api=20260803-unified-v1&startup-queue=20260804-v1&shop-fixes=20260820-v2&api-error-dialog=20260923-v1&layout=20260923-gallery-v1&tabs=20260928-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1&apk-sync=113-selective-20261022&apk-patch=20261022-1&gift-update=20261024-v1&v-update=20261123"></script>
+        <script src="js/xapp.js?v=20261007-107-r1&apk-sync=119-selective-20261026&v-update=20261123"></script>
         <script src="js/custom_app_template_source.js?v=20260830-custom-apps-v6-user-profile&repair=20261003"></script>
-        <script src="js/custom_app_runtime.js?v=20260830-custom-apps-v13-icon-only-same-origin&repair=20261003"></script>
+        <script src="js/custom_app_runtime.js?v=20260830-custom-apps-v13-icon-only-same-origin&repair=20261003&v-update=20261123"></script>
         <script src="js/appstore.js?v=20260830-app-details-v7-profile-permission&repair=20261003"></script>
         <script src="js/gallery.js?v=20260829-gallery-ios26-v8&repair=20261003&repair=20261101-local-ui-v1"></script>
         <script src="js/cycle_health.js?v=119"></script>
         <script src="js/cycle.js?v=20261007-107-r1&apk-sync=119-selective-20261026"></script>
-        <script src="js/call.js?v=20260917-call-history-v8&api-error-dialog=20260923-v1&repair=20261003"></script>
+        <script src="js/call.js?v=20260917-call-history-v8&api-error-dialog=20260923-v1&repair=20261003&v-update=20261123"></script>
         <script src="js/mcp.js?v=20260906-relay-ui-v1&android-input=20260906-v1&storage-persistence=20260907-v1&repair=20261003&presets=20261029-token"></script>
-        <script src="js/diary.js?v=20260913-diary-v6-prompt-toggle-scroll&api-error-dialog=20260923-v1&repair=20261003&home-avatar-migration=20261023-v1"></script>
-        <script src="js/ao3.js?v=20260904-ao3-cp-search-v12&persona=20260920-v4&api-error-dialog=20260923-v2&repair=20261003&apk-sync=113-selective-20261022"></script>
+        <script src="js/diary.js?v=20260913-diary-v6-prompt-toggle-scroll&api-error-dialog=20260923-v1&repair=20261003&home-avatar-migration=20261023-v1&v-update=20261123"></script>
+        <script src="js/ao3.js?v=20260904-ao3-cp-search-v12&persona=20260920-v4&api-error-dialog=20260923-v2&repair=20261003&apk-sync=113-selective-20261022&v-update=20261123"></script>
         <script src="js/treasure.js?card-menu=20261122-v1"></script>
 <script src="js/home_desktop.js?v=20261007-107-r1&settings=20261010-r1&app-positions=20261024-v1&apk-sync=119-selective-20261026&widget-opacity=20261027-v1"></script>
         <script src="js/home_widget_panel_enhance.js?v=20260830-widget-image-flush-v1&couple-text=20260911-v1&repair=20261003&settings=20261010-r1&apk-sync=111-selective&widget-opacity=20261027-v1"></script>
         <!-- 引入主逻辑脚本 -->
         <script src="script.js?v=20260725-modal-owner-v1&home-swipe=20260801-scrollend-v2&performance=20260801-v1&splash-notice-handshake=20260813-v1&reader-selection=20260819-v1&ihg=20260929-106-r1&repair=20261003&shop-moments=20261010-v1"></script>
-        <script src="js/app_tutorials.js?v=120"></script>
+        <script src="js/app_tutorials.js?v=120&v-update=20261123"></script>
 <div class="bottom-sheet-overlay detail-sheet-overlay wb-centered-modal-overlay" id="group-announcement-sheet" style="z-index: 700;">
     <section class="wb-centered-modal-card wb-group-modal-card im-group-announcement-panel" role="dialog" aria-modal="true" aria-labelledby="group-announcement-title">
         <header class="wb-centered-modal-header">

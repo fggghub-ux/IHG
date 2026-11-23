@@ -1123,6 +1123,11 @@ Current voice-call context:
                         apiConfig_2.endpoint,
                     ),
                     value_177 = await fetch(chatCompletionsEndpoint, {
+                        u2ApiTrace: {
+                          service: "text",
+                          source: "iMessage › 语音通话",
+                          purpose: "生成通话回复"
+                        },
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -2001,6 +2006,11 @@ Requirements:
                             apiConfig_3.endpoint,
                         ),
                         value_289 = await fetch(chatCompletionsEndpoint_288, {
+                            u2ApiTrace: {
+                              service: "text",
+                              source: "iMessage › 群通话",
+                              purpose: "生成通话回复"
+                            },
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

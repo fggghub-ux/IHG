@@ -1554,7 +1554,10 @@ class NetflixApp {
         if (!endpoint_2 || !config_2.apiKey || !config_2.model)
             throw new Error('请先在设置中完成 API 配置');
         const controller = new AbortController(),
-            timeoutId = setTimeout(() => controller.abort(), 90000);
+            timeoutId = setTimeout(() => {
+              window.u2ApiConsole?.markTimeout(controller.signal);
+              controller.abort();
+            }, 90000);
         try {
             const headers_2 = window.u2Api?.buildApiHeaders
                     ? window.u2Api.buildApiHeaders(config_2, {
@@ -1566,6 +1569,11 @@ class NetflixApp {
                           'X-U2-Silent-Errors': '1',
                       },
                 response = await fetch(endpoint_2, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "Netflix",
+                      purpose: "生成游戏内容"
+                    },
                     method: 'POST',
                     headers: headers_2,
                     body: JSON.stringify({

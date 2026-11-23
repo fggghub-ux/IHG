@@ -854,7 +854,10 @@
             throw new Error('请先在设置中完成 API 配置');
         const value_262 = await buildPrompt_2(value_257, value_258, value_259),
             value_263 = new AbortController(),
-            setTimeout_264 = setTimeout(() => value_263.abort(), count_5);
+            setTimeout_264 = setTimeout(() => {
+              window.u2ApiConsole?.markTimeout(value_263.signal);
+              value_263.abort();
+            }, count_5);
         try {
             const headers_2 = window.u2Api?.buildApiHeaders
                     ? window.u2Api.buildApiHeaders(value_260, {
@@ -876,9 +879,12 @@
                 options_266.frequency_penalty = Number(value_260.frequencyPenalty);
             if (Number.isFinite(Number(value_260.presencePenalty)))
                 options_266.presence_penalty = Number(value_260.presencePenalty);
-            if (Number.isFinite(Number(value_260.maxTokens)) && Number(value_260.maxTokens) > 0)
-                options_266.max_tokens = Number(value_260.maxTokens);
             const value_267 = await fetch(handleAction_36_261, {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "电话",
+                  purpose: "生成通话回复"
+                },
                 method: 'POST',
                 headers: headers_2,
                 body: JSON.stringify(options_266),

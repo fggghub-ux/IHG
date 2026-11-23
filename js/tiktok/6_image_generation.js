@@ -361,6 +361,7 @@
                 _value97.status = '正在生成图片…';
                 _value25(_value97);
                 const _value104 = await window.u2ImageGeneration.generate(_value102.scenePrompt, {
+                    traceSource: "TikTok › 生图",
                     ..._value99,
                     referenceImages: _value103,
                     includeCharAppearance: _value102.charPresent,

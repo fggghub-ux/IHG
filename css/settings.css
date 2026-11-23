@@ -3036,3 +3036,164 @@ button.settings-item {
 .data-media-card > button { min-height: 44px; border: 0; border-radius: 10px; padding: 0 12px; background: #f1f2f6; color: #25252b; font: inherit; font-size: 12px; cursor: pointer; }
 
 .data-media-card > button:disabled { opacity: .45; }
+
+.api-console-view {
+    --console-ink: #191c27;
+    --console-muted: #555d71;
+    --console-surface: #fff;
+    --console-line: #e3e6ee;
+    --console-accent: #3a46a0;
+}
+.api-console-content.data-management-content { gap: 12px; padding-bottom: 12px; }
+.api-console-overview, .api-console-statistics {
+    padding: 12px;
+    border: 1px solid var(--console-line);
+    border-radius: 16px;
+    background: var(--console-surface);
+}
+.api-console-overview-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.api-console-overview-heading h3 { margin: 0; color: var(--console-ink); font-size: 15px; }
+.api-console-overview-heading p { margin: 3px 0 0; color: var(--console-muted); font-size: 12px; }
+.api-console-statistics-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.api-console-statistics-heading h3 { margin: 0; font-size: 14px; color: var(--console-ink); }
+.api-console-statistics-heading span, .api-console-stat-note { color: var(--console-muted); font-size: 12px; }
+.api-console-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin: 8px 0 0;
+    overflow: hidden;
+    border: 1px solid var(--console-line);
+    border-radius: 10px;
+    background: var(--console-line);
+}
+.api-console-stat-grid > div { min-width: 0; padding: 7px 9px; background: #f8f9fc; overflow-wrap: anywhere; }
+.api-console-stat-grid dt { color: var(--console-muted); font-size: 11px; }
+.api-console-stat-grid dd { margin: 3px 0 0; color: var(--console-ink); font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.api-console-stat-note { margin: 7px 0 0; }
+.api-console-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+.api-console-controls select,
+.api-console-pagination button,
+#api-console-clear {
+    min-height: 44px;
+    min-width: 0;
+    padding: 7px 9px;
+    border: 1px solid var(--console-line);
+    border-radius: 10px;
+    background: #f6f7fb;
+    color: var(--console-ink);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.25;
+}
+#api-console-clear { flex-shrink: 0; border-color: transparent; background: transparent; color: #aa262b; }
+.api-console-empty {
+    margin: 0;
+    padding: 28px 14px;
+    border: 1px dashed var(--console-line);
+    border-radius: 14px;
+    text-align: center;
+    color: var(--console-muted);
+    font-size: 13px;
+}
+.api-console-list { display: grid; gap: 8px; flex: 0 0 auto; }
+.api-console-record {
+    position: relative;
+    border: 1px solid var(--console-line);
+    border-radius: 14px;
+    background: var(--console-surface);
+    color: var(--console-ink);
+    overflow-wrap: anywhere;
+}
+.api-console-record summary {
+    position: relative;
+    padding: 10px 54px 10px 12px;
+    list-style: none;
+    cursor: pointer;
+    border-radius: 13px;
+}
+.api-console-record summary::-webkit-details-marker { display: none; }
+.api-console-record summary::after {
+    content: '';
+    position: absolute;
+    inset: auto 19px 15px auto;
+    width: 6px;
+    height: 6px;
+    border: solid var(--console-muted);
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+}
+.api-console-record details[open] summary::after { transform: rotate(225deg); }
+.api-console-record-title { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; margin-top: 3px; font-size: 15px; }
+.api-console-source, .api-console-meta, .api-console-model { color: var(--console-muted); font-size: 12px; }
+.api-console-source, .api-console-model { display: block; }
+.api-console-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 12px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.api-console-meta span { color: var(--console-ink); }
+.api-console-model { margin-top: 3px; }
+.api-console-status { padding: 2px 7px; border-radius: 20px; background: #edf0ff; color: var(--console-accent); font-size: 11px; white-space: nowrap; }
+.api-console-status[data-status="success"] { background: #e3f5e9; color: #196237; }
+.api-console-status[data-status="failed"] { background: #fce8e8; color: #982528; }
+.api-console-status[data-status="timeout"] { background: #fff0d8; color: #824800; }
+.api-console-status[data-status="cancelled"] { background: #ededf3; color: #515669; }
+.api-console-delete {
+    position: absolute;
+    inset: 1px 1px auto auto;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 11px;
+    background: transparent;
+    color: var(--console-muted);
+    font-size: 14px;
+}
+.api-console-delete:hover, .api-console-delete:active { background: #fce8e8; color: #982528; }
+.api-console-token-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    margin: 0 12px;
+    padding: 8px;
+    border-radius: 10px;
+    background: #f2f4fc;
+    text-align: center;
+}
+.api-console-token-grid dt { color: var(--console-muted); font-size: 11px; }
+.api-console-token-grid dd { margin: 3px 0 0; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
+.api-console-details {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 8px 12px;
+    margin: 0;
+    padding: 10px 12px 12px;
+    font-size: 12px;
+}
+.api-console-details dt { color: var(--console-muted); }
+.api-console-details dd { margin: 0; }
+.api-console-pagination {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    padding: 7px 12px max(7px, var(--u2-native-safe-bottom, env(safe-area-inset-bottom)));
+    border-top: 1px solid var(--console-line);
+    background: var(--console-surface);
+    color: var(--console-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+.api-console-pagination button { color: var(--console-accent); }
+.api-console-pagination button:disabled, #api-console-clear:disabled { opacity: .55; }
+.api-console-view :is(summary, button, select):focus-visible { outline: 2px solid var(--console-accent); outline-offset: -2px; }

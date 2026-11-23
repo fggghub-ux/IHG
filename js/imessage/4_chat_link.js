@@ -331,6 +331,11 @@
         apk119Value190 = speakerFriend ? speakerFriend.language || "zh" : "",
         apk119Value191 = (async () => {
           const apk119Value192 = await fetch(apk119Value177, {
+            u2ApiTrace: {
+              service: "text",
+              source: "iMessage › 链接",
+              purpose: "生成链接内容"
+            },
             method: "POST",
             headers: window.u2Api?.["buildApiHeaders"]?.(apk119Value176, {
               "X-U2-Silent-Errors": "1"

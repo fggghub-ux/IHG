@@ -1420,6 +1420,11 @@ async function requestYtPostGeneratedComments({
             window.apiConfig.endpoint,
         ),
         value_208 = await fetch(chatCompletionsEndpoint, {
+            u2ApiTrace: {
+              service: "text",
+              source: "YouTube › 社区",
+              purpose: "生成帖子评论"
+            },
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -3187,6 +3192,11 @@ async function triggerGroupChatAPI(text_9) {
                 window.apiConfig.endpoint,
             ),
             value_379 = await fetch(chatCompletionsEndpoint_378, {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "YouTube › 群聊",
+                  purpose: "生成群聊回复"
+                },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

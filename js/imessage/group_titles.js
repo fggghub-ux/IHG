@@ -109,19 +109,7 @@
             value_56 = new Set(
                 (Array.isArray(value_52) ? value_52 : []).map(handleAction_4).filter(Boolean),
             );
-        if (
-            !handleAction_7(value_48) ||
-            !handleAction_4_53 ||
-            !handleAction_4_54 ||
-            !handleAction_55 ||
-            String(value_51).trim().length > count ||
-            !value_56.has(handleAction_4_53) ||
-            !value_56.has(handleAction_4_54) ||
-            !handleAction_10(value_48, handleAction_4_53) ||
-            (handleAction_4_54 !== handleAction_4_53 &&
-                handleAction_10(value_48, handleAction_4_54))
-        )
-            return false;
+        if (!handleAction_7(value_48) || !handleAction_4_53 || !handleAction_4_54 || !handleAction_55 || String(value_51).trim().length > count || !value_56.has(handleAction_4_53) || !value_56.has(handleAction_4_54) || !handleAction_10(value_48, handleAction_4_53) || value_1.isGroupMemberMuted?.(value_48, handleAction_4_53) || handleAction_4_54 !== handleAction_4_53 && handleAction_10(value_48, handleAction_4_54)) return false;
         return handleAction_11(value_48, handleAction_4_54, handleAction_55);
     }
     async function handleAction_14(value_57, value_58, value_59, value_60 = {}) {

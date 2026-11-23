@@ -399,6 +399,7 @@
                 (await window.u2ImageUnderstanding.analyze(url_2, {
                     prompt: text_32,
                     raw: true,
+                    traceSource: "iMessage › 聊天"
                 })) || '',
             ).trim();
             if (!trim_36) throw new Error('识图接口没有返回图片内容');
@@ -409,9 +410,17 @@
         if (!chatCompletionsEndpoint_29 || !currentApiConfig.apiKey || !currentApiConfig.model)
             throw new Error('请先在 API 配置中填写可识图的接口、密钥和模型');
         const controller = new AbortController(),
-            timeoutId = setTimeout(() => controller.abort(), 30000);
+            timeoutId = setTimeout(() => {
+              window.u2ApiConsole?.markTimeout(controller.signal);
+              controller.abort();
+            }, 30000);
         try {
             const response_2 = await fetch(chatCompletionsEndpoint_29, {
+                u2ApiTrace: {
+                  service: "vision",
+                  source: "iMessage › 聊天",
+                  purpose: "识别图片"
+                },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -818,8 +827,8 @@ The prompt must describe the same current moment with characters, action, settin
             };
         const value_178_2 = () => {
             const value_370_391 = getAttachmentTargetFriend();
-            if (!value_370_391 || value_370_391.type !== 'char') {
-                window.showToast?.('定位仅支持 Char 单聊');
+            if (!value_370_391 || !["char", "group"].includes(value_370_391.type)) {
+              window.showToast?.("定位仅支持角色单聊和群聊");
                 return;
             }
             attachmentSheet_2.querySelector('.location-composer-overlay')?.remove();
@@ -6655,6 +6664,11 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                     const value_1386 = typeof window.u2Api?.fetchChatCompletion === 'function',
                         value_1387 = value_1386 ? window.u2Api.fetchChatCompletion : fetch;
                     response_4 = await value_1387(chatCompletionsEndpoint, {
+                        u2ApiTrace: {
+                          service: "text",
+                          source: "iMessage › 线下",
+                          purpose: "生成对话"
+                        },
                         method: 'POST',
                         headers: window.u2Api.buildApiHeaders(currentApiConfig_3),
                         apiConfig: currentApiConfig_3,
@@ -6692,12 +6706,14 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                     ) &&
                     !!response_4.body?.getReader;
                 if (isEventStream) {
+                    const trace = window.u2ApiConsole?.forResponse(response_4);
                     let streamedContent = '',
                         streamedReasoning = '',
                         completionTokens = 0,
                         finishReason_3 = '',
                         streamBuffer = '',
-                        streamFinished = false;
+                        streamFinished = false,
+                        invalidStreamData = false;
                     const appendStreamPayload = (payload) => {
                             const streamChoice = payload?.choices?.[0] || {},
                                 delta_2 = streamChoice.delta || streamChoice.message || {},
@@ -6758,8 +6774,11 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                                 return;
                             }
                             try {
-                                appendStreamPayload(JSON.parse(payloadText));
+                                const payload = JSON.parse(payloadText);
+                                trace?.payload(payload);
+                                appendStreamPayload(payload);
                             } catch (error_12) {
+                                invalidStreamData = true;
                                 console.warn(
                                     '[iMessage Offline] Ignored malformed stream frame',
                                     error_12,
@@ -6786,6 +6805,7 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                         if (streamBuffer.trim() && !streamFinished)
                             consumeStreamFrame(streamBuffer);
                     } catch (value_1412) {
+                        trace?.fail(value_1412);
                         if (signal_2?.aborted || value_1412?.name === 'AbortError')
                             return finishStream(
                                 streamedContent,
@@ -6804,6 +6824,7 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                             true,
                         );
                     }
+                    trace?.finish(invalidStreamData ? 'invalid' : streamFinished || finishReason_3 ? '' : 'truncated');
                     return finishStream(
                         streamedContent,
                         streamedReasoning,
@@ -7104,7 +7125,7 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                         apiKey: selectedPreset.apiKey || '',
                         model: selectedPreset.model || '',
                         temperature: selectedPreset.temperature ?? selectedPreset.temp ?? 0.7,
-                        frequencyPenalty: selectedPreset.frequencyPenalty ?? 0, streamEnabled: selectedPreset.streamEnabled === true,
+                        frequencyPenalty: selectedPreset.frequencyPenalty ?? 0, maxTokens: selectedPreset.maxTokens ?? null, streamEnabled: selectedPreset.streamEnabled === true,
                         presetId: selectedId,
                     };
                 const current = window.getApiConfig
@@ -7210,6 +7231,11 @@ The Default Language is {{default_language}}. It overrides any conflicting older
                 let value_1500;
                 try {
                     value_1500 = await value_1499(text_1494, {
+                        u2ApiTrace: {
+                          service: "text",
+                          source: "iMessage › 线下",
+                          purpose: "总结对话"
+                        },
                         method: 'POST',
                         headers: headers_3,
                         apiConfig: apiConfig_3,
@@ -13313,10 +13339,11 @@ Persona: ` +
                           (item_33) => String(item_33.id) === String(friendId_8),
                       )
                     : null;
-        if (!friend_25 || friend_25.type !== 'char') {
-            window.showToast?.('定位仅支持 Char 单聊');
+        if (!friend_25 || !['char', 'group'].includes(friend_25.type)) {
+            window.showToast?.('定位仅支持角色单聊和群聊');
             return false;
         }
+        if (friend_25.type === 'group' && (Number(friend_25.leftGroupAt) > 0 || friend_25.groupObserverMode === true)) return false;
         const locationName_2 = String(value_2423 || '')
                 .trim()
                 .slice(0, 80);
@@ -13556,7 +13583,7 @@ Persona: ` +
         const sheetTabItemDataTabLocationElement = sheet_2.querySelector(
                 '.sheet-tab-item[data-tab="location"]',
             ),
-            value_2469 = activeFriend_57.type !== 'char';
+            value_2469 = !["char", "group"].includes(activeFriend_57.type);
         if (sheetTabItemDataTabLocationElement)
             sheetTabItemDataTabLocationElement.style.display = value_2469 ? 'none' : 'flex';
         const attachmentMoreContactEntryElement_2470 = sheet_2.querySelector(

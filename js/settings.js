@@ -98,6 +98,7 @@
       model: "",
       temperature: 0.7,
       frequencyPenalty: 0,
+      maxTokens: null,
       streamEnabled: false
     },
     scopeValue12 = window.getVectorMemoryConfig ? window.getVectorMemoryConfig() : window.vectorMemoryConfig || {},
@@ -396,6 +397,7 @@
       apiModelList: document.getElementById("api-model-list"),
       apiTemp: document.getElementById("api-temp-input"),
       apiStream: document.getElementById("api-stream-enabled"),
+      apiMaxTokens: document.getElementById("api-max-tokens-input"),
       apiFrequencyPenalty: document.getElementById("api-frequency-penalty-input"),
       vectorMemoryEnabled: document.getElementById("vector-memory-enabled-toggle"),
       vectorMemoryProvider: document.getElementById("vector-memory-provider-select"),
@@ -5505,7 +5507,7 @@
       scopeValue404 = null;
     function scopeValue405() {
       if (!Array.isArray(scopeValue16)) return "";
-      const scopeValue1455 = scopeValue16.find(scopeValue1456 => (scopeValue1456.provider || "openai-compatible") === (scopeValue11.provider || "openai-compatible") && (scopeValue1456.endpoint || "") === (scopeValue11.endpoint || "") && (scopeValue1456.apiKey || "") === (scopeValue11.apiKey || "") && (scopeValue1456.model || "") === (scopeValue11.model || "") && String(scopeValue1456.temperature ?? scopeValue1456.temp ?? 0.7) === String(scopeValue11.temperature ?? 0.7) && String(scopeValue1456.frequencyPenalty ?? 0) === String(scopeValue11.frequencyPenalty ?? 0) && scopeValue1456.streamEnabled === true === (scopeValue11.streamEnabled === true));
+      const scopeValue1455 = scopeValue16.find(scopeValue1456 => (scopeValue1456.provider || "openai-compatible") === (scopeValue11.provider || "openai-compatible") && (scopeValue1456.endpoint || "") === (scopeValue11.endpoint || "") && (scopeValue1456.apiKey || "") === (scopeValue11.apiKey || "") && (scopeValue1456.model || "") === (scopeValue11.model || "") && String(scopeValue1456.temperature ?? scopeValue1456.temp ?? 0.7) === String(scopeValue11.temperature ?? 0.7) && String(scopeValue1456.frequencyPenalty ?? 0) === String(scopeValue11.frequencyPenalty ?? 0) && window.u2Api.normalizeMaxTokens(scopeValue1456.maxTokens) === window.u2Api.normalizeMaxTokens(scopeValue11.maxTokens) && scopeValue1456.streamEnabled === true === (scopeValue11.streamEnabled === true));
       return scopeValue1455 ? String(scopeValue1455.id) : "";
     }
     function scopeValue406(scopeValue1457, scopeValue1458 = "未设置") {
@@ -5817,6 +5819,7 @@
         model: scopeValue1525.model || "",
         temperature: scopeValue1525.temp ?? 0.7,
         frequencyPenalty: scopeValue1525.frequencyPenalty ?? 0,
+        maxTokens: window.u2Api.normalizeMaxTokens(scopeValue1525.maxTokens),
         streamEnabled: scopeValue1525.streamEnabled === true
       };
       scopeValue20 = {
@@ -5833,6 +5836,7 @@
       if (UI.inputs.apiTemp) UI.inputs.apiTemp.value = scopeValue11.temperature;
       if (UI.inputs.apiStream) UI.inputs.apiStream.checked = scopeValue11.streamEnabled === true;
       if (UI.inputs.apiFrequencyPenalty) UI.inputs.apiFrequencyPenalty.value = scopeValue11.frequencyPenalty ?? 0;
+      if (UI.inputs.apiMaxTokens) UI.inputs.apiMaxTokens.value = scopeValue11.maxTokens ?? "";
       scopeValue381();
       scopeValue427();
       showToast("已切换到 " + (scopeValue1525.name || "未命名预设"));
@@ -6046,6 +6050,11 @@
       }
       return scopeValue1553.applyPreset && scopeValue1554 !== window.u2Api.normalizeApiProvider(scopeValue1553.previousProvider) && (scopeValue17 = [], scopeValue435()), scopeValue20.provider = scopeValue1554, scopeValue1554;
     }
+    function readMaxTokensInput() {
+      const input = UI.inputs.apiMaxTokens;
+      if (input?.validity?.badInput) throw new Error("最大生成 Token 请输入正整数，或留空使用默认值");
+      return window.u2Api.validateMaxTokens(input?.value);
+    }
     function scopeValue443(scopeValue1558 = true) {
       const scopeValue1559 = window.u2Api.validateApiConfig({
         provider: UI.inputs.apiProvider?.value,
@@ -6054,6 +6063,7 @@
         model: UI.inputs.apiModel?.value,
         temperature: UI.inputs.apiTemp?.value,
         frequencyPenalty: UI.inputs.apiFrequencyPenalty?.value,
+        maxTokens: readMaxTokensInput(),
         streamEnabled: UI.inputs.apiStream?.checked === true
       }, {
         requireModel: scopeValue1558
@@ -6077,6 +6087,7 @@
         model: scopeValue11.model || "",
         temperature: scopeValue11.temperature ?? 0.7,
         frequencyPenalty: scopeValue11.frequencyPenalty ?? 0,
+        maxTokens: scopeValue11.maxTokens ?? null,
         streamEnabled: scopeValue11.streamEnabled === true
       };
       scopeValue442({
@@ -6088,6 +6099,7 @@
       UI.inputs.apiTemp.value = scopeValue20.temperature ?? 0.7;
       if (UI.inputs.apiStream) UI.inputs.apiStream.checked = scopeValue20.streamEnabled === true;
       if (UI.inputs.apiFrequencyPenalty) UI.inputs.apiFrequencyPenalty.value = scopeValue20.frequencyPenalty ?? 0;
+      if (UI.inputs.apiMaxTokens) UI.inputs.apiMaxTokens.value = scopeValue20.maxTokens ?? "";
       scopeValue391();
       scopeValue394();
       scopeValue49();
@@ -6795,7 +6807,14 @@
           }),
           scopeValue1686 = await fetch(scopeValue1684, {
             method: "GET",
-            headers: scopeValue1685
+            headers: scopeValue1685,
+            u2ApiTrace: {
+              service: "models",
+              source: "设置 › API 配置",
+              purpose: "获取模型列表",
+              provider: scopeValue1683.provider,
+              tokenApplicable: false
+            }
           });
         if (!scopeValue1686.ok) {
           const scopeValue1690 = await window.u2Api.readApiError(scopeValue1686);
@@ -6849,6 +6868,11 @@
           scopeValue1705 = typeof window.u2Api.fetchChatCompletion === "function",
           scopeValue1706 = scopeValue1705 ? window.u2Api.fetchChatCompletion : fetch,
           scopeValue1707 = await scopeValue1706(scopeValue1702, {
+            u2ApiTrace: {
+              service: "test",
+              source: "设置 › API 配置",
+              purpose: "测试连接"
+            },
             method: "POST",
             headers: scopeValue1703,
             apiConfig: scopeValue1701,
@@ -6900,6 +6924,7 @@
         model: String(UI.inputs.apiModel && UI.inputs.apiModel.value || "").trim(),
         temperature: Number.isFinite(scopeValue1715) ? Math.max(0, Math.min(2, scopeValue1715)) : 0.7,
         frequencyPenalty: Number.isFinite(scopeValue1716) ? Math.max(-2, Math.min(2, scopeValue1716)) : 0,
+        maxTokens: readMaxTokensInput(),
         streamEnabled: UI.inputs.apiStream?.checked === true
       };
     }
@@ -6914,6 +6939,7 @@
           model: String(scopeValue1717.model || "").trim(),
           temperature: Number.isFinite(scopeValue1719) ? Math.max(0, Math.min(2, scopeValue1719)) : 0.7,
           frequencyPenalty: Number.isFinite(scopeValue1720) ? Math.max(-2, Math.min(2, scopeValue1720)) : 0,
+          maxTokens: window.u2Api.normalizeMaxTokens(scopeValue1717.maxTokens),
           streamEnabled: scopeValue1717.streamEnabled === true
         };
       scopeValue20 = {
@@ -6933,6 +6959,7 @@
       if (UI.inputs.apiTemp) UI.inputs.apiTemp.value = String(scopeValue1721.temperature);
       if (UI.inputs.apiStream) UI.inputs.apiStream.checked = scopeValue1721.streamEnabled === true;
       if (UI.inputs.apiFrequencyPenalty) UI.inputs.apiFrequencyPenalty.value = String(scopeValue1721.frequencyPenalty);
+      if (UI.inputs.apiMaxTokens) UI.inputs.apiMaxTokens.value = scopeValue1721.maxTokens ?? "";
       if (scopeValue1718.persist !== false) {
         const scopeValue1722 = await scopeValue381();
         if (!scopeValue1722) throw new Error("API 设置未能写入本地存储");
@@ -7046,9 +7073,15 @@
       }), 80);
     });
     scopeValue481 && scopeValue481.addEventListener("click", async () => {
-      const scopeValue1749 = String(UI.inputs.presetName && UI.inputs.presetName.value || "").trim() || "未命名预设",
-        scopeValue1750 = scopeValue485(),
-        scopeValue1751 = scopeValue1749.toLocaleLowerCase(),
+      const scopeValue1749 = String(UI.inputs.presetName && UI.inputs.presetName.value || "").trim() || "未命名预设";
+      let scopeValue1750;
+      try {
+        scopeValue1750 = scopeValue485();
+      } catch (scopeValue1751) {
+        showToast(scopeValue1751.message);
+        return;
+      }
+      const scopeValue1751 = scopeValue1749.toLocaleLowerCase(),
         scopeValue1752 = Array.isArray(scopeValue16) ? scopeValue16.findIndex(scopeValue1755 => String(scopeValue1755.name || "").trim().toLocaleLowerCase() === scopeValue1751) : -1,
         scopeValue1753 = scopeValue1752 >= 0 ? scopeValue16[scopeValue1752] : null,
         scopeValue1754 = {
@@ -7933,6 +7966,7 @@
           scopeValue1804(scopeValue503, true);
           scopeValue1815("正在清空应用数据...");
           await window.appStorage.clearAllPersistentData();
+          await window.u2ApiConsole?.clear().catch(() => {});
           scopeValue1816({
             message: "已清空，正在重启...",
             progress: 100

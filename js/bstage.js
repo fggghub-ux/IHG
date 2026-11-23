@@ -1711,6 +1711,11 @@
                     ? window.apiConfig.temperature
                     : window.apiConfig.temp,
             value_245 = await fetch(normalizeChatCompletionsEndpoint(window.apiConfig.endpoint), {
+                u2ApiTrace: {
+                  service: "text",
+                  source: "b.stage",
+                  purpose: "生成内容"
+                },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -3941,6 +3946,7 @@
                         model: preset_3.model,
                         temperature: preset_3.temp !== undefined ? preset_3.temp : 0.7,
                         frequencyPenalty: preset_3.frequencyPenalty ?? 0,
+                        maxTokens: preset_3.maxTokens ?? null,
                     });
             } catch (e_17) {
                 console.warn('Failed to load preset config', e_17);
@@ -4136,6 +4142,11 @@ After Role Rules:
                     resolvedApiConfig.endpoint,
                 ),
                 value_542 = await fetch(endpoint_3, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "b.stage › 聊天",
+                      purpose: "生成回复"
+                    },
                     method: 'POST',
                     headers: window.u2Api?.buildApiHeaders
                         ? window.u2Api.buildApiHeaders(resolvedApiConfig)
@@ -4657,6 +4668,11 @@ After Role Rules:
                     window.apiConfig.endpoint,
                 ),
                 value_614 = await fetch(chatCompletionsEndpoint_613, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "b.stage › 商店",
+                      purpose: "生成商品内容"
+                    },
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -5180,6 +5196,11 @@ After Role Rules:
                     window.apiConfig.endpoint,
                 ),
                 value_670 = await fetch(chatCompletionsEndpoint_669, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "b.stage › 视频",
+                      purpose: "生成视频详情"
+                    },
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -5636,6 +5657,11 @@ User 评论：` +
                     window.apiConfig.endpoint,
                 ),
                 value_719 = await fetch(chatCompletionsEndpoint_718, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "b.stage › 动态",
+                      purpose: "生成内容"
+                    },
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

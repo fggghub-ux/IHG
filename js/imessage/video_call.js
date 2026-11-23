@@ -21,6 +21,8 @@
         items = [5, 10, 20, 30];
     let value_4 = null,
         value_5 = null;
+    const nativeApiTraces = new Map();
+    let isDrainingNativeCalls = false;
     const getActiveSingleCallContext_6 = window.imChat.getActiveSingleCallContext;
     window.imChat.getActiveSingleCallContext = function (value_53) {
         const friendId_2 = String(
@@ -179,6 +181,7 @@
             });
         const setTimeout_81 = setTimeout(() => {
             enabled_79 = true;
+            window.u2ApiConsole?.markTimeout(value_78.signal);
             handleSignalAbort();
         }, value_76);
         try {
@@ -537,6 +540,13 @@
                           }
                         : {},
                     body: body_2,
+                    u2ApiTrace: {
+                      service: "asr",
+                      source: "iMessage › 视频通话",
+                      purpose: "语音转文字",
+                      provider: "openai-compatible",
+                      model: handleAction_7_151.model
+                    }
                 },
                 30000,
                 '语音识别',
@@ -657,6 +667,7 @@
                     window.u2ImageUnderstanding.analyze(url_2, {
                         prompt: text_2,
                         raw: true,
+                        traceSource: "iMessage › 视频通话"
                     }),
                     45000,
                     '画面识别',
@@ -699,6 +710,11 @@
                             },
                         ],
                     }),
+                    u2ApiTrace: {
+                      service: "vision",
+                      source: "iMessage › 视频通话",
+                      purpose: "识别画面"
+                    }
                 },
                 45000,
                 '画面识别',
@@ -856,6 +872,11 @@ Retry the last turn using the same evidence, without repeating the previous line
                                 },
                             ],
                         }),
+                        u2ApiTrace: {
+                          service: "text",
+                          source: "iMessage › 视频通话",
+                          purpose: value_188 ? "重新生成通话回复" : "生成通话回复"
+                        }
                     },
                     45000,
                     '通话回复',
@@ -997,6 +1018,7 @@ Retry the last turn using the same evidence, without repeating the previous line
                                 value_232.friend,
                                 {
                                     ignoreFriendToggle: true,
+                                    traceSource: "iMessage › 视频通话"
                                 },
                             );
                         if (!value_236()) return;
@@ -1125,6 +1147,7 @@ Retry the last turn using the same evidence, without repeating the previous line
                     endpoint: window.u2Api.resolveChatCompletionsEndpoint(value_267.endpoint),
                     apiKey: value_267.apiKey,
                     model: value_267.model,
+                    provider: value_267.provider
                 },
                 vision: vision_2,
                 asr: asr_2,
@@ -1168,6 +1191,48 @@ Retry the last turn using the same evidence, without repeating the previous line
             true
         );
     }
+    function applyNativeApiCall(event) {
+      const purposes = {
+          text: "生成通话回复",
+          vision: "识别画面",
+          asr: "语音转文字",
+          tts: "合成语音"
+        },
+        trace = purposes[event.service];
+      if (!trace || !Number.isFinite(event.startedAt) || typeof event.callId !== "string") return;
+      const reason = nativeApiTraces.get(event.callId) || window.u2ApiConsole?.start({
+        service: event.service,
+        source: "iMessage › Android 屏幕共享",
+        purpose: trace,
+        provider: event.provider,
+        model: event.model
+      }, null, null, {
+        id: "native-" + event.callId,
+        startedAt: event.startedAt
+      });
+      if (event.duration == null) {
+        if (reason) nativeApiTraces.set(event.callId, reason);
+      } else {
+        nativeApiTraces.delete(event.callId);
+        if (event.httpStatus) reason?.response({
+          status: event.httpStatus,
+          ok: event.httpStatus < 400
+        }, event.duration);
+        reason?.payload(event.usage);
+        const error = ["timeout", "cancelled", "network", "invalid", "service"].includes(event.reason) ? event.reason : "";
+        reason?.finish(error, event.duration);
+      }
+    }
+    async function drainNativeApiCalls() {
+      if (isDrainingNativeCalls || !window.u2ApiConsole) return;
+      isDrainingNativeCalls = true;
+      try {
+        const events = await handleAction_38()?.drainApiCalls();
+        events?.events?.length && (await window.u2ApiConsole.syncJournal().catch(() => {}), events.events.forEach(applyNativeApiCall));
+      } catch (purpose) {} finally {
+        isDrainingNativeCalls = false;
+      }
+    }
     function handleAction_40(value_275, value_276) {
         if (
             !handleAction_15(value_275) ||
@@ -1175,6 +1240,10 @@ Retry the last turn using the same evidence, without repeating the previous line
             String(value_276.sessionId || '') !== value_275.id
         )
             return;
+        if (value_276.type === "api-call") {
+          applyNativeApiCall(value_276);
+          return;
+        }
         if (value_276.id && value_275.seenNative.has(value_276.id)) return;
         if (value_276.id) value_275.seenNative.add(value_276.id);
         if (value_276.type === 'user') {
@@ -1229,6 +1298,7 @@ Retry the last turn using the same evidence, without repeating the previous line
     }
     async function handleAction_41(value_282, value_283 = false) {
         if (!value_282.nativeScreen) return;
+        await drainNativeApiCalls();
         try {
             const value_284 = await handleAction_38()?.drainEvents({
                 sessionId: value_282.id,
@@ -1250,6 +1320,8 @@ Retry the last turn using the same evidence, without repeating the previous line
                     sessionId: value_287.id,
                 });
             } catch (value_289) {}
+        for (const trace of nativeApiTraces.values()) trace.finish("cancelled");
+        nativeApiTraces.clear();
         value_287.nativeListener?.remove();
         value_287.nativeListener = null;
         handleAction_15(value_287) &&
@@ -1390,6 +1462,8 @@ Retry the last turn using the same evidence, without repeating the previous line
                     sessionId: value_305.id,
                 });
             } catch (value_306) {}
+        for (const trace of nativeApiTraces.values()) trace.finish("cancelled");
+        nativeApiTraces.clear();
         value_305.nativeListener?.remove();
         window.u2Tts?.stopPlayback?.();
         if (window.speechSynthesis) window.speechSynthesis.cancel();
@@ -1830,10 +1904,14 @@ Retry the last turn using the same evidence, without repeating the previous line
         handleAction_51(options_361);
         handleAction_44(options_361);
     };
+    document.addEventListener("DOMContentLoaded", drainNativeApiCalls, {
+      once: true
+    });
+    function refreshVideoCall() {
+      if (value_4?.nativeScreen) void handleAction_41(value_4);else void drainNativeApiCalls();
+    }
     document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && value_4?.nativeScreen) handleAction_41(value_4);
+        if (!document.hidden) refreshVideoCall();
     });
-    window.addEventListener('focus', () => {
-        if (value_4?.nativeScreen) handleAction_41(value_4);
-    });
+    window.addEventListener("focus", refreshVideoCall);
 })();

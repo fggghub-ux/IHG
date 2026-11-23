@@ -407,12 +407,26 @@
       }
     }
   }
-  async function localValue39(localValue185, localValue186 = {}, localValue187 = "TTS 服务") {
+  async function localValue39(localValue185, localValue186, localValue187, config, purpose = "合成语音") {
     const localValue188 = new AbortController(),
-      localValue189 = setTimeout(() => localValue188.abort(), localValue3);
+      localValue189 = setTimeout(() => {
+        window.u2ApiConsole?.markTimeout(localValue188.signal);
+        localValue188.abort();
+      }, localValue3),
+      listRequest = purpose === "获取模型列表" || purpose === "获取音色列表",
+      trace = {
+        service: listRequest ? "models" : "tts",
+        source: listRequest ? "设置 › TTS 配置" : config.traceSource || "iMessage › 语音合成",
+        purpose: purpose,
+        provider: config.provider,
+        model: listRequest ? "" : config.model,
+        tokenApplicable: purpose === "合成语音",
+        format: purpose === "合成语音" ? "manual" : "json"
+      };
     try {
       const localValue190 = await fetch(localValue185, {
         ...localValue186,
+        u2ApiTrace: trace,
         "signal": localValue188.signal
       });
       if (!localValue190.ok) {
@@ -524,34 +538,51 @@
     const localValue238 = localValue13(localValue236?.["message"], 500).replace(/\b(api[ _-]?key|authorization|token|secret)\b\s*[:=]\s*[^\s,;]+/gi, "$1：已隐藏");
     return localValue238 || localValue237;
   }
-  async function localValue51(localValue239, localValue240 = "TTS 服务") {
+  async function withResponseTrace(response, consume) {
+    const trace = window.u2ApiConsole?.forResponse(response);
+    try {
+      const result = await consume(trace);
+      return trace?.finish(), result;
+    } catch (error) {
+      trace?.fail(error);
+      throw error;
+    }
+  }
+  function localValue51(localValue239, localValue240 = "TTS 服务") {
+    return withResponseTrace(localValue239, async trace => {
     const localValue241 = String(localValue239.headers.get("content-type") || "").toLowerCase();
     if (localValue241.includes("application/json") || localValue241.includes("text/json")) {
-      const localValue243 = await localValue239.json(),
-        localValue244 = localValue48(localValue243);
+      const localValue243 = await localValue239.json();
+      trace?.payload(localValue243);
+      const localValue244 = localValue48(localValue243);
       if (localValue244) return localValue244;
       const localValue245 = localValue49(localValue243);
       if (localValue245) throw new Error(localValue240 + "合成失败：" + localValue245);
-      if (!localValue244) throw new Error("TTS 服务未返回音频");
+      throw new Error("TTS 服务未返回音频");
     }
     const localValue242 = await localValue239.blob();
     if (!localValue242.size) throw new Error("TTS 服务未返回音频");
     return URL.createObjectURL(new Blob([localValue242], {
       "type": localValue242.type || "audio/mpeg"
     }));
+    });
   }
-  async function localValue52(localValue246) {
+  function localValue52(localValue246) {
+    return withResponseTrace(localValue246, async trace => {
     let localValue247;
     try {
       localValue247 = await localValue246.json();
     } catch (localValue250) {
+        trace?.fail(localValue250);
       throw new Error("MiniMax TTS 返回的音频响应不是有效 JSON");
     }
+      trace?.payload(localValue247);
     const localValue248 = localValue49(localValue247);
     if (localValue248) throw new Error("MiniMax TTS合成失败：" + localValue248);
     const localValue249 = localValue48(localValue247);
     if (!localValue249) throw new Error("MiniMax TTS 未返回音频");
     return localValue249;
+    });
   }
   async function localValue53(localValue251, localValue252 = false) {
     if (!localValue251) throw new Error("没有可播放的音频");
@@ -627,7 +658,7 @@
         ...localValue37()
       },
       "body": JSON.stringify(localValue269)
-    }, "MiniMax TTS");
+    }, "MiniMax TTS", localValue265);
     return localValue52(localValue271);
   }
   async function localValue57(localValue272, localValue273, localValue274) {
@@ -645,7 +676,7 @@
         "speed": localValue274.speed,
         "response_format": "mp3"
       })
-    }, localValue24(localValue272.provider) + " TTS");
+    }, localValue24(localValue272.provider) + " TTS", localValue272);
     return localValue51(localValue275);
   }
   async function localValue58(localValue276, localValue277, localValue278) {
@@ -668,7 +699,7 @@
           "similarity_boost": 0.75
         }
       })
-    }, "ElevenLabs TTS");
+    }, "ElevenLabs TTS", localValue276);
     return localValue51(localValue281);
   }
   async function localValue59(localValue282, localValue283, localValue284) {
@@ -691,6 +722,13 @@
       localValue290 = new AbortController(),
       localValue291 = Object.assign(new Error("Fish Audio TTS 请求超时，请稍后重试"), {
         "name": "TimeoutError"
+      }),
+      trace = window.u2ApiConsole?.start({
+        service: "tts",
+        source: localValue282.traceSource || "iMessage › 语音合成",
+        purpose: "合成语音",
+        provider: "fish-audio",
+        model: localValue288
       });
     let localValue292;
     const localValue293 = new Promise((localValue294, localValue295) => {
@@ -718,6 +756,7 @@
           "body": JSON.stringify(localValue289)
         });
         if (localValue290.signal.aborted) throw localValue291;
+          trace?.response(localValue297);
         if (!localValue297.ok) {
           if (localValue287.throughRelay && localValue297.status === 404) throw new Error("当前网站未部署 Fish Audio 转发接口，请更新 Cloudflare Pages 部署");
           const localValue300 = await localValue38(localValue297);
@@ -740,10 +779,15 @@
           throw localValue291;
         }
         return localValue299;
-      })();
-      return await Promise.race([localValue296, localValue293]);
+      })(),
+      result = await Promise.race([localValue296, localValue293]);
+    return trace?.finish(), result;
     } catch (localValue302) {
-      if (localValue290.signal.aborted || localValue302?.["name"] === "AbortError" || localValue286 && /timed?\s*out|timeout/i.test(String(localValue302?.["message"] || localValue302?.["code"] || ""))) throw localValue291;
+      if (localValue290.signal.aborted || localValue302?.name === "AbortError" || localValue286 && /timed?\s*out|timeout/i.test(String(localValue302?.message || localValue302?.code || ""))) {
+        trace?.fail(localValue291);
+        throw localValue291;
+      }
+      trace?.fail(localValue302);
       throw localValue302;
     } finally {
       clearTimeout(localValue292);
@@ -761,7 +805,7 @@
           ...localValue37()
         },
         "body": "<speak version=\"1.0\" xml:lang=\"" + localValue54(localValue305.language || "zh-CN") + "\"><voice name=\"" + localValue54(localValue306) + "\"><prosody rate=\"" + Math.round((localValue305.speed - 1) * 100) + "%\">" + localValue54(localValue304) + "</prosody></voice></speak>"
-      }, "Azure Speech");
+      }, "Azure Speech", localValue303);
     return localValue51(localValue307);
   }
   async function localValue61(localValue308, localValue309, localValue310) {
@@ -784,7 +828,7 @@
           "speakingRate": localValue310.speed
         }
       })
-    }, "Google Cloud TTS");
+    }, "Google Cloud TTS", localValue308);
     return localValue51(localValue311);
   }
   function localValue62(localValue312) {
@@ -851,7 +895,7 @@
           ...localValue37()
         },
         "body": localValue345
-      }, "AWS Polly");
+      }, "AWS Polly", localValue340);
     return localValue51(localValue347);
   }
   async function localValue68(localValue348, localValue349, localValue350) {
@@ -883,7 +927,7 @@
           ...localValue37()
         },
         "body": JSON.stringify(localValue351)
-      }, "火山引擎 TTS");
+      }, "火山引擎 TTS", localValue348);
     return localValue51(localValue352);
   }
   async function localValue69(localValue353, localValue354, localValue355) {
@@ -923,24 +967,47 @@
           "model": localValue356,
           "input": localValue361
         })
-      }, "DashScope TTS");
+      }, "DashScope TTS", localValue353);
     return localValue51(localValue362);
   }
-  function localValue70(localValue363, localValue364, localValue365, localValue366) {
+  function localValue70(socketUrl, localValue364, localValue365, serviceName, config) {
     if (typeof WebSocket !== "function") return Promise.reject(new Error("当前环境不支持 WebSocket TTS"));
     return new Promise((localValue367, localValue368) => {
       let localValue369 = false;
-      const localValue370 = new WebSocket(localValue363),
-        localValue371 = setTimeout(() => localValue372(new Error(localValue366 + "连接超时")), localValue3),
+      const trace = window.u2ApiConsole?.start({
+        service: "tts",
+        source: config.traceSource || "iMessage › 语音合成",
+        purpose: "合成语音",
+        provider: config.provider,
+        model: config.model
+      });
+      let localValue370;
+      try {
+        localValue370 = new WebSocket(socketUrl);
+      } catch (error) {
+        trace?.fail(error);
+        localValue368(error);
+        return;
+      }
+      const localValue371 = setTimeout(() => localValue372(Object.assign(new Error(serviceName + "连接超时"), {
+          name: "TimeoutError"
+        })), localValue3),
         localValue372 = (localValue373, localValue374) => {
           if (localValue369) return;
           localValue369 = true, clearTimeout(localValue371);
           try {
             localValue370.close();
           } catch (localValue375) {}
-          if (localValue373) localValue368(localValue373);else localValue367(localValue374);
+          localValue373 ? (trace?.fail(localValue373), localValue368(localValue373)) : (trace?.finish(), localValue367(localValue374));
         };
-      localValue370.onerror = () => localValue372(new Error(localValue366 + "连接失败，请检查地址、凭据或浏览器跨域限制")), localValue370.onopen = () => {
+      localValue370.onerror = () => {
+        trace?.finish("network");
+        localValue372(new Error(serviceName + "连接失败，请检查地址、凭据或浏览器跨域限制"));
+      };
+      localValue370.onclose = () => {
+        if (!localValue369) trace?.finish("network");
+      };
+      localValue370.onopen = () => {
         try {
           localValue364(localValue370);
         } catch (localValue376) {
@@ -997,7 +1064,7 @@
         const localValue403 = localValue46(localValue390.join(""));
         localValue400(localValue403 ? null : new Error("腾讯云 TTS 未返回音频"), localValue403);
       }
-    }, "腾讯云 TTS");
+    }, "腾讯云 TTS", localValue379);
   }
   async function localValue72(localValue404, localValue405, localValue406) {
     const localValue407 = new URLSearchParams({
@@ -1012,7 +1079,7 @@
           ...localValue37()
         },
         "body": localValue407.toString()
-      }, "百度智能云鉴权"),
+      }, "百度智能云鉴权", localValue404, "获取语音服务凭据"),
       localValue409 = await localValue408.json(),
       localValue410 = localValue13(localValue409?.["access_token"]);
     if (!localValue410) throw new Error("百度智能云未返回 Access Token");
@@ -1020,7 +1087,7 @@
     localValue411.searchParams.set("tex", localValue405), localValue411.searchParams.set("tok", localValue410), localValue411.searchParams.set("cuid", "u2phone"), localValue411.searchParams.set("ctp", "1"), localValue411.searchParams.set("lan", String(localValue406.language || "zh").split("-")[0]), localValue411.searchParams.set("per", localValue34(localValue404, localValue406)), localValue411.searchParams.set("spd", String(Math.round(5 + (localValue406.speed - 1) * 5)));
     const localValue412 = await localValue39(localValue411.toString(), {
       "headers": localValue37()
-    }, "百度智能云 TTS");
+    }, "百度智能云 TTS", localValue404);
     return localValue51(localValue412);
   }
   async function localValue73(localValue413, localValue414, localValue415) {
@@ -1060,7 +1127,7 @@
         const localValue428 = localValue46(localValue422.join(""));
         localValue426(localValue428 ? null : new Error("讯飞 TTS 未返回音频"), localValue428);
       }
-    }, "讯飞 TTS");
+    }, "讯飞 TTS", localValue413);
   }
   async function localValue74(localValue429, localValue430, localValue431) {
     if (localValue429.provider === "minimax") return localValue56(localValue429, localValue430, localValue431);
@@ -1119,7 +1186,10 @@
     if (!localValue450.enabled && !localValue448.ignoreFriendToggle) throw new Error("请先在 Chat Settings Info 开启 TTS");
     const localValue451 = localValue28(localValue448.config || localValue21());
     if (localValue451.provider === "minimax" && localValue449.length > localValue8) throw new Error("MiniMax TTS 单次文本不能超过 " + localValue8.toLocaleString() + " 个字符");
-    return localValue80(localValue451, localValue449, {
+    return localValue80({
+      ...localValue451,
+      traceSource: localValue448.traceSource
+    }, localValue449, {
       ...localValue450,
       "voiceId": localValue448.voiceId || localValue450.voiceId
     });
@@ -1138,7 +1208,10 @@
     const localValue457 = localValue28(localValue454.config || localValue21());
     if (localValue457.provider === "minimax" && localValue455.length > localValue8) throw new Error("MiniMax TTS 单次文本不能超过 " + localValue8.toLocaleString() + " 个字符");
     if (!localValue454.suppressToast && window.showToast) window.showToast("语音生成中...");
-    const localValue458 = await localValue80(localValue457, localValue455, {
+    const localValue458 = await localValue80({
+      ...localValue457,
+      traceSource: localValue454.traceSource
+    }, localValue455, {
       ...localValue456,
       "voiceId": localValue454.voiceId || localValue456.voiceId
     });
@@ -1206,7 +1279,7 @@
         "Authorization": "Bearer " + localValue478.apiKey,
         ...localValue37()
       }
-    }, localValue24(localValue478.provider) + " 模型列表");
+    }, localValue24(localValue478.provider) + " 模型列表", localValue478, "获取模型列表");
     return localValue88(await localValue479.json());
   }
   async function localValue90(localValue480) {
@@ -1219,7 +1292,7 @@
           "xi-api-key": localValue480.apiKey,
           ...localValue37()
         }
-      }, "ElevenLabs 模型列表"),
+      }, "ElevenLabs 模型列表", localValue480, "获取模型列表"),
       localValue484 = await localValue483.json();
     return (Array.isArray(localValue484) ? localValue484 : []).filter(localValue485 => localValue485?.["can_do_text_to_speech"] !== false).map(localValue486 => localValue13(localValue486?.["model_id"] || localValue486?.["id"], 256)).filter(Boolean);
   }
@@ -1229,14 +1302,14 @@
           "Ocp-Apim-Subscription-Key": localValue487.apiKey,
           ...localValue37()
         }
-      }, "Azure Speech 音色列表"),
+      }, "Azure Speech 音色列表", localValue487, "获取音色列表"),
       localValue489 = await localValue488.json();
     return (Array.isArray(localValue489) ? localValue489 : []).map(localValue490 => localValue13(localValue490?.["ShortName"] || localValue490?.["Name"], 256)).filter(Boolean);
   }
   async function localValue92(localValue491) {
     const localValue492 = await localValue39(localValue45(localValue491, "voices"), {
         "headers": localValue37()
-      }, "Google Cloud TTS 音色列表"),
+      }, "Google Cloud TTS 音色列表", localValue491, "获取音色列表"),
       localValue493 = await localValue492.json();
     return (Array.isArray(localValue493?.["voices"]) ? localValue493.voices : []).map(localValue494 => localValue13(localValue494?.["name"], 256)).filter(Boolean);
   }
@@ -1250,7 +1323,7 @@
           ...localValue498,
           ...localValue37()
         }
-      }, "AWS Polly 音色列表"),
+      }, "AWS Polly 音色列表", localValue495, "获取音色列表"),
       localValue500 = await localValue499.json();
     return (Array.isArray(localValue500?.["Voices"]) ? localValue500.Voices : []).map(localValue501 => localValue13(localValue501?.["Id"], 256)).filter(Boolean);
   }

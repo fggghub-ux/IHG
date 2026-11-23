@@ -1185,6 +1185,11 @@ async function requestUserLiveLotteryJson(content_2) {
             window.apiConfig.endpoint,
         ),
         value_164 = await fetch(chatCompletionsEndpoint, {
+            u2ApiTrace: {
+              service: "text",
+              source: "YouTube › 用户直播",
+              purpose: "生成抽奖结果"
+            },
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -2432,6 +2437,11 @@ userLiveTriggerApiBtn &&
                     window.apiConfig.endpoint,
                 ),
                 value_322 = await fetch(chatCompletionsEndpoint_321, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "YouTube › 用户直播",
+                      purpose: "生成观众互动"
+                    },
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -98,7 +98,10 @@
             apk110New_41 = window.getUserState?.() || window.userState || {},
             apk110New_42 = apk110New_41.name || 'User',
             apk110New_43 = new AbortController(),
-            apk110New_44 = setTimeout(() => apk110New_43.abort(), 60000);
+            apk110New_44 = setTimeout(() => {
+              window.u2ApiConsole?.markTimeout(apk110New_43.signal);
+              apk110New_43.abort();
+            }, 60000);
         try {
             const apk110New_45 = window.u2Api?.buildApiHeaders
                     ? window.u2Api.buildApiHeaders(apk110New_38, {
@@ -110,6 +113,11 @@
                           'X-U2-Silent-Errors': '1',
                       },
                 apk110New_46 = await fetch(apk110New_39, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "iMessage › 聊天 › 生图",
+                      purpose: "整理英文场景"
+                    },
                     method: 'POST',
                     headers: apk110New_45,
                     body: JSON.stringify({
@@ -206,6 +214,7 @@ User: ` +
         imageGenerationRuns.add(runKey);
         try {
             return await window.u2ImageGeneration.generate(String(value_14 || '').trim(), {
+                traceSource: value_16.traceSource || (value_15?.type === "group" ? "iMessage › 群聊" : "iMessage › 聊天"),
                 referenceImages:
                     value_16.referenceImages ||
                     (value_16.referenceImage

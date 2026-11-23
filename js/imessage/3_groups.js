@@ -1468,6 +1468,22 @@
                         );
                 });
         }
+        const previousMuteButton = document.getElementById("gmm-mute-btn");
+        if (previousMuteButton) {
+          const muteButton = previousMuteButton.cloneNode(true);
+          previousMuteButton.replaceWith(muteButton);
+          muteButton.setAttribute("role", "button");
+          muteButton.tabIndex = 0;
+          const muteLabel = muteButton.querySelector(".settings-text");
+          if (muteLabel) muteLabel.textContent = window.imApp.isGroupMemberMuted?.(latestGroup_3, memberId_4) ? "禁言中 · 管理禁言" : "禁止发言";
+          const openMuteDialog = () => window.imApp.openGroupMuteDialog?.(latestGroup_3.id, memberId_4);
+          muteButton.addEventListener("click", openMuteDialog);
+          muteButton.addEventListener("keydown", event => {
+            if (!["Enter", " "].includes(event.key)) return;
+            event.preventDefault();
+            openMuteDialog();
+          });
+        }
         const gmmKickBtnElement = document.getElementById('gmm-kick-btn');
         if (gmmKickBtnElement) {
             const cloneNode_171 = gmmKickBtnElement.cloneNode(true);
@@ -1528,6 +1544,9 @@
                                         );
                                     if (targetGroup_4.memberTitles)
                                         delete targetGroup_4.memberTitles[memberKey];
+                                    for (const key of ["groupMutes", "groupMuteRequests", "groupMuteRevisions"]) {
+                                      if (targetGroup_4[key]) delete targetGroup_4[key][memberKey];
+                                    }
                                     Array.isArray(targetGroup_4.adminMemberIds) &&
                                         (targetGroup_4.adminMemberIds =
                                             targetGroup_4.adminMemberIds.filter(
@@ -2304,21 +2323,24 @@
                 },
             });
         });
+    window.addEventListener("u2:group-management-updated", event => {
+      if (String(currentViewingGroup?.id) !== String(event.detail?.groupId)) return;
+      currentViewingGroup = window.imApp.getFriendById(currentViewingGroup.id) || currentViewingGroup;
+      const label = document.getElementById("group-details-name");
+      if (label) label.textContent = currentViewingGroup.nickname;
+    });
     confirmGroupEditBtn &&
         confirmGroupEditBtn.addEventListener('click', async () => {
             if (!currentViewingGroup) return;
             const newName = groupEditNameInput ? groupEditNameInput.value.trim() : '';
             if (newName) {
-                const saved_10 = await commitCurrentGroupChange(
-                    (targetGroup_6) => {
-                        targetGroup_6.nickname = newName;
-                        targetGroup_6.realName = newName;
-                    },
-                    {
-                        silent: true,
-                    },
+                const renameResult = await window.imApp.performGroupManagement(
+                    currentViewingGroup.id,
+                    { role: "user" },
+                    { type: "group_rename", name: newName }
                 );
-                if (!saved_10) {
+                currentViewingGroup = resolveLatestGroup(currentViewingGroup);
+                if (!renameResult.success) {
                     if (window.showToast) window.showToast('群聊名称保存失败');
                     return;
                 }

@@ -1807,7 +1807,10 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
 
 返回结构：{"comments":[...]}`,
             controller_569 = new AbortController(),
-            setTimeout_570 = setTimeout(() => controller_569.abort(), 60000);
+            setTimeout_570 = setTimeout(() => {
+              window.u2ApiConsole?.markTimeout(controller_569.signal);
+              controller_569.abort();
+            }, 60000);
         try {
             const headers_3 = window.u2Api?.buildApiHeaders
                     ? window.u2Api.buildApiHeaders(value_560, {
@@ -1819,6 +1822,11 @@ User 刚刚在你们正在共读的小说中选中了下面一段，并查看了
                           'X-U2-Silent-Errors': '1',
                       },
                 value_572 = await fetch(value_561, {
+                    u2ApiTrace: {
+                      service: "text",
+                      source: "Library › 阅读器",
+                      purpose: "生成选段评论"
+                    },
                     method: 'POST',
                     headers: headers_3,
                     body: JSON.stringify({

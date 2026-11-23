@@ -2262,7 +2262,7 @@ Do not output markdown, code fences, explanations, chain-of-thought, [Comment] t
 
 Generate replies and thoughts grounded in this exact public Moment topic.`,
         });
-        const value_453 = await requestMomentApiCompletion(items_452, 0.8);
+        const value_453 = await requestMomentApiCompletion(items_452, 0.8, "生成评论回复");
         return handleAction_58(value_453, handleAction_56_440, {
             requireAuthor: !targetComment_2,
             requireRelationship: !targetComment_2 && some_441,
@@ -3247,10 +3247,11 @@ Generate replies and thoughts grounded in this exact public Moment topic.`,
     function getApiChatCompletionsEndpoint(config_2 = getCurrentMomentApiConfig()) {
         return window.u2Api.resolveChatCompletionsEndpoint(config_2?.endpoint || '');
     }
-    async function requestMomentApiCompletion(messages_3, temperature_2 = 0.8) {
+    async function requestMomentApiCompletion(messages_3, temperature_2 = 0.8, purpose) {
         const currentApiConfig = getCurrentMomentApiConfig();
         if (!hasCurrentMomentApiConfig(currentApiConfig)) throw new Error('API config missing');
         const value_637 = await fetch(getApiChatCompletionsEndpoint(currentApiConfig), {
+            u2ApiTrace: { service: "text", source: "iMessage › 朋友圈", purpose },
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -3414,7 +3415,7 @@ Do not output comments, private chat replies, markdown, explanations, or chain-o
 
 `),
             });
-            const aiResponse_4 = await requestMomentApiCompletion(messages_4, 0.75);
+            const aiResponse_4 = await requestMomentApiCompletion(messages_4, 0.75, "生成点赞心声");
             return parseAutoLikeThought(aiResponse_4, friend_26);
         } catch (error_9) {
             return (
@@ -3542,7 +3543,7 @@ If you chatted with the user recently, the public comment and private replies ca
 
 `),
             }),
-            requestMomentApiCompletion(items_675, 0.8)
+            requestMomentApiCompletion(items_675, 0.8, "生成评论")
         );
     }
     function hasMomentNotification(type_2, friend_28, momentId_10) {
@@ -4097,7 +4098,7 @@ Do not output markdown, tagged lines, explanations, or chain-of-thought.`,
             role: 'user',
             content: 'Generate the public moment now.',
         });
-        const value_810 = await requestMomentApiCompletion(messages_6, 0.8),
+        const value_810 = await requestMomentApiCompletion(messages_6, 0.8, "生成动态草稿"),
             payload_5 = parseMomentJsonObject(value_810),
             post_2 = normalizeMomentLocalizedContent(payload_5?.post, momentLanguage_795);
         if (!post_2) throw new Error('朋友圈内容格式无效');
@@ -4244,6 +4245,7 @@ Output shape: {"postIndex":0,"description":"visual description in Simplified Chi
                         },
                     ],
                     0.5,
+                    "筛选生图动态",
                 ),
                 momentJsonObject_841 = parseMomentJsonObject(value_840),
                 index_8 = Number.parseInt(momentJsonObject_841?.postIndex, 10),
@@ -4272,6 +4274,7 @@ Output shape: {"postIndex":0,"description":"visual description in Simplified Chi
                 ? await window.imChat.resolveAutoImageReferenceFace(value_844)
                 : '',
             options_848 = {
+                traceSource: "iMessage › 朋友圈",
                 referenceImage: referenceImage_2,
                 basePrompt: value_846.basePrompt || value_846.lastPrompt || '',
                 charAppearance: value_846.charAppearance || '',

@@ -713,6 +713,7 @@
                 window.apiConfig.endpoint,
             );
             const value_92 = await window.tkFetch('videos', endpoint_2, {
+                u2ApiTrace: { service: "text", source: "TikTok › 个人主页", purpose: "生成角色视频" },
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
