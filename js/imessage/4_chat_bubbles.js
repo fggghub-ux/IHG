@@ -3233,6 +3233,7 @@ if (msg_10.type === "group_announcement") {
             friend_18?.showAvatar ? 1 : 0,
             friend_18?.showGroupUserAvatar ? 1 : 0,
             String(friend_18?.avatarDisplayMode || 'one'),
+            getChatTranslationStyle(friend_18),
             friend_18?.continuousBubbles === false ? 0 : 1,
             String(friend_18?.replyStyle || 'inside'),
             friend_18?.showTimestamp ? 1 : 0,
@@ -4002,6 +4003,61 @@ if (msg_10.type === "group_announcement") {
             force: true,
         });
     }
+    function getChatTranslationStyle(friend) {
+        const style = friend?.translationStyle;
+        return style === 'outline' || style === 'label' ? style : 'split';
+    }
+    function setChatBubbleTranslation(bubble, expanded, translation, friend) {
+        if (!bubble) return;
+        const line = bubble.closest('.im-single-ai-text-line');
+        const style = line ? getChatTranslationStyle(friend) : 'split';
+        const inlineTranslation = bubble.querySelector('.msg-translation');
+        const overlay = line?.nextElementSibling;
+        const floatingTranslation = overlay?.classList.contains('im-chat-translation-overlay')
+            ? overlay
+            : null;
+        if (!expanded) {
+            inlineTranslation?.remove();
+            floatingTranslation?.remove();
+            return;
+        }
+        if (inlineTranslation || floatingTranslation) return;
+
+        const element = document.createElement('div');
+        element.className = 'msg-translation';
+        const meta = bubble.querySelector('.bubble-meta');
+        if (style === 'split') {
+            const isUser = !!bubble.closest('.user-row');
+            const separator = line ? '#cfcfcf' : isUser ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)';
+            element.style.cssText =
+                'margin-top: 6px; padding-top: 6px; font-size: 13px; line-height: 1.4; word-wrap: break-word; white-space: normal;';
+            element.style.borderTop = '1px solid ' + separator;
+            element.style.color = line ? '#444444' : isUser ? 'rgba(255,255,255,0.7)' : '#8e8e93';
+            element.innerHTML = translation;
+            if (meta) bubble.insertBefore(element, meta);
+            else bubble.appendChild(element);
+            return;
+        }
+
+        element.classList.add('im-chat-translation-overlay');
+        element.dataset.translationStyle = style;
+        if (style === 'label') {
+            const firstText = Array.from(bubble.childNodes).find(
+                node => !node.matches?.('.msg-reply-quote, .bubble-meta') && node.textContent.trim(),
+            );
+            element.dataset.firstCharacter = Array.from(firstText?.textContent.trimStart() || '')[0] || '';
+        }
+        const text = document.createElement('span');
+        text.className = 'im-chat-translation-text';
+        text.innerHTML = translation;
+        element.appendChild(text);
+        if (meta) {
+            const outsideMeta = meta.cloneNode(true);
+            outsideMeta.classList.add('im-chat-translation-timestamp');
+            element.appendChild(outsideMeta);
+        }
+        line.after(element);
+    }
     function renderAiBubble_2(
         value_243,
         friend_27,
@@ -4026,6 +4082,9 @@ if (msg_10.type === "group_announcement") {
                     !element_272.classList.contains('typing-row'),
         );
         const isGroupMessage_2 = friend_27.type === 'group' && !!speakerName_5;
+        const isSingleText =
+            (!friend_27.type || friend_27.type === 'char') &&
+            (!value_262?.type || value_262.type === 'text');
         let hasPrev_3 = false;
         let enabled_640 = false;
         if (handleAction_18_637 && handleAction_18_637.classList.contains('ai-row')) {
@@ -4066,7 +4125,8 @@ if (msg_10.type === "group_announcement") {
                 value_628 +
                 '</div>');
         text_642 += value_243;
-        value_626 &&
+        !isSingleText &&
+            value_626 &&
             value_248 &&
             (text_642 +=
                 '<div class="msg-translation" style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px; color: #8e8e93; line-height: 1.4; word-wrap: break-word; white-space: normal;">' +
@@ -4109,13 +4169,16 @@ if (msg_10.type === "group_announcement") {
             timestamp_6 +
             '" style="color: #c7c7cc; font-size: 22px;"></i>\n            </div>\n            <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">\n                ' +
             headerHtml_2 +
-            '\n                <div style="display: flex; justify-content: flex-start; align-items: flex-end; width: 100%;">\n                    ' +
+            '\n                <div' + (isSingleText ? ' class="im-single-ai-text-line"' : '') +
+            ' style="display: flex; justify-content: flex-start; align-items: flex-end; width: 100%;">\n                    ' +
             text_645 +
             '\n                    ' +
             (value_262?.deliveryStatus === 'blocked'
                 ? '<i class="fas fa-exclamation-circle chat-delivery-failed is-char" aria-label="发送失败"></i>'
                 : '') +
             '\n                </div>\n            </div>\n        ';
+        if (isSingleText && value_626 && value_248)
+            setChatBubbleTranslation(row_12.querySelector('.ai-bubble'), true, value_626, friend_27);
         element_245.appendChild(row_12);
         decorateMessageRowAvatar(
             row_12,
@@ -6579,6 +6642,8 @@ if (msg_10.type === "group_announcement") {
     window.imChat.renderUserBubble = renderUserBubble_2;
     window.imChat.syncGroupUserAvatarState = syncGroupUserAvatarState_3;
     window.imChat.renderAiBubble = renderAiBubble_2;
+    window.imChat.getChatTranslationStyle = getChatTranslationStyle;
+    window.imChat.setChatBubbleTranslation = setChatBubbleTranslation;
     window.imChat.renderImageBubble = renderImageBubble_2;
     window.imChat.renderLocationBubble = renderLocationBubble_2;
     window.imChat.renderFakeLinkBubble = renderFakeLinkBubble_2;

@@ -32,24 +32,6 @@
         msgContextOverlay = document.getElementById('msg-context-overlay'),
         msgContextMenu = document.getElementById('msg-context-menu'),
         value_7 = new Map();
-    function handleAction_8(element, element_15, value_16, innerHTML_2) {
-        if (!element) return;
-        const msgTranslationElement = element.querySelector('.msg-translation');
-        if (value_16) {
-            if (msgTranslationElement) return;
-            const bubbleMetaElement = element.querySelector('.bubble-meta'),
-                element_18 = document.createElement('div');
-            element_18.className = 'msg-translation';
-            element_18.style.cssText = element_15?.classList.contains('user-row')
-                ? 'margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.4; word-wrap: break-word; white-space: normal;'
-                : 'margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px; color: #8e8e93; line-height: 1.4; word-wrap: break-word; white-space: normal;';
-            element_18.innerHTML = innerHTML_2;
-            if (bubbleMetaElement) element.insertBefore(element_18, bubbleMetaElement);
-            else element.appendChild(element_18);
-            return;
-        }
-        msgTranslationElement?.remove();
-    }
     if (chatsContent) {
         let startX, startY;
         const startPress = (e_2) => {
@@ -127,7 +109,7 @@
                             showTranslation_3 = !!msg.showTranslation;
                         value_7.set(value_38, value_39);
                         msg.showTranslation = showTranslation_2;
-                        handleAction_8(bubble, row_2, showTranslation_2, translation_37);
+                        window.imChat.setChatBubbleTranslation(bubble, showTranslation_2, translation_37, liveFriend);
                         const value_41 = window.imApp.updateFriendMessage
                             ? await window.imApp.updateFriendMessage(
                                   id_33,
@@ -161,7 +143,7 @@
                         if (value_7.get(value_38) !== value_39) return;
                         !value_41
                             ? ((msg.showTranslation = showTranslation_3),
-                              handleAction_8(bubble, row_2, showTranslation_3, translation_37),
+                              window.imChat.setChatBubbleTranslation(bubble, showTranslation_3, translation_37, liveFriend),
                               window.showToast?.('翻译状态保存失败'))
                             : value_7['delete'](value_38);
                     }
@@ -755,46 +737,12 @@
                                                     window.imChat.closeContextMenu();
                                                     return;
                                                 }
-                                                const chatBubbleElement_123 =
-                                                    currentActiveRow_111.querySelector(
-                                                        '.chat-bubble',
-                                                    );
-                                                if (chatBubbleElement_123) {
-                                                    const msgTranslationElement_128 =
-                                                        chatBubbleElement_123.querySelector(
-                                                            '.msg-translation',
-                                                        );
-                                                    if (showTranslation_4) {
-                                                        if (!msgTranslationElement_128) {
-                                                            const bubbleMetaElement_129 =
-                                                                    chatBubbleElement_123.querySelector(
-                                                                        '.bubble-meta',
-                                                                    ),
-                                                                element_130 =
-                                                                    document.createElement('div');
-                                                            element_130.className =
-                                                                'msg-translation';
-                                                            currentActiveRow_111.classList.contains(
-                                                                'user-row',
-                                                            )
-                                                                ? (element_130.style.cssText =
-                                                                      'margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.4; word-wrap: break-word; white-space: normal;')
-                                                                : (element_130.style.cssText =
-                                                                      'margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 13px; color: #8e8e93; line-height: 1.4; word-wrap: break-word; white-space: normal;');
-                                                            element_130.innerHTML = innerHTML_4;
-                                                            bubbleMetaElement_129
-                                                                ? chatBubbleElement_123.insertBefore(
-                                                                      element_130,
-                                                                      bubbleMetaElement_129,
-                                                                  )
-                                                                : chatBubbleElement_123.appendChild(
-                                                                      element_130,
-                                                                  );
-                                                        }
-                                                    } else
-                                                        msgTranslationElement_128 &&
-                                                            msgTranslationElement_128.remove();
-                                                }
+                                                window.imChat.setChatBubbleTranslation(
+                                                    currentActiveRow_111.querySelector('.chat-bubble'),
+                                                    showTranslation_4,
+                                                    innerHTML_4,
+                                                    value_114,
+                                                );
                                             } else {
                                                 if (window.showToast)
                                                     window.showToast('该消息无需翻译或暂无翻译');

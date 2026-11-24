@@ -2161,6 +2161,11 @@ const IM_CHAT_BACK_BADGE_DEFAULT = '2991';
                 }
             } else clonedBubble.style.maxWidth = '100%';
             clonedRow.appendChild(clonedBubble);
+            const translationOverlay = row_5.querySelector('.im-chat-translation-overlay');
+            if (translationOverlay) {
+                clonedRow.classList.add('has-translation-overlay');
+                clonedRow.appendChild(translationOverlay.cloneNode(true));
+            }
             msgContextBubbleCloneElement_274.appendChild(clonedRow);
         }
         const msgContextMoreActionsElement = document.getElementById('msg-context-more-actions'),

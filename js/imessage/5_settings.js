@@ -5381,6 +5381,11 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
         const avatarSelect = document.getElementById('avatar-position-select');
         if (avatarBody) avatarBody.style.display = friend_57.showAvatar ? 'flex' : 'none';
         if (avatarSelect) avatarSelect.value = friend_57.avatarDisplayMode === 'two' ? 'two' : 'one';
+        const translationStyleSelect = document.getElementById('chat-translation-style-select');
+        if (translationStyleSelect) {
+            translationStyleSelect.closest('.form-item').style.display = friend_57.type === 'char' ? '' : 'none';
+            translationStyleSelect.value = window.imChat.getChatTranslationStyle(friend_57);
+        }
         if (chatLanguageSelect) {
             const language_2 = String(friend_57.language || 'zh').trim() || 'zh';
             const standardLanguages = new Set(['zh', 'en', 'ru', 'yue', 'it', 'es', 'ar']);
@@ -6322,6 +6327,31 @@ Field rules: Keep summary.memoryPoints as summary detail. summary.memoryTags is 
                 return;
             }
             rerenderAvatarSettingPreview();
+        });
+    }
+
+    const translationStyleSelect = document.getElementById('chat-translation-style-select');
+    if (translationStyleSelect && translationStyleSelect.dataset.bound !== 'true') {
+        translationStyleSelect.dataset.bound = 'true';
+        translationStyleSelect.addEventListener('change', async () => {
+            const friend = window.imData.currentSettingsFriend;
+            if (friend?.type !== 'char') return;
+            const style = translationStyleSelect.value;
+            const saved = await commitSettingsFriendChange(
+                target => { target.translationStyle = style; },
+                { silent: true },
+            );
+            const latest = window.imApp.getFriendById(friend.id) || friend;
+            if (!saved) {
+                if (window.imData.currentSettingsFriend?.id === friend.id && translationStyleSelect.value === style) {
+                    translationStyleSelect.value = window.imChat.getChatTranslationStyle(latest);
+                }
+                showToast_2('翻译样式保存失败');
+                return;
+            }
+            const page = document.getElementById('chat-interface-' + friend.id);
+            const messages = page?.querySelector('.ins-chat-messages');
+            if (messages) window.imChat.rerenderChatContainer(latest, messages, { scroll: false });
         });
     }
 
